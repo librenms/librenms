@@ -1,65 +1,61 @@
 <?php
 
-$i_i = '0';
-
-echo '<table width=100% border=0 cellpadding=10>';
-echo '<tr><th>Device</th><th>Router Id</th><th>Status</th><th>ABR</th><th>ASBR</th><th>Areas</th><th>Ports</th><th>Neighbours</th></tr>';
-
-// Loop Instances
+echo '
+<div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <table class="table table-condensed" style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Device</th>
+            <th>Router ID</th>
+            <th>Status</th>
+            <th>ABR</th>
+            <th>ASBR</th>
+            <th>Areas</th>
+            <th>Ports(Enabled)</th>
+            <th>Neighbours</th>
+          </tr>
+        </thead>';
 foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'") as $instance) {
-    if (!is_integer($i_i / 2)) {
-        $instance_bg = $list_colour_a;
-    }
-    else {
-        $instance_bg = $list_colour_b;
-    }
 
-    $device = device_by_id_cache($instance['device_id']);
+	$device             = device_by_id_cache($instance['device_id']);
+    $area_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '" . $device['device_id'] . "'");
+    $port_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '" . $device['device_id'] . "'");
+    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '" . $device['device_id'] . "'");
+    $nbr_count           = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '" . $device['device_id'] . "'");
 
-    $area_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'");
-    $port_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."'");
-    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'");
-    $neighbour_count    = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'");
-
-    $ip_query  = 'SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ';
-    $ip_query .= '(A.ipv4_address = ? AND I.port_id = A.port_id)';
-    $ip_query .= ' AND I.device_id = ?';
-
-    $ipv4_host = dbFetchRow($ip_query, array($peer['bgpPeerIdentifier'], $device['device_id']));
+    $status_color = $abr_status_color = $asbr_status_color = 'default';
 
     if ($instance['ospfAdminStat'] == 'enabled') {
-        $enabled = '<span style="color: #00aa00">enabled</span>';
-    }
-    else {
-        $enabled = '<span style="color: #aaaaaa">disabled</span>';
+        $status_color = 'success';
     }
 
     if ($instance['ospfAreaBdrRtrStatus'] == 'true') {
-        $abr = '<span style="color: #00aa00">yes</span>';
-    }
-    else {
-        $abr = '<span style="color: #aaaaaa">no</span>';
+        $abr_status_color = 'success';
     }
 
     if ($instance['ospfASBdrRtrStatus'] == 'true') {
-        $asbr = '<span style="color: #00aa00">yes</span>';
-    }
-    else {
-        $asbr = '<span style="color: #aaaaaa">no</span>';
+        $asbr_status_color = 'success';
     }
 
-    echo '<tr bgcolor="'.$instance_bg.'">';
-    echo '  <td class="list-large">'.generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'ospf')).'</td>';
-    echo '  <td class="list-large">'.$instance['ospfRouterId'].'</td>';
-    echo '  <td>'.$enabled.'</td>';
-    echo '  <td>'.$abr.'</td>';
-    echo '  <td>'.$asbr.'</td>';
-    echo '  <td>'.$area_count.'</td>';
-    echo '  <td>'.$port_count.'('.$port_count_enabled.')</td>';
-    echo '  <td>'.$neighbour_count.'</td>';
-    echo '</tr>';
-
-    $i_i++;
-} //end foreach
-
-echo '</table>';
+   echo '
+        <tbody>
+          <tr>
+            <td></td>
+            <td>' . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'ospf')) . '</td>
+            <td>' . $instance['ospfRouterId'] . '</td>
+            <td><span class="label label-' . $status_color . '">' . $instance['ospfAdminStat'] . '</span></td>
+            <td><span class="label label-' . $abr_status_color  . '">' . $instance['ospfAreaBdrRtrStatus'] . '</span></td>
+            <td><span class="label label-' . $asbr_status_color . '">' . $instance['ospfASBdrRtrStatus'] . '</span></td>
+            <td>' . $area_count . '</td>
+            <td>' . $port_count . '(' . $port_count_enabled . ')</td>
+            <td>' . $nbr_count . '</td>
+          </tr>
+        </tbody>';
+}
+echo '</table>
+    </div>
+  </div>
+</div>';

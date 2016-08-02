@@ -1,17 +1,11 @@
 #### Please note
 
-> Please read this information and delete it once ready.
+> Please read this information carefully.
 
-- Ensure that your install is upto date before submitting an issue. You can ensure you are upto date by running `./daily.sh` as the librenms user. If you experience errors updating then please run `./validate.php`.
+[ ] Is your install up to date? [Updating your install](http://docs.librenms.org/General/Updating/)
 
-- If your issue is a request for us to add a new device then please ensure you provide the following information as pastebin links.
+[ ] Please include all of the information between the `====================================` section of `./validate.php`.
 
-Please replace the relevant information in these commands.
+[ ] If you would like us to add a new device then please provide the information asked for [here](http://docs.librenms.org/Support/FAQ/#faq20)
 
-```bash
-./discovery.php -h HOSTNAME -d -m os
-./poller.php -h HOSTNAME -r -f -d -m os
-snmpbulkwalk -On -v2c -c COMMUNITY HOSTNAME .
-```
-
-If possible please also provide what the OS name should be if it doesn't exist already.
+[ ] Please provide as much detail as possible.
