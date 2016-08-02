@@ -438,11 +438,11 @@ if (passwordscanchange($users_details['username'])) {
                     }//end if
                 }
                 else {
-                    echo print_error('Error getting user details');
+                    print_error('Error getting user details');
                 }//end if
             }
             else {
-                echo print_error("Authentication method doesn't support updating users");
+                print_error("Authentication method doesn't support updating users");
             }//end if
         }//end if
     }
