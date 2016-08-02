@@ -41,6 +41,7 @@ echo ' | Prefixes: ';
 
 if ($vars['view'] == 'prefixes_ipv4unicast') {
     echo "<span class='pagemenu-selected'>";
+    $sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
 }
 
 echo generate_link('IPv4', $link_array, array('view' => 'prefixes_ipv4unicast'));
@@ -63,6 +64,7 @@ echo ' | ';
 
 if ($vars['view'] == 'prefixes_ipv6unicast') {
     echo "<span class='pagemenu-selected'>";
+    $sql = " AND `bgpLocalAddr` LIKE '%:%'";
 }
 
 echo generate_link('IPv6', $link_array, array('view' => 'prefixes_ipv6unicast'));
@@ -98,7 +100,7 @@ echo '<tr style="height: 30px"><td width=1></td><th></th><th>Peer address</th><t
 
 $i = '1';
 
-foreach (dbFetchRows('SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `bgpPEerRemoteAs`, `bgpPeerIdentifier`', array($device['device_id'])) as $peer) {
+foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $sql ORDER BY `bgpPeerRemoteAs`, `bgpPeerIdentifier`", array($device['device_id'])) as $peer) {
     $has_macaccounting = dbFetchCell('SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address', array($peer['bgpPeerIdentifier']));
     unset($bg_image);
     if (!is_integer($i / 2)) {
