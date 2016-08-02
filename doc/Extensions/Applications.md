@@ -47,6 +47,8 @@ Note: if you change the path you will need to change the path in `scripts/agent-
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
+The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
+
 Unlike most other scripts, the MySQL script requires a configuration file `/usr/lib/check_mk_agent/local/mysql.cnf` with following content:
 
 ```php
@@ -56,6 +58,8 @@ $mysql_pass = 'toor';
 $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
+
+Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
 ### NGINX
 
@@ -165,8 +169,7 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 
 | xinetd | systemd |
 | --- | --- |
-| `/etc/init.d/xinetd restart` | `systemctl enable --now check_mk.socket` |
-
+| `/etc/init.d/xinetd restart` | `systemctl enable check_mk.socket && systemctl start check_mk.socket` |
 
 8. Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 9. Then under Applications, enable the apps that you plan to monitor.
