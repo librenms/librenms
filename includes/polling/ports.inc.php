@@ -479,8 +479,8 @@ foreach ($ports as $port) {
                 }
             }
             else if ($port[$oid] != $this_port[$oid]) {
-                $port_tune = get_dev_attrib($device, 'ifName_tune:'.$port['ifName']);
-                $device_tune = get_dev_attrib($device,'override_rrdtool_tune');
+                $port_tune = $attribs['ifName_tune:'.$port['ifName']];
+                $device_tune = $attribs['override_rrdtool_tune'];
                 if ($port_tune == "true" ||
                     ($device_tune == "true" && $port_tune != 'false') || 
                     ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
