@@ -336,14 +336,6 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     return "Could not connect, please check the snmp details and snmp reachability";
 }
 
-function getAddHostErrorMessage($error) {
-    switch($error) {
-        case -1:
-            return "Already got host $host";
-    }
-
-}
-
 function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3, $port_assoc_mode = 'ifIndex') {
     $device = array();
     $device['hostname'] = $host;
