@@ -31,6 +31,17 @@ if ($options['f'] === 'update') {
     exit(0);
 }
 
+if ($options['f'] === 'rrd_purge') {
+    if (is_numeric($config['rrd_purge']) && $config['rrd_purge'] > 0) {
+        $cmd = "find ".$config['rrd_dir']." -type f -mtime +".$config['rrd_purge']." -print -exec rm -f {} +";
+        $purge = `$cmd`;
+        if (!empty($purge)) {
+            echo "Purged the following RRD files due to old age (over ".$config['rrd_purge']." days old):\n";
+            echo $purge;
+        }
+    }
+}
+
 if ($options['f'] === 'syslog') {
     if (is_numeric($config['syslog_purge'])) {
         $rows = dbFetchRow('SELECT MIN(seq) FROM syslog');
