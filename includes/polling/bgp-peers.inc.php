@@ -107,7 +107,7 @@ if ($config['enable_bgp']) {
                         }
                     }
 
-                    $peer_data_tmp   = array_shift(snmp_get_multi(
+                    $peer_data_tmp = snmp_get_multi(
                         $device,
                         array(
                             'jnxBgpM2PeerState.'.$junos[$peer_ip]['oid'],
@@ -124,7 +124,8 @@ if ($config['enable_bgp']) {
                         '-OQnUs',
                         'BGP4-V2-MIB-JUNIPER',
                         $config['mibdir'].'/junos'
-                    ));
+                    );
+                    $peer_data_tmp = array_shift($peer_data_tmp);
                     d_echo($peer_data_tmp);
 
                     $bgpPeerState = $peer_data_tmp['jnxBgpM2PeerState'];
