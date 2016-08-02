@@ -74,6 +74,9 @@ function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=nul
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
     $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'];
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
     $cmd .= ' '.$oids;
 
     if (!$debug) {
