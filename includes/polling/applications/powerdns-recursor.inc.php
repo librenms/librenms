@@ -24,19 +24,27 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-echo ' powerdns-recrusor';
-
 global $config;
 $data = '';
-
 $name = 'powerdns-recursor';
 $app_id = $app['app_id'];
+
+echo ' ' . $name;
+
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];
 } elseif (isset($config['apps'][$name]['api-key'])) {
+    if (isset($config['apps'][$name]['port']) && is_numeric($config['apps'][$name]['port'])) {
+        $port = $config['apps'][$name]['port'];
+    } else {
+        $port = '8082';
+    }
+
+    $scheme = (isset($config['apps'][$name]['https']) && $config['apps'][$name]['https']) ? 'https://' : 'http://';
+
     d_echo("\nNo Agent Data. Attempting to connect directly to the powerdns-recursor server " . $device['hostname'] . ":8082\n");
     $context = stream_context_create(array('http' => array('header' => 'X-API-Key: ' . $config['apps'][$name]['api-key'])));
-    $data = file_get_contents('http://' . $device['hostname'] . ':8082/servers/localhost/statistics', false, $context);
+    $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/servers/localhost/statistics', false, $context);
 }
 
 if (!empty($data)) {
