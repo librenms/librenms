@@ -92,7 +92,11 @@ A recursive DNS server: https://www.powerdns.com/recursor.html
 ##### Direct
 The LibreNMS polling host must be able to connect to port 8082 on the monitored device.
 The web-server must be enabled, see the Recursor docs: https://doc.powerdns.com/md/recursor/settings/#webserver
-There is currently no way to specify a custom port or password.
+
+###### Variables
+`$config['apps']['powerdns-recursor']['api-key']` required, this is defined in the Recursor config
+`$config['apps']['powerdns-recursor']['port']` numeric, defines the port to connect to PowerDNS Recursor on.  The default is 8082
+`$config['apps']['powerdns-recursor']['https']` true or false, defaults to use http.
 
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
