@@ -27,9 +27,10 @@ if (isset($options['g']) && $options['g'] >= 0) {
     array_shift($argv);
     array_unshift($argv, $cmd);
     $poller_group = $options['g'];
-}
-else if ($config['distributed_poller'] === true) {
+} elseif ($config['distributed_poller'] === true) {
     $poller_group = $config['distributed_poller_group'];
+} else {
+    $poller_group = 0;
 }
 
 if (isset($options['f']) && $options['f'] == 0) {
@@ -37,6 +38,8 @@ if (isset($options['f']) && $options['f'] == 0) {
     array_shift($argv);
     array_unshift($argv, $cmd);
     $force_add = 1;
+} else {
+    $force_add = 0;
 }
 
 $port_assoc_mode = $config['default_port_association_mode'];
@@ -46,7 +49,7 @@ if (isset ($options['p'])) {
     if (! in_array ($port_assoc_mode, $valid_assoc_modes)) {
         echo "Invalid port association mode '" . $port_assoc_mode . "'\n";
         echo 'Valid modes: ' . join (', ', $valid_assoc_modes) . "\n";
-        exit;
+        exit(2);
     }
 
     $cmd = array_shift($argv);
@@ -76,6 +79,7 @@ if (!empty($argv[1])) {
             'cryptoalgo' => 'AES',
         );
 
+        // v3
         if ($seclevel === 'nanp' or $seclevel === 'any' or $seclevel === 'noAuthNoPriv') {
             $v3['authlevel'] = 'noAuthNoPriv';
             $v3args          = array_slice($argv, 4);
@@ -84,11 +88,9 @@ if (!empty($argv[1])) {
                 // parse all remaining args
                 if (is_numeric($arg)) {
                     $port = $arg;
-                }
-                else if (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/', $arg)) {
+                } elseif (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/', $arg)) {
                     $transport = $arg;
-                }
-                else {
+                } else {
                     // should add a sanity check of chars allowed in user
                     $user = $arg;
                 }
@@ -97,10 +99,7 @@ if (!empty($argv[1])) {
             if ($seclevel === 'nanp') {
                 array_push($config['snmp']['v3'], $v3);
             }
-
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-        }
-        else if ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
+        } elseif ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
             $v3['authlevel'] = 'authNoPriv';
             $v3args          = array_slice($argv, 4);
             $v3['authname']  = array_shift($v3args);
@@ -110,23 +109,18 @@ if (!empty($argv[1])) {
                 // parse all remaining args
                 if (is_numeric($arg)) {
                     $port = $arg;
-                }
-                else if (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/i', $arg)) {
+                } elseif (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/i', $arg)) {
                     $transport = $arg;
-                }
-                else if (preg_match('/^(sha|md5)$/i', $arg)) {
+                } elseif (preg_match('/^(sha|md5)$/i', $arg)) {
                     $v3['authalgo'] = $arg;
-                }
-                else {
+                } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    return;
+                    exit(2);
                 }
             }
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-        }
-        else if ($seclevel === 'ap' or $seclevel === 'authPriv') {
+        } elseif ($seclevel === 'ap' or $seclevel === 'authPriv') {
             $v3['authlevel']  = 'authPriv';
             $v3args           = array_slice($argv, 4);
             $v3['authname']   = array_shift($v3args);
@@ -137,41 +131,31 @@ if (!empty($argv[1])) {
                 // parse all remaining args
                 if (is_numeric($arg)) {
                     $port = $arg;
-                }
-                else if (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/i', $arg)) {
+                } elseif (preg_match('/^('.implode('|', $config['snmp']['transports']).')$/i', $arg)) {
                     $transport = $arg;
-                }
-                else if (preg_match('/^(sha|md5)$/i', $arg)) {
+                } elseif (preg_match('/^(sha|md5)$/i', $arg)) {
                     $v3['authalgo'] = $arg;
-                }
-                else if (preg_match('/^(aes|des)$/i', $arg)) {
+                } elseif (preg_match('/^(aes|des)$/i', $arg)) {
                     $v3['cryptoalgo'] = $arg;
-                }
-                else {
+                } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    return;
+                    exit(2);
                 }
             }//end while
 
             array_push($config['snmp']['v3'], $v3);
-            $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
         }
-        else {
-            // Error or do nothing ?
-        }//end if
-    }
-    else {
+    } else {
+        // v2c or v1
         $v2args = array_slice($argv, 2);
 
         while ($arg = array_shift($v2args)) {
             // parse all remaining args
             if (is_numeric($arg)) {
                 $port = $arg;
-            }
-            else if (preg_match('/('.implode('|', $config['snmp']['transports']).')/i', $arg)) {
+            } elseif (preg_match('/('.implode('|', $config['snmp']['transports']).')/i', $arg)) {
                 $transport = $arg;
-            }
-            else if (preg_match('/^(v1|v2c)$/i', $arg)) {
+            } elseif (preg_match('/^(v1|v2c)$/i', $arg)) {
                 $snmpver = $arg;
             }
         }
@@ -179,36 +163,20 @@ if (!empty($argv[1])) {
         if ($community) {
             $config['snmp']['community'] = array($community);
         }
-
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
     }//end if
 
-    if ($snmpver) {
-        $snmpversions[] = $snmpver;
-    }
-    else {
-        $snmpversions = array(
-            'v2c',
-            'v3',
-            'v1',
-        );
-    }
+    $result = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
 
-    while (!$device_id && count($snmpversions)) {
-        $snmpver   = array_shift($snmpversions);
-        $device_id = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-    }
-
-    if ($device_id) {
-        $device = device_by_id_cache($device_id);
+    if (is_numeric($result)) {
+        $device = device_by_id_cache($result);
         echo 'Added device '.$device['hostname'].' ('.$device_id.")\n";
-        exit;
+        exit(0);
     }
     else {
-        print $console_color->convert("%rWe couldn't add this device, please check the snmp details%n\n");
+        print $console_color->convert("%rWe couldn't add this device:\n" . $result . "%n\n");
+        exit(1);
     }
-}
-else {
+} else {
 
     print $console_color->convert(
     "\n".$config['project_name_version'].' Add Host Tool
@@ -229,4 +197,5 @@ else {
     %rRemember to run discovery for the host afterwards.%n
 '
     );
+    exit(2);
 }
