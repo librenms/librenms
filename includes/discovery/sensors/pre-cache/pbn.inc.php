@@ -16,6 +16,6 @@ if ($device['os'] == 'pbn') {
     $pbn_oids = array();
     echo 'Caching OIDs:';
 
-    $pbn_oids = snmpwalk_cache_multi_oid($device, 'ifSfpParameterTable', $oids, 'NMS-IF-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/pbn');
+    $pbn_oids = snmpwalk_cache_multi_oid($device, 'ifSfpParameterTable', $pbn_oids, 'NMS-IF-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/pbn');
 
 }
