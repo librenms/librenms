@@ -169,11 +169,11 @@ if (!empty($argv[1])) {
 
     if (is_numeric($result)) {
         $device = device_by_id_cache($result);
-        echo 'Added device '.$device['hostname'].' ('.$device_id.")\n";
+        echo 'Added device '.$device['hostname'].' ('.$result.")\n";
         exit(0);
     }
     else {
-        print $console_color->convert("%rWe couldn't add this device:\n" . $result . "%n\n");
+        print $console_color->convert("%rWe couldn't add this device:\n  " . $result . "%n\n");
         exit(1);
     }
 } else {
