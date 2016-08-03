@@ -10,6 +10,8 @@ Different applications support a variety of ways collect data: by direct connect
 4. [PowerDNS](#powerdns) - Agent
 5. [PowerDNS Recursor](#powerdns-recursor) - Agent
 6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
+7. [OS Updates](#os-updates) - extend SNMP
+
 
 * [Agent Setup](#agent-setup)
 
@@ -120,6 +122,19 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 ```
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
+
+### OS Updates 
+A small shell script that checks your system package manager for any available updates (supports yum/apt/zypper package managers).
+
+##### Extend SNMP
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /opt/os-updates.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend osupdate /opt/os-updates.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
 
 
 Agent Setup
