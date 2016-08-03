@@ -149,13 +149,13 @@ function rrdtool_graph($graph_file, $options)
  * @param string $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
  * @param string $filename The full patth to the rrd file
  * @param string $options rrdtool command options
- * @param integer $timeout seconds give up waiting for output, default 0 usually results in empty output
+ * @param integer $timeout seconds give up waiting for output, default 5, setting this too low may disrupt subsequent rrdtool commands
  * @return array the output of stdout and stderr in an array
  * @global config
  * @global debug
  * @global rrd_pipes
  */
-function rrdtool($command, $filename, $options, $timeout=1)
+function rrdtool($command, $filename, $options, $timeout=5)
 {
     global $config, $debug, $rrd_pipes, $console_color;
 
