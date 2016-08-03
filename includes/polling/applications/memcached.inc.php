@@ -1,6 +1,53 @@
 <?php
 
-$data = $agent_data['app']['memcached'][$app['app_instance']];
+if (!empty($agent_data['app']['memcached'])) {
+    $data = $agent_data['app']['memcached'][$app['app_instance']];
+} else {
+    $options = '-O qv';
+    $oid     = 'nsExtendOutputFull.9.109.101.109.99.97.99.104.101.100';
+    $res     = explode(';' , snmp_get($device, $oid, $options));
+    $values  = [
+        'uptime',
+        'threads',
+        'rusage_user_microseconds',
+        'rusage_system_microseconds',
+        'curr_items',
+        'total_items',
+        'limit_maxbytes',
+        'curr_connections',
+        'total_connections',
+        'connection_structures',
+        'bytes',
+        'cmd_get',
+        'cmd_set',
+        'get_hits',
+        'get_misses',
+        'evictions',
+        'bytes_read',
+        'bytes_written',
+    ];
+
+    $data = array_map(function ($key) use ($res) {
+        return substr($res[$key+1], 2);
+    },
+    array_combine(
+        $values,
+        array_values(
+            array_flip(
+                array_filter(
+                    $res,
+                    function ($item) use ($values) {
+                        foreach ($values as $value) {
+                            if (strpos($item, $value)) {
+                                return true;
+                            }
+                        }
+                    }
+                )
+            )
+        )
+    ));
+}
 
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-memcached-'.$app['app_id'].'.rrd';
 
