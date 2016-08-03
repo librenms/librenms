@@ -149,13 +149,13 @@ function rrdtool_graph($graph_file, $options)
  * @param string $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
  * @param string $filename The full patth to the rrd file
  * @param string $options rrdtool command options
- * @param integer $timeout seconds give up waiting for output, default 5, setting this too low may disrupt subsequent rrdtool commands
+ * @param integer $timeout seconds give up waiting for output, default 0
  * @return array the output of stdout and stderr in an array
  * @global config
  * @global debug
  * @global rrd_pipes
  */
-function rrdtool($command, $filename, $options, $timeout=5)
+function rrdtool($command, $filename, $options, $timeout=0)
 {
     global $config, $debug, $rrd_pipes, $console_color;
 
@@ -179,6 +179,10 @@ function rrdtool($command, $filename, $options, $timeout=5)
         print $console_color->convert('[%rRRD Disabled%n]');
         $output = array(null, null);
     } else {
+        if ( $timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0) ) {
+            // dump existing data
+            stream_get_contents($rrd_pipes[1]);
+        }
 
         fwrite($rrd_pipes[0], $cmd . "\n");
 
@@ -208,10 +212,10 @@ function rrdtool($command, $filename, $options, $timeout=5)
  */
 function rrdtool_create($filename, $options)
 {
-    if (rrdtool_check_rrd_exists($filename)) {
-        return true;
-    }
-    return rrdtool('create', $filename, str_replace(array("\r", "\n"), '', $options));
+    $options = str_replace(array("\r", "\n"), '', $options);
+    $options .= ' -O';  // do not overwrite files with create
+
+    return rrdtool('create', $filename, $options);
 }
 
 /**
@@ -225,7 +229,7 @@ function rrdtool_check_rrd_exists($filename)
 {
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('last', $filename, '', 5); // wait up to 5 seconds
+        $chk = rrdtool('last', $filename, '', 10); // wait up to 10 seconds
         return strpos(implode($chk), "$filename': No such file or directory") === false;
     } else {
         return is_file($filename);
