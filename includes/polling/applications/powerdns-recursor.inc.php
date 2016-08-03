@@ -42,7 +42,7 @@ if ($agent_data['app'][$name]) {
 
     $scheme = (isset($config['apps'][$name]['https']) && $config['apps'][$name]['https']) ? 'https://' : 'http://';
 
-    d_echo("\nNo Agent Data. Attempting to connect directly to the powerdns-recursor server " . $device['hostname'] . ":8082\n");
+    d_echo("\nNo Agent Data. Attempting to connect directly to the powerdns-recursor server $scheme" . $device['hostname'] . ":$port\n");
     $context = stream_context_create(array('http' => array('header' => 'X-API-Key: ' . $config['apps'][$name]['api-key'])));
     $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/servers/localhost/statistics', false, $context);
 }
