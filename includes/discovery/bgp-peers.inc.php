@@ -1,7 +1,7 @@
 <?php
 if ($config['enable_bgp']) {
     // Discover BGP peers
-    
+
     if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     }
@@ -156,8 +156,8 @@ if ($config['enable_bgp']) {
                             $safis[2] = 'multicast';
 
                             if (!isset($j_peerIndexes)) {
-                                $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
-
+                                $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
+                                print_r($j_bgp);
                                 foreach ($j_bgp as $index => $entry) {
                                     switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
                                         case 'ipv4':
