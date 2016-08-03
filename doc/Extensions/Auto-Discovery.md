@@ -1,9 +1,54 @@
 # Auto discovery support
 
+### Getting started with auto discovery.
+
 LibreNMS provides the ability to automatically add devices on your network, we can do this with via 
 a few methods which will be explained below and also indicate if they are enabled by default.
 
 All discovery methods run when discovery.php runs (every 6 hours by default and within 5 minutes for new devices).
+
+The first thing to do though is add the required configuration options to `config.php`.
+
+#### SNMP Details
+
+To add devices automatically we need to know your snmp details, examples of SNMP v1, v2c and v3 are below:
+
+```php
+// v1 or v2c
+$config['snmp']['community'][] = "my_custom_community";
+$config['snmp']['community'][] = "another_community";
+
+// v3
+$config['snmp']['v3'][0]['authlevel'] = 'AuthPriv';
+$config['snmp']['v3'][0]['authname'] = 'my_username';
+$config['snmp']['v3'][0]['authpass'] = 'my_password';
+$config['snmp']['v3'][0]['authalgo'] = 'MD5';
+$config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
+$config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
+```
+
+These details will be attempted when adding devices, you can specify any mixture of these.
+
+#### Your networks
+
+To add devices, we need to know what are your subnets so we don't go blindly attempting to add devices not 
+under your control.
+
+```php
+$config['nets'][] = '192.168.0.0/24';
+$config['nets'][] = '172.2.4.0/22';
+```
+
+#### Exclusions
+
+If you have added a network as above but a single device exists within it that you can't auto 
+add, then you can exclude this with the following:
+
+```php
+$config['autodiscovery']['nets-exclude'][] = '192.168.0.1/32';
+```
+
+If you want to enable / disable certain auto-discovery modules then see the rest of this doc for further info.
 
 ### Discovery methods
 
@@ -30,23 +75,6 @@ Enabled by default.
 `$config['autodiscovery']['bgp'] = false;` to disable.
 
 This module is invoked from bgp-peers discovery module.
-
-### Including / Excluding subnets to scan
-
-By default the following config is in place to exclude loopback, multicast, etc ranges. You can expand this out by adding more 
-ranges to config.php
-
-```php
-$config['autodiscovery']['nets-exclude'][] = '0.0.0.0/8';
-$config['autodiscovery']['nets-exclude'][] = '127.0.0.0/8';
-$config['autodiscovery']['nets-exclude'][] = '169.254.0.0/16';
-$config['autodiscovery']['nets-exclude'][] = '224.0.0.0/4';
-$config['autodiscovery']['nets-exclude'][] = '240.0.0.0/4';
-```
-
-You will need to specify your own subnets that you would like to scan for which can be done with:
-
-`$config['nets'][] = '8.8.8.0/24';`
 
 #### Discovering devices by IP
 
