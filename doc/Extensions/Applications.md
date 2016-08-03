@@ -11,7 +11,7 @@ Different applications support a variety of ways collect data: by direct connect
 5. [PowerDNS Recursor](#powerdns-recursor) - Agent
 6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 7. [OS Updates](#os-updates) - extend SNMP
-
+8. [DHCP Stats](#dhcp-stats) - extend SNMP
 
 * [Agent Setup](#agent-setup)
 
@@ -135,6 +135,20 @@ extend osupdate /opt/os-updates.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
+
+
+### DHCP Stats
+A small shell script that reports current DHCP leases stats.
+
+##### Extend SNMP
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /opt/dhcp-status.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /opt/dhcp-status.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
 
 
 Agent Setup
