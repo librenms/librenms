@@ -113,6 +113,7 @@ LibreNMS contributors:
 - Andy Noyland <andrew@noyland.co.uk> (Zappatron) 
 - Cercel Valentin <crc@nuamchefazi.ro> (crcro)
 - Ahmed Sajid <ahmed4343@hotmail.com> (ahmedsajid)
+- Karsten Schmidt <git@guggemand.dk> (guggemand)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
