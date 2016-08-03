@@ -7,6 +7,8 @@ a few methods which will be explained below and also indicate if they are enable
 
 All discovery methods run when discovery.php runs (every 6 hours by default and within 5 minutes for new devices).
 
+> Please note that you need at least ONE device added before auto-discovery will work.
+
 The first thing to do though is add the required configuration options to `config.php`.
 
 #### SNMP Details
@@ -75,6 +77,16 @@ Enabled by default.
 `$config['autodiscovery']['bgp'] = false;` to disable.
 
 This module is invoked from bgp-peers discovery module.
+
+#### SNMP Scan
+This isn't actually an auto- mechanism but manually invoked.
+
+It's designed to scan through all of the subnets in your config or what you have manually specified 
+to automatically add devices. An example of it's usage is:
+
+```bash
+./snmp-scan.php r 192.168.0.0/24
+```
 
 #### Discovering devices by IP
 
