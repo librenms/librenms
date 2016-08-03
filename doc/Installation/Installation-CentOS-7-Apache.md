@@ -160,6 +160,7 @@ Now that you've installed LibreNMS, we'd suggest that you have a read of a few o
  - (Performance tuning)[http://docs.librenms.org/Support/Performance]
  - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
  - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
+ - (Auto discovery)[http://docs.librenms.org/Extensions/Auto-Discovery/]
 
 #### Closing
 
