@@ -132,7 +132,7 @@ $complete = 1;
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        <h4 class="text-center">Stage <?php echo $stage; ?> of <?php echo $total_stages; ?> complete</h2>
+        <h4 class="text-center">Stage <?php echo $stage; ?> of <?php echo $total_stages; ?> complete</h4>
       </div>
       <div class="col-md-3">
       </div>
