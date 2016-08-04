@@ -56,6 +56,8 @@ $graphs['tinydns']   = array(
     'other',
 );
 
+$graphs['os-updates'] = array('');
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
