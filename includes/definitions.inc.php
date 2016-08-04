@@ -1048,7 +1048,7 @@ $config['os'][$os]['over'][3]['text'] = 'Storage Usage';
 
 $os = 'equallogic';
 $config['os'][$os]['text']             = 'Dell EqualLogic';
-$config['os'][$os]['type'] 	       = 'storage';
+$config['os'][$os]['type'] 	           = 'storage';
 $config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
