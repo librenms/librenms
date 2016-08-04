@@ -1,13 +1,24 @@
 <?php
-$sysObjectId = $poll_device['sysObjectID'];
-switch ($sysObjectId) {
-case '.1.3.6.1.4.1.674.10895.3031':
+$trimmed_sysObjectId = ltrim($device["sysObjectID"],"enterprise.");
+switch ($trimmed_sysObjectId) {
+case '674.10895.3031':
     /*
      * Devices supported:
      * Dell Powerconnect 55xx
      */
     $proc = snmp_get($device, $processor['processor_oid'], '-O Uqnv', '""');
     break;
+
+case '674.10895.3024':
+     /*
+      * Devices supported:
+      * Dell Powerconnect 8024F
+      */
+      $values = trim(snmp_get($device, $processor['processor_oid'], '-O Uqnv'), '""');
+      $values = ltrim($values,' ');
+      preg_match('/(\d*\.\d*)/', $values, $matches);
+      $proc = $matches[0];
+      break;
 
 default:
     $values = trim(snmp_get($device, 'dellLanExtension.6132.1.1.1.1.4.4.0', '-OvQ', 'Dell-Vendor-MIB'), '"');
