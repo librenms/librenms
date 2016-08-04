@@ -127,8 +127,8 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
-### OS Updates 
-A small shell script that checks your system package manager for any available updates (supports yum/apt/zypper package managers).
+### OS Updates
+A small shell script that checks your system package manager for any available updates (supports yum/apt-get/zypper package managers).
 
 ##### Extend SNMP
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
@@ -140,6 +140,8 @@ extend osupdate /opt/os-updates.sh
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
 
+_Note_: apt-get depends on an updated package index. There are several ways to have your system run `apt-get update` automatically. The easiest is to create `/etc/apt/apt.conf.d/10periodic` and pasting the following in it: `APT::Periodic::Update-Package-Lists "1";`.
+If you have apticron, cron-apt or apt-listchanges installed and configured, chances are that packages are already updated periodically.
 
 Agent Setup
 -----------
