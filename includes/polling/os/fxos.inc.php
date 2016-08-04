@@ -2,20 +2,17 @@
 /*
  * LibreNMS
  *
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
-if ($device['os'] == 'pbn') {
-
-    echo 'Pre-cache PBN: ';
-
-    $pbn_oids = array();
-    echo 'Caching OIDs:';
-
-    $pbn_oids = snmpwalk_cache_multi_oid($device, 'ifSfpParameterTable', $pbn_oids, 'NMS-IF-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/pbn');
-
+ 
+if (preg_match('/Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
+    $version = $regexp_result[1];
 }
+
+$serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerialNum.10", "-Osqnv");
+$hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');

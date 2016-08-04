@@ -25,6 +25,10 @@ if (!$os) {
         //Dell N4064F
         $os = 'dnos';
     }
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3057')) {
+        //Dell N3024
+        $os = 'dnos';
+    }
     if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3058')) {
         //Dell N3048P
         $os = 'dnos';
