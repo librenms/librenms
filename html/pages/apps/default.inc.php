@@ -23,7 +23,7 @@ foreach ($app_devices as $app_device) {
         <div class="row">';
 
     foreach ($graphs[$vars['app']] as $graph_type) {
-    $graph_array['type']          = 'application_'.$vars['app'].'_'.$graph_type;
+        $graph_array['type']      = empty($graph_type) ? 'application_'.$vars['app'] : 'application_'.$vars['app'].'_'.$graph_type;
         $graph_array['id']        = $app_device['app_id'];
         $graph_array_zoom['type'] = 'application_'.$vars['app'].'_'.$graph_type;
         $graph_array_zoom['id']   = $app_device['app_id'];
