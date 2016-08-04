@@ -901,7 +901,7 @@ $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'fabos';
 $config['os'][$os]['text']             = 'Brocade FabricOS';
-$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'brocade';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
