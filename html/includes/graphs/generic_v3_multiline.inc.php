@@ -119,3 +119,4 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' HRULE:0#555555';
 }
 
+
