@@ -290,13 +290,13 @@ function add_device() {
     }
     if (empty($message)) {
         $result = addHost($hostname, $snmpver, $port, $transport, 1, $poller_group, $force_add);
-        if ($result) {
+        if (is_numeric($result)) {
             $code    = 201;
             $status  = 'ok';
             $message = "Device $hostname has been added successfully";
         }
         else {
-            $message = "Failed adding $hostname";
+            $message = $result;
         }
     }
 

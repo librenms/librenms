@@ -76,6 +76,9 @@ If the page you are trying to load has a substantial amount of data in it then i
 
 The easiest way to check if all is well is to run `./validate.php` as root from within your install directory. This should give you info on why things aren't working.
 
+One other reason could be a restricted snmpd.conf file or snmp view which limits the data sent back. If you use net-snmp then we suggest using 
+the (included snmpd.conf)[https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example] file.
+
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
 A debug system is in place which enables you to see the output from php errors, warnings and notices along with the MySQL queries that have been run for that page.

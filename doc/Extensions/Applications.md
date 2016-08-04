@@ -94,7 +94,11 @@ A recursive DNS server: https://www.powerdns.com/recursor.html
 ##### Direct
 The LibreNMS polling host must be able to connect to port 8082 on the monitored device.
 The web-server must be enabled, see the Recursor docs: https://doc.powerdns.com/md/recursor/settings/#webserver
-There is currently no way to specify a custom port or password.
+
+###### Variables
+`$config['apps']['powerdns-recursor']['api-key']` required, this is defined in the Recursor config
+`$config['apps']['powerdns-recursor']['port']` numeric, defines the port to connect to PowerDNS Recursor on.  The default is 8082
+`$config['apps']['powerdns-recursor']['https']` true or false, defaults to use http.
 
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
@@ -123,8 +127,8 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
-### OS Updates 
-A small shell script that checks your system package manager for any available updates (supports yum/apt/zypper package managers).
+### OS Updates
+A small shell script that checks your system package manager for any available updates (supports yum/apt-get/zypper package managers).
 
 ##### Extend SNMP
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
@@ -136,6 +140,8 @@ extend osupdate /opt/os-updates.sh
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
 
+_Note_: apt-get depends on an updated package index. There are several ways to have your system run `apt-get update` automatically. The easiest is to create `/etc/apt/apt.conf.d/10periodic` and pasting the following in it: `APT::Periodic::Update-Package-Lists "1";`.
+If you have apticron, cron-apt or apt-listchanges installed and configured, chances are that packages are already updated periodically.
 
 Agent Setup
 -----------
