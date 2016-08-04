@@ -50,31 +50,35 @@ function data_uri($file, $mime) {
 }//end data_uri()
 
 
-function nicecase($item) {
+function nicecase($item)
+{
     switch ($item) {
-    case 'dbm':
-        return 'dBm';
+        case 'dbm':
+            return 'dBm';
 
-    case 'mysql':
-        return ' MySQL';
+        case 'mysql':
+            return ' MySQL';
 
-    case 'powerdns':
-        return 'PowerDNS';
+        case 'powerdns':
+            return 'PowerDNS';
 
-    case 'bind':
-        return 'BIND';
+        case 'bind':
+            return 'BIND';
 
-    case 'nfs-stats':
-        return 'NFS Stats';
+        case 'nfs-stats':
+            return 'NFS Stats';
 
-    case 'nfs-v3-stats':
-        return 'NFS v3 Stats';
+        case 'nfs-v3-stats':
+            return 'NFS v3 Stats';
 
-    case 'os-updates':
-	return 'OS Updates';
+        case 'os-updates':
+            return 'OS Updates';
 
-    default:
-        return ucfirst($item);
+        case 'powerdns-recursor':
+            return 'PowerDNS Recursor';
+
+        default:
+            return ucfirst($item);
     }
 
 }//end nicecase()
