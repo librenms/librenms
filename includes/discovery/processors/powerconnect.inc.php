@@ -20,4 +20,3 @@ if ($device['os'] == 'powerconnect') {
         }
     }
 }
-
