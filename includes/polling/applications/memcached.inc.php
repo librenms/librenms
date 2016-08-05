@@ -6,7 +6,7 @@ if (!empty($agent_data['app']['memcached'])) {
     $options = '-O qv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
     $result  = snmp_get($device, $oid, $options);
-    $result  = unserialize(str_replace("<<<app-memcached>>>\n", '', $result));
+    $result  = array_values(unserialize(str_replace("<<<app-memcached>>>\n", '', $result)));
     $data    = $result[0];
 }
 
@@ -17,25 +17,25 @@ echo ' memcached('.$app['app_instance'].')';
 if (!is_file($rrd_filename)) {
     rrdtool_create(
         $rrd_filename,
-        '--step 300 
-        DS:uptime:GAUGE:600:0:125000000000 
-        DS:threads:GAUGE:600:0:125000000000 
-        DS:rusage_user_ms:DERIVE:600:0:125000000000 
-        DS:rusage_system_ms:DERIVE:600:0:125000000000 
-        DS:curr_items:GAUGE:600:0:125000000000 
-        DS:total_items:DERIVE:600:0:125000000000 
-        DS:limit_maxbytes:GAUGE:600:0:125000000000 
-        DS:curr_connections:GAUGE:600:0:125000000000 
-        DS:total_connections:DERIVE:600:0:125000000000 
-        DS:conn_structures:GAUGE:600:0:125000000000 
-        DS:bytes:GAUGE:600:0:125000000000 
-        DS:cmd_get:DERIVE:600:0:125000000000 
-        DS:cmd_set:DERIVE:600:0:125000000000 
-        DS:get_hits:DERIVE:600:0:125000000000 
-        DS:get_misses:DERIVE:600:0:125000000000 
-        DS:evictions:DERIVE:600:0:125000000000 
-        DS:bytes_read:DERIVE:600:0:125000000000 
-        DS:bytes_written:DERIVE:600:0:125000000000 
+        '--step 300
+        DS:uptime:GAUGE:600:0:125000000000
+        DS:threads:GAUGE:600:0:125000000000
+        DS:rusage_user_ms:DERIVE:600:0:125000000000
+        DS:rusage_system_ms:DERIVE:600:0:125000000000
+        DS:curr_items:GAUGE:600:0:125000000000
+        DS:total_items:DERIVE:600:0:125000000000
+        DS:limit_maxbytes:GAUGE:600:0:125000000000
+        DS:curr_connections:GAUGE:600:0:125000000000
+        DS:total_connections:DERIVE:600:0:125000000000
+        DS:conn_structures:GAUGE:600:0:125000000000
+        DS:bytes:GAUGE:600:0:125000000000
+        DS:cmd_get:DERIVE:600:0:125000000000
+        DS:cmd_set:DERIVE:600:0:125000000000
+        DS:get_hits:DERIVE:600:0:125000000000
+        DS:get_misses:DERIVE:600:0:125000000000
+        DS:evictions:DERIVE:600:0:125000000000
+        DS:bytes_read:DERIVE:600:0:125000000000
+        DS:bytes_written:DERIVE:600:0:125000000000
         '.$config['rrd_rra']
     );
 }
