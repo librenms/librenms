@@ -73,6 +73,9 @@ function nicecase($item) {
     case 'os-updates':
 	return 'OS Updates';
 
+    case 'dhcp-stats':
+        return 'DHCP Stats';
+
     default:
         return ucfirst($item);
     }
