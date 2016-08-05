@@ -12,6 +12,8 @@ Different applications support a variety of ways collect data: by direct connect
 6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 7. [OS Updates](#os-updates) - extend SNMP
 8. [DHCP Stats](#dhcp-stats) - extend SNMP
+9. [Memcached](#memcached) - extend SNMP
+
 
 * [Agent Setup](#agent-setup)
 
@@ -156,6 +158,15 @@ extend dhcpstats /opt/dhcp-status.sh
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
 
+### Memcached
+1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/usr/local/bin` (or any other suitable location) on your remote server.
+2. Make the script executable: `chmod +x /usr/local/memcached`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend memcached /usr/local/bin/memcached
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
 Agent Setup
 -----------
