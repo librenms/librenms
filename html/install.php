@@ -539,6 +539,11 @@ elseif($stage == "4") {
 elseif($stage == "6") {
 ?>
     <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+            <div class="alert alert-danger">You haven't quite finished yet - please go back to the install docs and carry on the necessary steps to finish the setup!</div>
+        </div>
+    </div>
+    <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
