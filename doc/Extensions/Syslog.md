@@ -114,12 +114,11 @@ Ancient versions of rsyslog may require different syntax.
 
 This is an example for rsyslog 5 (default on Debian 7):
 ```bash
-# Feed syslog messages to librenms                                                                                                                                                  
-$ModLoad omprog                                                                                                                                                                      
-                                                                                                                                                                                     
-$template librenms,"%FROMHOST%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timereported:8:25%||%msg%||%programname%\n"              
-                                                                                                                                                                                     
-$ActionOMProgBinary /opt/librenms/syslog.php                                                                                                                                        
+# Feed syslog messages to librenms
+$ModLoad omprog
+$template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%\n"
+
+$ActionOMProgBinary /opt/librenms/syslog.php
 *.* :omprog:;librenms
 ```
 
