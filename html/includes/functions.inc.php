@@ -77,8 +77,8 @@ function nicecase($item)
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
-	case 'dhcp-stats':
-		return 'DHCP Stats';
+        case 'dhcp-stats':
+            return 'DHCP Stats';
 
         default:
             return ucfirst($item);
