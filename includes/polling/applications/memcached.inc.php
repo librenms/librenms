@@ -1,6 +1,14 @@
 <?php
 
-$data = $agent_data['app']['memcached'][$app['app_instance']];
+if (!empty($agent_data['app']['memcached'])) {
+    $data = $agent_data['app']['memcached'][$app['app_instance']];
+} else {
+    $options = '-O qv';
+    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
+    $result  = snmp_get($device, $oid, $options);
+    $result  = unserialize(str_replace("<<<app-memcached>>>\n", '', $result));
+    $data    = $result[0];
+}
 
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-memcached-'.$app['app_id'].'.rrd';
 
