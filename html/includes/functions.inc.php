@@ -74,11 +74,19 @@ function nicecase($item)
         case 'os-updates':
             return 'OS Updates';
 
+<<<<<<< HEAD
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
         default:
             return ucfirst($item);
+=======
+    case 'dhcp-stats':
+        return 'DHCP Stats';
+
+    default:
+        return ucfirst($item);
+>>>>>>> 777d3757aedd4814410e837575a59cc6303f811a
     }
 
 }//end nicecase()
