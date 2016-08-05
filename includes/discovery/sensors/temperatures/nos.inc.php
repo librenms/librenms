@@ -16,7 +16,7 @@ if ($device['os'] == "nos") {
             {
                 $descr = str_replace('"', '', $descr);
                 $descr = trim($descr);
-                discover_sensor($valid['sensor'], 'temperature', $device, $value_oid, $data[35], 'nos', $descr, '1', '1', null, null, '80', '100');
+                discover_sensor($valid['sensor'], 'temperature', $device, $value_oid, $data[35], 'nos', $descr, '1', '1', null, null, '80', '100', $value);
             }
         }
     }
