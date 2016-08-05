@@ -16,6 +16,7 @@ $pagetitle[] = 'Syslog';
 <table id="syslog" class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
+            <th data-column-id="priority">&nbsp;</th>
             <th data-column-id="timestamp" data-order="desc">Datetime</th>
             <th data-column-id="device_id">Hostname</th>
             <th data-column-id="program">Program</th>
@@ -67,6 +68,21 @@ var grid = $("#syslog").bootgrid({
                 "</select>"+
                 "</div>"+
                 "<div class=\"form-group\">"+
+                "<select name=\"priority\" id=\"priority\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Priorities</option>"+
+                <?php
+                foreach (dbFetchRows('SELECT DISTINCT `priority` FROM `syslog` ORDER BY `level`') as $data) {
+                    echo '"<option value=\"'.$data['priority'].'\"';
+                    if ($data['priority'] == $vars['priority']) {
+                        echo ' selected';
+                    }
+
+                    echo '>'.$data['priority'].'</option>"+';
+                }
+                ?>
+                "</select>"+
+                "</div>"+
+                "<div class=\"form-group\">"+
                 "<input name=\"from\" type=\"text\" class=\"form-control input-sm\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"<?php echo $vars['from']; ?>\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
                 "</div>"+
                 "<div class=\"form-group\">"+
@@ -83,6 +99,7 @@ var grid = $("#syslog").bootgrid({
             id: "syslog",
             device: '<?php echo htmlspecialchars($vars['device']); ?>',
             program: '<?php echo htmlspecialchars($vars['program']); ?>',
+            priority: '<?php echo htmlspecialchars($vars['priority']); ?>',
             to: '<?php echo htmlspecialchars($vars['to']); ?>',
             from: '<?php echo htmlspecialchars($vars['from']); ?>',
         };
