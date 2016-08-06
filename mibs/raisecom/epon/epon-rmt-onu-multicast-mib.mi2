@@ -1,0 +1,292 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-multicast-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2007
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-MULTICAST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        rcEponOnuEthPortIndex FROM EPON-RMT-ONU-PORT-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuMulticastGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 16 }
+-------------------------------------------------------------------------------------------
+
+--
+-- rcEponOnuCtcMulticastTable
+--
+
+    rcEponOnuCtcMulticastTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcMulticastEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU UNI multicast management table."
+        ::= { rcEponOnuMulticastGroup 1 }
+
+    rcEponOnuCtcMulticastEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcMulticastEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU UNI multicast management table entry."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuCtcMulticastTable 1 }
+
+    RcEponOnuCtcMulticastEntry ::= SEQUENCE {
+        rcEponOnuCtcMulticastSwitch                INTEGER,
+        rcEponOnuCtcMulticastFastLeaveAblityBitMap OCTET STRING,
+        rcEponOnuCtcMulticastFastLeaveAdminState   EnableVar,
+        rcEponOnuCtcMulticastFastLeaveAdminCtrl    EnableVar
+       }
+              
+    rcEponOnuCtcMulticastSwitch OBJECT-TYPE
+        SYNTAX INTEGER {
+               igmp_snooping(0),
+               ctrl_multicast(1),
+               transparent(2),
+               igmp_proxy(3)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL { 0 }
+        ::= { rcEponOnuCtcMulticastEntry 1 }  
+        
+    rcEponOnuCtcMulticastFastLeaveAblityBitMap OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..1))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastEntry 2 }  
+        
+    rcEponOnuCtcMulticastFastLeaveAdminState OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastEntry 3 }  
+        
+    rcEponOnuCtcMulticastFastLeaveAdminCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastEntry 4 }  
+        
+--
+-- rcEponOnuCtcMulticastPortTable
+--
+
+    rcEponOnuCtcMulticastPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcMulticastPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU UNI multicast management table."
+        ::= { rcEponOnuMulticastGroup 2 }
+
+    rcEponOnuCtcMulticastPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcMulticastPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU UNI multicast management table entry."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuCtcMulticastPortTable 1 }
+
+    RcEponOnuCtcMulticastPortEntry ::= SEQUENCE {
+        rcEponOnuCtcMulticastPortGroupMaxNum        	INTEGER,
+        rcEponOnuCtcMulticastPortMcastVlanTagCtrl   	INTEGER,
+        rcEponOnuCtcMulticastPortMcastVlanList      	OCTET STRING,
+        rcEponOnuCtcMulticastPortMcastVlanXlateVlanList OCTET STRING
+       }
+       
+    rcEponOnuCtcMulticastPortGroupMaxNum OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastPortEntry 1 }  
+        
+    rcEponOnuCtcMulticastPortMcastVlanTagCtrl OBJECT-TYPE
+        SYNTAX INTEGER {
+               no_striped(0),
+               striped(1),
+               translation(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastPortEntry 2 }  
+        
+    rcEponOnuCtcMulticastPortMcastVlanList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastPortEntry 3 }  
+        
+    rcEponOnuCtcMulticastPortMcastVlanXlateVlanList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcMulticastPortEntry 4 }  
+       
+--
+-- rcEponOnuIgmpSnoopingTable
+--
+    rcEponOnuIgmpSnoopingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuIgmpSnoopingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU IGMP management table."
+        ::= { rcEponOnuMulticastGroup 3 }
+
+    rcEponOnuIgmpSnoopingEntry OBJECT-TYPE
+        SYNTAX RcEponOnuIgmpSnoopingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU IGMP management table entry."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuIgmpSnoopingTable 1 }
+
+    RcEponOnuIgmpSnoopingEntry ::= SEQUENCE {
+        rcEponOnuIgmpSnoopingMembershipAgingTime     INTEGER,
+        rcEponOnuIgmpSnoopingLastMemberQueryCount    INTEGER,
+        rcEponOnuIgmpSnoopingLastMemberQueryInterval INTEGER,
+        rcEponOnuIgmpSnoopingSnoopingVlanAwareAdmin  EnableVar
+       }
+
+   rcEponOnuIgmpSnoopingMembershipAgingTime OBJECT-TYPE
+        SYNTAX INTEGER(30..3600)
+        UNITS "s" 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL { 300 }
+        ::= { rcEponOnuIgmpSnoopingEntry 1 }
+
+   rcEponOnuIgmpSnoopingLastMemberQueryCount OBJECT-TYPE
+        SYNTAX INTEGER(1..16)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Limit on times of IGMP query timeout triggered by IGMP Leave packets."
+        DEFVAL { 2 }
+        ::= { rcEponOnuIgmpSnoopingEntry 2 }
+
+   rcEponOnuIgmpSnoopingLastMemberQueryInterval OBJECT-TYPE
+        SYNTAX INTEGER(1..25)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Limit on maximum response time in second units of IGMP snooping query triggered by IGMP Leave packets."
+        DEFVAL { 20 }
+        ::= { rcEponOnuIgmpSnoopingEntry 3 }
+ 
+ 
+    rcEponOnuIgmpSnoopingSnoopingVlanAwareAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuIgmpSnoopingEntry 4 }
+        
+--
+-- rcEponOnuIgmpProxyTable
+--
+    rcEponOnuIgmpProxyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuIgmpProxyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU IGMP management table."
+        ::= { rcEponOnuMulticastGroup 4 }
+
+    rcEponOnuIgmpProxyEntry OBJECT-TYPE
+        SYNTAX RcEponOnuIgmpProxyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ONU IGMP management table entry."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuIgmpProxyTable 1 }
+
+    RcEponOnuIgmpProxyEntry ::= SEQUENCE {
+        rcEponOnuIgmpProxyVlan             INTEGER,
+        rcEponOnuIgmpProxyIpAddress        IpAddress,
+        rcEponOnuIgmpProxyQueryInterval    INTEGER,
+        rcEponOnuIgmpProxyQueryRspInterval INTEGER
+       }
+
+   rcEponOnuIgmpProxyVlan OBJECT-TYPE
+        SYNTAX INTEGER(0..4095)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL { 4095 }
+        ::= { rcEponOnuIgmpProxyEntry 1 }
+
+   rcEponOnuIgmpProxyIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuIgmpProxyEntry 2 }
+        
+   rcEponOnuIgmpProxyQueryInterval OBJECT-TYPE
+        SYNTAX INTEGER(1..21600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL { 25 }
+        ::= { rcEponOnuIgmpProxyEntry 3 }
+
+   rcEponOnuIgmpProxyQueryRspInterval OBJECT-TYPE
+        SYNTAX INTEGER(1..25)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL { 10 }
+        ::= { rcEponOnuIgmpProxyEntry 4 }
+        
+END

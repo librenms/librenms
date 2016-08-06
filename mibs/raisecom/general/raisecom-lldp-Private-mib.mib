@@ -1,0 +1,110 @@
+--MibName=rcLldpPrivate
+   LLDP-PRI-MIB DEFINITIONS ::= BEGIN 
+   
+IMPORTS         
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        									FROM SNMPv2-SMI
+      	TruthValue				FROM SNMPv2-TC 
+        ifIndex   			    FROM IF-MIB
+        raisecomPonCommon       FROM RAISECOM-PONSERIES-BASE-MIB;
+
+rcLldp 			 OBJECT IDENTIFIER ::= { raisecomPonCommon 10 }
+
+rcLldpPrivate MODULE-IDENTITY 
+        LAST-UPDATED "201001040000Z"  -- Jan 4,2010"
+        ORGANIZATION 
+          "raisecom"
+        CONTACT-INFO 
+          "          "
+        DESCRIPTION
+          "The MIB module for private canfiguration of lldp."
+   
+        REVISION    "201001040000Z"  -- Jan 4, 2010"
+        DESCRIPTION ""
+     
+         ::= { rcLldp 2 }
+      
+      -- 
+      -- Sections of the raisecom LLDP MIB
+      --
+
+rcLldpPrivateConfig 			   OBJECT IDENTIFIER ::= { rcLldpPrivate 1 }
+rcLldpPrivatePortConfig		 OBJECT IDENTIFIER ::= { rcLldpPrivate 2 }
+
+        
+-- ***************************************************************
+--
+-- private LLDP objectes group
+--
+
+
+rcLldpPrivateEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    DEFVAL     { FALSE }
+    ::= { rcLldpPrivateConfig 1 }
+
+rcLldpPrivateNotificationEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    DEFVAL     { TRUE }
+    ::= { rcLldpPrivateConfig 2 }
+    
+rcLldpPrivatePortConfigTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF rcLldpPrivatePortConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION 
+	  "A table of LldpPrivate port configuration. "   
+	::= { rcLldpPrivatePortConfig 1 }
+
+rcLldpPrivatePortConfigEntry OBJECT-TYPE
+	SYNTAX     rcLldpPrivatePortConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+	  "Table entry for LldpPrivate port configuration."
+	INDEX       { ifIndex }
+	::= { rcLldpPrivatePortConfigTable 1 }
+
+rcLldpPrivatePortConfigEntry ::=
+	SEQUENCE {
+	  rcLldpPrivatePortEnable			TruthValue,
+	  rcLldpPrivateClearPortStatistic TruthValue,
+	  rcLldpPrivateClearPortRemTablesEntries TruthValue
+}
+      
+rcLldpPrivatePortEnable OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION 
+	  "Enable or disable port LldpPrivate function." 
+	DEFVAL     { TRUE }
+	 ::= { rcLldpPrivatePortConfigEntry 1 }
+
+rcLldpPrivateClearPortStatistic OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION 
+	  "Clear port statistic information." 
+	DEFVAL     { FALSE }
+	 ::= { rcLldpPrivatePortConfigEntry 2 }
+	 
+rcLldpPrivateClearPortRemTablesEntries OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION 
+	  "Clear port remote information."
+	DEFVAL     { FALSE }
+	 ::= { rcLldpPrivatePortConfigEntry 3 }	 
+
+END

@@ -1,0 +1,147 @@
+--MibName=rcLinkStateTrack
+-- *****************************************************************
+-- switch-linkStateTrack-mib.MIB:	 switch link state track MIB file
+--
+-- feb 2008, zhangjun
+--
+-- Copyright (c) 1994-2004,	2001 by	Raisecom, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+SWITCH-LINKSTATETRACK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        iscomSwitch			
+         				FROM RAISECOM-BASE-MIB
+        RowStatus,TruthValue
+                FROM SNMPv2-TC
+        EnableVar	
+                FROM SWITCH-TC
+        ifIndex  
+        		FROM IF-MIB;
+                 
+     rcLinkStateTrack MODULE-IDENTITY
+        LAST-UPDATED    "200802280000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "Raisecom Systems
+                        
+                Postal: Beijing,
+                        China
+
+                Tel: 86-010-82884499
+
+                E-mail: zhangjun@raisecom.com"
+        DESCRIPTION
+                "description of link state track group manage object."
+                ::= { iscomSwitch 33}  
+                
+-- rcLinkStateTrackGroupTable
+
+	rcLinkStateTrackGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RcLinkStateTrackGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of link state track group"
+    ::={ rcLinkStateTrack 1 }
+    
+
+	rcLinkStateTrackGroupEntry OBJECT-TYPE
+    SYNTAX      RcLinkStateTrackGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rcLinkStateTrackGroupTable provides objects .
+        "
+    INDEX        { rcLinkStateTrackGroupIndex }
+    ::={ rcLinkStateTrackGroupTable 1 }
+    
+	RcLinkStateTrackGroupEntry ::= SEQUENCE {
+		rcLinkStateTrackGroupIndex  INTEGER,
+		rcLinkStateTrackState	INTEGER,
+		rcLinkStateTrackGroupEnable	INTEGER,
+		rcLinkStateTrackRowStatus	RowStatus
+	}
+
+
+	rcLinkStateTrackGroupIndex OBJECT-TYPE
+		SYNTAX	INTEGER(1..10)
+		ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An index that uniquely identifies an entry in
+             the link state track group table."
+		::=	{ rcLinkStateTrackGroupEntry 1 }
+
+
+	rcLinkStateTrackState OBJECT-TYPE
+		SYNTAX	INTEGER { normal(1), failover(2) }
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The state of link state tracking for a Link-State-Tracking group, Normal or Failover"
+		::=	{ rcLinkStateTrackGroupEntry 2 }
+		
+	rcLinkStateTrackGroupEnable OBJECT-TYPE
+		SYNTAX	EnableVar
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"The state of this link state track group, Enable or Disable"
+		::=	{ rcLinkStateTrackGroupEntry 3 }
+		
+	rcLinkStateTrackRowStatus OBJECT-TYPE
+		SYNTAX	RowStatus
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"The status	of this	entry"
+		::=	{ rcLinkStateTrackGroupEntry 4 }
+		
+		
+-- rcLinkStateTrackIfTable
+
+	rcLinkStateTrackIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RcLinkStateTrackIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of link state track interface config"
+    ::={ rcLinkStateTrack 2 }
+    
+  rcLinkStateTrackIfEntry OBJECT-TYPE
+    SYNTAX      RcLinkStateTrackIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rcLinkStateTrackIfTable provides objects.
+        "
+    INDEX        { ifIndex }
+    ::={ rcLinkStateTrackIfTable 1 }
+    
+    RcLinkStateTrackIfEntry ::= SEQUENCE {
+		rcLinkStateTrackIfOwerGroup	INTEGER,
+		rcLinkStateTrackIfStreamType	INTEGER
+	}
+			
+	rcLinkStateTrackIfOwerGroup OBJECT-TYPE
+		SYNTAX	INTEGER(0..10)
+		ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"link state group number of the interface.
+			 Set '0' means that the port dose not belong to any group."
+		::=	{ rcLinkStateTrackIfEntry 2 }
+		
+	rcLinkStateTrackIfStreamType OBJECT-TYPE
+		SYNTAX	INTEGER { upstream(1), downstream(2) }
+		ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Interface type in the link state track group,Upstream or Downstream."
+		::=	{ rcLinkStateTrackIfEntry 3 }		
+
+END
+	

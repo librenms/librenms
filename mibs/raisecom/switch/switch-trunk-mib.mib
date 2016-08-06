@@ -1,0 +1,143 @@
+--MibName=rcTrunk
+SWITCH-TRUNK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE     	FROM SNMPv2-SMI
+    RowStatus  							FROM SNMPv2-TC 
+    PortList,EnableVar					FROM SWITCH-TC     
+    raisecomSwitchMgt           		FROM RAISECOM-PONSERIES-BASE-MIB;
+
+
+	rcTrunkConfig MODULE-IDENTITY
+    	LAST-UPDATED "200412200000Z"
+    	ORGANIZATION "RAISECOM Group"
+    	CONTACT-INFO
+            	" 
+             	Phone:  01082884499
+             	Email:  support@raisecom.com"
+    	DESCRIPTION
+            	"The MIB module for managing  trunk  in rc2026."
+    	REVISION      "9103310000Z"
+    	DESCRIPTION
+            ""
+    	::= { raisecomSwitchMgt 3}  
+    	
+------------------------------------------------------------------
+--scalar	  
+
+	rcTrunkMaxGroupNum OBJECT-TYPE
+    	SYNTAX   INTEGER
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+            "The number of maximum trunking group that system supports."
+        DEFVAL { 32 }
+        ::= { rcTrunkConfig 1 }
+ 
+	rcTrunkMaxPortNumPerGroup OBJECT-TYPE
+    	SYNTAX      INTEGER 
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+            "The number of ports that each trunk group supports."    
+    	DEFVAL { 8 }
+    	::= { rcTrunkConfig 2 }
+
+-- rcTrunkGroupTable
+
+	rcTrunkGroupTable OBJECT-TYPE
+    	SYNTAX  SEQUENCE OF RcTrunkGroupEntry
+    	MAX-ACCESS  not-accessible
+    	STATUS      current
+    	DESCRIPTION
+            "Some ports participate in a trunking group."
+    	::= { rcTrunkConfig 3 }
+
+	rcTrunkGroupEntry OBJECT-TYPE
+    	SYNTAX      RcTrunkGroupEntry      
+    	MAX-ACCESS  not-accessible
+    	STATUS      current
+    	DESCRIPTION
+            "The entry is used to set some ports into a trunking group."
+    	INDEX   { rcTrunkGroupIndex }
+    	::= { rcTrunkGroupTable 1 }
+
+	RcTrunkGroupEntry ::= SEQUENCE {
+        rcTrunkGroupIndex          		INTEGER, --应该为Olt-PortIndex类型
+        rcTrunkGroupPortList    		PortList,
+        rcTrunkGroupMode            	INTEGER, 
+        rcTrunkGroupCurrentInOperation  PortList,
+        rcTrunkLoadSharingMode          INTEGER
+        }
+
+	rcTrunkGroupIndex OBJECT-TYPE
+    	SYNTAX      INTEGER
+    	MAX-ACCESS  not-accessible
+    	STATUS      current
+    	DESCRIPTION
+            "The trunking group index, arranged with other physical port together."
+    	::= { rcTrunkGroupEntry 1 }
+
+	rcTrunkGroupPortList OBJECT-TYPE
+    	SYNTAX      PortList
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "When a bit of PortList is set, the port this bit specified participate in 
+            a appointed trunking group."
+    ::= { rcTrunkGroupEntry 2 }  
+    
+    rcTrunkGroupMode OBJECT-TYPE
+    	SYNTAX		INTEGER{
+	    				manual(1),
+	    				lacp_static(2),
+	    				lacp_dynamic(3)
+    				}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+    		"Trunk group mode, which indicates the link aggregation method."
+    	DEFVAL {manual}
+    	::= { rcTrunkGroupEntry 3 }
+
+	rcTrunkGroupCurrentInOperation OBJECT-TYPE
+    	SYNTAX      PortList
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+            "Show these ports that are in 'up' status in a trunking group."
+    	::= { rcTrunkGroupEntry 4 }
+
+	rcTrunkLoadSharingMode OBJECT-TYPE
+    	SYNTAX      INTEGER {
+	                    srcMAC(1),
+				        destMAC(2),
+				        srcXORDestMAC(3),
+				        srcIP(4),
+				        destIP(5),
+				        srcXORDestIP(6)
+                    }
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            "The Rule to be applied to this Link Aggregator's Trunk Group
+			Table. The rules are based on the following selections SrcMAC (1),
+			means that the last three bits of the Source MAC Address are used to
+			index the Trunk Group to get the destination port. DestMAC (2), means
+			the last three bits of the Destination MAC Address are used to index 
+			into the Trunk Group to get the destination port. SrcXORDestMAC (3),
+			means that the last three bits of the Source MAC Address are logically
+			XORed with the last three bits of the Destination MAC Address and used
+			to index into the Trunk Group to get the destination port. SrcIP (4),
+			means the last three bits of the Source IP Address are used to index
+			into the Trunk Group to get the destination port. DestIP (5), means
+			the last three bits of the Destination IP Address are used to index
+			into the Trunk Group to get the destination port. SrcXORDestIP (6),
+			means the last three bits of the Source IP Address are logically XORed
+			with the last three bits of the Destination IP Address and used to 
+			index into the Trunk Group to get the destination port. This rule
+			defines the distribution algorithm applied to the aggregated link." 
+        DEFVAL { srcXORDestMAC }
+   		::= { rcTrunkGroupEntry 5 }
+    	
+END

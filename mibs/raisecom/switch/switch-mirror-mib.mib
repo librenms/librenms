@@ -1,0 +1,150 @@
+--MibName=switch-mirror-mib
+-- *****************************************************************
+-- epon-mirror-mib.MIB:  Raisecom epon Mirror MIB file
+--
+-- May 2004, 2682
+--
+-- Copyright (c) 1994-2004 by Raisecom, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+SWITCH-MIRROR-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32                         FROM SNMPv2-SMI
+        EnableVar                         FROM SWITCH-TC
+        RowStatus                         FROM SNMPv2-TC
+		OltPortIndex                      FROM RAISECOM-PONSERIES-TC
+        raisecomSwitchMgt                 FROM RAISECOM-PONSERIES-BASE-MIB;
+
+	rcMirrorCfg MODULE-IDENTITY
+        LAST-UPDATED    "200412200000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "       Raise Systems
+
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: support@raisecom.com"
+        DESCRIPTION
+                "description of epon mirror object."
+                ::= { raisecomSwitchMgt 8}
+
+----------------------define groups-------------------------------
+	rcMirrorGlbConfig	OBJECT IDENTIFIER ::= { rcMirrorCfg 1 }
+-------------------config some scalar---------------------------
+	rcMirrorEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global configuration of mirror function£¬enable or disable this function."
+        DEFVAL	{ disable }
+        ::= { rcMirrorGlbConfig 1}
+
+   	rcMirrorToPort OBJECT-TYPE
+        SYNTAX OltPortIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Config the mirror destination port."
+        ::= { rcMirrorGlbConfig 2 }
+
+	rcBlockNoMirrorTrafficEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Block the Non-mirror traffic. Currently unsupport in ROAP V2.0."
+        DEFVAL	{ disable }
+		::= { rcMirrorGlbConfig 3 }
+		
+    rcRspanRemoteVlan OBJECT-TYPE
+        SYNTAX INTEGER (2..4094,0)
+		MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Remote Mirror Vlan setting"
+		::= { rcMirrorGlbConfig 4 }
+	
+   -- Global configuration£¨group£© end----------
+
+
+ ------------ mirror source port object------------
+    rcMirrorSrcPortTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF RcMirrorSrcPortEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+	       "A table of objects that display and control attributes
+		     of all the source ports in the mirror configuration."
+       ::= { rcMirrorCfg 2 }
+
+    rcMirrorSrcPortEntry OBJECT-TYPE
+		SYNTAX      RcMirrorSrcPortEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+           "A set of objects that display and control the source ports in the mirror configuration."
+		INDEX    { rcMirrorSrcPort }
+		::= { rcMirrorSrcPortTable 1 }
+
+	RcMirrorSrcPortEntry ::= SEQUENCE {
+		rcMirrorSrcPort     OltPortIndex,
+        rcMirrorDirection   INTEGER,
+	    rcIngressDivider    INTEGER,
+	    rcEgressDivider     INTEGER,
+        rcSrcPortRowStatus  RowStatus
+        }
+
+	rcMirrorSrcPort OBJECT-TYPE
+		SYNTAX      OltPortIndex
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+           "This variable uniquely identifies a source port in the mirror configuration.
+            This port is configured as the source port."
+		::= { rcMirrorSrcPortEntry 1 }
+
+	rcMirrorDirection OBJECT-TYPE
+		SYNTAX  INTEGER {
+					ingress(1),
+					egress(2),
+					both(3)
+					}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+	        "ingress: the incoming traffic of the port is mirrored to the monitor port,
+	         egress: the outgoing traffic of the port is mirrored to the monitor port,
+	         both: the incoming and outgoing traffic are both mirrored to the monitor port."
+		::= { rcMirrorSrcPortEntry 2 }
+
+	rcIngressDivider OBJECT-TYPE
+        SYNTAX INTEGER (0..1023)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ingress Sample Rate. Currently unsupport in ROAP V2.0."
+        ::= { rcMirrorSrcPortEntry 3 }
+
+	rcEgressDivider OBJECT-TYPE
+        SYNTAX INTEGER (0..1023)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Egress Sample Rate. Currently unsupport in ROAP V2.0."
+        ::= { rcMirrorSrcPortEntry 4 }
+
+    rcSrcPortRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { rcMirrorSrcPortEntry 5 }
+ END

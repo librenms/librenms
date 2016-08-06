@@ -1,0 +1,946 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-dhcp-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Dec 9, 2010
+--  Author       : wujingyong
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-DHCP-MIB DEFINITIONS ::= BEGIN 
+    
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar FROM SWITCH-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        rcEponOnuL3IpIfIndex FROM EPON-RMT-ONU-L3-MIB
+        rcEponOnuEthPortIndex FROM EPON-RMT-ONU-PORT-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+
+	rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+        
+rcEponOnuDhcpGroup           OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 31 } 
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpOption82Group
+--
+
+rcEponOnuDhcpOption82Group   OBJECT IDENTIFIER ::= { rcEponOnuDhcpGroup 1 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpOption82Table
+--
+    rcEponOnuDhcpOption82Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpOption82Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Group 1 }
+
+    rcEponOnuDhcpOption82Entry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpOption82Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuDhcpOption82Table 1 }
+
+    RcEponOnuDhcpOption82Entry ::= SEQUENCE {
+        rcEponOnuDhcpOption82Enable             EnableVar,
+        rcEponOnuDhcpOption82AttachString       OCTET STRING,
+        rcEponOnuDhcpOption82RemoteIdMode       INTEGER,
+        rcEponOnuDhcpOption82RemoteIdString     OCTET STRING
+        }
+ 
+    rcEponOnuDhcpOption82Enable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Entry 1 } 
+
+    rcEponOnuDhcpOption82AttachString OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Entry 2 }
+
+    rcEponOnuDhcpOption82RemoteIdMode OBJECT-TYPE
+        SYNTAX INTEGER {
+               onumac(1),
+               clientmac(2),
+               onumac-string(3),
+               clientmac-string(4),
+               hostname(5),
+               user-defined(6)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Entry 3 }
+
+    rcEponOnuDhcpOption82RemoteIdString OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Entry 4 }
+
+        
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpOption82PortTable
+--
+    rcEponOnuDhcpOption82PortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpOption82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82Group 2 }
+
+    rcEponOnuDhcpOption82PortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpOption82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuDhcpOption82PortTable 1 }
+
+    RcEponOnuDhcpOption82PortEntry ::= SEQUENCE {
+        rcEponOnuDhcpOption82CircuitId       OCTET STRING
+        }
+
+    rcEponOnuDhcpOption82CircuitId OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpOption82PortEntry 1 }
+        
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpSnoopingGroup
+--
+
+rcEponOnuDhcpSnoopingGroup   OBJECT IDENTIFIER ::= { rcEponOnuDhcpGroup 2 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpSnoopingMgntTable
+--
+    rcEponOnuDhcpSnoopingMgntTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpSnoopingMgntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingGroup 1 }
+
+    rcEponOnuDhcpSnoopingMgntEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpSnoopingMgntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuDhcpSnoopingMgntTable 1 }
+
+    RcEponOnuDhcpSnoopingMgntEntry ::= SEQUENCE {
+        rcEponOnuDhcpSnoopingEnable                       EnableVar,
+        rcEponOnuDhcpSnoopingUserDefinedSuboptionEnable   EnableVar
+        }
+
+    rcEponOnuDhcpSnoopingEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingMgntEntry 1 } 
+
+    rcEponOnuDhcpSnoopingUserDefinedSuboptionEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingMgntEntry 2 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpSnoopingPortTable
+--
+    rcEponOnuDhcpSnoopingPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpSnoopingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingGroup 2 }
+
+    rcEponOnuDhcpSnoopingPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpSnoopingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuDhcpSnoopingPortTable 1 }
+
+    RcEponOnuDhcpSnoopingPortEntry ::= SEQUENCE {
+        rcEponOnuDhcpSnoopingPortTrustEnable      EnableVar,
+        rcEponOnuDhcpSnoopingPortOption82Policy   INTEGER,
+        rcEponOnuDhcpSnoopingPortRatelimit        INTEGER,
+        rcEponOnuDhcpSnoopingBindingMaxNum        INTEGER
+        }
+
+    rcEponOnuDhcpSnoopingPortTrustEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingPortEntry 1 }
+
+    rcEponOnuDhcpSnoopingPortOption82Policy OBJECT-TYPE
+        SYNTAX INTEGER {
+               drop(1),
+               keep(2),
+               replace(3)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingPortEntry 2 }
+
+    rcEponOnuDhcpSnoopingPortRatelimit OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingPortEntry 3 }
+
+    rcEponOnuDhcpSnoopingBindingMaxNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingPortEntry 4 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpSnoopingBindingTable
+--
+    rcEponOnuDhcpSnoopingBindingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpSnoopingBindingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingGroup 3 }
+
+    rcEponOnuDhcpSnoopingBindingEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpSnoopingBindingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuDhcpSnoopingBindingIpAddr }
+        ::= { rcEponOnuDhcpSnoopingBindingTable 1 }
+
+    RcEponOnuDhcpSnoopingBindingEntry ::= SEQUENCE {
+        rcEponOnuDhcpSnoopingBindingIpAddr        IpAddress,
+        rcEponOnuDhcpSnoopingBindingMacAddr       MacAddress,
+        rcEponOnuDhcpSnoopingBindingLeaseTime     INTEGER,
+        rcEponOnuDhcpSnoopingBindingVlan          INTEGER,
+        rcEponOnuDhcpSnoopingBindingPort          INTEGER,
+        rcEponOnuDhcpSnoopingBindingRowstatus     RowStatus
+        }
+
+    rcEponOnuDhcpSnoopingBindingIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 1 }
+
+    rcEponOnuDhcpSnoopingBindingMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 2 }
+
+    rcEponOnuDhcpSnoopingBindingLeaseTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 3 }
+
+    rcEponOnuDhcpSnoopingBindingVlan OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 4 }
+
+    rcEponOnuDhcpSnoopingBindingPort OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 5 }
+
+    rcEponOnuDhcpSnoopingBindingRowstatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingBindingEntry 6 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpSnoopingStatisticTable
+--
+    rcEponOnuDhcpSnoopingStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpSnoopingStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingGroup 4 }
+
+    rcEponOnuDhcpSnoopingStatisticEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpSnoopingStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuDhcpSnoopingStatisticTable 1 }
+
+    RcEponOnuDhcpSnoopingStatisticEntry ::= SEQUENCE {
+        rcEponOnuDhcpSnoopingStatsClear                 INTEGER,
+        rcEponOnuDhcpSnoopingForwardPkts                Counter32,
+        rcEponOnuDhcpSnoopingDropPkts                   Counter32,
+        rcEponOnuDhcpSnoopingRcvWithOption82Pkts        Counter32,
+        rcEponOnuDhcpSnoopingRcvWithoutOption82Pkts     Counter32,
+        rcEponOnuDhcpSnoopingSendBootpPkts              Counter32,
+        rcEponOnuDhcpSnoopingRcvBootpPkts               Counter32,
+        rcEponOnuDhcpSnoopingSendDiscoverPkts           Counter32,
+        rcEponOnuDhcpSnoopingRcvDiscoverPkts   	        Counter32,
+        rcEponOnuDhcpSnoopingSendRequestPkts            Counter32,
+        rcEponOnuDhcpSnoopingRcvRequestPkts             Counter32,
+        rcEponOnuDhcpSnoopingSendOfferPkts              Counter32,
+        rcEponOnuDhcpSnoopingRcvOfferPkts               Counter32,
+        rcEponOnuDhcpSnoopingSendAckPkts                Counter32,
+        rcEponOnuDhcpSnoopingRcvAckPkts                 Counter32,
+        rcEponOnuDhcpSnoopingSendNakPkts                Counter32,
+        rcEponOnuDhcpSnoopingRcvNakPkts                 Counter32,
+        rcEponOnuDhcpSnoopingSendDeclinePkts            Counter32,
+        rcEponOnuDhcpSnoopingRcvDeclinePkts             Counter32,
+        rcEponOnuDhcpSnoopingSendReleasePkts            Counter32,
+        rcEponOnuDhcpSnoopingRcvReleasePkts             Counter32,
+        rcEponOnuDhcpSnoopingSendInformPkts             Counter32,
+        rcEponOnuDhcpSnoopingRcvInformPkts              Counter32,
+        rcEponOnuDhcpSnoopingRcvUnknownPkts             Counter32
+        }
+
+    rcEponOnuDhcpSnoopingStatsClear OBJECT-TYPE
+        SYNTAX INTEGER {
+               ready(0),
+               clear(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 1 }
+
+    rcEponOnuDhcpSnoopingForwardPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 2 } 
+
+    rcEponOnuDhcpSnoopingDropPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 3 } 
+
+    rcEponOnuDhcpSnoopingRcvWithOption82Pkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 4 } 
+        
+    rcEponOnuDhcpSnoopingRcvWithoutOption82Pkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 5 }
+
+    rcEponOnuDhcpSnoopingSendBootpPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 6 }
+
+    rcEponOnuDhcpSnoopingRcvBootpPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 7 }
+
+    rcEponOnuDhcpSnoopingSendDiscoverPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 8 }
+
+    rcEponOnuDhcpSnoopingRcvDiscoverPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 9 }
+
+    rcEponOnuDhcpSnoopingSendRequestPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 10 }
+
+    rcEponOnuDhcpSnoopingRcvRequestPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 11 }
+
+    rcEponOnuDhcpSnoopingSendOfferPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 12 }
+
+    rcEponOnuDhcpSnoopingRcvOfferPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 13 }        
+
+    rcEponOnuDhcpSnoopingSendAckPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 14 }        
+
+    rcEponOnuDhcpSnoopingRcvAckPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 15 }        
+
+    rcEponOnuDhcpSnoopingSendNakPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 16 }        
+
+    rcEponOnuDhcpSnoopingRcvNakPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 17 }        
+
+    rcEponOnuDhcpSnoopingSendDeclinePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 18 }        
+
+    rcEponOnuDhcpSnoopingRcvDeclinePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 19 }        
+
+    rcEponOnuDhcpSnoopingSendReleasePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 20 }        
+
+    rcEponOnuDhcpSnoopingRcvReleasePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 21 }        
+
+    rcEponOnuDhcpSnoopingSendInformPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 22 }        
+
+    rcEponOnuDhcpSnoopingRcvInformPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 23 }        
+
+    rcEponOnuDhcpSnoopingRcvUnknownPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpSnoopingStatisticEntry 24 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpRelayGroup
+--
+
+rcEponOnuDhcpRelayGroup   OBJECT IDENTIFIER ::= { rcEponOnuDhcpGroup 3 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpRelayMgntTable
+--
+    rcEponOnuDhcpRelayMgntTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpRelayMgntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayGroup 1 }
+
+    rcEponOnuDhcpRelayMgntEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpRelayMgntEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuDhcpRelayMgntTable 1 }
+
+    RcEponOnuDhcpRelayMgntEntry ::= SEQUENCE {
+        rcEponOnuDhcpRelayEnable                       EnableVar,
+        rcEponOnuDhcpRelayUserDefinedSuboptionEnable   EnableVar
+        }
+
+    rcEponOnuDhcpRelayEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayMgntEntry 1 } 
+
+    rcEponOnuDhcpRelayUserDefinedSuboptionEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayMgntEntry 2 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpRelayPortTable
+--
+    rcEponOnuDhcpRelayPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpRelayPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayGroup 2 }
+
+    rcEponOnuDhcpRelayPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpRelayPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuDhcpRelayPortTable 1 }
+
+    RcEponOnuDhcpRelayPortEntry ::= SEQUENCE {
+        rcEponOnuDhcpRelayPortTrustEnable      EnableVar,
+        rcEponOnuDhcpRelayPortOption82Policy   INTEGER
+        }
+
+    rcEponOnuDhcpRelayPortTrustEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayPortEntry 1 }
+
+    rcEponOnuDhcpRelayPortOption82Policy OBJECT-TYPE
+        SYNTAX INTEGER {
+               drop(1),
+               keep(2),
+               replace(3)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayPortEntry 2 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpRelayTargetIpTable
+--
+    rcEponOnuDhcpRelayTargetIpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpRelayTargetIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayGroup 3 }
+
+    rcEponOnuDhcpRelayTargetIpEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpRelayTargetIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuL3IpIfIndex }
+        ::= { rcEponOnuDhcpRelayTargetIpTable 1 }  
+    
+    RcEponOnuDhcpRelayTargetIpEntry ::= SEQUENCE {
+        rcEponOnuDhcpRelayTargetIpAddr    IpAddress
+        }
+
+    rcEponOnuDhcpRelayTargetIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayTargetIpEntry 1 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuDhcpRelayStatisticTable
+--
+    rcEponOnuDhcpRelayStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDhcpRelayStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayGroup 4 }
+
+    rcEponOnuDhcpRelayStatisticEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDhcpRelayStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuDhcpRelayStatisticTable 1 }
+
+    RcEponOnuDhcpRelayStatisticEntry ::= SEQUENCE {
+        rcEponOnuDhcpRelayStatsClear                 INTEGER,
+        rcEponOnuDhcpRelayForwardPkts                Counter32,
+        rcEponOnuDhcpRelayDropPkts                   Counter32,
+        rcEponOnuDhcpRelayRcvWithOption82Pkts        Counter32,
+        rcEponOnuDhcpRelayRcvWithoutOption82Pkts     Counter32,
+        rcEponOnuDhcpRelaySendBootpPkts              Counter32,
+        rcEponOnuDhcpRelayRcvBootpPkts               Counter32,
+        rcEponOnuDhcpRelaySendDiscoverPkts           Counter32,
+        rcEponOnuDhcpRelayRcvDiscoverPkts   	     Counter32,
+        rcEponOnuDhcpRelaySendRequestPkts            Counter32,
+        rcEponOnuDhcpRelayRcvRequestPkts             Counter32,
+        rcEponOnuDhcpRelaySendOfferPkts              Counter32,
+        rcEponOnuDhcpRelayRcvOfferPkts               Counter32,
+        rcEponOnuDhcpRelaySendAckPkts                Counter32,
+        rcEponOnuDhcpRelayRcvAckPkts                 Counter32,
+        rcEponOnuDhcpRelaySendNakPkts                Counter32,
+        rcEponOnuDhcpRelayRcvNakPkts                 Counter32,
+        rcEponOnuDhcpRelaySendDeclinePkts            Counter32,
+        rcEponOnuDhcpRelayRcvDeclinePkts             Counter32,
+        rcEponOnuDhcpRelaySendReleasePkts            Counter32,
+        rcEponOnuDhcpRelayRcvReleasePkts             Counter32,
+        rcEponOnuDhcpRelaySendInformPkts             Counter32,
+        rcEponOnuDhcpRelayRcvInformPkts              Counter32,
+        rcEponOnuDhcpRelayRcvUnknownPkts             Counter32
+        }
+
+    rcEponOnuDhcpRelayStatsClear OBJECT-TYPE
+        SYNTAX INTEGER {
+               ready(0),
+               clear(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 1 }
+
+    rcEponOnuDhcpRelayForwardPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 2 } 
+
+    rcEponOnuDhcpRelayDropPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 3 } 
+
+    rcEponOnuDhcpRelayRcvWithOption82Pkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 4 } 
+        
+    rcEponOnuDhcpRelayRcvWithoutOption82Pkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 5 }
+
+    rcEponOnuDhcpRelaySendBootpPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 6 }
+
+    rcEponOnuDhcpRelayRcvBootpPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 7 }
+
+    rcEponOnuDhcpRelaySendDiscoverPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 8 }
+
+    rcEponOnuDhcpRelayRcvDiscoverPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 9 }
+
+    rcEponOnuDhcpRelaySendRequestPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 10 }
+
+    rcEponOnuDhcpRelayRcvRequestPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 11 }
+
+    rcEponOnuDhcpRelaySendOfferPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 12 }
+
+    rcEponOnuDhcpRelayRcvOfferPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 13 }        
+
+    rcEponOnuDhcpRelaySendAckPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 14 }        
+
+    rcEponOnuDhcpRelayRcvAckPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 15 }        
+
+    rcEponOnuDhcpRelaySendNakPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 16 }        
+
+    rcEponOnuDhcpRelayRcvNakPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 17 }        
+
+    rcEponOnuDhcpRelaySendDeclinePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 18 }        
+
+    rcEponOnuDhcpRelayRcvDeclinePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 19 }        
+
+    rcEponOnuDhcpRelaySendReleasePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 20 }        
+
+    rcEponOnuDhcpRelayRcvReleasePkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 21 }        
+
+    rcEponOnuDhcpRelaySendInformPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 22 }        
+
+    rcEponOnuDhcpRelayRcvInformPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 23 }        
+
+    rcEponOnuDhcpRelayRcvUnknownPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuDhcpRelayStatisticEntry 24 }
+
+END                                       

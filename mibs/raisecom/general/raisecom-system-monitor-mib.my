@@ -1,0 +1,724 @@
+-- MibName=rcSystemMonitor
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2011.2.25 by YANZHIJIE
+-- This version of MIB is created just for the use of Network Management Systems
+-- display the  memory and cpu.
+--
+-- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.     
+-- modify history 
+--                   
+-- =======================================================================
+
+RAISECOM-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY, Unsigned32 
+                	FROM SNMPv2-SMI
+		OBJECT-TYPE     
+					FROM SNMPv2-SMI
+		raisecomPonCommon
+			FROM RAISECOM-PONSERIES-BASE-MIB
+        EnableVar	
+                    FROM SWITCH-TC
+        TimeStamp, TEXTUAL-CONVENTION
+                    FROM SNMPv2-TC;
+
+-------------------------------------------------------------------------------			
+--
+--  System Monitor MIB
+--
+	rcSystemMonitor MODULE-IDENTITY
+        LAST-UPDATED 	"201102250000Z"
+        ORGANIZATION 	"RAISECOM TECH, Ltd."
+        CONTACT-INFO 	"www.raisecom.com"
+        DESCRIPTION  	
+        	"raisecom System monitor objects."
+        ::= { raisecomPonCommon 7 } 
+--------------------------------------------------------------------------------	
+--       	
+-- Textual Conventions
+--
+    ProcessStatus ::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION
+	   	    	"Status of the process."		
+        SYNTAX   INTEGER{
+	                      ready(0),
+	                      suspend(1),
+	                      pend(2),
+	                      pend_s(3),
+	                      delay(4), 
+	                      delay_s(5),
+	                      pend_t(6),
+	                      pend_t_s(7), 
+	                      dead(8)
+                        }   
+                      
+    CPUTimeStamp ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "4d.4d"
+        STATUS       current
+        DESCRIPTION                
+                "The time in seconds that could represent signed
+                quantities like time delay with respect to some
+                source. The signed integer part is in the first 
+                32 bits and the fraction part is in the last 32 bits."
+        REFERENCE
+                "D.L. Mills, 'Network Time Protocol (Version 3)',
+                RFC-1305, March 1992, Sections 2,  3.2.1"
+        SYNTAX     OCTET STRING (SIZE (8))
+
+
+--------------------------------------------------------------------------------
+-- rcCpuMonGroup
+--------------------------------------------------------------------------------
+rcCpuMonGroup OBJECT IDENTIFIER ::= { rcSystemMonitor 1 }
+        	
+--
+-- rcCpuMonTable
+--
+    rcCpuMonTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcCpuMonEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU utilization."
+		::= { rcCpuMonGroup 1 }                          
+
+	rcCpuMonEntry OBJECT-TYPE
+	    SYNTAX  RcCpuMonEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU utilization."
+	    INDEX { rcSystemSlotId, rcSystemCpuId } 
+	    ::= { rcCpuMonTable 1 }
+		
+	RcCpuMonEntry ::= SEQUENCE {
+	    rcSystemSlotId          INTEGER,
+	    rcSystemCpuId           INTEGER,
+	    rcCpuUsage1Second       INTEGER,
+	    rcCpuUsage10Minutes     INTEGER,
+	    rcCpuUsage2Hours        INTEGER,
+	    rcCpuUtilizationTotal   INTEGER
+        }  
+        
+    rcSystemSlotId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-only
+    	STATUS mandatory
+    	DESCRIPTION
+    		"Slot index"
+    	::= { rcCpuMonEntry 1 }
+    	
+    rcSystemCpuId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-only
+    	STATUS mandatory
+    	DESCRIPTION
+    		"The CPU index"
+    	::= { rcCpuMonEntry 2 }
+ 
+    rcCpuUsage1Second OBJECT-TYPE
+    	SYNTAX INTEGER (0..100)
+    	UNITS "percent"
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization of the last second"  
+    	::= { rcCpuMonEntry 3 }
+    	
+    rcCpuUsage10Minutes OBJECT-TYPE
+    	SYNTAX INTEGER (0..100)
+    	UNITS "percent"
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization of the last 10 minutes"
+    	::= { rcCpuMonEntry 4 }
+    	
+    rcCpuUsage2Hours OBJECT-TYPE
+    	SYNTAX INTEGER (0..100)
+    	UNITS "percent"
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization of the last 2 hours"
+    	::= { rcCpuMonEntry 5 }
+    	
+      rcCpuUtilizationTotal OBJECT-TYPE
+    	SYNTAX INTEGER (0..100)
+    	UNITS "percent"
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"CPU busy percentage since startup"
+    	::= { rcCpuMonEntry 6 }  
+  
+ --
+ -- rcCpuMonAlarmTable
+ --
+ 
+ rcCpuMonAlarmTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcCpuMonAlarmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU utilization."
+		::= { rcCpuMonGroup 2 }                          
+
+	rcCpuMonAlarmEntry OBJECT-TYPE
+	    SYNTAX  RcCpuMonAlarmEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU utilization alarm."
+	    INDEX { rcSystemSlotId, rcSystemCpuId } 
+	    ::= { rcCpuMonAlarmTable 1 }
+		
+	RcCpuMonAlarmEntry ::= SEQUENCE {
+	    rcCpuThresholdTrapAdmin EnableVar,
+	    rcCpuRisingThreshold    INTEGER,
+	    rcCpuFallingThreshold   INTEGER,
+	    rcCpuThresholdInterval  INTEGER
+        }
+     
+    rcCpuThresholdTrapAdmin OBJECT-TYPE
+    	SYNTAX EnableVar
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization threshold trap status"
+    	::= { rcCpuMonAlarmEntry 1 }
+    	
+    rcCpuRisingThreshold OBJECT-TYPE
+    	SYNTAX  INTEGER (1..99)
+    	UNITS "percent"
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization rising threshold value" 
+    	::= { rcCpuMonAlarmEntry 2 }
+    	
+    rcCpuFallingThreshold OBJECT-TYPE
+    	SYNTAX  INTEGER (1..99)
+    	UNITS "percent"
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization falling threshold value" 
+    	::= { rcCpuMonAlarmEntry 3 }
+    	
+    rcCpuThresholdInterval OBJECT-TYPE
+    	SYNTAX INTEGER (5..36000)
+    	UNITS "second"
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization threshold interval" 
+    	::= { rcCpuMonAlarmEntry 4 }    
+ 
+--       
+-- rcCpuTrapGroup
+--       
+rcCpuTrapGroup OBJECT IDENTIFIER ::= { rcCpuMonGroup 3 }   
+ 
+ 	rcCpuRisingThresholdTrap NOTIFICATION-TYPE
+		OBJECTS { rcSystemSlotId,
+				  rcSystemCpuId,
+				  rcCpuUtilization,
+				  rcCpuRisingThreshold,
+				  rcCpuThresholdInterval }
+		STATUS current
+		DESCRIPTION
+			"CPU utilization rising threshold trap transfer"
+		::= { rcCpuTrapGroup 1 }
+		
+	rcCpuFallingThresholdTrap NOTIFICATION-TYPE
+		OBJECTS { rcSystemSlotId,
+				  rcSystemCpuId,
+				  rcCpuUtilization,
+				  rcCpuFallingThreshold,
+				  rcCpuThresholdInterval }
+		STATUS current
+		DESCRIPTION
+			"CPU utilization rising threshold trap transfer"
+		::= { rcCpuTrapGroup 2 }
+                                    
+--------------------------------------------------------------------------
+-- rcProcessesMonGroup
+--------------------------------------------------------------------------                                   
+rcProcessesMonGroup OBJECT IDENTIFIER ::= { rcSystemMonitor 2 }
+        
+--
+-- rcRunProcessesTable
+--                                
+    rcRunProcessesTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcRunProcessesEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU running process utilization."
+		::= { rcProcessesMonGroup 1 }                          
+
+	rcRunProcessesEntry OBJECT-TYPE
+	    SYNTAX  RcRunProcessesEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU process utilization."
+	    INDEX { rcSystemSlotId, rcSystemCpuId } 
+	    ::= { rcRunProcessesTable 1 }
+	    
+	RcRunProcessesEntry ::= SEQUENCE {
+	    rcRunProcessTotalNum      INTEGER
+        }
+	    
+	rcRunProcessTotalNum OBJECT-TYPE
+    	SYNTAX INTEGER (1..256)
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Total Processes Number"
+        ::= { rcRunProcessesEntry 1 }
+--
+-- rcRunProcessMonTable
+--       
+    rcRunProcessMonTable OBJECT-TYPE
+    	SYNTAX  SEQUENCE OF RcRunProcessMonEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU process utilization."
+		::= { rcProcessesMonGroup 2 }
+		
+	rcRunProcessMonEntry OBJECT-TYPE
+	    SYNTAX  RcRunProcessMonEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU running process utilization."
+	    INDEX { rcSystemSlotId, rcSystemCpuId ,rcRunProcessIndex } 
+	    ::= { rcRunProcessMonTable 1 } 
+	    
+	RcRunProcessMonEntry ::= SEQUENCE {
+	    rcRunProcessIndex             INTEGER,
+	    rcRunProcessPID               INTEGER,
+	    rcRunProcessName              OCTET STRING,
+	    rcRunProcessRunTimeTotal      CPUTimeStamp,
+	    rcRunProcessInvokedTotal      INTEGER,
+	    rcRunProcessTimeCreated       TimeStamp,
+	    rcRunProcessNormalPriority    INTEGER,
+	    rcRunProcessCurrentPriority   INTEGER,
+	    rcRunProcessStatus            ProcessStatus,
+	    rcRunProcessStackSize         INTEGER,
+	    rcRunProcessStackCurrentSize  INTEGER,
+	    rcRunProcessStackMaxSize      INTEGER,
+	    rcRunProcessStackBegin        INTEGER,
+	    rcRunProcessStackPointer      INTEGER,
+	    rcRunProcessStackEnd          INTEGER
+        }
+	    
+	rcRunProcessIndex OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Processes Index"
+        ::= { rcRunProcessMonEntry 1 }
+        
+    rcRunProcessPID OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process ID"   
+    	::= { rcRunProcessMonEntry 2 }
+    	
+    rcRunProcessName OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(1..32))
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process name"   
+    	::= { rcRunProcessMonEntry 3 }                             
+                                    
+    rcRunProcessRunTimeTotal OBJECT-TYPE
+    	SYNTAX CPUTimeStamp
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Time of the process occupied"   
+    	::= { rcRunProcessMonEntry 4 }                                
+                                    
+    rcRunProcessInvokedTotal OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Invoked times of the process"   
+    	::= { rcRunProcessMonEntry 5 }                                
+        
+    rcRunProcessTimeCreated OBJECT-TYPE
+    	SYNTAX TimeStamp
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Time stamp when the process was created"   
+    	::= { rcRunProcessMonEntry 6 }    
+
+    rcRunProcessNormalPriority OBJECT-TYPE
+    	SYNTAX INTEGER (0..255)
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process normal priority"   
+    	::= { rcRunProcessMonEntry 7 }
+    	
+    rcRunProcessCurrentPriority OBJECT-TYPE
+    	SYNTAX INTEGER (0..255)
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process current priority"   
+    	::= { rcRunProcessMonEntry 8 }
+    	
+    rcRunProcessStatus OBJECT-TYPE
+    	SYNTAX ProcessStatus
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process status"   
+    	::= { rcRunProcessMonEntry 9 }
+    	
+    rcRunProcessStackSize OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process stack size"   
+    	::= { rcRunProcessMonEntry 10 }
+    	
+    rcRunProcessStackCurrentSize OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Stack size for current use"   
+    	::= { rcRunProcessMonEntry 11 }
+    	
+    rcRunProcessStackMaxSize OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Stack size for the following use"   
+    	::= { rcRunProcessMonEntry 12 }
+    	
+    rcRunProcessStackBegin OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"the bottom of the stack"   
+    	::= { rcRunProcessMonEntry 13 }
+    	
+    rcRunProcessStackPointer OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process stack pointer"   
+    	::= { rcRunProcessMonEntry 14 }
+    	
+     rcRunProcessStackEnd OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"the actual end of the stack"   
+    	::= { rcRunProcessMonEntry 15 }
+
+--
+-- rcRunProcessesStatTable  
+--
+    rcRunProcessesStatTable OBJECT-TYPE
+    	SYNTAX  SEQUENCE OF RcRunProcessesStatEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU process utilization stat information."
+		::= { rcProcessesMonGroup 3 }
+		
+	rcRunProcessesStatEntry OBJECT-TYPE
+	    SYNTAX  RcRunProcessesStatEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU running process utilization stat information."
+	    INDEX { rcSystemSlotId, rcSystemCpuId ,rcRunProcessIndex, rcRunProcessStatPeriod } 
+	    ::= { rcRunProcessesStatTable 1 }
+	    
+	RcRunProcessesStatEntry ::= SEQUENCE {
+	    rcRunProcessStatPeriod       INTEGER,
+	    rcRunProcessStatRunTime      CPUTimeStamp,
+	    rcRunProcessStatInvoked      INTEGER,
+	    rcRunProcessStatUtilization  INTEGER
+        }
+	    
+	rcRunProcessStatPeriod OBJECT-TYPE
+    	SYNTAX INTEGER {
+    			fivesec(1),
+    			onemin(2),
+    			temmin(3)
+    			}
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Process statistics period"   
+    	::= { rcRunProcessesStatEntry 1 }	  
+        
+     rcRunProcessStatRunTime OBJECT-TYPE
+    	SYNTAX CPUTimeStamp
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Time of the process occupied in period"   
+    	::= { rcRunProcessesStatEntry 2 } 
+    	
+    rcRunProcessStatInvoked OBJECT-TYPE
+    	SYNTAX INTEGER
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"Times of the process invoked in period"   
+    	::= { rcRunProcessesStatEntry 3 }  
+        
+     rcRunProcessStatUtilization OBJECT-TYPE
+    	SYNTAX INTEGER(0..100)
+    	ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"CPU utilization in period"   
+    	::= { rcRunProcessesStatEntry 4 } 
+    	
+--
+-- rcDeadProcessesMonTable
+--        
+    rcDeadProcessesMonTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcDeadProcessesMonEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about CPU dead process information."
+		::= { rcProcessesMonGroup 4 }                          
+
+	rcDeadProcessesMonEntry OBJECT-TYPE
+	    SYNTAX  RcDeadProcessesMonEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the CPU dead process information."
+	    INDEX { rcSystemSlotId, rcSystemCpuId, rcDeadProcessIndex } 
+	    ::= { rcDeadProcessesMonTable 1 }
+	
+	RcDeadProcessesMonEntry ::= SEQUENCE {
+	    rcDeadProcessIndex        INTEGER,
+	    rcDeadProcessName         OCTET STRING,
+	    rcDeadProcessEntry        INTEGER,
+	    rcDeadProcessErrorNumber  INTEGER,
+	    rcDeadProcessPriority     INTEGER,
+	    rcDeadProcessMaxStackSize INTEGER
+        }
+	    
+	rcDeadProcessIndex OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Dead processes table index"
+        ::= { rcDeadProcessesMonEntry 1 }     
+         
+    rcDeadProcessName OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(1..32))
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Dead process name"
+        ::= { rcDeadProcessesMonEntry 2 }     
+         
+    rcDeadProcessEntry OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Dead process entry"
+        ::= { rcDeadProcessesMonEntry 3 }    
+         
+    rcDeadProcessErrorNumber OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Dead process error number"
+        ::= { rcDeadProcessesMonEntry 4 }
+        
+    rcDeadProcessPriority OBJECT-TYPE
+    	SYNTAX INTEGER(0..255)
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Dead process priority"
+        ::= { rcDeadProcessesMonEntry 5 }   
+         
+     rcDeadProcessMaxStackSize OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Stack size for max use"
+        ::= { rcDeadProcessesMonEntry 6 }    
+
+--------------------------------------------------------------------------
+-- rcMemoryMonGroup
+--------------------------------------------------------------------------                                   
+rcMemoryMonGroup OBJECT IDENTIFIER ::= { rcSystemMonitor 3 }        
+         
+--
+-- rcMemoryMonTable
+--                                
+    rcMemoryMonTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcMemoryMonEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about memory utilization."
+		::= { rcMemoryMonGroup 1 }                          
+
+	rcMemoryMonEntry OBJECT-TYPE
+	    SYNTAX  RcMemoryMonEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the memory utilization."
+	    INDEX { rcSystemSlotId, rcSystemCpuId } 
+	    ::= { rcMemoryMonTable 1 }
+	
+	RcMemoryMonEntry ::= SEQUENCE {
+	    rcMemoryTotoalMemory    INTEGER,
+	    rcMemoryAvailableMemory INTEGER,
+	    rcMemoryMaxUtilMemory   INTEGER,
+	    rcMemoryMaxBlock        INTEGER
+        }
+	    
+	rcMemoryTotoalMemory OBJECT-TYPE
+    	SYNTAX INTEGER
+    	UNITS "byte"
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Total memory size"
+        ::= { rcMemoryMonEntry 1 }
+        
+    rcMemoryAvailableMemory OBJECT-TYPE
+    	SYNTAX INTEGER
+    	UNITS "byte"
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Available memory size"
+        ::= { rcMemoryMonEntry 2 }         
+         
+     rcMemoryMaxUtilMemory OBJECT-TYPE
+    	SYNTAX INTEGER
+    	UNITS "byte"
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Peak utility of memory since startup"
+        ::= { rcMemoryMonEntry 3 }    
+         
+      rcMemoryMaxBlock OBJECT-TYPE
+    	SYNTAX INTEGER
+    	UNITS "byte"
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"Max blocks"
+        ::= { rcMemoryMonEntry 4 }   
+         
+--
+-- rcMemoryMonAlarmTable
+--                                
+    rcMemoryMonAlarmTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF RcMemoryMonAlarmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains information about memory monitor alarm information."
+		::= { rcMemoryMonGroup 2 }                          
+
+	rcMemoryMonAlarmEntry OBJECT-TYPE
+	    SYNTAX  RcMemoryMonAlarmEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+	        "Information about the memory monitor alarm."
+	    INDEX { rcSystemSlotId, rcSystemCpuId } 
+	    ::= { rcMemoryMonAlarmTable 1 }
+    
+    RcMemoryMonAlarmEntry ::= SEQUENCE {
+	    rcMemoryAlarmAdmin     EnableVar,
+	    rcMemoryAlarmThreshold INTEGER
+        }
+    
+	rcMemoryAlarmAdmin OBJECT-TYPE
+    	SYNTAX EnableVar
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           	"Memory alarm administration"
+        ::= { rcMemoryMonAlarmEntry 1 }
+        
+    rcMemoryAlarmThreshold OBJECT-TYPE
+    	SYNTAX INTEGER
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           	"Memory alarm threshold"
+        ::= { rcMemoryMonAlarmEntry 2 }        
+         
+         
+--
+-- rcMemoryMonTrapGroup
+--         
+rcMemoryMonTrapGroup OBJECT IDENTIFIER ::= { rcMemoryMonGroup 3 }   
+ 
+ 	rcMemoryAlarmTrap NOTIFICATION-TYPE
+		OBJECTS { rcSystemSlotId,
+				  rcSystemCpuId,
+				  rcMemoryAlarmThreshold,
+				  rcMemoryTotoalMemory,
+				  rcMemoryAvailableMemory,
+				  rcMemoryMaxUtilMemory
+				}
+		STATUS current
+		DESCRIPTION
+			"Available memory is too less trap"
+		::= { rcMemoryMonTrapGroup 1 }
+		
+	rcMemoryAlarmRecoverTrap NOTIFICATION-TYPE
+		OBJECTS { rcSystemSlotId,
+				  rcSystemCpuId,
+				  rcMemoryAlarmThreshold,
+				  rcMemoryTotoalMemory,
+				  rcMemoryAvailableMemory,
+				  rcMemoryMaxUtilMemory
+				}
+		STATUS current
+		DESCRIPTION
+			"Available memory is too less recover trap"
+		::= { rcMemoryMonTrapGroup 2 }
+            
+END  

@@ -1,0 +1,196 @@
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2008.7.31 by heyumei
+-- Copyright(c) 2003-2008 by RAISECOM TECH, Ltd. 
+-- =======================================================================
+
+-- ===========================================================================
+
+--
+-- RAISECOM base management objects
+--            
+
+	HA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE ,
+		Integer32 							FROM SNMPv2-SMI 		
+	    SlotIndex 							FROM RAISECOM-PONSERIES-TC         
+		raisecomAgent						FROM RAISECOM-BASE-MIB		
+		DateAndTime     					FROM SWITCH-TC;   
+				
+	raisecomdeviceMgt    MODULE-IDENTITY
+		LAST-UPDATED 	"201012310000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for device management"
+		::= { raisecomAgent  27} 
+                
+	--groups                 
+	  rcHighAvailabilityGroup    OBJECT IDENTIFIER ::= {raisecomdeviceMgt 9}
+	  
+	  rcHighAvailabilityTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RcHighAvailabilityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "."
+    ::= { rcHighAvailabilityGroup 1 }
+                                     
+	rcHighAvailabilityEntry    OBJECT-TYPE
+		SYNTAX          RcHighAvailabilityEntry
+		MAX-ACCESS      not-accessible
+	    STATUS          current
+		DESCRIPTION     "y."
+		INDEX { rcHighAvailabilityIndex  }
+    ::= { rcHighAvailabilityTable 1 }
+    
+	RcHighAvailabilityEntry  ::=
+        SEQUENCE { 
+        rcHighAvailabilityIndex           			Integer32,
+        rcHighAvailabilityMajorSlot             	SlotIndex,
+        rcHighAvailabilityMajorSlotState            Integer32,
+        rcHighAvailabilityMinorSlot             	SlotIndex,
+        rcHighAvailabilityMinorSlotState            Integer32,
+        rcHighAvailabilityOperState                 Integer32,
+        rcHighAvailabilityForcedSwitch              Integer32,
+        rcHighAvailabilitySwitchedCount             Integer32,
+        rcHighAvailabilitySwitchResult              INTEGER ,
+        rcHighAvailabilitySwitchTime                DateAndTime,
+        rcHighAvailabilitySwitchReason              INTEGER      
+        }         
+                    
+     rcHighAvailabilityIndex      OBJECT-TYPE
+        SYNTAX          Integer32      
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "." 
+        ::= { rcHighAvailabilityEntry 1 }   
+        
+    rcHighAvailabilityMajorSlot      OBJECT-TYPE
+        SYNTAX          SlotIndex      
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Card protect group major card index." 
+        ::= { rcHighAvailabilityEntry 2 }
+        
+    rcHighAvailabilityMajorSlotState      OBJECT-TYPE
+        SYNTAX          Integer32{
+						          normal(1),
+						          offline(2),
+							      disable(3)
+                                  }
+		MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group major card state." 
+        ::= { rcHighAvailabilityEntry 3 }
+        
+    rcHighAvailabilityMinorSlot      OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Card protect group major card state." 
+        ::= { rcHighAvailabilityEntry 4 }
+        
+    rcHighAvailabilityMinorSlotState      OBJECT-TYPE
+        SYNTAX          Integer32{
+						          normal(1),
+							      offline(2),
+							      disable(3)
+                                  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group minor card state." 
+        ::= { rcHighAvailabilityEntry 5 }
+        
+	rcHighAvailabilityOperState      OBJECT-TYPE
+        SYNTAX          Integer32 {
+						          stopped(0),
+								  normal(1),
+								  protected(2),
+                                  pending(3)
+                                  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group operate state." 
+        ::= { rcHighAvailabilityEntry 6 }   
+        
+ 	rcHighAvailabilityForcedSwitch      OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Card protect group lock flag." 
+        ::= { rcHighAvailabilityEntry 7 }
+        
+    rcHighAvailabilitySwitchedCount      OBJECT-TYPE
+        SYNTAX          Integer32      
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group force switch." 
+        ::= { rcHighAvailabilityEntry 8 }    
+        
+    rcHighAvailabilitySwitchResult      OBJECT-TYPE
+        SYNTAX          INTEGER {
+						          succeeded(1),
+								  destFailure(2)
+								  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group switch result." 
+        ::= { rcHighAvailabilityEntry 9 }
+        
+    rcHighAvailabilitySwitchTime      OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Card protect group switch time." 
+        ::= { rcHighAvailabilityEntry 10 }
+ 
+     rcHighAvailabilitySwitchReason      OBJECT-TYPE
+        SYNTAX          INTEGER{  
+        						auto-switch(1),
+        						force-switch(2)
+       						 }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "." 
+        ::= { rcHighAvailabilityEntry 11 }   
+                  
+   
+   rcHighAvailabilityForcedSwitchResultTrap  NOTIFICATION-TYPE
+           OBJECTS {
+                    rcHighAvailabilityIndex,
+                    rcHighAvailabilityMajorSlot,
+                    rcHighAvailabilityMajorSlotState,
+                    rcHighAvailabilityMinorSlot,
+                    rcHighAvailabilityMinorSlotState,
+                    rcHighAvailabilityOperState,
+                    rcHighAvailabilitypSwitchResult,
+                    rcHighAvailabilitySwitchTime,
+                    rcHighAvailabilitySwitchReason 
+                    }
+           STATUS  current
+           DESCRIPTION  "Card protect group forced switch result."
+           ::= { rcHighAvailabilityGroup 2 } 
+           
+     rcHighAvailabilityAutoSwitchResultTrap  NOTIFICATION-TYPE
+           OBJECTS {
+                    rcHighAvailabilityIndex,
+                    rcHighAvailabilityMajorSlot,
+                    rcHighAvailabilityMajorSlotState,
+                    rcHighAvailabilityMinorSlot,
+                    rcHighAvailabilityMinorSlotState,
+                    rcHighAvailabilityOperState,
+                    rcHighAvailabilitypSwitchResult,
+                    rcHighAvailabilitySwitchTime,
+                    rcHighAvailabilitySwitchReason 
+                    }
+           STATUS  current
+           DESCRIPTION  "Card protect group auto switch result."
+           ::= { rcHighAvailabilityGroup 3 }
+                    
+          
+ END

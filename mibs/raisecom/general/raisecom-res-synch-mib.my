@@ -1,0 +1,129 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : FraisecomResSynchMib
+-- FILE NAME: raisecom-res-synch-mib.my			
+-- DATE     : 2011/2/16							
+-- VERSION  : 1.00								
+-- PURPOSE  : The MIB module defining objects for resource synchronization
+--            functions			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author        
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2011/2/16, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+-----------------------------------------------------------------------------
+--
+-- RAISECOM base management objects
+--            
+
+RAISECOM-RES-SYNCH-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE,
+		InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB
+		raisecomPonCommon
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+
+	rcResourcesSynchGroup    MODULE-IDENTITY
+		LAST-UPDATED 	"201102150000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for resource synchronization functions."
+		::= { raisecomPonCommon  4}        
+		
+   rcResourcesSynchTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcResourcesSynchEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"A list of raisecomResourcesSynchServer entries."
+           	::= { rcResourcesSynchGroup 1 }
+
+    rcResourcesSynchEntry OBJECT-TYPE
+        SYNTAX RcResourcesSynchEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"The resources synchronization server list group infomation entry."
+        INDEX { rcResourcesSynchType }
+           	::= { rcResourcesSynchTable 1 }
+	
+	RcResourcesSynchEntry ::= SEQUENCE {
+		rcResourcesSynchType INTEGER,
+        rcResourcesSynchRemIpAddr InetAddress,
+        rcResourcesSynchRemIpAddrType InetAddressType,   
+        rcResourcesSynchPort  INTEGER,
+        rcResourcesSynchStats  INTEGER,
+        rcResourcesSynchPortList OCTET STRING
+                }
+        
+    rcResourcesSynchType OBJECT-TYPE
+        SYNTAX INTEGER{
+            		topologyRes(1),                              
+            		onuRes(2),
+            		onuMacTable(3)
+            		}
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          	"The resource type of synchronization."
+          	::= { rcResourcesSynchEntry 1 } 
+              	
+    rcResourcesSynchRemIpAddr OBJECT-TYPE
+    	SYNTAX InetAddress
+    	ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"The IPv4 or IPv6 address of a specified server.
+    		while rcResourcesSynchStats equals busy,The address must not be modified."
+    		::= { rcResourcesSynchEntry 2 }
+
+	rcResourcesSynchRemIpAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           	"The IP address type of a specified server.
+           	While rcResourcesSynchStats equals busy,The address type must not be modified.
+           	Only modifing the address and the address type at the same time,it can send a request for synchronization."
+           	::= { rcResourcesSynchEntry 3 }    
+
+    rcResourcesSynchPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"The socket port of resources synchronization."
+           	::= { rcResourcesSynchEntry 4 }
+          	  
+    rcResourcesSynchStats OBJECT-TYPE
+        SYNTAX INTEGER{
+            		ready(1),
+              		busy(2)
+              		}
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           	"The state of resources synchronization."
+           	::= { rcResourcesSynchEntry 5 } 
+           	
+	rcResourcesSynchPortList OBJECT-TYPE
+        SYNTAX OCTET STRING  (SIZE (1..256))
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           	"The Index of Onu."
+           	::= { rcResourcesSynchEntry 6 }
+          	
+END
+
+

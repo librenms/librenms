@@ -1,0 +1,133 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-extend-uplink-protect-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Dec 13, 2011
+--  Author       : zhuchen
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+    EPON-EXTEND-UPLINK-PROTECT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        DateAndTime FROM SWITCH-TC
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+    rcEponProtectExtendedUpLinkGroup MODULE-IDENTITY
+    
+        LAST-UPDATED    "201112140000Z"  -- Dec 14, 2011
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "Raisecom Science & Technology Co., ltd.
+                         E-mail: support@raisecom.com"
+
+        DESCRIPTION     "EPON extended uplink protection group MIB definition."
+
+        REVISION        "201112140000Z"  -- Dec 14, 2011
+        DESCRIPTION     "Initial MIB creation. Migrated from EPON-FAULT-MGMT-MIB."
+
+                ::= { raisecomEponMgt 5 }
+
+------------------------------------------------------------------------------
+--
+--  rcEponProtectExtendedUpLinkTable
+--  
+	rcEponProtectExtendedUpLinkTable OBJECT-TYPE      
+        SYNTAX SEQUENCE OF  rcEponProtectExtendedUpLinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkGroup 1 } 
+        
+	rcEponProtectExtendedUpLinkEntry OBJECT-TYPE
+    	SYNTAX rcEponProtectExtendedUpLinkEntry
+    	MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            "."  
+        INDEX { rcEponProtectExtendedUpLinkIndex }    
+        ::= { rcEponProtectExtendedUpLinkTable 1 }
+    	
+	rcEponProtectExtendedUpLinkEntry ::= SEQUENCE {
+        rcEponProtectExtendedUpLinkIndex     			INTEGER,
+        rcEponProtectExtendedUpLinkObjId   				INTEGER,
+        rcEponProtectExtendedUpLinkObjType              INTEGER,
+        rcEponProtectExtendedUpLinkAdmin                INTEGER,
+        rcEponProtectExtendedUpLinkStatus               INTEGER,
+        rcEponProtectExtendedUpLinkCycleLen             INTEGER,
+        rcEponProtectExtendedUpLinkLastSwitchTimeStamp	DateAndTime
+       }
+       
+     rcEponProtectExtendedUpLinkIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 1 }    
+        
+     rcEponProtectExtendedUpLinkObjId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 2 } 
+
+     rcEponProtectExtendedUpLinkObjType OBJECT-TYPE
+        SYNTAX INTEGER{
+					unknown(1),
+					ge(2),
+					trunk(3)
+					}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 3 }
+
+     rcEponProtectExtendedUpLinkAdmin OBJECT-TYPE
+        SYNTAX INTEGER{
+					unknown(1),
+					enable(2),
+					disable(3)
+					}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 4 }
+
+     rcEponProtectExtendedUpLinkStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+					unknown(1),
+					normal(2),
+					los(3)
+					}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 5 }
+
+     rcEponProtectExtendedUpLinkCycleLen OBJECT-TYPE
+        SYNTAX INTEGER(1..30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 6 }
+
+     rcEponProtectExtendedUpLinkLastSwitchTimeStamp OBJECT-TYPE
+        SYNTAX DateAndTime				
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponProtectExtendedUpLinkEntry 7 }
+
+END

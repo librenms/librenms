@@ -1,0 +1,479 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-voip-net-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Oct 7, 2008
+--  Author       : heyumei
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-VOIP-NET-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress, DisplayString FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        OnuIndex, Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuVoipGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 22 }
+
+rcEponOnuVoipNetGroup      	OBJECT IDENTIFIER ::= { rcEponOnuVoipGroup 2 }     
+
+------------------------------------------------------------------------------
+-- rcEponOnuCtcVoipNetTable 
+--
+  
+  rcEponOnuCtcVoipNetTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcVoipNetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipNetGroup 1 }
+
+    rcEponOnuCtcVoipNetEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcVoipNetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuCtcVoipNetTable 1 }
+
+    RcEponOnuCtcVoipNetEntry ::= SEQUENCE {
+        rcEponOnuCtcVoipNetMode           	INTEGER, 
+        rcEponOnuCtcVoipNetIpAddress		IpAddress,
+        rcEponOnuCtcVoipNetIpMask			IpAddress, 
+        rcEponOnuCtcVoipNetDefaultRoute     IpAddress,
+        rcEponOnuCtcVoipNetVlanMode         INTEGER,       	       	
+       	rcEponOnuCtcVoipNetCVlanId          INTEGER,        	
+       	rcEponOnuCtcVoipNetSVlanId          INTEGER,
+       	rcEponOnuCtcVoipNetDataPriority     INTEGER,
+       	rcEponOnuCtcVoipCardMacAddress      MacAddress
+        }
+                
+    rcEponOnuCtcVoipNetMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				static(1),
+						dhcp(2),
+						pppoe(3)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {static}
+        ::= { rcEponOnuCtcVoipNetEntry 1 }
+        
+    rcEponOnuCtcVoipNetIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL { '00000000'h }           
+        ::= { rcEponOnuCtcVoipNetEntry 2 }          
+        
+    rcEponOnuCtcVoipNetIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL { '00000000'h }
+        ::= { rcEponOnuCtcVoipNetEntry 3 }    
+   
+    rcEponOnuCtcVoipNetDefaultRoute OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL { '00000000'h }
+        ::= { rcEponOnuCtcVoipNetEntry 4 }
+                       
+    rcEponOnuCtcVoipNetVlanMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				tranparent(0),
+						tag(1),
+						stacking(2)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {transparent}
+        ::= { rcEponOnuCtcVoipNetEntry 5 }   
+    
+    rcEponOnuCtcVoipNetCVlanId OBJECT-TYPE
+        SYNTAX INTEGER(0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuCtcVoipNetEntry 6 }   
+    
+    rcEponOnuCtcVoipNetSVlanId OBJECT-TYPE
+        SYNTAX INTEGER(0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuCtcVoipNetEntry 7 }  
+        
+    rcEponOnuCtcVoipNetDataPriority OBJECT-TYPE
+        SYNTAX INTEGER(0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {6}
+        ::= { rcEponOnuCtcVoipNetEntry 8 }
+
+    rcEponOnuCtcVoipCardMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcVoipNetEntry 9 }
+
+------------------------------------------------------------------------------
+-- rcEponOnuCtcVoipPPPoETable 
+--
+  
+  rcEponOnuCtcVoipPPPoETable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcVoipPPPoEEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipNetGroup 2 }
+
+    rcEponOnuCtcVoipPPPoEEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcVoipPPPoEEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuCtcVoipPPPoETable 1 }
+
+    RcEponOnuCtcVoipPPPoEEntry ::= SEQUENCE {
+        rcEponOnuCtcVoipPPPoEMode           INTEGER, 
+        rcEponOnuCtcVoipPPPoEUserName		DisplayString,
+        rcEponOnuCtcVoipPPPoEPassword		DisplayString
+        }
+    
+    rcEponOnuCtcVoipPPPoEMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				auto(0),
+						chap(1),
+						pap(2)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {auto}
+        ::= { rcEponOnuCtcVoipPPPoEEntry 1 } 
+        
+    rcEponOnuCtcVoipPPPoEUserName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..12))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuCtcVoipPPPoEEntry 2 }    
+    
+    rcEponOnuCtcVoipPPPoEPassword OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..12))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuCtcVoipPPPoEEntry 3 }
+                              
+------------------------------------------------------------------------------
+-- rcEponOnuVoipNetTable 
+--
+  
+  rcEponOnuVoipNetTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipNetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipNetGroup 3 }
+
+    rcEponOnuVoipNetEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipNetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuVoipNetTable 1 }
+
+    RcEponOnuVoipNetEntry ::= SEQUENCE {
+        rcEponOnuVoipNetDnsServerIp         IpAddress,
+        rcEponOnuVoipNetIpQosTrustMode      INTEGER,
+        rcEponOnuVoipNetDscp                INTEGER,
+        rcEponOnuVoipNetPrior               INTEGER,
+        rcEponOnuVoipNetTos                 INTEGER
+        }
+                
+    rcEponOnuVoipNetDnsServerIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuVoipNetEntry 1 }
+        
+    rcEponOnuVoipNetIpQosTrustMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				none(0),
+        				dscp(1),
+        				prior(2),
+        				tos(3)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {none}       
+        ::= { rcEponOnuVoipNetEntry 2 }
+        
+    rcEponOnuVoipNetDscp OBJECT-TYPE
+        SYNTAX INTEGER(0..63)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."           
+        ::= { rcEponOnuVoipNetEntry 3 }	
+        
+    rcEponOnuVoipNetPrior OBJECT-TYPE
+        SYNTAX INTEGER(0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."           
+        ::= { rcEponOnuVoipNetEntry 4 }
+        
+    rcEponOnuVoipNetTos OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."           
+        ::= { rcEponOnuVoipNetEntry 5 }			                              
+
+------------------------------------------------------------------------------
+-- rcEponOnuVoipDhcpClientTable 
+--
+  
+  rcEponOnuVoipDhcpClientTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipDhcpClientEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipNetGroup 4 }
+
+    rcEponOnuVoipDhcpClientEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipDhcpClientEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuVoipDhcpClientTable 1 }
+
+    RcEponOnuVoipDhcpClientEntry ::= SEQUENCE {
+        rcEponOnuVoipDhcpClientHostName     OCTET STRING, 
+        rcEponOnuVoipDhcpClientId			OCTET STRING,
+        rcEponOnuVoipDhcpClientClassId		OCTET STRING
+        }
+            
+    rcEponOnuVoipDhcpClientHostName OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuVoipDhcpClientEntry 1 }
+    
+    rcEponOnuVoipDhcpClientId OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuVoipDhcpClientEntry 2 }    
+    
+    rcEponOnuVoipDhcpClientClassId OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        ::= { rcEponOnuVoipDhcpClientEntry 3 }  
+
+------------------------------------------------------------------------------
+-- rcEponOnuVoipNetMediaTable 
+--
+    
+    rcEponOnuVoipNetMediaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipNetMediaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipNetGroup 5 }  
+        
+    rcEponOnuVoipNetMediaEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipNetMediaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuVoipNetMediaTable 1 }
+        
+    RcEponOnuVoipNetMediaEntry ::= SEQUENCE {
+        rcEponOnuVoipNetMediaIpAddr         IpAddress, 
+        rcEponOnuVoipNetMediaIpMask			IpAddress,
+        rcEponOnuVoipNetMediaIpDefaultRoute IpAddress,
+        rcEponOnuVoipNetMediaVlanId         INTEGER,
+        rcEponOnuVoipNetMediaVlanCos        INTEGER,
+        rcEponOnuVoipNetMediaIpQosTrustMode INTEGER,
+        rcEponOnuVoipNetMediaDscp           INTEGER,
+        rcEponOnuVoipNetMediaPrior          INTEGER,
+        rcEponOnuVoipNetMediaTos            INTEGER
+        } 
+        
+    rcEponOnuVoipNetMediaIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL { '00000000'h }
+        ::= { rcEponOnuVoipNetMediaEntry 1 } 
+        
+    rcEponOnuVoipNetMediaIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL { '00000000'h }
+        ::= { rcEponOnuVoipNetMediaEntry 2 }
+        
+    rcEponOnuVoipNetMediaIpDefaultRoute OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL { '00000000'h }
+        ::= { rcEponOnuVoipNetMediaEntry 3 }
+        
+    rcEponOnuVoipNetMediaVlanId OBJECT-TYPE
+        SYNTAX INTEGER(0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuVoipNetMediaEntry 4 }
+        
+    rcEponOnuVoipNetMediaVlanCos OBJECT-TYPE
+        SYNTAX INTEGER(0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {6}       
+        ::= { rcEponOnuVoipNetMediaEntry 5 } 
+        
+    rcEponOnuVoipNetMediaIpQosTrustMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				none(0),
+        				dscp(1),
+        				prior(2),
+        				tos(3)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."    
+        DEFVAL {none}       
+        ::= { rcEponOnuVoipNetMediaEntry 6 } 
+        
+    rcEponOnuVoipNetMediaDscp OBJECT-TYPE
+        SYNTAX INTEGER(0..63)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."      
+        ::= { rcEponOnuVoipNetMediaEntry 7 }
+        
+    rcEponOnuVoipNetMediaPrior OBJECT-TYPE
+        SYNTAX INTEGER(0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."      
+        ::= { rcEponOnuVoipNetMediaEntry 8 } 
+        
+    rcEponOnuVoipNetMediaTos OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."      
+        ::= { rcEponOnuVoipNetMediaEntry 9 }
+                                                         
+-------------------------------------------------------------------------------- 
+---
+---Net Trap Group
+---
+rcEponOnuVoipNetTrapGroup      	OBJECT IDENTIFIER ::= { rcEponOnuVoipNetGroup 10 }
+
+    rcEponOnuVoipGetDynamicIpAddrSuccessTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuDevIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuVoipNetTrapGroup 1 }  
+   
+    rcEponOnuVoipGetDynamicIpAddrFailTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuDevIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuVoipNetTrapGroup 2 } 
+   
+    rcEponOnuVoipGetDefaultGatewayFailTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuDevIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuVoipNetTrapGroup 3 } 
+END

@@ -1,0 +1,322 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-voip-stats-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Oct 07, 2008
+--  Author       : heyumei
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-VOIP-STATS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        OnuIndex, Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC            
+        rcEponOnuPotsIndex FROM EPON-RMT-ONU-VOIP-SERVICE-MIB
+        rcEponRmtOnuMgt, rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB           
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;   
+    
+    rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+             
+rcEponOnuVoipGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 22 }
+
+rcEponOnuVoipStatsGroup      	OBJECT IDENTIFIER ::= { rcEponOnuVoipGroup 6 }
+------------------------------------------------------------------------------
+--
+-- rcEponOnuVoipRtpStatisticTable
+--
+    rcEponOnuVoipRtpStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipRtpStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current       
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipStatsGroup 1 }
+
+    rcEponOnuVoipRtpStatisticEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipRtpStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex  }
+        ::= { rcEponOnuVoipRtpStatisticTable 1 }
+
+    RcEponOnuVoipRtpStatisticEntry ::= SEQUENCE {
+        rcEponOnuVoipRtpStatisticClear    			 INTEGER,
+        rcEponOnuVoipRtpStatisticInPkts				 Counter64,
+        rcEponOnuVoipRtpStatisticInOcts    		     Counter64,
+        rcEponOnuVoipRtpStatisticOutPkts			 Counter64,
+        rcEponOnuVoipRtpStatisticOutOcts    		 Counter64
+        }         
+                                                                
+    rcEponOnuVoipRtpStatisticClear OBJECT-TYPE
+        SYNTAX INTEGER{
+        				ready(0),
+						clear(1)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipRtpStatisticEntry 1 } 
+        
+	rcEponOnuVoipRtpStatisticInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipRtpStatisticEntry 2 }     
+        
+	rcEponOnuVoipRtpStatisticInOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipRtpStatisticEntry 3 } 
+        
+	rcEponOnuVoipRtpStatisticOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipRtpStatisticEntry 4 }   
+        
+	rcEponOnuVoipRtpStatisticOutOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipRtpStatisticEntry 5 } 
+ 
+--
+-- rcEponOnuVoipLineStatisticTable
+--
+    rcEponOnuVoipLineStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipLineStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipStatsGroup 2 }
+
+    rcEponOnuVoipLineStatisticEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipLineStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex  }
+        ::= { rcEponOnuVoipLineStatisticTable 1 }
+
+    RcEponOnuVoipLineStatisticEntry ::= SEQUENCE {        
+        rcEponOnuVoipLineStatisticClear   				    INTEGER,
+        rcEponOnuVoipLineStatisticCallerSuccess			Counter32,
+        rcEponOnuVoipLineStatisticCallerFail    			Counter32,
+        rcEponOnuVoipLineStatisticCalleeSuccess			Counter32,
+        rcEponOnuVoipLineStatisticCalleeFail    			Counter32,
+        rcEponOnuVoipLineCurConnectionTime              Counter32,  
+        rcEponOnuVoipLineTotalConnectionTime              Counter32,
+        rcEponOnuVoipLineTotalNumber              		Counter32
+        }         
+                                                                
+    rcEponOnuVoipLineStatisticClear OBJECT-TYPE
+        SYNTAX INTEGER{
+						ready(0),
+						clear(1)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 1 } 
+        
+	rcEponOnuVoipLineStatisticCallerSuccess OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 2 }     
+        
+	rcEponOnuVoipLineStatisticCallerFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 3 } 
+        
+	rcEponOnuVoipLineStatisticCalleeSuccess OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 4 }   
+        
+	rcEponOnuVoipLineStatisticCalleeFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 5 } 
+    
+    rcEponOnuVoipLineCurConnectionTime OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 6 }
+    
+    rcEponOnuVoipLineTotalConnectionTime OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 7 }
+    
+    rcEponOnuVoipLineTotalNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineStatisticEntry 8 }
+        
+--
+--  rcEponOnuVoipStatisticMngTable
+-- 
+	rcEponOnuVoipStatisticMngTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipStatisticMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current       
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipStatsGroup 3 }
+
+    rcEponOnuVoipStatisticMngEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipStatisticMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex  }
+        ::= { rcEponOnuVoipStatisticMngTable 1 }
+
+	RcEponOnuVoipStatisticMngEntry ::= SEQUENCE {        
+        rcEponOnuVoipStatisticClear    		INTEGER
+        }     
+                                                                
+    rcEponOnuVoipStatisticClear OBJECT-TYPE
+        SYNTAX INTEGER{
+        				ready(0),
+						clearAllPots(1)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipStatisticMngEntry 1 }
+
+--
+--  rcEponOnuVoipPotsStatisticTable
+-- 
+    rcEponOnuVoipPotsStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF rcEponOnuVoipPotsStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current       
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipStatsGroup 4 }
+
+    rcEponOnuVoipPotsStatisticEntry OBJECT-TYPE
+        SYNTAX rcEponOnuVoipPotsStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuVoipPotsStatisticTable 1 }
+
+    rcEponOnuVoipPotsStatisticEntry ::= SEQUENCE {        
+        rcEponOnuVoipPotsStatistcClear      INTEGER,
+        rcEponOnuVoipPotsTxPktCount         Counter64,
+        rcEponOnuVoipPotsRxPktCount         Counter64,
+        rcEponOnuVoipPotsMeanDelay          INTEGER,
+        rcEponOnuVoipPotsMeanJitter         INTEGER,
+        rcEponOnuVoipPotsFractionLoss       INTEGER
+        }     
+                                                                
+    rcEponOnuVoipPotsStatistcClear OBJECT-TYPE
+        SYNTAX INTEGER{
+                    ready(0),
+                    clear(1)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 1 }            
+
+    rcEponOnuVoipPotsTxPktCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 2 }
+
+    rcEponOnuVoipPotsRxPktCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 3 }
+
+    rcEponOnuVoipPotsMeanDelay OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 4 }
+
+    rcEponOnuVoipPotsMeanJitter OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 5 }
+
+    rcEponOnuVoipPotsFractionLoss OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsStatisticEntry 6 }
+        
+END
