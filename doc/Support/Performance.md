@@ -36,6 +36,17 @@ $config['poller_modules']['ospf'] = 0;
 You can disable modules globally then re-enable the module per device or the opposite way. For a list of modules please see
 [Poller modules](http://docs.librenms.org/Support/Poller%20Support/)
 
+#### SNMP Max Repeaters
+
+We have support for SNMP Max repeaters which can be handy on devices where we poll a lot of ports or bgp sessions for instance and 
+where snmpwalk or snmpbulkwalk is used. This needs to be enabled on a per device basis under edit device -> snmp -> Max repeaters.
+
+It's advisable to test the time taken to snmpwalk IF-MIB or something similar to work out what the best value is. To do this run the following 
+but replace <REPEATERS> with varying numbers from 10 upto around 50. You will also need to set the correct snmp version, hostname and community string:
+
+`time snmpbulkwalk -v2c -cpublic HOSTNAME -Cr<REPEATERS> -M /opt/librenms/mibs -m IF-MIB`
+
+> NOTE: Do not go blindly setting this value as you can impact polling negatively.
 
 #### Optimise poller-wrapper
 
