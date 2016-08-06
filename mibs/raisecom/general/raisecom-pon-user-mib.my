@@ -1,0 +1,404 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : FraisecomPonUserManageGroup
+-- FILE NAME: raisecom-pon-user-mib.my			
+-- DATE     : 2010/12/23							
+-- VERSION  : 1.00								
+-- PURPOSE  : The MIB module defining objects for user management
+--            functions.			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2010/12/23, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+-----------------------------------------------------------------------------
+
+--
+-- RAISECOM base management objects
+--            
+
+RAISECOM-PON-USER-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE ,
+		Integer32,
+		IpAddress,
+		Unsigned32
+			FROM SNMPv2-SMI
+		RowStatus, TruthValue
+			FROM SNMPv2-TC    
+		DateAndTime,
+		EnableVar
+			FROM SWITCH-TC 
+		InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB
+		raisecomPonCommon
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+
+	raisecomPonUserManageGroup    MODULE-IDENTITY
+		LAST-UPDATED 	"201012230000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for user management functions."
+		::= { raisecomPonCommon  2}  
+	                
+	--groups                 
+
+--	raisecomPonUserManageGroup 	OBJECT IDENTIFIER ::= {raisecomPonCommon 2}
+  
+  -- raisecomPonUserManageGroup
+   --scalars
+        raisecomPonUserLogMethod OBJECT-TYPE
+	        SYNTAX INTEGER{
+	        	local(1),
+	        	radius(2),        	
+	        	local_radius(3),
+	        	radius_local(4),
+	        	radius_local_no_response(5),
+	        	tacacs(6),
+	        	local_tacacs(7),
+	        	tacacs_local(8),
+	        	tacacs_local_no_response(9)
+	        	}        
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	            "stand for the method for user to log in system.
+	            local for log on user to user information from local system;
+	            local_radius for get user information on local system and then from radius server;
+	            radius_local for first get user on radius server and then from local system;
+	            radius-local server-no-response for first get user on radius server and then from local system, when there is no response from radius server;
+	            tacacs+ for get user information only from tacacs+ server;
+	            local_tacacs+ for first get user information on local system and then from on tacacs+ server;
+	            tacacs+_local for first get user information on tacacs+ server and then from local system;
+	            tacacs+_local server-no-response for first get user information on tacacs+ server and then from local system when there is no response from tacacs+ server;"
+        ::= { raisecomPonUserManageGroup 1 }    
+  
+    raisecomPonEnableLogMethod OBJECT-TYPE
+    SYNTAX INTEGER{
+    local(1),
+    radius(2),
+    local_radius(3),
+    radius_local(4),
+    radius_local_no_response(5),
+    tacacs(6),
+    local_tacacs(7),
+    tacacs_local(8),
+    tacacs_local_no_response(9)
+    }        
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "stand for the method for user to enable in system.
+        local for log on user to user information from local system;
+        local_radius for get user information on local system and then from radius server;
+        radius_local for first get user on radius server and then from local system;
+        radius-local server-no-response for first get user on radius server and then from local system, when there is no response from radius server;
+        tacacs+ for get user information only from tacacs+ server;
+        local_tacacs+ for first get user information on local system and then from on tacacs+ server;
+        tacacs+_local for first get user information on tacacs+ server and then from local system;
+        tacacs+_local server-no-response for first get user information on tacacs+ server and then from local system when there is noresponse from tacacs+ server;"
+   ::= { raisecomPonUserManageGroup 2 }
+    
+    raisecomPonEnableLogPassword OBJECT-TYPE
+	        SYNTAX OCTET STRING 	(SIZE (1..16))
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	            "The password for enable log."
+        ::= { raisecomPonUserManageGroup 3 }
+        
+    raisecomPonEnableLogOldPassword OBJECT-TYPE
+	        SYNTAX OCTET STRING 	(SIZE (1..16))
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	            "The old password for enable log."
+        ::= { raisecomPonUserManageGroup 4 }   
+
+     --user manage table
+    raisecomPonUserTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RaisecomPonUserEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "User manage table"
+    ::= { raisecomPonUserManageGroup 5 }
+
+    raisecomPonUserEntry    OBJECT-TYPE
+	SYNTAX          RaisecomPonUserEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+	DESCRIPTION     "An entry in the raisecomUserTable."
+	INDEX { raisecomPonUserServerIPType, raisecomPonUserServerIP, raisecomPonUsername }
+    ::= { raisecomPonUserTable 1 }
+
+    RaisecomPonUserEntry ::=
+        SEQUENCE {
+        raisecomPonUserServerIPType     InetAddressType,
+        raisecomPonUserServerIP 		InetAddress,
+       	raisecomPonUsername		OCTET STRING (SIZE (1..16)),   
+       	raisecomPonUserPriority    	INTEGER,
+        raisecomPonUserStatus			INTEGER,
+        raisecomPonUserTerminalType    INTEGER,
+        raisecomPonUserPassword  OCTET STRING (SIZE (1..16)),        
+	    raisecomPonUserOldPassword OCTET STRING (SIZE (1..16)),
+      	raisecomPonUserEntryRowStatus RowStatus	        
+        }
+        
+ 	raisecomPonUserServerIPType         OBJECT-TYPE
+        SYNTAX          InetAddressType        
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The address type of the server ip address"
+    ::= { raisecomPonUserEntry 1 }   
+ 
+	raisecomPonUserServerIP         OBJECT-TYPE
+        SYNTAX          InetAddress        
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The server ip address user belongs to.
+            local user's server ip is 0.0.0.0."
+    ::= { raisecomPonUserEntry 2 }   
+   
+    raisecomPonUsername     OBJECT-TYPE
+        SYNTAX          OCTET STRING  (SIZE (1..16))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The name a user login the device with."
+    ::= { raisecomPonUserEntry 3 }    
+
+
+    raisecomPonUserPriority  OBJECT-TYPE
+        SYNTAX 		INTEGER  (1..15)
+        MAX-ACCESS 	read-create
+        STATUS current
+        DESCRIPTION
+            "the priority of system user."
+        ::= { raisecomPonUserEntry 4 }
+    
+    
+    raisecomPonUserStatus          OBJECT-TYPE
+        SYNTAX          INTEGER{
+        			 	online(1),
+        			 	offline(2)
+        			 }           
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The status of a user."
+    ::= { raisecomPonUserEntry 5 }
+	    
+    raisecomPonUserTerminalType          OBJECT-TYPE
+        SYNTAX          INTEGER 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Connection type that the user is logon.
+            the bit 0 stand for console
+            the bit 1 stand for telnet 1 
+            the bit 2 stand for telnet 2 
+            the bit 3 stand for telnet 3 
+            the bit 4 stand for telnet 4 
+            the bit 5 stand for telnet 5
+            
+            Eg. a user abc login system on console and on telent 5 
+            then the value is 0100001b "
+    ::= { raisecomPonUserEntry 6 }
+    
+    raisecomPonUserPassword  OBJECT-TYPE
+        SYNTAX 		OCTET STRING  (SIZE (1..16))
+        MAX-ACCESS 	read-create
+        STATUS current
+        DESCRIPTION
+            "The password of system user."
+        ::= { raisecomPonUserEntry 7 }
+
+    raisecomPonUserOldPassword  OBJECT-TYPE
+        SYNTAX 		OCTET STRING  (SIZE (1..16)) 
+        MAX-ACCESS 	read-create
+        STATUS current
+        DESCRIPTION
+            "The old password of system user."
+        ::= { raisecomPonUserEntry 8 }
+
+    raisecomPonUserEntryRowStatus  OBJECT-TYPE
+        SYNTAX 		RowStatus
+        MAX-ACCESS 	read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { raisecomPonUserEntry 9 }
+ 
+ 	--command set table
+    raisecomCmdSetTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RaisecomCmdSetEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The command set table"
+    ::= { raisecomPonUserManageGroup 6 }
+
+    raisecomCmdSetEntry    OBJECT-TYPE
+	SYNTAX          RaisecomCmdSetEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+	DESCRIPTION     "An entry in the raisecomCmdSetTable."
+	INDEX {raisecomCmdSetName}
+    ::= { raisecomCmdSetTable 1 }
+
+    RaisecomCmdSetEntry ::=
+        SEQUENCE {
+        raisecomCmdSetName        OCTET STRING,
+        raisecomCmdSetCmdCounter  INTEGER,   
+        raisecomCmdSetCmdNextNo   INTEGER,
+      	raisecomCmdSetEntryRowStatus RowStatus	        
+        }
+
+    raisecomCmdSetName         OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1..255))        
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The name of a command set"
+    ::= { raisecomCmdSetEntry 1 }  
+    
+    raisecomCmdSetCmdCounter         OBJECT-TYPE
+        SYNTAX          INTEGER       
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The command number in a command set"
+    ::= { raisecomCmdSetEntry 2 } 
+    
+    raisecomCmdSetCmdNextNo         OBJECT-TYPE
+        SYNTAX          INTEGER       
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The next command no in a command set,when raisecomCmdSetCmdCounter is the
+            max value,the raisecomCmdSetCmdNextNo is 0"
+    ::= { raisecomCmdSetEntry 3 }
+       
+    raisecomCmdSetEntryRowStatus         OBJECT-TYPE
+        SYNTAX          RowStatus        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "Rowstatus for raisecomCmdSetEntryRowStatus"
+    ::= { raisecomCmdSetEntry 4 }   
+    
+    --the command of command set table
+    raisecomCmdSetCmdTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RaisecomCmdSetCmdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "the command  table of command set"
+    ::= { raisecomPonUserManageGroup 7 }
+
+    raisecomCmdSetCmdEntry    OBJECT-TYPE
+	SYNTAX          RaisecomCmdSetCmdEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+	DESCRIPTION     "An entry in the raisecomCmdSetCmdTable."
+	INDEX {raisecomCmdSetName,raisecomCmdSetCmdNo }
+    ::= { raisecomCmdSetCmdTable 1 }
+
+    RaisecomCmdSetCmdEntry ::=
+        SEQUENCE {
+        raisecomCmdSetCmdNo          	INTEGER,
+        raisecomCmdSetCmdKeyList   		OCTET STRING,
+      	raisecomCmdSetCmdEntryRowStatus RowStatus	        
+        } 
+        
+    raisecomCmdSetCmdNo         OBJECT-TYPE
+        SYNTAX          INTEGER       
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The command no in a command set"
+    ::= { raisecomCmdSetCmdEntry 1 } 
+    
+    raisecomCmdSetCmdKeyList         OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1..255))        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "The key words in a command"
+    ::= { raisecomCmdSetCmdEntry 2 }
+        
+    raisecomCmdSetCmdEntryRowStatus         OBJECT-TYPE
+        SYNTAX          RowStatus        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "Rowstatus for raisecomCmdSetCmdEntryRowStatus"
+    ::= { raisecomCmdSetCmdEntry 3 }
+
+	--user excute command set control table
+    raisecomUserCmdSetCtrlTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RaisecomUserCmdSetCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "User command set control table"
+    ::= { raisecomPonUserManageGroup 8 }
+
+    raisecomUserCmdSetCtrlEntry    OBJECT-TYPE
+	SYNTAX          RaisecomUserCmdSetCtrlEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+	DESCRIPTION     "An entry in the raisecomUserCmdSetCtrlTable."
+	INDEX {raisecomPonUsername, raisecomUserCmdSetCtrlIndex}
+    ::= { raisecomUserCmdSetCtrlTable 1 }
+
+    RaisecomUserCmdSetCtrlEntry ::=
+        SEQUENCE {
+       	raisecomUserCmdSetCtrlIndex           INTEGER,
+        raisecomUserCmdSetCtrlType            INTEGER,
+        raisecomUserCmdSetName               OCTET STRING,
+      	raisecomUserCmdSetCtrlEntryRowStatus RowStatus	        
+        }
+
+	raisecomUserCmdSetCtrlIndex         OBJECT-TYPE
+        SYNTAX          INTEGER (1..4)        
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "User command set control config index, range 1 to 4"
+    ::= { raisecomUserCmdSetCtrlEntry 1 }   
+    
+    raisecomUserCmdSetCtrlType         OBJECT-TYPE
+        SYNTAX          INTEGER {allow(1), disallow(2)}        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "User command control config type, add a command set or remove a command  set
+             for special user could excute"
+    ::= { raisecomUserCmdSetCtrlEntry 2 }    
+
+    raisecomUserCmdSetName         OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1..255))        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "The  name of a command set"
+    ::= { raisecomUserCmdSetCtrlEntry 3 } 
+    
+    raisecomUserCmdSetCtrlEntryRowStatus         OBJECT-TYPE
+        SYNTAX          RowStatus        
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     
+            "Rowstatus for raisecomUserCmdSetCtrlEntryRowStatus"
+    ::= { raisecomUserCmdSetCtrlEntry 4 }
+           
+END    		

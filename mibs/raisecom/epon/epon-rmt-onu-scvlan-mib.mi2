@@ -1,0 +1,103 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-scvlan-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2013
+--  Author       : xiaoyingjie
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-SCVLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        rcEponOnuEthPortIndex FROM EPON-RMT-ONU-PORT-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB
+        rcEponRmtOnuMgt FROM EPON-RMT-ONU-VLAN-MIB;
+                
+     rcEponOnuVlanGroup      MODULE-IDENTITY
+        LAST-UPDATED    "201309160000Z"  -- Jul 16, 2013
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "201309160000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { rcEponRmtOnuMgt 15 }
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuSCVlanTable
+--
+
+    rcEponOnuSCVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSCVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVlanGroup 7 }
+    
+    rcEponOnuSCVlanEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSCVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortSvlan, rcEponOnuEthPortCvlan }
+        ::= { rcEponOnuSCVlanTable 1 }
+        
+	RcEponOnuSCVlanEntry ::= SEQUENCE {
+        rcEponOnuEthPortSvlan       INTEGER,
+        rcEponOnuEthPortCvlan 		INTEGER,
+        rcEponOnuEthPortIndexCount 	INTEGER,
+        rcEponOnuEthPortIndexList 	OCTET STRING,
+        rcEponOnuEthPortStateList 	OCTET STRING
+       }
+
+    rcEponOnuEthPortSvlan  OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSCVlanEntry 1 }
+
+    rcEponOnuEthPortCvlan OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSCVlanEntry 2 }
+
+   rcEponOnuEthPortIndexCount OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSCVlanEntry 3 }
+
+   rcEponOnuEthPortIndexList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..512))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "T."
+        ::= { rcEponOnuSCVlanEntry 4 }
+        
+   rcEponOnuEthPortStateList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "T."
+        ::= { rcEponOnuSCVlanEntry 5 }
+END

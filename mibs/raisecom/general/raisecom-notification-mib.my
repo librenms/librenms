@@ -1,0 +1,689 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : raisecomNotificationMib
+-- FILE NAME: raisecom-notification-mib.my			
+-- DATE     : 2011/4/1							
+-- VERSION  : 1.00								
+-- PURPOSE  : The MIB module defining objects for notification manager
+--            functions			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2011/4/1, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+-----------------------------------------------------------------------------
+--
+-- RAISECOM base management objects
+--  
+
+RAISECOM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        RowStatus,StorageType
+			FROM SNMPv2-TC
+        EnableVar
+        	FROM SWITCH-TC
+  		SnmpAdminString
+      		FROM SNMP-FRAMEWORK-MIB
+      	ResourceId, alarmListName, alarmModelIndex,
+      	alarmActiveDateAndTime, alarmActiveIndex,
+      	alarmClearIndex,alarmClearDateAndTime
+      		FROM ALARM-MIB
+      	ItuPerceivedSeverity,
+      	ItuTrendIndication
+      		FROM ITU-ALARM-TC-MIB
+      	IANAItuProbableCauseOrZero
+      	    FROM ARC-MIB
+      	IANAItuProbableCause,
+      	IANAItuEventType
+      		FROM IANA-ITU-ALARM-TC-MIB
+      	ZeroBasedCounter32
+      		FROM RMON2-MIB
+      	raisecomPonCommon
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+
+	rcNotificationManagerGroup    MODULE-IDENTITY
+		LAST-UPDATED 	"201104010000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for notification manager functions."
+		::= { raisecomPonCommon  5}     
+	
+	rcAlarmManagerObjects OBJECT IDENTIFIER ::= { rcNotificationManagerGroup 1 }
+    
+-- rcAlarmManagerObjects--
+    
+    rcAlarmTrapEnable OBJECT-TYPE
+    SYNTAX   EnableVar
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION " The status of the alarm trap send function is enable or disable"
+    	::= { rcAlarmManagerObjects 1 }  
+    
+    rcAlarmDelayEnable  OBJECT-TYPE
+    SYNTAX   EnableVar
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION " The status of the alarm delay function is enable or disable"
+    	::= { rcAlarmManagerObjects 2 }
+       
+    rcAlarmDelayInterval  OBJECT-TYPE
+    SYNTAX   INTEGER (1..60)
+    UNITS    "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION " The interval of the alarm delay."
+    DEFVAL      { 10 }
+    	::= { rcAlarmManagerObjects 3 }  
+    
+    rcAlarmActiveTableSize   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION " The size of the alarmActiveTable"
+    	::= { rcAlarmManagerObjects 4 }
+    	  
+    rcAlarmActiveTableSizeCurrent   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION " The size of the alarmActiveTable"
+    	::= { rcAlarmManagerObjects 5 } 
+    	
+    rcAlarmClearTableSize   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION " The size of the alarmClearTable"
+    	::= { rcAlarmManagerObjects 6 }  
+    	
+    rcAlarmClearTableSizeCurrent   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION " The size of the alarmClearTable"
+    	::= { rcAlarmManagerObjects 7 }   
+    
+ -- Alarm filter Table --
+   
+    rcAlarmFilterTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF RcAlarmFilterEntry 
+    ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A list of alarm filter entries."
+		::= { rcAlarmManagerObjects 8 }
+    
+	rcAlarmFilterEntry   OBJECT-TYPE
+	SYNTAX RcAlarmFilterEntry
+	ACCESS not-accessible
+	STATUS current
+	DESCRIPTION " The alarm filter entry"
+	INDEX { rcAlarmResourceId, rcAlarmModelIndex }
+   		::= {rcAlarmFilterTable 1}
+    
+	RcAlarmFilterEntry ::= SEQUENCE {
+   		rcAlarmResourceId ResourceId,
+   		rcAlarmModelIndex Unsigned32,
+   		rcAlarmFilterRowStatus RowStatus
+   		}	
+
+	rcAlarmResourceId OBJECT-TYPE
+	SYNTAX ResourceId		
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This object uniquely identifies a resource.
+		
+		For example, if the resource is an interface, this object will
+		point to an instance of interface, e.g., ifIndex.1."
+		::= { rcAlarmFilterEntry 1 }
+		
+	rcAlarmModelIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This object identifies the type of notification to be filter.
+     	The notification type identified should be the one normally used
+     	by the resource for reporting its alarms.  When the value of 0.0 is
+     	specified for this object, it implies all applicable notification
+     	types."
+  		::= { rcAlarmFilterEntry 2 }
+  		
+  	rcAlarmFilterRowStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+    	"This columnar object is used for creating and deleting a conceptual
+     	row of the rcAlarmFilterTable.  It is used to create and delete an alarm
+     	filter	setting.
+
+     	Setting RowStatus to createAndGo or createAndWait implies creating
+     	a new alarm filter setting for the specified resource and alarm type.
+     	Setting RowStatus to destroy implies removing the alarm filter setting and
+     	thus has the effect of resuming normal reporting behaviour of the
+     	resource for the alarm type."
+  		::= { rcAlarmFilterEntry 3 }
+  		
+-- arc Table --
+  		
+  	rcAlarmArcTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RcAlarmArcEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+    	"A table of Alarm Reporting Control (ARC) settings on the system.
+
+     	Alarm Reporting Control is a feature that provides an automatic
+     	in-service provisioning capability.  Alarm reporting is turned
+     	off on a per-resource basis for a selective set of potential
+     	alarm conditions to allow sufficient time for customer testing
+     	and other maintenance activities in an 'alarm free' state.
+     	Once a resource is ready for service, alarm reporting is
+     	automatically or manually turned on.
+
+     	Functional description and requirements of Alarm Reporting
+     	Control are defined in ITU-T Recommendation M.3100 Amendment 3
+     	[M.3100 Amd3]."
+
+  	REFERENCE
+        "ITU Recommendation M.3100 Amendment 3, 'Generic Network
+         Information Model', January 2001."
+  		::= { rcAlarmManagerObjects 9 }
+
+	rcAlarmArcEntry OBJECT-TYPE
+	SYNTAX  RcAlarmArcEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+    	"A conceptual row that contains information about an ARC setting
+     	of a resource in the system.
+
+     	Implementation need to be aware that if the total size of
+     	arcIndex and arcNotificationId exceeds 114 sub-IDs, then OIDs
+     	of column instances in this table will have more than 128
+     	sub-IDs and cannot be access using SNMPv1, SNMPv2c, or snmpv3."
+
+	INDEX  { rcAlarmArcIndex, rcAlarmArcAlarmType, rcAlarmArcNotificationId }
+  		::= { rcAlarmArcTable 1 }
+
+	RcAlarmArcEntry ::=
+  	SEQUENCE {
+    	rcAlarmArcIndex                      ResourceId,
+    	rcAlarmArcAlarmType                  IANAItuProbableCauseOrZero,
+    	rcAlarmArcNotificationId             OBJECT IDENTIFIER,
+    	rcAlarmArcState                      INTEGER,
+    	rcAlarmArcStartTime				     DateAndTime,
+    	rcAlarmArcNalmTimeInterval           Unsigned32,
+    	rcAlarmArcNextNalmInterval           Unsigned32,
+    	rcAlarmArcStopTime					 DateAndTime,
+   		rcAlarmArcRowStatus                  RowStatus,
+    	rcAlarmArcStorageType                StorageType
+    }
+
+	rcAlarmArcIndex OBJECT-TYPE
+	SYNTAX  ResourceId
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This object uniquely identifies a resource, which is under the
+     	arcState's control for the associated rcAlarmArcAlarmType.
+
+     	For example, if the resource is an interface, this object will
+     	point to an instance of interface, e.g., ifIndex.1."
+  		::= { rcAlarmArcEntry 1 }
+
+	rcAlarmArcAlarmType OBJECT-TYPE
+	SYNTAX  IANAItuProbableCauseOrZero
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This object identifies the alarm condition type controlled by the
+     	arcState.  It specifies the value 0 or a value of
+     	IANAItuProbableCause that is applicable to the resource.
+     	IANAItuProbableCause is defined in the IANA-ITU-ALARM-TC
+     	module in the Alarm MIB document.
+     	The value of zero (0) implies any probable causes that are
+     	applicable to the resource.  Usually, the applicable probable
+     	causes of a resource are specified in the resource-specific mib."
+  		::= { rcAlarmArcEntry 2 }
+
+	rcAlarmArcNotificationId OBJECT-TYPE
+	SYNTAX  OBJECT IDENTIFIER
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+    	"This object identifies the type of notification to be suppressed.
+     	The notification type identified should be the one normally used
+     	by the resource for reporting its alarms.  When the value of 0.0 is
+     	specified for this object, it implies all applicable notification
+     	types."
+  		::= { rcAlarmArcEntry 3 }
+
+	rcAlarmArcState OBJECT-TYPE
+  	SYNTAX  INTEGER {
+            nalm (1),
+            nalmQI (2),
+            nalmTI (3),
+            nalmQICD (4)
+            }
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION
+     	"ARC states: alm, nalm, nalmQI, nalmQICD, and nalmTI.
+
+        alm:        Alarm reporting is turned on (i.e., is allowed).
+        nalm:       Alarm reporting is turned off (i.e., not allowed).
+        nalmQI:     nalm - Qualified Inhibit. Alarm reporting is
+                    turned off until the managed entity is qualified
+                    problem-free for an optional persistence interval.
+                    Problem-free means that the condition corresponding
+                    to the specified alarm type is cleared.
+        nalmQICD:   nalmQI - Count down.  This is a substate of nalmQI
+                    and performs the persistence timing countdown
+                    function after the managed entity is qualified
+                    problem-free.
+        nalmTI:     nalm - Timed Inhibit.  Alarm reporting is turned
+                    off for a specified time interval.
+
+     	alm may transition to nalm, nalmQI or nalmTI by management request.
+
+     	nalm may transition to alm, nalmQI or nalmTI by management request.
+
+     	nalmQI may transition to nalm or alm by management request.
+
+     	nalmQI may transition to alm automatically
+             if qualified problem-free (if nalmQICD is not supported) or
+             if the CD timer expired (if nalmQICD is supported)
+
+     	nalmTI may transition to alm or nalm by management request.
+
+     	nalmTI may transition to alm automatically if the TI timer expired.
+
+     	Further details of ARC state transitions are defined in Figure 3
+
+     	According to the requirements in M.3100 Amd3, a resource
+     	supporting the ARC feature shall support the alm state and at
+     	least one of the nalm, nalmTI, and nalmQI states. The nalmQICD
+     	state is an optional substate of nalmQI.
+
+	     The arcState object controls the alarm reporting state of a
+	     resource. Note that the state alm (alarm reporting is allowed) is
+	     not listed in the enumeration of the value of this object. However,
+	     this state is implicitly supported by the mib.
+	     Once a resource enters the normal reporting mode (i.e., in the alm
+	     state) for the specified alarm type, the corresponding
+	     row will be automatically deleted from the arc table.
+	     Also the manual setting of arcState to alm can be achieved through
+	     setting the RowStatus object to 'destroy'.
+	
+	     The nalamQICD state is a transitional state from nalmQI to alm. It
+	     is optional depending on the resource type and the implementation
+	     of the resource.  If it is supported, before the state
+	     transitions from nalmQI to alm, a count down period is activated
+	     for a duration set by the object arcNalmCDTimeInterval.  When the
+	     time is up, the arcState transitions to alm."
+  		::= { rcAlarmArcEntry 4 }
+
+	rcAlarmArcStartTime OBJECT-TYPE
+  	SYNTAX  DateAndTime
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION  " The start time of the nalanTI state."
+  		::= { rcAlarmArcEntry 5 } 
+  		
+  	rcAlarmArcNalmTimeInterval OBJECT-TYPE
+	SYNTAX  Unsigned32
+  	UNITS       "seconds"
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION
+	    	"This variable indicates the time interval used for the nalmTI
+	     state, in units of second.  It is a pre-defined length of time
+	     in which the resource will stay in the nalmTI state before
+	     transition into the alm state."
+  		::= { rcAlarmArcEntry 6 }
+
+   	rcAlarmArcNextNalmInterval OBJECT-TYPE
+	SYNTAX  Unsigned32
+  	UNITS       "seconds"
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION
+	    	"This variable indicates the next time interval form last start time used for the nalmTI
+	     state, in units of second. "
+  		::= { rcAlarmArcEntry 7 } 
+ 	
+ 	rcAlarmArcStopTime OBJECT-TYPE
+  	SYNTAX  DateAndTime
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION  " The start time of the nalanTI state."
+  		::= { rcAlarmArcEntry 8 } 
+  		 		
+	rcAlarmArcRowStatus OBJECT-TYPE
+  	SYNTAX  RowStatus
+  	MAX-ACCESS  read-create
+  	STATUS  current
+  	DESCRIPTION
+	    "This columnar object is used for creating and deleting a conceptual
+	     row of the arcTable.  It is used to create and delete an arc
+	     setting.
+	
+	     Setting RowStatus to createAndGo or createAndWait implies creating
+	     a new ARC setting for the specified resource and alarm type.
+	     Setting RowStatus to destroy implies removing the ARC setting and
+	     thus has the effect of resuming normal reporting behaviour of the
+	     resource for the alarm type."
+		 ::= { rcAlarmArcEntry 9 }
+
+	rcAlarmArcStorageType OBJECT-TYPE
+  	SYNTAX       StorageType
+  	MAX-ACCESS   read-create
+  	STATUS       current
+  	DESCRIPTION
+	    "The storage type for this conceptual row.
+	     Conceptual rows having the value 'permanent' must
+	     allow write-access at a minimum to arcState.
+	     Note that arcState must allow change by management request.
+	     Therefore, no row can be created with 'readOnly'.
+	     If a set operation tries to set the value to 'readOnly',
+	     then an 'inconsistentValue' error must be returned."
+		DEFVAL      { nonVolatile }
+	  	::= { rcAlarmArcEntry 10}   
+	  
+-- Active Alarm exten Table --    
+
+    rcAlarmActiveTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RcAlarmActiveEntry 
+    ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A list of alarm active entries."
+		::= { rcAlarmManagerObjects 10 }
+    
+	rcAlarmActiveEntry   OBJECT-TYPE
+	SYNTAX RcAlarmActiveEntry
+	ACCESS not-accessible
+	STATUS current
+	DESCRIPTION " The alarm filter entry"
+	INDEX { alarmListName, alarmActiveDateAndTime,
+                 alarmActiveIndex }
+   		::= { rcAlarmActiveTable 1 }
+    
+	RcAlarmActiveEntry ::= SEQUENCE {
+   		rcAlarmActiveType  INTEGER,
+   		rcAlarmActiveAlarmId  Unsigned32
+   		}	
+    
+	rcAlarmActiveType OBJECT-TYPE
+	SYNTAX INTEGER{ 
+			normal(1),
+			alarmfilter(2),
+			alarmDisable(3)
+	}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		" The reason of the alarm to active table. the alarmfilter identifies 
+		the alarm is filtered, not sended to the EMS. The alarmEnable identifies
+		the rcAlarmTrapEnable is disable, the alarm is not sended to the EMS."
+		::= { rcAlarmActiveEntry 1 }   
+	
+	rcAlarmActiveAlarmId OBJECT-TYPE
+	SYNTAX Unsigned32		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		""
+		::= { rcAlarmActiveEntry 2 } 
+ 
+-- Clear Alarm extensen Table --
+
+	rcAlarmClearTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RcAlarmClearEntry 
+    ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A list of alarm active entries."
+		::= { rcAlarmManagerObjects 11 }
+    
+	rcAlarmClearEntry   OBJECT-TYPE
+	SYNTAX RcAlarmClearEntry
+	ACCESS not-accessible
+	STATUS current
+	DESCRIPTION " The alarm clear entry"
+	INDEX { alarmListName, alarmClearDateAndTime,
+                 alarmClearIndex }
+   		::= {rcAlarmClearTable 1}
+    
+	RcAlarmClearEntry ::= SEQUENCE {
+		rcAalarmActiveDateAndTime DateAndTime,
+		rcAalarmClearVariables    Unsigned32,
+   		rcAlarmClearType  INTEGER,
+   		rcAlarmClearAlarmId   Unsigned32
+   		}
+   			
+	rcAalarmActiveDateAndTime OBJECT-TYPE
+	SYNTAX      DateAndTime
+  	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The local date and time when the error occurred.
+
+       This object facilitates retrieving all instances of
+
+       alarms that have been raised or have changed state
+       since a given point in time.
+
+       Implementations MUST include the offset from UTC,
+       if available.  Implementation in environments in which
+       the UTC offset is not available is NOT RECOMMENDED."
+   		::= { rcAlarmClearEntry 1 } 
+ 
+ 	rcAalarmClearVariables OBJECT-TYPE
+   	SYNTAX      Unsigned32
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       	"The number of variables in alarmActiveVariableTable for this
+       	alarm."
+   		::= { rcAlarmClearEntry 2 } 
+   		 		
+	rcAlarmClearType OBJECT-TYPE
+	SYNTAX INTEGER{ 
+			normal(1),
+			alarmDealy(2),
+			manualDel(3),
+			noActiveAlarm(4),
+			resourceLost(5)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		" The reason of the alarm to active table. the alarmfilter identifies 
+		the alarm is filtered, not sended to the EMS. The alarmEnable identifies
+		the rcAlarmTrapEnable is disable, the alarm is not sended to the EMS."
+		::= { rcAlarmClearEntry 3 }
+   
+   	rcAlarmClearAlarmId OBJECT-TYPE
+	SYNTAX Unsigned32		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		""
+		::= { rcAlarmClearEntry 4 } 
+		
+-- Clear Alarm Variable Table --
+
+	rcAlarmClearVariableTable OBJECT-TYPE
+   	SYNTAX      SEQUENCE OF RcAlarmClearVariableEntry
+   	MAX-ACCESS  not-accessible
+   	STATUS      current
+   	DESCRIPTION
+       "A table of variables to go with clear alarm entries."
+   	::= { rcAlarmManagerObjects 12 }
+
+	rcAlarmClearVariableEntry OBJECT-TYPE
+   	SYNTAX      RcAlarmClearVariableEntry
+   	MAX-ACCESS  not-accessible
+   	STATUS      current
+   	DESCRIPTION
+       "Entries appear in this table when there are variables in
+       the varbind list of a corresponding alarm in
+       alarmActiveTable.
+
+       Entries appear in this table as though
+       the trap/notification had been transported using a
+       alarmActiveVariableIndex 1 will always be sysUpTime
+       and alarmActiveVariableIndex 2 will always be
+       snmpTrapOID.
+
+       If the incoming notification is instead an SNMPv1 Trap-PDU and
+       the value of alarmModelVarbindIndex is 1 or 2, an appropriate
+       value for sysUpTime.0 or snmpTrapOID.0 shall be determined
+       by using the rules in section 3.1 of [RFC3584]."
+   	INDEX   {  alarmListName, alarmClearIndex,
+              rcAlarmClearVariableIndex  }
+   		::= { rcAlarmClearVariableTable 1 }
+
+	RcAlarmClearVariableEntry ::= SEQUENCE {
+	   rcAlarmClearVariableIndex                 Unsigned32,
+	   rcAlarmClearVariableID                    OBJECT IDENTIFIER,
+	   rcAlarmClearVariableValueType             INTEGER,
+	   rcAlarmClearVariableCounter32Val          Counter32,
+	   rcAlarmClearVariableUnsigned32Val         Unsigned32,
+	   rcAlarmClearVariableTimeTicksVal          TimeTicks,
+	   rcAlarmClearVariableInteger32Val          Integer32,
+	   rcAlarmClearVariableOctetStringVal        OCTET STRING,
+	   rcAlarmClearVariableIpAddressVal          IpAddress,
+	   rcAlarmClearVariableOidVal                OBJECT IDENTIFIER,
+	   rcAlarmClearVariableCounter64Val          Counter64,
+	   rcAlarmClearVariableOpaqueVal             Opaque }
+
+	rcAlarmClearVariableIndex OBJECT-TYPE
+   	SYNTAX     Unsigned32 (1..4294967295)
+   	MAX-ACCESS not-accessible
+   	STATUS     current
+   	DESCRIPTION
+       "A strictly monotonically increasing integer, starting at
+       1 for a given alarmActiveIndex, for indexing variables
+       within the active alarm variable list. "
+   		::= { rcAlarmClearVariableEntry 1 }
+
+	rcAlarmClearVariableID OBJECT-TYPE
+   	SYNTAX     OBJECT IDENTIFIER
+   	MAX-ACCESS read-only
+   	STATUS     current
+   	DESCRIPTION
+       "The alarm variable's object identifier."
+   		::= { rcAlarmClearVariableEntry 2 }
+
+	rcAlarmClearVariableValueType OBJECT-TYPE
+   	SYNTAX      INTEGER {
+         counter32(1),
+         unsigned32(2),
+         timeTicks(3),
+         integer32(4),
+         ipAddress(5),
+         octetString(6),
+         objectId(7),
+         counter64(8),
+         opaque(9)
+         }
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The type of the value.  One and only one of the value
+       objects that follow is used for a given row in this table,
+       based on this type."
+   		::= { rcAlarmClearVariableEntry 3 }
+
+	rcAlarmClearVariableCounter32Val OBJECT-TYPE
+   	SYNTAX      Counter32
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'counter32'."
+   		::= { rcAlarmClearVariableEntry 4 }
+
+	rcAlarmClearVariableUnsigned32Val OBJECT-TYPE
+   	SYNTAX      Unsigned32
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'unsigned32'."
+   		::= { rcAlarmClearVariableEntry 5 }
+
+	rcAlarmClearVariableTimeTicksVal OBJECT-TYPE
+   	SYNTAX      TimeTicks
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'timeTicks'."
+   		::= { rcAlarmClearVariableEntry 6 }
+
+	rcAlarmClearVariableInteger32Val OBJECT-TYPE
+   	SYNTAX      Integer32
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'integer32'."
+   		::= { rcAlarmClearVariableEntry 7 }
+
+	rcAlarmClearVariableOctetStringVal OBJECT-TYPE
+   	SYNTAX      OCTET STRING (SIZE(0..65535))
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'octetString'."
+   		::= { rcAlarmClearVariableEntry 8 }
+
+	rcAlarmClearVariableIpAddressVal OBJECT-TYPE
+   	SYNTAX      IpAddress
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'ipAddress'."
+   		::= { rcAlarmClearVariableEntry 9 }
+
+	rcAlarmClearVariableOidVal OBJECT-TYPE
+   	SYNTAX      OBJECT IDENTIFIER
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'objectId'."
+   		::= { rcAlarmClearVariableEntry 10 }
+
+	rcAlarmClearVariableCounter64Val OBJECT-TYPE
+   	SYNTAX      Counter64
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'counter64'."
+   		::= { rcAlarmClearVariableEntry 11 }
+
+	rcAlarmClearVariableOpaqueVal OBJECT-TYPE
+   	SYNTAX      Opaque (SIZE(0..65535))
+   	MAX-ACCESS  read-only
+   	STATUS      current
+   	DESCRIPTION
+       "The value when alarmActiveVariableType is 'opaque'.
+
+       of Opaque in 'standard' MIB modules, this particular
+       usage is driven by the need to be able to accurately
+       represent any well-formed notification, and justified
+       by the need for backward compatibility."
+   		::= { rcAlarmClearVariableEntry 12 }     
+   		
+END
+     

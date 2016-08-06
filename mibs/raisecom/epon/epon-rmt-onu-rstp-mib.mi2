@@ -1,0 +1,731 @@
+--
+--  File         : epon-rmt-onu-rstp-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : May 8, 2009
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+
+    EPON-RMT-ONU-RSTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress, TruthValue FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        OnuIndex, Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+    -- All representations of Bridge-Id in this MIB
+    -- Module use, as a textual convention (i.e. this
+    -- convention does not affect their encoding), the data
+    -- type:
+        BridgeId ::= OCTET STRING (SIZE (8))   -- the
+                         -- Bridge-Identifier
+                         -- as used in the
+                         -- Spanning Tree
+    -- Protocol to uniquely identify a bridge.  Its first two
+    -- octets (in network byte order) contain a priority
+    -- value and its last 6 octets contain the MAC address
+    -- used to refer to a bridge in a unique fashion
+    -- (typically, the numerically smallest MAC address
+    -- of all ports on the bridge).
+
+
+    -- Several objects in this MIB module represent values of
+    -- timers used by the Spanning Tree Protocol.  In this
+    -- MIB, these timers have values in units of hundreths of
+    -- a second (i.e. 1/100 secs).
+    -- These timers, when stored in a Spanning Tree Protocol's
+    -- BPDU, are in units of 1/256 seconds.  Note, however,
+    -- that 802.1D-1990 specifies a settable granularity of
+    -- no more than 1 second for these timers.  To avoid
+    -- ambiguity, a data type is defined here as a textual
+    -- convention and all representation of these timers
+    -- in this MIB module are defined using this data type.  An
+    -- algorithm is also defined for converting between the
+    -- different units, to ensure a timer's value is not
+    -- distorted by multiple conversions.
+    -- The data type is:
+
+    Timeout ::= INTEGER -- a STP timer in units of 1/100 seconds
+
+    -- To convert a Timeout value into a value in units of
+    -- 1/256 seconds, the following algorithm should be used:
+    --
+    --      b  = floor( (n * 256) / 100)
+    --
+    -- where:
+    --      floor   =  quotient [ignore remainder]
+    --      n is the value in 1/100 second units
+    --      b is the value in 1/256 second units
+    --
+    -- To convert the value from 1/256 second units back to
+    -- 1/100 seconds, the following algorithm should be used:
+    --
+    --      n = ceiling( (b * 100) / 256)
+    --
+    -- where:
+    --      ceiling =  quotient [if remainder is 0], or
+    --           quotient + 1 [if remainder is non-zero]
+    --      n is the value in 1/100 second units
+    --      b is the value in 1/256 second units
+    --
+    -- Note: it is important that the arithmetic operations are
+    -- done in the order specified (i.e., multiply first, divide
+    -- second).
+
+    rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuRstpGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 18 }
+------------------------------------------------------------------------------
+--
+--  rcEponOnuDot1dStpTable
+--
+
+    rcEponOnuDot1dStpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuDot1dStpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+      "."
+        ::= { rcEponOnuRstpGroup 1 }
+
+     rcEponOnuDot1dStpEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDot1dStpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+			"An entry in the table, containing some basic attribute information item of
+      		ONU RSTP per PON."
+       INDEX { rcEponOnuDot1dStpIndex }
+        ::= { rcEponOnuDot1dStpTable 1 }
+
+    RcEponOnuDot1dStpEntry ::= SEQUENCE {
+        rcEponOnuDot1dStpIndex                    OnuIndex,
+        rcEponOnuDot1dStpProtocolSpecification    INTEGER,
+        rcEponOnuDot1dStpPriority                 INTEGER,
+        rcEponOnuDot1dStpTimeSinceTopologyChange  TimeTicks,
+        rcEponOnuDot1dStpTopChanges               Counter,
+        rcEponOnuDot1dStpDesignatedRoot           BridgeId,
+        rcEponOnuDot1dStpRootCost                 INTEGER,
+        rcEponOnuDot1dStpRootPort                 INTEGER,
+        rcEponOnuDot1dStpMaxAge                   Timeout,
+        rcEponOnuDot1dStpHelloTime                Timeout,
+        rcEponOnuDot1dStpHoldTime                 INTEGER,
+        rcEponOnuDot1dStpForwardDelay             Timeout,
+        rcEponOnuDot1dStpBridgeMaxAge             Timeout,
+        rcEponOnuDot1dStpBridgeHelloTime          Timeout,
+        rcEponOnuDot1dStpBridgeForwardDelay       Timeout,
+        rcEponOnuDot1dStpVersion                  INTEGER,
+        rcEponOnuDot1dStpTxHoldCount              Integer32,
+        rcEponOnuDot1dStpPathCostDefault          INTEGER,
+        rcEponOnuRstpEnable                       EnableVar
+     }
+
+    rcEponOnuDot1dStpIndex OBJECT-TYPE
+        SYNTAX OnuIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+      		"."
+        ::= { rcEponOnuDot1dStpEntry 1 }
+        
+    rcEponOnuDot1dStpProtocolSpecification OBJECT-TYPE
+        SYNTAX INTEGER{
+               unknown(1),
+        	   decLb100(2),
+               ieee8021d(3)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An indication of what version of the Spanning
+    		Tree Protocol is being run.  The value
+    		'decLb100(2)' indicates the DEC LANbridge 100
+    		Spanning Tree protocol.  IEEE 802.1d
+    		implementations will return 'ieee8021d(3)'.  If
+    		future versions of the IEEE Spanning Tree Protocol
+    		are released that are incompatible with the
+    		current version a new value will be defined."
+        ::= { rcEponOnuDot1dStpEntry 2 }
+        
+    rcEponOnuDot1dStpPriority OBJECT-TYPE
+        SYNTAX  INTEGER (0..61440)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+    		"The value of the write-able portion of the Bridge
+    		ID, i.e., the first two octets of the (8 octet
+    		long) Bridge ID.  The other (last) 6 octets of the
+    		Bridge ID are given by the value of dot1dBaseBridgeAddress.
+    		values are 0-61440, in steps of 4096"
+        ::= { rcEponOnuDot1dStpEntry 3 }
+
+    rcEponOnuDot1dStpTimeSinceTopologyChange OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The time (in hundredths of a second) since the
+    		last time a topology change was detected by the
+    		bridge entity."
+        ::= { rcEponOnuDot1dStpEntry 4 }
+
+    rcEponOnuDot1dStpTopChanges OBJECT-TYPE
+        SYNTAX  Counter
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The total number of topology changes detected by
+    		this bridge since the management entity was last
+    		reset or initialized."
+        ::= { rcEponOnuDot1dStpEntry 5 }
+
+    rcEponOnuDot1dStpDesignatedRoot OBJECT-TYPE
+        SYNTAX  BridgeId
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The bridge identifier of the root of the spanning
+    		tree as determined by the Spanning Tree Protocol
+    		as executed by this node.  This value is used as
+    		the Root Identifier parameter in all Configuration
+    		Bridge PDUs originated by this node."
+        ::= { rcEponOnuDot1dStpEntry 6 }
+
+    rcEponOnuDot1dStpRootCost OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The cost of the path to the root as seen from
+    		this bridge."
+        ::= { rcEponOnuDot1dStpEntry 7 }
+
+    rcEponOnuDot1dStpRootPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The port number of the port which offers the
+   		 	lowest cost path from this bridge to the root
+    		bridge."
+        ::= { rcEponOnuDot1dStpEntry 8 }
+
+    rcEponOnuDot1dStpMaxAge OBJECT-TYPE
+        SYNTAX  Timeout
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The maximum age of Spanning Tree Protocol
+    		information learned from the network on any port
+    		before it is discarded, in units of hundredths of
+    		a second.  This is the actual value that this
+    		bridge is currently using."
+        ::= { rcEponOnuDot1dStpEntry 9 }
+
+    rcEponOnuDot1dStpHelloTime OBJECT-TYPE
+        SYNTAX  Timeout
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The amount of time between the transmission of
+    		Configuration bridge PDUs by this node on any port
+    		when it is the root of the spanning tree or trying
+    		to become so, in units of hundredths of a second.
+    		This is the actual value that this bridge is
+    		currently using."
+        ::= { rcEponOnuDot1dStpEntry 10 }
+
+    rcEponOnuDot1dStpHoldTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"This time value determines the interval length
+    		during which no more than two Configuration bridge
+    		PDUs shall be transmitted by this node, in units
+    		of hundredths of a second."
+        ::= { rcEponOnuDot1dStpEntry 11 }
+
+    rcEponOnuDot1dStpForwardDelay OBJECT-TYPE
+        SYNTAX  Timeout
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"This time value, measured in units of hundredths
+    		of a second, controls how fast a port changes its
+    		spanning state when moving towards the Forwarding
+    		state.  The value determines how long the port
+    		stays in each of the Listening and Learning
+    		states, which precede the Forwarding state.  This
+    		value is also used, when a topology change has
+    		been detected and is underway, to age all dynamic
+    		entries in the Forwarding Database.  [Note that
+    		this value is the one that this bridge is
+    		currently using, in contrast to
+    		rcEponOnuDot1dStpBridgeForwardDelay which is the value that
+    		this bridge and all others would start using
+    		if/when this bridge were to become the root.]"
+        ::= { rcEponOnuDot1dStpEntry 12 }
+
+    rcEponOnuDot1dStpBridgeMaxAge OBJECT-TYPE
+        SYNTAX  Timeout (600..4000)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The value that all bridges use for MaxAge when
+    		this bridge is acting as the root.  Note that
+    		802.1D-1990 specifies that the range for this
+    		parameter is related to the value of
+    		rcEponOnuDot1dStpBridgeHelloTime. The granularity of this
+    		timer is specified by 802.1D-1990 to be 1 second.
+    		An agent may return a badValue error if a set is
+    		attempted to a value which is not a whole number
+    		of seconds."
+        ::= { rcEponOnuDot1dStpEntry 13 }
+
+    rcEponOnuDot1dStpBridgeHelloTime OBJECT-TYPE
+        SYNTAX  Timeout (100..1000)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The value that all bridges use for HelloTime when
+    		this bridge is acting as the root.  The
+    		granularity of this timer is specified by 802.1D-
+    		1990 to be 1 second.  An agent may return a
+    		badValue error if a set is attempted to a value
+    		which is not a whole number of seconds."
+        ::= { rcEponOnuDot1dStpEntry 14 }
+
+    rcEponOnuDot1dStpBridgeForwardDelay OBJECT-TYPE
+        SYNTAX  Timeout (400..3000)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    		"The value that all bridges use for ForwardDelay
+    		when this bridge is acting as the root.  Note that
+    		802.1D-1990 specifies that the range for this
+    		parameter is related to the value of
+    		rcEponOnuDot1dStpBridgeMaxAge.  The granularity of this
+    		timer is specified by 802.1D-1990 to be 1 second.
+    		An agent may return a badValue error if a set is
+    		attempted to a value which is not a whole number
+    		of seconds."
+        ::= { rcEponOnuDot1dStpEntry 15 }
+        
+    rcEponOnuDot1dStpVersion OBJECT-TYPE
+    	SYNTAX      INTEGER {
+        	stpCompatible(0),
+        	rstp(2)
+          		}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+        	"The version of Spanning Tree Protocol the bridge is
+         	currently running.  The value 'stpCompatible(0)'
+         	indicates the Spanning Tree Protocol specified in
+         	IEEE 802.1D and 'rstp(2)' indicates the Rapid Spanning
+         	Tree Protocol specified in IEEE 802.1w.  New value may
+         	be defined as future versions of the protocol become
+         	available."
+    	DEFVAL      { rstp }
+    	::= { rcEponOnuDot1dStpEntry 16 }
+
+    rcEponOnuDot1dStpTxHoldCount OBJECT-TYPE
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        	"The value used by the Port Transmit state machine to limit
+         	the maximum transmission rate."
+        DEFVAL      { 3 }
+           ::= { rcEponOnuDot1dStpEntry 17 }
+
+    rcEponOnuDot1dStpPathCostDefault OBJECT-TYPE
+        SYNTAX      INTEGER {
+             stp8021d1998(1),
+             stp8021t2001(2)
+             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        	"The version of the Spanning Tree default Path Costs that
+         	are to be used by this Bridge.  A value of 8021d1998(1)
+         	uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+        	A value of stp8021t2001(2) uses the 32-bit default Path
+         	Costs from IEEE Std. 802.1t."
+        ::= { rcEponOnuDot1dStpEntry 18 } 
+        
+    rcEponOnuRstpEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+      "."
+        ::= { rcEponOnuDot1dStpEntry 19 }
+
+--
+-- rcEponOnuDot1dStpPortTable
+--
+    rcEponOnuDot1dStpPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuDot1dStpPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+      "."
+        ::= { rcEponOnuRstpGroup 2 }
+
+    rcEponOnuDot1dStpPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuDot1dStpPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+      "."
+        INDEX { rcEponOnuDot1dStpPort }
+        ::= { rcEponOnuDot1dStpPortTable 1 }
+
+    RcEponOnuDot1dStpPortEntry ::= SEQUENCE {
+        rcEponOnuDot1dStpPort                   Olt_OnuIfIndex,
+        rcEponOnuDot1dStpPortPriority           INTEGER,
+        rcEponOnuDot1dStpPortState              INTEGER ,
+        rcEponOnuDot1dStpPortEnable             INTEGER ,
+        rcEponOnuDot1dStpPortPathCost           INTEGER ,
+        rcEponOnuDot1dStpPortDesignatedRoot     BridgeId,
+        rcEponOnuDot1dStpPortDesignatedCost     INTEGER,
+        rcEponOnuDot1dStpPortDesignatedBridge   BridgeId,
+        rcEponOnuDot1dStpPortDesignatedPort     OCTET STRING,
+        rcEponOnuDot1dStpPortForwardTransitions Counter
+     } 
+     
+    rcEponOnuDot1dStpPort OBJECT-TYPE
+        SYNTAX  Olt_OnuIfIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"The ONU UNI index for which this entry
+          	contains Spanning Tree Protocol management
+          	information."
+        ::= { rcEponOnuDot1dStpPortEntry 1 }
+
+    rcEponOnuDot1dStpPortPriority OBJECT-TYPE
+        SYNTAX  INTEGER (0..240)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+          	"The value of the priority field which is
+          	contained in the first (in network byte order)
+          	octet of the (2 octet long) Port ID.  The other
+          	octet of the Port ID is given by the value of
+          	rcEponOnuDot1dStpPort.values are 0-240, in steps of 16"
+        ::= { rcEponOnuDot1dStpPortEntry 2 }
+
+    rcEponOnuDot1dStpPortState OBJECT-TYPE
+        SYNTAX  INTEGER { 
+        	 unknown(0),
+             disabled(1),  
+             blocking(2),
+             listening(3),
+             learning(4),
+             forwarding(5),
+             broken(6)
+          }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+          	"The port's current state as defined by
+          	application of the Spanning Tree Protocol.  This
+          	state controls what action a port takes on
+          	reception of a frame.  If the bridge has detected
+          	a port that is malfunctioning it will place that
+          	port into the broken(6) state.  For ports which
+          	are disabled (see rcEponOnuDot1dStpPortEnable), this object
+          	will have a value of disabled(1)."
+        ::= { rcEponOnuDot1dStpPortEntry 3 }
+
+    rcEponOnuDot1dStpPortEnable OBJECT-TYPE
+        SYNTAX  INTEGER {  
+        	  unknown(0),
+              enabled(1),
+              disabled(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"The enabled/disabled status of the port."
+        ::= { rcEponOnuDot1dStpPortEntry 4 }
+
+    rcEponOnuDot1dStpPortPathCost OBJECT-TYPE
+        SYNTAX  INTEGER (1..200000000)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"The contribution of this port to the path cost of
+			paths towards the spanning tree root which include
+			this port.  802.1D-1990 recommends that the
+            default value of this parameter be in inverse
+            proportion to the speed of the attached LAN."
+        ::= { rcEponOnuDot1dStpPortEntry 5 }
+
+    rcEponOnuDot1dStpPortDesignatedRoot OBJECT-TYPE
+        SYNTAX  BridgeId
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"The unique Bridge Identifier of the Bridge
+			recorded as the Root in the Configuration BPDUs
+			transmitted by the Designated Bridge for the
+			segment to which the port is attached."
+        ::= { rcEponOnuDot1dStpPortEntry 6 }
+
+    rcEponOnuDot1dStpPortDesignatedCost OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"The path cost of the Designated Port of the
+            segment connected to this port.  This value is
+            compared to the Root Path Cost field in received
+            bridge PDUs."
+        ::= { rcEponOnuDot1dStpPortEntry 7 }
+
+    rcEponOnuDot1dStpPortDesignatedBridge OBJECT-TYPE
+        SYNTAX  BridgeId
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The Bridge Identifier of the bridge which this
+            port considers to be the Designated Bridge for
+            this port's segment."
+        ::= { rcEponOnuDot1dStpPortEntry 8 }
+
+    rcEponOnuDot1dStpPortDesignatedPort OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (2))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The Port Identifier of the port on the Designated
+            Bridge for this port's segment."
+        ::= { rcEponOnuDot1dStpPortEntry 9 }
+
+    rcEponOnuDot1dStpPortForwardTransitions OBJECT-TYPE
+        SYNTAX  Counter
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of times this port has transitioned
+            from the Learning state to the Forwarding state."
+        ::= { rcEponOnuDot1dStpPortEntry 10 } 
+
+---
+-- rcEponOnuDot1dStpExtPortTable
+--
+    rcEponOnuDot1dStpExtPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RcEponOnuDot1dStpExtPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains port-specific Rapid Spanning Tree
+             information."
+        ::= { rcEponOnuRstpGroup 3 }
+
+    rcEponOnuDot1dStpExtPortEntry OBJECT-TYPE
+        SYNTAX      RcEponOnuDot1dStpExtPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of Rapid Spanning Tree information maintained by
+            each port."
+        INDEX { rcEponOnuDot1dStpPort }
+        ::= { rcEponOnuDot1dStpExtPortTable 1 }
+
+    RcEponOnuDot1dStpExtPortEntry ::= SEQUENCE {
+        rcEponOnuDot1dStpPortProtocolMigration TruthValue,
+        rcEponOnuDot1dStpPortAdminEdgePort     TruthValue,
+        rcEponOnuDot1dStpPortOperEdgePort      TruthValue,
+        rcEponOnuDot1dStpPortAdminPointToPoint INTEGER,
+        rcEponOnuDot1dStpPortOperPointToPoint  TruthValue,
+        rcEponOnuDot1dStpPortAdminPathCost     Integer32
+    }
+
+    rcEponOnuDot1dStpPortProtocolMigration OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When operating in RSTP (version 2) mode, writing TRUE(1)
+            to this object forces this port to transmit RSTP BPDUs.
+            Any other operation on this object has no effect and
+            it always returns FALSE(2) when read."
+        ::= { rcEponOnuDot1dStpExtPortEntry 1 }
+
+    rcEponOnuDot1dStpPortAdminEdgePort OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The administrative value of the Edge Port parameter.  A
+            value of TRUE(1) indicates that this port should be
+            assumed as an edge-port and a value of FALSE(2) indicates
+            that this port should be assumed as a non-edge-port."
+        ::= { rcEponOnuDot1dStpExtPortEntry 2 }
+
+    rcEponOnuDot1dStpPortOperEdgePort OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational value of the Edge Port parameter.  The
+            object is initialized to the value of
+            rcEponOnuDot1dStpPortAdminEdgePort and is set FALSE on reception of
+            a BPDU."
+        ::= { rcEponOnuDot1dStpExtPortEntry 3 }
+
+    rcEponOnuDot1dStpPortAdminPointToPoint OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The administrative point-to-point status of the LAN segment
+            attached to this port.  A value of forceTrue(0) indicates that
+            this port should always be treated as if it is connected to
+            a point-to-point link.  A value of forceFalse(1) indicates
+            that this port should be treated as having a shared media
+            connection.  A value of auto(2) indicates that this port is
+            considered to have a point-to-point link if it is an Aggregator
+            and all of its members are aggregatable, or if the MAC entity
+            is configured for full duplex operation, either through
+            auto-negotiation or by management means."
+       ::= { rcEponOnuDot1dStpExtPortEntry 4 }
+
+    rcEponOnuDot1dStpPortOperPointToPoint OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational point-to-point status of the LAN segment
+            attached to this port.  It indicates whether a port is
+            considered to have a point-to-point connection or not.
+            The value is determined by management or by auto-detection,
+            as described in the rcEponOnuDot1dStpPortAdminPointToPoint object."
+        ::= { rcEponOnuDot1dStpExtPortEntry 5 }
+
+    rcEponOnuDot1dStpPortAdminPathCost OBJECT-TYPE
+        SYNTAX      Integer32 (0..200000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The administratively assigned value for the contribution
+            of this port to the path cost of paths towards the spanning
+            tree root.
+            Writing a value of '0' assigns the automatically calculated
+            default Path Cost value to the port.  If the default Path
+            Cost is being used, this object returns '0' when read.
+            This complements the object rcEponOnuDot1dStpPortPathCost or
+            rcEponOnuDot1dStpPortPathCost32, which returns the operational value
+            of the path cost."
+        ::= { rcEponOnuDot1dStpExtPortEntry 6 }
+
+--
+-- rcEponOnuRstpPortStatsTable
+--
+    rcEponOnuRstpPortStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RcEponOnuRstpPortStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Rstp stats table"
+        ::= { rcEponOnuRstpGroup 4 }
+
+    rcEponOnuRstpPortStatsEntry OBJECT-TYPE
+        SYNTAX      RcEponOnuRstpPortStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Rstp stats table"
+        INDEX { rcEponOnuDot1dStpPort }
+        ::= { rcEponOnuRstpPortStatsTable 1 }
+
+    RcEponOnuRstpPortStatsEntry ::= SEQUENCE {
+        rcEponOnuRstpPortClear         INTEGER,
+        rcEponOnuRstpPortRxStpBPDUs    Counter32,
+        rcEponOnuRstpPortRxTCNs        Counter32,
+        rcEponOnuRstpPortRxRstpBPDUs   Counter32,
+        rcEponOnuRstpPortTxStpBPDUs    Counter32,
+        rcEponOnuRstpPortTxTCNs        Counter32,
+        rcEponOnuRstpPortTxRstpBPDUs   Counter32
+        }   
+        
+    rcEponOnuRstpPortClear OBJECT-TYPE
+        SYNTAX      INTEGER{ 
+                ready(0),
+				clear (1)
+        		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "clear port statistics"
+        ::= { rcEponOnuRstpPortStatsEntry 1 }
+
+    rcEponOnuRstpPortRxStpBPDUs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port receive STP BPDUs"
+        ::= { rcEponOnuRstpPortStatsEntry 2 }   
+    
+    rcEponOnuRstpPortRxTCNs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port receive TCNs"
+    ::= { rcEponOnuRstpPortStatsEntry 3 }
+
+    rcEponOnuRstpPortRxRstpBPDUs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port receive RSTP BPDUs"
+        ::= { rcEponOnuRstpPortStatsEntry 4 }
+
+    rcEponOnuRstpPortTxStpBPDUs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port send STP BPDUs"
+        ::= { rcEponOnuRstpPortStatsEntry 5 }
+
+    rcEponOnuRstpPortTxTCNs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port send TCNs"
+        ::= { rcEponOnuRstpPortStatsEntry 6 }
+
+    rcEponOnuRstpPortTxRstpBPDUs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "port send RSTP BPDUs"
+        ::= { rcEponOnuRstpPortStatsEntry 7 }     
+      
+    
+END

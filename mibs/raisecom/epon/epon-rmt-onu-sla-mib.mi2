@@ -1,0 +1,585 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-sla-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2007
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-SLA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus FROM SNMPv2-TC
+        rcEponLLIDIndex FROM EPON-ONU-LLID-MIB
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+  
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuSlaGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 12 }
+------------------------------------------------------------------------------
+
+--
+--  rcEponOnuCtcSvcTable
+--
+
+    rcEponOnuCtcSlaQueueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcSlaQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSlaGroup 1 }
+
+     rcEponOnuCtcSlaQueueEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcSlaQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuDevIndex, rcEponOnuCtcSlaQueueIndex }
+        ::= { rcEponOnuCtcSlaQueueTable 1 }
+
+     RcEponOnuCtcSlaQueueEntry ::= SEQUENCE {
+        rcEponOnuCtcSlaQueueIndex         INTEGER,
+        rcEponOnuCtcSlaQueueFixedPktSize  INTEGER,
+        rcEponOnuCtcSlaQueueBandwidthType INTEGER,
+        rcEponOnuCtcSlaQueueFir           INTEGER,
+        rcEponOnuCtcSlaQueueCir           INTEGER,
+        rcEponOnuCtcSlaQueuePir           INTEGER
+     }
+     
+    rcEponOnuCtcSlaQueueIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Queue to which service traffic is classified."
+        ::= { rcEponOnuCtcSlaQueueEntry 1 }
+        
+    rcEponOnuCtcSlaQueueFixedPktSize OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        UNITS  "byte"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It is common for fixed-bandwidth traffic uses fixed packet size, 
+            and the parameter does not make sense for other traffic."
+        ::= { rcEponOnuCtcSlaQueueEntry 2 }
+        
+    rcEponOnuCtcSlaQueueBandwidthType OBJECT-TYPE
+        SYNTAX INTEGER{
+        			fixed(1),
+        			assured(2),
+        			bestEffort(3),
+        			assuredPlusBestEffort(4),
+        			fixedPlusBestEffort(5),
+        			fixedPlusAssured(6),
+        			fixedPlusAssuredPlusBestEffort(7),
+        			unknown(8)
+        			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcSlaQueueEntry 3 }
+
+    rcEponOnuCtcSlaQueueFir OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "Kbps"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Fixed Information Rate in Kbps units."
+        ::= { rcEponOnuCtcSlaQueueEntry 4 }
+        
+    rcEponOnuCtcSlaQueueCir OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "Kbps"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Committed Information Rate in Kbps units."
+        ::= { rcEponOnuCtcSlaQueueEntry 5 }
+        
+    rcEponOnuCtcSlaQueuePir OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "Kbps"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Peak Information Rate in Kbps units."
+        ::= { rcEponOnuCtcSlaQueueEntry 6 } 
+
+--
+--  rcEponOnuCtcSlaTable
+--
+
+    rcEponOnuCtcSlaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcSlaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSlaGroup 2 }
+
+     rcEponOnuCtcSlaEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcSlaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuCtcSlaTable 1 }
+
+    RcEponOnuCtcSlaEntry ::= SEQUENCE {
+        rcEponOnuCtcSlaActive         				INTEGER,
+        rcEponOnuCtcSlaBestEffortScheduleScheme 	INTEGER,
+        rcEponOnuCtcSlaHighPriorityBoundary			INTEGER,        
+        rcEponOnuCtcSlaCycleLength    				INTEGER,
+        rcEponOnuCtcSlaRefQueueBitMap   			OCTET STRING,
+        rcEponOnuCtcSlaQueuesWeight   				OCTET STRING
+     }
+
+    rcEponOnuCtcSlaActive OBJECT-TYPE
+        SYNTAX INTEGER {
+               deactive(1),
+               active(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " For single port SFU ONU , if this attribute is used 
+            then EthPortUS Policing attribute should not be used, 
+            since both attributes affect the upstream policing in the ONU."
+        ::= { rcEponOnuCtcSlaEntry 1 }
+        
+  	rcEponOnuCtcSlaBestEffortScheduleScheme OBJECT-TYPE
+  		SYNTAX INTEGER {
+			sp(1),
+			wrr(2),
+			sp_and_wrr(3)
+  		}
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+  			"."
+  		::= { rcEponOnuCtcSlaEntry 2 }  
+  		
+  	rcEponOnuCtcSlaHighPriorityBoundary OBJECT-TYPE
+  		SYNTAX 		INTEGER (0..100)
+  		MAX-ACCESS 	read-write
+  		STATUS 		current
+  		DESCRIPTION
+  			"Relevant only when using SP+WRR scheduling.  Priorities greater than 
+  			or equal to this value are considered high priority and are transmitted 
+  			in SP fashion. Priorities less than this value are considered low priority
+  			and are transmitted in WRR fashion."
+  		::= { rcEponOnuCtcSlaEntry 3 }   					
+       
+    rcEponOnuCtcSlaCycleLength OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "TQ"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Cycle length parameter indicates OLT DBA cycle and is needed in order to 
+            optimize ONU transmission. Setting cycle length to 0 has the effect of stopping 
+            per service SLA and scheduling and going back to basic SP scheduling."
+        ::= { rcEponOnuCtcSlaEntry 4 }
+        
+    rcEponOnuCtcSlaRefQueueBitMap OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Every bit means a service from low to high."
+        ::= { rcEponOnuCtcSlaEntry 5 } 
+        
+    rcEponOnuCtcSlaQueuesWeight OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Possible values: 0 (SP), 1 ¨C 100 (WRR).
+            WRR weight of an active service participating in SP must be 0.
+            The sum of WRR weight over the active services participating in WRR must be 100."
+        ::= { rcEponOnuCtcSlaEntry 6 }        
+        
+--
+--  rcEponOnuCtcLlidQueueTable
+--
+
+    rcEponOnuCtcLlidQueueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcLlidQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSlaGroup 3 }
+
+     rcEponOnuCtcLlidQueueEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcLlidQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponLLIDIndex }
+        ::= { rcEponOnuCtcLlidQueueTable 1 }
+
+     RcEponOnuCtcLlidQueueEntry ::= SEQUENCE {
+        rcEponOnuCtcLlidQueueNumber       INTEGER,
+        rcEponOnuCtcLlidQueueWrrWeight    OCTET STRING
+     }
+
+    rcEponOnuCtcLlidQueueNumber OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of queues Mapped to this LLID ( range 1 .. 8)."
+        ::= { rcEponOnuCtcLlidQueueEntry 1 }
+        
+    rcEponOnuCtcLlidQueueWrrWeight OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Possible values: 0 (SP), 1 ¨C 100 (WRR).
+            The sum of WRR weight over the LLID must be 100."
+        ::= { rcEponOnuCtcLlidQueueEntry 2 }
+        
+--
+-- rcEponOnuCtcDbaQueueTable
+--
+    rcEponOnuCtcDbaQueueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcDbaQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSlaGroup 4 }
+
+    rcEponOnuCtcDbaQueueEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcDbaQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuCtcDbaQueueSetIndex }
+        ::= { rcEponOnuCtcDbaQueueTable 1 }
+
+    RcEponOnuCtcDbaQueueEntry ::= SEQUENCE {
+        rcEponOnuCtcDbaQueueSetIndex  INTEGER,
+        rcEponOnuCtcDbaQueueBitMap    OCTET STRING,
+        rcEponOnuCtcDbaQueueThreshold OCTET STRING
+       }
+
+    rcEponOnuCtcDbaQueueSetIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..3)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of queue sets reported in REPORT frames."
+        ::= { rcEponOnuCtcDbaQueueEntry 1 }
+
+    rcEponOnuCtcDbaQueueBitMap OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Report bitmap to assured bandwidth.Just use the lowest 8 bits: bit0~bit7.
+             Bit0~bit7 is queue 1~8:
+             1 -present
+             0 £­not present"
+        ::= { rcEponOnuCtcDbaQueueEntry 2 }
+
+    rcEponOnuCtcDbaQueueThreshold OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))
+        UNITS  "Tq"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Two bytes means threshold value."
+        ::= { rcEponOnuCtcDbaQueueEntry 3 }
+        
+--
+-- rcEponOnuCtcDbaReportTable
+--
+    rcEponOnuCtcDbaReportTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcDbaReportEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSlaGroup 5 }
+
+    rcEponOnuCtcDbaReportEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcDbaReportEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuCtcDbaReportTable 1 }
+
+    RcEponOnuCtcDbaReportEntry ::= SEQUENCE {
+        rcEponOnuCtcDbaReportQueueSetBitMap OCTET STRING
+       }
+
+    rcEponOnuCtcDbaReportQueueSetBitMap OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Report queue set bitmap to assured bandwidth.
+            Just use the lowest 4 bits: bit0~bit3, queue sets 1~4"
+        ::= { rcEponOnuCtcDbaReportEntry 1 }
+-----------------------------------------------------------------------
+--  rcEponOnuQosTemplateGroup
+
+rcEponOnuQosTemplateGroup OBJECT IDENTIFIER ::= { rcEponOnuSlaGroup 10 }
+
+        rcEponOnuQosTemplateNextId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateGroup 1 }
+    	
+--
+--  rcEponOnuQosTemplateMngTable
+--
+ 	
+    rcEponOnuQosTemplateMngTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuQosTemplateMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuQosTemplateGroup 2 }
+
+     rcEponOnuQosTemplateMngEntry OBJECT-TYPE
+        SYNTAX RcEponOnuQosTemplateMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX {rcEponOnuQosTemplateId }
+        ::= { rcEponOnuQosTemplateMngTable 1 }
+
+    RcEponOnuQosTemplateMngEntry ::= SEQUENCE {
+        rcEponOnuQosTemplateId               INTEGER,
+        rcEponOnuQosTemplateName             OCTET STRING,
+        rcEponOnuQosTemplateSchedulingScheme INTEGER,
+        rcEponOnuQosTemplatePriorityBoundary INTEGER,
+        rcEponOnuQosTemplateCycleLength      INTEGER,
+        rcEponOnuQosTemplateQueueWeightList  OCTET STRING,
+        rcEponOnuQosTemplateRefCnt           Counter32,
+        rcEponOnuQosTemplateRowStatus        RowStatus
+        }                                                                             
+            
+    rcEponOnuQosTemplateId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 1 }
+    	 
+    rcEponOnuQosTemplateName OBJECT-TYPE
+    	SYNTAX OCTET STRING (SIZE(0..16))
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 2 } 
+        
+    rcEponOnuQosTemplateSchedulingScheme OBJECT-TYPE
+    	SYNTAX INTEGER{
+					unknown(1),
+					sp(2),
+					wrr(3),
+					spPlusWrr(4)
+					}
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 3 }
+    	 
+    rcEponOnuQosTemplatePriorityBoundary OBJECT-TYPE
+    	SYNTAX INTEGER(0..7)
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 4 } 
+
+    rcEponOnuQosTemplateCycleLength OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 5 }
+    	 
+    rcEponOnuQosTemplateQueueWeightList OBJECT-TYPE
+    	SYNTAX OCTET STRING (SIZE(8))
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 6 } 
+        
+    rcEponOnuQosTemplateRefCnt OBJECT-TYPE
+    	SYNTAX Counter32
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 7 }
+   	
+    rcEponOnuQosTemplateRowStatus  OBJECT-TYPE
+    	SYNTAX RowStatus
+    	MAX-ACCESS read-create
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateMngEntry 8 }   
+--
+--  rcEponOnuQosTemplateQueueMngTable
+--
+ 	
+    rcEponOnuQosTemplateQueueMngTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuQosTemplateQueueMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuQosTemplateGroup 3 }
+
+     rcEponOnuQosTemplateQueueMngEntry OBJECT-TYPE
+        SYNTAX RcEponOnuQosTemplateQueueMngEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuQosTemplateId, rcEponOnuQosTemplateQueueId }
+        ::= { rcEponOnuQosTemplateQueueMngTable 1 }
+
+    RcEponOnuQosTemplateQueueMngEntry ::= SEQUENCE {
+        rcEponOnuQosTemplateQueueId            INTEGER,
+        rcEponOnuQosTemplateQueueFixedPktSize  INTEGER,
+        rcEponOnuQosTemplateQueueBandwidthType INTEGER,
+        rcEponOnuQosTemplateQueueFir           INTEGER,
+        rcEponOnuQosTemplateQueueCir           INTEGER,
+        rcEponOnuQosTemplateQueuePir           INTEGER
+        }                                                                             
+            
+    rcEponOnuQosTemplateQueueId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 1 }
+    	 
+    rcEponOnuQosTemplateQueueFixedPktSize OBJECT-TYPE
+    	SYNTAX INTEGER (0..65535)
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 2 } 
+
+    rcEponOnuQosTemplateQueueBandwidthType OBJECT-TYPE
+        SYNTAX INTEGER{
+        			fixed(1),
+        			assured(2),
+        			bestEffort(3),
+        			assuredPlusBestEffort(4),
+        			fixedPlusBestEffort(5),
+        			fixedPlusAssured(6),
+        			fixedPlusAssuredPlusBestEffort(7),
+        			unknown(8)
+        			}
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 3 }
+    	        
+    rcEponOnuQosTemplateQueueFir OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 4 }
+    	 
+    rcEponOnuQosTemplateQueueCir OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 5 } 
+
+    rcEponOnuQosTemplateQueuePir OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateQueueMngEntry 6 }
+    	     	
+--
+--  rcEponOnuQosTemplateBindTable
+--
+ 	
+    rcEponOnuQosTemplateBindTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuQosTemplateBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuQosTemplateGroup 4 }
+
+     rcEponOnuQosTemplateBindEntry OBJECT-TYPE
+        SYNTAX RcEponOnuQosTemplateBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX {rcEponOnuDevIndex }
+        ::= { rcEponOnuQosTemplateBindTable 1 }
+
+    RcEponOnuQosTemplateBindEntry ::= SEQUENCE {
+        rcEponOnuQosTemplateBindTemplateId    INTEGER
+        }                                                                             
+            
+    rcEponOnuQosTemplateBindTemplateId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuQosTemplateBindEntry 1 }
+
+END

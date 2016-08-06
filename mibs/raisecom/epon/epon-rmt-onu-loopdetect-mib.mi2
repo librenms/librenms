@@ -1,0 +1,248 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-loopdetect-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2007
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-LOOPDETECT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar FROM SWITCH-TC
+        OnuIndex, Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuLoopDetectGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 10 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuCtcLoopDetectPortTable
+--
+    rcEponOnuCtcLoopDetectPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcLoopDetectPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The loop detection configuration of each UNI."
+        ::= { rcEponOnuLoopDetectGroup 1 }
+
+    rcEponOnuCtcLoopDetectPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcLoopDetectPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The loop detection configuration of each UNI."
+        INDEX { rcEponOnuLoopDetectPortIndex }
+        ::= { rcEponOnuCtcLoopDetectPortTable 1 }
+
+    RcEponOnuCtcLoopDetectPortEntry ::= SEQUENCE {
+        rcEponOnuLoopDetectPortIndex           Olt_OnuIfIndex,
+        rcEponOnuCtcLoopDetectPortEnable       EnableVar,
+        rcEponOnuCtcLoopDetectPortShutdown     EnableVar
+     }
+
+    rcEponOnuLoopDetectPortIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The UNI index for loop detection configuration."
+        ::= { rcEponOnuCtcLoopDetectPortEntry 1 }
+        
+    rcEponOnuCtcLoopDetectPortEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable or disable loop detection of this UNI."
+        DEFVAL {enable}
+        ::= { rcEponOnuCtcLoopDetectPortEntry 2 }
+
+   rcEponOnuCtcLoopDetectPortShutdown OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Shutdown the UNI automatically if loop is detected from this UNI."
+        DEFVAL {enable}
+        ::= { rcEponOnuCtcLoopDetectPortEntry 3 }
+--
+-- rcEponOnuLoopDetectPortTable
+--
+    rcEponOnuLoopDetectPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuLoopDetectPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The extended loop detection configuration of each UNI."
+        ::= { rcEponOnuLoopDetectGroup 2 }
+
+    rcEponOnuLoopDetectPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuLoopDetectPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The extended loop detection configuration of each UNI."
+        INDEX { rcEponOnuLoopDetectPortIndex }
+        ::= { rcEponOnuLoopDetectPortTable 1 }
+
+    RcEponOnuLoopDetectPortEntry ::= SEQUENCE {
+        rcEponOnuLoopDetectPortDownTime       INTEGER,
+        rcEponOnuLoopDetectPortSrcPortId      INTEGER,
+        rcEponOnuLoopDetectPortSrcDevMac      MacAddress,
+        rcEponOnuLoopDetectPortSrcOnuIndex    OnuIndex
+     }
+
+    rcEponOnuLoopDetectPortDownTime OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The duration of automatical shutdown. Value of 0 means no automatical shutdown. Value of 65535 means permanent automatical shutdown. This configuration works only when rcEponOnuCtcLoopDetectPortShutdown takes value enable."
+        DEFVAL {65535}
+        ::= { rcEponOnuLoopDetectPortEntry 1 }
+        
+    rcEponOnuLoopDetectPortSrcPortId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of the UNI that forms a loop with this UNI."
+        ::= { rcEponOnuLoopDetectPortEntry 2 }
+        
+    rcEponOnuLoopDetectPortSrcDevMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "MAC address of the ONU that forms a loop with this UNI."
+        ::= { rcEponOnuLoopDetectPortEntry 3 }
+        
+    rcEponOnuLoopDetectPortSrcOnuIndex OBJECT-TYPE
+        SYNTAX OnuIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of the ONU that forms a loop with this UNI."
+        ::= { rcEponOnuLoopDetectPortEntry 4 }
+        
+--
+-- rcEponOnuLoopDetectTable
+--
+    rcEponOnuLoopDetectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuLoopDetectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The loop detection configuration of each ONU."
+        ::= { rcEponOnuLoopDetectGroup 3 }
+
+    rcEponOnuLoopDetectEntry OBJECT-TYPE
+        SYNTAX RcEponOnuLoopDetectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The loop detection configuration of each ONU."
+        INDEX { rcEponOnuLoopDetectOnuIndex }
+        ::= { rcEponOnuLoopDetectTable 1 }
+
+    RcEponOnuLoopDetectEntry ::= SEQUENCE {
+        rcEponOnuLoopDetectOnuIndex       OnuIndex,
+        rcEponOnuLoopDetectHelloTime      INTEGER,
+        rcEponOnuLoopDetectVlanId         INTEGER
+     }
+
+    rcEponOnuLoopDetectOnuIndex OBJECT-TYPE
+        SYNTAX OnuIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of an ONU."
+        ::= { rcEponOnuLoopDetectEntry 1 }
+        
+    rcEponOnuLoopDetectHelloTime OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interval of periodical loop detection."
+        DEFVAL {4}
+        ::= { rcEponOnuLoopDetectEntry 2 }
+        
+    rcEponOnuLoopDetectVlanId OBJECT-TYPE
+        SYNTAX INTEGER (0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The VLAN ID of loop detection protocol. 0 for untagged protocol."
+        DEFVAL {0}
+        ::= { rcEponOnuLoopDetectEntry 3 }
+        
+--
+--Trap
+--
+rcEponOnuLoopDetectTrapGroup  OBJECT IDENTIFIER ::= { rcEponOnuLoopDetectGroup 10 }
+       
+     rcSelfLoopLinkUpTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 1 }
+
+     rcSelfLoopLinkDownTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 2 }
+       
+     rcInnerLoopLinkUpTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex, rcEponOnuLoopDetectPortSrcPortId}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 3 }
+
+     rcInnerLoopLinkDownTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex, rcEponOnuLoopDetectPortSrcPortId}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 4 }
+       
+     rcOuterLoopLinkUpTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex, rcEponOnuLoopDetectPortSrcPortId, 
+                     rcEponOnuLoopDetectPortSrcDevMac,rcEponOnuLoopDetectPortSrcOnuIndex}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 5 }
+
+     rcOuterLoopLinkDownTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuLoopDetectPortIndex, rcEponOnuLoopDetectPortSrcPortId, 
+                     rcEponOnuLoopDetectPortSrcDevMac,rcEponOnuLoopDetectPortSrcOnuIndex}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuLoopDetectTrapGroup 6 }
+      
+END

@@ -1,0 +1,1283 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-tdm-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Aug 3, 2009
+--  Author       : yanzhijie
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-TDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress FROM SNMPv2-TC
+        EnableVar FROM SWITCH-TC
+        Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "201006250000Z"  -- Jun 25, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "201006250000Z"  -- Jun 25, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuTdmGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 23 }
+------------------------------------------------------------------------------------------- 
+
+rcEponOnuTdmSysGroup   OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 1 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuTdmSysMngTable
+--
+	rcEponOnuTdmSysMngTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmSysMngEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmSysGroup 1 }
+		
+	rcEponOnuTdmSysMngEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmSysMngEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"." 
+		INDEX { rcEponOnuDevIndex }
+		::= { rcEponOnuTdmSysMngTable 1 }
+		
+	RcEponOnuTdmSysMngEntry ::= SEQUENCE { 
+		rcEponOnuTdmSysOamUdpFrameId   INTEGER,
+		rcEponOnuTdmSysOosCode         INTEGER,
+		rcEponOnuTdmSysOosSignalling   INTEGER,
+		rcEponOnuTdmSysClockSrcQuality INTEGER
+		}     
+		
+	rcEponOnuTdmSysOamUdpFrameId OBJECT-TYPE
+	    SYNTAX INTEGER
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    	"."
+	    ::= { rcEponOnuTdmSysMngEntry 1 }
+			
+	rcEponOnuTdmSysOosCode OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmSysMngEntry 2 }
+		
+	rcEponOnuTdmSysOosSignalling OBJECT-TYPE
+		SYNTAX INTEGER (0..15)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmSysMngEntry 3 }
+		
+	rcEponOnuTdmSysClockSrcQuality OBJECT-TYPE
+		SYNTAX	INTEGER {
+					stratum1(1),
+					stratum2(2),
+					stratum3(3),
+					stratum3e(4),
+					stratum4(5)
+					}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmSysMngEntry 4 }
+		
+--
+-- rcEponOnuTdmSysNetTable
+--
+    rcEponOnuTdmSysNetTable OBJECT-TYPE
+    	SYNTAX SEQUENCE OF RcEponOnuTdmSysNetEntry
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysGroup 2 }
+    	
+    rcEponOnuTdmSysNetEntry OBJECT-TYPE
+    	SYNTAX RcEponOnuTdmSysNetEntry
+    	MAX-ACCESS not-accessible
+    	STATUS current
+    	DESCRIPTION
+    		"."        
+    	INDEX {rcEponOnuDevIndex }
+    	::= { rcEponOnuTdmSysNetTable 1 }  
+    	
+    RcEponOnuTdmSysNetEntry ::= SEQUENCE {
+    	rcEponOnuTdmSysIpAddress               IpAddress,
+    	rcEponOnuTdmSysIpMask                  IpAddress,
+    	rcEponOnuTdmSysMacAddress              MacAddress,
+    	rcEponOnuTdmSysUdpMultiPlexMethod      INTEGER,
+    	rcEponOnuTdmSysBundleDoubleTaggingTpid INTEGER
+    	}
+    	
+    rcEponOnuTdmSysIpAddress OBJECT-TYPE
+    	SYNTAX IpAddress
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysNetEntry 1 }
+    	
+    rcEponOnuTdmSysIpMask OBJECT-TYPE
+    	SYNTAX IpAddress
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysNetEntry 2 }
+    	
+    rcEponOnuTdmSysMacAddress OBJECT-TYPE
+    	SYNTAX MacAddress
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysNetEntry 3 }
+    	
+    rcEponOnuTdmSysUdpMultiPlexMethod OBJECT-TYPE
+    	SYNTAX		INTEGER {
+    					sourceport(1),
+    					destport(2)
+    					}
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysNetEntry 4 }
+    	
+    rcEponOnuTdmSysBundleDoubleTaggingTpid OBJECT-TYPE
+    	SYNTAX INTEGER(1536..65535)
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmSysNetEntry 5 }
+    	
+-------------------------------------------------------------------------------------
+rcEponOnuTdmPortGroup   OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 2 }
+-------------------------------------------------------------------------------------
+--
+-- rcEponOnuTdmPortTable
+--                      
+	rcEponOnuTdmPortTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortGroup 1 }         
+	
+	rcEponOnuTdmPortEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuTdmPortIndex }
+		::= { rcEponOnuTdmPortTable 1 }
+		
+	RcEponOnuTdmPortEntry ::= SEQUENCE {
+		rcEponOnuTdmPortIndex           Olt_OnuIfIndex,
+		rcEponOnuTdmPortDescr           OCTET STRING,
+		rcEponOnuTdmPortType            INTEGER,
+		rcEponOnuTdmPortFrameMode       INTEGER,
+		rcEponOnuTdmPortCrc             EnableVar,
+		rcEponOnuTdmPortTsIdleCode      INTEGER,
+		rcEponOnuTdmPortSignalIdleCode  INTEGER,
+		rcEponOnuTdmPortLoopbackMode    INTEGER,
+		rcEponOnuTdmPortAlarmStatus     BITS,
+		rcEponOnuTdmPortAssignTsNumuber OCTET STRING,
+		rcEponOnuTdmPortT1SignalMode	INTEGER
+		}  
+		
+	rcEponOnuTdmPortIndex OBJECT-TYPE
+		SYNTAX Olt_OnuIfIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 1 } 
+		
+	rcEponOnuTdmPortDescr OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 2 }
+		
+	rcEponOnuTdmPortType OBJECT-TYPE
+		SYNTAX 		INTEGER {
+						e1(1),
+						t1(2)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 3 }
+		
+	rcEponOnuTdmPortFrameMode OBJECT-TYPE
+		SYNTAX		INTEGER {
+						unframed(1),
+						e1framed(2),
+						e1mf(3),
+						t1esfmf(4),
+						t1sfmf(5)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 4 }
+		
+	rcEponOnuTdmPortCrc OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 5 }
+		
+	rcEponOnuTdmPortTsIdleCode OBJECT-TYPE
+		SYNTAX INTEGER(0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= {rcEponOnuTdmPortEntry 6 }
+		
+	rcEponOnuTdmPortSignalIdleCode OBJECT-TYPE
+		SYNTAX INTEGER(0..15)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 7 }
+		
+	rcEponOnuTdmPortLoopbackMode OBJECT-TYPE
+		SYNTAX		INTEGER {
+						none(1),
+						internalLoop(2),
+						externalLoop(3),
+						bidirectional(4)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 8 }
+		
+	rcEponOnuTdmPortAlarmStatus OBJECT-TYPE
+		SYNTAX BITS
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 9 }
+		
+	rcEponOnuTdmPortAssignTsNumuber OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 10 }
+		
+	rcEponOnuTdmPortT1SignalMode OBJECT-TYPE
+		SYNTAX 		INTEGER {
+						none(1),
+						robbed-bit (2)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortEntry 11 }
+  
+		
+--
+-- rcEponOnuCtcTdmPortTable
+--
+	rcEponOnuCtcTdmPortTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuCtcTdmPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortGroup 2 }
+	
+	rcEponOnuCtcTdmPortEntry OBJECT-TYPE
+		SYNTAX RcEponOnuCtcTdmPortEntry	
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuTdmPortIndex }
+		::= { rcEponOnuCtcTdmPortTable 1 }
+		
+	RcEponOnuCtcTdmPortEntry ::= SEQUENCE {
+		rcEponOnuCtcTdmPortAdmin EnableVar
+		}
+		
+	rcEponOnuCtcTdmPortAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortEntry 1 }
+		
+--
+-- rcEponOnuTdmPortClkSrcTable
+--		 		              
+	rcEponOnuTdmPortClkSrcTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmPortClkSrcEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortGroup 3 }
+		
+	rcEponOnuTdmPortClkSrcEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmPortClkSrcEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuTdmPortIndex }
+		::= { rcEponOnuTdmPortClkSrcTable 1 }
+		
+	RcEponOnuTdmPortClkSrcEntry ::= SEQUENCE {
+		rcEponOnuTdmPortTxClkSource      INTEGER,
+		rcEponOnuTdmPortAdaptiveBundleId INTEGER
+		}   
+                            
+	rcEponOnuTdmPortTxClkSource OBJECT-TYPE
+		SYNTAX		INTEGER {
+						arc(1),
+						drc(2),
+						loopbak(3),
+						system(4)
+						}        
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortClkSrcEntry 1 }
+				
+	rcEponOnuTdmPortAdaptiveBundleId OBJECT-TYPE
+		SYNTAX INTEGER(1..64)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortClkSrcEntry 2 }
+
+----------------------------------------------------------------------------------
+rcEponOnuTdmPortStatisticGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 3 }
+---------------------------------------------------------------------------------- 
+--
+-- rcEponOnuTdmPortStatisticTable
+--
+	rcEponOnuTdmPortStatisticTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmPortStatisticEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortStatisticGroup 1 }
+	
+	rcEponOnuTdmPortStatisticEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmPortStatisticEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"." 
+		INDEX { rcEponOnuTdmPortIndex }
+		::= { rcEponOnuTdmPortStatisticTable 1 }
+		
+	RcEponOnuTdmPortStatisticEntry ::= SEQUENCE {
+		rcEponOnuTdmPortStatisticClear      INTEGER,
+		rcEponOnuTdmPortStatisticCurrentES  Counter32,
+		rcEponOnuTdmPortStatisticCurrentSES Counter32,
+		rcEponOnuTdmPortStatisticCurrentUAS Counter32
+		}                                   
+		
+	rcEponOnuTdmPortStatisticClear OBJECT-TYPE
+		SYNTAX		INTEGER {
+						ready(0),
+						clear(1)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortStatisticEntry 1 }
+		
+	rcEponOnuTdmPortStatisticCurrentES OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortStatisticEntry 2 }
+		
+	rcEponOnuTdmPortStatisticCurrentSES OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortStatisticEntry 3 }
+		
+	rcEponOnuTdmPortStatisticCurrentUAS OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortStatisticEntry 4 }
+						
+----------------------------------------------------------------------------------------
+rcEponOnuTdmPortAlarmGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 4 }
+----------------------------------------------------------------------------------------
+--
+-- rcEponOnuCtcTdmPortAlarmCtrlTable
+--		                            
+	rcEponOnuCtcTdmPortAlarmCtrlTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuCtcTdmPortAlarmCtrlEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortAlarmGroup 1 }
+		
+	rcEponOnuCtcTdmPortAlarmCtrlEntry OBJECT-TYPE
+		SYNTAX RcEponOnuCtcTdmPortAlarmCtrlEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmId }
+		::= { rcEponOnuCtcTdmPortAlarmCtrlTable 1 }
+		
+	RcEponOnuCtcTdmPortAlarmCtrlEntry ::= SEQUENCE {
+		rcEponOnuCtcTdmPortAlarmId             INTEGER,
+		rcEponOnuCtcTdmPortAlarmAdmin          EnableVar,
+		rcEponOnuCtcTdmPortAlarmThreshold      INTEGER,
+		rcEponOnuCtcTdmPortAlarmClearThreshold INTEGER
+		}                         
+		
+	rcEponOnuCtcTdmPortAlarmId OBJECT-TYPE
+		SYNTAX		INTEGER {
+						failure(1),
+						time_unlock(2),
+						los(3),
+						lof(11),
+						ais(12),
+						crc_error(13),
+						lomf(14)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortAlarmCtrlEntry 1 }
+		
+	rcEponOnuCtcTdmPortAlarmAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortAlarmCtrlEntry 2 }
+		
+	rcEponOnuCtcTdmPortAlarmThreshold OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortAlarmCtrlEntry 3 }
+		
+	 rcEponOnuCtcTdmPortAlarmClearThreshold OBJECT-TYPE
+	 	SYNTAX INTEGER
+	 	MAX-ACCESS read-write
+	 	STATUS current
+	 	DESCRIPTION
+	 		"."
+	 	::= { rcEponOnuCtcTdmPortAlarmCtrlEntry 4 }
+						             
+--
+-- rcEponOnuCtcTdmPortAlarmInfoTable
+--		                            
+	rcEponOnuCtcTdmPortAlarmInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuCtcTdmPortAlarmInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortAlarmGroup 2 }
+		
+	rcEponOnuCtcTdmPortAlarmInfoEntry OBJECT-TYPE
+		SYNTAX RcEponOnuCtcTdmPortAlarmInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmId }
+		::= { rcEponOnuCtcTdmPortAlarmInfoTable 1 }
+		
+	RcEponOnuCtcTdmPortAlarmInfoEntry ::= SEQUENCE {
+		rcEponOnuCtcTdmPortAlarmState INTEGER,
+		rcEponOnuCtcTdmPortAlarmInfo  OCTET STRING
+		}
+		
+	rcEponOnuCtcTdmPortAlarmState OBJECT-TYPE
+		SYNTAX		INTEGER {
+						ready(0),
+						alarm(1),
+						clear(2)
+						}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortAlarmInfoEntry 1 }
+		
+	rcEponOnuCtcTdmPortAlarmInfo OBJECT-TYPE
+		SYNTAX OCTET STRING(SIZE(32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuCtcTdmPortAlarmInfoEntry 2 }
+
+--
+-- rcEponOnuTdmPortTrapGroup
+--    
+rcEponOnuTdmPortTrapGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmPortAlarmGroup 10 }
+	
+	rcEponOnuTdmCtcPortFailureTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 1 }
+		
+	rcEponOnuTdmCtcPortTimingUnlockTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 2 }
+		
+	rcEponOnuTdmCtcPortLosTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 3 }
+	
+	rcEponOnuTdmPortAisTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 4 }
+	
+	rcEponOnuTdmPortLofTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 5 }
+	
+	rcEponOnuTdmPortCrcErTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 6 }		    
+		
+	rcEponOnuTdmPortLomfTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuTdmPortIndex, rcEponOnuCtcTdmPortAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmPortTrapGroup 7 }		
+		
+-------------------------------------------------------------------------------------------
+rcEponOnuTdmBundleGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 5 }
+------------------------------------------------------------------------------------------- 
+--
+-- rcEponOnuTdmBundleTable
+--
+	rcEponOnuTdmBundleTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleGroup 1 }
+		
+	rcEponOnuTdmBundleEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"." 
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+		::= { rcEponOnuTdmBundleTable 1}
+		
+	RcEponOnuTdmBundleEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleIndex          INTEGER,
+	    rcEponOnuTdmBundlePayloadType    INTEGER,
+		rcEponOnuTdmBundlePsnType        INTEGER,
+	    rcEponOnuTdmBundleDestBundleId   INTEGER,
+		rcEponOnuTdmBundleSourceBundleId INTEGER,
+		rcEponOnuTdmBundlePortIndex      INTEGER,
+	    rcEponOnuTdmBundleTsIndex        Unsigned32,
+	    rcEponOnuTdmBundleRowStatus      RowStatus
+	    }
+	
+	rcEponOnuTdmBundleIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..64)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 1 }
+		
+	rcEponOnuTdmBundlePayloadType OBJECT-TYPE
+		SYNTAX		INTEGER{
+						aal1(1),
+						aal2(2),
+						cesop(3),
+						satop(4),
+						hdlc(5)
+						}
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 2 }
+		
+	rcEponOnuTdmBundlePsnType OBJECT-TYPE
+		SYNTAX		INTEGER {
+						udpip(1),
+						mpls(2),
+						l2tp(3),
+						mef(4)
+						}
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 3 }
+		
+	rcEponOnuTdmBundleDestBundleId OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 4 }
+		
+	rcEponOnuTdmBundleSourceBundleId OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 5 }
+		
+	rcEponOnuTdmBundlePortIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..4)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 6 }
+		
+	rcEponOnuTdmBundleTsIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 7 }
+		
+	rcEponOnuTdmBundleRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleEntry 8 } 
+		
+--
+-- rcEponOnuTdmBundleMngTable
+--
+	rcEponOnuTdmBundleMngTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleMngEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleGroup 2 }
+		
+	 rcEponOnuTdmBundleMngEntry OBJECT-TYPE
+	 	SYNTAX RcEponOnuTdmBundleMngEntry
+	 	MAX-ACCESS not-accessible
+	 	STATUS current
+	 	DESCRIPTION
+	 		 "."
+	    INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+	 	::= { rcEponOnuTdmBundleMngTable 1 }
+	 	
+	 RcEponOnuTdmBundleMngEntry ::= SEQUENCE {
+	 	rcEponOnuTdmBundleAdmin           EnableVar,
+	    rcEponOnuTdmBundleDescr           OCTET STRING,
+	    rcEponOnuTdmBundleCurrentStatus   BITS,
+	    rcEponOnuTdmBundleOosStatusAction INTEGER,
+	    rcEponOnuTdmBundleProtocolPort    INTEGER,
+	    rcEponOnuTdmBundleJitterBuffer    INTEGER,
+	    rcEponOnuTdmBundleOamConnectivity EnableVar,
+	    rcEponOnuTdmBundleRtpAdmin        EnableVar,
+		rcEponOnuTdmBundlePacketLoadTime  INTEGER
+		} 
+		
+	rcEponOnuTdmBundleAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 1 }
+		
+	rcEponOnuTdmBundleDescr OBJECT-TYPE
+		SYNTAX OCTET STRING(SIZE(32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 2 }
+		
+	rcEponOnuTdmBundleCurrentStatus OBJECT-TYPE
+		SYNTAX BITS
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 3 }
+		
+	rcEponOnuTdmBundleOosStatusAction OBJECT-TYPE
+		SYNTAX		INTEGER {
+						disable(1),
+						lbit(2), 
+						txoff(3)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 4 }
+		
+	rcEponOnuTdmBundleProtocolPort OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 5 }
+		
+	rcEponOnuTdmBundleJitterBuffer OBJECT-TYPE
+		SYNTAX INTEGER (5..2000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 6 }
+		
+	rcEponOnuTdmBundleOamConnectivity OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 7 }
+		
+	rcEponOnuTdmBundleRtpAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"." 
+		::= { rcEponOnuTdmBundleMngEntry 8 }
+		
+	rcEponOnuTdmBundlePacketLoadTime OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMngEntry 9 }
+
+--
+-- rcEponOnuTdmBundleUdpTable
+--
+	rcEponOnuTdmBundleUdpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleUdpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleGroup 3 }
+		
+	rcEponOnuTdmBundleUdpEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleUdpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."  
+		INDEX {  rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+		::= { rcEponOnuTdmBundleUdpTable 1 }
+		
+	RcEponOnuTdmBundleUdpEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleUdpDestIpAddress      IpAddress,
+	    rcEponOnuTdmBundleUdpIpQosType          INTEGER,
+		rcEponOnuTdmBundleUdpIpQosTypeValue     INTEGER,
+		rcEponOnuTdmBundleUdpIpTtlValue         INTEGER,
+		rcEponOnuTdmBundleUdpNextHopAddressType INTEGER,
+	    rcEponOnuTdmBundleUdpNextHopIpAddress   IpAddress,
+		rcEponOnuTdmBundleUdpNextHopMacAddress  MacAddress
+		} 
+		
+	rcEponOnuTdmBundleUdpDestIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleUdpEntry 1 }
+		
+	rcEponOnuTdmBundleUdpIpQosType OBJECT-TYPE
+		SYNTAX		INTEGER {
+						none(0),
+						dscp(1),
+						prior(2),
+						tos(3)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleUdpEntry 2 }
+		
+	rcEponOnuTdmBundleUdpIpQosTypeValue OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleUdpEntry 3 }
+		
+     rcEponOnuTdmBundleUdpIpTtlValue OBJECT-TYPE
+     	SYNTAX INTEGER (0..255)
+     	MAX-ACCESS read-write
+     	STATUS current
+     	DESCRIPTION
+     		"."
+     	::= { rcEponOnuTdmBundleUdpEntry 4 }
+     	
+     rcEponOnuTdmBundleUdpNextHopAddressType OBJECT-TYPE
+     	SYNTAX		INTEGER {
+     					mac(1),
+     					ip(2)
+     					}
+     	MAX-ACCESS read-write
+     	STATUS current
+     	DESCRIPTION
+     		"."
+     	::= { rcEponOnuTdmBundleUdpEntry 5 }
+     	 
+     rcEponOnuTdmBundleUdpNextHopIpAddress OBJECT-TYPE
+     	SYNTAX IpAddress
+     	MAX-ACCESS read-write
+     	STATUS current
+     	DESCRIPTION
+     		"."
+     	::= { rcEponOnuTdmBundleUdpEntry 6 }
+     	
+     rcEponOnuTdmBundleUdpNextHopMacAddress OBJECT-TYPE
+     	SYNTAX MacAddress
+     	MAX-ACCESS read-write
+     	STATUS current
+     	DESCRIPTION
+     		"."
+     	::= { rcEponOnuTdmBundleUdpEntry 7 }
+
+--
+-- rcEponOnuTdmBundleMplsTable 
+--                            
+	rcEponOnuTdmBundleMplsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleMplsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleGroup 4 } 
+		
+	rcEponOnuTdmBundleMplsEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleMplsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"." 
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+		::= { rcEponOnuTdmBundleMplsTable 1 }
+		
+	RcEponOnuTdmBundleMplsEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleMplsOuterLabelNum    INTEGER,
+		rcEponOnuTdmBundleMplsOuter1LabelValue INTEGER,
+    	rcEponOnuTdmBundleMplsOuter2LabelValue INTEGER,
+		rcEponOnuTdmBundleMplsExpValue         INTEGER,
+		rcEponOnuTdmBundleMplsTtlValue         INTEGER
+		}
+		
+	rcEponOnuTdmBundleMplsOuterLabelNum OBJECT-TYPE
+		SYNTAX INTEGER (0..2)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMplsEntry 1 }
+		
+	rcEponOnuTdmBundleMplsOuter1LabelValue OBJECT-TYPE
+		SYNTAX INTEGER (1..1048575)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMplsEntry 2 }
+		
+	rcEponOnuTdmBundleMplsOuter2LabelValue OBJECT-TYPE
+		SYNTAX INTEGER (1..1048575)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMplsEntry 3 }
+		
+	rcEponOnuTdmBundleMplsExpValue OBJECT-TYPE
+		SYNTAX INTEGER (1..7)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMplsEntry 4 }
+		
+	rcEponOnuTdmBundleMplsTtlValue OBJECT-TYPE
+		SYNTAX INTEGER (1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleMplsEntry 5 }
+		
+--
+-- rcEponOnuTdmBundleVlanTable
+--  
+	rcEponOnuTdmBundleVlanTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleGroup 5 }
+		
+	rcEponOnuTdmBundleVlanEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."    
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+		::= { rcEponOnuTdmBundleVlanTable 1 }
+		
+	RcEponOnuTdmBundleVlanEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleVlanTagging  INTEGER,
+		rcEponOnuTdmBundleInnerVlanId  INTEGER,
+    	rcEponOnuTdmBundleOuterVlanId  INTEGER,
+		rcEponOnuTdmBundleInnerVlanCos INTEGER,
+		rcEponOnuTdmBundleOuterVlanCos INTEGER
+		}                                          
+		
+	rcEponOnuTdmBundleVlanTagging OBJECT-TYPE
+		SYNTAX		INTEGER {
+						tag(1),
+						double-tag(2),
+						untag(3)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleVlanEntry 1 }
+		
+	rcEponOnuTdmBundleInnerVlanId OBJECT-TYPE
+		SYNTAX INTEGER (1..4095)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleVlanEntry 2 }
+		
+	rcEponOnuTdmBundleOuterVlanId OBJECT-TYPE
+		SYNTAX INTEGER(1..4095)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleVlanEntry 3 }
+		
+	rcEponOnuTdmBundleInnerVlanCos OBJECT-TYPE
+		SYNTAX INTEGER (0..7)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleVlanEntry 4 }
+	
+	rcEponOnuTdmBundleOuterVlanCos OBJECT-TYPE
+		SYNTAX INTEGER (0..7)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleVlanEntry 5 }
+		
+---------------------------------------------------------------------------------
+rcEponOnuTdmBundleStatisticGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 6 }
+---------------------------------------------------------------------------------
+--
+-- rcEponOnuTdmBundleStatisticTable
+--
+	rcEponOnuTdmBundleStatisticTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleStatisticEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticGroup 1 }
+		
+	rcEponOnuTdmBundleStatisticEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleStatisticEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex }
+		::= { rcEponOnuTdmBundleStatisticTable 1 }
+		
+	RcEponOnuTdmBundleStatisticEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleStatisticStatisticClear        INTEGER,
+    	rcEponOnuTdmBundleStatisticTxPacketsNum          Counter64,
+		rcEponOnuTdmBundleStatisticRxPacketsNum          Counter64,
+		rcEponOnuTdmBundleStatisticDiscardPacketsNum     Counter64,
+		rcEponOnuTdmBundleStatisticJitterBufOverflowNum  Counter64,
+		rcEponOnuTdmBundleStatisticJitterBufUnderflowNum Counter64
+		}
+		
+	rcEponOnuTdmBundleStatisticStatisticClear OBJECT-TYPE
+		SYNTAX		INTEGER	{
+						ready(0),
+						clear(1)
+						}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 1 }
+		
+	rcEponOnuTdmBundleStatisticTxPacketsNum OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 2 }
+		
+	rcEponOnuTdmBundleStatisticRxPacketsNum OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 3 }
+		
+	rcEponOnuTdmBundleStatisticDiscardPacketsNum OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 4 }      
+		
+	rcEponOnuTdmBundleStatisticJitterBufOverflowNum OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 5 } 
+		
+	rcEponOnuTdmBundleStatisticJitterBufUnderflowNum OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleStatisticEntry 6 }
+
+
+-------------------------------------------------------------------------------------
+rcEponOnuTdmBundleAlarmGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmGroup 7 }
+-------------------------------------------------------------------------------------
+--
+-- rcEponOnuTdmBundleAlarmCtrlTable
+-- 		
+	rcEponOnuTdmBundleAlarmCtrlTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleAlarmCtrlEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleAlarmGroup 1 }
+		
+	rcEponOnuTdmBundleAlarmCtrlEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleAlarmCtrlEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex, rcEponOnuTdmBundleAlarmId }
+		::= { rcEponOnuTdmBundleAlarmCtrlTable 1 }
+		
+	RcEponOnuTdmBundleAlarmCtrlEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleAlarmId    INTEGER,
+    	rcEponOnuTdmBundleAlarmAdmin EnableVar
+    	}
+    	
+    rcEponOnuTdmBundleAlarmId OBJECT-TYPE
+    	SYNTAX		INTEGER {
+    					overflow(1),
+    					underflow(2),
+    					localfailure(3)
+    					}
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmBundleAlarmCtrlEntry 1 }
+    	
+    rcEponOnuTdmBundleAlarmAdmin OBJECT-TYPE
+    	SYNTAX EnableVar
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuTdmBundleAlarmCtrlEntry 2 }
+    	
+--
+-- rcEponOnuTdmBundleAlarmInfoTable
+--
+	rcEponOnuTdmBundleAlarmInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcEponOnuTdmBundleAlarmInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."		
+		::= { rcEponOnuTdmBundleAlarmGroup 2 }
+			
+	rcEponOnuTdmBundleAlarmInfoEntry OBJECT-TYPE
+		SYNTAX RcEponOnuTdmBundleAlarmInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex, rcEponOnuTdmBundleAlarmId }
+		::= { rcEponOnuTdmBundleAlarmInfoTable 1 }
+		
+	RcEponOnuTdmBundleAlarmInfoEntry ::= SEQUENCE {
+		rcEponOnuTdmBundleAlarmState INTEGER,
+		rcEponOnuTdmBundleAlarmInfo  OCTET STRING
+		}			                                       
+	
+	rcEponOnuTdmBundleAlarmState OBJECT-TYPE
+		SYNTAX		INTEGER {
+						ready(0),
+						alarm(1),
+						clear(2)
+						}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleAlarmInfoEntry 1 }
+		
+	rcEponOnuTdmBundleAlarmInfo OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleAlarmInfoEntry 2 }
+		
+--
+-- rcEponOnuTdmBundleTrapGroup
+--      
+rcEponOnuTdmBundleTrapGroup OBJECT IDENTIFIER ::= { rcEponOnuTdmBundleAlarmGroup 10 }
+
+	rcEponOnuTdmBundleOverflowTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex, rcEponOnuTdmBundleAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleTrapGroup 1 }
+		
+	rcEponOnuTdmBundleUnderflowTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex, rcEponOnuTdmBundleAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleTrapGroup 2 }
+		
+	rcEponOnuTdmBundleLocalFailureTrap NOTIFICATION-TYPE
+		OBJECTS { rcEponOnuDevIndex, rcEponOnuTdmBundleIndex, rcEponOnuTdmBundleAlarmState }
+		STATUS current
+		DESCRIPTION
+			"."
+		::= { rcEponOnuTdmBundleTrapGroup 3 }
+		
+END

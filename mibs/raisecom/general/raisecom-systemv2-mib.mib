@@ -1,0 +1,133 @@
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2003.12.17 by GONGGUIDONG
+-- This version of MIB is created just for the use of Network Management Systems
+-- display the  memory and cpu.
+--
+-- Copyright(c) by RAISECOM TECH, Ltd. 
+-- =======================================================================
+
+   RAISECOM-SYSTEMV2-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY 
+                	FROM SNMPv2-SMI
+		OBJECT-TYPE     
+					FROM SNMPv2-SMI
+		raisecomAgent    
+					FROM RAISECOM-BASE-MIB;
+
+	raisecomSystemV2 MODULE-IDENTITY
+                LAST-UPDATED 	"200507270000Z"
+                ORGANIZATION 	"RAISECOM TECH, Ltd."
+                CONTACT-INFO 	"www.raisecom.com"
+                DESCRIPTION  	
+                		"raisecom System objects: objects common to all platforms."
+        	::= { raisecomAgent 25 }	
+
+	--cpu table
+       	raisecomCpuV2Table    OBJECT-TYPE
+        			SYNTAX          SEQUENCE OF RaisecomCpuV2Entry
+        			MAX-ACCESS    	not-accessible
+        			STATUS          mandatory
+        			DESCRIPTION     "CPU table"
+    				::= { raisecomSystemV2 1 }
+
+   		raisecomCpuV2Entry    OBJECT-TYPE
+					SYNTAX          RaisecomCpuV2Entry
+					MAX-ACCESS      	not-accessible
+        			STATUS          mandatory
+					DESCRIPTION     "An entry in the raisecomCpuTable."
+					INDEX { raisecomSystemDeviceIdV2, raisecomSystemCpuIdV2 }
+    				::= { raisecomCpuV2Table 1 }
+        
+        RaisecomCpuV2Entry ::=
+        			SEQUENCE {
+        			raisecomSystemDeviceIdV2 			 	Integer32,
+       				raisecomSystemCpuIdV2				 	Integer32(0..7),   
+       				raisecomCpuUsage1SecondV2    	INTEGER(0..100),
+        			raisecomCpuUsage60SecondsV2		INTEGER(0..100),
+        			raisecomTotalMemoryV2       	INTEGER,
+	                raisecomAvailableMemoryV2 		INTEGER,
+	                raisecomMaxUtilmemoryV2	    	INTEGER	        
+        			}
+
+        raisecomSystemDeviceIdV2    OBJECT-TYPE
+        			SYNTAX          Integer32      
+        			MAX-ACCESS      	read-only
+        			STATUS          mandatory
+        			DESCRIPTION     
+            						"The divice id for identified every device."
+    				::= { raisecomCpuV2Entry 1 }
+    	
+    	raisecomSystemCpuIdV2    OBJECT-TYPE
+        			SYNTAX          Integer32     
+        			MAX-ACCESS      	read-only
+        			STATUS          mandatory
+        			DESCRIPTION     
+            						"The cpu index."
+    				::= { raisecomCpuV2Entry 2 }    
+
+    	raisecomCpuUsage1SecondV2 OBJECT-TYPE
+                   SYNTAX  INTEGER (0..100)
+                   UNITS	"percent"
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "CPU busy percentage in the last 1 second
+                           period,gathering data at the rate 200 times 
+                           per second. Not the last 1 realtime seconds 
+                           but the last 1 second period in the scheduler."
+                   ::= { raisecomCpuV2Entry 3 }
+
+        raisecomCpuUsage60SecondsV2 OBJECT-TYPE
+                   SYNTAX  INTEGER  (0..100)
+                   UNITS	"percent"
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                          "CPU busy percentage in the last 60 second
+                           period,gathering data at the rate 200 times 
+                           per second. Not the last 60 realtime seconds 
+                           but the last 60 second period in the scheduler."
+                   ::= { raisecomCpuV2Entry 4}
+     
+	   raisecomTotalMemoryV2 OBJECT-TYPE
+		        SYNTAX INTEGER
+				MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		          		"The  total memory of the system as reported by the
+		  	   			operating system."
+				::= { raisecomCpuV2Entry 5 }
+		
+		raisecomAvailableMemoryV2 OBJECT-TYPE
+		        SYNTAX INTEGER
+				MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		          		"The available total memory of the system as reported by the
+		  	   			operating system."
+		::= { raisecomCpuV2Entry 6}
+	
+	    raisecomMaxUtilmemoryV2 OBJECT-TYPE
+	            SYNTAX INTEGER
+	            UNITS        "percent"
+	        	MAX-ACCESS read-only
+	            STATUS current
+	            DESCRIPTION
+	                  	"The maximum memory utilization by this system since
+			   			system starting. This value may be cleared."
+		::= { raisecomCpuV2Entry 7 }    
+       --  trap
+		raisecomSystemAlarmTrap	OBJECT IDENTIFIER ::= {raisecomSystemV2 2}
+		raisecomMemoryAlarmTrap NOTIFICATION-TYPE
+		    OBJECTS { raisecomSystemDeviceIdV2, raisecomSystemCpuIdV2,
+					raisecomTotalMemoryV2,raisecomAvailableMemoryV2,raisecomMaxUtilmemoryV2,raisecomMemoryAlarmThreshold}
+			STATUS current
+		    DESCRIPTION
+		        "send the trap about system's memory information when system's memory 
+		        less than threshold."
+		    ::= {raisecomSystemAlarmTrap 1}   				
+END  

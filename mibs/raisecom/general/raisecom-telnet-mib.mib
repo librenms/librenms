@@ -1,0 +1,55 @@
+--MibName=rcTelnet
+-- *****************************************************************
+-- switch-telnet-mib.my:  TELNET MIB
+--
+-- Nov 2011, zhangronghua
+--
+-- Copyright (c) 1996-2011 by Raisecom Technology Co., Ltd. 
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+SWITCH-TELNET-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,
+        Integer32                           FROM SNMPv2-SMI
+        PortList				            FROM SWITCH-TC
+        raisecomPonCommon           		FROM RAISECOM-PONSERIES-BASE-MIB; 
+    
+    rcTelnetServerInfo MODULE-IDENTITY
+        LAST-UPDATED "201111150000Z"
+    	ORGANIZATION "RAISECOM Group"
+    	CONTACT-INFO
+            	" 
+             	Phone:  010-82884499
+             	Email:  support@raisecom.com"
+    	DESCRIPTION
+            	"The MIB module for managing  telnet server infomation."
+    	REVISION      "1111150000Z"
+    	DESCRIPTION
+            ""
+    	::= { raisecomPonCommon 12} 
+    	
+------------------------------------------------------------------
+--scalar  
+  
+    rcTelnetMaxSessions OBJECT-TYPE
+        SYNTAX  Integer32 (0..5)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max sessions device telnet server permits. '0' indicates that 
+            device won't permits any telnet connect."   
+        DEFVAL {5}
+        ::= { rcTelnetServerInfo 1 }
+        
+    rcTelnetAcceptPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ports that access telnet connect request to telnet server 
+            on device."   
+        ::= { rcTelnetServerInfo 2 }    
+END

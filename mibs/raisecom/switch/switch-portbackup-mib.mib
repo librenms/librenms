@@ -1,0 +1,252 @@
+--MibName=rcPortBackup
+-- *****************************************************************
+-- switch-portbackup-mib.MIB:	 switch port backup MIB file
+--
+-- Feb 2012, gxd
+--
+-- Copyright (c) 1994-2012,	2012 by	Raisecom, Inc.
+-- All rights reserved.
+-- Modify
+-- *****************************************************************
+
+SWITCH-PORTBACKUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        raisecomSwitchMgt                FROM RAISECOM-PONSERIES-BASE-MIB  
+        RowStatus,TruthValue             FROM SNMPv2-TC
+        Vlanset,EnableVar	             FROM SWITCH-TC  
+        InterfaceIndex                   FROM IF-MIB;
+                 
+     rcPortBackup MODULE-IDENTITY
+        LAST-UPDATED    "201202020000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "Raisecom Systems
+                        
+                Postal: Beijing,
+                        China
+
+                Tel: 86-010-82884499
+
+                E-mail: zhangronghua@raisecom.com"
+        DESCRIPTION
+                "description of port backup group manage object."
+                ::= { raisecomSwitchMgt 11}  
+                
+         rcPortBackupObjects 			OBJECT IDENTIFIER ::= { rcPortBackup 1 }
+         rcPortBackupNotifications       OBJECT IDENTIFIER ::= { rcPortBackup 2 }  
+                         
+-- rcPortBackupTable
+
+	rcPortBackupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RcPortBackupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of port backup group"
+    ::={ rcPortBackupObjects 1 }
+    
+
+	rcPortBackupEntry OBJECT-TYPE
+    SYNTAX      RcPortBackupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rcPortBackupTable provides objects ."
+    INDEX        { rcPortBackupGroupIndex }
+    ::={ rcPortBackupTable 1 }
+    
+	RcPortBackupEntry ::= SEQUENCE {
+		rcPortBackupGroupIndex	            INTEGER,     
+		rcPortBackupPrimaryPort	            InterfaceIndex,
+		rcPortBackupBackupPort              InterfaceIndex,
+		rcPortBackupVlanlist	            Vlanset,
+		rcPortBackupEnable                  EnableVar,        		
+		rcPortBackupPrimaryPortForwardState	INTEGER,
+		rcPortBackupBackupPortForwardState  INTEGER,
+		rcPortBackupPrimaryPortLinkState	INTEGER,
+		rcPortBackupBackupPortLinkState     INTEGER,
+		rcPortBackupSwitchCount             INTEGER,   
+	    rcPortBackupForceSwitch             TruthValue,
+	    rcPortBackupRestoreMode             EnableVar,
+	    rcPortBackupRestoreDelay            INTEGER,
+	    rcPortBackupRowStatus               RowStatus
+	}
+ 
+ 	rcPortBackupGroupIndex OBJECT-TYPE
+		SYNTAX	INTEGER(1..16)
+		ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An index that uniquely identifies an entry in
+             the port backup group table."
+		::=	{ rcPortBackupEntry 1 }
+	
+	rcPortBackupPrimaryPort OBJECT-TYPE
+		SYNTAX	InterfaceIndex
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"This object is the first index of an rcPortBackupTable. 
+			It is the primary port of a backup group."
+		::=	{ rcPortBackupEntry 2 }
+		
+	rcPortBackupBackupPort OBJECT-TYPE
+		SYNTAX	InterfaceIndex
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"This object is the second index of an rcPortBackupTable. 
+			It is the standby port of a backup group."
+		::=	{ rcPortBackupEntry 3 }
+
+	rcPortBackupVlanlist OBJECT-TYPE
+		SYNTAX	Vlanset
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"Backup vlan list.Within each octet, the most significant 
+			bit represents the lowest numbered vlan, and the least significant 
+			bit represents the highest numbered vlan.  Thus, each vlan is 
+			represented by a single bit within the value of this object. If that
+			bit has a value of '1' then that vlan is included in the set of vlans; 
+			the vlan is not included if its bit has a value of '0'."
+		::=	{ rcPortBackupEntry 4 }   
+
+	rcPortBackupEnable OBJECT-TYPE
+		SYNTAX	EnableVar
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"The purpose of this object is to set backup function enable or disable."
+		::=	{ rcPortBackupEntry 5 }
+				
+	rcPortBackupPrimaryPortForwardState OBJECT-TYPE
+        SYNTAX INTEGER	{
+                unknown(1),
+            	discarding(2),
+    			forwarding(3)
+        			}
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Primary port stg status£¬including three states: unknown, 
+			discarding and forwarding. If the primary port is not set, the
+			primary port state is unknown. If a primary port is at discarding 
+			state, the port only reiceive and send BPDU;If a primary port is at 
+			forwarding state,the port reiceive and send not only BPDU but also 
+			other frames."
+		::=	{ rcPortBackupEntry 6 }
+		
+	rcPortBackupBackupPortForwardState OBJECT-TYPE
+        SYNTAX INTEGER	{   
+                unknown(1),
+            	discarding(2),
+    			forwarding(3)
+        			}
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Backup port stg status£¬including three states: unknown,
+			discarding and forwarding. If the backup port is not set, the
+			backup port state is unknown. If a backup port is at discarding 
+			state, the port only reiceive and send BPDU;If a backup port is at 
+			forwarding state,the port reiceive and send not only BPDU but also 
+			other frames."
+		::=	{ rcPortBackupEntry 7 }
+		
+	rcPortBackupPrimaryPortLinkState OBJECT-TYPE
+        SYNTAX INTEGER	{
+                unknown(1),
+            	up(2),
+    			down(3)
+        			}
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Primary port link status£¬including three states: unknown,
+			up and down. If the primary port is not set, the primary port 
+			link state is unknown. "
+		::=	{ rcPortBackupEntry 8 }
+
+	rcPortBackupBackupPortLinkState OBJECT-TYPE
+        SYNTAX INTEGER	{
+                unknown(1),
+            	up(2),
+    			down(3)
+        			}
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Backup port link status£¬including three states: unknown,
+			up and down. If the backup port is not set, the backup port 
+			link state is unknown. "
+		::=	{ rcPortBackupEntry 9 }
+		
+	rcPortBackupSwitchCount OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only     
+		STATUS	current
+		DESCRIPTION
+			"The count of switch between primary port and standby port."
+		::=	{ rcPortBackupEntry 10 } 
+			
+	rcPortBackupForceSwitch OBJECT-TYPE   
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The purpose of this object is to force transition between main and backup port."
+        DEFVAL { False }
+        ::= { rcPortBackupEntry 11 }  
+		               
+	rcPortBackupRestoreMode OBJECT-TYPE 
+		SYNTAX EnableVar
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The mode of port restoration."
+        ::= { rcPortBackupEntry 12 } 
+        
+    rcPortBackupRestoreDelay OBJECT-TYPE 
+		SYNTAX INTEGER (0..180)
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The restoration delay when bridge received the restoration incident."
+        ::= { rcPortBackupEntry 13 }  
+        
+ 	rcPortBackupRowStatus OBJECT-TYPE
+		SYNTAX	RowStatus
+		ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+			"This object allows entries to be created and deleted
+			 in the rcPortBackupTable. Deletion of an entry in
+			 this table results in a deletion of all corresponding (same
+			 rcPortBackupPrimaryPortIndex and rcPortBackupStandbyPort index values) rcPortBackupTable."
+		::=	{ rcPortBackupEntry 14 }      
+		  
+    rcPortBackupBackupPortOperate NOTIFICATION-TYPE
+        OBJECTS { rcPortBackupGroupIndex,
+                  rcPortBackupPrimaryPort,
+				  rcPortBackupBackupPort
+            	}
+        STATUS  current
+        DESCRIPTION
+          "Backup PORT Switch TRAP"
+       ::= { rcPortBackupNotifications 1 } 
+       
+    rcPortBackupPrimaryPortOperate NOTIFICATION-TYPE
+        OBJECTS { rcPortBackupGroupIndex,
+                  rcPortBackupPrimaryPort,
+				  rcPortBackupBackupPort
+            	}
+        STATUS  current
+        DESCRIPTION
+          "Backup PORT Restore TRAP"
+       ::= { rcPortBackupNotifications 2 }        
+
+			
+END
+	

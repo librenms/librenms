@@ -1,0 +1,101 @@
+--MibName=rcProxyArp
+-- =======================================================================
+-- Version info
+--
+-- Version 1.0 Created 2012.05.15 by YULEI
+-- This version of MIB is created just for the use of Network Management Systems
+-- display and set the system configuration of Proxy Arp .
+--
+-- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.
+-- =======================================================================
+
+
+RAISECOM-PROXYARP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        raisecomSwitchMgt      FROM RAISECOM-PONSERIES-BASE-MIB  
+        TruthValue             FROM SNMPv2-TC
+        EnableVar	           FROM SWITCH-TC  
+        InterfaceIndex         FROM IF-MIB;
+                         
+     roapProxyArp MODULE-IDENTITY
+        LAST-UPDATED    "201312150000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "Raisecom Systems
+                        
+                Postal: Beijing,
+                        China
+
+                Tel: 86-010-82884499
+
+                E-mail: support@raisecom.com"
+        DESCRIPTION
+                "Raisecom Proxy Arp MIB definition."
+                ::= { raisecomSwitchMgt 27} 
+                
+        roapProxyArpConfig OBJECT IDENTIFIER ::= { roapProxyArp 1 }  
+       -- roapProxyArpTableGroup  OBJECT IDENTIFIER ::= { roapProxyArpObjects 1 }       
+------------------------------------------------------------------------------
+--	define groups in RAISECOM-PROXYARP-MIB
+------------------------------------------------------------------------------
+-- ---------------------------------------------------------- --
+-- The PAE System Group
+-- ---------------------------------------------------------- --   
+roapProxyArpEnable OBJECT-TYPE
+	    SYNTAX      EnableVar
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This object controls whether the proxy ARP 
+                is enabled on the device."
+        DEFVAL { 2 }
+        ::= { roapProxyArpConfig 1 } 
+        
+roapProxyArpIfTable OBJECT-TYPE
+	    SYNTAX     SEQUENCE OF RoapProxyArpIfEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	        ""
+	    ::= { roapProxyArpConfig 2 }   
+	    
+roapProxyArpIfEntry OBJECT-TYPE
+	    SYNTAX     RoapProxyArpIfEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	        "Each entry represents a IfIndex."
+	    INDEX { roapProxyArpIfIndex }
+	    ::= { roapProxyArpIfTable 1 }
+
+RoapProxyArpIfEntry ::= SEQUENCE {
+	    roapProxyArpIfIndex	  InterfaceIndex,
+	    roapProxyArpIfEnable    INTEGER
+} 
+
+roapProxyArpIfIndex  OBJECT-TYPE
+	    SYNTAX     InterfaceIndex
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION 
+	        "The index of interface ip."
+	    ::= { roapProxyArpIfEntry 1 }
+	    
+roapProxyArpIfEnable  OBJECT-TYPE
+	    SYNTAX     EnableVar
+	    MAX-ACCESS read-write
+	    STATUS     current
+	    DESCRIPTION 
+	        "This object control whether the proxy arp 
+	        is enable on the index of interface ip"  
+	    DEFVAL { 0 }    
+	    ::= { roapProxyArpIfEntry 2 }
+	    		    
+END				
+				
+
+
+
+
+
