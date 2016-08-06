@@ -1,0 +1,106 @@
+--MibName=rcRateLimit
+-- *****************************************************************
+-- RAISECOM-RC3026BANDWIDTHMANAGE-MIB.MIB:  Raisecom Bandwidth Manage MIB file
+--
+-- May 2003, yuanqingguo
+--
+-- Copyright (c) 1994-2000, 2001 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+SWITCH-RATELIMIT-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS 
+       raisecomSwitchMgt      FROM RAISECOM-PONSERIES-BASE-MIB
+       RowStatus              FROM SNMPv2-TC
+       EnableVar              FROM SWITCH-TC 
+       InterfaceIndex         FROM IF-MIB;
+                 
+       roapRateLimit MODULE-IDENTITY
+       LAST-UPDATED    "201205020000Z"
+       ORGANIZATION    "Raisecom, Inc."
+       CONTACT-INFO
+                       "Raise Systems
+                        
+                        Postal: Beijing,
+                        China
+
+                        Tel: 86-010-82884499
+
+                        E-mail: zhangronghua@raisecom.com"
+       DESCRIPTION
+                       "description of rate limit manage object."
+       ::= { raisecomSwitchMgt 23}    
+
+---------------------------------rate-limit for port-------------  
+roapRateLimitPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RoapRateLimitPortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+      "A table of rate-limit for port and associated properties."
+    ::= { roapRateLimit 1}
+
+roapRateLimitPortEntry OBJECT-TYPE
+    SYNTAX      RoapRateLimitPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table entry for rate-limit of port and status information."
+    INDEX { roapRateLimitPortIndex }
+    ::= { roapRateLimitPortTable 1 }
+
+RoapRateLimitPortEntry ::= SEQUENCE 
+{
+    roapRateLimitPortIndex             InterfaceIndex,
+    roapRateLimitPortIngressRate       INTEGER,
+    roapRateLimitPortIngressBurst      INTEGER,
+    roapRateLimitPortEgressRate        INTEGER,
+    roapRateLimitPortEgressBurst       INTEGER  
+}
+             
+roapRateLimitPortIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+      "The value of ifIndex that identifies the rate-limit of port which based 1."    
+    ::= { roapRateLimitPortEntry 1 }          
+    
+roapRateLimitPortIngressRate   OBJECT-TYPE
+    SYNTAX    INTEGER  (64..10485760)  
+    UNITS     "kbps"
+    ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+      "The value is the ingress rate( kbps) of the port.when the port is 10Ge port,the max value is 10485760,else 1048576"    
+    ::= { roapRateLimitPortEntry 2 }    
+    
+roapRateLimitPortIngressBurst   OBJECT-TYPE
+    SYNTAX    INTEGER (2..512)   
+    UNITS     "kB"            
+    ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+      "The value is the ingress burst( kB) of the port."    
+    ::= { roapRateLimitPortEntry 3 } 
+        
+roapRateLimitPortEgressRate   OBJECT-TYPE
+    SYNTAX    INTEGER  (64..10485760)   
+    UNITS     "kbps"
+    ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+       "The value is the egress rate( kbps) of the port.when the port is 10Ge port,the max value is 10485760,else 1048576"    
+    ::= { roapRateLimitPortEntry 4 }    
+    
+roapRateLimitPortEgressBurst   OBJECT-TYPE
+    SYNTAX    INTEGER  (2..512)  
+    UNITS     "kB"                
+    ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+      "The value is the egress burst( kB) of the port."    
+    ::= { roapRateLimitPortEntry 5 }  
+        
+END

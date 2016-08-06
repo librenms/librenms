@@ -1,0 +1,219 @@
+--MibName=roapNd
+-- *****************************************************************
+-- switch-ndi-mib.mib:  Raisecom ND MIB file
+--
+-- April 2012, pangxijia
+--
+-- Copyright (c) 2012-2019, 2012 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+SWITCH-ND-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32     	 			FROM SNMPv2-SMI
+    MacAddress,RowStatus		FROM SNMPv2-TC 
+    PortList, Vlanset, EnableVar	FROM SWITCH-TC 
+    InetAddressType, InetAddressIPv6    FROM INET-ADDRESS-MIB 
+    OltPortIndex	                    FROM RAISECOM-PONSERIES-TC 
+	raisecomSwitchMgt                   FROM RAISECOM-PONSERIES-BASE-MIB;
+     
+roapNd MODULE-IDENTITY
+    LAST-UPDATED "201204090000Z"
+    ORGANIZATION "raisecom Group"
+    CONTACT-INFO
+                "       Raise Systems
+                        
+                Postal: Beijing,
+                        China
+
+                E-mail: pangxijia@raisecom.com"
+    DESCRIPTION
+            "The MIB module for dynamic arp inspection."
+    ::= { raisecomSwitchMgt   17}   
+    
+------------------------------------------------------------------------------
+--
+--  roapNd - Dynamic ARP Inspection
+--
+--  This group is used to instrument the dynamic ARP inspection support.
+--
+------------------------------------------------------------------------------    
+------------------------------------------------------------------------------
+roapNdConfig			OBJECT IDENTIFIER ::= {	roapNd 1 }
+
+------------------------------------------------------------------------------
+--
+-- ND Config
+--
+
+roapNdStaticEnable OBJECT-TYPE
+	    SYNTAX      EnableVar
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This object controls whether the static ND 
+               bind is enabled on the device. A disable(2) value 
+               will prevent the static ND bind rule to write 
+               to hardware on the device."
+        DEFVAL { 2 }
+        ::= { roapNdConfig 1 }   
+        
+roapNdDhcpSnoopEnable OBJECT-TYPE
+	    SYNTAX      EnableVar
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This object controls whether the dhcp snooping ND 
+               bind is   enabled on the device. A disable(2) value 
+               will prevent the dhcp snooping ND bind on the device."
+        DEFVAL { 2 }
+        ::= { roapNdConfig 2 }
+
+roapNdBindCurrentRules OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the current ND rule number on the device."
+        ::= { roapNdConfig 3 }
+--
+-- ND Port Config
+--
+
+roapNdPortTrustTable	OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapNdPortTrustEntry
+        MAX-ACCESS      not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains entries that identify the configured ND trust
+            for each port."
+        ::= { roapNdConfig 4 }
+
+roapNdPortTrustEntry OBJECT-TYPE
+	    SYNTAX     RoapNdPortTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry (conceptual row) in the roapNdPortStateTable.
+                The entry identify the configured ND trust for the port."
+       AUGMENTS    { roapNdiPortIndex }
+       ::= { roapNdPortTrustTable 1 }
+
+RoapNdPortTrustEntry ::= 
+SEQUENCE {        
+                roapNdiPortIndex       OltPortIndex,
+                roapNdTrust			INTEGER
+         }
+    
+ roapNdiPortIndex OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write 
+        STATUS current
+        DESCRIPTION     
+                "port index."   
+        DEFVAL { 0 }        
+        ::= { roapNdPortTrustEntry 1 }
+
+roapNdTrust OBJECT-TYPE
+        SYNTAX INTEGER { trust(1), untrust(2) }  
+        MAX-ACCESS read-write 
+        STATUS current
+        DESCRIPTION     
+                "This object indicates the whether trust arp packet on this port."   
+        DEFVAL { 2 }        
+        ::= { roapNdPortTrustEntry 2 }
+
+--
+--  The ND bind table
+--
+
+roapNDBindTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapNDBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION                   
+                "This table contains the list of ND bind table."
+        ::= { roapNdConfig 5 } 
+
+roapNDBindEntry OBJECT-TYPE
+	    SYNTAX     RoapNDBindEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Each entry contains the list of ND bind table."
+        INDEX      { roapNDBindIp}
+        ::= { roapNDBindTable 1 }
+
+RoapNDBindEntry ::= SEQUENCE {
+                roapNDBindIp		    InetAddressIPv6,
+                roapNDBindPortId		INTEGER,
+                roapNDBindMac		MacAddress,
+                roapNDBindVlan       INTEGER,
+                roapNDBindMode       INTEGER,  
+                roapNDBindInHw       INTEGER,
+                roapNDBindRowStatus  RowStatus
+        }  
+        
+ roapNDBindIp OBJECT-TYPE
+        SYNTAX        InetAddressIPv6
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+		 "Index identifying this entry.The ip address of this bind rule."
+        ::= { roapNDBindEntry 1 }
+        
+roapNDBindPortId OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-create 
+        STATUS        current
+        DESCRIPTION
+		 "This object specifies the port id of this rule."
+        ::= { roapNDBindEntry 2 }
+        
+roapNDBindMac OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    read-create 
+        STATUS        current
+        DESCRIPTION
+		 "This object specifies the mac address of this rule."
+        ::= { roapNDBindEntry 3 }
+
+roapNDBindVlan OBJECT-TYPE
+        SYNTAX        INTEGER (1..4094)
+        MAX-ACCESS    read-create 
+        STATUS        current
+        DESCRIPTION
+                "This object specifies the vlan of this rule."
+        ::= { roapNDBindEntry 4 }
+
+roapNDBindMode OBJECT-TYPE
+        SYNTAX        INTEGER { static(1), dhcp-snooping(2) }
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION
+		 "This object specifies the mode of this rule.static(1) specifies 
+		 this rule is staticly configured.dhcp snooping(2) specifies this 
+		 rule is learned from dhcp snooping."
+        ::= { roapNDBindEntry 5 }
+
+roapNDBindInHw  OBJECT-TYPE
+        SYNTAX        INTEGER { inHw(1), notinHw(2) }
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION
+		 "This object specifies the state of this rule.InHw(1) specifies 
+		 this rule is in hardware.notInHw(1) specifies this rule is not in hardware."
+        ::= { roapNDBindEntry 6 }     
+        
+roapNDBindRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create 
+        STATUS        current
+        DESCRIPTION
+		 "The row status of this entry."
+        ::= { roapNDBindEntry 7 }
+
+END

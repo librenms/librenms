@@ -1,0 +1,3433 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-port-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2007
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-PORT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        EnableVar,PortList FROM SWITCH-TC
+        Olt_OnuIfIndex     FROM RAISECOM-PONSERIES-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt    FROM RAISECOM-PONSERIES-BASE-MIB
+        CounterBasedGauge64 FROM HCNUM-TC;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuPortGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 3 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuCtcEthPortTable
+--
+    rcEponOnuCtcEthPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcEthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 1 }
+
+    rcEponOnuCtcEthPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcEthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuCtcEthPortTable 1 }
+
+    RcEponOnuCtcEthPortEntry ::= SEQUENCE {
+        rcEponOnuEthPortIndex                   Olt_OnuIfIndex,
+        rcEponOnuCtcEthPortLinkState            INTEGER,
+        rcEponOnuCtcEthPortAdminState           INTEGER,
+        rcEponOnuCtcEthPortAdminCtrl            EnableVar,
+        rcEponOnuCtcEthPortAutoNegAdminState    INTEGER,
+        rcEponOnuCtcEthPortAutoNegAdminCtrl     EnableVar,
+        rcEponOnuCtcEthPortAutoNegLocalAbility  OCTET STRING,
+        rcEponOnuCtcEthPortAutoNegAdverAbility  OCTET STRING,
+        rcEponOnuCtcEthPortAutoNegRestart       INTEGER,
+        rcEponOnuCtcEthPortFlowCtrlState        INTEGER,
+        rcEponOnuCtcEthPortFlowCtrlAdmin        EnableVar
+        }
+        
+    rcEponOnuEthPortIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 1 }
+        
+    rcEponOnuCtcEthPortLinkState OBJECT-TYPE
+        SYNTAX INTEGER {
+               unknown(0),
+               linkDown(1),
+               linkUp(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 2 }
+        
+    rcEponOnuCtcEthPortAdminState OBJECT-TYPE
+        SYNTAX INTEGER {
+               unknown(0),
+               disable(1),
+               enable(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 3 }
+        
+    rcEponOnuCtcEthPortAdminCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 4 }
+        
+    rcEponOnuCtcEthPortAutoNegAdminState OBJECT-TYPE
+        SYNTAX INTEGER {
+               unknown(0),
+               disable(1),
+               enable(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 5 }
+        
+    rcEponOnuCtcEthPortAutoNegAdminCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 6 }
+        
+    rcEponOnuCtcEthPortAutoNegLocalAbility OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..40))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 7 }
+        
+    rcEponOnuCtcEthPortAutoNegAdverAbility OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..40))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 8 }
+        
+    rcEponOnuCtcEthPortAutoNegRestart OBJECT-TYPE
+        SYNTAX INTEGER {
+               ready(0),
+               restart(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 9 }
+        
+    rcEponOnuCtcEthPortFlowCtrlState OBJECT-TYPE
+        SYNTAX INTEGER {
+               unknown(0),
+               disable(1),
+               enable(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 10 }
+        
+    rcEponOnuCtcEthPortFlowCtrlAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortEntry 11 }
+        
+--
+-- rcEponOnuEthPortTable
+--
+    rcEponOnuEthPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuEthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 2 }
+
+    rcEponOnuEthPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuEthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuEthPortTable 1 }
+
+    RcEponOnuEthPortEntry ::= SEQUENCE {
+        rcEponOnuEthPortLinkTrapCtrl   EnableVar,
+        rcEponOnuEthPortDuplexSpeedGet INTEGER,
+        rcEponOnuEthPortDuplexSpeedSet INTEGER,
+        rcEponOnuEthPortIsolationCtrl  EnableVar,
+        rcEponOnuEthPortDescription    OCTET STRING,
+        rcEponOnuEthPortNominalSpeed   Gauge32,
+        rcEponOnuEthPortActualSpeed    Gauge32,
+        rcEponOnuEthPortLoopBackCtrl   INTEGER
+        }
+
+    rcEponOnuEthPortLinkTrapCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 1 }
+
+    rcEponOnuEthPortDuplexSpeedGet OBJECT-TYPE
+        SYNTAX INTEGER{
+               unknown(1),
+               half_10(2),
+               full_10(3),
+               half_100(4),
+               full_100(5),
+               half_1000(6),
+               full_1000(7),
+               illegal(99)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 2 }
+        
+    rcEponOnuEthPortDuplexSpeedSet OBJECT-TYPE
+        SYNTAX INTEGER{
+               auto(1),               
+               half_10(2),
+               full_10(3),
+               half_100(4),
+               full_100(5),
+               half_1000(6),
+               full_1000(7)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 3 }
+        
+    rcEponOnuEthPortIsolationCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 4 }
+        
+    rcEponOnuEthPortDescription OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 5 }
+        
+    rcEponOnuEthPortNominalSpeed OBJECT-TYPE
+    	SYNTAX Gauge32
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuEthPortEntry 6 }
+    	
+    rcEponOnuEthPortActualSpeed OBJECT-TYPE
+    	SYNTAX Gauge32
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuEthPortEntry 7 }
+
+    rcEponOnuEthPortLoopBackCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortEntry 8 }
+
+--
+--  rcEponOnuEthPortStatsTable
+--
+
+    rcEponOnuEthPortStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuEthPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 3 }
+
+    rcEponOnuEthPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuEthPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuEthPortStatsTable 1 }
+
+    RcEponOnuEthPortStatsEntry ::= SEQUENCE {
+        rcEponOnuEthPortStatsClear              INTEGER,
+        rcEponOnuEthPortStatsInUnicast          Counter64,
+        rcEponOnuEthPortStatsInMulticasts       Counter64,
+        rcEponOnuEthPortStatsInBroadcasts       Counter64, 
+        rcEponOnuEthPortStatsInPause            Counter64, 
+        rcEponOnuEthPortStatsInGoodOctets       Counter64,
+        rcEponOnuEthPortStatsInBadOctets        Counter64,
+        rcEponOnuEthPortStatsInUndersize        Counter64,
+        rcEponOnuEthPortStatsInFragments        Counter64,
+        rcEponOnuEthPortStatsInOversize         Counter64,
+        rcEponOnuEthPortStatsInJabber           Counter64,
+        rcEponOnuEthPortStatsInFCSErr           Counter64,
+        rcEponOnuEthPortStatsIn64Octets         Counter64,
+        rcEponOnuEthPortStatsIn65to127Octets    Counter64,
+        rcEponOnuEthPortStatsIn128to255Octets   Counter64,
+        rcEponOnuEthPortStatsIn256to511Octets   Counter64,
+        rcEponOnuEthPortStatsIn512to1023Octets  Counter64,
+        rcEponOnuEthPortStatsIn1024toMaxOctets  Counter64,
+        rcEponOnuEthPortStatsOutUnicast         Counter64,
+        rcEponOnuEthPortStatsOutMuliticasts     Counter64,
+        rcEponOnuEthPortStatsOutBroadcasts      Counter64, 
+        rcEponOnuEthPortStatsOutPause           Counter64, 
+        rcEponOnuEthPortStatsOutGoodOctets      Counter64,        
+        rcEponOnuEthPortStatsInErrors           Counter64,
+        rcEponOnuEthPortStatsInDiscards         Counter64,
+        rcEponOnuEthPortStatsInUnknownProtos    Counter64, 
+        rcEponOnuEthPortStatsOutErrors          Counter64, 
+        rcEponOnuEthPortStatsOutDiscards        Counter64   
+     }
+
+    rcEponOnuEthPortStatsClear  OBJECT-TYPE
+        SYNTAX INTEGER{
+               ready(0),
+               clear(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear performance statistic data of onu's ethernet unis."
+        ::= { rcEponOnuEthPortStatsEntry 1 }
+
+    rcEponOnuEthPortStatsInUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 2 }
+
+    rcEponOnuEthPortStatsInMulticasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 3 }
+
+    rcEponOnuEthPortStatsInBroadcasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 4 }
+
+     rcEponOnuEthPortStatsInPause OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 5 }
+
+    rcEponOnuEthPortStatsInGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 6 }
+
+    rcEponOnuEthPortStatsInBadOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 7 }
+
+    rcEponOnuEthPortStatsInUndersize OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 8 }
+
+    rcEponOnuEthPortStatsInFragments OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 9 }
+
+    rcEponOnuEthPortStatsInOversize OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 10 }
+
+    rcEponOnuEthPortStatsInJabber OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 11 }
+
+    rcEponOnuEthPortStatsInFCSErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 12 }
+
+    rcEponOnuEthPortStatsIn64Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 13 }
+
+    rcEponOnuEthPortStatsIn65to127Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 14 }
+
+    rcEponOnuEthPortStatsIn128to255Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 15 }
+
+    rcEponOnuEthPortStatsIn256to511Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 16 }
+
+    rcEponOnuEthPortStatsIn512to1023Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 17 }
+
+    rcEponOnuEthPortStatsIn1024toMaxOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 18 }
+
+    rcEponOnuEthPortStatsOutUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 19 }
+
+    rcEponOnuEthPortStatsOutMuliticasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 20 }
+
+    rcEponOnuEthPortStatsOutBroadcasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 21 }
+
+    rcEponOnuEthPortStatsOutPause OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 22 }
+
+    rcEponOnuEthPortStatsOutGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 23 }
+   
+    rcEponOnuEthPortStatsInErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 24 }
+
+    rcEponOnuEthPortStatsInDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 25 }
+
+    rcEponOnuEthPortStatsInUnknownProtos OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 26 }
+
+    rcEponOnuEthPortStatsOutErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 27 }
+
+    rcEponOnuEthPortStatsOutDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuEthPortStatsEntry 28 }
+    
+--
+-- rcEponOnuPonPortStatsTable
+--
+
+    rcEponOnuPonPortStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuPonPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 4 }
+
+     rcEponOnuPonPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPonPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPonPortStatsIndex }
+        ::= { rcEponOnuPonPortStatsTable 1 }
+
+    RcEponOnuPonPortStatsEntry ::= SEQUENCE {
+        rcEponOnuPonPortStatsIndex              Olt_OnuIfIndex,
+        rcEponOnuPonPortStatsClear              INTEGER,
+        rcEponOnuPonPortStatsInUnicast          Counter64,
+        rcEponOnuPonPortStatsInMulticasts       Counter64,
+        rcEponOnuPonPortStatsInBroadcasts       Counter64, 
+        rcEponOnuPonPortStatsInGoodOctets       Counter64,
+        rcEponOnuPonPortStatsInGoods            Counter64,
+        rcEponOnuPonPortStatsInErrors           Counter64,
+        rcEponOnuPonPortStatsInDiscards         Counter64,
+        rcEponOnuPonPortStatsOutUnicast         Counter64,
+        rcEponOnuPonPortStatsOutMuliticasts     Counter64,
+        rcEponOnuPonPortStatsOutBroadcasts      Counter64, 
+        rcEponOnuPonPortStatsOutGoodOctets      Counter64, 
+        rcEponOnuPonPortStatsOutGoods           Counter64, 
+        rcEponOnuPonPortStatsOutErrors          Counter64,
+        rcEponOnuPonPortStatsOutDiscards        Counter64        
+    }                                           
+
+
+    rcEponOnuPonPortStatsIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 1 }
+
+    rcEponOnuPonPortStatsClear  OBJECT-TYPE
+        SYNTAX INTEGER{
+               ready (0),
+               clear (1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear performance statistic data of onu's ethernet unis."
+        ::= { rcEponOnuPonPortStatsEntry 2 }
+
+    rcEponOnuPonPortStatsInUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 3 }
+
+    rcEponOnuPonPortStatsInMulticasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 4 }
+
+    rcEponOnuPonPortStatsInBroadcasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 5 }
+
+    rcEponOnuPonPortStatsInGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 6 }
+
+    rcEponOnuPonPortStatsInGoods OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 7 }
+
+    rcEponOnuPonPortStatsInErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 8 }
+
+    rcEponOnuPonPortStatsInDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 9 }
+
+    rcEponOnuPonPortStatsOutUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 10 }
+
+    rcEponOnuPonPortStatsOutMuliticasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 11 }
+
+    rcEponOnuPonPortStatsOutBroadcasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 12 }
+
+    rcEponOnuPonPortStatsOutGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 13 }
+   
+    rcEponOnuPonPortStatsOutGoods OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 14 }    
+        
+    rcEponOnuPonPortStatsOutErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 15 }
+
+    rcEponOnuPonPortStatsOutDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPonPortStatsEntry 16 }
+
+--
+-- rcEponOnuLinkupPortsTable
+--
+
+    rcEponOnuLinkupPortsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuLinkupPortsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 5 }
+ 
+      rcEponOnuLinkupPortsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuLinkupPortsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuLinkupPortsTable 1 } 
+        
+     RcEponOnuLinkupPortsEntry ::= SEQUENCE {
+	   rcEponOnuLinkupPortList          PortList
+     }  
+     
+     rcEponOnuLinkupPortList OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuLinkupPortsEntry 1 }
+        
+--
+-- alarm control
+--
+
+    rcEponOnuCtcEthPortAlarmCtrlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcEthPortAlarmCtrlEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuPortGroup 6 }
+
+    rcEponOnuCtcEthPortAlarmCtrlEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcEthPortAlarmCtrlEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        INDEX { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmId }
+        	::= { rcEponOnuCtcEthPortAlarmCtrlTable 1 }
+
+    RcEponOnuCtcEthPortAlarmCtrlEntry ::= SEQUENCE {
+        rcEponOnuCtcEthPortAlarmId             INTEGER,
+        rcEponOnuCtcEthPortAlarmAdmin          EnableVar,
+        rcEponOnuCtcEthPortAlarmThreshold 	   INTEGER,
+        rcEponOnuCtcEthPortAlarmClearThreshold INTEGER      
+      	}
+
+    rcEponOnuCtcEthPortAlarmId OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    auto_neg_failure(1),
+                    los(2),
+                    failure(3),
+                    loopback(4),
+                    congestion(5),
+                    downdropeventalarm(6),
+					updropeventalarm(7),
+					downcrcerroralarm(8),
+					upcrcerroralarm(9),
+					downundersizealarm(10),
+					upundersizealarm(11),
+					downoversizealarm(12),
+					upoversizealarm(13),
+					downfragmentalarm(14),
+					upfragmentalarm(15),
+					downjabberalarm(16),
+					upjabberalarm(17),
+					downdiscardalarm(18),
+					updiscardalarm(19),
+					downerroralarm(20),
+					uperroralarm(21),
+					statuschangetimesalarm(22), 
+					downdropeventwarning(23),
+					updropeventwarning(24),
+					downcrcerrorwarning(25),
+					upcrcerrorwarning(26),
+					downundersizewarning(27),
+					upundersizewarning(28),
+					downoversizewarning(29),
+					upoversizewarning(30),
+					downfragmentwarning(31),
+					upfragmentwarning(32),
+					downjabberwarning(33),
+					upjabberwarning(34),
+					downdiscardwarning(35),
+					updiscardwarning(36),
+					downerrorwarning(37),
+					uperrorwarning(38),
+					statuschangetimeswarning(39)
+
+                    }
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmCtrlEntry 1 }
+
+    rcEponOnuCtcEthPortAlarmAdmin OBJECT-TYPE
+        SYNTAX 		EnableVar
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmCtrlEntry 2 }
+
+    rcEponOnuCtcEthPortAlarmThreshold OBJECT-TYPE
+        SYNTAX 		INTEGER
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmCtrlEntry 3 } 
+        
+    rcEponOnuCtcEthPortAlarmClearThreshold OBJECT-TYPE
+        SYNTAX 		INTEGER
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmCtrlEntry 4 }
+        	        
+--
+-- alarm info
+--
+    rcEponOnuCtcEthPortAlarmInfoTable OBJECT-TYPE
+        SYNTAX 		SEQUENCE OF RcEponOnuCtcEthPortAlarmInfoEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuPortGroup 7 }
+
+    rcEponOnuCtcEthPortAlarmInfoEntry OBJECT-TYPE
+        SYNTAX 		RcEponOnuCtcEthPortAlarmInfoEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        INDEX { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmId }
+        	::= { rcEponOnuCtcEthPortAlarmInfoTable 1 }
+
+    RcEponOnuCtcEthPortAlarmInfoEntry ::= SEQUENCE {
+				rcEponOnuCtcEthPortAlarmState     INTEGER,
+				rcEponOnuCtcEthPortAlarmInfo      OCTET STRING
+      	}
+
+    rcEponOnuCtcEthPortAlarmState OBJECT-TYPE
+        SYNTAX 		INTEGER{
+											ready(0),
+											alarm(1),
+											clear(2)
+									}
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmInfoEntry 1 }
+
+    rcEponOnuCtcEthPortAlarmInfo OBJECT-TYPE
+        SYNTAX 		OCTET STRING (SIZE(0..32))
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcEthPortAlarmInfoEntry 2 }
+        	
+--
+-- rcEponOnuPonPortTable
+-- 	
+   rcEponOnuPonPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPonPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 8 }
+
+    rcEponOnuPonPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPonPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuPonPortTable 1 }
+
+    RcEponOnuPonPortEntry ::= SEQUENCE {        
+        rcEponOnuPonPortNominalSpeed   CounterBasedGauge64,
+        rcEponOnuPonPortActualSpeed    CounterBasedGauge64
+        }                                                 
+        
+    rcEponOnuPonPortNominalSpeed OBJECT-TYPE
+    	SYNTAX CounterBasedGauge64
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuPonPortEntry 1 }
+    	
+    rcEponOnuPonPortActualSpeed OBJECT-TYPE
+    	SYNTAX CounterBasedGauge64
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuPonPortEntry 2 }
+ 
+--
+-- rcEponOnuUplinkPortStatsTable
+-- 	
+
+    rcEponOnuUplinkPortStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuUplinkPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 9 }
+
+    rcEponOnuUplinkPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuUplinkPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuUplinkPortStatsTable 1 }
+
+    RcEponOnuUplinkPortStatsEntry ::= SEQUENCE {
+        rcEponOnuUplinkPortStatsClear              INTEGER,
+        rcEponOnuUplinkPortStatsInUnicast          Counter64,
+        rcEponOnuUplinkPortStatsInMulticasts       Counter64,
+        rcEponOnuUplinkPortStatsInBroadcasts       Counter64, 
+        rcEponOnuUplinkPortStatsInPause            Counter64, 
+        rcEponOnuUplinkPortStatsInGoodOctets       Counter64,
+        rcEponOnuUplinkPortStatsInBadOctets        Counter64,
+        rcEponOnuUplinkPortStatsInUndersize        Counter64,
+        rcEponOnuUplinkPortStatsInFragments        Counter64,
+        rcEponOnuUplinkPortStatsInOversize         Counter64,
+        rcEponOnuUplinkPortStatsInJabber           Counter64,
+        rcEponOnuUplinkPortStatsInFCSErr           Counter64,
+        rcEponOnuUplinkPortStatsIn64Octets         Counter64,
+        rcEponOnuUplinkPortStatsIn65to127Octets    Counter64,
+        rcEponOnuUplinkPortStatsIn128to255Octets   Counter64,
+        rcEponOnuUplinkPortStatsIn256to511Octets   Counter64,
+        rcEponOnuUplinkPortStatsIn512to1023Octets  Counter64,
+        rcEponOnuUplinkPortStatsIn1024toMaxOctets  Counter64,
+        rcEponOnuUplinkPortStatsOutUnicast         Counter64,
+        rcEponOnuUplinkPortStatsOutMuliticasts     Counter64,
+        rcEponOnuUplinkPortStatsOutBroadcasts      Counter64, 
+        rcEponOnuUplinkPortStatsOutPause           Counter64, 
+        rcEponOnuUplinkPortStatsOutGoodOctets      Counter64,        
+        rcEponOnuUplinkPortStatsInErrors           Counter64,
+        rcEponOnuUplinkPortStatsInDiscards         Counter64,
+        rcEponOnuUplinkPortStatsInUnknownProtos    Counter64, 
+        rcEponOnuUplinkPortStatsOutErrors          Counter64, 
+        rcEponOnuUplinkPortStatsOutDiscards        Counter64 
+     }
+
+    rcEponOnuUplinkPortStatsClear  OBJECT-TYPE
+        SYNTAX INTEGER{
+               ready(0),
+               clear(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear performance statistic data of onu's uplink port."
+        ::= { rcEponOnuUplinkPortStatsEntry 1 }
+
+    rcEponOnuUplinkPortStatsInUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 2 }
+
+    rcEponOnuUplinkPortStatsInMulticasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 3 }
+
+    rcEponOnuUplinkPortStatsInBroadcasts  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 4 }
+
+     rcEponOnuUplinkPortStatsInPause OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 5 }
+
+    rcEponOnuUplinkPortStatsInGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 6 }
+
+    rcEponOnuUplinkPortStatsInBadOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 7 }
+
+    rcEponOnuUplinkPortStatsInUndersize OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 8 }
+
+    rcEponOnuUplinkPortStatsInFragments OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 9 }
+
+    rcEponOnuUplinkPortStatsInOversize OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 10 }
+
+    rcEponOnuUplinkPortStatsInJabber OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 11 }
+
+    rcEponOnuUplinkPortStatsInFCSErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 12 }
+
+    rcEponOnuUplinkPortStatsIn64Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 13 }
+
+    rcEponOnuUplinkPortStatsIn65to127Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 14 }
+
+    rcEponOnuUplinkPortStatsIn128to255Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 15 }
+
+    rcEponOnuUplinkPortStatsIn256to511Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 16 }
+
+    rcEponOnuUplinkPortStatsIn512to1023Octets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 17 }
+
+    rcEponOnuUplinkPortStatsIn1024toMaxOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 18 }
+
+    rcEponOnuUplinkPortStatsOutUnicast OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 19 }
+
+    rcEponOnuUplinkPortStatsOutMuliticasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 20 }
+
+    rcEponOnuUplinkPortStatsOutBroadcasts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 21 }
+
+    rcEponOnuUplinkPortStatsOutPause OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 22 }
+
+    rcEponOnuUplinkPortStatsOutGoodOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 23 }
+   
+    rcEponOnuUplinkPortStatsInErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 24 }
+
+    rcEponOnuUplinkPortStatsInDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 25 }
+
+    rcEponOnuUplinkPortStatsInUnknownProtos OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 26 }
+
+    rcEponOnuUplinkPortStatsOutErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 27 }
+
+    rcEponOnuUplinkPortStatsOutDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuUplinkPortStatsEntry 28 }
+    	
+---------------------------------------------------------------------------
+rcEponOnuPortTrapGroup      OBJECT IDENTIFIER ::= { rcEponOnuPortGroup 10 }
+
+    rcEponOnuEthPortLinkDownTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 1 }
+
+    rcEponOnuEthPortLinkUpTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 2 }
+
+    rcEponOnuEthPortAutoNegFailureTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 3 }
+
+    rcEponOnuEthPortLosTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 4 }
+
+    rcEponOnuEthPortFailureTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 5 }
+
+    rcEponOnuEthPortLoopbackTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 6 }
+
+    rcEponOnuEthPortCongestionTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 7 }          
+  -----CTC3.0 add dujie
+	rcEponOnuEthPortOutDropEventsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutDropEvents}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 8 }   
+       
+    rcEponOnuEthPortInDropEventsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInDropEvents }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 9 }
+
+    rcEponOnuEthPortOutFCSErrAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 10 }    
+       
+    rcEponOnuEthPortInFCSErrAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 11 }    
+       
+    rcEponOnuEthPortOutUndersizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 12 }   
+            
+    rcEponOnuEthPortInUndersizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 13 }    
+       
+    rcEponOnuEthPortOutOversizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 14 }       
+       
+    rcEponOnuEthPortInOversizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 15 }    
+       
+       
+    rcEponOnuEthPortOutFragmentsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 16 }       
+       
+    rcEponOnuEthPortInFragmentsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 17 }         
+     
+    rcEponOnuEthPortOutJabberAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 18 }       
+       
+    rcEponOnuEthPortInJabberAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInJabber }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 19 }     
+       
+    rcEponOnuEthPortOutDiscardsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 20 }       
+       
+    rcEponOnuEthPortInDiscardsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 21 }          
+       
+    rcEponOnuEthPortOutErrorsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsOutErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 22 }       
+       
+    rcEponOnuEthPortInErrorsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatsInErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 23 }        
+       
+ 	rcEponOnuEthPortStatusChangeTimesAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState,rcEponOnuCtcEthPortStatusChangeTimes }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 24 }        
+                                            
+	rcEponOnuEthPortOutDropEventsWarningTrap NOTIFICATION-TYPE         
+	
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutDropEvents}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 25 }   
+       
+    rcEponOnuEthPortInDropEventsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInDropEvents }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 26 }
+
+    rcEponOnuEthPortOutFCSErrWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 27 }    
+       
+    rcEponOnuEthPortInFCSErrWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 28 }    
+       
+    rcEponOnuEthPortOutUndersizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 29 }   
+            
+    rcEponOnuEthPortInUndersizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 30 }    
+       
+    rcEponOnuEthPortOutOversizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 31 }       
+       
+    rcEponOnuEthPortInOversizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 32 }    
+       
+       
+    rcEponOnuEthPortOutFragmentsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 33 }       
+       
+    rcEponOnuEthPortInFragmentsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 34 }         
+     
+    rcEponOnuEthPortOutJabberWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 35 }       
+       
+    rcEponOnuEthPortInJabberWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInJabber }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 36 }     
+       
+    rcEponOnuEthPortOutDiscardsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 37 }       
+       
+    rcEponOnuEthPortInDiscardsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 38 }          
+       
+    rcEponOnuEthPortOutErrorsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsOutErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 38 }       
+       
+    rcEponOnuEthPortInErrorsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatsInErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 40 }        
+       
+ 	rcEponOnuEthPortStatusChangeTimesWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuEthPortIndex, rcEponOnuCtcEthPortAlarmState, rcEponOnuCtcEthPortStatusChangeTimes }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 41 }             
+        
+-----PON alarm
+
+	rcEponOnuPonPortOutDropEventsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutDropEvents}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 42 }   
+       
+    rcEponOnuPonPortInDropEventsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInDropEvents }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 43 }
+
+    rcEponOnuPonPortOutFCSErrAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 44 }    
+       
+    rcEponOnuPonPortInFCSErrAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 45 }    
+       
+    rcEponOnuPonPortOutUndersizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 46 }   
+            
+    rcEponOnuPonPortInUndersizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 47 }    
+       
+    rcEponOnuPonPortOutOversizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 48 }       
+       
+    rcEponOnuPonPortInOversizeAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 49 }    
+       
+       
+    rcEponOnuPonPortOutFragmentsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 50 }       
+       
+    rcEponOnuPonPortInFragmentsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 51 }         
+     
+    rcEponOnuPonPortOutJabberAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 52 }       
+       
+    rcEponOnuPonPortInJabberAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInJabber }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 53 }     
+       
+    rcEponOnuPonPortOutDiscardsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 54 }       
+       
+    rcEponOnuPonPortInDiscardsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 55 }          
+       
+    rcEponOnuPonPortOutErrorsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsOutErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 56 }       
+       
+    rcEponOnuPonPortInErrorsAlarmTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState,rcEponOnuCtcPonPortStatsInErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 57 }        
+          
+                                            
+	rcEponOnuPonPortOutDropEventsWarningTrap NOTIFICATION-TYPE         
+	
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutDropEvents}
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 58 }   
+       
+    rcEponOnuPonPortInDropEventsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInDropEvents }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 59 }
+
+    rcEponOnuPonPortOutFCSErrWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 60 }    
+       
+    rcEponOnuPonPortInFCSErrWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInFCSErr }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 61 }    
+       
+    rcEponOnuPonPortOutUndersizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 62 }   
+            
+    rcEponOnuPonPortInUndersizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInUndersize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 63 }    
+       
+    rcEponOnuPonPortOutOversizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 64 }       
+       
+    rcEponOnuPonPortInOversizeWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInOversize }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 65 }    
+       
+       
+    rcEponOnuPonPortOutFragmentsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 66 }       
+       
+    rcEponOnuPonPortInFragmentsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 67 }         
+     
+    rcEponOnuPonPortOutJabberWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutFragments }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 68 }       
+       
+    rcEponOnuPonPortInJabberWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInJabber }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 69 }     
+       
+    rcEponOnuPonPortOutDiscardsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 70 }       
+       
+    rcEponOnuPonPortInDiscardsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInDiscards }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 71 }          
+       
+    rcEponOnuPonPortOutErrorsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsOutErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 72 }       
+       
+    rcEponOnuPonPortInErrorsWarningTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmState, rcEponOnuCtcPonPortStatsInErrors }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPortTrapGroup 73 }        
+        
+ 
+     
+-----------------------------------------------------------------------------------------------------------------     
+--
+-- rcEponOnuPowerPortTable
+-- 	
+
+    rcEponOnuPowerPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuPowerPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 11 }
+
+    rcEponOnuPowerPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPowerPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPowerPortIndex }
+        ::= { rcEponOnuPowerPortTable 1 }
+
+    RcEponOnuPowerPortEntry ::= SEQUENCE {
+        rcEponOnuPowerPortIndex         INTEGER,
+        rcEponOnuPowerPortAdmin         EnableVar
+    }     
+    
+    rcEponOnuPowerPortIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPowerPortEntry 1 }  
+    
+    rcEponOnuPowerPortAdmin OBJECT-TYPE   
+    	SYNTAX 		EnableVar
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        ::= { rcEponOnuPowerPortEntry 2 }
+        
+--
+-- rcEponOnuCtcPonPortAlarmCtrlTable
+-- 	
+   rcEponOnuCtcPonPortAlarmCtrlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcPonPortAlarmCtrlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 12 }
+
+    rcEponOnuCtcPonPortAlarmCtrlEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcPonPortAlarmCtrlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmId }
+        ::= { rcEponOnuCtcPonPortAlarmCtrlTable 1 }
+
+    RcEponOnuCtcPonPortAlarmCtrlEntry ::= SEQUENCE {  
+        rcEponOnuPonPortIndex                    INTEGER,
+        rcEponOnuCtcPonPortAlarmId               INTEGER,
+        rcEponOnuCtcPonPortAlarmAdmin            EnableVar,
+        rcEponOnuCtcPonPortAlarmThreshold        INTEGER,
+        rcEponOnuCtcPonPortAlarmClearThreshold   INTEGER
+
+    }     
+      
+      
+ 	rcEponOnuPonPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortAlarmCtrlEntry 1 }  
+
+    rcEponOnuCtcPonPortAlarmId OBJECT-TYPE
+        SYNTAX INTEGER{
+					    downdropeventalarm(1),
+					    updropeventalarm(2),
+						downcrcerroralarm(3),
+						upcrcerroralarm(4),
+						downundersizealarm(5),
+						upundersizealarm(6),
+						downoversizealarm(7),
+						upoversizealarm(8),
+						downfragmentalarm(9),
+						upfragmentalarm(10),
+						downjabberalarm(11),
+						upjabberalarm(12),
+						downdiscardalarm(13),
+						updiscardalarm(14),
+						downerroralarm(15),
+						uperroralarm(16),
+						downdropeventwarning(17),
+						updropeventwarning(18),
+						downcrcerrorwarning(19),
+						upcrcerrorwarning(20),
+						downundersizewarning(21),
+						upundersizewarning(22),
+						downoversizewarning(23),
+						upoversizewarning(24),
+						downfragmentwarning(25),
+						upfragmentwarning(26),
+						downjabberwarning(27),
+						upjabberwarning(28),
+						downdiscardwarning(29),
+						updiscardwarning(30),
+						downerrorwarning(31),
+						uperrorwarning(32)
+						}
+
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortAlarmCtrlEntry 2 }  
+
+     rcEponOnuCtcPonPortAlarmAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortAlarmCtrlEntry 3 }  
+     
+     rcEponOnuCtcPonPortAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortAlarmCtrlEntry 4 }  
+        
+     rcEponOnuCtcPonPortAlarmClearThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortAlarmCtrlEntry 5 }              
+        
+--
+-- rcEponOnuCtcPonPortAlarmInfoTable
+-- 	
+        
+  rcEponOnuCtcPonPortAlarmInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcPonPortAlarmInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 13 }
+
+    rcEponOnuCtcPonPortAlarmInfoEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcPonPortAlarmInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPonPortIndex, rcEponOnuCtcPonPortAlarmId }
+        ::= { rcEponOnuCtcPonPortAlarmInfoTable 1 }
+
+    RcEponOnuCtcPonPortAlarmInfoEntry ::= SEQUENCE {   
+    	rcEponOnuCtcPonPortAlarmState           INTEGER,
+    	rcEponOnuCtcPonPortAlarmInfo            OCTET STRING
+
+    }     
+      
+      
+ 	rcEponOnuCtcPonPortAlarmState OBJECT-TYPE
+        SYNTAX 		INTEGER{
+											ready(0),
+											alarm(1),
+											clear(2)
+									}
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcPonPortAlarmInfoEntry 1 }
+
+    rcEponOnuCtcPonPortAlarmInfo OBJECT-TYPE
+        SYNTAX 		OCTET STRING (SIZE(0..32))
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcPonPortAlarmInfoEntry 2 }
+       
+             
+--
+-- rcEponOnuCtcEthPortStatsTable
+-- 	
+   rcEponOnuCtcEthPortStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcEthPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 14 }        
+        
+   rcEponOnuCtcEthPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcEthPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuCtcEthPortStatsTable 1 }
+        
+    RcEponOnuCtcEthPortStatsEntry ::= SEQUENCE {
+        rcEponOnuCtcEthPortStatsClear           INTEGER,
+        rcEponOnuCtcEthPortStatsState           EnableVar,     
+        rcEponOnuCtcEthPortStatsPeriod          INTEGER,    
+        rcEponOnuCtcEthPortStatusChangeTimes    Counter64,
+        rcEponOnuCtcEthPortStatsInDropEvents    Counter64, 
+        rcEponOnuCtcEthPortStatsInOctets        Counter64,  
+        rcEponOnuCtcEthPortStatsIn              Counter64,   
+        rcEponOnuCtcEthPortStatsInMulticasts    Counter64,
+        rcEponOnuCtcEthPortStatsInBroadcasts    Counter64,     
+        rcEponOnuCtcEthPortStatsInUndersize     Counter64,  
+        rcEponOnuCtcEthPortStatsInFragments     Counter64,  
+        rcEponOnuCtcEthPortStatsInOversize      Counter64,  
+        rcEponOnuCtcEthPortStatsInJabber        Counter64,    
+        rcEponOnuCtcEthPortStatsInFCSErr        Counter64,  
+        rcEponOnuCtcEthPortStatsIn64Octets      Counter64,   
+        rcEponOnuCtcEthPortStatsIn65to127Octets Counter64,    
+        rcEponOnuCtcEthPortStatsIn128to255Octets Counter64,  
+        rcEponOnuCtcEthPortStatsIn256to511Octets Counter64,
+        rcEponOnuCtcEthPortStatsIn512to1023Octets Counter64, 
+        rcEponOnuCtcEthPortStatsIn1024toMaxOctets Counter64,    
+        rcEponOnuCtcEthPortStatsInErrors          Counter64,  
+        rcEponOnuCtcEthPortStatsInDiscards        Counter64,   
+        rcEponOnuCtcEthPortStatsOutDropEvents     Counter64,
+        rcEponOnuCtcEthPortStatsOutOctets         Counter64, 
+        rcEponOnuCtcEthPortStatsOut               Counter64,  
+        rcEponOnuCtcEthPortStatsOutMuliticasts    Counter64,   
+        rcEponOnuCtcEthPortStatsOutBroadcasts     Counter64,  
+        rcEponOnuCtcEthPortStatsOutUndersize      Counter64,    
+        rcEponOnuCtcEthPortStatsOutFragments       Counter64, 
+        rcEponOnuCtcEthPortStatsOutOversize     Counter64,   
+        rcEponOnuCtcEthPortStatsOutJabber       Counter64,
+        rcEponOnuCtcEthPortStatsOutFCSErr          Counter64,   
+        rcEponOnuCtcEthPortStatsOut64Octets        Counter64,  
+        rcEponOnuCtcEthPortStatsOut65to127Octets  Counter64, 
+        rcEponOnuCtcEthPortStatsOut128to255Octets Counter64, 
+        rcEponOnuCtcEthPortStatsOut256to511Octets  Counter64,  
+        rcEponOnuCtcEthPortStatsOut512to1023Octets Counter64,   
+        rcEponOnuCtcEthPortStatsOut1024toMaxOctets Counter64,
+        rcEponOnuCtcEthPortStatsOutErrors          Counter64,  
+        rcEponOnuCtcEthPortStatsOutDiscards        Counter64 
+     }     
+     
+    rcEponOnuCtcEthPortStatsClear OBJECT-TYPE
+        SYNTAX INTEGER{
+						Ready(0),
+						Clear(1)
+						}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcEthPortStatsEntry 1 }
+        
+    rcEponOnuCtcEthPortStatsState OBJECT-TYPE
+    	SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL{disable}
+        ::= { rcEponOnuCtcEthPortStatsEntry 2 }
+        
+    rcEponOnuCtcEthPortStatsPeriod OBJECT-TYPE    
+    	SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL{900}
+        ::= { rcEponOnuCtcEthPortStatsEntry 3 }
+
+     rcEponOnuCtcEthPortStatusChangeTimes OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 4 }
+
+     rcEponOnuCtcEthPortStatsInDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 5 } 
+        
+     rcEponOnuCtcEthPortStatsInOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 6 } 
+ 
+     rcEponOnuCtcEthPortStatsIn  OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 7 }    
+        
+     rcEponOnuCtcEthPortStatsInMulticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 8 }     
+      
+     rcEponOnuCtcEthPortStatsInBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 9 }  
+           
+    rcEponOnuCtcEthPortStatsInUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 10 }  
+
+    rcEponOnuCtcEthPortStatsInFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 11 }     
+        
+    rcEponOnuCtcEthPortStatsInOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 12 }     
+
+    rcEponOnuCtcEthPortStatsInJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 13 }     
+
+    rcEponOnuCtcEthPortStatsInFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 14 }      
+        
+    rcEponOnuCtcEthPortStatsIn64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 15 }    
+     
+    rcEponOnuCtcEthPortStatsIn65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 16 }    
+      
+    rcEponOnuCtcEthPortStatsIn128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 17 }    
+        
+    rcEponOnuCtcEthPortStatsIn256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 18 }    
+
+    rcEponOnuCtcEthPortStatsIn512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 19 }    
+                                                   
+    rcEponOnuCtcEthPortStatsIn1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 20 }  
+     
+    rcEponOnuCtcEthPortStatsInErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 21 }   
+        
+    rcEponOnuCtcEthPortStatsInDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 22 }    
+        
+   rcEponOnuCtcEthPortStatsOutDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 23 }    
+  
+    rcEponOnuCtcEthPortStatsOutOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 24 } 
+        
+    rcEponOnuCtcEthPortStatsOut OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 25 } 
+    
+    rcEponOnuCtcEthPortStatsOutMuliticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 26 }   
+        
+    rcEponOnuCtcEthPortStatsOutBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 27 }  
+        
+    rcEponOnuCtcEthPortStatsOutUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 28 }   
+        
+    rcEponOnuCtcEthPortStatsOutFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 29 }
+        
+    rcEponOnuCtcEthPortStatsOutOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 30 }
+    
+    rcEponOnuCtcEthPortStatsOutJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 31 }
+
+   	rcEponOnuCtcEthPortStatsOutFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 32 } 
+     
+    rcEponOnuCtcEthPortStatsOut64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 33 }  
+        
+    rcEponOnuCtcEthPortStatsOut65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 34 }       
+    
+    rcEponOnuCtcEthPortStatsOut128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 35 }     
+        
+     rcEponOnuCtcEthPortStatsOut256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 36 }     
+
+    rcEponOnuCtcEthPortStatsOut512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 37 }     
+        
+    rcEponOnuCtcEthPortStatsOut1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 38 } 
+     
+    rcEponOnuCtcEthPortStatsOutErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 39 } 
+    
+   rcEponOnuCtcEthPortStatsOutDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsEntry 40 }     
+        
+        
+ --- 
+ ---rcEponOnuCtcPonPortStatsTable
+ ---                                 
+     rcEponOnuCtcPonPortStatsTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcPonPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 15 }        
+        
+   rcEponOnuCtcPonPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcPonPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPonPortStatsIndex }
+        ::= { rcEponOnuCtcPonPortStatsTable 1 }
+        
+    RcEponOnuCtcPonPortStatsEntry ::= SEQUENCE {
+        rcEponOnuCtcPonPortStatsClear           INTEGER,
+        rcEponOnuCtcPonPortStatsState           EnableVar,     
+        rcEponOnuCtcPonPortStatsPeriod          INTEGER,    
+        rcEponOnuCtcPonPortStatsInDropEvents    Counter64, 
+        rcEponOnuCtcPonPortStatsInOctets        Counter64,  
+        rcEponOnuCtcPonPortStatsIn              Counter64,   
+        rcEponOnuCtcPonPortStatsInMulticasts    Counter64,
+        rcEponOnuCtcPonPortStatsInBroadcasts    Counter64,     
+        rcEponOnuCtcPonPortStatsInUndersize     Counter64,  
+        rcEponOnuCtcPonPortStatsInFragments     Counter64,  
+        rcEponOnuCtcPonPortStatsInOversize      Counter64,  
+        rcEponOnuCtcPonPortStatsInJabber        Counter64,    
+        rcEponOnuCtcPonPortStatsInFCSErr        Counter64,  
+        rcEponOnuCtcPonPortStatsIn64Octets      Counter64,   
+        rcEponOnuCtcPonPortStatsIn65to127Octets Counter64,    
+        rcEponOnuCtcPonPortStatsIn128to255Octets Counter64,  
+        rcEponOnuCtcPonPortStatsIn256to511Octets Counter64,
+        rcEponOnuCtcPonPortStatsIn512to1023Octets Counter64, 
+        rcEponOnuCtcPonPortStatsIn1024toMaxOctets Counter64,    
+        rcEponOnuCtcPonPortStatsInErrors          Counter64,  
+        rcEponOnuCtcPonPortStatsInDiscards        Counter64,   
+        rcEponOnuCtcPonPortStatsOutDropEvents     Counter64,
+        rcEponOnuCtcPonPortStatsOutOctets         Counter64, 
+        rcEponOnuCtcPonPortStatsOut               Counter64,  
+        rcEponOnuCtcPonPortStatsOutMuliticasts    Counter64,   
+        rcEponOnuCtcPonPortStatsOutBroadcasts     Counter64,  
+        rcEponOnuCtcPonPortStatsOutUndersize      Counter64,    
+        rcEponOnuCtcPonPortStatsOutFragments       Counter64, 
+        rcEponOnuCtcPonPortStatsOutOversize     Counter64,   
+        rcEponOnuCtcPonPortStatsOutJabber       Counter64,
+        rcEponOnuCtcPonPortStatsOutFCSErr          Counter64,   
+        rcEponOnuCtcPonPortStatsOut64Octets        Counter64,  
+        rcEponOnuCtcPonPortStatsOut65to127Octets  Counter64, 
+        rcEponOnuCtcPonPortStatsOut128to255Octets Counter64, 
+        rcEponOnuCtcPonPortStatsOut256to511Octets  Counter64,  
+        rcEponOnuCtcPonPortStatsOut512to1023Octets Counter64,   
+        rcEponOnuCtcPonPortStatsOut1024toMaxOctets Counter64,
+        rcEponOnuCtcPonPortStatsOutErrors          Counter64,  
+        rcEponOnuCtcPonPortStatsOutDiscards        Counter64   
+        }
+   rcEponOnuCtcPonPortStatsClear OBJECT-TYPE
+        SYNTAX INTEGER{
+						Ready(0),
+						Clear(1)
+						}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcPonPortStatsEntry 1 }
+        
+    rcEponOnuCtcPonPortStatsState OBJECT-TYPE
+    	SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL{disable}
+        ::= { rcEponOnuCtcPonPortStatsEntry 2 }
+        
+    rcEponOnuCtcPonPortStatsPeriod OBJECT-TYPE    
+    	SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."       
+        DEFVAL{900}
+        ::= { rcEponOnuCtcPonPortStatsEntry 3 }
+
+     rcEponOnuCtcPonPortStatsInDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 4 } 
+        
+     rcEponOnuCtcPonPortStatsInOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 5 } 
+ 
+     rcEponOnuCtcPonPortStatsIn  OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 6 }    
+        
+     rcEponOnuCtcPonPortStatsInMulticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 7 }     
+      
+     rcEponOnuCtcPonPortStatsInBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 8 }  
+           
+    rcEponOnuCtcPonPortStatsInUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 9 }  
+
+    rcEponOnuCtcPonPortStatsInFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 10 }     
+        
+    rcEponOnuCtcPonPortStatsInOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 11 }     
+
+    rcEponOnuCtcPonPortStatsInJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 12 }     
+
+    rcEponOnuCtcPonPortStatsInFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 13 }      
+        
+    rcEponOnuCtcPonPortStatsIn64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 14 }    
+     
+    rcEponOnuCtcPonPortStatsIn65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 15 }    
+      
+    rcEponOnuCtcPonPortStatsIn128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 16 }    
+        
+    rcEponOnuCtcPonPortStatsIn256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 17 }    
+
+    rcEponOnuCtcPonPortStatsIn512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 18 }    
+                                                   
+    rcEponOnuCtcPonPortStatsIn1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 19 }  
+     
+    rcEponOnuCtcPonPortStatsInErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 20 }   
+        
+    rcEponOnuCtcPonPortStatsInDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 21 }    
+        
+   rcEponOnuCtcPonPortStatsOutDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 22 }    
+  
+    rcEponOnuCtcPonPortStatsOutOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 23 } 
+        
+    rcEponOnuCtcPonPortStatsOut OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 24 } 
+    
+    rcEponOnuCtcPonPortStatsOutMuliticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 25 }   
+        
+    rcEponOnuCtcPonPortStatsOutBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 26 }  
+        
+    rcEponOnuCtcPonPortStatsOutUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 27 }   
+        
+    rcEponOnuCtcPonPortStatsOutFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 28 }
+        
+    rcEponOnuCtcPonPortStatsOutOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 29 }
+    
+    rcEponOnuCtcPonPortStatsOutJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 30 }
+
+   	rcEponOnuCtcPonPortStatsOutFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 31 } 
+     
+    rcEponOnuCtcPonPortStatsOut64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 32 }  
+        
+    rcEponOnuCtcPonPortStatsOut65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 33 }       
+    
+    rcEponOnuCtcPonPortStatsOut128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 34 }     
+        
+     rcEponOnuCtcPonPortStatsOut256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 35 }     
+
+    rcEponOnuCtcPonPortStatsOut512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 36 }     
+        
+    rcEponOnuCtcPonPortStatsOut1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 37 } 
+     
+    rcEponOnuCtcPonPortStatsOutErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 38 } 
+    
+   rcEponOnuCtcPonPortStatsOutDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsEntry 39 }        
+        
+ --- 
+ ---rcEponOnuCtcEthPortStatsHistroyTable
+ ---                                
+        
+   rcEponOnuCtcEthPortStatsHistroyTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcEthPortStatsHistoryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 16 }        
+        
+   rcEponOnuCtcEthPortStatsHistoryEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcEthPortStatsHistoryEntry         
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuCtcEthPortStatsHistroyTable 1 }
+        
+    RcEponOnuCtcEthPortStatsHistoryEntry ::= SEQUENCE {
+        rcEponOnuCtcEthPortStatusHistoryChangeTimes    Counter64,
+        rcEponOnuCtcEthPortStatsHistoryInDropEvents    Counter64, 
+        rcEponOnuCtcEthPortStatsHistoryInOctets        Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryIn              Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryInMulticasts    Counter64,
+        rcEponOnuCtcEthPortStatsHistoryInBroadcasts    Counter64,     
+        rcEponOnuCtcEthPortStatsHistoryInUndersize     Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryInFragments     Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryInOversize      Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryInJabber        Counter64,    
+        rcEponOnuCtcEthPortStatsHistoryInFCSErr        Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryIn64Octets      Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryIn65to127Octets Counter64,    
+        rcEponOnuCtcEthPortStatsHistoryIn128to255Octets Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryIn256to511Octets Counter64,
+        rcEponOnuCtcEthPortStatsHistoryIn512to1023Octets Counter64, 
+        rcEponOnuCtcEthPortStatsHistoryIn1024toMaxOctets Counter64,    
+        rcEponOnuCtcEthPortStatsHistoryInErrors          Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryInDiscards        Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryOutDropEvents     Counter64,
+        rcEponOnuCtcEthPortStatsHistoryOutOctets         Counter64, 
+        rcEponOnuCtcEthPortStatsHistoryOut               Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryOutMuliticasts    Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryOutBroadcasts     Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryOutUndersize      Counter64,    
+        rcEponOnuCtcEthPortStatsHistoryOutFragments       Counter64, 
+        rcEponOnuCtcEthPortStatsHistoryOutOversize     Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryOutJabber       Counter64,
+        rcEponOnuCtcEthPortStatsHistoryOutFCSErr          Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryOut64Octets        Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryOut65to127Octets  Counter64, 
+        rcEponOnuCtcEthPortStatsHistoryOut128to255Octets Counter64,
+        rcEponOnuCtcEthPortStatsHistoryOut256to511Octets  Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryOut512to1023Octets Counter64,   
+        rcEponOnuCtcEthPortStatsHistoryOut1024toMaxOctets Counter64,
+        rcEponOnuCtcEthPortStatsHistoryOutErrors          Counter64,  
+        rcEponOnuCtcEthPortStatsHistoryOutDiscards        Counter64 
+     }     
+             
+     rcEponOnuCtcEthPortStatusHistoryChangeTimes OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 1 }
+
+     rcEponOnuCtcEthPortStatsHistoryInDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 2 } 
+        
+     rcEponOnuCtcEthPortStatsHistoryInOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 3 } 
+ 
+     rcEponOnuCtcEthPortStatsHistoryIn  OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 4 }    
+        
+     rcEponOnuCtcEthPortStatsHistoryInMulticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 5 }     
+      
+     rcEponOnuCtcEthPortStatsHistoryInBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 6 }  
+           
+    rcEponOnuCtcEthPortStatsHistoryInUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 7 }  
+
+    rcEponOnuCtcEthPortStatsHistoryInFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 8 }     
+        
+    rcEponOnuCtcEthPortStatsHistoryInOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 9 }     
+
+    rcEponOnuCtcEthPortStatsHistoryInJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 10 }     
+
+    rcEponOnuCtcEthPortStatsHistoryInFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 11 }      
+        
+    rcEponOnuCtcEthPortStatsHistoryIn64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 12 }    
+     
+    rcEponOnuCtcEthPortStatsHistoryIn65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 13 }    
+      
+    rcEponOnuCtcEthPortStatsHistoryIn128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 14 }    
+        
+    rcEponOnuCtcEthPortStatsHistoryIn256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 15 }    
+
+    rcEponOnuCtcEthPortStatsHistoryIn512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 16 }    
+                                                   
+    rcEponOnuCtcEthPortStatsHistoryIn1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 17 }  
+     
+    rcEponOnuCtcEthPortStatsHistoryInErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 18 }   
+        
+    rcEponOnuCtcEthPortStatsHistoryInDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 19 }    
+        
+   rcEponOnuCtcEthPortStatsHistoryOutDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 20 }    
+  
+    rcEponOnuCtcEthPortStatsHistoryOutOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 21 } 
+        
+    rcEponOnuCtcEthPortStatsHistoryOut OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 22 } 
+    
+    rcEponOnuCtcEthPortStatsHistoryOutMuliticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 23 }   
+        
+    rcEponOnuCtcEthPortStatsHistoryOutBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 24 }  
+        
+    rcEponOnuCtcEthPortStatsHistoryOutUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 25 }   
+        
+    rcEponOnuCtcEthPortStatsHistoryOutFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 26 }
+        
+    rcEponOnuCtcEthPortStatsHistoryOutOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 27 }
+    
+    rcEponOnuCtcEthPortStatsHistoryOutJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 28 }
+
+   	rcEponOnuCtcEthPortStatsHistoryOutFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 29 } 
+     
+    rcEponOnuCtcEthPortStatsHistoryOut64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 30 }  
+        
+    rcEponOnuCtcEthPortStatsHistoryOut65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 31 }       
+    
+    rcEponOnuCtcEthPortStatsHistoryOut128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 32 }     
+        
+     rcEponOnuCtcEthPortStatsHistoryOut256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 33 }     
+
+    rcEponOnuCtcEthPortStatsHistoryOut512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 34 }     
+        
+    rcEponOnuCtcEthPortStatsHistoryOut1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 35 } 
+     
+    rcEponOnuCtcEthPortStatsHistoryOutErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 36 } 
+    
+   rcEponOnuCtcEthPortStatsHistoryOutDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcEthPortStatsHistoryEntry 37 }      
+        
+ --- 
+ ---rcEponOnuCtcPonPortStatsHistroyTable
+ ---                                
+        
+   rcEponOnuCtcPonPortStatsHistroyTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcPonPortStatsHistoryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPortGroup 17 }        
+        
+   rcEponOnuCtcPonPortStatsHistoryEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcPonPortStatsHistoryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+       INDEX { rcEponOnuPonPortStatsIndex }
+        ::= { rcEponOnuCtcPonPortStatsHistroyTable 1 }
+        
+    RcEponOnuCtcPonPortStatsHistoryEntry ::= SEQUENCE {
+        rcEponOnuCtcPonPortStatsHistoryInDropEvents    Counter64, 
+        rcEponOnuCtcPonPortStatsHistoryInOctets        Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryIn              Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryInMulticasts    Counter64,
+        rcEponOnuCtcPonPortStatsHistoryInBroadcasts    Counter64,     
+        rcEponOnuCtcPonPortStatsHistoryInUndersize     Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryInFragments     Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryInOversize      Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryInJabber        Counter64,    
+        rcEponOnuCtcPonPortStatsHistoryInFCSErr        Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryIn64Octets      Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryIn65to127Octets Counter64,    
+        rcEponOnuCtcPonPortStatsHistoryIn128to255Octets Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryIn256to511Octets Counter64,
+        rcEponOnuCtcPonPortStatsHistoryIn512to1023Octets Counter64, 
+        rcEponOnuCtcPonPortStatsHistoryIn1024toMaxOctets Counter64,    
+        rcEponOnuCtcPonPortStatsHistoryInErrors          Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryInDiscards        Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOutDropEvents     Counter64,
+        rcEponOnuCtcPonPortStatsHistoryOutOctets         Counter64, 
+        rcEponOnuCtcPonPortStatsHistoryOut               Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryOutMuliticasts    Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOutBroadcasts     Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryOutUndersize      Counter64,    
+        rcEponOnuCtcPonPortStatsHistoryOutFragments       Counter64, 
+        rcEponOnuCtcPonPortStatsHistoryOutOversize     Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOutJabber       Counter64,
+        rcEponOnuCtcPonPortStatsHistoryOutFCSErr          Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOut64Octets        Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOut65to127Octets  Counter64, 
+        rcEponOnuCtcPonPortStatsHistoryOut128to255Octets Counter64,
+        rcEponOnuCtcPonPortStatsHistoryOut256to511Octets  Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryOut512to1023Octets Counter64,   
+        rcEponOnuCtcPonPortStatsHistoryOut1024toMaxOctets Counter64,
+        rcEponOnuCtcPonPortStatsHistoryOutErrors          Counter64,  
+        rcEponOnuCtcPonPortStatsHistoryOutDiscards        Counter64 
+     }     
+     
+      rcEponOnuCtcPonPortStatsHistoryInDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 1 } 
+        
+     rcEponOnuCtcPonPortStatsHistoryInOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 2 } 
+ 
+     rcEponOnuCtcPonPortStatsHistoryIn  OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 3 }    
+        
+     rcEponOnuCtcPonPortStatsHistoryInMulticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 4 }     
+      
+     rcEponOnuCtcPonPortStatsHistoryInBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 5 }  
+           
+    rcEponOnuCtcPonPortStatsHistoryInUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 6 }  
+
+    rcEponOnuCtcPonPortStatsHistoryInFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 7 }     
+        
+    rcEponOnuCtcPonPortStatsHistoryInOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 8 }     
+
+    rcEponOnuCtcPonPortStatsHistoryInJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 9 }     
+
+    rcEponOnuCtcPonPortStatsHistoryInFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 10 }      
+        
+    rcEponOnuCtcPonPortStatsHistoryIn64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 11 }    
+     
+    rcEponOnuCtcPonPortStatsHistoryIn65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 12 }    
+      
+    rcEponOnuCtcPonPortStatsHistoryIn128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 13 }    
+        
+    rcEponOnuCtcPonPortStatsHistoryIn256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 14 }    
+
+    rcEponOnuCtcPonPortStatsHistoryIn512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 15 }    
+                                                   
+    rcEponOnuCtcPonPortStatsHistoryIn1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 16 }  
+     
+    rcEponOnuCtcPonPortStatsHistoryInErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 17 }   
+        
+    rcEponOnuCtcPonPortStatsHistoryInDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 18 }    
+        
+   rcEponOnuCtcPonPortStatsHistoryOutDropEvents OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 19 }    
+  
+    rcEponOnuCtcPonPortStatsHistoryOutOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 20 } 
+        
+    rcEponOnuCtcPonPortStatsHistoryOut OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 21 } 
+    
+    rcEponOnuCtcPonPortStatsHistoryOutMuliticasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 22 }   
+        
+    rcEponOnuCtcPonPortStatsHistoryOutBroadcasts OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 23 }  
+        
+    rcEponOnuCtcPonPortStatsHistoryOutUndersize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 24 }   
+        
+    rcEponOnuCtcPonPortStatsHistoryOutFragments OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 25 }
+        
+    rcEponOnuCtcPonPortStatsHistoryOutOversize OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 26 }
+    
+    rcEponOnuCtcPonPortStatsHistoryOutJabber OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 27 }
+
+   	rcEponOnuCtcPonPortStatsHistoryOutFCSErr OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 28 } 
+     
+    rcEponOnuCtcPonPortStatsHistoryOut64Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 29 }  
+        
+    rcEponOnuCtcPonPortStatsHistoryOut65to127Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 30 }       
+    
+    rcEponOnuCtcPonPortStatsHistoryOut128to255Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 31 }     
+        
+     rcEponOnuCtcPonPortStatsHistoryOut256to511Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 32 }     
+
+    rcEponOnuCtcPonPortStatsHistoryOut512to1023Octets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 33 }     
+        
+    rcEponOnuCtcPonPortStatsHistoryOut1024toMaxOctets OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 34 } 
+     
+    rcEponOnuCtcPonPortStatsHistoryOutErrors OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 35 } 
+    
+   rcEponOnuCtcPonPortStatsHistoryOutDiscards OBJECT-TYPE  
+     	SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."       
+        ::= { rcEponOnuCtcPonPortStatsHistoryEntry 36 }      
+
+ 
+                
+END

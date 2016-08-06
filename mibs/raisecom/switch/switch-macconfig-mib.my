@@ -1,0 +1,241 @@
+--MibName=rcMacConfig
+-- *****************************************************************
+-- RAISECOM-MACCONFIG-MIB.MIB:  Raisecom MacAddr Config MIB file
+--
+-- March 2011, yanzhijie
+--
+-- Copyright (c) 1994-2000, 2001 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+--modify history
+--
+-- *****************************************************************
+SWITCH-MACCONFIG-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS 
+        RowStatus ,MacAddress       FROM SNMPv2-TC
+        raisecomSwitchMgt           FROM RAISECOM-PONSERIES-BASE-MIB; 
+        
+	rcMacAddrConfig  MODULE-IDENTITY
+        LAST-UPDATED    "200809230000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "Raise Systems
+                Postal: Beijing, China
+                Tel: 86-010-82884499
+                E-mail: yuanqingguo@raisecom.com"
+        DESCRIPTION
+                "description of Mac binding object."
+                ::= { raisecomSwitchMgt 2 }
+
+	EnableVar ::= TEXTUAL-CONVENTION
+    	STATUS      current
+    	DESCRIPTION
+        	"enable or disable a function."
+    	SYNTAX    INTEGER {enable(1), disable(2)}  	  
+              
+------------------------------------------------------------------------------
+-- rcMacAddrPortTable - MAC地址管理端口配置表
+
+--		|-- rcMacAddrPortTable
+--			|-- rcMacAddrPortEntry   
+--				|-- rcPortIndex
+--				|-- rcMacLearningPortAdmin
+--				|-- rcMacThresholdPort
+--				|-- rcMacThresholdVlanId   
+--				|-- rcMacStationMoveAdmin 
+
+	rcMacAddrPortTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcMacAddrPortEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of MAC address administration of port and associated properties."
+        ::= { rcMacAddrConfig 1}
+
+	rcMacAddrPortEntry OBJECT-TYPE
+        SYNTAX RcMacAddrPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for MAC address administration and status information."
+        INDEX { rcPortIndex }
+        ::= { rcMacAddrPortTable 1 }
+
+  	RcMacAddrPortEntry ::= SEQUENCE {
+        rcPortIndex         	INTEGER,
+        rcMacLearningPortAdmin	EnableVar,
+        rcMacThresholdPort		INTEGER,
+        rcMacThresholdVlanId    INTEGER,
+        rcMacStationMoveAdmin   EnableVar
+    	}
+             
+    rcPortIndex   OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "The port index."
+        ::= { rcMacAddrPortEntry 1 }    
+             
+	rcMacLearningPortAdmin   OBJECT-TYPE
+        SYNTAX    EnableVar
+        ACCESS    read-write
+        STATUS    current
+        DESCRIPTION
+                "The value based on which to enable or disble MAC address learning."
+      	::= { rcMacAddrPortEntry 2 }    
+       
+	rcMacThresholdPort   OBJECT-TYPE
+	  	SYNTAX      INTEGER
+	  	MAX-ACCESS  read-write
+	  	STATUS      current
+	  	DESCRIPTION
+	         "The max number of MAC address that a port can learn."
+	  	::= { rcMacAddrPortEntry 3 }  
+	
+	rcMacThresholdVlanId	OBJECT-TYPE
+		SYNTAX	INTEGER(1..4095)
+		ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		    "Indicates the interface VLAN ID. If MAC learning threshold
+		     is not set based on VLAN, then the value must be 4095."  
+		::={ rcMacAddrPortEntry 4 }
+		
+	rcMacStationMoveAdmin   OBJECT-TYPE
+		SYNTAX    EnableVar
+		ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+			"The value based on which to enable or disble MAC address migration."
+		::= { rcMacAddrPortEntry 5 }
+
+------------------------------------------------------------------------------
+-- rcMacAddrTraceTable - MAC地址追踪管理表
+
+--		|-- rcMacAddrTraceTable
+--			|-- rcMacAddrTraceEntry   
+--				|-- rcMacTraceMacAddr
+--				|-- rcMacTracePortIndex
+--				|-- rcMacTracePortType
+--				|-- rcMacTraceOnuId
+--				|-- rcMacTraceAddrType
+--				|-- rcMacTraceState
+--				|-- rcMacTraceAction
+--				|-- rcMacTraceRowStatus
+       
+	rcMacAddrTraceTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF RcMacAddrTraceEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of MAC address trace function."
+        ::= { rcMacAddrConfig 2}
+
+	rcMacAddrTraceEntry OBJECT-TYPE
+        SYNTAX RcMacAddrTraceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for static MAC address and status information."
+        INDEX { rcMacTraceMacAddr }
+        ::= { rcMacAddrTraceTable 1 }
+        
+	RcMacAddrTraceEntry ::= SEQUENCE {
+        rcMacTraceMacAddr	MacAddress,
+        rcMacTracePortIndex	INTEGER,
+        rcMacTracePortType	INTEGER,
+        rcMacTraceOnuId     INTEGER,
+        rcMacTraceAddrType  INTEGER,
+        rcMacTraceState     INTEGER,
+        rcMacTraceAction    INTEGER,
+        rcMacTraceRowStatus RowStatus
+    	}
+ 
+	rcMacTraceMacAddr   OBJECT-TYPE
+        SYNTAX    MacAddress
+        ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+             "The traced MAC address."    
+        ::= { rcMacAddrTraceEntry 1 }
+
+	rcMacTracePortIndex   OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "The port index that MAC address rcMacTraceMacAddr related to, and this port may be
+              uplink port, trunk ID or PON port."
+        ::= { rcMacAddrTraceEntry 2 }
+        
+	rcMacTracePortType   OBJECT-TYPE
+        SYNTAX    INTEGER
+        		{
+        			  other(1),
+        			  uplinkport(2),
+        			  ponport(3),
+        			  trunkgroupid(4)
+        		}
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "Port type of rcMacTracePortIndex."    
+        ::= { rcMacAddrTraceEntry 3 }
+        
+    rcMacTraceOnuId   OBJECT-TYPE
+        SYNTAX    INTEGER(0..64)
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "The traced ONU ID."
+        ::= { rcMacAddrTraceEntry 4 }
+        
+    rcMacTraceAddrType   OBJECT-TYPE
+        SYNTAX    INTEGER
+        		{
+        			other(1),
+        			dynamic(2),
+        			static(3)
+        		}
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "MAC address type of rcMacTraceMacAddr."
+        ::= { rcMacAddrTraceEntry 5 } 
+        
+    rcMacTraceState   OBJECT-TYPE
+        SYNTAX    INTEGER
+        		{
+        			undo(1),
+        			tracingport(2),
+        			tracingonu(3),
+        			complete(4)
+        		}
+        ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+             "The current tracing state ."
+        ::= { rcMacAddrTraceEntry 6 } 
+        
+    rcMacTraceAction   OBJECT-TYPE
+        SYNTAX    INTEGER
+        		{
+        			null(1),
+        			start(2)
+        		}
+        ACCESS    read-write
+        STATUS    current
+        DESCRIPTION
+             "Start trace action."
+        ::= { rcMacAddrTraceEntry 7 }  
+        
+    rcMacTraceRowStatus   OBJECT-TYPE
+        SYNTAX    RowStatus
+        ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+             "Row status of this table."
+        ::= { rcMacAddrTraceEntry 8 }
+END

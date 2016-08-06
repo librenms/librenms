@@ -1,0 +1,235 @@
+--MibName=rcKeyChain
+-- *****************************************************************
+-- RAISECOM-KEYCHAIN-MIB.MIB:  raisecom KeyChain MIB file
+-- Dec 2010, Yuyonghong
+--
+-- Copyright (c) 2010 by raisecom, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+RAISECOM-KEYCHAIN-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+        RowStatus                               FROM SNMPv2-TC 
+        DateAndTime                             FROM SNMPv2-TC 
+        raisecomAgent	            	        FROM RAISECOM-BASE-MIB;    
+        
+	    raisecomKeyChain  MODULE-IDENTITY
+        LAST-UPDATED    "201012300000Z"
+        ORGANIZATION    "raisecom, Inc."
+        CONTACT-INFO
+                "       Raise Systems
+
+                Postal: Beijing, China
+
+                   Tel: 86-010-82884499
+
+                E-mail: support@raisecom.com"
+        DESCRIPTION
+                "description of raisecomKeyChain object."  
+                REVISION   "201012300000Z"
+                DESCRIPTION
+                "Configure keychain and key information."
+                ::= { raisecomAgent 31}  
+
+  raisecomKeyChainNotifications       OBJECT IDENTIFIER ::={ raisecomKeyChain 1 }
+  raisecomKeyChainObjects             OBJECT IDENTIFIER ::={ raisecomKeyChain 2 }
+  raisecomKeyChainConformance         OBJECT IDENTIFIER ::={ raisecomKeyChain 3 } 
+
+-- -------------------------------------------------------------
+-- scalar in the MIB
+-- -------------------------------------------------------------
+
+  raisecomKeyChainScalarGroup         OBJECT IDENTIFIER ::={ raisecomKeyChainObjects 1 }
+  raisecomKeyChainTableGroup          OBJECT IDENTIFIER ::={ raisecomKeyChainObjects 2 }
+  
+  raisecomKeyChainNextIndex        OBJECT-TYPE 
+        SYNTAX   INTEGER
+        ACCESS	 read-only
+        STATUS   current
+        DESCRIPTION
+                 "Next Keychain index"
+        ::= { raisecomKeyChainScalarGroup 1}    
+         
+  raisecomKeyChainCurrentCount     OBJECT-TYPE 
+        SYNTAX   INTEGER
+        ACCESS	 read-only
+        STATUS   current
+        DESCRIPTION
+                 "The count of current keychain"
+        ::= { raisecomKeyChainScalarGroup 2}   
+        
+  raisecomKeyChainTotalCount            OBJECT-TYPE 
+        SYNTAX   INTEGER
+        ACCESS	 read-only
+        STATUS   current
+        DESCRIPTION
+                 "The count of total keychain"
+        ::= { raisecomKeyChainScalarGroup 3}  
+
+------------------------------------------------------------------
+--table in the mib
+------------------------------------------------------------------
+
+--raisecomKeyChainTable
+
+  raisecomKeyChainTable      OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF raisecomKeyChainEntry
+        ACCESS	 not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "keychain information"
+        ::= { raisecomKeyChainTableGroup   1 }
+        
+  raisecomKeyChainEntry      OBJECT-TYPE
+        SYNTAX   raisecomKeyChainEntry
+        ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "An entry in raisecomKeyChainTable"
+        INDEX { raisecomKeyChainIndex}
+        ::= { raisecomKeyChainTable  1 } 
+      
+  raisecomKeyChainEntry ::= SEQUENCE {
+		raisecomKeyChainIndex	          INTEGER,
+		raisecomKeyChainName                 OCTET STRING ,
+		raisecomKeyChainAcceptTolerance	   INTEGER,
+		raisecomKeyChainRowStatus           RowStatus
+  }
+
+  raisecomKeyChainIndex      OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "Keychain index"
+        ::= { raisecomKeyChainEntry   1 }
+
+  raisecomKeyChainName   OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(1..16))
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "Keychain name"
+        ::= { raisecomKeyChainEntry   2 }
+
+  raisecomKeyChainAcceptTolerance     OBJECT-TYPE
+        SYNTAX   INTEGER(0..14400, 4102416000)
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "Keychain accept tolerance time, zero is default value,and unsigned integer value 4102416000 which changes to interger is -192551296 means infinite"
+        ::= { raisecomKeyChainEntry  3 }
+
+  raisecomKeyChainRowStatus    OBJECT-TYPE
+        SYNTAX   RowStatus
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "Row status of the Keychain configuration table"
+        ::= { raisecomKeyChainEntry   4 }
+
+         
+--raisecomKeyTable 
+
+  raisecomKeyTable    OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF raisecomKeyEntry       
+        ACCESS	 not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "Key information"
+        ::= { raisecomKeyChainTableGroup   2}
+        
+  raisecomKeyEntry  OBJECT-TYPE
+        SYNTAX   raisecomKeyEntry 
+        ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "An entry in raisecomKeyTable "
+        INDEX { raisecomKeyChainIndex, raisecomKeyID}
+        ::= { raisecomKeyTable  1 } 
+      
+  raisecomKeyEntry ::= SEQUENCE {  
+		raisecomKeyID	                  INTEGER,
+		raisecomKeyString               OCTET STRING,
+		raisecomKeyStringStyle          INTEGER,
+		raisecomKeyAcceptLifeTimeStart  OCTET STRING,
+		raisecomKeyAcceptLifeTimeEnd    OCTET STRING,
+        raisecomKeySendLifeTimeStart    OCTET STRING,  
+        raisecomKeySendLifeTimeEnd      OCTET STRING,
+        raisecomKeyRowStatus            RowStatus
+		} 
+		
+  raisecomKeyID   OBJECT-TYPE
+        SYNTAX   INTEGER(1..255)
+        ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "Key ID"
+        ::= { raisecomKeyEntry  1 }
+
+  raisecomKeyString   OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(1..255))
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "The password of keyID, it may be encrypted  string or unencrypted  string"
+        ::= { raisecomKeyEntry  2 }
+
+  raisecomKeyStringStyle  OBJECT-TYPE
+        SYNTAX   INTEGER{plain(0), cipher(7)}
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "Use encrypted style or unencrypted style for KeyID string"
+        ::= { raisecomKeyEntry  3 }
+
+  raisecomKeyAcceptLifeTimeStart  OBJECT-TYPE
+        SYNTAX   DateAndTime  
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "The accept lifetime to start for KeyID, and the year of the time can't be larger than 2099, 
+                 but when the year is 2100, that means inifinite. Specifically, we use 2100-1-1 00:00:00 to represent time inifnite"
+        ::= { raisecomKeyEntry  4 }
+
+  raisecomKeyAcceptLifeTimeEnd  OBJECT-TYPE
+        SYNTAX   DateAndTime  
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "The accept lifetime to end for KeyID, and the year of the time can't be larger than 2099,
+                  but when the year is 2100, that means inifinite. Specifically, we use 2100-1-1 00:00:00 to represent time inifnite"
+        ::= { raisecomKeyEntry  5 }
+
+  raisecomKeySendLifeTimeStart  OBJECT-TYPE
+        SYNTAX   DateAndTime  
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "The send lifetime to start for KeyID, and the year of the time can't be larger than 2099, 
+                 but when the year is 2100, that means inifinite. Specifically, we use 2100-1-1 00:00:00 to represent time inifnite"
+        ::= { raisecomKeyEntry  6 }
+
+
+  raisecomKeySendLifeTimeEnd  OBJECT-TYPE
+        SYNTAX   DateAndTime  
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "The send lifetime to end for KeyID, and the year of the time can't be larger than 2099, 
+                 but when the year is 2100, that means inifinite. Specifically, we use 2100-1-1 00:00:00 to represent time inifnite"
+        ::= { raisecomKeyEntry  7 }
+
+
+  raisecomKeyRowStatus  OBJECT-TYPE
+        SYNTAX   RowStatus
+        ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+                 "Row status of the Key configuration table"
+        ::= { raisecomKeyEntry  8 }
+
+
+
+END

@@ -1,0 +1,118 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : rcVersionMangngerGroup
+-- FILE NAME: raisecom-version-management-mib.my			
+-- DATE     : 2011/7/20							
+-- VERSION  : 1.00								
+-- PURPOSE  : 			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2011/7/20, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+ 
+RAISECOM-VERSION-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+     
+	IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE,
+		Integer32,
+		IpAddress,
+		Counter32,
+		Unsigned32
+			FROM SNMPv2-SMI
+		InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB  
+		raisecomPonCommon
+			FROM RAISECOM-PONSERIES-BASE-MIB
+	    iscomSwitch
+	        FROM RAISECOM-BASE-MIB;
+	        
+    rcSystem MODULE-IDENTITY
+    
+        LAST-UPDATED    "0412170000Z"  -- Dec 17, 2004
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "Raisecom Science & Technology Co., ltd.
+                         E-mail: support@raisecom.com"
+
+        DESCRIPTION     "iscom switch system Enterprise MIB definition."
+
+        REVISION        "0412170000Z"  -- Dec 17, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+                ::= { iscomSwitch 1 }
+			
+	rcVersionMangngerGroup MODULE-IDENTITY
+		LAST-UPDATED 	"201107200000Z"
+		ORGANIZATION 	"rc TECH, Ltd."
+		CONTACT-INFO 	"www.rc.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for version management  functions"
+		::= { raisecomPonCommon  6}
+
+
+--rcSwitchRoseVersion
+        
+rcSwitchInformation     OBJECT IDENTIFIER ::= { rcSystem 1 } 
+
+rcSwitchRoseVersion    OBJECT-TYPE
+        SYNTAX OCTET STRING  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "rose software version  ."
+        ::= { rcSwitchInformation 1 }
+
+--rcVersionMangngerGroup
+	  	
+    -- version softpackage table
+     rcVersionPackageTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RcVersionPackageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "version softpackage table"
+    	::= { rcVersionMangngerGroup 1 }    
+    
+     rcVersionPackageEntry  OBJECT-TYPE
+		SYNTAX          RcVersionPackageEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the rcVersionPackageTable."
+		INDEX { rcVersionPackageIndex }
+		::= { rcVersionPackageTable 1 }
+		
+	RcVersionPackageEntry ::=
+		SEQUENCE { 
+		rcVersionPackageIndex					INTEGER,
+		rcVersionPackageEnable 					INTEGER,
+		rcVersionPackageName					OCTET STRING (SIZE (1..128))
+		}		
+    
+	rcVersionPackageIndex  OBJECT-TYPE
+        SYNTAX 			INTEGER
+        MAX-ACCESS 		not-accessible
+        STATUS 			current
+        DESCRIPTION		"The index of rcVersionPackageTable."
+        ::= { rcVersionPackageEntry 1 }  
+         
+    rcVersionPackageEnable  OBJECT-TYPE
+        SYNTAX 			INTEGER{ enable(1),disable(2)}
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"Indicates whether the system starts from the softpackage."
+        ::= { rcVersionPackageEntry 2 }    
+        
+    rcVersionPackageName  OBJECT-TYPE
+        SYNTAX 			OCTET STRING (SIZE (1..128))
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"The name of softpackage."
+        ::= { rcVersionPackageEntry 3 }
+     
+END

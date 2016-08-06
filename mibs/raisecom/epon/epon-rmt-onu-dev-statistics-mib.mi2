@@ -1,0 +1,103 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-dev-statistics-mib.mi2
+--  Description  : Raisecom EPON software mib defination 
+--  Version      : 1.0   
+--  Date         : Oct. 23, 2007     
+--  Author		 : yangyuanjian
+--  Copyright (c) 1999-2015 Beijing Raisecom Science & Technology Co.,ltd
+--  			  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-DEV-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        OltPortIndex, OnuIndex FROM RAISECOM-PONSERIES-TC    
+        EnableVar FROM SWITCH-TC
+        Vlanset FROM SWITCH-TC                 
+        RowStatus, DisplayString FROM SNMPv2-TC
+        rcEponRmtOnuMgt FROM EPON-RMT-ONU-DEV-MIB 
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+                               
+    rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuDevStatisticsGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 39 }  
+------------------------------------------------------------------------------
+-- rcEponOnuDevStatisticsGroup  
+--------------------------------------------------------------------------------------------
+
+	rcEponOnuDevTotalNum OBJECT-TYPE
+    	SYNTAX INTEGER (0..65535)
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 1 }
+		
+	rcEponOnuDevOnlineTotalNum OBJECT-TYPE
+    	SYNTAX INTEGER (0..65535)
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 2 }
+		
+	rcEponOnuDevOfflineTotalNum OBJECT-TYPE
+    	SYNTAX INTEGER (0..65535)
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 3 }
+    	 
+    rcEponOnuDevTypeTotalNum OBJECT-TYPE
+    	SYNTAX INTEGER (0..65535)
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 4 }
+    	
+    rcEponOnuDevTypeTotalList OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(0..400))
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 5 } 
+		
+	rcEponOnuDevTotalList OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(0..200))
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 6 } 
+		
+	rcEponOnuDevOnlineList OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(0..200))
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 7 } 
+		
+	rcEponOnuDevOfflineList OBJECT-TYPE
+    	SYNTAX OCTET STRING(SIZE(0..200))
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponOnuDevStatisticsGroup 8 } 
+
+END    

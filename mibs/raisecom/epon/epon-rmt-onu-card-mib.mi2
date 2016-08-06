@@ -1,0 +1,264 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-card-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Nov 26, 2008
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+    EPON-RMT-ONU-CARD-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        PONDeviceCardType, SlotIndex FROM RAISECOM-PONSERIES-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        EnableVar				FROM SWITCH-TC
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuCardGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 2 }
+------------------------------------------------------------------------------
+
+--
+--  rcEponOnuCtcCardTable
+--
+
+    rcEponOnuCtcCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCtcCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCardGroup 1 }
+
+    rcEponOnuCtcCardEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the table, containing some basic attribute information item of
+            ONU per PON."
+       INDEX { rcEponOnuDevIndex, rcEponOnuCardIndex }
+        ::= { rcEponOnuCtcCardTable 1 }
+
+    RcEponOnuCtcCardEntry ::= SEQUENCE {
+        rcEponOnuCardIndex             SlotIndex,
+        rcEponOnuCtcCardReset          INTEGER
+       }
+
+    rcEponOnuCardIndex OBJECT-TYPE
+        SYNTAX SlotIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot id."
+        ::= { rcEponOnuCtcCardEntry 1 }
+        
+    rcEponOnuCtcCardReset OBJECT-TYPE
+        SYNTAX INTEGER{
+                ready(0),
+								reset(1)
+								}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcCardEntry 2 }
+        
+--
+--  rcEponOnuCardExtTable
+--
+
+    rcEponOnuCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  RcEponOnuCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCardGroup 2 }
+
+     rcEponOnuCardEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the table, containing some basic attribute information item of
+            ONU per PON."
+       INDEX { rcEponOnuDevIndex, rcEponOnuCardIndex }
+        ::= { rcEponOnuCardTable 1 }
+
+    RcEponOnuCardEntry ::= SEQUENCE {
+        rcEponOnuCardCardType       PONDeviceCardType,  
+        rcEponOnuCardHwVersion      OCTET STRING,
+        rcEponOnuCardState          INTEGER
+       }
+
+    rcEponOnuCardCardType OBJECT-TYPE
+        SYNTAX PONDeviceCardType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the ONU card."
+        ::= { rcEponOnuCardEntry 1 }
+        
+    rcEponOnuCardHwVersion OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Hardware version of the card actually installed."
+        ::= { rcEponOnuCardEntry 2 }
+
+    rcEponOnuCardState OBJECT-TYPE
+        SYNTAX INTEGER{
+                lost(1),
+                normal(2)
+                } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Working state of the card actually installed."
+        ::= { rcEponOnuCardEntry 3 }
+
+--
+-- alarm control
+--
+
+    rcEponOnuCtcCardAlarmCtrlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcCardAlarmCtrlEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCardGroup 8 }
+
+    rcEponOnuCtcCardAlarmCtrlEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcCardAlarmCtrlEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        INDEX { rcEponOnuDevIndex, rcEponOnuCardIndex, rcEponOnuCtcCardAlarmId }
+        	::= { rcEponOnuCtcCardAlarmCtrlTable 1 }
+
+    RcEponOnuCtcCardAlarmCtrlEntry ::= SEQUENCE {
+        rcEponOnuCtcCardAlarmId             INTEGER,
+        rcEponOnuCtcCardAlarmAdmin          EnableVar,
+        rcEponOnuCtcCardAlarmThreshold 	   INTEGER,
+        rcEponOnuCtcCardAlarmClearThreshold INTEGER
+      	}
+
+    rcEponOnuCtcCardAlarmId OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    failure(1),
+                    self_test_failure(2)
+                    }
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmCtrlEntry 1 }
+
+    rcEponOnuCtcCardAlarmAdmin OBJECT-TYPE
+        SYNTAX 		EnableVar
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmCtrlEntry 2 }
+
+    rcEponOnuCtcCardAlarmThreshold OBJECT-TYPE
+        SYNTAX 		INTEGER
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmCtrlEntry 3 } 
+        
+    rcEponOnuCtcCardAlarmClearThreshold OBJECT-TYPE
+        SYNTAX 		INTEGER
+        MAX-ACCESS 	read-write
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmCtrlEntry 4 }
+
+--
+-- alarm info
+--
+    rcEponOnuCtcCardAlarmInfoTable OBJECT-TYPE
+        SYNTAX 		SEQUENCE OF RcEponOnuCtcCardAlarmInfoEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCardGroup 9 }
+
+    rcEponOnuCtcCardAlarmInfoEntry OBJECT-TYPE
+        SYNTAX 		RcEponOnuCtcCardAlarmInfoEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        INDEX { rcEponOnuDevIndex, rcEponOnuCardIndex, rcEponOnuCtcCardAlarmId }
+        	::= { rcEponOnuCtcCardAlarmInfoTable 1 }
+
+    RcEponOnuCtcCardAlarmInfoEntry ::= SEQUENCE {
+				rcEponOnuCtcCardAlarmState     INTEGER,
+				rcEponOnuCtcCardAlarmInfo      OCTET STRING
+      	}
+
+    rcEponOnuCtcCardAlarmState OBJECT-TYPE
+        SYNTAX 		INTEGER{
+											ready(0),
+											alarm(1),
+											clear(2)
+									}
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmInfoEntry 1 }
+
+    rcEponOnuCtcCardAlarmInfo OBJECT-TYPE
+        SYNTAX 		OCTET STRING (SIZE(0..32))
+        MAX-ACCESS 	read-only
+        STATUS 		current
+        DESCRIPTION
+            		"."
+        	::= { rcEponOnuCtcCardAlarmInfoEntry 2 }
+        	
+------------------------------------------------------------------------
+--
+--  rcEponOnuCardTrapGroup
+--
+	rcEponOnuCardTrapGroup OBJECT IDENTIFIER ::= { rcEponOnuCardGroup 10 }
+
+	rcEponOnuCardFunctionalFailureTrap NOTIFICATION-TYPE
+		OBJECTS 	{ rcEponOnuDevIndex, rcEponOnuCardIndex, rcEponOnuCtcCardAlarmState, rcEponOnuCtcCardAlarmInfo }
+		STATUS  	current
+		DESCRIPTION
+			"."
+       ::= { rcEponOnuCardTrapGroup 1 }   
+       
+	rcEponOnuCardSelfTestFailureTrap NOTIFICATION-TYPE
+		OBJECTS 	{ rcEponOnuDevIndex, rcEponOnuCardIndex, rcEponOnuCtcCardAlarmState, rcEponOnuCtcCardAlarmInfo }
+		STATUS  	current
+		DESCRIPTION
+			"."
+       ::= { rcEponOnuCardTrapGroup 2 }
+       
+        
+END

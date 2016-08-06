@@ -1,0 +1,420 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : roapIpDhcpRelayMib
+-- FILE NAME: switch-ipdhcprelay-mib.mib			
+-- DATE     : 2012/03/09						
+-- VERSION  : 1.00								
+-- PURPOSE  : 			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2012/03/09, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+   
+IP-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, TimeTicks, OBJECT-TYPE
+                                    FROM SNMPv2-SMI       
+        RowStatus                   FROM SNMPv2-TC 
+        EnableVar			        FROM SWITCH-TC       
+        raisecomSwitchMgt
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+
+    roapIpDhcpRelay MODULE-IDENTITY
+        LAST-UPDATED "201203090000Z"
+        ORGANIZATION "Raisecom."
+        CONTACT-INFO
+              "raisecom
+               E-mail: raisecom@raisecom.com"
+
+        DESCRIPTION "dhcp relay module management."
+        ::= { raisecomSwitchMgt 22 }
+          
+------------------------------------------------------------------------------
+-- define groups in roapIpDhcpRelay
+------------------------------------------------------------------------------
+    roapIpDhcpRelayConfig      	        OBJECT IDENTIFIER ::= { roapIpDhcpRelay 1 } 
+    roapIpDhcpRelayInformationOptionGroup OBJECT IDENTIFIER ::= { roapIpDhcpRelay 2 } 
+    roapIpDhcpRelayStatistics             OBJECT IDENTIFIER ::= { roapIpDhcpRelay 3 }
+ 
+
+------------------------------------------------------------------------------
+-- begin--roapIpDhcpRelayConfig-----
+-- roapIpDhcpRelayConfig scale MIB--
+-------------------------------
+          
+    roapIpDhcpRelayEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of global dhcp relay. 
+             It has two values,one is enable(1),which indicates that the system start dhcp relay; 
+             the other is disable(2) that means dhcp relay is invalid in this system. 
+             The default value is disable(2)."
+        DEFVAL { disable }
+        ::= { roapIpDhcpRelayConfig 1 }
+                                            
+    roapIpDhcpRelayStartTime  OBJECT-TYPE
+        SYNTAX TimeTicks
+      	MAX-ACCESS read-only
+     	STATUS mandatory
+       	DESCRIPTION
+            "This read-only object displays the DHCP Relay startup time."
+        ::= { roapIpDhcpRelayConfig 2 }        
+ 
+------------------------------------------------------
+-- roapIpDhcpRelayConfig roapIpDhcpRelayIpInterfaceTable--
+------------------------------------------------------                 
+    roapIpDhcpRelayIpInterfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpDhcpRelayIpInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains DHCP Relay State information for ip interfaces."
+        ::= { roapIpDhcpRelayConfig 3 }
+              
+    roapIpDhcpRelayIpInterfaceEntry OBJECT-TYPE
+        SYNTAX RoapIpDhcpRelayIpInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry that contains DHCP Relay State information for ip interface."
+        INDEX { roapIpDhcpRelayIpInterfaceIfIndex }
+        ::= { roapIpDhcpRelayIpInterfaceTable 1 }
+            
+    RoapIpDhcpRelayIpInterfaceEntry ::=
+        SEQUENCE {
+                     roapIpDhcpRelayIpInterfaceIfIndex INTEGER,
+                     roapIpDhcpRelayIpInterfaceEnable EnableVar
+                 }
+                  
+    roapIpDhcpRelayIpInterfaceIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of IP interface table about state of DHCP Relay.
+             Its range is (MAX_PORT_NUM + 1..MAX_PORT_NUM + MAX_SW_NUM - 1)
+             'MAX_PORT_NUM' is the PHY port number of a layer3 device while
+             'MAX_SW_NUM' is the SW interface number."
+        REFERENCE
+              "SOUCE-CODE OF DHCP RELAY"
+        ::= { roapIpDhcpRelayIpInterfaceEntry 1 }                  
+              
+    roapIpDhcpRelayIpInterfaceEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of this IP interface enabling DHCP Relay.
+             It has two value,one is enable(1),which indicates the IP inteface enable DHCP Relay,
+             the other is disable(2) that means the IP interface doesn't support DHCP Relay. 
+             The default value is disable(2)."
+        REFERENCE
+             "SOUCE-CODE OF DHCP RELAY"
+        ::= { roapIpDhcpRelayIpInterfaceEntry 2 } 
+
+--------------------------------------------
+-- roapIpDhcpRelayConfig roapIpDhcpRelayTargetTable--
+--------------------------------------------                 
+    roapIpDhcpRelayTargetTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpDhcpRelayTargetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains target server information for IP interfaces."
+        ::= { roapIpDhcpRelayConfig 4 }
+              
+    roapIpDhcpRelayTargetEntry OBJECT-TYPE
+        SYNTAX RoapIpDhcpRelayTargetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A entry that contains target server information for IP interface."
+        INDEX { roapIpDhcpRelayTargetIfIndex,
+                roapIpDhcpRelayTargetAddress }
+        ::= { roapIpDhcpRelayTargetTable 1 }
+            
+    RoapIpDhcpRelayTargetEntry ::=
+        SEQUENCE {
+                     roapIpDhcpRelayTargetIfIndex INTEGER,
+                     roapIpDhcpRelayTargetAddress IpAddress,
+                     roapIpDhcpRelayTargetRowStatus RowStatus
+                 }
+                  
+    roapIpDhcpRelayTargetIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of DHCP Relay Target Address Table. 
+             Its range is (MAX_PORT_NUM + 1..MAX_PORT_NUM + MAX_SW_NUM - 1).
+             'MAX_PORT_NUM' is the PHY port number of a layer3 device while
+             'MAX_SW_NUM' is the SW interface number."
+        REFERENCE
+            "SOUCE-CODE OF DHCP RELAY"
+        ::= { roapIpDhcpRelayTargetEntry 1 }                  
+              
+    roapIpDhcpRelayTargetAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "IP address of target server.
+             It's also the index of DHCP Relay Target Address Table.
+             Each ip interface can have 4 target ip address at most."
+        REFERENCE
+            "SOUCE-CODE OF DHCP RELAY"
+        ::= { roapIpDhcpRelayTargetEntry 2 } 
+              
+    roapIpDhcpRelayTargetRowStatus OBJECT-TYPE
+        SYNTAX RowStatus              
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The row status of DHCP Relay Target Address Table."
+        REFERENCE
+            "SOUCE-CODE OF DHCP RELAY."
+        ::= { roapIpDhcpRelayTargetEntry 3 }                                  
+              
+-- end--roapIpDhcpRelayConfig------------------------
+
+------------------------------------------------
+-- begin--roapIpDhcpRelayInformationOptionGroup-----
+-- roapIpDhcpRelayInformationOptionGroup scale MIB--
+------------------------------------------------
+
+-----------------------------------------------------------------------------
+-- roapIpDhcpRelayInformationOptionGroup roapIpDhcpRelayInformationOptionTrustTable--
+-----------------------------------------------------------------------------     
+    roapIpDhcpRelayInformationOptionTrustTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpDhcpRelayInformationOptionTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table provides the mechanism to control dhcp relay trust per port."
+        ::= { roapIpDhcpRelayInformationOptionGroup 3 }
+
+    roapIpDhcpRelayInformationOptionTrustEntry OBJECT-TYPE
+        SYNTAX RoapIpDhcpRelayInformationOptionTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch dhcp relay trust based on port."
+        INDEX { roapIpDhcpRelayInformationOptionTrustPortIfIndex }
+        ::= { roapIpDhcpRelayInformationOptionTrustTable 1 }
+
+    RoapIpDhcpRelayInformationOptionTrustEntry ::= 
+        SEQUENCE {
+                     roapIpDhcpRelayInformationOptionTrustPortIfIndex INTEGER,         
+                     roapIpDhcpRelayInformationOptionTrustState INTEGER
+                 }
+
+    roapIpDhcpRelayInformationOptionTrustPortIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index that uniquely identifies a port in DHCP Relay trust table.
+             Eg: for ISCOM3012gf, the value range is from 1 to 12, for ISCOM3026/3026e, 
+             the value range is from 1 to 26, for iscom3028f,from 1 to 28, for iscom3052,from 1 to 52,and so on."
+        ::= { roapIpDhcpRelayInformationOptionTrustEntry 1}
+
+    roapIpDhcpRelayInformationOptionTrustState OBJECT-TYPE
+        SYNTAX INTEGER{trusted(1), untrusted(2)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The trust state of this port. It has two value,one is trusted (1),
+            which indicates the port support DHCP Relay trust; 
+            the other is untrusted (2) that means the port doesn't support DHCP Relay trust. 
+            The default value is untrusted(2)."
+        ::= { roapIpDhcpRelayInformationOptionTrustEntry 2}     
+
+-- end--roapIpDhcpRelayInformationOptionGroup-------
+              
+-----------------------------------------
+-- begin--roapIpDhcpRelayStatisticsGroup-----
+-- roapIpDhcpRelayStatisticsGroup scale MIB--
+-----------------------------------------
+    roapIpDhcpRelayStatsBootpsRcv OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Bootp packets received by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 1 }  
+        
+    roapIpDhcpRelayStatsBootpsSnd OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Bootp packets sended by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 2 }  
+        
+    roapIpDhcpRelayStatsDiscoversRcv OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Discover packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 3 }        
+
+    roapIpDhcpRelayStatsDiscoversSnd OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Discover packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 4 }  
+                
+    roapIpDhcpRelayStatsRequestsRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Request packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 5 }        
+
+    roapIpDhcpRelayStatsRequestsSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Request packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 6 }   
+
+    roapIpDhcpRelayStatsReleasesRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Release packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 7 }                
+
+    roapIpDhcpRelayStatsReleasesSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Release packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 8 }   
+        
+    roapIpDhcpRelayStatsOffersRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Offer packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 9 }        
+
+    roapIpDhcpRelayStatsOffersSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Offer packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 10 }    
+
+    roapIpDhcpRelayStatsAcksRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Ack packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 11 }        
+
+    roapIpDhcpRelayStatsAcksSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Ack packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 12 }   
+
+    roapIpDhcpRelayStatsNacksRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Nack packets received by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 13 }     
+
+    roapIpDhcpRelayStatsNacksSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Nack packets sended by DHCP relay."
+        ::= { roapIpDhcpRelayStatistics 14 }  
+                   
+    roapIpDhcpRelayStatsDeclinesRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Decline packets received by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 15 }  
+
+    roapIpDhcpRelayStatsDeclinesSnd OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Decline packets sended by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 16 }  
+  
+      roapIpDhcpRelayStatsInformationsRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Inform packets received by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 17 } 
+  
+    roapIpDhcpRelayStatsInformationsSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Inform packets sended by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 18 } 
+                
+    roapIpDhcpRelayStatsUnknowns  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of Unknown packets received by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 19 }  
+                
+    roapIpDhcpRelayStatsPacketsRcv  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets received by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 20 }  
+                                                               
+    roapIpDhcpRelayStatsPacketsSnd  OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets sended by DHCP relay."
+        ::= {roapIpDhcpRelayStatistics 21 }  
+                                                                       
+-- end--roapIpDhcpRelayStatisticsGroup-------
+------------------------------------------------------------------------------
+
+                                                               
+END

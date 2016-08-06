@@ -1,0 +1,1450 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-voip-service-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Oct 7, 2008
+--  Author       : heyumei
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-VOIP-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress, DisplayString FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        OnuIndex, Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC
+        rcEponRmtOnuMgt, rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;     
+        
+    rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+             
+rcEponOnuVoipGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 22 }
+
+rcEponOnuVoipServiceGroup      	OBJECT IDENTIFIER ::= { rcEponOnuVoipGroup 3 }
+------------------------------------------------------------------------------        
+-- 
+-- rcEponOnuCtcVoipPotsTable 
+--
+  
+  	rcEponOnuCtcVoipPotsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcVoipPotsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 1 }
+
+    rcEponOnuCtcVoipPotsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcVoipPotsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuCtcVoipPotsTable 1 }               
+
+    RcEponOnuCtcVoipPotsEntry ::= SEQUENCE {    
+    	rcEponOnuPotsIndex                   	Olt_OnuIfIndex,     
+        rcEponOnuCtcVoipPotsAdmin    			EnableVar,
+       	rcEponOnuCtcVoipPotsPortStatus          INTEGER,       	
+       	rcEponOnuCtcVoipPotsServiceStatus       INTEGER,        	
+       	rcEponOnuCtcVoipPotsCodecType           INTEGER
+        }        
+    
+    rcEponOnuPotsIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsEntry 1 }
+              
+    rcEponOnuCtcVoipPotsAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsEntry 2 }
+   
+   	rcEponOnuCtcVoipPotsPortStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+        				registering(0),
+						idle(1),
+						offhook(2),
+						dialing(3),
+						ringing(4),
+						ringback(5),
+						connecting(6),
+						connected(7),
+						disconnecting(8),
+						register_failed(9),
+						inactive(10)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsEntry 3 }
+    
+    rcEponOnuCtcVoipPotsServiceStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+        				endLocal(0),
+						endRemote(1),
+						endAuto(2),
+						normal(3)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsEntry 4 }
+    
+    rcEponOnuCtcVoipPotsCodecType OBJECT-TYPE
+        SYNTAX INTEGER{
+        				g711a(0),
+						g729(1),
+						g711u(2),
+						g723(3),
+						g726(4),
+						t38(5),
+						noconnected(6)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsEntry 5 }  
+
+-- 
+-- rcEponOnuCtcVoipPotsCallTable 
+--
+  
+  rcEponOnuCtcVoipPotsCallTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuCtcVoipPotsCallEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 2 }
+
+    rcEponOnuCtcVoipPotsCallEntry OBJECT-TYPE
+        SYNTAX RcEponOnuCtcVoipPotsCallEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuCtcVoipPotsCallTable 1 }  
+              
+    RcEponOnuCtcVoipPotsCallEntry ::= SEQUENCE {         
+        rcEponOnuCtcVoipPotsPhoneNumber		DisplayString,
+        rcEponOnuCtcVoipPotsUniType			INTEGER
+        }
+                
+    rcEponOnuCtcVoipPotsPhoneNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsCallEntry 1 }
+    
+    rcEponOnuCtcVoipPotsUniType OBJECT-TYPE
+        SYNTAX INTEGER{
+        				fxs(1),
+        				fxo(2)
+        			  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuCtcVoipPotsCallEntry 2 }
+                       
+-- 
+-- rcEponOnuVoipPotsCallTable 
+--
+  
+  	rcEponOnuVoipPotsCallTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipPotsCallEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 3 }
+
+    rcEponOnuVoipPotsCallEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipPotsCallEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuVoipPotsCallTable 1 }               
+
+    RcEponOnuVoipPotsCallEntry ::= SEQUENCE {         
+        rcEponOnuVoipPotsUserName				   DisplayString,
+        rcEponOnuVoipPotsEchoCancel				   EnableVar, 
+        rcEponOnuVoipPotsCallerIDMode              INTEGER,       	
+       	rcEponOnuVoipPotsFaxRelayMaxRate           INTEGER,        	
+       	rcEponOnuVoipPotsSilenceCompression        EnableVar,
+       	rcEponOnuVoipPotsUniComfortNoiseGeneration EnableVar,
+       	rcEponOnuVoipPotsUniIsCaller               INTEGER,
+       	rcEponOnuVoipPotsUniInputGain              INTEGER,
+       	rcEponOnuVoipPotsUniOutputGain             INTEGER,
+       	rcEponOnuVoipPotsUniPreferCodec  		   INTEGER 
+       	}
+                                
+    rcEponOnuVoipPotsUserName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 1 }
+        
+    rcEponOnuVoipPotsEchoCancel OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 2 }           
+        
+ 	rcEponOnuVoipPotsCallerIDMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        				bellCore(1),
+						etsi(2),
+						ntt(3)
+        			  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 3 }
+        	        
+	rcEponOnuVoipPotsFaxRelayMaxRate OBJECT-TYPE
+        SYNTAX INTEGER{
+        				fax_2400bps(1),
+						fax_4800bps(2),
+						fax_7200bps(3),
+						fax_9600bps(4),
+						fax_12000bps(5),
+						fax_14400bps(6)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 4 }
+                
+	rcEponOnuVoipPotsSilenceCompression OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 5 }                       
+
+	rcEponOnuVoipPotsUniComfortNoiseGeneration OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 6 }     
+        
+	rcEponOnuVoipPotsUniIsCaller OBJECT-TYPE
+        SYNTAX INTEGER{
+        				caller(1),
+						callee(2),
+						other(3)
+					  }  
+      MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 7 }          
+      
+    rcEponOnuVoipPotsUniInputGain OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 8 }
+      
+    rcEponOnuVoipPotsUniOutputGain OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 9 } 
+        
+    rcEponOnuVoipPotsUniPreferCodec OBJECT-TYPE
+        SYNTAX INTEGER{
+        				g711A(0),
+						g729(1),
+						g711U(2),
+						g723(3),
+						g726(4)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallEntry 10 }  
+        
+-- 
+-- rcVoipLineTestTable 
+--
+  
+  rcEponOnuVoipLineTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipLineTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 4 }
+
+    rcEponOnuVoipLineTestEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipLineTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuVoipLineTestTable 1 }
+
+    RcEponOnuVoipLineTestEntry ::= SEQUENCE {         
+        rcEponOnuVoipLineTestType	                        INTEGER,        
+        rcEponOnuVoipLineTestStatus	                        INTEGER,
+        rcEponOnuVoipLineTestCircuitPolarityReversal   	    INTEGER,
+        rcEponOnuVoipLineTestCircuitFeederVoltage	        INTEGER,  
+        rcEponOnuVoipLineTestCircuitVBHVoltage	            INTEGER,
+        rcEponOnuVoipLineTestCircuitVBMVoltage	            INTEGER,
+        rcEponOnuVoipLineTestCircuitVBLVoltage	            INTEGER,
+        rcEponOnuVoipLineTestLoopLineAGACVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineBGACVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineABACVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineAGDCVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineBGDCVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineABDCVoltage   	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineAGResistance  	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineBGResistance  	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineABLoopResistance	        INTEGER,
+        rcEponOnuVoipLineTestLoopLineABPolarityReverseVoltage	INTEGER,
+        rcEponOnuVoipLineTestLoopLineConclusion	            	INTEGER,
+        rcEponOnuVoipLineTestCircuitRingingVoltage          INTEGER,
+        rcEponOnuVoipLineTestCircuitLoopCurrent             INTEGER,
+        rcEponOnuVoipLineTestLoopLineABResistance           INTEGER,
+        rcEponOnuVoipLineTestLoopLineAGCapacitance          INTEGER,
+        rcEponOnuVoipLineTestLoopLineBGCapacitance          INTEGER,
+        rcEponOnuVoipLineTestLoopLineABCapacitance          INTEGER
+        }
+                        
+    rcEponOnuVoipLineTestType OBJECT-TYPE
+        SYNTAX INTEGER{
+               ready(0),
+               circuit_test(1),
+               loopline_tes(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 1 }        
+
+    rcEponOnuVoipLineTestStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+               idle(1),
+               testing(2),
+               testsuccess(3),
+               testfail(4)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 2 }                           
+        
+    rcEponOnuVoipLineTestCircuitPolarityReversal    OBJECT-TYPE
+        SYNTAX INTEGER{
+               normal(0),
+               abnormal(1),
+               invalid(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 3 }     
+        
+    rcEponOnuVoipLineTestCircuitFeederVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 4 }        
+ 
+    rcEponOnuVoipLineTestCircuitVBHVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 5 } 
+ 
+    rcEponOnuVoipLineTestCircuitVBMVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 6 } 
+ 
+    rcEponOnuVoipLineTestCircuitVBLVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 7 }
+                
+    rcEponOnuVoipLineTestLoopLineAGACVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 8 }         
+        
+    rcEponOnuVoipLineTestLoopLineBGACVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 9 }        
+        
+    rcEponOnuVoipLineTestLoopLineABACVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 10 }     
+        
+    rcEponOnuVoipLineTestLoopLineAGDCVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 11 }        
+        
+    rcEponOnuVoipLineTestLoopLineBGDCVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 12 }        
+        
+    rcEponOnuVoipLineTestLoopLineABDCVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 13 }        
+        
+    rcEponOnuVoipLineTestLoopLineAGResistance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 14 }     
+        
+    rcEponOnuVoipLineTestLoopLineBGResistance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 15 }                         
+        
+    rcEponOnuVoipLineTestLoopLineABLoopResistance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 16 }                
+        
+    rcEponOnuVoipLineTestLoopLineConclusion OBJECT-TYPE
+        SYNTAX INTEGER{
+                      normal(0),
+                      phoneNotConnected(1),
+                      groundLineA(2),
+                      groundLineB(3),
+                      lineAConnectedLineB(4),
+                      hookOff(5),
+                      hookOn(6),
+                      lineAHighVoltage(7),
+                      lineBHighVoltage(8),
+                      lineABHighVoltage(9),
+                      lineALowVoltage(10),
+                      lineBLowVoltage(11),
+                      lineABLowVoltage(12),
+                      lineAHighCapacitance(13),
+                      lineBHighCapacitance(14),
+                      lineABHighCapacitance(15),
+                      invalid(255)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 17 }
+        
+    rcEponOnuVoipLineTestCircuitRingingVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 18 }
+        
+    rcEponOnuVoipLineTestCircuitLoopCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 19 }  
+     
+    rcEponOnuVoipLineTestLoopLineABResistance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 20 }
+        
+    rcEponOnuVoipLineTestLoopLineAGCapacitance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 21 } 
+        
+    rcEponOnuVoipLineTestLoopLineBGCapacitance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 22 }
+        
+    rcEponOnuVoipLineTestLoopLineABCapacitance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipLineTestEntry 23 }
+          
+-- 
+-- rcEponOnuVoipMediaTable 
+--
+    rcEponOnuVoipMediaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipMediaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 5 }
+
+    rcEponOnuVoipMediaEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipMediaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuVoipRtpId  }
+        ::= { rcEponOnuVoipMediaTable 1 }
+
+    RcEponOnuVoipMediaEntry ::= SEQUENCE {              
+        rcEponOnuVoipRtpId	                     INTEGER,
+        rcEponOnuVoipRtpPotsId 	                 INTEGER,
+        rcEponOnuVoipRtpSlotId	                 INTEGER,
+        rcEponOnuVoipMediaLocalIpAddr	         IpAddress,
+        rcEponOnuVoipMediaLocalPort	             INTEGER,
+        rcEponOnuVoipMediaRemoteIpAddr	         IpAddress,
+        rcEponOnuVoipMediaRemotePort	         INTEGER,
+        rcEponOnuVoipMediaLocalCodec	         INTEGER,
+        rcEponOnuVoipMediaLocalPayload	         INTEGER,
+        rcEponOnuVoipMediaLocalPackLen	         INTEGER,
+        rcEponOnuVoipMediaLocalConnectMode	     INTEGER,
+        rcEponOnuVoipMediaRemoteCodec	         INTEGER,
+        rcEponOnuVoipMediaRemotePayload	         INTEGER,
+        rcEponOnuVoipMediaRemotePackLen	         INTEGER,
+        rcVoipRtpRtpRemoteConnectMode	     	 INTEGER,
+        rcEponOnuVoipDtmfType 	                 INTEGER,
+        rcEponOnuVoipRfc2198RedDepth	         INTEGER,
+        rcEponOnuVoipRfc2198Payload	             INTEGER,
+        rcEponOnuVoipRfc2833Payload	             INTEGER,
+        rcEponOnuVoipMediaStatus	             EnableVar,
+        rcEponOnuVoipMediaType	             	 INTEGER,
+        rcEponOnuVoipMediaSilence	             INTEGER,
+        rcEponOnuVoipMediaEchoCancel	         EnableVar, 
+        rcEponOnuVoipT38Rate	                 INTEGER,
+        rcEponOnuVoipT38ProtectMode 	         INTEGER,
+        rcEponOnuVoipRtpTxPackets	             INTEGER,
+        rcEponOnuVoipRtpTxBytes	                 INTEGER,
+        rcEponOnuVoipRtpRxPackets	             INTEGER,
+        rcEponOnuVoipRtpRxBytes	                 INTEGER,
+        rcEponOnuVoipH248ContextId 	             INTEGER,
+        rcEponOnuVoipH248RtpTextTid     	     OCTET STRING,
+        rcEponOnuVoipMediaUpstreamRate           INTEGER,
+        rcEponOnuVoipMediaDownstreamRate         INTEGER,
+        rcEponOnuVoipMediaPacketLosserRate       INTEGER,
+        rcEponOnuVoipMediaPacketDelay            INTEGER,
+        rcEponOnuVoipMediaAverageDelay           INTEGER
+        }
+             
+	rcEponOnuVoipRtpId OBJECT-TYPE
+        SYNTAX INTEGER(1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 1 }
+        
+	rcEponOnuVoipRtpPotsId  OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 2 }
+        
+	rcEponOnuVoipRtpSlotId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 3 }        
+        
+	rcEponOnuVoipMediaLocalIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 4 }
+        
+	rcEponOnuVoipMediaLocalPort OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 5 }          
+        
+	rcEponOnuVoipMediaRemoteIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 6 }
+        
+	rcEponOnuVoipMediaRemotePort OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 7 }        
+        
+	rcEponOnuVoipMediaLocalCodec OBJECT-TYPE
+        SYNTAX INTEGER{
+               pcma(0),
+               pcmu(1),
+               g723(2),
+               g729(3),
+               g726-32(4),
+               g726-16(5),
+               g726-24(6),
+               g726-40(7),
+               t38(8)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 8 }
+        
+	rcEponOnuVoipMediaLocalPayload OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 9 }         
+        
+	rcEponOnuVoipMediaLocalPackLen OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 10 }
+        
+	rcEponOnuVoipMediaLocalConnectMode OBJECT-TYPE
+        SYNTAX INTEGER{
+               noset(0),
+               send(1),
+               receive(2),
+               send-and-receive(3),
+               notactived(4)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 11 }        
+        
+	rcEponOnuVoipMediaRemoteCodec OBJECT-TYPE
+        SYNTAX INTEGER{
+               pcma(0),
+               pcmu(1),
+               g723(2),
+               g729(3),
+               g726-32(4),
+               g726-16(5),
+               g726-24(6),
+               g726-40(7),
+               t38(8)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 12 }
+        
+	rcEponOnuVoipMediaRemotePayload OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 13 }          
+        
+	rcEponOnuVoipMediaRemotePackLen OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 14 }              
+        
+	rcEponOnuVoipDtmfType  OBJECT-TYPE
+        SYNTAX INTEGER{
+    	       transparent(1),
+               rfc2833(2),
+               rfc2833andrfc2198(3),
+               infoMsg(4)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 15 }
+        
+	rcEponOnuVoipRfc2198RedDepth OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 16 }        
+
+	rcEponOnuVoipRfc2198Payload OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 17 }
+        
+	rcEponOnuVoipRfc2833Payload OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 19 }        
+        
+	rcEponOnuVoipMediaStatus OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 20 }
+        
+	rcEponOnuVoipMediaType OBJECT-TYPE
+        SYNTAX INTEGER{
+                      fax(1),
+                      text(2),
+                      data(3),
+                      voip(4)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 21 }          
+        
+	rcEponOnuVoipMediaSilence OBJECT-TYPE
+        SYNTAX INTEGER{
+                      notset(0),
+                      enable(1),
+                      disable(2)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 22 }
+        
+	rcEponOnuVoipMediaEchoCancel OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 23 }        
+        
+	rcEponOnuVoipT38Rate OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 24 }
+        
+	rcEponOnuVoipT38ProtectMode  OBJECT-TYPE
+        SYNTAX INTEGER{      
+        			  unset(0),
+                      redundancy(1),
+                      fec(2)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 25 }         
+        
+	rcEponOnuVoipRtpTxPackets OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 26 }
+        
+	rcEponOnuVoipRtpTxBytes OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 27 }        
+        
+	rcEponOnuVoipRtpRxPackets OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 28 }
+        
+	rcEponOnuVoipRtpRxBytes OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 29 }          
+        
+	rcEponOnuVoipH248ContextId  OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 30 }
+        
+	rcEponOnuVoipH248RtpTextTid      OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 31 }        
+    
+    rcEponOnuVoipMediaUpstreamRate   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 32 }
+        
+    rcEponOnuVoipMediaDownstreamRate   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 33 }
+        
+     rcEponOnuVoipMediaPacketLosserRate   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 34 }
+     
+    rcEponOnuVoipMediaPacketDelay   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 35 } 
+        
+    rcEponOnuVoipMediaAverageDelay   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipMediaEntry 36 }  
+         
+ -- 
+-- rcEponOnuVoipSessionTable 
+ --
+  
+  rcEponOnuVoipSessionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 6 }
+
+    rcEponOnuVoipSessionEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex }
+        ::= { rcEponOnuVoipSessionTable 1 }
+
+    RcEponOnuVoipSessionEntry ::= SEQUENCE {
+        rcEponOnuVoipSessionStatus      DisplayString
+        }
+                
+ 	rcEponOnuVoipSessionStatus OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..1024))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipSessionEntry 1 }      
+        
+-- 
+-- rcEponOnuVoipPotsCallTestTable 
+--
+    rcEponOnuVoipPotsCallTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuVoipPotsCallTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 7 }
+
+    rcEponOnuVoipPotsCallTestEntry OBJECT-TYPE
+        SYNTAX RcEponOnuVoipPotsCallTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuPotsIndex  }
+        ::= { rcEponOnuVoipPotsCallTestTable 1 }
+
+    RcEponOnuVoipPotsCallTestEntry ::= SEQUENCE {              
+        rcEponOnuVoipPotsCallTestAction	             INTEGER,
+        rcEponOnuVoipPotsCallTestType 	             INTEGER,
+        rcEponOnuVoipPotsCallTestTimeOut	         INTEGER,
+        rcEponOnuVoipPotsCallTestMediaType	         INTEGER,
+        rcEponOnuVoipPotsCallTestPhoneNumber	     DisplayString,
+        rcEponOnuVoipPotsCallTestPotsStatus	         INTEGER,  
+        rcEponOnuVoipPotsCallTestStatus              INTEGER,
+        rcEponOnuVoipPotsCallTestConclusion	         INTEGER,
+        rcEponOnuVoipPotsCallTestFailedReason	     INTEGER,
+        rcEponOnuVoipPotsCallTestTargetNumber	     DisplayString,
+        rcEponOnuVoipPotsCallTestFailedSig	         DisplayString
+        }
+             
+	rcEponOnuVoipPotsCallTestAction OBJECT-TYPE
+        SYNTAX INTEGER{ 
+                        ready(0),
+                        start(1),
+					    stop(2)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 1 }
+        
+	rcEponOnuVoipPotsCallTestType OBJECT-TYPE
+        SYNTAX INTEGER{
+                        invalid(0),
+					    callee(1),
+					    caller(2)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 2 }
+        
+	rcEponOnuVoipPotsCallTestTimeOut OBJECT-TYPE
+        SYNTAX INTEGER(60..300)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 3 }        
+        
+	rcEponOnuVoipPotsCallTestMediaType OBJECT-TYPE
+        SYNTAX INTEGER{
+                        tone(1),
+                        loopback(2)
+                      }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 4 }
+        
+	rcEponOnuVoipPotsCallTestPhoneNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 5 }          
+        
+	rcEponOnuVoipPotsCallTestPotsStatus OBJECT-TYPE
+        SYNTAX INTEGER{ 
+                        invalid(0),
+        				Hookoff(1),
+						Calling (2),
+						Ringback(3),
+						Talking(4),
+						Hookon (5),
+						Remotehookon(6),
+						IncomingCall(7),
+						LocalRinging(8),
+						Testing(9),
+						Faxing(10),
+						Error (11),
+						Hold(12),
+						Conference (13),
+						Disconnecting(14),
+						DialNum(15)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 6 }
+        
+	rcEponOnuVoipPotsCallTestStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+						idle(1),
+						testing(2),
+						testend(3)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 7 }        
+        
+	rcEponOnuVoipPotsCallTestConclusion OBJECT-TYPE
+        SYNTAX INTEGER{
+                        invalid(0),
+                        success(1),
+                        failed(2),
+                        unconfirmed(3)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 8 }
+        
+	rcEponOnuVoipPotsCallTestFailedReason OBJECT-TYPE
+        SYNTAX INTEGER{
+						invalid(0),                                                                
+						no_signal(1),                      
+						no_offhook_replay(2),
+						mg_error(3),
+						no_dial_tone(4),
+						wrong_targetnum(5),
+						no_ringback_tone(6),
+						no_offhook_remote(7),
+						connect_failed(8),
+						no_onhook_replay (9),     
+						other(10)
+					  }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 9 }         
+                
+	rcEponOnuVoipPotsCallTestTargetNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))        
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 10}        
+        
+	rcEponOnuVoipPotsCallTestFailedSig OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipPotsCallTestEntry 11 }
+
+-- 
+-- rcEponOnuVoipPingTestTable 
+--
+    rcEponOnuVoipPingTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF rcEponOnuVoipPingTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= {rcEponOnuVoipServiceGroup 8}
+
+    rcEponOnuVoipPingTestEntry OBJECT-TYPE
+        SYNTAX rcEponOnuVoipPingTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX {rcEponOnuDevIndex}
+        ::= {rcEponOnuVoipPingTestTable 1}
+
+    rcEponOnuVoipPingTestEntry ::= SEQUENCE {
+        rcEponOnuVoipPingTestAction                 INTEGER,
+        rcEponOnuVoipPingTestDestIp                 IpAddress,
+        rcEponOnuVoipPingTestSrcIpType              INTEGER,
+        rcEponOnuVoipPingTestTimes                  INTEGER,
+        rcEponOnuVoipPingTestSize                   INTEGER,
+        rcEponOnuVoipPingTestEachPingTimeout        INTEGER,
+        rcEponOnuVoipPingTestResult                 INTEGER,
+        rcEponOnuVoipPingTestResultTxPackets        INTEGER,
+        rcEponOnuVoipPingTestResultRxPackets        INTEGER,
+        rcEponOnuVoipPingTestResultLostPackets      INTEGER,
+        rcEponOnuVoipPingTestResultLostPacketsRatio INTEGER,
+        rcEponOnuVoipPingTestResultMinDelay         INTEGER,     
+        rcEponOnuVoipPingTestResultMaxDelay         INTEGER,
+        rcEponOnuVoipPingTestResultAvgDelay         INTEGER          
+        }
+             
+        rcEponOnuVoipPingTestAction OBJECT-TYPE
+        SYNTAX INTEGER{
+                    stop(1),
+                    start(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ping test action. Start or stop ping test."
+        ::= {rcEponOnuVoipPingTestEntry 1}
+    
+    rcEponOnuVoipPingTestDestIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ping test destination IP address (IPv4)."
+        ::= {rcEponOnuVoipPingTestEntry 2}
+        
+    rcEponOnuVoipPingTestSrcIpType OBJECT-TYPE
+        SYNTAX INTEGER{
+                    signal(1),
+                    media(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ping test destination IP type, signal or media."
+        ::= {rcEponOnuVoipPingTestEntry 3}
+
+    rcEponOnuVoipPingTestTimes OBJECT-TYPE
+        SYNTAX INTEGER(1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ping test operation times."
+        ::= {rcEponOnuVoipPingTestEntry 4}
+                              
+    rcEponOnuVoipPingTestSize OBJECT-TYPE
+        SYNTAX INTEGER(1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each ping packets sizes (bytes)."
+        ::= {rcEponOnuVoipPingTestEntry 5}
+
+    rcEponOnuVoipPingTestEachPingTimeout OBJECT-TYPE
+        SYNTAX INTEGER(1..2000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each ping timeout."
+        ::= {rcEponOnuVoipPingTestEntry 6}
+      
+    rcEponOnuVoipPingTestResult OBJECT-TYPE
+        SYNTAX INTEGER{
+                    ready(0),
+                    finish(1),
+                    running(2),
+                    notStart(3),
+                    unknown(4),
+                    unknownIP(5),
+                    noRout(6),
+                    dstPortNotActive(7),
+                    arpFailed(8),
+                    exMaxburstNum(9),
+                    parseDNSFailed(10),
+                    invalidHostAddr(11)
+                    }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test result."
+        ::= {rcEponOnuVoipPingTestEntry 7}
+        
+    rcEponOnuVoipPingTestResultTxPackets OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test packets sent."
+        ::= {rcEponOnuVoipPingTestEntry 8}
+        
+    rcEponOnuVoipPingTestResultRxPackets OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test packets recieve."
+        ::= {rcEponOnuVoipPingTestEntry 9}
+        
+    rcEponOnuVoipPingTestResultLostPackets OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test packets sent but no answered."
+        ::= {rcEponOnuVoipPingTestEntry 10}   
+        
+    rcEponOnuVoipPingTestResultLostPacketsRatio OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test lost packets ratio."
+        ::= {rcEponOnuVoipPingTestEntry 11}
+
+    rcEponOnuVoipPingTestResultMinDelay OBJECT-TYPE
+        SYNTAX INTEGER(0..2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test min delay."
+        ::= {rcEponOnuVoipPingTestEntry 12}
+        
+    rcEponOnuVoipPingTestResultMaxDelay OBJECT-TYPE
+        SYNTAX INTEGER(0..2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test max delay."
+        ::= {rcEponOnuVoipPingTestEntry 13}
+        
+    rcEponOnuVoipPingTestResultAvgDelay OBJECT-TYPE
+        SYNTAX INTEGER(0..2000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ping test average delay."
+        ::= {rcEponOnuVoipPingTestEntry 14}           
+        
+ -- 
+-- rcEponOnuVoipCallProgressToneTable  
+ --
+  
+  rcEponOnuVoipCallProgressToneTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF rcEponOnuVoipCallProgressToneEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipServiceGroup 9 }
+
+    rcEponOnuVoipCallProgressToneEntry OBJECT-TYPE
+        SYNTAX rcEponOnuVoipCallProgressToneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuVoipCallProgressToneType }
+        ::= { rcEponOnuVoipCallProgressToneTable 1 }
+
+    rcEponOnuVoipCallProgressToneEntry ::= SEQUENCE {
+        rcEponOnuVoipCallProgressToneType           INTEGER,
+ 		rcEponOnuVoipCallProgressToneLowFreq        INTEGER,
+ 		rcEponOnuVoipCallProgressToneHighFreq       INTEGER,
+ 		rcEponOnuVoipCallProgressToneLowFreqVolume        INTEGER,
+ 		rcEponOnuVoipCallProgressToneHighFreqVolume       INTEGER,
+ 		rcEponOnuVoipCallProgressTone1stSignalOnTime      INTEGER,
+ 		rcEponOnuVoipCallProgressTone1stSignalOffTime     INTEGER,
+ 		rcEponOnuVoipCallProgressTone2ndSignalOnTime      INTEGER,
+ 		rcEponOnuVoipCallProgressTone2ndSignalOffTime     INTEGER
+        }
+                
+ 	rcEponOnuVoipCallProgressToneType OBJECT-TYPE
+        SYNTAX INTEGER{
+        			dial(1),
+					ringback(2),
+					busy(3),
+					congestion(4),
+					waiting(6)
+					  }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 1 }  
+        
+    rcEponOnuVoipCallProgressToneLowFreq OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 2 }   
+        
+    rcEponOnuVoipCallProgressToneHighFreq OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 3 }  
+        
+    rcEponOnuVoipCallProgressToneLowFreqVolume OBJECT-TYPE
+        SYNTAX INTEGER(0..100)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 4 }        
+        
+    rcEponOnuVoipCallProgressToneHighFreqVolume OBJECT-TYPE
+        SYNTAX INTEGER(0..100)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 5 }  
+        
+    rcEponOnuVoipCallProgressTone1stSignalOnTime OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 6 }  
+
+    rcEponOnuVoipCallProgressTone1stSignalOffTime OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 7 }
+
+    rcEponOnuVoipCallProgressTone2ndSignalOnTime OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 8 }
+        
+    rcEponOnuVoipCallProgressTone2ndSignalOffTime OBJECT-TYPE
+        SYNTAX INTEGER(0..65535)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuVoipCallProgressToneEntry 9 }        
+        
+--------------------------------------------------------------------------------
+rcEponOnuVoipPotsTrapGroup      	OBJECT IDENTIFIER ::= { rcEponOnuVoipServiceGroup 10 }
+
+    rcEponOnuVoipPOTSPortFailureTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPotsIndex }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuVoipPotsTrapGroup 1 }   
+           
+END

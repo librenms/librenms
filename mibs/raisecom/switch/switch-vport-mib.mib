@@ -1,0 +1,431 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : roapVPortCfg
+-- FILE NAME: switch-vport-mib.mib
+-- DATE     : 2011/4/18						
+-- VERSION  : 1.00								
+-- PURPOSE  : 			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2012/4/18, yanzhijie
+-- This is the first formal version for universal MIB definition.
+ 
+SWITCH-VPORT-MIB DEFINITIONS ::= BEGIN
+     
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32, IpAddress, Counter32, Unsigned32
+			FROM SNMPv2-SMI
+
+		RowStatus, TruthValue
+			FROM SNMPv2-TC
+		
+		Vlanset, EnableVar
+			FROM SWITCH-TC
+			
+		OltPortIndex
+			FROM RAISECOM-PONSERIES-TC
+		
+		raisecomSwitchMgt
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+			
+	roapVPortCfg MODULE-IDENTITY
+		LAST-UPDATED 	"201107200000Z"
+		ORGANIZATION 	"rc TECH, Ltd."
+		CONTACT-INFO 	"www.rc.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for version management  functions"
+		::= { raisecomSwitchMgt  21 }
+		
+--rcVPortCfg 
+
+------------------------------------------------------------------------------
+--	define groups in swtich-vport-mib
+------------------------------------------------------------------------------
+	roapVPortCfgMib	        	OBJECT IDENTIFIER ::= {	roapVPortCfg 1 }
+------------------------------------------------------------------------------
+
+-- VPort administration management table
+	 
+	 roapVPortAdminTable OBJECT-TYPE
+	 	SYNTAX      SEQUENCE OF RoapVPortAdminEntry
+	 	MAX-ACCESS      not-accessible
+        STATUS          current
+	 	DESCRIPTION     "A table of	virtual port administration."
+	 	::=	{ roapVPortCfgMib 1 }
+	 	       
+     roapVPortAdminEntry  OBJECT-TYPE
+		SYNTAX          RoapVPortAdminEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapVPortAdminTable."
+		INDEX { roapPonPortIndex }
+		::= { roapVPortAdminTable 1 }
+		
+	RoapVPortAdminEntry ::=	SEQUENCE {
+		roapPonPortIndex           OltPortIndex,
+		roapVPortAdmin             EnableVar
+		}		
+        
+        roapPonPortIndex  OBJECT-TYPE
+	        SYNTAX 			OltPortIndex
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"Index of roapVPortAdminTable, mainly refer to EPON port."
+	        ::= { roapVPortAdminEntry 1 }
+        
+		roapVPortAdmin  OBJECT-TYPE
+	        SYNTAX 			EnableVar
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Administrate virtual port function on EPON port."
+	        ::= { roapVPortAdminEntry 2 }        
+         
+    	
+-- VLAN attribute administration on VPort
+
+	roapVPortVlanTable OBJECT-TYPE
+	 	SYNTAX      SEQUENCE OF RoapVPortVlanEntry
+	 	MAX-ACCESS      not-accessible
+        STATUS          current
+	 	DESCRIPTION     "A table of	VPort VLAN attribute administration."
+	 	::=	{ roapVPortCfgMib 2 }
+
+     roapVPortVlanEntry  OBJECT-TYPE
+		SYNTAX          RoapVPortVlanEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapVPortVlanTable."
+		INDEX { roapVPortIndex }
+		::= { roapVPortVlanTable 1 }
+		
+	RoapVPortVlanEntry ::=	SEQUENCE {
+		roapVPortIndex              OltPortIndex, 
+		roapVPortNativeVlanId       INTEGER,
+		roapVPortAllowedVlanList    Vlanset,
+		roapVPortUntaggedVlanList   Vlanset,
+		roapVportBasedQinQAdmin     EnableVar,
+		roapVportVlanMode           INTEGER
+		}		
+        
+        roapVPortIndex  OBJECT-TYPE
+	        SYNTAX 			OltPortIndex
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"Virtual port Index."
+	        ::= { roapVPortVlanEntry 1 }
+
+        roapVPortNativeVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Native VLAN ID of virtual port."
+	        ::= { roapVPortVlanEntry 2 }
+	        
+	    roapVPortAllowedVlanList  OBJECT-TYPE
+	        SYNTAX 			Vlanset
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"VLAN list that are allowed to pass the virtual port."
+	        ::= { roapVPortVlanEntry 3 } 
+	        
+	    roapVPortUntaggedVlanList  OBJECT-TYPE
+	        SYNTAX 			Vlanset
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Untagged VLAN list in egress of virtual port."
+	        ::= { roapVPortVlanEntry 4 } 
+	        
+	    roapVportBasedQinQAdmin  OBJECT-TYPE
+	        SYNTAX 			EnableVar
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Basic QinQ function of virtual port."
+	        ::= { roapVPortVlanEntry 5 }
+	        
+	    roapVportVlanMode  OBJECT-TYPE
+	    	SYNTAX 			INTEGER {
+	    						transparent(1),
+	    						trunk(2)
+	    						}
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"VLAN mode of virtual port."
+	        ::= { roapVPortVlanEntry 6 }
+
+-- VLAN aggregation administration on VPort
+
+	roapVPortVARuleTable OBJECT-TYPE
+	 	SYNTAX      SEQUENCE OF RoapVPortVARuleEntry
+	 	MAX-ACCESS      not-accessible
+        STATUS          current
+	 	DESCRIPTION     "A table of	VPort VLAN attribute administration."
+	 	::=	{ roapVPortCfgMib 3 }
+
+     roapVPortVARuleEntry  OBJECT-TYPE
+		SYNTAX          RoapVPortVARuleEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapVPortVARuleTable."
+		INDEX { roapVPortIndex, roapVPortVACVlanId }
+		::= { roapVPortVARuleTable 1 }
+		
+	RoapVPortVARuleEntry ::=	SEQUENCE {
+		roapVPortVACVlanId           INTEGER, 
+		roapVPortVACVlanAction       INTEGER,
+		roapVPortVANewOVID           INTEGER,
+		roapVPortVANewOVlanCos       INTEGER,
+		roapVPortVANewIVID           INTEGER,
+		roapVPortVANewIVlanCos       INTEGER,
+		roapVPortVARowStatus         RowStatus
+		}		
+        
+        roapVPortVACVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"CVLAN ID."
+	        ::= { roapVPortVARuleEntry 1 }
+	        
+	    roapVPortVACVlanAction  OBJECT-TYPE
+	        SYNTAX 			INTEGER {
+	        					unchange(1),
+	        					add(2),
+	        					remove(3),
+	        					change(4)
+	        					}
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner vlan aggregation action, copyfromouter action is specially used for VLAN range aggregation."
+	        ::= { roapVPortVARuleEntry 2 }
+	        
+	    roapVPortVANewOVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN ID after aggregation."
+	        ::= { roapVPortVARuleEntry 3 }
+	        
+	    roapVPortVANewOVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN COS after aggregation."
+	        ::= { roapVPortVARuleEntry 4 }
+	        
+	    roapVPortVANewIVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN ID after aggregation."
+	        ::= { roapVPortVARuleEntry 5 }
+	        
+	    roapVPortVANewIVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN COS after aggregation."
+	        ::= { roapVPortVARuleEntry 6 }
+	        
+	    roapVPortVARowStatus  OBJECT-TYPE
+	        SYNTAX 			RowStatus
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Row status."
+	        ::= { roapVPortVARuleEntry 7 }
+
+-- VLAN translation administration on VPort ingress direction
+
+	roapVPortIngressVTRuleTable OBJECT-TYPE
+	 	SYNTAX      SEQUENCE OF RoapVPortIngressVTRuleEntry
+	 	MAX-ACCESS      not-accessible
+        STATUS          current
+	 	DESCRIPTION     "A table of	ingress VPort VLAN translation administration."
+	 	::=	{ roapVPortCfgMib 4 }
+
+     roapVPortIngressVTRuleEntry  OBJECT-TYPE
+		SYNTAX          RoapVPortIngressVTRuleEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapVPortIngressVTRuleTable."
+		INDEX { roapVPortIndex, roapVPortIngressVTSVlanId, roapVPortIngressVTCVlanId }
+		::= { roapVPortIngressVTRuleTable 1 }
+		
+	RoapVPortIngressVTRuleEntry ::=	SEQUENCE {
+		roapVPortIngressVTSVlanId           INTEGER,
+		roapVPortIngressVTCVlanId           INTEGER,
+		roapVPortIngressVTCVlanAction       INTEGER,
+		roapVPortIngressVTNewOVID           INTEGER,
+		roapVPortIngressVTNewOVlanCos       INTEGER,
+		roapVPortIngressVTNewIVID           INTEGER,
+		roapVPortIngressVTNewIVlanCos       INTEGER,
+		roapVPortIngressVTRowStatus         RowStatus,
+		roapVPortIngressVTSVlanIdHighBound  INTEGER
+		}		
+        
+        roapVPortIngressVTSVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"SVLAN ID."
+	        ::= { roapVPortIngressVTRuleEntry 1 }
+        
+        roapVPortIngressVTCVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"CVLAN ID."
+	        ::= { roapVPortIngressVTRuleEntry 2 }
+        
+        roapVPortIngressVTCVlanAction  OBJECT-TYPE
+	        SYNTAX 			INTEGER  {
+	        					unchange(1),
+	        					add(2),
+	        					remove(3),
+	        					change(4),
+	        					copyfromouter(5)
+	        					}
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"CVLAN translation action."
+	        ::= { roapVPortIngressVTRuleEntry 3 }
+       
+       roapVPortIngressVTNewOVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN ID after translation."
+	        ::= { roapVPortIngressVTRuleEntry 4 }
+	        
+	    roapVPortIngressVTNewOVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN COS after translation."
+	        ::= { roapVPortIngressVTRuleEntry 5 }
+	        
+	    roapVPortIngressVTNewIVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN ID after translation."
+	        ::= { roapVPortIngressVTRuleEntry 6 }
+	        
+	    roapVPortIngressVTNewIVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN COS after translation."
+	        ::= { roapVPortIngressVTRuleEntry 7 }
+	        
+	    roapVPortIngressVTRowStatus  OBJECT-TYPE
+	        SYNTAX 			RowStatus
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Row status."
+	        ::= { roapVPortIngressVTRuleEntry 8 } 
+
+	        
+	    roapVPortIngressVTSVlanIdHighBound  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"SVLAN ID high bound."
+	        ::= { roapVPortIngressVTRuleEntry 9 }
+	        
+-- VLAN translation rule on VPort egress direction
+
+	roapVPortEgressVTRuleTable OBJECT-TYPE
+	 	SYNTAX      SEQUENCE OF RoapVPortEgressVTRuleEntry
+	 	MAX-ACCESS      not-accessible
+        STATUS          current
+	 	DESCRIPTION     "A table of	egress VPort VLAN translation administration."
+	 	::=	{ roapVPortCfgMib 5 }
+
+     roapVPortEgressVTRuleEntry  OBJECT-TYPE
+		SYNTAX          RoapVPortEgressVTRuleEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapVPortEgressVTRuleTable."
+		INDEX { roapVPortIndex, roapVPortEgressVTSVlanId, roapVPortEgressVTCVlanId }
+		::= { roapVPortEgressVTRuleTable 1 }
+		
+	RoapVPortEgressVTRuleEntry ::=	SEQUENCE {
+		roapVPortEgressVTSVlanId           INTEGER,
+		roapVPortEgressVTCVlanId           INTEGER,
+		roapVPortEgressVTCVlanAction       INTEGER,
+		roapVPortEgressVTNewOVID           INTEGER,
+		roapVPortEgressVTNewOVlanCos       INTEGER,
+		roapVPortEgressVTNewIVID           INTEGER,
+		roapVPortEgressVTNewIVlanCos       INTEGER,
+		roapVPortEgressVTRowStatus         RowStatus
+		}		
+        
+        roapVPortEgressVTSVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"SVLAN ID."
+	        ::= { roapVPortEgressVTRuleEntry 1 }
+        
+        roapVPortEgressVTCVlanId  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..4094)
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"CVLAN ID."
+	        ::= { roapVPortEgressVTRuleEntry 2 }
+        
+        roapVPortEgressVTCVlanAction  OBJECT-TYPE
+	        SYNTAX 			INTEGER  {
+	        					unchange(1),
+	        					add(2),
+	        					remove(3),
+	        					change(4)
+	        					}
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"CVLAN translation action."
+	        ::= { roapVPortEgressVTRuleEntry 3 }
+       
+       roapVPortEgressVTNewOVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN ID after translation."
+	        ::= { roapVPortEgressVTRuleEntry 4 }
+	        
+	    roapVPortEgressVTNewOVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Outer VLAN COS after translation."
+	        ::= { roapVPortEgressVTRuleEntry 5 }
+	        
+	    roapVPortEgressVTNewIVID  OBJECT-TYPE
+	        SYNTAX 			INTEGER (1..4094)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN ID after translation."
+	        ::= { roapVPortEgressVTRuleEntry 6 }
+	        
+	    roapVPortEgressVTNewIVlanCos  OBJECT-TYPE
+	        SYNTAX 			INTEGER (0..7)
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Inner VLAN COS after translation."
+	        ::= { roapVPortEgressVTRuleEntry 7 }
+	        
+	    roapVPortEgressVTRowStatus  OBJECT-TYPE
+	        SYNTAX 			RowStatus
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Row status."
+	        ::= { roapVPortEgressVTRuleEntry 8 }
+
+END

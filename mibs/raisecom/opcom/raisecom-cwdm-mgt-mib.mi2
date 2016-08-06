@@ -1,0 +1,459 @@
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2011/12/10, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+-----------------------------------------------------------------------------
+--
+-- RAISECOM base management objects
+--            
+
+RAISECOM-CWDM-MGT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE,
+		ponSeries
+			FROM RAISECOM-PONSERIES-BASE-MIB		
+		ifIndex                                                     
+          	FROM IF-MIB
+		raisecomSlotId
+		  	FROM RAISECOM-PON-DEVICE-MIB;
+
+	raisecomCwdmMgt    MODULE-IDENTITY
+		LAST-UPDATED 	"201112100000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for cwdm cards."
+		::= { ponSeries  7}        
+	
+	raisecomCwdmMgtGroup OBJECT IDENTIFIER ::= {raisecomCwdmMgt 1}
+	
+				
+    rcGempCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcGempCardEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"A list of  rcGempCardEntry entries."
+           	::= { raisecomCwdmMgtGroup 1 }
+
+    rcGempCardEntry OBJECT-TYPE
+        SYNTAX RcGempCardEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"The rcGempCardTable entry."
+        INDEX { raisecomSlotId }
+           	::= { rcGempCardTable 1 }
+	
+	RcGempCardEntry ::= SEQUENCE {
+        rcGempCardWorkingStatus 	INTEGER, 
+        rcGempCardSwitchMode		INTEGER,
+        rcGempCardRevertive  		INTEGER,
+        rcGempCardWaitToRestore		INTEGER,
+        rcGempCardSwitchDelay       INTEGER,
+        rcGempCardSwitchDelayTime   INTEGER,  
+        rcGempCardTransferMode      INTEGER,
+        rcGempCardBandwidthRatio    OCTET STRING
+        }
+                      	
+	rcGempCardWorkingStatus OBJECT-TYPE
+        SYNTAX INTEGER
+		{
+			unknown(1),
+			priMUX(2),
+			secMUX(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 工作口指示（1:未知, 2：主用通道，3：备用通道）
+		"
+			::= { rcGempCardEntry 1 } 
+
+	rcGempCardSwitchMode OBJECT-TYPE
+        SYNTAX INTEGER
+		{
+			auto(1),
+			priMUX(2),
+			secMUX(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 通道切换模式（1：自动，2：主用通道，3：备用通道）
+		"
+          	::= { rcGempCardEntry 2 } 
+    
+
+    rcGempCardRevertive OBJECT-TYPE
+        SYNTAX INTEGER
+		{
+       		nonrevertive(1),
+       		revertive(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 光开关工作模式（1：非返回模式，2：自动返回模式）
+		"
+          	::= { rcGempCardEntry 3 } 
+
+          	  
+    rcGempCardWaitToRestore OBJECT-TYPE
+        SYNTAX INTEGER
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 光开关自动返回时间（0-255min,默认12min ）
+		"
+          	::= { rcGempCardEntry 4 } 
+
+    rcGempCardSwitchDelay OBJECT-TYPE
+        SYNTAX INTEGER
+		{
+       		enable(1),
+       		disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 光开关切换延时设置（1：延时，2：非延时）
+		"
+          	::= { rcGempCardEntry 5 }
+
+    rcGempCardSwitchDelayTime OBJECT-TYPE
+        SYNTAX INTEGER
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 光开关切换延时时间（0-255s，默认0s）
+		"
+          	::= { rcGempCardEntry 6 }
+          	         	
+    rcGempCardTransferMode OBJECT-TYPE
+        SYNTAX INTEGER 
+		{   
+			unknown(1),
+		 	mode_4gemp(2),
+		 	mode_2x2gem(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"
+		  -- 业务传输模式设置 
+		   	4gemp: 4路客户侧GE接口业务复用到线路侧GE口，2路线路侧GE口互为保护的模式
+ 			2x2gem: 4路客户侧GE接口业务分别复用到线路侧的2个GE接口，线路接口独立传输业务
+
+		"
+          	::= { rcGempCardEntry 7 }  
+    
+    rcGempCardBandwidthRatio OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..64))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"
+			opcom600-4gemp eg :ge1-ge2 1:9 # ge3-ge4 5:5	
+		"
+          	::= { rcGempCardEntry 8 }
+          	
+          	
+	rcGempCardInterfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcGempCardInterfaceEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"A list of  rcGempCardInterfaceEntry entries."
+           	::= { raisecomCwdmMgtGroup 2 }
+
+    rcGempCardInterfaceEntry OBJECT-TYPE
+        SYNTAX RcGempCardInterfaceEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"The rcGempCardInterfaceTable entry."
+        INDEX { ifIndex }
+           	::= { rcGempCardInterfaceTable 1 }
+	
+	RcGempCardInterfaceEntry ::= SEQUENCE {
+		rcGempCardIfFaultPass  		INTEGER,
+        rcGempCardIfLOA			 	INTEGER, 
+        rcGempCardIfLOL				INTEGER
+        }          	
+    
+    rcGempCardIfFaultPass OBJECT-TYPE
+        SYNTAX INTEGER
+       	{
+       		enable(1),
+       		disable(2)
+       	}       	
+       	MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+         "
+			故障转移
+         "
+			::= { rcGempCardInterfaceEntry 1 }    
+
+    rcGempCardIfLOA OBJECT-TYPE
+        SYNTAX INTEGER
+       	{
+			normal(1),
+			alarm(2)
+       	}       	
+       	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+         "
+           --光口LOA状态
+         "
+			::= { rcGempCardInterfaceEntry 2 } 	
+			
+    rcGempCardIfLOL OBJECT-TYPE
+        SYNTAX INTEGER
+       	{
+			normal(1),
+			alarm(2)
+       	}       	
+       	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+         "
+           --光口LOL状态
+         "
+			::= { rcGempCardInterfaceEntry 3 } 	
+
+	rcOmdCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcOmdCardEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"A list of  rcOmdCardEntry entries."
+           	::= { raisecomCwdmMgtGroup 3 }
+
+    rcOmdCardEntry OBJECT-TYPE
+        SYNTAX RcOmdCardEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           	"The rcOmdCardTable entry."
+        INDEX { raisecomSlotId }
+           	::= { rcOmdCardTable 1 }
+	
+	RcOmdCardEntry ::= SEQUENCE {
+		rcOmdCardOrderInfo  		INTEGER,
+        rcOmdCardChannelNum			INTEGER, 
+        rcOmdCardAttribute 			INTEGER,
+        rcOmdCardWaveLehgth			INTEGER
+        }          	
+    
+    rcOmdCardOrderInfo OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS     current    
+        DESCRIPTION 
+        "
+          订货信息.               																	
+                板卡型号				Bit 15~13	12~8	7~6		5~1			0   
+                OPCOM600-OMD4		   		010		00100	  11		11111		保留	
+                OPCOM600-OMU8		   		000		01000	  11		11111		保留  
+                OPCOM600-ODU8		   		001		01000		11		11111		保留  
+                OPCOM600-OMU9		   		000		01001		11		11111		保留           
+                OPCOM600-ODU9		   		001		01001		11		11111		保留  
+                OPCOM600-OMU18	  		000		10010		11		11111		保留  
+                OPCOM600-ODU18	  		001		10010		11		11111		保留  
+                OPCOM600-OMD2-SL			010		00010		00		11111		保留  
+                OPCOM600-OMD2-SR			010		00010		01		11111		保留  
+                OPCOM600-OMD3-SL			010		00011		00		11111		保留              
+                OPCOM600-OMD3-SR			010		00011		01		11111		保留  
+                OPCOM600-OMD4-SL			010		00100		00		11111		保留              
+                OPCOM600-OMD4-SR			010		00100		01		11111		保留  
+                OPCOM600-OMD5-SL			010		00101		00		11111		保留  
+                OPCOM600-OMD5-SR			010		00101		01		11111		保留  
+                OPCOM600-OAD1D-27			100		00001		11		00000		保留  
+                OPCOM600-OAD1D-29			100		00001		11		00001		保留  
+                OPCOM600-OAD1D-31			100		00001		11		00010		保留                
+                OPCOM600-OAD1D-33			100		00001		11		00011		保留  
+                OPCOM600-OAD1D-35			100		00001		11		00100		保留  
+                OPCOM600-OAD1D-37			100		00001		11		00101		保留  
+                OPCOM600-OAD1D-39			100		00001		11		00110		保留                
+                OPCOM600-OAD1D-41			100		00001		11		00111		保留               
+                OPCOM600-OAD1D-43			100		00001		11		01000		保留  
+                OPCOM600-OAD1D-45 		100		00001		11		01001		保留  
+                OPCOM600-OAD1D-47			100		00001		11		01010		保留  
+                OPCOM600-OAD1D-49			100		00001		11		01011		保留  
+                OPCOM600-OAD1D-51			100		00001		11		01100		保留  
+                OPCOM600-OAD1D-53			100		00001		11		01101		保留  
+                OPCOM600-OAD1D-55 		100		00001		11		01110		保留  
+                OPCOM600-OAD1D-57 		100		00001		11		01111		保留  
+                OPCOM600-OAD1D-59 		100		00001		11		10000		保留  
+                OPCOM600-OAD1D-61 		100		00001		11		10001		保留               
+                OPCOM600-OAD1S-27			101		00001		11		00000		保留  
+                OPCOM600-OAD1S-29			101		00001		11		00001		保留  
+                OPCOM600-OAD1S-31			101		00001		11		00010		保留  
+                OPCOM600-OAD1S-33			101		00001		11		00011		保留  
+                OPCOM600-OAD1S-35			101		00001		11		00100		保留  
+                OPCOM600-OAD1S-37			101		00001		11		00101		保留  
+                OPCOM600-OAD1S-39			101		00001		11		00110		保留                
+                OPCOM600-OAD1S-41			101		00001		11		00111		保留  
+                OPCOM600-OAD1S-43			101		00001		11		01000		保留  
+                OPCOM600-OAD1S-45			101		00001		11		01001		保留  
+                OPCOM600-OAD1S-47			101		00001		11		01010		保留  
+                OPCOM600-OAD1S-49			101		00001		11		01011		保留  
+                OPCOM600-OAD1S-51			101		00001		11		01100		保留               
+                OPCOM600-OAD1S-53			101		00001		11		01101		保留                
+                OPCOM600-OAD1S-55			101		00001		11		01110		保留	
+                OPCOM600-OAD1S-57			101		00001		11		01111		保留	
+                OPCOM600-OAD1S-59			101		00001		11		10000		保留	              
+                OPCOM600-OAD1S-61			101		00001		11		10001		保留	
+                OPCOM600-OAD1S-SL-27	101		00001		00		00000		保留  
+                OPCOM600-OAD1S-SL-31	101		00001		00		00010		保留  
+                OPCOM600-OAD1S-SL-35	101		00001		00		00100		保留  
+                OPCOM600-OAD1S-SL-39	101		00001		00		00110		保留  ,
+                OPCOM600-OAD1S-SL-43	101		00001		00		01000		保留  ,
+                OPCOM600-OAD1S-SL-47	101		00001		00		01010		保留  ,                
+                OPCOM600-OAD1S-SL-51	101		00001		00		01100		保留  ,
+                OPCOM600-OAD1S-SL-55	101		00001		00		01110		保留  ,
+                OPCOM600-OAD1S-SL-59	101		00001		00		10000		保留  ,
+                OPCOM600-OAD1S-SR-27	101		00001		01		00000		保留  ,
+                OPCOM600-OAD1S-SR-31	101		00001		01		00010		保留  ,
+                OPCOM600-OAD1S-SR-35	101		00001		01		00100		保留  ,
+                OPCOM600-OAD1S-SR-39	101		00001		01		00110		保留  
+                OPCOM600-OAD1S-SR-43	101		00001		01		01000		保留  ,
+                OPCOM600-OAD1S-SR-47	101		00001		01		01010		保留  ,
+                OPCOM600-OAD1S-SR-51	101		00001		01		01100		保留  ,
+                OPCOM600-OAD1S-SR-55	101		00001		01		01110		保留  ,
+                OPCOM600-OAD1S-SR-59	101		00001		01		10000		保留  ,
+
+        "
+			::= { rcOmdCardEntry 1 }    
+
+    rcOmdCardChannelNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS     current    
+        DESCRIPTION 
+        "
+        	设备的Channel number.
+        "
+			::= { rcOmdCardEntry 2 } 	
+			
+    rcOmdCardAttribute OBJECT-TYPE
+        SYNTAX  INTEGER{
+                    singleleft (1),
+                    singleright   (2),
+                    single  (3),
+                    double   (4)
+                    }
+        MAX-ACCESS read-only
+        STATUS     current    
+        DESCRIPTION 
+        "
+          设备的左右侧设备属性.
+          singleleft(1),单纤左侧
+          singleright(2),单纤右侧
+          single  (3),单纤（无左右侧属性）
+          double   (4)双纤（无左右侧属性）
+          
+        "
+			::= { rcOmdCardEntry 3 }
+			
+    rcOmdCardWaveLehgth OBJECT-TYPE
+        SYNTAX  INTEGER {
+        					unknownWavelength(1),
+        					w1271nm(2),
+							w1291nm(3),
+							w1311nm(4),
+							w1331nm(5),
+							w1351nm(6),
+							w1371nm(7),
+							w1391nm(8),
+							w1411nm(9),
+							w1431nm(10),
+							w1451nm(11),
+							w1471nm(12),
+							w1491nm(13),
+							w1511nm(14),
+							w1531nm(15),
+							w1551nm(16),
+							w1571nm(17),
+							w1591nm(18),
+							w1611nm(19),
+							multiWavelength(20)       
+        }
+        MAX-ACCESS read-only
+        STATUS     current    
+        DESCRIPTION 
+        "
+          设备的光波长.
+          	1保留
+					2~19 为波长，
+					20表示无波长属性，
+        "
+			::= { rcOmdCardEntry 4 }
+
+			
+	rcGempCardNotifyGroup OBJECT IDENTIFIER ::= {raisecomCwdmMgt 2}
+		
+	rcGempCardSwitchToSecTrap NOTIFICATION-TYPE
+		OBJECTS	{	
+					raisecomSlotId
+				}
+		STATUS 		current
+		DESCRIPTION
+		"
+			设备级工作通道切换--主用切换到备用
+		"
+		::= {rcGempCardNotifyGroup 1}
+
+	rcGempCardSwitchToPriTrap NOTIFICATION-TYPE
+		OBJECTS	{	
+					raisecomSlotId 
+				}
+		STATUS 		current
+		DESCRIPTION
+		"
+			设备级工作通道切换--备用切换到主用
+		"
+		::= {rcGempCardNotifyGroup 2}
+
+ 	rcGempCardIfLOLTrap NOTIFICATION-TYPE
+		OBJECTS	{	
+					ifIndex
+				}
+		STATUS 		current
+		DESCRIPTION
+		"   
+            接口LOL告警
+		"
+		::= {rcGempCardNotifyGroup 3}
+
+	rcGempCardIfLOLTrapOk NOTIFICATION-TYPE
+		OBJECTS	{	
+					ifIndex 
+				}
+		STATUS 		current
+		DESCRIPTION
+		"   
+            接口LOL告警恢复
+		"
+		::= {rcGempCardNotifyGroup 4}
+										  	        	          	
+END
+
+

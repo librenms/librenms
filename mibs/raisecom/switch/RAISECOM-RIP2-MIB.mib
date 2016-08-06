@@ -1,0 +1,679 @@
+-- *****************************************************************
+-- RAISECOM-RIP2-MIB.mib
+--
+-- January 2011, gaoyanxiang
+--
+-- Copyright(c) 2011-2013 by RAISECOM TECH, Ltd. 
+-- All rights reserved.   
+-- 01,20111231,yangkewei,ROS00008218,advent mib±‡“ÎºÏ≤È
+-- *****************************************************************
+
+--MibName=rcRip
+RAISECOM-RIP2-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+        Integer32, IpAddress                     FROM SNMPv2-SMI
+        RowStatus, TruthValue                    FROM SNMPv2-TC 
+        EnableVar		                         FROM SWITCH-TC
+                
+        raisecomAgent	            	         FROM RAISECOM-BASE-MIB
+         
+        ifIndex                                  FROM RFC1213-MIB  
+        rip2IfStatAddress                        FROM RIPv2-MIB;
+
+    raisecomRip2 MODULE-IDENTITY
+        LAST-UPDATED    "201101100000Z"  -- Jan 10, 2011
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO    
+                "       Raise Systems        
+                        Postal: Beijing, China
+                        Tel: 86-010-82884499
+                        E-mail: support@raisecom.com"
+
+        DESCRIPTION     "This MIB module defines objects to RIP."
+
+        REVISION        "201101100000Z"  -- Jan 10, 2011  
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { raisecomAgent 32}
+
+------------------------------------------------------------------------------
+--  Define groups in RAISECOM-RIP2-MIB
+------------------------------------------------------------------------------
+
+    raisecomRip2Notifications        OBJECT IDENTIFIER ::= { raisecomRip2 1 } 
+    raisecomRip2Objects              OBJECT IDENTIFIER ::= { raisecomRip2 2 } 
+    raisecomRip2Conformance          OBJECT IDENTIFIER ::= { raisecomRip2 3 } 
+ 
+------------------------------------------------------------------------------
+--
+--   raisecomRip2Notifications 
+--   
+--   This group defines the traps related to RIP.
+------------------------------------------------------------------------------
+    raisecomRip2LastKeyExpirationTrap    NOTIFICATION-TYPE
+    OBJECTS { ifIndex, raisecomRip2IfConfAuthKeyChain }
+    STATUS current
+    DESCRIPTION
+          "This trap will notify the network manager that the last 
+          key associated with an interface expires."
+    ::= { raisecomRip2Notifications 1 }
+ 
+    raisecomRip2KeyValidTrap    NOTIFICATION-TYPE
+    OBJECTS { ifIndex, raisecomRip2IfConfAuthKeyChain }
+    STATUS current
+    DESCRIPTION
+          "This trap will notify the network manager that some key associated with an interface recovers valid."
+    ::= { raisecomRip2Notifications 2 }
+
+ 
+------------------------------------------------------------------------------
+--
+--   raisecomRip2Objects 
+--   
+--   This group defines all the objects related to RIP.
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--  Define groups in raisecomRip2Objects
+------------------------------------------------------------------------------
+
+    raisecomRip2ScalarGroup             OBJECT IDENTIFIER ::= { raisecomRip2Objects 1 }
+    raisecomRip2InterfaceConfigGroup    OBJECT IDENTIFIER ::= { raisecomRip2Objects 2 }
+    raisecomRip2InterfaceStatisticGroup OBJECT IDENTIFIER ::= { raisecomRip2Objects 3 }
+    raisecomRip2NetConfigGroup          OBJECT IDENTIFIER ::= { raisecomRip2Objects 4 }
+    raisecomRip2RouteGroup              OBJECT IDENTIFIER ::= { raisecomRip2Objects 5 } 
+
+------------------------------------------------------------------------------    
+
+        raisecomRip2Enabled  OBJECT-TYPE
+        SYNTAX EnableVar        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value of RIP administrative status. A value of 
+            enable(1) indicates that router should enable RIP. 
+            Disable(2) indicates that router should disable RIP." 
+        DEFVAL {disable}
+        ::= { raisecomRip2ScalarGroup 1 }  
+        
+        
+        raisecomRip2Version  OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    none(0),
+                    rip1(1),
+                    rip2(2)
+                    }
+        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Config the global RIP version. 
+             None(0) indicates that an interface without being configed 
+             send-version can send RIP version 1 packets and can receive 
+             any RIP version packets if it is not configed receive-version.
+
+             Rip1(1) means an interface without being configed send-version
+             can only send RIP version 1 packets and only receive RIP 
+             version 1 packets if it is not configed receive-version. 
+
+             Rip2(2) means an interface without being configed send-version 
+             can only send RIP version 2 packets by multicast and only 
+             receive RIP version 2 packets if it is not configed receive-version." 
+        DEFVAL {none}
+        ::= { raisecomRip2ScalarGroup 2 }
+
+        raisecomRip2SourceAddressValidated  OBJECT-TYPE
+        SYNTAX EnableVar        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative status of validating source IP address. 
+            A value of enable(1) indicates that router should validate 
+            the source IP address of incoming routing updates for RIP. 
+            disable(2) indicates that validation should not performed." 
+        DEFVAL {enable}
+        ::= { raisecomRip2ScalarGroup 3 }
+
+
+        raisecomRip2HostRouteAccepted  OBJECT-TYPE
+        SYNTAX EnableVar        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative status of accepting host routes. A value 
+            of enable(1) indicates that router should accept the host 
+            route entry in the RIP-2 packet; disable(2) indicates that 
+            router should ignore the host route entry." 
+        DEFVAL {enable}
+        ::= { raisecomRip2ScalarGroup 4 }
+
+
+        raisecomRip2AdminDistance  OBJECT-TYPE
+        SYNTAX Integer32 (1..255)        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative distance of RIP protocol." 
+        DEFVAL {120}
+        ::= { raisecomRip2ScalarGroup 5 }
+
+        raisecomRip2TimerUpdate  OBJECT-TYPE
+        SYNTAX Integer32 (1..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Rate, in seconds, at which the RIP process sends an unsolicited 
+            Response message containing the complete routing table to every 
+            neighboring router.  "  
+        DEFVAL {30}
+        ::= { raisecomRip2ScalarGroup 6 }
+        
+        raisecomRip2TimerInvalid  OBJECT-TYPE
+        SYNTAX Integer32 (1..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "After the time a route is declared invalid; it should be at least 
+            three times the value of the update argument. A route becomes 
+            invalid when there is an absence of updates that refresh the route. 
+            The route then enters into a holddown state. The route is marked 
+            inaccessible and is advertised as unreachable.  "  
+        DEFVAL {180}
+        ::= { raisecomRip2ScalarGroup 7 }    
+        
+        raisecomRip2TimerFlush  OBJECT-TYPE
+        SYNTAX Integer32 (1..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The garbage-collection timer is initialized when a route is 
+            unreachable. Upon expiration of the garbage-collection timer, the 
+            route is finally removed from the routing table. " 
+        DEFVAL {120}    
+        ::= { raisecomRip2ScalarGroup 8 }  
+        
+        raisecomRip2TimerSuppress  OBJECT-TYPE
+        SYNTAX Integer32 (0..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "During the time routing information regarding better paths is 
+            suppressed. It should be at least three times the value of the 
+            update argument. A route enters into a holddown state when an 
+            update packet is received that indicates that the route is 
+            unreachable. The route is marked inaccessible and is advertised 
+            as unreachable. When holddown expires, routes advertised by other 
+            sources are accepted, and the route is no longer inaccessible. " 
+        DEFVAL {120}    
+        ::= { raisecomRip2ScalarGroup 9 }   
+                
+        raisecomRip2DatabaseClear  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The flag of clearing RIP routing database. When set the value as 
+            true(1), the router should clear all the route entries from RIP 
+            routing database except the directly-connected routes."  
+        DEFVAL {false}
+        ::= { raisecomRip2ScalarGroup 10 }  
+        
+        raisecomRip2StatisticsClear  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The flag of clearing RIP statistics. When set the value as true(1), 
+            the router should clear all the RIP statistics, including the global 
+            statistics and the statistics of all the IP interface."  
+        DEFVAL {false}
+        ::= { raisecomRip2ScalarGroup 11 } 
+        
+        raisecomRip2TrapEnable  OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch controls whether to send trap when the last key associated
+             with an interface expires. Disable(2) indicates that trap notifying 
+             the last key expries or the key recovers valid will never be sent. 
+             Enable(1) indicates that trap notifying the last key expires or the 
+             key recovers will be sent automatically."  
+        DEFVAL {disable}
+        ::= { raisecomRip2ScalarGroup 12 } 
+                          
+------------------------------------------------------------------------------
+--
+--  rcRip2IfConfigTable 
+--
+--  This Table defines the RIP configuration info in IP interface.
+--
+------------------------------------------------------------------------------
+
+    raisecomRip2IfConfTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RaisecomRip2IfConfEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of entries which conserve the RIP configuraton info for each interface."
+       ::= { raisecomRip2InterfaceConfigGroup 1 }
+
+    raisecomRip2IfConfEntry OBJECT-TYPE
+       SYNTAX   RaisecomRip2IfConfEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "Defines an entry in the rcRip2IfConfigTable."
+       AUGMENTS {ifIndex}
+       ::= { raisecomRip2IfConfTable 1 }
+
+    RaisecomRip2IfConfEntry ::=
+        SEQUENCE {
+            raisecomRip2IfConfPassiveInterface          EnableVar,
+            raisecomRip2IfConfSendVersion               INTEGER,
+            raisecomRip2IfConfReceiveVersion            INTEGER,
+            raisecomRip2IfConfAuthMode                  INTEGER,
+            raisecomRip2IfConfInputMetricOffset         Integer32, 
+            raisecomRip2IfConfOutputMetricOffset        Integer32,
+            raisecomRip2IfConfSplitHorizon              EnableVar,
+            raisecomRip2IfConfPoisonReverse             EnableVar,
+            raisecomRip2IfConfDatabaseClear             TruthValue,
+            raisecomRip2IfConfStatisticClear            TruthValue,
+            raisecomRip2IfConfAuthKeyChain              OCTET STRING
+    }
+
+        raisecomRip2IfConfPassiveInterface OBJECT-TYPE
+        SYNTAX    EnableVar
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The passive interface can only receive RIP packets£¨but 
+           can not send RIP packets. Disable(2) indicates the interface 
+           is not passive. Enable(1) indicates the interface is passive."  
+        DEFVAL {disable}
+        ::= { raisecomRip2IfConfEntry 1 }    
+       
+        raisecomRip2IfConfSendVersion OBJECT-TYPE
+        SYNTAX    INTEGER {
+                    none(0),
+                    rip1(1),
+                    rip1Compatible(2),
+                    rip2(3)
+                    }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Configure the RIP interface to send version-specific packets.
+            None(0) implies sending RIP updates compliant with the global version.
+            rip1(1) implies sending RIP updates compliant with  RFC  1058.   
+            rip1Compatible(2) implies broadcasting RIP-2 updates using 
+            RFC 1058 route subsumption rules.  
+            rip2(3) implies multicasting RIP-2 updates. " 
+        DEFVAL {none}
+        ::= { raisecomRip2IfConfEntry 2 }
+
+        raisecomRip2IfConfReceiveVersion OBJECT-TYPE
+        SYNTAX    INTEGER {
+                    none(0),
+                    rip1(1),
+                    rip2(2),
+                    rip1OrRip2(3)
+                    }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Configure the RIP interface to accept version-specific packets.
+            none implies receiving RIP updates compliant with the global version.
+            rip1(1) implies receiving RIP-1 packets.   
+            rip2(2) implies receiving RIP-2 packets.  
+            rip1OrRip2(3) implies receiving any RIP packets."
+        DEFVAL {none}    
+        ::= { raisecomRip2IfConfEntry 3 }
+
+        raisecomRip2IfConfAuthMode OBJECT-TYPE
+        SYNTAX    INTEGER {
+                    noAuthentication(1),
+                    simplePassword(2),
+                    md5(3)
+                   }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The type of Authentication used on this interface. The default value 
+           is noAuthentication(1) implies that the RIP version 2 packet without 
+           authentication will be sent or received on the interface. 
+           SimplePassword(2) implies the RIP version 2 packet with text authentication 
+           will be sent or received on the interface. Md5(3) implies the RIP version 2 
+           packet with Keyed MD5 authentication will be sent or received on the interface." 
+        DEFVAL {noAuthentication}   
+        ::= { raisecomRip2IfConfEntry 4 }
+
+        raisecomRip2IfConfInputMetricOffset OBJECT-TYPE
+        SYNTAX     Integer32 (0..15)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The offset value to be added to the incoming route's metric."
+        DEFVAL {1}    
+        ::= { raisecomRip2IfConfEntry 5 }
+
+        raisecomRip2IfConfOutputMetricOffset OBJECT-TYPE
+        SYNTAX     Integer32 (0..15)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The offset value to be added to the outgoing route's metric." 
+        DEFVAL {0}   
+        ::= { raisecomRip2IfConfEntry 6 }
+
+        raisecomRip2IfConfSplitHorizon OBJECT-TYPE
+        SYNTAX      EnableVar
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "It is a switch of the IP interface, which indicates the 
+           enable status of Split Horizon function."  
+        DEFVAL {enable}  
+        ::= { raisecomRip2IfConfEntry 7 }
+
+        raisecomRip2IfConfPoisonReverse OBJECT-TYPE
+        SYNTAX       EnableVar
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "It is a swtich of the IP interface, which indicates 
+           the enable status of Poison Reverse function."  
+        DEFVAL {disable}    
+        ::= { raisecomRip2IfConfEntry 8 }
+
+
+        raisecomRip2IfConfDatabaseClear OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The flag of clearing RIP routes on this IP interface. 
+           When set the value as true(1), the router should clear 
+           the route entries associated with this IP interface from 
+           RIP routing database except the directly-connected routes." 
+        DEFVAL {false}   
+        ::= { raisecomRip2IfConfEntry 9 }
+
+        raisecomRip2IfConfStatisticClear OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The flag of clearing RIP statistics on this IP interface. 
+           When set the value as true(1), the router should clear the 
+           RIP statistics on this IP interface."   
+        DEFVAL {false}   
+        ::= { raisecomRip2IfConfEntry 10 }  
+        
+        raisecomRip2IfConfAuthKeyChain OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(0..16))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Configure the authentication key-chain for the IP interface."   
+        DEFVAL {''h}   
+        ::= { raisecomRip2IfConfEntry 11 }
+
+------------------------------------------------------------------------------
+--
+--  rcRip2IfStatisticTable 
+--
+--  This Table defines the extension of RIP statistics for subnets.
+--
+------------------------------------------------------------------------------
+
+    raisecomRip2IfStatsTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RaisecomRip2IfStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of subnets which require separate
+           status monitoring in RIP."
+       ::= { raisecomRip2InterfaceStatisticGroup 1 }
+
+    raisecomRip2IfStatsEntry OBJECT-TYPE
+       SYNTAX   RaisecomRip2IfStatsEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "Defines an entry in the rcRip2IfStatisticTable."
+       AUGMENTS {rip2IfStatAddress}
+       ::= { raisecomRip2IfStatsTable 1 }
+
+    RaisecomRip2IfStatsEntry ::=
+        SEQUENCE {
+                 raisecomRip2IfStatsRecvValid          Counter32
+                 }
+
+        raisecomRip2IfStatsRecvValid OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of valid RIP response packets received 
+           by the RIP process."  
+        ::= { raisecomRip2IfStatsEntry 1 }   
+         
+-------------------------------------------------------------------------------------
+--
+--  rcRip2NetConfigTable 
+--
+--  This Table defines the directly-connected networks which enable the RIP function. 
+--
+-------------------------------------------------------------------------------------
+
+raisecomRip2NetConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RaisecomRip2NetConfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of directly-connected networks which enable the RIP function."
+    ::=  { raisecomRip2NetConfigGroup 1 }                                                             
+
+raisecomRip2NetConfEntry OBJECT-TYPE
+    SYNTAX RaisecomRip2NetConfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Defines an entry in the rcRip2NetConfigTable."
+    INDEX { raisecomRip2NetConfNetwork }
+    ::=  { raisecomRip2NetConfTable 1 }
+
+    RaisecomRip2NetConfEntry ::= SEQUENCE {
+          raisecomRip2NetConfNetwork		    IpAddress, 
+          raisecomRip2NetConfRowStatus		    RowStatus
+    }
+
+    raisecomRip2NetConfNetwork  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The number of valid RIP network. It must be 
+        Natural Network Number except special Network Number."
+    ::=  { raisecomRip2NetConfEntry 1 }
+                                     
+
+    raisecomRip2NetConfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        " The row status of the Network configuration table."
+    ::=  { raisecomRip2NetConfEntry 2 }
+
+-------------------------------------------------------------------------------------
+--
+--  rcRip2RouteTable 
+--
+--  This Table defines the RIP routes' info. 
+--
+-------------------------------------------------------------------------------------
+
+raisecomRip2RouteTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RaisecomRip2RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of RIP routes."
+    ::=  { raisecomRip2RouteGroup 1 }                                                             
+
+raisecomRip2RouteEntry OBJECT-TYPE
+    SYNTAX RaisecomRip2RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Defines info of one RIP route."
+    INDEX { raisecomRip2RouteDest, raisecomRip2RouteMask, raisecomRip2RouteNextHop }
+    ::=  { raisecomRip2RouteTable 1 }
+
+    RaisecomRip2RouteEntry ::= SEQUENCE {
+          raisecomRip2RouteDest		      IpAddress,
+          raisecomRip2RouteMask           IpAddress, 
+          raisecomRip2RouteNextHop        IpAddress, 
+          raisecomRip2RouteLearnFrom      IpAddress,
+          raisecomRip2RouteIfIndex        INTEGER,
+          raisecomRip2RouteMetric         Integer32,
+          raisecomRip2RouteProtoType      INTEGER,
+          raisecomRip2RouteStatus         BITS,
+          raisecomRip2RouteTimer          Integer32
+          }
+
+    raisecomRip2RouteDest  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The destination IP address of the RIP route.  An entry with 
+        a value of 0.0.0.0 is considered a default route."
+    ::=  { raisecomRip2RouteEntry 1 }   
+    
+    raisecomRip2RouteMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicate the mask to be logical-ANDed with the destination address
+         before being compared to the value in the ipRouteDest field. 
+         For those systems that do not support arbitrary subnet masks, an 
+         agent constructs the value of the ipRouteMask by determining whether 
+         the value of the correspondent ipRouteDest field belong to a class-A, 
+         B, or C network, and then using one of:
+         mask           network
+         255.0.0.0      class-A
+         255.255.0.0    class-B
+         255.255.255.0  class-C
+
+         If the value of the ipRouteDest is 0.0.0.0 (a default route), then the 
+         mask value is also 0.0.0.0."
+    ::=  { raisecomRip2RouteEntry 2 }
+
+
+    raisecomRip2RouteNextHop  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of the next hop of this route.
+        (In the case of a route bound to an interface which is realized via a broadcast 
+        media, the value of this field is the agent's IP address on that interface.)"
+    ::=  { raisecomRip2RouteEntry 3 }
+
+
+    raisecomRip2RouteLearnFrom  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of this node is the source address of an RIP update packet from which 
+        this route is learned."
+    ::=  { raisecomRip2RouteEntry 4 }
+
+
+    raisecomRip2RouteIfIndex  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which uniquely identifies the local interface through which the 
+        next hop of this route should be reached.  The interface identified by a particular 
+        value of this index is the same interface as identified by the same value of ifIndex."
+    ::=  { raisecomRip2RouteEntry 5 }
+
+
+    raisecomRip2RouteMetric  OBJECT-TYPE
+    SYNTAX Integer32 (0..16)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The routing metric for the RIP route."
+    ::=  { raisecomRip2RouteEntry 6 }
+
+
+    raisecomRip2RouteProtoType  OBJECT-TYPE
+    SYNTAX INTEGER{
+                   other(1),                       
+                   local(2),                   
+                   netmgmt(3), 
+                   icmp(4),
+                   egp(5),
+                   ggp(6),
+                   hello(7),
+                   rip(8),
+                   is-is(9),
+                   es-is(10),
+                   ciscoIgrp(11),
+                   bbnSpfIgp(12),
+                   ospf(13),
+                   bgp(14), 
+                   directly-connected(15),
+                   static(16)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The routing mechanism via which the RIP route was generated. "
+    ::=  { raisecomRip2RouteEntry 7 }
+
+
+    raisecomRip2RouteStatus  OBJECT-TYPE
+    SYNTAX BITS{
+                    permenant(1),
+                    aging(2),
+                    suppress(3),
+                    flush(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of this node indicates the current status of the RIP route.
+        A value of permenant(1) implies the route would never be aged. 
+        Aging(2) indicates the route is being aged expecting the updates to 
+        refresh it. 
+        Suppress(3) indicates a route enters into a holddown state so that 
+        route is marked inaccessible and is advertised as unreachable.
+        Flush(4) indicates the route will be removed from the routing table 
+        unless it is be refreshed by updates."
+    ::=  { raisecomRip2RouteEntry 8 }
+
+
+    raisecomRip2RouteTimer  OBJECT-TYPE
+    SYNTAX Integer32 (0..3600)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of this node indicates the time of timer associated with 
+        a RIP route. And by the value of rcRip2RouteStatus we can identify 
+        the timer."
+    ::=  { raisecomRip2RouteEntry 9 }
+
+
+
+END

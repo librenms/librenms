@@ -1,0 +1,106 @@
+--MibName=rcAttackDefense
+-- *****************************************************************
+-- RAISECOM-ATTACKDEFNSE-MIB.MIB:  Raisecom Bandwidth Manage MIB file
+--
+-- Dec 2014, yanzhijie
+--
+-- Copyright (c) 1994-2000, 2001 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+SWITCH-ATTACKDEFENSE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS 
+       raisecomSwitchMgt      FROM RAISECOM-PONSERIES-BASE-MIB
+       RowStatus              FROM SNMPv2-TC
+       EnableVar              FROM SWITCH-TC 
+       InterfaceIndex         FROM IF-MIB;
+                 
+       roapAttackDefenseCfg MODULE-IDENTITY
+	       LAST-UPDATED    "201205020000Z"
+	       ORGANIZATION    "Raisecom, Inc."
+	       CONTACT-INFO
+	                       "Raise Systems
+	                        
+	                        Postal: Beijing,
+	                        China
+	
+	                        Tel: 86-010-82884499
+	
+	                        E-mail: yanzhijie@raisecom.com"
+	       DESCRIPTION
+	                       "description of rate limit manage object."
+       ::= { raisecomSwitchMgt 28}           
+       
+--rcAttackDefenseCfg 
+
+------------------------------------------------------------------------------
+--	define groups in swtich-attackdefense-mib
+------------------------------------------------------------------------------
+	roapDefenseSinglePacketAttack	OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 1 }
+	roapDefenseScanAttack		    OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 2 }
+	roapDefenseFloodAttack	        OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 3 }
+	roapDefenseArpAttack            OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 4 } 	
+	roapDefenseTcpAttack            OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 5 }
+	roapDefenseUrpfAttack           OBJECT IDENTIFIER ::= { roapAttackDefenseCfg 6 }  
+------------------------------------------------------------------------------
+--
+-- roapDefenseSinglePacketAttack 
+--                     
+	roapDefenseSinglePacketAttackGroup   OBJECT IDENTIFIER ::= { roapDefenseSinglePacketAttack 1 }
+	
+	roapDefenseLandAttackAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The administration status of the land attack."
+		DEFVAL { disable }
+			::= { roapDefenseSinglePacketAttackGroup 1 }
+     
+	roapDefenseSmurfAttachAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The administration status of smurf attack."
+		DEFVAL { disable }
+			::= { roapDefenseSinglePacketAttackGroup 2 }
+
+
+   	roapDefenseLargeIcmpAttackGroup      OBJECT IDENTIFIER ::= { roapDefenseSinglePacketAttack 2 }
+    
+    roapDefenseLargeIcmpAttackAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The administration status of large icmp attack."
+		DEFVAL { disable }
+			::= { roapDefenseLargeIcmpAttackGroup 1 }
+			
+			
+	roapDefenseLargeIcmpAttackSize OBJECT-TYPE
+		SYNTAX Integer32(256..2048)
+		UNITS  "Byte"
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The largest icmp packet length that allows pass from device."
+		DEFVAL { 1024 }
+			::= { roapDefenseLargeIcmpAttackGroup 2 }
+
+--
+-- roapDefenseUrpfAttack 
+--        
+	roapDefenseUrpfAttackGroup   OBJECT IDENTIFIER ::= { roapDefenseUrpfAttack 1 }
+    
+    roapDefenseUrpfAttackAdmin OBJECT-TYPE
+		SYNTAX EnableVar
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The administration status of urpf attack."
+		DEFVAL { disable }
+			::= { roapDefenseUrpfAttackGroup 1 }
+END

@@ -1,0 +1,248 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-onu-template-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.1
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--  History:
+--     initial version 2011-03-07
+--     V1.0 Mar 7, 2011, created by chenwei
+--     V1.1 Jul 7, 2011, modifed by luwentao,
+--     		Add  table rcEponOnuTemplateDeviceTable
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+    EPON-ONU-TEMPLATE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB
+        DisplayString   FROM SNMPv2-TC     
+        PortList        FROM SWITCH-TC;        
+        
+	rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+	rcEponOnuTemplateGroup          OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 36 }
+
+    rcEponOnuTemplateMngGroup       OBJECT IDENTIFIER ::= { rcEponOnuTemplateGroup 1 }
+------------------------------------------------------------------------------
+
+	rcEponOnuTemplateLoad OBJECT-TYPE
+        SYNTAX INTEGER  {ready(1),
+                        load(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateMngGroup 1 }
+        
+    rcEponOnuTemplateRestore OBJECT-TYPE
+    SYNTAX INTEGER  {ready(1),
+                    restore(2)
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "."
+    ::= { rcEponOnuTemplateMngGroup 2 }
+        
+    rcEponOnuTemplateTrapGroup      OBJECT IDENTIFIER ::= { rcEponOnuTemplateGroup 2 }
+------------------------------------------------------------------------------
+    
+	rcEponOnuTemplateLoadFailTrap       NOTIFICATION-TYPE
+        STATUS  		current
+        DESCRIPTION
+        "."
+        ::= { rcEponOnuTemplateTrapGroup 1 }
+       
+	rcEponOnuTemplateLoadSuccessTrap     NOTIFICATION-TYPE
+        STATUS  		current
+        DESCRIPTION
+        "."
+        ::= { rcEponOnuTemplateTrapGroup 2 }
+        
+	rcEponOnuTemplateRestoreFailTrap    NOTIFICATION-TYPE
+        STATUS  		current
+        DESCRIPTION
+        "."
+        ::= { rcEponOnuTemplateTrapGroup 3 }
+       
+	rcEponOnuTemplateRestoreSuccessTrap  NOTIFICATION-TYPE
+        STATUS  		current
+        DESCRIPTION
+        "."
+        ::= { rcEponOnuTemplateTrapGroup 4 }     
+                
+--
+-- rcEponOnuTemplateDeviceTable                    
+--   
+         
+	rcEponOnuTemplateDeviceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuTemplateDeviceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateGroup 3 }
+
+    rcEponOnuTemplateDeviceEntry OBJECT-TYPE
+        SYNTAX RcEponOnuTemplateDeviceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuTemplateDeviceType }
+        ::= { rcEponOnuTemplateDeviceTable 1 }
+   
+    RcEponOnuTemplateDeviceEntry ::= SEQUENCE {
+    	rcEponOnuTemplateDeviceType			INTEGER,
+        rcEponOnuTemplateDeviceName			DisplayString,
+        rcEponOnuTemplateDeviceProtectType  INTEGER,
+        rcEponOnuTemplateDeviceFeNum        INTEGER,
+        rcEponOnuTemplateDeviceFePortList   PortList,
+        rcEponOnuTemplateDeviceGeNum   		INTEGER,
+        rcEponOnuTemplateDeviceGePortList 	PortList,
+        rcEponOnuTemplateDeviceSerialNum    INTEGER,
+        rcEponOnuTemplateDevicePotsNum      INTEGER,
+        rcEponOnuTemplateDeviceTdmNum       INTEGER,
+        rcEponOnuTemplateDeviceCatvRfNum    INTEGER,
+        rcEponOnuTemplateDeviceCatvNniNum  	INTEGER,
+        rcEponOnuTemplateDevicePoePortList  PortList,  
+        rcEponOnuTemplateDevicePseGroupNum  INTEGER,
+        rcEponOnuTemplateDeviceOmciMng      INTEGER  
+        }  
+        
+	rcEponOnuTemplateDeviceType OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 1 }      
+        
+	rcEponOnuTemplateDeviceName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 2 }           
+        
+	rcEponOnuTemplateDeviceProtectType OBJECT-TYPE
+        SYNTAX INTEGER {unsupport(1),         	
+        				type_c(2),
+						type_d(3)}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 3 }      
+        
+	rcEponOnuTemplateDeviceFeNum OBJECT-TYPE
+        SYNTAX INTEGER(0..64)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 4 }
+                          
+	rcEponOnuTemplateDeviceFePortList OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 5 }
+
+	rcEponOnuTemplateDeviceGeNum OBJECT-TYPE
+        SYNTAX INTEGER(0..64)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 6 }
+              
+	rcEponOnuTemplateDeviceGePortList OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 7 }
+        
+	rcEponOnuTemplateDeviceSerialNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 8 }
+
+	rcEponOnuTemplateDevicePotsNum OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 9 }
+
+	rcEponOnuTemplateDeviceTdmNum OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 10 }     
+        
+	rcEponOnuTemplateDeviceCatvRfNum OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 11 }
+
+	rcEponOnuTemplateDeviceCatvNniNum OBJECT-TYPE
+        SYNTAX INTEGER(0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 12 }
+
+	rcEponOnuTemplateDevicePoePortList OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 13 }  
+        
+	rcEponOnuTemplateDevicePseGroupNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 14 }    
+        
+    rcEponOnuTemplateDeviceOmciMng OBJECT-TYPE
+        SYNTAX INTEGER  {
+        				unsupported(1),
+        				supported(2)
+        				}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuTemplateDeviceEntry 15 }
+
+END
