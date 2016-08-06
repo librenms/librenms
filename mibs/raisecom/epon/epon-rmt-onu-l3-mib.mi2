@@ -1,0 +1,112 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-l3-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Feb 22, 2011
+--  Author       : wangningning
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-L3-MIB DEFINITIONS ::= BEGIN 
+    
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus FROM SNMPv2-TC
+        EnableVar, Vlanset FROM SWITCH-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+                   
+	rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+        
+rcEponOnuL3Group           OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 35 } 
+
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuL3IpIfTable
+--
+    rcEponOnuL3IpIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuL3IpIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3Group 1 }
+
+    rcEponOnuL3IpIfEntry OBJECT-TYPE
+        SYNTAX RcEponOnuL3IpIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex, rcEponOnuL3IpIfIndex }
+        ::= { rcEponOnuL3IpIfTable 1 }
+
+    RcEponOnuL3IpIfEntry ::= SEQUENCE {
+        rcEponOnuL3IpIfIndex             INTEGER,
+        rcEponOnuL3IpIfAddress           IpAddress,
+        rcEponOnuL3IpIfMask              IpAddress,
+        rcEponOnuL3IpIfVlanList          Vlanset,
+        rcEponOnuL3IpIfDefaultGateway    IpAddress,
+        rcEponOnuL3IpIfRowStatus         RowStatus
+        }
+ 
+    rcEponOnuL3IpIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3IpIfEntry 1 } 
+    
+    rcEponOnuL3IpIfAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3IpIfEntry 2 }
+    
+    rcEponOnuL3IpIfMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3IpIfEntry 3 }
+    
+    rcEponOnuL3IpIfVlanList OBJECT-TYPE
+        SYNTAX Vlanset
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "T."
+        ::= { rcEponOnuL3IpIfEntry 4 }
+
+    rcEponOnuL3IpIfDefaultGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3IpIfEntry 5 }
+    
+    rcEponOnuL3IpIfRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuL3IpIfEntry 6 }
+
+END                                       

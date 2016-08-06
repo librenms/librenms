@@ -1,0 +1,226 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-pppoe-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Dec 20, 2010
+--  Author       : yanzhijie
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-PPPOE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        EnableVar FROM SWITCH-TC
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        rcEponOnuEthPortIndex FROM EPON-RMT-ONU-PORT-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuPppoeGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 32 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuPppoeAgentConfigTable
+--
+
+    rcEponOnuPppoeAgentConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPppoeAgentConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeGroup 1 }
+
+    rcEponOnuPppoeAgentConfigEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPppoeAgentConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuPppoeAgentConfigTable 1 }
+
+    RcEponOnuPppoeAgentConfigEntry ::= SEQUENCE {
+        rcEponOnuPPPoEAgentConfigAdmin              EnableVar,
+        rcEponOnuPPPoEAgentConfigUserDefSubOptAdmin EnableVar,
+        rcEponOnuPPPoEAgentConfigAttachString       OCTET STRING,
+        rcEponOnuPPPoEAgentConfigRemoteIdMode       INTEGER,
+        rcEponOnuPPPoEAgentConfigRemoteIdString     OCTET STRING
+       }
+
+    rcEponOnuPPPoEAgentConfigAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentConfigEntry 1 }
+
+    rcEponOnuPPPoEAgentConfigUserDefSubOptAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentConfigEntry 2 }
+
+   rcEponOnuPPPoEAgentConfigAttachString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..55))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentConfigEntry 3 }
+
+   rcEponOnuPPPoEAgentConfigRemoteIdMode OBJECT-TYPE
+        SYNTAX INTEGER{
+        		 onumac-binary(1),
+        		 clientmac-binary(2),
+        		 onumac-ascii(3),
+        		 clientmac-ascii(4),
+        		 user-defined(5)
+        		 }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentConfigEntry 4 }
+
+   rcEponOnuPPPoEAgentConfigRemoteIdString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentConfigEntry 5 }
+        
+--
+-- rcEponOnuPppoeAgentPortMgmtTable
+--
+
+    rcEponOnuPppoeAgentPortMgmtTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPppoeAgentPortMgmtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeGroup 2 }
+
+    rcEponOnuPppoeAgentPortMgmtEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPppoeAgentPortMgmtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuPppoeAgentPortMgmtTable 1 }
+
+    RcEponOnuPppoeAgentPortMgmtEntry ::= SEQUENCE {
+        rcEponOnuPPPoEAgentPortCircuitId  OCTET STRING,
+        rcEponOnuPPPoEAgentPortPolicy     INTEGER
+       }
+
+    rcEponOnuPPPoEAgentPortCircuitId OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentPortMgmtEntry 1 }
+
+    rcEponOnuPPPoEAgentPortPolicy OBJECT-TYPE
+        SYNTAX INTEGER{
+        		keep(1),
+        		replace(2)
+        		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentPortMgmtEntry 2 } 
+        
+--
+-- rcEponOnuPppoeAgentStatisticTable
+--
+
+    rcEponOnuPppoeAgentStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPppoeAgentStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeGroup 3 }
+
+    rcEponOnuPppoeAgentStatisticEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPppoeAgentStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuEthPortIndex }
+        ::= { rcEponOnuPppoeAgentStatisticTable 1 }
+
+    RcEponOnuPppoeAgentStatisticEntry ::= SEQUENCE {
+        rcEponOnuPppoeAgentStatisticClear     INTEGER,
+        rcEponOnuPppoeAgentStatisticPADISend  Counter32,
+        rcEponOnuPppoeAgentStatisticPADRSend  Counter32,
+        rcEponOnuPppoeAgentStatisticPADIRecv  Counter32,
+        rcEponOnuPppoeAgentStatisticPADRRecv  Counter32
+       }
+       
+    rcEponOnuPppoeAgentStatisticClear OBJECT-TYPE
+        SYNTAX INTEGER{
+        		ready(0),
+        		clear(1)
+        		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentStatisticEntry 1 }
+
+    rcEponOnuPppoeAgentStatisticPADISend OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentStatisticEntry 2 }
+
+    rcEponOnuPppoeAgentStatisticPADRSend OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentStatisticEntry 3 }
+
+    rcEponOnuPppoeAgentStatisticPADIRecv OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentStatisticEntry 4 }
+
+   rcEponOnuPppoeAgentStatisticPADRRecv OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPppoeAgentStatisticEntry 5 }
+    
+END

@@ -1,0 +1,224 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : roapIpDhcpOptionMib
+-- FILE NAME: switch-ipdhcpoption-mib.mib			
+-- DATE     : 2012/03/09						
+-- VERSION  : 1.00								
+-- PURPOSE  : 			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2012/03/09, xiaoyingjie
+-- This is the first formal version for universal MIB definition.  
+
+IP-DHCP-OPTION-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE                         FROM SNMPv2-SMI
+        
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+          
+    EnableVar        			        FROM SWITCH-TC
+   
+    raisecomSwitchMgt					FROM RAISECOM-PONSERIES-BASE-MIB;
+     
+	roapIpDhcpOption MODULE-IDENTITY
+        LAST-UPDATED    "201203090000Z"
+        ORGANIZATION    "Raisecom Technology Co., Ltd."
+        CONTACT-INFO
+              "raisecom
+               E-mail: raisecom@raisecom.com"
+
+        DESCRIPTION "dhcp option module management."
+        ::= { raisecomSwitchMgt 13 }
+  
+------------------------------------------------------------------------------
+-- define groups in roapIpDhcpOption
+------------------------------------------------------------------------------
+    roapIpDhcpOption82MibObjects	
+    	OBJECT IDENTIFIER ::= { roapIpDhcpOption 1 }
+    
+    roapIpDhcpOption82PortGroup		             	
+    	OBJECT IDENTIFIER ::= { roapIpDhcpOption82MibObjects 1 }
+    roapIpDhcpOption82ConfigGroup	
+    	OBJECT IDENTIFIER ::= { roapIpDhcpOption82MibObjects 2 }
+					
+    
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+-- begin-- roapIpDhcpOption82PortGroup--
+--------------------------------------------------------------------------
+roapIpDhcpOption82PortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpDhcpOption82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table keep record of circuit ID for every port."
+        ::= { roapIpDhcpOption82PortGroup 1 }
+
+roapIpDhcpOption82PortEntry OBJECT-TYPE
+        SYNTAX RoapIpDhcpOption82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch dhcp option config based on port."
+        INDEX {  roapIpDhcpOption82PortIndex }
+        ::= { roapIpDhcpOption82PortTable 1 }
+
+RoapIpDhcpOption82PortEntry ::= SEQUENCE 
+	{
+		roapIpDhcpOption82PortIndex INTEGER,     
+        roapIpDhcpOption82CircuitID	OCTET STRING (SIZE(1..64)),
+        roapIpDhcpOption82Policy	INTEGER,
+        roapIpDhcpOption82PolicyLen INTEGER
+    }
+
+roapIpDhcpOption82PortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index that uniquely identifies a configuration about dhcp option."
+        ::= { roapIpDhcpOption82PortEntry 1}
+                
+roapIpDhcpOption82CircuitID OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "string of circuit-ID in which you can fill anything you want. 
+            The maximum length is 64 bytes.If it not configged,it is zero.
+            if it configged,the OPTION82 will use it as circuit-id."
+        ::= { roapIpDhcpOption82PortEntry 2 }
+
+roapIpDhcpOption82Policy OBJECT-TYPE
+        SYNTAX      INTEGER{drop(1), keep(2), replace(3)}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Policy state of port.It has three values.The default value is replace(3)."
+        ::= { roapIpDhcpOption82PortEntry 3}
+
+roapIpDhcpOption82PolicyLen OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "when the value of roapIpDhcpOption82Policy is replace(3), the lentch will be replaced."
+        ::= { roapIpDhcpOption82PortEntry 4}
+      
+-- end--roapIpDhcpOption82PortGroup------------------------
+
+---------------------------------------------------
+-- begin--roapIpDhcpOption82ConfigGroup-----
+-- roapIpDhcpOption82ConfigGroup scale MIB--
+---------------------------------------------------
+roapIpDhcpOption82Enable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of global dhcp opton82. It has two values,
+            one is enable(1),which indicates that the system start dhcp snooping;
+            the other is disable(2) that means dhcp snooping is invalid in this system."
+        DEFVAL { disable }
+        ::= { roapIpDhcpOption82ConfigGroup 1 }
+
+
+
+
+
+
+
+
+
+        
+roapIpDhcpOption82AttachString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the string use in sub option 1,in this mode,the sub option
+            1 discribe as port-number\VID\AttachingSring ."
+        ::= { roapIpDhcpOption82ConfigGroup 2 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+roapIpDhcpOption82RemoteIDMode OBJECT-TYPE
+        SYNTAX INTEGER{switchmac(1), 
+                       clientmac(2),
+                       switchmac-string(3),
+                       clientmac-string(4),
+                       hostname(5),
+                       user-defined(6)
+                       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "mode of Remote-ID, switchmac:switch MAC as HEX;clientmac:client MAC as HEX;
+             switchmac-string:switch MAX as string;clientmac-string:client MAC as string; 
+             hostname:host name of device;user-defined:string of user set."
+        DEFVAL { switchmac }
+        ::= { roapIpDhcpOption82ConfigGroup 3 }
+
+roapIpDhcpOption82RemoteIDString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "string of remote ID, only used in user-define mode."
+
+        ::= { roapIpDhcpOption82ConfigGroup 4 }      
+        
+  roapIpDhcpOption18Enable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of global dhcp opton18. It has two values,
+            one is enable(1),which indicates that the system start dhcp snooping;
+            the other is disable(2) that means dhcp snooping is invalid in this system."
+        DEFVAL { disable }
+        ::= { roapIpDhcpOption82ConfigGroup 5 }    
+        
+roapIpDhcpOption37Enable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of global dhcp opton37. It has two values,
+            one is enable(1),which indicates that the system start dhcp snooping;
+            the other is disable(2) that means dhcp snooping is invalid in this system."
+        DEFVAL { disable }
+        ::= { roapIpDhcpOption82ConfigGroup 6 }     
+-- end--roapIpDhcpOption82ConfigGroup-------
+------------------------------------------------------------------------------
+          
+END

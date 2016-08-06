@@ -1,0 +1,740 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : raisecom-epon-system-v2-mib.mi2
+--  Description  : Raisecom EPON software mib defination 
+--  Version      : 1.0   
+--  Date         : July 10, 2007     
+--  Author		 : gaohongwei
+--  Copyright (c) 1999-2007 Beijing Raisecom Science & Technology Co.,ltd
+--  			  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-PON-SYS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32,  
+        NOTIFICATION-TYPE                   FROM SNMPv2-SMI
+        
+        MacAddress,
+        RowStatus,TruthValue                FROM SNMPv2-TC
+        
+        ifIndex                             FROM IF-MIB
+        
+        OBJECT-GROUP                        FROM SNMPv2-CONF                
+        raisecomEponMgt            			FROM RAISECOM-PONSERIES-BASE-MIB
+        EnableVar,DateAndTime				FROM SWITCH-TC
+        SlotIndex,OltPortIndex              FROM RAISECOM-PONSERIES-TC;
+                               
+    rcEponSystem MODULE-IDENTITY
+    
+        LAST-UPDATED    "200707100000Z"  -- July 10, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "Raisecom Science & Technology Co., ltd.
+                         E-mail: support@raisecom.com"
+
+        DESCRIPTION     "iscom EPON system MIB definition."
+
+        REVISION        "200707100000Z"  -- July 10, 2007
+        DESCRIPTION     "Initial MIB creation."
+
+                ::= { raisecomEponMgt 1 }
+
+rcEponCardGroup   OBJECT IDENTIFIER ::= { rcEponSystem 1 }  
+rcEponPONGroup    OBJECT IDENTIFIER ::= { rcEponSystem 2 }
+
+------------------------------------------------------------------------------
+
+-- rcEponCardGroup  
+    
+    rcEponCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponCardGroup 1 }
+
+    rcEponCardEntry OBJECT-TYPE
+        SYNTAX RcEponCardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponCardIndex }
+        ::= { rcEponCardTable 1 }
+                      
+    RcEponCardEntry ::= SEQUENCE {
+        rcEponCardIndex               			SlotIndex,
+        rcEponCardSupportedNumberOfONUsPerPON   INTEGER,
+        rcEponCardTripleChurningReplyTimeout    INTEGER,
+		rcEponCardTripleChurningUpdatePeriod    INTEGER
+     }      
+      
+    rcEponCardIndex OBJECT-TYPE
+        SYNTAX SlotIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponCardEntry 1 }
+                 
+    rcEponCardSupportedNumberOfONUsPerPON OBJECT-TYPE
+        SYNTAX INTEGER (1..128)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponCardEntry 2 }     
+
+    rcEponCardTripleChurningReplyTimeout OBJECT-TYPE
+        SYNTAX INTEGER (10..2550)
+        UNITS  "100ms"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {300}
+        ::= { rcEponCardEntry 3 }
+                                     
+    rcEponCardTripleChurningUpdatePeriod OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {100}
+        ::= { rcEponCardEntry 4 }  
+                                      
+--------------------------------------------------------------------------------------------        
+-- rcEponPONGroup
+
+    rcEponPONPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponPONPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table decrypts the information and configuration of PON interface at OLT.
+             This table is supported only at OLT device."
+        ::= { rcEponPONGroup 1 }
+
+    rcEponPONPortEntry OBJECT-TYPE
+        SYNTAX RcEponPONPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the table, containing some information of PON interface and 
+            configuration item. Entries in the table are automatically created at 
+            initialization."
+        INDEX { rcEponPONPortIndex }
+        ::= { rcEponPONPortTable 1 }
+                      
+    RcEponPONPortEntry ::= SEQUENCE {
+    	rcEponPONPortIndex						OltPortIndex,
+        rcEponPONPortAdmin               		INTEGER,
+        rcEponPONPortOperStatus             	INTEGER,
+        rcEponPONPortRegisteredONUNumber   		INTEGER,
+        rcEponPONPortMaxRTT                		INTEGER,
+    	rcEponPONPortBandwidthAlgorithmMode		INTEGER,
+        rcEponPONPortEncryptionType         	INTEGER,
+        rcEponPONPortMacAgingTime           	INTEGER,
+        rcEponPONPortMacLearningEn   			EnableVar,
+        rcEponPONPortUpUnknownSAForwardingEn    EnableVar,
+        rcEponPONPortDLFForwardingEn            EnableVar,
+        rcEponPONPortVlanTPID      				INTEGER,
+		rcEponPONPortONUAuthorizationMode		INTEGER ,
+		rcEponPONPortDownlinkUntaggedForwardingEn EnableVar,
+		rcEponPONPortPolicingDownstreamBroadcastRate    INTEGER,
+		rcEponPONPortPolicingDownstreamBroadcastBurst   INTEGER, 
+        rcEponPONPortSFPOperStatus             	INTEGER,
+        rcEponPONPortONULoidAuthPwdChk          EnableVar,  
+        rcEponPONPortBestEffortScheduling       INTEGER,
+        rcEponPONPortHighPriorityBoundary       INTEGER,
+        rcEponPONPortDescription                OCTET STRING,
+        rcEponPONPortUplinkVlanMode             INTEGER,
+        rcEponPONPortUplinkVlanNewVID           INTEGER,  
+        rcEponPONPortP2PAccessEn                EnableVar,
+        rcEponPONPortCreateONUNumber            INTEGER,   
+        rcEponPONPortMacStationMoveEn           EnableVar, 
+		rcEponOnuLaserAlwaysOnAutoPowerOffEnable    EnableVar,
+		rcEponOnuLaserAlwaysOnOperState    			INTEGER,
+        rcEponOnuLaserAlwaysOnOperOnuList           OCTET STRING,
+		rcEponOnuLaserAlwaysOnUpdate    			INTEGER,
+		rcEponPONLosControlEnable               EnableVar
+     }      
+      
+    rcEponPONPortIndex OBJECT-TYPE
+        SYNTAX OltPortIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortEntry 1 }
+                 
+    rcEponPONPortAdmin OBJECT-TYPE
+        SYNTAX INTEGER {
+               up(1),
+               down(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {1}
+        ::= { rcEponPONPortEntry 2 }     
+                 
+    rcEponPONPortOperStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               up(1),
+               down(2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortEntry 3 }
+                                             
+    rcEponPONPortRegisteredONUNumber OBJECT-TYPE
+        SYNTAX INTEGER (0..128)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortEntry 4 }   
+                    
+    rcEponPONPortMaxRTT OBJECT-TYPE
+        SYNTAX INTEGER (100..32767)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {14000}
+        ::= { rcEponPONPortEntry 5 }
+                  
+    rcEponPONPortBandwidthAlgorithmMode OBJECT-TYPE
+        SYNTAX INTEGER {
+               external_dba(1),
+               internal_dba(2),
+               static(3)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {1}
+        ::= { rcEponPONPortEntry 6 }
+                  
+    rcEponPONPortEncryptionType OBJECT-TYPE
+        SYNTAX INTEGER {
+               aes_128(1),
+               ctc_triple_churning(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {2}
+        ::= { rcEponPONPortEntry 7 }
+                  
+    rcEponPONPortMacAgingTime OBJECT-TYPE
+        SYNTAX INTEGER (0..57600)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {300}
+        ::= { rcEponPONPortEntry 8 }
+                  
+    rcEponPONPortMacLearningEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {enable}
+        ::= { rcEponPONPortEntry 9 }
+                  
+    rcEponPONPortUpUnknownSAForwardingEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {enable}
+        ::= { rcEponPONPortEntry 10 }
+                  
+    rcEponPONPortDLFForwardingEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {enable}
+        ::= { rcEponPONPortEntry 11 }
+                  
+    rcEponPONPortVlanTPID OBJECT-TYPE
+        SYNTAX INTEGER (1536..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {33024}
+        ::= { rcEponPONPortEntry 12 }
+   
+    rcEponPONPortONUAuthorizationMode OBJECT-TYPE
+        SYNTAX INTEGER {			
+			authModeNone(1),
+			authModeMac(2),
+			authModeSn(3),
+			authModePwd(4),
+			authModeSnPwd(5),
+			authModeHybrid(6)
+			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {2}
+        ::= { rcEponPONPortEntry 13 }
+        
+    rcEponPONPortDownlinkUntaggedForwardingEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {enable}
+        ::= { rcEponPONPortEntry 14 }    
+        
+    rcEponPONPortPolicingDownstreamBroadcastRate OBJECT-TYPE
+        SYNTAX INTEGER (0..999994)
+        UNITS  "Kbps"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Allocating downstream max bandwidth for broadcast llid."
+        DEFVAL {0}
+        ::= { rcEponPONPortEntry 15 }
+                 
+    rcEponPONPortPolicingDownstreamBroadcastBurst OBJECT-TYPE
+        SYNTAX INTEGER (1518..16777215)
+        UNITS  "Byte"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Allocating downstream burst for broadcast llid."
+        DEFVAL {4095}
+        ::= { rcEponPONPortEntry 16 }          
+
+    rcEponPONPortSFPOperStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               ok(1),
+               tx_fault(2),
+               unknown(3)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortEntry 19 }  
+        
+    rcEponPONPortONULoidAuthPwdChk OBJECT-TYPE
+        SYNTAX EnableVar        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        DEFVAL {enable}
+        ::= { rcEponPONPortEntry 20 }      
+	
+	rcEponPONPortBestEffortScheduling OBJECT-TYPE
+        SYNTAX INTEGER {
+                wrr (1),
+				sp-wrr (2),
+				sp(3)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {1}
+        ::= { rcEponPONPortEntry 21 }       
+        
+	rcEponPONPortHighPriorityBoundary OBJECT-TYPE
+        SYNTAX INTEGER (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {7}
+        ::= { rcEponPONPortEntry 22 }  
+        
+    rcEponPONPortDescription OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..64))        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        ::= { rcEponPONPortEntry 23 }    
+
+   rcEponPONPortUplinkVlanMode OBJECT-TYPE
+        SYNTAX INTEGER {
+               transparent(1), 
+               tagged(2),
+               stacking(3),
+               exchanged(4)
+        	}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Allocating LLID VLAN mode for all LLID."
+        DEFVAL {1} 
+        ::= { rcEponPONPortEntry 24 } 
+
+   rcEponPONPortUplinkVlanNewVID OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Allocating VLAN ID for all LLID."
+        ::= { rcEponPONPortEntry 25 }  
+        
+   rcEponPONPortP2PAccessEn  OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONPortEntry 26 }
+    
+    rcEponPONPortCreateONUNumber OBJECT-TYPE
+        SYNTAX INTEGER (0..128)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortEntry 27 }  
+        
+    rcEponPONPortMacStationMoveEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONPortEntry 28 }
+
+        
+    rcEponOnuLaserAlwaysOnAutoPowerOffEnable OBJECT-TYPE
+        SYNTAX EnableVar        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        ::= { rcEponPONPortEntry 29 }        
+        
+    rcEponOnuLaserAlwaysOnOperState OBJECT-TYPE
+        SYNTAX INTEGER {
+               ok(1),
+               lao(2),
+               unknown(3)
+               }       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        ::= { rcEponPONPortEntry 30 }        
+        
+    rcEponOnuLaserAlwaysOnOperOnuList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        ::= { rcEponPONPortEntry 31 }        
+        
+    rcEponOnuLaserAlwaysOnUpdate OBJECT-TYPE
+        SYNTAX INTEGER        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."     
+        ::= { rcEponPONPortEntry 32 }         
+        
+    rcEponPONLosControlEnable OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONPortEntry 33 }
+
+--
+-- rcEponPONPortStaticMacTable
+--        
+    rcEponPONPortStaticMacTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponPONPortStaticMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONGroup 2 }
+
+    rcEponPONPortStaticMacEntry OBJECT-TYPE
+        SYNTAX RcEponPONPortStaticMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponPONPortIndex, rcEponPONPortStaticMacAddress }
+        ::= { rcEponPONPortStaticMacTable 1 }
+                      
+    RcEponPONPortStaticMacEntry ::= SEQUENCE {
+        rcEponPONPortStaticMacAddress 		MacAddress,
+        rcEponPONPortStaticMacONUID         INTEGER,
+		rcEponPONPortStaticMacRowStatus     RowStatus  
+     }      
+      
+    rcEponPONPortStaticMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortStaticMacEntry 1 }
+                 
+    rcEponPONPortStaticMacONUID OBJECT-TYPE
+        SYNTAX INTEGER (1..64)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortStaticMacEntry 2 }
+            
+    rcEponPONPortStaticMacRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONPortStaticMacEntry 3 }
+                    
+--
+-- rcEponPONVlanDownlinkTable
+--        
+    rcEponPONVlanDownlinkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponPONVlanDownlinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONGroup 3 }
+
+    rcEponPONVlanDownlinkEntry OBJECT-TYPE
+        SYNTAX RcEponPONVlanDownlinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponPONPortIndex, rcEponPONVlanDownlinkVID }
+        ::= { rcEponPONVlanDownlinkTable 1 }
+                      
+    RcEponPONVlanDownlinkEntry ::= SEQUENCE {
+        rcEponPONVlanDownlinkVID 			INTEGER,
+        rcEponPONVlanDownlinkMode         	INTEGER,
+        rcEponPONVlanDownlinkNewVID			INTEGER,
+        rcEponPONVlanDownlinkNewPriority	INTEGER,
+        rcEponPONVlanDownlinkNewPriorityEn	EnableVar,
+		rcEponPONVlanDownlinkRowStatus     	RowStatus  
+     }      
+      
+    rcEponPONVlanDownlinkVID OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONVlanDownlinkEntry 1 }
+                 
+    rcEponPONVlanDownlinkMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        		transparent(1),
+        		removed(2),
+        		exchanged(3),
+        		discard(4)
+        		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {1}
+        ::= { rcEponPONVlanDownlinkEntry 2 }
+          
+    rcEponPONVlanDownlinkNewVID OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {1}
+        ::= { rcEponPONVlanDownlinkEntry 3 }
+        
+    rcEponPONVlanDownlinkNewPriority OBJECT-TYPE
+        SYNTAX INTEGER (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {0}
+        ::= { rcEponPONVlanDownlinkEntry 4 }
+ 
+    rcEponPONVlanDownlinkNewPriorityEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONVlanDownlinkEntry 5 }
+                   
+    rcEponPONVlanDownlinkRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONVlanDownlinkEntry 6 }   
+                
+--
+-- rcEponPONIgmpProxyTable
+--        
+    rcEponPONIgmpProxyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponPONIgmpProxyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponPONGroup 4 }
+
+    rcEponPONIgmpProxyEntry OBJECT-TYPE
+        SYNTAX RcEponPONIgmpProxyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponPONPortIndex }
+        ::= { rcEponPONIgmpProxyTable 1 }
+                      
+    RcEponPONIgmpProxyEntry ::= SEQUENCE {
+        rcEponPONIgmpProxyEn	EnableVar,
+        rcEponPONIgmpProxyQueryInterval     INTEGER,
+        rcEponPONIgmpProxyQueryResponseInterval		INTEGER,
+        rcEponPONIgmpProxyLastMemberQueryInterval	INTEGER,
+        rcEponPONIgmpProxyLastMemberQueryCount	INTEGER,
+        rcEponPONIgmpProxySourceIpAddr	IpAddress,        
+        rcEponPONIgmpProxyAdminVer	INTEGER,
+        rcEponPONIgmpProxyVlanTag	INTEGER,
+        rcEponPONIgmpProxyRouterAlertOptionIgnore   EnableVar
+     }      
+      
+    rcEponPONIgmpProxyEn OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONIgmpProxyEntry 1 }
+                 
+    rcEponPONIgmpProxyQueryInterval OBJECT-TYPE
+        SYNTAX INTEGER (1..31744)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {125}
+        ::= { rcEponPONIgmpProxyEntry 2 }
+          
+    rcEponPONIgmpProxyQueryResponseInterval OBJECT-TYPE
+        SYNTAX INTEGER (1..25)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {10}
+        ::= { rcEponPONIgmpProxyEntry 3 }
+        
+    rcEponPONIgmpProxyLastMemberQueryInterval OBJECT-TYPE
+        SYNTAX INTEGER (1..25)
+        UNITS  "s"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {10}
+        ::= { rcEponPONIgmpProxyEntry 4 }
+ 
+    rcEponPONIgmpProxyLastMemberQueryCount OBJECT-TYPE
+        SYNTAX INTEGER (1..128)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {2}
+        ::= { rcEponPONIgmpProxyEntry 5 }   
+
+	rcEponPONIgmpProxySourceIpAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Source IP address of the IGMP proxy. When proxy send multicast control packets
+			to multicast routers, the source ip address field will be filled this address."
+		DEFVAL {0}
+		::= { rcEponPONIgmpProxyEntry 6 }
+		
+	rcEponPONIgmpProxyAdminVer OBJECT-TYPE		
+        SYNTAX INTEGER {
+			igmp_v1(1),
+			igmp_v2(2),
+			igmp_v3(3)
+			} 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"IGMP administrative version. This supports IGMP v1, v2 and v3."
+		DEFVAL {2}
+		::= { rcEponPONIgmpProxyEntry 7 }
+
+    rcEponPONIgmpProxyVlanTag OBJECT-TYPE
+        SYNTAX INTEGER (1..4095)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Set VLAN tag of the IGMP packet. Default value is 4095, which stands
+            for untagged VLAN ID."
+        DEFVAL {4095}
+        ::= { rcEponPONIgmpProxyEntry 8 }
+ 
+    rcEponPONIgmpProxyRouterAlertOptionIgnore OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        DEFVAL {disable}
+        ::= { rcEponPONIgmpProxyEntry 9 }
+
+--
+-- END of EPON-PON-SYS-MIB                
+-- 
+END

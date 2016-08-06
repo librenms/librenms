@@ -1,0 +1,279 @@
+--MibName=roapArpMib
+-- *****************************************************************
+-- RAISECOM-ARP-MIB.MIB:  Raisecom Arp Manage MIB file
+--
+-- Aug 2018, yanzhijie
+--
+-- Copyright (c) 1994-2000, 2001 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+RAISECOM-ARP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS 
+       RowStatus, MacAddress  FROM SNMPv2-TC
+       EnableVar              FROM SWITCH-TC 
+	   IpAddress, Counter32   FROM SNMPv2-SMI
+	   OltPortIndex           FROM RAISECOM-PONSERIES-TC
+	   raisecomSwitchMgt      FROM RAISECOM-PONSERIES-BASE-MIB;
+
+       roapArpCfg           MODULE-IDENTITY
+	       LAST-UPDATED    "201205020000Z"
+	       ORGANIZATION    "Raisecom, Inc."
+	       CONTACT-INFO
+	                       "Raise Systems
+	                        
+	                        Postal: Beijing,
+	                        China
+	
+	                        Tel: 86-010-82884499
+	
+	                        E-mail: yanzhijie@raisecom.com"
+	       DESCRIPTION
+	                       "description of rate limit manage object."
+       ::= { raisecomSwitchMgt 29}           
+       
+--roapArpCfg 
+
+------------------------------------------------------------------------------
+--	define groups in swtich-attackdefense-mib
+------------------------------------------------------------------------------
+	roapArpScalarConfig	        OBJECT IDENTIFIER ::= { roapArpCfg 1 }
+------------------------------------------------------------------------------
+--
+-- roapArpScalarConfig 
+--                     
+
+	roapArpAgingTime OBJECT-TYPE
+		SYNTAX INTEGER
+		UNITS  "Second"
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"The aging time of dynamic arp item."
+		DEFVAL { 1200 }
+			::= { roapArpScalarConfig 1 }
+     
+	roapArpMaxCount OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"Max items that device supports."
+		DEFVAL { 8192 }
+			::= { roapArpScalarConfig 2 }
+	
+	roapArpClearAction OBJECT-TYPE
+		SYNTAX INTEGER{
+					clear_dynamic(1),
+					clear_static(2),
+					clear_all(3)
+				}
+		ACCESS read-write
+		STATUS current
+		DESCRIPTION
+				"Clear one kind of arp items."
+			::= { roapArpScalarConfig 3 }
+	
+	--
+	-- roapArpStatTable
+	--
+	roapArpStatTable OBJECT IDENTIFIER ::= { roapArpScalarConfig 4 }
+	
+		roapArpTotalNum OBJECT-TYPE
+			SYNTAX Counter32
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Current arp item counts that device owns."
+				::= { roapArpStatTable 1 }
+				
+		roapArpStaticNum OBJECT-TYPE
+			SYNTAX Counter32
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Current static arp item counts that device owns."
+				::= { roapArpStatTable 2 }
+				
+		roapArpDynamicNum OBJECT-TYPE
+			SYNTAX Counter32
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Current dynamic arp item counts that device owns."
+				::= { roapArpStatTable 3 }
+				
+		roapArpInHardWareNum OBJECT-TYPE
+			SYNTAX Counter32
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Current arp item counts in hardware that device owns."
+				::= { roapArpStatTable 4 }
+   	
+--
+-- roapArpIfConfigTable 
+--        
+	roapArpIfConfigTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RoapArpIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Arp configuration based interfaces"
+    	::= { roapArpCfg 2 }
+		
+	roapArpIfConfigEntry  OBJECT-TYPE
+		SYNTAX          RoapArpIfConfigEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapArpIfConfigTable."
+		INDEX { roapArpIfIndex }
+		::= { roapArpIfConfigTable 1 }
+    
+    RoapArpIfConfigEntry ::=	SEQUENCE { 
+		roapArpIfIndex               OltPortIndex,
+		roapArpIfLearningMode        INTEGER,
+		roapArpIfMaxLearningCount    Integer32,
+		roapArpIfTotalNum            Counter32,
+		roapArpIfStaticNum           Counter32,
+		roapArpIfDynamicNum          Counter32,
+		roapArpIfInHardWareNum       Counter32,
+		roapArpIfClearAction         INTEGER
+		}
+		
+	roapArpIfIndex  OBJECT-TYPE
+	        SYNTAX 			OltPortIndex
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"if index that the acl will be applied on."
+	        ::= { roapArpIfConfigEntry 1 }
+			
+	roapArpIfLearningMode  OBJECT-TYPE
+	        SYNTAX 			INTEGER {
+								learn_all(1),
+								learn_reply_only(2)
+							}
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"arp learn mode."
+	        ::= { roapArpIfConfigEntry 2 }
+			
+	roapArpIfMaxLearningCount  OBJECT-TYPE
+	        SYNTAX 			Integer32
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Max arp counts interface can learn."
+	        ::= { roapArpIfConfigEntry 3 }
+			
+	roapArpIfTotalNum  OBJECT-TYPE
+	        SYNTAX 			Counter32
+	        MAX-ACCESS 		read-only
+	        STATUS 			current
+	        DESCRIPTION		"Total arp counts on this interface."
+	        ::= { roapArpIfConfigEntry 4 }
+			
+	roapArpIfStaticNum  OBJECT-TYPE
+	        SYNTAX 			Counter32
+	        MAX-ACCESS 		read-only
+	        STATUS 			current
+	        DESCRIPTION		"Static arp counts on this interface."
+	        ::= { roapArpIfConfigEntry 5 }
+			
+	roapArpIfDynamicNum  OBJECT-TYPE
+	        SYNTAX 			Counter32
+	        MAX-ACCESS 		read-only
+	        STATUS 			current
+	        DESCRIPTION		"Dynamic arp counts on this interface."
+	        ::= { roapArpIfConfigEntry 6 }
+			
+	roapArpIfInHardWareNum  OBJECT-TYPE
+	        SYNTAX 			Counter32
+	        MAX-ACCESS 		read-only
+	        STATUS 			current
+	        DESCRIPTION		"Arp counts in hardware on this interface."
+	        ::= { roapArpIfConfigEntry 7 }
+			
+	roapArpIfClearAction  OBJECT-TYPE
+	        SYNTAX 			INTEGER{
+								clear_dynamic(1),
+								clear_static(2),
+								clear_all(3)
+							}
+	        MAX-ACCESS 		read-write
+	        STATUS 			current
+	        DESCRIPTION		"Clear arp action."
+	        ::= { roapArpIfConfigEntry 8 }
+			
+--
+-- roapArpStaticTable
+--
+
+	roapArpStaticTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RoapArpStaticEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Static arp configuration"
+    	::= { roapArpCfg 3 }
+		
+	roapArpStaticEntry  OBJECT-TYPE
+		SYNTAX          RoapArpStaticEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the roapArpStaticTable."
+		INDEX { roapStaticArpIfIndex, roapStaticArpNetAddress }
+		::= { roapArpStaticTable 1 }
+    
+    RoapArpStaticEntry ::=	SEQUENCE { 
+		roapStaticArpIfIndex           OltPortIndex,
+		roapStaticArpNetAddress        IpAddress,
+		roapStaticArpPhyAddress        MacAddress,
+		roapStaticArpType              INTEGER,
+		roapStaticArpBindIfIndex       OltPortIndex,
+		roapStaticArpRowStatus         RowStatus
+		}
+		
+	roapStaticArpIfIndex  OBJECT-TYPE
+	        SYNTAX 			OltPortIndex
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"Interface index."
+	        ::= { roapArpStaticEntry 1 }
+			
+	roapStaticArpNetAddress  OBJECT-TYPE
+	        SYNTAX 			IpAddress
+	        MAX-ACCESS 		not-accessible
+	        STATUS 			current
+	        DESCRIPTION		"Ip address index."
+	        ::= { roapArpStaticEntry 2 }
+			
+	roapStaticArpPhyAddress  OBJECT-TYPE
+	        SYNTAX 			MacAddress
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Mac address correspon with Ip address."
+	        ::= { roapArpStaticEntry 3 }
+			
+	roapStaticArpType  OBJECT-TYPE
+	        SYNTAX 			INTEGER{
+								static(1),
+								dynamic(2)
+							}
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Arp item type."
+	        ::= { roapArpStaticEntry 4 }
+	        
+	roapStaticArpBindIfIndex OBJECT-TYPE
+	        SYNTAX 			OltPortIndex
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Staic arp item binded interface index."
+	        ::= { roapArpStaticEntry 5 }
+			
+	roapStaticArpRowStatus  OBJECT-TYPE
+	        SYNTAX 			RowStatus
+	        MAX-ACCESS 		read-create
+	        STATUS 			current
+	        DESCRIPTION		"Arp entry row status."
+	        ::= { roapArpStaticEntry 6 }
+END

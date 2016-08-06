@@ -1,0 +1,120 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : rcStormControlGroup
+-- FILE NAME: raisecom-storm-control-mib.mi2			
+-- DATE     : 2011/8/8						
+-- VERSION  : 1.00								
+-- PURPOSE  : 			
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:								
+--  [New Object]		
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2011/8/8, xiaoyingjie
+-- This is the first formal version for universal MIB definition.
+ 
+SWITCH-STORM-CONTROL-MIB DEFINITIONS ::= BEGIN
+     
+	IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE,
+		Integer32,
+		IpAddress,
+		Counter32,
+		Unsigned32
+			FROM SNMPv2-SMI    
+		EnableVar
+			FROM SWITCH-TC
+		raisecomSwitchMgt
+			FROM RAISECOM-PONSERIES-BASE-MIB;
+			
+	rcStormControlGroup MODULE-IDENTITY
+		LAST-UPDATED 	"201107200000Z"
+		ORGANIZATION 	"rc TECH, Ltd."
+		CONTACT-INFO 	"www.rc.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for version management  functions"
+		::= { raisecomSwitchMgt  9}
+
+--rcStormControlGroup
+	  	
+    -- port storm control table
+     rcPortStormControlTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RcPortStormControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "port storm control table"
+    	::= { rcStormControlGroup 1 }    
+    
+     rcPortStormControlEntry  OBJECT-TYPE
+		SYNTAX          RcPortStormControlEntry
+		MAX-ACCESS      not-accessible
+        STATUS          current
+		DESCRIPTION     "An entry in the rcPortStormControlTable."
+		INDEX { rcPortStormControlIndex }
+		::= { rcPortStormControlTable 1 }
+		
+	RcPortStormControlEntry ::=
+		SEQUENCE { 
+		rcPortStormControlIndex					INTEGER,
+		rcPortStormControlBcastEnable 			EnableVar,
+		rcPortStormControlMcastEnable			EnableVar,
+		rcPortStormControlDlfEnable				EnableVar,
+		rcPortStormControlPps					INTEGER,
+		rcPortStormControlBps					INTEGER,
+		rcPortStormControlBurst					INTEGER
+		}		
+    
+	rcPortStormControlIndex  OBJECT-TYPE
+        SYNTAX 			INTEGER
+        MAX-ACCESS 		read-only
+        STATUS 			current
+        DESCRIPTION		"The index of rcPortStormControlTable."
+        ::= { rcPortStormControlEntry 1 }        
+         
+    rcPortStormControlBcastEnable  OBJECT-TYPE
+        SYNTAX 			EnableVar
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"Set the broadcast storm control on the interface to enable(1) or disable(2)."
+        ::= { rcPortStormControlEntry 2 }    
+        
+    rcPortStormControlMcastEnable  OBJECT-TYPE
+        SYNTAX 			EnableVar
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"Set the multicast storm control on the interface to enable(1) or disable(2)."
+        ::= { rcPortStormControlEntry 3 }   
+    
+    rcPortStormControlDlfEnable  OBJECT-TYPE
+        SYNTAX 			EnableVar
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"Set the DLF storm control on the interface to enable(1) or disable(2)."
+        ::= { rcPortStormControlEntry 4 }  
+         
+    rcPortStormControlPps  OBJECT-TYPE
+        SYNTAX 			INTEGER(0..1048574 |4294967295)
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"The limit package number for storm control on this port."
+        ::= { rcPortStormControlEntry 5 }
+        
+    rcPortStormControlBps  OBJECT-TYPE
+        SYNTAX 			INTEGER(1..33554368|4294967295)    
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"The limit rate for storm control on this port,unit kb."
+        ::= { rcPortStormControlEntry 6 }
+        
+    rcPortStormControlBurst  OBJECT-TYPE
+        SYNTAX 			INTEGER(4..16384|4294967295)
+        MAX-ACCESS 		read-create
+        STATUS 			current
+        DESCRIPTION		"Set burst length when storm control open on this port,unit KB."
+        ::= { rcPortStormControlEntry 7 }
+END

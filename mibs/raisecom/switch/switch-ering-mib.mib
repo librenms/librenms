@@ -1,0 +1,562 @@
+--MibName=rcEthRing
+-- *****************************************************************
+-- RAISECOM-ETHERNET-RING-MIB.MIB:  Raisecom Ethernet Ring MIB file
+--
+-- Oct. 2008, guoxiaodan
+--
+-- Copyright (c) 1994-2008, 2008 by Raisecom, Inc.
+-- All rights reserved.
+--  
+--02, 20100423, huochao,the preversion had Compile errors, I have changed  it at:
+--    RcEthRingEntry ::= SEQUENCE {...
+--        rcEthRingBridgeState            INTEGER, 
+--        rcEthRingState                  INTEGER, 
+--        rcEthRingDbState                INTEGER,   
+--        ...
+--    RcEthRingPortEntry ::= SEQUENCE {
+--        rcEthRingPortState              INTEGER,
+--        rcEthRingPortForwardState       INTEGER,
+--        rcEthRingDiscoverPeerState      INTEGER,
+--    RcEthRingDeviceListEntry ::= SEQUENCE {
+--        rcEthRingDeviceListBridgeState    INTEGER,
+-- 01, 20100401, gxd, add node rcEthRingExtInfoGroup
+-- *****************************************************************
+SWITCH-ERING-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+       iscomSwitch
+		   FROM RAISECOM-BASE-MIB 
+	   MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+       Unsigned32, NOTIFICATION-TYPE
+           FROM SNMPv2-SMI                  -- RFC2578
+       RowStatus, MacAddress, TruthValue, DisplayString
+           FROM SNMPv2-TC                   -- RFC2579
+       EnableVar    FROM SWITCH-TC;
+       
+rcEthRing MODULE-IDENTITY
+    LAST-UPDATED "0808120000Z"
+    ORGANIZATION "Raisecom China World"
+    CONTACT-INFO
+            " 
+             Phone:  01082884499
+             Email:  support@raisecom.com"
+    DESCRIPTION
+            "The MIB module for Ethernet Ring protocol."
+    REVISION      "0808050000Z"
+    DESCRIPTION
+            "Ethernet Ring MIB."
+    ::= {iscomSwitch 39}
+   
+  rcEthRingObjects           OBJECT IDENTIFIER ::= { rcEthRing 1 }
+  rcEthRingNotifications     OBJECT IDENTIFIER ::= { rcEthRing 2 }   
+     
+--------------------- ERING Table -------------------------------
+    rcEthRingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEthRingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Raisecom ethernet ring table."
+        ::= { rcEthRingObjects 1 }
+
+    rcEthRingEntry OBJECT-TYPE
+        SYNTAX RcEthRingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "raisecom ethernet ring table entry."
+        INDEX { rcEthRingIndex }
+        ::= { rcEthRingTable 1 }
+
+    RcEthRingEntry ::= SEQUENCE {
+        rcEthRingIndex                  Integer32,
+        rcEthRingPrimaryPort            Unsigned32,
+        rcEthRingSecondaryPort          Unsigned32,
+        rcEthRingPriority               Unsigned32,
+        rcEthRingHelloTime              Unsigned32,
+        rcEthRingRestoreDelay           Unsigned32,
+        rcEthRingHoldTime               Unsigned32,
+        rcEthRingProtocolVlan           Unsigned32,
+        rcEthRingEnable                 EnableVar,
+        rcEthRingDescription            OCTET STRING,  
+        rcEthRingBridgeState            INTEGER, 
+        rcEthRingState                  INTEGER,             
+        rcEthRingCurStateDuration       Unsigned32,  
+        rcEthRingDbMac                  MacAddress,
+        rcEthRingDbPri                  Unsigned32,
+        rcEthRingDbState                INTEGER,   
+        rcEthRingClearStatistics        TruthValue,
+        rcEthRingRowStatus              RowStatus
+     }
+
+    rcEthRingIndex OBJECT-TYPE
+        SYNTAX  Integer32(1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An index uniquely identifies a ERING Ring, which ranges from 1~8. 
+            This value can't be modified after created."
+        ::= { rcEthRingEntry 1 }
+
+    rcEthRingPrimaryPort OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The primary port blocked firstly when ring node state changes. 
+            It can't be modified after enabled."
+        ::= { rcEthRingEntry 2 }
+          
+    rcEthRingSecondaryPort OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The secondary port; It can't be modified after enabled."
+        ::= { rcEthRingEntry 3 }  
+        
+    rcEthRingPriority OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The priority of bridge,The value 0 signifies the lowest priority 
+            and 255 signifies the highest priority."
+        ::= { rcEthRingEntry 4 }
+
+    rcEthRingEnable OBJECT-TYPE
+        SYNTAX  EnableVar
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute, while TRUE, indicates that the  function 
+            of ethernet ring is enabled(1). The function is disabled(2), otherwise."
+        DEFVAL { disable }
+        ::= { rcEthRingEntry 5 }
+
+    rcEthRingDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The description information of ethernet ring."     
+        ::= { rcEthRingEntry 6 }
+
+    rcEthRingHelloTime OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value indicates the interval between two hello packets sent by ethernet ring node, 
+            and its unit is second.This value ranges from 1s~10s."
+        ::= { rcEthRingEntry 7 }  
+        
+    rcEthRingRestoreDelay OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..180)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value indicates the delay time when up happens, and its unit is second.
+            This value ranges from 0s~180s."
+        ::= { rcEthRingEntry 8 }
+      
+     rcEthRingHoldTime OBJECT-TYPE
+        SYNTAX  Unsigned32 (3..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This time value determines the interval length during which no more than two protocol 
+            packet received by this port. "
+        ::= { rcEthRingEntry 9 }
+
+     rcEthRingProtocolVlan OBJECT-TYPE
+        SYNTAX  Unsigned32 (2..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Vlan of protocol packet."
+        ::= { rcEthRingEntry 10 }
+                          
+    rcEthRingBridgeState OBJECT-TYPE
+        SYNTAX INTEGER{
+                       invalid(0),
+                       down(1),
+                       block(2),
+                       forward(3)
+                       } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of designated bridge, including forward,block,down and invalid. 
+            The default  bridge state is invalid(0) before ring was created.
+            Each bridge have two ports,down(1) if at least one port is in the state of DOWN;
+            Block(2) if at least one port is blocked when two ports are in DISCOVER state;
+            Forward(3) when two ports are in the state of forwarding;"
+        ::= { rcEthRingEntry 11 }
+
+    rcEthRingState OBJECT-TYPE
+        SYNTAX INTEGER{
+                       Down(0),
+                       Unstable(1),
+                       Enclosed(2),
+                       Unenclosed(3)             
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ethernet ring state.
+            Down(0)-- The default state of ring state when the ring was created;
+            Error(1)-- The state before achieve stability after enable the ring;
+            Enclosed(2)-- The ring state is stable and enclosed.
+            Unenclosed(3)-- The ring state is stable but unenclosed."
+        ::= { rcEthRingEntry 12 }
+               
+    rcEthRingCurStateDuration OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It means duration since ring state got into stability if the current ring state is stable, 
+            unstable state means duration of the last stable state."   
+        ::= { rcEthRingEntry 13 }
+
+    rcEthRingDbMac OBJECT-TYPE
+        SYNTAX MacAddress  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Mac address of the designated bridge."
+        ::= { rcEthRingEntry 14 }
+    
+    rcEthRingDbPri OBJECT-TYPE
+        SYNTAX   Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The DB priority of the Ethernet ring."
+        ::= { rcEthRingEntry 15 }
+
+    rcEthRingDbState OBJECT-TYPE
+        SYNTAX INTEGER{
+                       invalid(0),
+                       down(1),
+                       block(2),
+                       forward(3)
+                       } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of designated bridge, including forward,block,down and invalid. 
+            The default  bridge state is invalid(0) before ring was created.
+            Each bridge have two ports,down(1) if at least one port is in the state of DOWN;
+            Block(2) if at least one port is blocked when two ports are in DISCOVER state;
+            Forward(3) when two ports are in the state of forwarding;"
+        DEFVAL{ 0 }
+        ::= { rcEthRingEntry 16 }
+          
+    rcEthRingClearStatistics OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The purpose of this object is to clear all the ring statistics. 
+            Set the value to true(1) means clear current ring statistics and begin the next recalculation."
+        DEFVAL { False }
+        ::= { rcEthRingEntry 17 }
+    
+    rcEthRingRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is responsible for managing the creation, 
+            deletion and modification of rows, which support active status and CreatAndGo, destroy operation."
+       ::= { rcEthRingEntry 18 }
+   
+--------------------- ERING Port Table -------------------------------
+    rcEthRingPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEthRingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Raisecom ethernet ring Port Table."
+        ::= { rcEthRingObjects 2 }
+
+    rcEthRingPortEntry OBJECT-TYPE
+        SYNTAX RcEthRingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Raisecom ethernet ring port table entry."
+        INDEX { rcEthRingIndex, rcEthRingPortFlagIndex }
+        ::= { rcEthRingPortTable 1 }
+
+    RcEthRingPortEntry ::= SEQUENCE {
+        rcEthRingPortFlagIndex          Unsigned32,
+        rcEthRingPort                   Unsigned32,
+        rcEthRingPortState              INTEGER,
+        rcEthRingPortForwardState       INTEGER,
+        rcEthRingDiscoverPeerState      INTEGER,
+        rcEthRingPortStateSwitchCount   Unsigned32,
+        rcEthRingCurrStateDuration      Unsigned32,  
+        rcEthRingRecvHelloPkts        	Unsigned32,
+        rcEthRingRecvChangePkts       	Unsigned32,  
+        rcEthRingRecvChangeRelayPkts    Unsigned32,
+        rcEthRingRecvFlushPkts          Unsigned32,  
+        rcEthRingSendHelloPkts        	Unsigned32,
+        rcEthRingSendChangePkts       	Unsigned32,  
+        rcEthRingSendChangeRelayPkts    Unsigned32,
+        rcEthRingSendFlushPkts          Unsigned32
+        }
+
+    rcEthRingPortFlagIndex OBJECT-TYPE
+        SYNTAX  Unsigned32(1..2)                        
+                         --1,Index of the primary port statistics
+                         --2,--Index of the secondary port statistics  
+    MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of the port table which corresponding to the specific port statistics uniquely."
+        ::= { rcEthRingPortEntry 1 }
+
+    rcEthRingPort OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port number corresponding to the index."
+        ::= { rcEthRingPortEntry 2 }
+
+    rcEthRingPortState OBJECT-TYPE
+        SYNTAX  INTEGER{
+                         Active(1),--port is active in the ring
+                         Inactive(2)--port is inactive in the ring
+                         }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value means whether port is active in the ring or not."
+        ::= { rcEthRingPortEntry 3 } 
+     
+    rcEthRingPortForwardState OBJECT-TYPE
+        SYNTAX  INTEGER{
+                      block(1),
+                      forward(2)
+                      }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "State of ethernet ring port, including block and forward."
+        ::= { rcEthRingPortEntry 4 }
+
+    rcEthRingDiscoverPeerState OBJECT-TYPE
+        SYNTAX INTEGER{ 
+                    none(1),  
+                    discover(2),
+                    full(3) 
+                     }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port state of ethernet ring,including none,discover and full.
+            none(1)-- two ports of the bridge did not receive any packets from opposite ports;
+            discover(2)-- at least one port of the bridge received packet before got into stable status;
+            full(3)-- Port received the same packet three times continuously."
+        ::= { rcEthRingPortEntry 5 } 
+                      
+    rcEthRingPortStateSwitchCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Times of port state switch between block and forward state."
+        ::= { rcEthRingPortEntry 6 }
+        
+    rcEthRingCurrStateDuration OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It means the duration since port got into current state."
+        ::= { rcEthRingPortEntry 7 }
+
+
+    rcEthRingRecvHelloPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 8 }   
+           
+    rcEthRingRecvChangePkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 9 }   
+         
+    rcEthRingRecvChangeRelayPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 10 }
+                        
+    rcEthRingRecvFlushPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 11 }
+                              
+    rcEthRingSendHelloPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 12 }   
+           
+    rcEthRingSendChangePkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 13 }   
+         
+    rcEthRingSendChangeRelayPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 14 }
+                        
+    rcEthRingSendFlushPkts OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet number which received from peer device."
+        ::= { rcEthRingPortEntry 15 }
+        
+--------------------- ERING Device Table -------------------------------
+    rcEthRingDeviceListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEthRingDeviceListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "EthRing Device Table."
+        ::= { rcEthRingObjects 3 }
+
+    rcEthRingDeviceListEntry OBJECT-TYPE
+        SYNTAX RcEthRingDeviceListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Raisecom ethernet ring device table entry."
+        INDEX { rcEthRingIndex, rcEthRingPortFlagIndex, rcEthRingDeviceListIndex }
+        ::= { rcEthRingDeviceListTable 1 }
+
+    RcEthRingDeviceListEntry ::= SEQUENCE {
+        rcEthRingDeviceListIndex          Unsigned32,
+        rcEthRingDeviceListMac            MacAddress,
+        rcEthRingDeviceListPort1          Integer32,
+        rcEthRingDeviceListPort2          Integer32,
+        rcEthRingDeviceListPriority       Unsigned32 ,
+        rcEthRingDeviceListBridgeState    INTEGER
+        }
+
+    rcEthRingDeviceListIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An entry in this table is created when hello packet is received. 
+            An entry is removed from this table when its corresponding rcEthRingEntry is deleted.
+            An implementation MUST start assigning rcEthRingDeviceListIndex values at 1 and wrap 
+            after exceeding the maximum possible value, as defined by the limit of this object ('ffffffff'h)."
+        ::= { rcEthRingDeviceListEntry 1 }
+
+    rcEthRingDeviceListMac OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The mac address of bridge in the ethernet ring."
+        ::= { rcEthRingDeviceListEntry 2 }
+
+    rcEthRingDeviceListPort1 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "One of active port of the device."
+        ::= { rcEthRingDeviceListEntry 3 } 
+            
+    rcEthRingDeviceListPort2 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Another active port of the device."
+        ::= { rcEthRingDeviceListEntry 4 }
+
+    rcEthRingDeviceListPriority OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The priority of bridge,The value 0 signifies the lowest priority 
+            and 255 signifies the highest priority."
+        ::= { rcEthRingDeviceListEntry 5 } 
+
+    rcEthRingDeviceListBridgeState OBJECT-TYPE
+        SYNTAX INTEGER{
+                       invalid(0),
+                       down(1),  
+                       block(2),
+                       forward(3)
+                       } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of designated bridge, including forward,block,alone,down and invalid. 
+            The default  bridge state is invalid(0) before ring was created.
+            Each bridge have two ports,down(1) if at least one port is in the state of DOWN;
+             Block(2) if at least one port is blocked when two ports are in DISCOVER state;
+            Forward(3) when two ports are in the state of forwarding;"  
+        ::= { rcEthRingDeviceListEntry 6 }      
+       
+-- Extend Info Group Definition section    
+
+    rcEthRingExtInfoGroup OBJECT IDENTIFIER ::= { rcEthRingObjects 4 }      
+
+    rcEthRingUpStreamGroupList OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(4))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Upstream group list of ethernet ring which is corresponding to the link state track group.
+            A bit mask corresponding to the upstream group. Set corresponding bit to 1 to create the 
+            group, set bit to 0 delete the group."
+        ::= { rcEthRingExtInfoGroup 1 }   
+     
+-- Notification Definition section 
+
+   rcEthRingStateChange NOTIFICATION-TYPE
+         OBJECTS {
+           rcEthRingIndex,
+           rcEthRingState,
+           rcEthRingDbMac
+                }
+         STATUS  current
+         DESCRIPTION
+             "Generated when ring state changes between enclosed and other status;"
+         ::= { rcEthRingNotifications 1 }        
+  END

@@ -1,0 +1,247 @@
+--MibName=rcStaticRoute
+-- *****************************************************************
+-- RAISECOM-SROUTE-MIB.MIB:  Raisecom StaticRoute MIB file
+-- Feb 2011, Yuyonghong
+--
+-- Copyright (c) 2011 by Raisecom, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+RAISECOM-SROUTE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32               FROM SNMPv2-SMI  
+                                                
+        InetAddress                         FROM INET-ADDRESS-MIB
+             
+        RowStatus, TruthValue,
+        MacAddress                          FROM SNMPv2-TC    
+        
+        PortList                            FROM SWITCH-TC
+        
+        Vlanset			                    FROM SWITCH-TC 
+     
+        raisecomAgent	                   	FROM RAISECOM-BASE-MIB;
+
+    	        
+    raisecomSRoute MODULE-IDENTITY
+        LAST-UPDATED    "0412200000Z"  -- Dec 20, 2004
+        ORGANIZATION    "Wind River Systems, Inc."
+        CONTACT-INFO    "Wind River Systems, Inc.
+                         E-mail: support@windriver.com"
+
+        DESCRIPTION     "description of raisecomSRoute object."
+
+        REVISION        "0412200000Z"  -- Dec 20, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= {raisecomAgent 29}
+    
+ ------------------------------------------------------------------------------
+--  groups in the ROSE Layer 3 MIB
+------------------------------------------------------------------------------  
+    raisecomSRouteNotifications         OBJECT IDENTIFIER ::={ raisecomSRoute 1 }
+    raisecomSRouteObjects               OBJECT IDENTIFIER ::={ raisecomSRoute 2 }
+    raisecomSRouteConformance           OBJECT IDENTIFIER ::={ raisecomSRoute 3 }
+------------------------------------------------------------------------------   
+    
+------------------------------------------------------------------------------
+--  groups in the ROSE Layer 3 MIB
+------------------------------------------------------------------------------  
+    raisecomSRouteScalarGroup         OBJECT IDENTIFIER ::={ raisecomSRouteObjects 1 }
+    raisecomSRouteTableGroup          OBJECT IDENTIFIER ::={ raisecomSRouteObjects 2 } 
+------------------------------------------------------------------------------
+--
+--  raisecomL3IpStatic:
+--      This group is used to configure and retrieve static routes for both
+--      host and subnet IP destinations.
+--
+--      This group is independent of the underlying switch hardware and
+--      araisecomhitecture.  It indicates how many Host IDs and Subnet IDs that
+--      the hardware can directly support, if any.  In general, hardware
+--      entries route much faster than software entries.
+--      
+--      The user can choose to reserve zero, some, or all of the available
+--      hardware entries for use as static routes.  The remaining entries,
+--      if any, are reserved for dynamic routes (e.g., RIP, OSPF, etc.).
+--
+--      Note that the default route entry (0.0.0.0) cannot be placed in this
+--      table.  If the default route was ever placed into the hardware route
+--      table, unknown routes would never be sent to the CPU (i.e., this would
+--      prevent new routes from being learned and/or placed into the hardware
+--      route table).  The default route is reserved for use by the agent.
+--
+------------------------------------------------------------------------------
+--
+
+-- -------------------------------------------------------------
+-- scalar in the MIB
+-- -------------------------------------------------------------
+    raisecomIpv4StaticDefaultDistance  OBJECT-TYPE
+        SYNTAX Unsigned32(1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If you do not specify the administrative 
+            distance separately when you configure a static route,
+            you will use this value as the configuration" 
+        DEFVAL  {1}
+        ::= { raisecomSRouteScalarGroup 1 }
+
+    raisecomIpv4StaticMaxRouteNum  OBJECT-TYPE
+        SYNTAX Unsigned32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum ipv4 static route number." 
+        ::= { raisecomSRouteScalarGroup 2 }
+
+    raisecomIpv4StaticCurrentRouteNum  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current ipv4 static route number."
+        ::= { raisecomSRouteScalarGroup 3 }
+
+------------------------------------------------------------------
+--table in the mib
+------------------------------------------------------------------
+
+--raisecomIpv4StaticRouteTable 
+
+    raisecomIpv4StaticRouteTable      OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF raisecomIpv4StaticRouteEntry
+        ACCESS	 not-accessible
+        STATUS   current
+        DESCRIPTION
+                 "ipv4 static route information"
+        ::= { raisecomSRouteTableGroup   1 }
+
+    raisecomIpv4StaticRouteEntry   OBJECT-TYPE
+        SYNTAX raisecomIpv4StaticRouteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in raisecomIpv4StaticRouteTable."
+        INDEX { raisecomIpv4StaticDestInetAddress, raisecomIpv4StaticMask, raisecomIpv4StaticNextHop}
+        ::= { raisecomIpv4StaticRouteTable 1 }
+
+    raisecomIpv4StaticRouteEntry  ::= SEQUENCE {
+        raisecomIpv4StaticDestInetAddress     IpAddress,
+        raisecomIpv4StaticMask           IpAddress,
+        raisecomIpv4StaticNextHop        IpAddress,  
+        raisecomIpv4StaticIfIndex        Integer32,
+        raisecomIpv4StaticDistance       Unsigned32,  
+        raisecomIpv4StaticDescription    OCTET STRING, 
+        raisecomIpv4StaticRouteTag       Integer32,
+        raisecomIpv4StaticValid          TruthValue,
+        raisecomIpv4StaticRowStatus      RowStatus
+    }
+
+    raisecomIpv4StaticDestInetAddress  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The static route host or subnet IP destination address.
+             All IP destination addresses must be non-zero."
+        ::= { raisecomIpv4StaticRouteEntry 1 }
+
+    raisecomIpv4StaticMask  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The mask for this IP destination.  It contains 1's in the
+             bit positions for the net and subnet IDs and 0's in the
+             bit positions for host ID.  The 1's must be contiguous,
+             starting with the left most bit.
+             
+             Note that a host route uses a 255.255.255.255 mask."
+        ::= { raisecomIpv4StaticRouteEntry 2 }
+
+    raisecomIpv4StaticNextHop OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the next hop of this route.
+            (In the case of a route bound to an interface
+            which is realized via a broadcast media, the value
+            of this field is the agent's IP address on that
+            interface.)"
+        ::= { raisecomIpv4StaticRouteEntry 3 }
+
+    raisecomIpv4StaticIfIndex  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index value which uniquely identifies the local interface
+             through which the next hop of this route should be reached."
+        ::= { raisecomIpv4StaticRouteEntry 4 }
+
+    raisecomIpv4StaticDistance  OBJECT-TYPE
+        SYNTAX Unsigned32(1.. 255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "the AD lower,the priority higher."
+        ::= { raisecomIpv4StaticRouteEntry 5 }
+
+    raisecomIpv4StaticDescription  OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..60))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Description of the route."
+        ::= { raisecomIpv4StaticRouteEntry 6 } 
+        
+    raisecomIpv4StaticRouteTag  OBJECT-TYPE
+        SYNTAX Integer32(0.. 2147483647)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Used to tag external routes."
+        ::= { raisecomIpv4StaticRouteEntry 7 }    
+        
+    raisecomIpv4StaticValid  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "By setting this object to true(1), the user indicates the
+             desire to use hardware routing for this entry.  To disable hardware 
+             routing for this entry, set this object to false(2)."   
+        DEFVAL  { false }
+        ::= { raisecomIpv4StaticRouteEntry 8 } 
+    
+    raisecomIpv4StaticRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DURABLE:
+             This object indicates the status of this entry.  A row in this
+             table must be created using the createAndWait(5) action state
+             (i.e., createAndGo(4) is not supported).  This object can only
+             be set to active(1) after all objects for this row are valid.
+             The 'raisecomL3IpStaticName' is optional.
+             
+             Note that the notInService(2) state is not supported.  Objects
+             in this table row can be changed when this object is notReady(3)
+             or active(1)."
+        ::= { raisecomIpv4StaticRouteEntry 9 }
+
+
+
+--
+-- END of SRoute-MIB
+--
+
+END

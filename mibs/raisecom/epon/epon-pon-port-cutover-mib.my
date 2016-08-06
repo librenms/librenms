@@ -1,0 +1,178 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : eponPortCutoverMib
+-- FILE NAME: pon-port-cutover-mib.my            
+-- DATE     : 2012/12/4                            
+-- VERSION  : 1.00                                
+-- PURPOSE  : The MIB module defining objects for pon port service cutover
+--            functions            
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author        
+-- Description:                                
+--  [New Object]        
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 1.00, 2012/12/4, zhuchen
+-- This is the first formal version for universal MIB definition.
+-----------------------------------------------------------------------------
+--
+-- RAISECOM base management objects
+--            
+
+EPON-PON-PORT-CUTOVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+        RowStatus FROM SNMPv2-TC
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+    
+    rcEponServiceCutoverGroup MODULE-IDENTITY
+        LAST-UPDATED     "201212040000Z"
+        ORGANIZATION     "RAISECOM TECH, Ltd."
+        CONTACT-INFO     "www.raisecom.com"
+        DESCRIPTION      
+            "The MIB module defining objects for PON port service cutover function."
+        ::= { raisecomEponMgt  3}        
+
+    rcEponPonPortServiceCutoverScalarGroup OBJECT IDENTIFIER
+        ::= { rcEponServiceCutoverGroup  1}        
+
+    rcEponPonPortServiceCutoverNextEmtyId OBJECT-TYPE
+    	SYNTAX INTEGER
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponPonPortServiceCutoverScalarGroup 1 }
+
+    rcEponPonPortServiceCutoverCompleteIdList OBJECT-TYPE
+    	SYNTAX OCTET STRING (SIZE(4))
+    	MAX-ACCESS read-only
+    	STATUS current
+    	DESCRIPTION
+    		"."
+    	::= { rcEponPonPortServiceCutoverScalarGroup 2 }
+        
+   rcEponPonPortServiceCutoverTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF rcEponPonPortServiceCutoverEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           "A list of rcEponPonPortServiceCutoverTable entries."
+       ::= { rcEponServiceCutoverGroup 2 }
+
+    rcEponPonPortServiceCutoverEntry OBJECT-TYPE
+        SYNTAX rcEponPonPortServiceCutoverEntry 
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           "PON port service cutover entry."
+        INDEX { rcEponPonPortServiceCutoverIndex }
+        ::= { rcEponPonPortServiceCutoverTable 1 }
+    
+    rcEponPonPortServiceCutoverEntry ::= SEQUENCE {
+        rcEponPonPortServiceCutoverIndex        	INTEGER,
+        rcEponPonPortServiceCutoverSrcPort      	INTEGER,
+        rcEponPonPortServiceCutoverDstPort      	INTEGER,   
+        rcEponPonPortServiceCutoverValidateResult	BITS,
+        rcEponPonPortServiceCutoverAction       	INTEGER,
+        rcEponPonPortServiceCutoverSate         	INTEGER,    
+        rcEponPonPortServiceCutoverFailCause    	BITS,
+        rcEponPonPortServiceCutoverRowStatus    	RowStatus
+        }
+        
+    rcEponPonPortServiceCutoverIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "PON port cutover scheme ID."
+        ::= { rcEponPonPortServiceCutoverEntry 1 } 
+                  
+    rcEponPonPortServiceCutoverSrcPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Source PON port index."
+        ::= { rcEponPonPortServiceCutoverEntry 2 }
+
+    rcEponPonPortServiceCutoverDstPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Destination PON port index."
+        ::= { rcEponPonPortServiceCutoverEntry 3 }
+
+    rcEponPonPortServiceCutoverValidateResult OBJECT-TYPE
+        SYNTAX BITS{
+                    ok(0),
+                    ok_delOnu(1),
+                    err_portSame(2),
+                    err_portNotExist(3),
+                    err_proctectGroupExist(4),
+                    err_dstPortOnuOnline(5),
+                    err_dstPortDProtectGroup(6),
+                    err_portCfgForbidden(7)
+                    }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Validate result of the source and destination PON ports."
+        ::= { rcEponPonPortServiceCutoverEntry 4 }
+                
+    rcEponPonPortServiceCutoverAction OBJECT-TYPE
+        SYNTAX INTEGER{
+                        go(1)
+                        }
+        ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Control the schemel to run."
+        ::= { rcEponPonPortServiceCutoverEntry 5 } 
+               
+    rcEponPonPortServiceCutoverSate OBJECT-TYPE
+        SYNTAX INTEGER{
+                        ready(1),
+                        busy(2),
+                        complete(3)
+                        }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Running state of the scheme."
+        ::= { rcEponPonPortServiceCutoverEntry 6 }
+
+    rcEponPonPortServiceCutoverFailCause OBJECT-TYPE
+        SYNTAX BITS {
+                    noError(0),
+                    uknown(1),
+                    portSame(2),
+                    portNotExist(3),
+                    proctectGroupExist (4),
+                    dstPortOnuOnline(5),
+                    dstPortDProtectGroup(6),
+                    portCfgForbidden(7),
+                    ponPortCutoverError(15),
+                    onuCutoverError(16)
+                    }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cutover result of the scheme."
+        ::= { rcEponPonPortServiceCutoverEntry 7 }
+
+    rcEponPonPortServiceCutoverRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row status of the table"
+        ::= { rcEponPonPortServiceCutoverEntry 8 }
+              
+END
+
+

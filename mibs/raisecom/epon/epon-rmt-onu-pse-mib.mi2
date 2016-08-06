@@ -1,0 +1,236 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-pse-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jan 28, 2010
+--  Author       : liuyuhua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+	EPON-RMT-ONU-PSE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+        RowStatus, MacAddress, TruthValue FROM SNMPv2-TC
+        EnableVar FROM SWITCH-TC                     
+        pethMainPseGroupIndex, pethPsePortGroupIndex, pethPsePortIndex FROM POWER-ETHERNET-MIB
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB                              
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+     rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuPseGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 26 }
+------------------------------------------------------------------------------
+--
+-- rcEponOnuPseGlobeExtTable
+--
+    rcEponOnuPseGlobeExtTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPseGlobeExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGroup 1 }
+
+    rcEponOnuPseGlobeExtEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPseGlobeExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { pethMainPseGroupIndex }
+        ::= { rcEponOnuPseGlobeExtTable 1 }
+
+    RcEponOnuPseGlobeExtEntry ::= SEQUENCE {
+        rcEponOnuPseSubCardHwVersion        OCTET STRING,
+        rcEponOnuPsePowerMngMode           	INTEGER,
+        rcEponOnuPseTempProtectionCtrl     	EnableVar,
+        rcEponOnuPsePeakPower    		   	INTEGER,
+        rcEponOnuPseAveragePower     	   	INTEGER,
+        rcEponOnuPseOverTempStatus  		INTEGER        
+        }
+        
+    rcEponOnuPseSubCardHwVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 1 }
+        
+    rcEponOnuPsePowerMngMode OBJECT-TYPE
+        SYNTAX INTEGER{
+					auto(1),
+					manual(2)
+					}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 2 }	
+
+	rcEponOnuPseTempProtectionCtrl OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 3 }    	    
+
+	rcEponOnuPsePeakPower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 4 }
+
+	rcEponOnuPseAveragePower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 5 }        
+
+	rcEponOnuPseOverTempStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+					normal(1),
+					alarm(2)
+					}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGlobeExtEntry 6 }        
+        
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuPsePortExtTable
+--
+    rcEponOnuPsePortExtTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuPsePortExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPseGroup 2 }
+
+    rcEponOnuPsePortExtEntry OBJECT-TYPE
+        SYNTAX RcEponOnuPsePortExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { pethPsePortGroupIndex, pethPsePortIndex }
+        ::= { rcEponOnuPsePortExtTable 1 }
+
+    RcEponOnuPsePortExtEntry ::= SEQUENCE {
+        rcEponOnuPsePortAdminState          EnableVar,
+        rcEponOnuPsePortMaxPower           	INTEGER,
+        rcEponOnuPsePortOutputPower     	INTEGER,
+        rcEponOnuPsePortAveragePower    	INTEGER,
+        rcEponOnuPsePortPeakPower     	   	INTEGER,
+        rcEponOnuPsePortOutputCurrent  		INTEGER,
+        rcEponOnuPsePortOutputVoltage	    INTEGER,
+        rcEponOnuPsePortCompatibilityEnable EnableVar,
+        rcEponOnuPsePortPowerMode           INTEGER      
+        }
+        
+	rcEponOnuPsePortAdminState OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 1 }	                
+        
+	rcEponOnuPsePortMaxPower OBJECT-TYPE
+        SYNTAX INTEGER(4000..30000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 2 } 
+        
+	rcEponOnuPsePortOutputPower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 3 }
+        
+	rcEponOnuPsePortAveragePower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 4 }
+        
+	rcEponOnuPsePortPeakPower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 5 }
+        
+	rcEponOnuPsePortOutputCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 6 }
+        
+	rcEponOnuPsePortOutputVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 7 }      
+        
+    rcEponOnuPsePortCompatibilityEnable OBJECT-TYPE  
+    	SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 8 }  
+    
+    rcEponOnuPsePortPowerMode OBJECT-TYPE  
+    	SYNTAX INTEGER{
+                      af(1),
+                      at(2)
+                      }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuPsePortExtEntry 9 }
+        
+---------------------------------------------------------------------------    
+rcEponOnuPseTrapGroup      OBJECT IDENTIFIER ::= { rcEponOnuPseGroup 10 }
+
+	rcEponOnuPseOverTempTrap NOTIFICATION-TYPE
+           OBJECTS { rcEponOnuPseOverTempStatus  }
+           STATUS  current
+           DESCRIPTION
+               "."
+       ::= { rcEponOnuPseTrapGroup 1 }      
+       
+END                                                	                                               	

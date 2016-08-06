@@ -1,0 +1,516 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : epon-rmt-onu-serial-mib.mi2
+--  Description  : Raisecom EPON software mib defination
+--  Version      : 1.0
+--  Date         : Jul 3, 2007
+--  Author       : jiangyonghua
+--  Copyright (c) Beijing Raisecom Science & Technology Co., ltd  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    EPON-RMT-ONU-SERIAL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI   
+        DisplayString FROM SNMPv2-TC
+        EnableVar, DateAndTime FROM SWITCH-TC        
+        Olt_OnuIfIndex FROM RAISECOM-PONSERIES-TC  
+        rcEponOnuDevIndex FROM EPON-RMT-ONU-DEV-MIB
+        raisecomEponMgt FROM RAISECOM-PONSERIES-BASE-MIB;
+        
+        
+    rcEponRmtOnuMgt MODULE-IDENTITY
+        LAST-UPDATED    "200707030000Z"  -- Jul 3, 2007
+        ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+        CONTACT-INFO    "E-mail: support@raisecom.com"
+        DESCRIPTION     "Remote ONU management MIB definition."
+        REVISION        "200707030000Z"  -- Jul 3, 2007
+        DESCRIPTION     "Initial MIB creation."
+        ::= { raisecomEponMgt 6 }
+
+rcEponOnuSerialGroup      OBJECT IDENTIFIER ::= { rcEponRmtOnuMgt 24 }
+-------------------------------------------------------------------------------------------
+--
+-- rcEponOnuSerialPortTable
+-- 
+    rcEponOnuSerialPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSerialPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialGroup 1 }
+
+    rcEponOnuSerialPortEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSerialPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuSerialPortIndex }
+        ::= { rcEponOnuSerialPortTable 1 }
+
+    RcEponOnuSerialPortEntry ::= SEQUENCE {
+        rcEponOnuSerialPortIndex               Olt_OnuIfIndex,
+        rcEponOnuSerialPortProtocol            INTEGER,
+        rcEponOnuSerialPortBaudRate            INTEGER,
+        rcEponOnuSerialPortDataBits            INTEGER,
+        rcEponOnuSerialPortStopBits    		   INTEGER,
+        rcEponOnuSerialPortParity     		   INTEGER,
+        rcEponOnuSerialPortFlowCtrl  		   INTEGER,
+        rcEponOnuSerialPortLoop                INTEGER      
+        }
+        
+    rcEponOnuSerialPortIndex OBJECT-TYPE
+        SYNTAX Olt_OnuIfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 1 }        		  
+        
+    rcEponOnuSerialPortProtocol OBJECT-TYPE
+        SYNTAX INTEGER {
+               			rs232(1),
+               			rs485(2),
+               			uart(3)
+                	   }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 2 }
+        
+    rcEponOnuSerialPortBaudRate OBJECT-TYPE
+        SYNTAX INTEGER {
+               			br300(1),
+						br1200(2),
+						br2400(3),
+						br4800(4),
+						br9600(5),
+					    br14400(6),
+						br19200(7), 
+						br28800(8),
+					    br38400(9),
+					    br57600(10),
+						br115200(11)
+                       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 3 }
+        
+    rcEponOnuSerialPortDataBits OBJECT-TYPE
+    	SYNTAX INTEGER (5..8)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 4 }
+        
+    rcEponOnuSerialPortStopBits OBJECT-TYPE
+        SYNTAX INTEGER {
+						bit1(1), 
+						bit2(2), 
+              			bit1dot5(3)
+                       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 5 }
+        
+    rcEponOnuSerialPortParity OBJECT-TYPE
+        SYNTAX INTEGER {
+			         	none(0),
+						odd(1),
+						even(2),
+						mark(3),
+					    space(4)        
+        			   }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 6 }
+        
+    rcEponOnuSerialPortFlowCtrl OBJECT-TYPE
+        SYNTAX INTEGER {
+        			 	none(0),
+						rts_cts(1),
+					    dtr_dsr(2),
+						xon_xoff(3)
+				       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 7 }        
+    
+    rcEponOnuSerialPortLoop OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortEntry 8 }   
+         
+--
+-- rcEponOnuSerialPortSvcTable
+-- 
+    rcEponOnuSerialPortSvcTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSerialPortSvcEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialGroup 2 }
+
+    rcEponOnuSerialPortSvcEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSerialPortSvcEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuSerialPortIndex }
+        ::= { rcEponOnuSerialPortSvcTable 1 }
+
+    RcEponOnuSerialPortSvcEntry ::= SEQUENCE {
+        rcEponOnuSerialPortSvcMngAdmin          EnableVar,
+        rcEponOnuSerialPortSvcTrapAdmin         EnableVar,
+        rcEponOnuSerialPortSvcMode              INTEGER,
+        rcEponOnuSerialPortSvcSocketPort        INTEGER,
+        rcEponOnuSerialPortSvcPeerHostIp        IpAddress,
+        rcEponOnuSerialPortSvcPeerHostPort      INTEGER,
+        rcEponOnuSerialPortSvcConnectCondition  INTEGER,
+        rcEponOnuSerialPortSvcBreakCondition    INTEGER, 
+        rcEponOnuSerialPortSvcMaxSessionNum	    INTEGER,
+        rcEponOnuSerialPortSvcSessionInfo	    DisplayString,
+        rcEponOnuSerialPortSvcCurrentSessionNum INTEGER, 
+        rcEponOnuSerialPortSvcSessionWriteRight INTEGER      
+        }        
+       
+    rcEponOnuSerialPortSvcMngAdmin OBJECT-TYPE
+        SYNTAX EnableVar 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 1 }
+        
+    rcEponOnuSerialPortSvcTrapAdmin OBJECT-TYPE
+        SYNTAX EnableVar
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 2 }
+        
+    rcEponOnuSerialPortSvcMode OBJECT-TYPE
+        SYNTAX INTEGER {
+						tcp_realport(1),
+						tcp_socket_client(2),
+						tcp_socket_server(3),
+						udp (4)     
+        			   }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 3 }
+        
+    rcEponOnuSerialPortSvcSocketPort OBJECT-TYPE
+        SYNTAX INTEGER(1025..65535) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 4 }
+        
+    rcEponOnuSerialPortSvcPeerHostIp OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 5 }
+        
+    rcEponOnuSerialPortSvcPeerHostPort OBJECT-TYPE
+        SYNTAX INTEGER(1025..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 6 }        
+
+    rcEponOnuSerialPortSvcConnectCondition OBJECT-TYPE
+        SYNTAX INTEGER {
+						always(1),
+						char(2),
+						dcd_on(3),
+						dsr_on(4)
+					   } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 7 }  
+       
+    rcEponOnuSerialPortSvcBreakCondition OBJECT-TYPE
+        SYNTAX INTEGER{
+					   none (1),
+					   dcd_off(2),
+					   dsr_off (3)
+					  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 8 }     
+        
+    rcEponOnuSerialPortSvcMaxSessionNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 9 }  
+       
+    rcEponOnuSerialPortSvcSessionInfo OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..1024))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 10 }   
+        
+    rcEponOnuSerialPortSvcCurrentSessionNum OBJECT-TYPE
+        SYNTAX INTEGER(1..64)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 11 }
+        
+    rcEponOnuSerialPortSvcSessionWriteRight OBJECT-TYPE
+        SYNTAX INTEGER {
+					    first(1),
+					    all(2)
+					   }        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSvcEntry 12 } 
+
+--
+-- rcEponOnuSerialPortStatsTable
+-- 
+    rcEponOnuSerialPortStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSerialPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialGroup 3 }
+
+    rcEponOnuSerialPortStatsEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSerialPortStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuSerialPortIndex }
+        ::= { rcEponOnuSerialPortStatsTable 1 }
+
+    RcEponOnuSerialPortStatsEntry ::= SEQUENCE {
+        rcEponOnuSerialPortStatsClear         INTEGER,
+        rcEponOnuSerialPortStatsTxOctets      Counter64,      
+        rcEponOnuSerialPortStatsRxOctets      Counter64
+        }
+        
+    rcEponOnuSerialPortStatsClear OBJECT-TYPE
+        SYNTAX INTEGER {
+                        ready(1),
+                        clear(2)
+                       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortStatsEntry 1 }        		  
+        
+    rcEponOnuSerialPortStatsTxOctets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortStatsEntry 2 }
+        
+    rcEponOnuSerialPortStatsRxOctets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortStatsEntry 3 }
+      
+--
+-- rcEponOnuSerialPortSessionTable
+-- 
+    rcEponOnuSerialPortSessionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSerialPortSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialGroup 4 }
+
+    rcEponOnuSerialPortSessionEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSerialPortSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuSerialPortIndex, rcEponOnuSerialPortSessionIndex }
+        ::= { rcEponOnuSerialPortSessionTable 1 }
+
+    RcEponOnuSerialPortSessionEntry ::= SEQUENCE {
+        rcEponOnuSerialPortSessionIndex           INTEGER,
+        rcEponOnuSerialPortSessionStartTimestamp  DateAndTime,
+        rcEponOnuSerialPortSessionStopTimestamp   DateAndTime,
+        rcEponOnuSerialPortSessionPeerIpAddr      IpAddress,
+        rcEponOnuSerialPortSessionPeerSocketPort  INTEGER,
+        rcEponOnuSerialPortSessionTxOctets        Counter64,
+        rcEponOnuSerialPortSessionRxOctets        Counter64 
+        }        
+       
+    rcEponOnuSerialPortSessionIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 1 }
+        
+    rcEponOnuSerialPortSessionStartTimestamp OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 2 }
+        
+    rcEponOnuSerialPortSessionStopTimestamp OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 3 }
+        
+    rcEponOnuSerialPortSessionPeerIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 4 }  
+        
+    rcEponOnuSerialPortSessionPeerSocketPort OBJECT-TYPE
+        SYNTAX INTEGER (1025..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 5 }      
+    
+    rcEponOnuSerialPortSessionTxOctets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 6 } 
+        
+    rcEponOnuSerialPortSessionRxOctets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortSessionEntry 7 }   
+                  
+--
+-- rcEponOnuSerialPortGlobalTable
+-- 
+    rcEponOnuSerialPortGlobalTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcEponOnuSerialPortGlobalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialGroup 5 }
+
+    rcEponOnuSerialPortGlobalEntry OBJECT-TYPE
+        SYNTAX RcEponOnuSerialPortGlobalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        INDEX { rcEponOnuDevIndex }
+        ::= { rcEponOnuSerialPortGlobalTable 1 }
+
+    RcEponOnuSerialPortGlobalEntry ::= SEQUENCE {
+        rcEponOnuSerialPortGlobalMaxSessionNum      INTEGER
+        }
+                   
+    rcEponOnuSerialPortGlobalMaxSessionNum OBJECT-TYPE
+        SYNTAX INTEGER (4..64) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialPortGlobalEntry 1 }    		  
+               
+--
+-- rcEponOnuSerialTrapGroup
+-- 
+   rcEponOnuSerialTrapGroup  OBJECT IDENTIFIER ::= { rcEponOnuSerialGroup 10}
+
+   rcEponOnuSerialPortLinkUpTrap NOTIFICATION-TYPE
+        OBJECTS { rcEponOnuSerialPortIndex }
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialTrapGroup 1 }
+
+   rcEponOnuSerialPortLinkDownTrap NOTIFICATION-TYPE
+        OBJECTS { rcEponOnuSerialPortIndex }
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialTrapGroup 2 }
+
+   rcEponOnuSerialSessionLinkUpTrap NOTIFICATION-TYPE
+        OBJECTS { rcEponOnuSerialPortIndex ,rcEponOnuSerialPortSvcPeerHostIp, rcEponOnuSerialPortSvcPeerHostPort }
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialTrapGroup 3 }
+        
+   rcEponOnuSerialSessionLinkDownTrap NOTIFICATION-TYPE
+        OBJECTS { rcEponOnuSerialPortIndex , rcEponOnuSerialPortSvcPeerHostIp, rcEponOnuSerialPortSvcPeerHostPort }
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { rcEponOnuSerialTrapGroup 4 }
+
+
+END    
+  

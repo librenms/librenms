@@ -1,0 +1,298 @@
+--MibName=roapIpSourceGuard
+-- *****************************************************************
+-- RAISECOM-RC3026BANDWIDTHMANAGE-MIB.MIB:  Raisecom Bandwidth Manage MIB file
+--
+-- April 2012, pangxijia
+--
+-- Copyright (c) 2012-2019 by Raisecom, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+RAISECOM-IPSOURCEGUARD-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+        RowStatus,MacAddress                FROM SNMPv2-TC
+        EnableVar                           FROM SWITCH-TC
+        InetAddressType, InetAddressIPv6    FROM INET-ADDRESS-MIB     
+        OltPortIndex	                    FROM RAISECOM-PONSERIES-TC 
+	    raisecomSwitchMgt                   FROM RAISECOM-PONSERIES-BASE-MIB;
+          
+                 
+     roapIpSourceGuard MODULE-IDENTITY
+        LAST-UPDATED    "2012104080000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO   
+                "       Raise Systems
+                        
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: pangxijia@raisecom.com"   
+           DESCRIPTION "Version 1.0 ,The MIB module for IPSG"
+
+        ::= { raisecomSwitchMgt  15}    
+  
+        roapIpVerifySourceStatic OBJECT-TYPE 
+        SYNTAX EnableVar 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                   "The static bind enable or disable." 
+        DEFVAL { 2 }
+        ::= { roapIpSourceGuard 1}
+ 
+       roapIpVerifySourceDhcpsnooping OBJECT-TYPE 
+        SYNTAX EnableVar 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The dynamic bind enable or disable."  
+        DEFVAL { 2 }
+         ::= { roapIpSourceGuard 2}
+ 
+        roapIpVerifySourceCurrentEntryNum OBJECT-TYPE 
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current entry number."    
+        DEFVAL { 0 }    
+        ::= { roapIpSourceGuard 3}
+   
+   
+       roapPortTrustTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapPortTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "enable static or dynamic bind type."
+        ::= { roapIpSourceGuard 4}    
+        
+       roapPortTrustEntry OBJECT-TYPE
+        SYNTAX RoapPortTrustEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for ip Source Guard ."
+        INDEX { roapIpsgPortIndex }
+		     ::= { roapPortTrustTable 1 }
+
+
+       RoapPortTrustEntry ::= SEQUENCE {   
+       
+          roapIpsgPortIndex                OltPortIndex, 
+          roapPortIpVerifySourceTrust  EnableVar
+       }
+      
+          roapIpsgPortIndex   OBJECT-TYPE
+          SYNTAX    OltPortIndex 
+          ACCESS    read-only
+          STATUS    current  
+          DESCRIPTION
+                 "port index."
+          DEFVAL { 2 }
+          ::= { roapPortTrustEntry 1} 
+
+       roapPortIpVerifySourceTrust   OBJECT-TYPE
+          SYNTAX    EnableVar 
+          ACCESS    read-write
+          STATUS    current  
+          DESCRIPTION
+                 "enable or disable the dynamic port bind."
+          DEFVAL { 2 }
+          ::= { roapPortTrustEntry 2} 
+      
+  ---------------------------------ip Source Gurad table-------------  
+     roapIpSourceGuardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpSourceGuardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of ip Source Guard."
+        ::= { roapIpSourceGuard 5}
+
+    roapIpSourceGuardEntry OBJECT-TYPE
+        SYNTAX RoapIpSourceGuardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for ip Source Guard."
+        INDEX { roapPortBindPortid,roapPortBindIp,roapPortBindIpMask }
+        ::= { roapIpSourceGuardTable 1 }
+
+    RoapIpSourceGuardEntry ::= SEQUENCE {  
+        roapPortBindPortid        INTEGER,
+        roapPortBindIp            IpAddress,     
+        roapPortBindIpMask        IpAddress,
+        roapPortBindType          INTEGER,
+        roapPortBindMac           MacAddress,
+        roapPortBindVlan          INTEGER, 
+        roapPortBindHwStatus      EnableVar,
+        roapPortBindRowStatus     RowStatus
+    }  
+      
+      roapPortBindPortid   OBJECT-TYPE
+          SYNTAX    INTEGER 
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "the port of the ip source guard applied."  
+       ::= { roapIpSourceGuardEntry 1 }  
+       
+      roapPortBindIp   OBJECT-TYPE
+          SYNTAX    IpAddress    
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The bind ipv4 address."    
+       ::= { roapIpSourceGuardEntry 2 }   
+       
+      roapPortBindIpMask   OBJECT-TYPE
+          SYNTAX    IpAddress    
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The bind ipv4 address mask."    
+       ::= { roapIpSourceGuardEntry 3 } 
+
+     roapPortBindType   OBJECT-TYPE
+          SYNTAX    INTEGER{
+               static(1),
+               dynamic(2)
+          }   
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "static or dynamic."    
+       ::= { roapIpSourceGuardEntry 4 }    
+        
+     roapPortBindMac   OBJECT-TYPE
+          SYNTAX    MacAddress    
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The bind mac."    
+       ::= { roapIpSourceGuardEntry 5 }    
+    
+    roapPortBindVlan   OBJECT-TYPE
+          SYNTAX    INTEGER (0..4094)
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The bind vlan."    
+       ::= { roapIpSourceGuardEntry 6 } 
+
+     roapPortBindHwStatus   OBJECT-TYPE
+          SYNTAX    EnableVar 
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The row status."    
+       ::= { roapIpSourceGuardEntry 7 }  
+                
+     roapPortBindRowStatus   OBJECT-TYPE
+          SYNTAX    RowStatus 
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The row status."    
+       ::= { roapIpSourceGuardEntry 8 }  
+       
+ ---------------------------------ipv6 Source Gurad table-------------  
+     roapIpv6SourceGuardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RoapIpv6SourceGuardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of ip Source Guard."
+        ::= { roapIpSourceGuard 6}
+
+    roapIpv6SourceGuardEntry OBJECT-TYPE
+        SYNTAX RoapIpv6SourceGuardEntry
+        MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            "Table entry for ip Source Guard."
+        INDEX { roapPortBindPortidv6,roapPortBindIpv6,roapPortBindIpv6Prefix}
+        ::= { roapIpv6SourceGuardTable 1 }
+
+    RoapIpv6SourceGuardEntry ::= SEQUENCE {    
+        roapPortBindPortidv6        INTEGER,
+        roapPortBindIpv6            InetAddressIPv6,   
+        roapPortBindIpv6Prefix      INTEGER,
+        roapPortBindTypev6          INTEGER,
+        roapPortBindMacv6           MacAddress,
+        roapPortBindVlanv6          INTEGER, 
+        roapPortBindHwStatusv6      EnableVar,
+        roapPortBindRowStatusv6     RowStatus
+    }  
+     roapPortBindPortidv6   OBJECT-TYPE
+          SYNTAX    INTEGER 
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "the port of the ip source guard applied."  
+       ::= { roapIpv6SourceGuardEntry 1 }   
+       
+      roapPortBindIpv6   OBJECT-TYPE
+          SYNTAX    InetAddressIPv6    
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The bind ipv6 address."    
+       ::= { roapIpv6SourceGuardEntry 2 }  
+        
+     roapPortBindIpv6Prefix   OBJECT-TYPE
+          SYNTAX    INTEGER    
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The bind ipv6 address prefix."    
+       ::= { roapIpv6SourceGuardEntry 3 } 
+ 
+    
+     roapPortBindTypev6   OBJECT-TYPE
+          SYNTAX    INTEGER{
+               static(1),
+               dynamic(2)
+          }   
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "static or dynamic."    
+       ::= { roapIpv6SourceGuardEntry 4 }    
+        
+     roapPortBindMacv6   OBJECT-TYPE
+          SYNTAX    MacAddress    
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The bind mac."    
+       ::= { roapIpv6SourceGuardEntry 5 }    
+    
+    roapPortBindVlanv6   OBJECT-TYPE
+          SYNTAX    INTEGER (0..4094)
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The bind vlan."    
+       ::= { roapIpv6SourceGuardEntry 6 } 
+
+     roapPortBindHwStatusv6   OBJECT-TYPE
+          SYNTAX    EnableVar 
+          ACCESS    read-only
+          STATUS    current
+          DESCRIPTION
+                 "The row status."    
+       ::= { roapIpv6SourceGuardEntry 7 }  
+                
+     roapPortBindRowStatusv6   OBJECT-TYPE
+          SYNTAX    RowStatus 
+          ACCESS    read-create
+          STATUS    current
+          DESCRIPTION
+                 "The row status."    
+       ::= { roapIpv6SourceGuardEntry 8 }        
+ END
