@@ -74,9 +74,10 @@ $graphs['nfs-v3-stats'] = array(
     'ra',
     'net',
     'rpc',
-};
+);
 
 $graphs['os-updates'] = array('');
+$graphs['dhcp-stats'] = array('');
 
 print_optionbar_start();
 
