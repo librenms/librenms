@@ -56,7 +56,28 @@ $graphs['tinydns']   = array(
     'other',
 );
 
+$graphs['powerdns'] = array(
+    'latency',
+    'fail',
+    'packetcache',
+    'querycache',
+    'recursing',
+    'queries',
+    'queries_udp',
+);
+
+$graphs['nfs-v3-stats'] = array(
+    'stats',
+    'io',
+    'fh',
+    'rc',
+    'ra',
+    'net',
+    'rpc',
+);
+
 $graphs['os-updates'] = array('');
+$graphs['dhcp-stats'] = array('');
 
 print_optionbar_start();
 
