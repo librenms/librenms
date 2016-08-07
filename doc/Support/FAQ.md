@@ -20,6 +20,7 @@
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
+ - [What information do you need to add a new OS?](#faq20)
  - [What can I do to help?](#faq9)
  - [How can I test another users branch?](#faq13)
 
@@ -74,6 +75,9 @@ If the page you are trying to load has a substantial amount of data in it then i
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
 The easiest way to check if all is well is to run `./validate.php` as root from within your install directory. This should give you info on why things aren't working.
+
+One other reason could be a restricted snmpd.conf file or snmp view which limits the data sent back. If you use net-snmp then we suggest using 
+the (included snmpd.conf)[https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example] file.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
@@ -152,6 +156,20 @@ sysObjectID or sysDescr, or the existence of a particular enterprise tree.
 This file will usually set the variables for $version and $hardware gained from an snmp lookup.
 **html/images/os/$os.png**
 This is a 32x32 png format image of the OS you are adding support for.
+
+#### <a name="faq20"> What information do you need to add a new OS?</a>
+
+Please provide the following output as seperate non-expiring pastebin.com links.
+
+Replace the relevant information in these commands such as HOSTNAME and COMMUNITY.
+
+```bash
+./discovery.php -h HOSTNAME -d -m os
+./poller.php -h HOSTNAME -r -f -d -m os
+snmpbulkwalk -On -v2c -c COMMUNITY HOSTNAME .
+```
+
+If possible please also provide what the OS name should be if it doesn't exist already.
 
 #### <a name="faq9"> What can I do to help?</a>
 

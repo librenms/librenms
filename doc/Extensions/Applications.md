@@ -10,6 +10,10 @@ Different applications support a variety of ways collect data: by direct connect
 4. [PowerDNS](#powerdns) - Agent
 5. [PowerDNS Recursor](#powerdns-recursor) - Agent
 6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
+7. [OS Updates](#os-updates) - extend SNMP
+8. [DHCP Stats](#dhcp-stats) - extend SNMP
+9. [Memcached](#memcached) - extend SNMP
+
 
 * [Agent Setup](#agent-setup)
 
@@ -47,6 +51,8 @@ Note: if you change the path you will need to change the path in `scripts/agent-
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
+The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
+
 Unlike most other scripts, the MySQL script requires a configuration file `/usr/lib/check_mk_agent/local/mysql.cnf` with following content:
 
 ```php
@@ -56,6 +62,8 @@ $mysql_pass = 'toor';
 $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
+
+Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
 ### NGINX
 
@@ -88,7 +96,11 @@ A recursive DNS server: https://www.powerdns.com/recursor.html
 ##### Direct
 The LibreNMS polling host must be able to connect to port 8082 on the monitored device.
 The web-server must be enabled, see the Recursor docs: https://doc.powerdns.com/md/recursor/settings/#webserver
-There is currently no way to specify a custom port or password.
+
+###### Variables
+`$config['apps']['powerdns-recursor']['api-key']` required, this is defined in the Recursor config
+`$config['apps']['powerdns-recursor']['port']` numeric, defines the port to connect to PowerDNS Recursor on.  The default is 8082
+`$config['apps']['powerdns-recursor']['https']` true or false, defaults to use http.
 
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
@@ -117,6 +129,44 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
+### OS Updates
+A small shell script that checks your system package manager for any available updates (supports yum/apt-get/zypper package managers).
+
+##### Extend SNMP
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /opt/os-updates.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend osupdate /opt/os-updates.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
+
+_Note_: apt-get depends on an updated package index. There are several ways to have your system run `apt-get update` automatically. The easiest is to create `/etc/apt/apt.conf.d/10periodic` and pasting the following in it: `APT::Periodic::Update-Package-Lists "1";`.
+If you have apticron, cron-apt or apt-listchanges installed and configured, chances are that packages are already updated periodically.
+
+### DHCP Stats
+A small shell script that reports current DHCP leases stats.
+
+##### Extend SNMP
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /opt/dhcp-status.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /opt/dhcp-status.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
+
+### Memcached
+1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/usr/local/bin` (or any other suitable location) on your remote server.
+2. Make the script executable: `chmod +x /usr/local/memcached`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend memcached /usr/local/bin/memcached
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
 Agent Setup
 -----------
@@ -165,8 +215,7 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 
 | xinetd | systemd |
 | --- | --- |
-| `/etc/init.d/xinetd restart` | `systemctl enable --now check_mk.socket` |
-
+| `/etc/init.d/xinetd restart` | `systemctl enable check_mk.socket && systemctl start check_mk.socket` |
 
 8. Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 9. Then under Applications, enable the apps that you plan to monitor.
