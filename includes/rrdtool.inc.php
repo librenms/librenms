@@ -229,7 +229,7 @@ function rrdtool_check_rrd_exists($filename)
 {
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('last', $filename, '', 10); // wait up to 10 seconds
+        $chk = rrdtool('last', $filename, '', 30); // wait up to 30 seconds
         return strpos(implode($chk), "$filename': No such file or directory") === false;
     } else {
         return is_file($filename);
@@ -378,7 +378,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
     }
 
     $rrd = rrd_name($device['hostname'], $rrd_name);
-    if (!rrdtool_check_rrd_exists($rrd) && $tags['rrd_def']) {
+    if ($tags['rrd_def']) {
         $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
         // add the --step and the rra definitions to the command
         $newdef = "--step $step ".implode(' ', $rrd_def).$config['rrd_rra'];
