@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Neil Lathwood <neil@lathwood.co.uk>
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -10,13 +10,8 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'junos') {
-
-    echo 'Pre-cache JunOS: ';
-
-    $junos_oids = array();
-    echo 'Caching OIDs:';
-
-    $junos_oids = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/junos');
-
+if (empty($os)) {
+    if (strstr($sysDescr, 'Cisco FX-OS')) {
+        $os = 'fxos';
+    }
 }

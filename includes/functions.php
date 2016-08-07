@@ -244,155 +244,94 @@ function delete_device($id) {
     return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
+/**
+ * Add a device to LibreNMS
+ *
+ * @param string $host dns name or ip address
+ * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
+ * @param string $port the port to connect to for snmp
+ * @param string $transport udp or tcp
+ * @param int $quiet don't output anything
+ * @param string $poller_group the poller group this device will belong to
+ * @param string $force_add add even if the device isn't pingable
+ * @param string $port_assoc_mode snmp field to use to determine unique ports
+ * @return int|string returns the id of the added device, otherwise an error message
+ */
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $quiet = 0, $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
     global $config;
 
-    list($hostshort) = explode(".", $host);
     // Test Database Exists
-    if (host_exists($host) === false) {
-        // Valid port assoc mode
-        if (! is_valid_port_assoc_mode ($port_assoc_mode)) {
-            if ($quiet == 0) {
-                print_error ("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join (', ', get_port_assoc_modes ()));
-                return 0;
-            }
-        }
+    if (host_exists($host) === true) {
+        return "Already have host $host";
+    }
 
-        if ($config['addhost_alwayscheckip'] === TRUE) {
-            $ip = gethostbyname($host);
+    // Valid port assoc mode
+    if (!is_valid_port_assoc_mode($port_assoc_mode)) {
+        return "Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes());
+    }
+
+    // check if we have the host by IP
+    if ($config['addhost_alwayscheckip'] === true) {
+        $ip = gethostbyname($host);
+    } else {
+        $ip = $host;
+    }
+    if (ip_exists($ip)) {
+        return "Already have host with this IP $host";
+    }
+
+    // Test reachability
+    $address_family = snmpTransportToAddressFamily($transport);
+    $ping_result = isPingable($host, $address_family);
+    if ($force_add == 1 || !$ping_result['result']) {
+        return "Could not ping $host";
+    }
+
+    // if $snmpver isn't set, try each version of snmp
+    if (empty($snmp_version)) {
+        $snmpvers = array('v2c', 'v3', 'v1');
+    } else {
+        $snmpvers = array($snmp_version);
+    }
+
+    // try different snmp variables to add the device
+    foreach ($snmpvers as $snmpver) {
+        if ($snmpver === "v3") {
+            // Try each set of parameters from config
+            foreach ($config['snmp']['v3'] as $v3) {
+                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
+                print_message("Trying v3 parameters " . $v3['authname'] . "/" . $v3['authlevel'] . " ... ", $quiet);
+                if ($force_add == 1 || isSNMPable($device)) {
+                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
+                    if ($result !== false) {
+                        return $result;
+                    }
+                } else {
+                    print_error("No reply on credentials " . $v3['authname'] . "/" . $v3['authlevel'] . " using $snmpver", $quiet);
+                }
+            }
+        } elseif ($snmpver === "v2c" || $snmpver === "v1") {
+            // try each community from config
+            foreach ($config['snmp']['community'] as $community) {
+                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
+                print_message("Trying community $community ...", $quiet);
+                if ($force_add == 1 || isSNMPable($device)) {
+                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
+                    if ($result !== false) {
+                        return $result;
+                    }
+                } else {
+                    print_error("No reply on community $community using $snmpver", $quiet);
+                }
+            }
         } else {
-            $ip = $host;
-        }
-        if (ip_exists($ip) === false) {
-            // Test reachability
-            $address_family = snmpTransportToAddressFamily($transport);
-            if ($force_add == 1 || isPingable($host, $address_family)) {
-                if (empty($snmpver)) {
-                    // Try SNMPv2c
-                    $snmpver = 'v2c';
-                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
-                    if (!$ret) {
-                        //Try SNMPv3
-                        $snmpver = 'v3';
-                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
-                        if (!$ret) {
-                            // Try SNMPv1
-                            $snmpver = 'v1';
-                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
-                        }
-                        else {
-                            return $ret;
-                        }
-                    }
-                    else {
-                        return $ret;
-                    }
-                }
-
-                if ($snmpver === "v3") {
-                    // Try each set of parameters from config
-                    foreach ($config['snmp']['v3'] as $v3) {
-                        $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                        if($quiet == '0') { print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... "); }
-                        if ($force_add == 1 || isSNMPable($device)) {
-                            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                            if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
-                                return $device_id;
-                            }
-                            else {
-                                if($quiet == '0') {
-                                    print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
-                                }
-                            }
-                        }
-                        else {
-                            if($quiet == '0') {
-                                print_error("No reply on credentials " . $v3['authname'] . "/" .  $v3['authlevel'] . " using $snmpver");
-                            }
-                        }
-                    }
-                }
-                elseif ($snmpver === "v2c" or $snmpver === "v1") {
-                    // try each community from config
-                    foreach ($config['snmp']['community'] as $community) {
-                        $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL, $port_assoc_mode);
-                        if($quiet == '0') {
-                            print_message("Trying community $community ...");
-                        }
-                        if ($force_add == 1 || isSNMPable($device)) {
-                            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                            if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode, $snmphost);
-                                return $device_id;
-                            }
-                            else {
-                                if($quiet == '0') {
-                                    print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
-                                }
-                            }
-                        }
-                        else {
-                            if($quiet == '0') {
-                                print_error("No reply on community $community using $snmpver");
-                            }
-                        }
-                    }
-                }
-                else {
-                    if($quiet == '0') {
-                        print_error("Unsupported SNMP Version \"$snmpver\".");
-                    }
-                }
-
-                if (!$device_id) {
-                    // Failed SNMP
-                    if($quiet == '0') {
-                        print_error("Could not reach $host with given SNMP community using $snmpver");
-                    }
-                }
-            }
-            else {
-                // failed Reachability
-                if($quiet == '0') {
-                    print_error("Could not ping $host");
-                }
-            }
-        }
-        else {
-            if ($quiet == 0) {
-                print_error("Already have host with this IP $host");
-            }
-        }
-    }
-    else {
-        // found in database
-        if($quiet == '0') {
-            print_error("Already got host $host");
+            return "Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3";
         }
     }
 
-    return 0;
-}
-
-function scanUDP($host, $port, $timeout) {
-    $handle = fsockopen($host, $port, $errno, $errstr, 2);
-    socket_set_timeout ($handle, $timeout);
-    $write = fwrite($handle,"\x00");
-    if (!$write) {
-next;
-    }
-    $startTime = time();
-    $endTime = time();
-    $timeDiff = $endTime - $startTime;
-    if ($timeDiff >= $timeout) {
-        fclose($handle);
-        return 1;
-    }
-    else {
-        fclose($handle);
-        return 0;
-    }
+    return "Could not connect, please check the snmp details and snmp reachability";
 }
 
 function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3, $port_assoc_mode = 'ifIndex') {
@@ -505,7 +444,7 @@ function isSNMPable($device) {
  * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
  * @param array $attribs The device attributes
  *
- * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
+ * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
 function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     global $config;
@@ -544,10 +483,6 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     return($response);
 }
 
-function is_odd($number) {
-    return $number & 1; // 0 = even, 1 = odd
-}
-
 function getpollergroup($poller_group='0') {
     //Is poller group an integer
     if (is_int($poller_group) || ctype_digit($poller_group)) {
@@ -573,13 +508,13 @@ function getpollergroup($poller_group='0') {
     }
 }
 
-function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex', $snmphost) {
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex', $snmphost = '') {
     global $config;
     $host = trim(strtolower($host));
 
     $poller_group=getpollergroup($poller_group);
 
-    /* Get port_assoc_mode id if neccessary
+    /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int ($port_assoc_mode))
         $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
@@ -601,24 +536,17 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
     $device['os'] = getHostOS($device);
 
     if ($device['os']) {
-
         if (host_exists($host, $snmphost) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
                 oxidized_reload_nodes();
-                return($device_id);
-            }
-            else {
-                return false;
+                return $device_id;
             }
         }
-        else {
-            return false;
-        }
     }
-    else {
-        return FALSE;
-    }
+
+    // couldn't add the device
+    return false;
 }
 
 function isDomainResolves($domain) {
@@ -1211,22 +1139,19 @@ function fix_integer_value($value) {
     return $return;
 }
 
-function ip_exists($ip) {
+function ip_exists($ip)
+{
     // Function to check if an IP exists in the DB already
-    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== FALSE) {
-        if (!dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip,$ip))) {
-            return false;
-        }
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+        $dbresult = dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip, $ip));
+        return !empty($dbresult);
+    } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+        $dbresult = dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip));
+        return !empty($dbresult);
     }
-    elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== FALSE) {
-        if (!dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip))) {
-            return false;
-        }
-    }
-    else {
-        return false;
-    }
-    return true;
+
+    // not an ipv4 or ipv6 address...
+    return false;
 }
 
 function fping($host,$params,$address_family = AF_INET) {

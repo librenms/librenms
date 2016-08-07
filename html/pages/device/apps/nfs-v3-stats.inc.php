@@ -3,13 +3,13 @@
 global $config;
 
 $graphs = array(
-    'nfs-v3-stats' => 'NFS v3 Statistics',
-    'nfs-io' => 'IO',
-    'nfs-fh' => 'File handler',
-    'nfs-rc' => 'Reply cache',
-    'nfs-ra' => 'Read ahead cache',
-    'nfs-net' => 'Network stats',
-    'nfs-rpc' => 'RPC Stats',
+    'nfs-v3-stats_stats' => 'NFS v3 Statistics',
+    'nfs-v3-stats_io' => 'IO',
+    'nfs-v3-stats_fh' => 'File handler',
+    'nfs-v3-stats_rc' => 'Reply cache',
+    'nfs-v3-stats_ra' => 'Read ahead cache',
+    'nfs-v3-stats_net' => 'Network stats',
+    'nfs-v3-stats_rpc' => 'RPC Stats',
 
 );
 
