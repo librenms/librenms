@@ -25,7 +25,7 @@
  * @subpackage Devices
  */
 
-include_once($config['install_dir'].'/includes/common.inc.php');
+include_once($config['install_dir'].'/includes/common.php');
 
 /**
  * Add a new device group
