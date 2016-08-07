@@ -17,7 +17,8 @@
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
-// Observium Includes
+// Includes
+include_once($config['install_dir'] . "/includes/exceptions.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
@@ -253,23 +254,30 @@ function delete_device($id) {
  * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
  * @param string $port the port to connect to for snmp
  * @param string $transport udp or tcp
- * @param int $quiet don't output anything
  * @param string $poller_group the poller group this device will belong to
  * @param string $force_add add even if the device isn't pingable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
- * @return int|string returns the id of the added device, otherwise an error message
+ *
+ * @return int returns the device_id of the added device
+ *
+ * @throws HostExistsException This hostname already exists
+ * @throws HostIpExistsException We already have a host with this IP
+ * @throws HostUnreachableException We could not reach this device is some way
+ * @throws HostUnreachablePingException We could not ping the device
+ * @throws InvalidPortAssocModeException The given port association mode was invalid
+ * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $quiet = 0, $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
     global $config;
 
     // Test Database Exists
     if (host_exists($host) === true) {
-        return "Already have host $host";
+        throw new HostExistsException("Already have host $host");
     }
 
     // Valid port assoc mode
     if (!is_valid_port_assoc_mode($port_assoc_mode)) {
-        return "Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes());
+        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
     // check if we have the host by IP
@@ -279,14 +287,14 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $ip = $host;
     }
     if (ip_exists($ip)) {
-        return "Already have host with this IP $host";
+        throw new HostIpExistsException("Already have host with this IP $host");
     }
 
     // Test reachability
     $address_family = snmpTransportToAddressFamily($transport);
     $ping_result = isPingable($host, $address_family);
     if ($force_add == 1 || !$ping_result['result']) {
-        return "Could not ping $host";
+        throw new HostUnreachablePingException("Could not ping $host");
     }
 
     // if $snmpver isn't set, try each version of snmp
@@ -296,13 +304,13 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
+    $host_unreachable_exception = new HostUnreachableException("Could not connect, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === "v3") {
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                print_message("Trying v3 parameters " . $v3['authname'] . "/" . $v3['authlevel'] . " ... ", $quiet);
                 if ($force_add == 1 || isSNMPable($device)) {
                     $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                     $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
@@ -310,14 +318,14 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                         return $result;
                     }
                 } else {
-                    print_error("No reply on credentials " . $v3['authname'] . "/" . $v3['authlevel'] . " using $snmpver", $quiet);
+                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
             }
         } elseif ($snmpver === "v2c" || $snmpver === "v1") {
             // try each community from config
             foreach ($config['snmp']['community'] as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
-                print_message("Trying community $community ...", $quiet);
+
                 if ($force_add == 1 || isSNMPable($device)) {
                     $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                     $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
@@ -325,15 +333,15 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                         return $result;
                     }
                 } else {
-                    print_error("No reply on community $community using $snmpver", $quiet);
+                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
             }
         } else {
-            return "Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3";
+            throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
         }
     }
 
-    return "Could not connect, please check the snmp details and snmp reachability";
+    throw $host_unreachable_exception;
 }
 
 function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3, $port_assoc_mode = 'ifIndex') {
