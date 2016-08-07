@@ -51,9 +51,8 @@ function perform_snmp_scan($net) {
     $end   = ip2long($net->broadcast)-1;
     while ($start++ < $end) {
         $stats['count']++;
-        $device_id = false;
-        $host      = long2ip($start);
-        $test      = isPingable($host);
+        $host = long2ip($start);
+        $test = isPingable($host);
         if ($test['result'] === false) {
             echo '.';
             continue;
@@ -64,15 +63,23 @@ function perform_snmp_scan($net) {
             continue;
         }
         foreach (array('udp','tcp') as $transport) {
-            if ($device_id !== false && $device_id > 0) {
+            $result = addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $quiet, $config['distributed_poller_group'], 0);
+            if (is_numeric($result)) {
                 $stats['added']++;
                 echo '+';
-            } else if ($device_id === 0) {
+                break;
+            } elseif (substr($result, 0, 12) === 'Already have') {
+                $stats['known']++;
+                echo '*';
+                break;
+            } elseif (substr($result, 0 , 14) === 'Could not ping') {
+                echo '.';
+                break;
+            } elseif ($transport == 'tcp') {
+                // tried both udp and tcp without success
                 $stats['failed']++;
                 echo '-';
-                break;
             }
-            $device_id = addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $quiet, $config['distributed_poller_group'], 0);
         }
     }
     echo PHP_EOL;
@@ -106,7 +113,7 @@ if (isset($opts['r'])) {
     $net = Net_IPv4::parseAddress($opts['r']);
     if (ip2long($net->network) !== false) {
         perform_snmp_scan($net);
-        echo 'Scanned '.$stats['count'].' IPs, Already know '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
+        echo 'Scanned '.$stats['count'].' IPs, Already known '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
         echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
     } else {
         echo 'Could not interpret supplied CIDR noted IP-Range: '.$opts['r'].PHP_EOL;

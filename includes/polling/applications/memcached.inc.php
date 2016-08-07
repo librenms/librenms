@@ -2,7 +2,14 @@
 
 $name = 'memcached';
 $app_id = $app['app_id'];
-$data = $agent_data['app'][$name][$app['app_instance']];
+if (!empty($agent_data['app']['memcached'])) {
+    $data = $agent_data['app']['memcached'][$app['app_instance']];
+} else {
+    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
+    $result  = snmp_get($device, $oid, '-Oqv');
+    $result  = unserialize(str_replace("<<<app-memcached>>>\n", '', $result));
+    $data    = reset($result);
+}
 
 echo ' memcached('.$app['app_instance'].')';
 
