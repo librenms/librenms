@@ -80,7 +80,7 @@ foreach ($applications as $app) {
     echo '      <td>';
     echo '        <input type=checkbox'.(in_array($app, $app_enabled) ? ' checked="1"' : '')." name='app_".$app."'>";
     echo '      </td>';
-    echo '      <td>'.ucfirst($app).'</td>';
+    echo '      <td>'.nicecase($app).'</td>';
     echo '    </tr>
         ';
 

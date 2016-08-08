@@ -10,7 +10,7 @@ $git_log = `git log -10`;
         <h4 class="modal-title" id="myModalLabel">Local git log</h4>
       </div>
       <div class="modal-body">
-<pre><?php echo $git_log; ?></pre>
+	<pre><?php echo htmlspecialchars($git_log, ENT_COMPAT,'ISO-8859-1', true); ?></pre>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -235,7 +235,6 @@ echo "
         });
     });
 
-    // convert the version date from ISO 8601 to the browser's timezone
     var ver_date = $('#version_date');
-    ver_date.text(new Date(ver_date.text()).toString());
+    ver_date.text(moment.unix(ver_date.text()));
 </script>

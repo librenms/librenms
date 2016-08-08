@@ -19,7 +19,7 @@ global $config;
 // Loop over each component, pulling out the Overlays.
 foreach ($components as $oid => $overlay) {
     if ($overlay['otvtype'] == 'overlay') {
-        if ($overlay['status'] == 1) {
+        if ($overlay['status'] == 0) {
             $overlay_status = "<span class='green pull-right'>Normal</span>";
             $gli = "";
         }
@@ -33,7 +33,7 @@ foreach ($components as $oid => $overlay) {
 <?php
         foreach ($components as $aid => $adjacency) {
             if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
-                if ($adjacency['status'] == 1) {
+                if ($adjacency['status'] == 0) {
                     $adj_status = "<span class='green pull-right'>Normal</span>";
                     $gli = "";
                 }

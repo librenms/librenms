@@ -5,6 +5,7 @@ $common_output[] = '
     <table id="syslog" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
+                <th data-column-id="priority">&nbsp;</th>
                 <th data-column-id="timestamp" data-order="desc">Datetime</th>
                 <th data-column-id="device_id">Hostname</th>
                 <th data-column-id="program">Program</th>
@@ -21,7 +22,11 @@ var syslog_grid = $("#syslog").bootgrid({
     {
         return {
             id: "syslog",
-            device: "' .mres($vars['device']) .'",
+            device: "'.mres($vars['device']) .'",
+            program: "'.mres($vars['program']).'",
+            priority: "'.mres($vars['priority']).'",
+            to: "'.mres($vars['to']).'",
+            from: "'.mres($vars['from']).'",
         };
     },
     url: "ajax_table.php"

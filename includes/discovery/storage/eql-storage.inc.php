@@ -19,7 +19,7 @@ if (is_array($eql_storage)) {
     foreach ($eql_storage as $index => $storage) {
         $fstype = $storage['eqliscsiVolumeAdminStatus'];
         $descr  = $storage['eqliscsiVolumeName'];
-        $units  = 1;
+        $units  = 1000000;
         $size = $storage['eqliscsiVolumeSize'] * $units;
         $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
         if (is_int($index)) {

@@ -67,8 +67,10 @@ if ($_POST['hostname']) {
 
         $port_assoc_mode = $_POST['port_assoc_mode'];
         $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-        if ($result) {
+        if (is_numeric($result)) {
             print_message("Device added ($result)");
+        } else {
+            print_error('Error: ' . $result);
         }
     }
     else {

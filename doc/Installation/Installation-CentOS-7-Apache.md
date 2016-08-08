@@ -21,7 +21,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/my.cnf`
+`vim /etc/my.cnf.d/server.cnf`
 
 Within the [mysqld] section please add:
 
@@ -152,6 +152,15 @@ That's it!  You now should be able to log in to http://librenms.example.com/.  P
 #### Add first device
 
 We now suggest that you add localhost as your first device from within the WebUI.
+
+#### What next?
+
+Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
+
+ - (Performance tuning)[http://docs.librenms.org/Support/Performance]
+ - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
+ - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
+ - (Auto discovery)[http://docs.librenms.org/Extensions/Auto-Discovery/]
 
 #### Closing
 
