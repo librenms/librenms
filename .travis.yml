@@ -1,13 +1,19 @@
 language: php
-
-php:
-  - '5.3'
-  - '5.4'
-  - '5.5'
-  - '5.6'
-  - '7.0'
-  - hhvm
-
 matrix:
+  fast_finish: true
+  include:
+  - php: 5.3
+    script: find . -path './lib/influxdb-php' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+  - php: 5.4
+    script: find . -path './lib/influxdb-php' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+  - php: 5.5
+    script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+  - php: 5.6
+    script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+  - php: 7.0
+    script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+  - php: hhvm
+    script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
   allow_failures:
-    - php: 7.0
+  - php: 7.0
+  - php: hhvm
