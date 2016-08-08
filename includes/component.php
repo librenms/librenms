@@ -20,7 +20,7 @@ class component {
     private $reserved = array(
         'type'      => '',
         'label'     => '',
-        'status'    => 1,
+        'status'    => 0,
         'ignore'    => 0,
         'disabled'  => 0,
         'error'     => '',
@@ -148,6 +148,69 @@ class component {
         return $RESULT;
     }
 
+    public function getComponentStatus($device=null) {
+        $sql_query = "SELECT status, count(status) as count FROM component WHERE";
+        $sql_param = array();
+        $add = 0;
+
+        if (!is_null($device)) {
+            // Add a device filter to the SQL query.
+            $sql_query .= " `device_id` = ?";
+            $sql_param[] = $device;
+            $add++;
+        }
+
+        if ($add == 0) {
+            // No filters, remove " WHERE" -6
+            $sql_query = substr($sql_query, 0, strlen($sql_query)-6);
+        }
+        $sql_query .= " GROUP BY status";
+        d_echo("SQL Query: ".$sql_query);
+
+        // $service is not null, get only what we want.
+        $result = dbFetchRows($sql_query, $sql_param);
+
+        // Set our defaults to 0
+        $count = array(0 => 0, 1 => 0, 2 => 0);
+        // Rebuild the array in a more convenient method
+        foreach ($result as $v) {
+            $count[$v['status']] = $v['count'];
+        }
+
+        d_echo("Component Count by Status: ".print_r($count,TRUE)."\n");
+        return $count;
+    }
+
+    public function getComponentStatusLog($component=null,$start=null,$end=null) {
+        if ( ($component == null) || ($start == null) || ($end == null) ) {
+            // Error...
+            d_echo("Required arguments are missing. Component: ".$component.", Start: ".$start.", End: ".$end."\n");
+            return false;
+        }
+
+        // Create our return array.
+        $return = array();
+
+        // 1. find the previous value, this is the value when $start occurred.
+        $sql_query = "SELECT status FROM component_statuslog WHERE `component` = ? AND time < ? ORDER BY `id` desc LIMIT 1";
+        $sql_param = array($component,$start);
+        $result = dbFetchRow($sql_query, $sql_param);
+        if ($result == false) {
+            $return['initial'] = false;
+        }
+        else {
+            $return['initial'] = $result['status'];
+        }
+
+        // 2. Then we just need a list of all the entries for the time period.
+        $sql_query = "SELECT status, time, message FROM component_statuslog WHERE `component` = ? AND time >= ? AND time < ? ORDER BY `time`";
+        $sql_param = array($component,$start,$end);
+        $return['data'] = dbFetchRows($sql_query, $sql_param);
+
+        d_echo("Status Log Data: ".print_r($return,TRUE)."\n");
+        return $return;
+    }
+
     public function createComponent ($device_id,$TYPE) {
         // Prepare our default values to be inserted.
         $DATA = $this->reserved;
@@ -159,11 +222,25 @@ class component {
         // Insert a new component into the database.
         $id = dbInsert($DATA, 'component');
 
+        // Add a default status log entry - we always start ok.
+        $this->createStatusLogEntry($id,0,'Component Created');
+
         // Create a default component array based on what was inserted.
         $ARRAY = array();
         $ARRAY[$id] = $DATA;
         unset ($ARRAY[$id]['device_id']);     // This doesn't belong here.
         return $ARRAY;
+    }
+
+    public function createStatusLogEntry($component,$status,$message) {
+        // Add an entry to the statuslog table for a particular component.
+        $DATA = array(
+            'component'     => $component,
+            'status'        => $status,
+            'message'       => $message,
+        );
+
+        return dbInsert($DATA, 'component_statuslog');
     }
 
     public function deleteComponent ($id) {
@@ -186,6 +263,12 @@ class component {
 
             // Ignore type, we cant change that.
             unset($AVP['type'],$OLD[$device_id][$COMPONENT]['type']);
+
+            // If the Status has changed we need to add a log entry
+            if ($AVP['status'] != $OLD[$device_id][$COMPONENT]['status']) {
+                d_echo("Status Changed - Old: ".$OLD[$device_id][$COMPONENT]['status'].", New: ".$AVP['status']."\n");
+                $this->createStatusLogEntry($COMPONENT,$AVP['status'],$AVP['error']);
+            }
 
             // Process our reserved components first.
             $UPDATE = array();
@@ -239,7 +322,7 @@ class component {
                     log_event("Component: ".$AVP[$COMPONENT]['type']."(".$COMPONENT."). Attribute: ".$ATTR.", was modified from: ".$OLD[$COMPONENT][$ATTR].", to: ".$VALUE,$device_id,'component',$COMPONENT);
                 }
 
-            } // End Foreach COMPONENT
+            } // End Foreach AVP
 
             // Process our Deletes.
             $DELETE = array_diff_key($OLD[$device_id][$COMPONENT], $AVP);

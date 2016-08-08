@@ -53,8 +53,9 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
     }
 
     if (match_network($config['nets'], $ip)) {
-        $remote_device_id = addHost($dst_host, '', '161', 'udp', '0', $config['distributed_poller_group']);
-        if ($remote_device_id) {
+        $result = addHost($dst_host, '', '161', 'udp', '0', $config['distributed_poller_group']);
+        if (is_numeric($result)) {
+            $remote_device_id = $result;
             $remote_device = device_by_id_cache($remote_device_id, 1);
             echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
             discover_device($remote_device);
@@ -72,9 +73,10 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
             }
 
             return $remote_device_id;
-        } 
-        else {
-            log_event("$method discovery of " . $dst_host . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery');
+        } else {
+            if(substr($result, 0, 12) !== 'Already have') {
+                log_event("$method discovery of " . $dst_host . " ($ip) failed - " . $result);
+            }
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
@@ -89,6 +91,7 @@ function discover_device($device, $options = null) {
     $valid = array();
     // Reset $valid array
     $attribs = get_dev_attribs($device['device_id']);
+    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $device_start = microtime(true);
     // Start counting device poll time

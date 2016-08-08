@@ -7,7 +7,7 @@
 #### Install / Configure MySQL
 ```bash
 apt-get install mariadb-server mariadb-client
-service mariadb restart
+service mysql restart
 mysql -uroot -p
 ```
 
@@ -30,7 +30,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mariadb restart```
+```service mysql restart```
 
 ### Web Server ###
 
@@ -134,6 +134,15 @@ That's it!  You now should be able to log in to http://librenms.example.com/.  P
 #### Add first device
 
 We now suggest that you add localhost as your first device from within the WebUI.
+
+#### What next?
+
+Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
+
+ - (Performance tuning)[http://docs.librenms.org/Support/Performance]
+ - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
+ - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
+ - (Auto discovery)[http://docs.librenms.org/Extensions/Auto-Discovery/]
 
 #### Closing
 

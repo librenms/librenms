@@ -1,0 +1,617 @@
+-- ==================================================================
+-- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Device Management MIB
+-- Reference:
+-- Version: V2.4
+-- History:
+--      V1.0 (1) Created by Hou Qiang, 2001.06.29
+--           (2) Revised by Qi Zhenglin, 2001.12.30 ----r003 revision
+--      V1.1 2004/7/20 import hh3cLswFrameIndex, hh3cLswSlotIndex
+--           FROM HH3C-LSW-DEV-ADM-MIB
+--      V1.2 2004/09/10
+--           1) change all MIB objects' STATUS from mandatory to current.
+--           2) remove statement before hh3cLswdevMMib
+--           3) adjust file format, change tab to space and some small
+--              changes.
+--           4) change STATUS of hh3cCfmWriteFlash and hh3cCfmEraseFlash
+--              from write-only to read-write.
+--      V2.0 2004-10-12 updated by gaolong
+--           Import Gauge32, OBJECT-IDENTITY.
+--           Relocate hh3cLswdevMMib MODULE-IDENTITY clause.
+--           Change ACCESS to MAX-ACCESS
+--           Change Gauge to Gauge32.
+--           Change value of hh3cDevMFanStatus and hh3cDevMPowerStatus from underscores to hyphens.
+--      V2.1  2005-01-12
+--           Change the description of hh3cFlhTotalSize and hh3cFlhTotalFree by sunqiang
+--      V2.2  2005-06-10 updated by Chen Xi
+--           Modify the SYNTAX and DESCRIPTION of hh3cLinkUpDownTrapEnable
+--           and adjust file format.
+--      V2.3  2011-11-26 updated by duyanbing
+--           Add hh3cDevMFirstTrapTime.
+--      V2.4  2012-04-26
+--           Added hh3cdevMExternalAlarmStatus for reserving by wangcong.
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-LswDEVM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, Gauge32, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    hh3clswCommon, hh3cRhw
+        FROM HH3C-OID-MIB
+    hh3cLswFrameIndex, hh3cLswSlotIndex
+        FROM HH3C-LSW-DEV-ADM-MIB
+        ;
+
+hh3cLswdevMMib MODULE-IDENTITY
+        LAST-UPDATED "201111260000Z"
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+        ""
+        REVISION "200106290000Z"
+        DESCRIPTION
+        ""
+        ::= { hh3clswCommon  9 }
+
+
+hh3cDevice OBJECT IDENTIFIER ::= { hh3cRhw 8 }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+hh3cCpuTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table of CPU statistics."
+    ::= { hh3cDevice 1 }
+
+hh3cCpuEntry  OBJECT-TYPE
+    SYNTAX  Hh3cCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hh3cCpuTable."
+    INDEX   { hh3cCpuIndex }
+    ::= { hh3cCpuTable  1 }
+
+Hh3cCpuEntry ::=
+   SEQUENCE {
+            hh3cCpuIndex          INTEGER,
+            hh3cCpuCostRate       Gauge32,
+            hh3cCpuCostRatePer1Min       Gauge32,
+            hh3cCpuCostRatePer5Min       Gauge32
+           }
+
+hh3cCpuIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hh3cCpuTable. This integer is a  uniq number to
+             identify the CPU(s). We recommand two Number Plans in this
+             paper, Logical Number or Phisical Number. For the first
+             case, hh3cCpuIndex is a integer, range from 1 to the Maximum
+             number, for example 1,2,3,4,5 ..., where 1 represents
+             the first CPU, 2 represents the second CPU, etc.  For the
+             second case hh3cCpuIndex represents physical card position
+             (Shelf Number, Frame Number, Slot Number, SubSlotNumber)
+             where the CPU residing, for example, 0x01020304 represent
+             the CPU on the 4th subslot of the 3th slot of the 2nd frame
+             of the 1st Shelf. In the condition of multiple CPU system
+             where CPU group coordinately  process on one board, we see
+             the CPUs as one CPU"
+    ::= { hh3cCpuEntry 1 }
+
+hh3cCpuCostRate  OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU busy percentage in the last 5 second period. "
+   ::= { hh3cCpuEntry 2 }
+
+hh3cCpuCostRatePer1Min OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU cost percentage in the last 1 minute period. "
+   ::= { hh3cCpuEntry 3 }
+
+hh3cCpuCostRatePer5Min OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU cost percentage in the last 5 minutes period. "
+   ::= { hh3cCpuEntry 4 }
+
+
+hh3cMem   OBJECT IDENTIFIER ::= { hh3cDevice 2 }
+
+hh3cMemTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cMemEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains memory information.  "
+    ::= { hh3cMem 1 }
+
+hh3cMemEntry  OBJECT-TYPE
+    SYNTAX  Hh3cMemEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hh3cMemTable"
+    INDEX   { hh3cMemModuleIndex }
+            ::= { hh3cMemTable  1 }
+
+Hh3cMemEntry ::=
+   SEQUENCE {
+            hh3cMemModuleIndex     INTEGER,
+            hh3cMemSize            Gauge32,
+            hh3cMemFree            Gauge32,
+            hh3cMemRawSliceUsed    Gauge32,
+            hh3cMemLgFree          Gauge32,
+            hh3cMemFail            Gauge32,
+            hh3cMemFailNoMem       Gauge32
+            }
+
+hh3cMemModuleIndex   OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hh3cMemTable. This integer is a  uniq number to
+             identify the memory module. We recommand two Number Plans
+             in this paper, Logical Number or Phisical Number. For the
+             first case, hh3cMemModuleIndex is a integer, range from 1 to
+             the Maximum number, for example 1,2,3,4,5 ..., where 1
+             represents the first memory module, 2 represents the second
+             memory module, etc.  For the second case hh3cMemModuleIndex
+             represents physical card position (Shelf Number, Frame Number,
+             Slot Number, SubSlotNumber) where the memory module residing,
+             for example, 0x01020304 represent the memory module on the 4th
+             subslot of the 3th slot of the 2nd frame of the 1st Shelf. "
+    ::= { hh3cMemEntry  1 }
+
+hh3cMemSize OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the total size of the memory module
+            which is on the managed object."
+    ::= { hh3cMemEntry  2 }
+
+hh3cMemFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the free size of the memory"
+    ::= { hh3cMemEntry  3 }
+
+hh3cMemRawSliceUsed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the used size of the raw slice memory"
+    ::= { hh3cMemEntry  4 }
+
+hh3cMemLgFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The largest free size of the contiguous area in the memory.
+           The unit is byte."
+    ::= { hh3cMemEntry  5 }
+
+hh3cMemFail OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The times of memory allocation failures"
+     ::= { hh3cMemEntry 6 }
+
+hh3cMemFailNoMem OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The times of memory allocation failures due to no free memory."
+     ::= { hh3cMemEntry 7 }
+
+
+hh3cBufTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cBufEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains buffer information.  "
+    ::= { hh3cMem 2 }
+
+hh3cBufEntry   OBJECT-TYPE
+    SYNTAX  Hh3cBufEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hh3cBufferTable"
+    INDEX   { hh3cBufModuleIndex , hh3cBufSize }
+    ::= { hh3cBufTable  1 }
+
+Hh3cBufEntry ::=
+   SEQUENCE {
+            hh3cBufModuleIndex     INTEGER,
+            hh3cBufSize            INTEGER,
+            hh3cBufCurrentTotal    Gauge32,
+            hh3cBufCurrentUsed     Gauge32
+           }
+
+hh3cBufModuleIndex   OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hh3cBufferTable. This integer is a  uniq number to
+             identify the buffer module. We recommand two Number Plans
+             in this paper, Logical Number or Phisical Number. For the
+             first case, hh3cBufferModuleIndex is a integer, range from 1 to
+             the Maximum number, for example 1,2,3,4,5 ..., where 1
+             represents the first buffer module, 2 represents the second
+             buffer module, etc.  For the second case hh3cBufferModuleIndex
+             represents physical card position (Shelf Number, Frame Number,
+             Slot Number, SubSlotNumber) where the buffer module residing,
+             for example, 0x01020304 represent the buffer module on the 4th
+             subslot of the 3th slot of the 2nd frame of the 1st Shelf. "
+    ::= { hh3cBufEntry  1 }
+
+hh3cBufSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The size of buffer,unit is byte."
+    ::= { hh3cBufEntry 2 }
+
+hh3cBufCurrentTotal OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The total number of buffer currently."
+    ::= { hh3cBufEntry 3 }
+
+hh3cBufCurrentUsed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of used buffer currently."
+    ::= { hh3cBufEntry 4 }
+
+
+hh3cFlh   OBJECT IDENTIFIER ::= { hh3cDevice 3 }
+
+-- Local Flash Group
+-- This group is present in all products which contain flash"
+
+hh3cFlhTotalSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The flash memory's total size, in kilobyte"
+    ::= { hh3cFlh 1 }
+
+hh3cFlhTotalFree OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The free space in internal flash memory, in kilobyte"
+    ::= { hh3cFlh 2 }
+
+hh3cFlhLastDelTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The time since system up of the lastest deleting operation of
+            flash memory.The value of Zero indicates there is no erasing operation
+            since system up"
+    DEFVAL { 0 }
+    ::= { hh3cFlh 3 }
+
+hh3cFlhDelState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        executing(1),
+        ok(2),
+        error(3),
+        readOnly(4),
+        failtoopen(5),
+        blockMallocFail(6),
+        noneDelOperationSinceStart(7)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The state indicates the result of current or
+            lastest flash memory deleting operation"
+    ::= { hh3cFlh 4 }
+
+hh3cFlhState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        busy(1),
+        free(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Busy indicates the flash memory is unavailable due to others may be using it,
+            and free indicates the flash memory is available now"
+    ::= { hh3cFlh 5 }
+
+-- ==================================================================
+
+hh3cLswdevMMibObject OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hh3cLswdevMMib 1 }
+
+hh3cdevMFanStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDevMFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Fan status description table "
+        ::= { hh3cLswdevMMibObject  1 }
+
+
+hh3cdevMFanStatusEntry OBJECT-TYPE
+        SYNTAX Hh3cDevMFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Fan status description table entry "
+        INDEX   { hh3cDevMFanNum }
+        ::= { hh3cdevMFanStatusTable 1}
+
+
+Hh3cDevMFanStatusEntry ::=
+   SEQUENCE {
+                hh3cDevMFanNum    INTEGER,
+                hh3cDevMFanStatus INTEGER
+            }
+
+hh3cDevMFanNum  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Fan number "
+        ::= { hh3cdevMFanStatusEntry 1 }
+
+
+hh3cDevMFanStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        active     (1),
+        deactive   (2),
+        not-install  (3),
+        unsupport    (4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Fan status: active (1), deactive (2) not installed (3) and unsupported (4)"
+        ::= { hh3cdevMFanStatusEntry 2 }
+
+
+hh3cdevMPowerStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDevMPowerStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Power status description table  "
+        ::= { hh3cLswdevMMibObject  2 }
+
+
+hh3cdevMPowerStatusEntry OBJECT-TYPE
+        SYNTAX Hh3cDevMPowerStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Power status description table entry   "
+        INDEX   { hh3cDevMPowerNum }
+        ::= { hh3cdevMPowerStatusTable 1}
+
+Hh3cDevMPowerStatusEntry ::=
+   SEQUENCE {
+                hh3cDevMPowerNum          INTEGER,
+                hh3cDevMPowerStatus       INTEGER
+            }
+
+
+hh3cDevMPowerNum  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power number "
+        ::= { hh3cdevMPowerStatusEntry 1 }
+
+
+hh3cDevMPowerStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        active     (1),
+        deactive   (2),
+        not-install (3),
+        unsupport    (4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Power status: active (1), deactive (2) not installed (3) and unsupported    "
+        ::= { hh3cdevMPowerStatusEntry 2 }
+
+
+hh3cdevMSlotEnvironmentTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cdevMSlotEnvironmentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " environment description table  "
+        ::= { hh3cLswdevMMibObject  3 }
+
+
+hh3cdevMSlotEnvironmentEntry OBJECT-TYPE
+        SYNTAX Hh3cdevMSlotEnvironmentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " environment description table entry   "
+        INDEX   { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cdevMSlotEnvironmentType }
+        ::= { hh3cdevMSlotEnvironmentTable 1 }
+
+
+Hh3cdevMSlotEnvironmentEntry ::=
+   SEQUENCE {
+                hh3cdevMSlotEnvironmentType               INTEGER,
+                hh3cDevMSlotEnvironmentStatus             INTEGER,
+                hh3cDevMSlotEnvironmentValue              INTEGER,
+                hh3cDevMSlotEnvironmentUpperLimit         INTEGER,
+                hh3cDevMSlotEnvironmentLowerLimit         INTEGER
+           }
+
+
+hh3cdevMSlotEnvironmentType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        temperature(1),
+        humidity(2),
+        fog(3)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Environment type "
+        ::= { hh3cdevMSlotEnvironmentEntry 1 }
+
+hh3cDevMSlotEnvironmentStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        normal(1),
+        upper(2),
+        lower(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Environment status"
+        ::= { hh3cdevMSlotEnvironmentEntry 2 }
+
+hh3cDevMSlotEnvironmentValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Environment value"
+        ::= { hh3cdevMSlotEnvironmentEntry 3 }
+
+hh3cDevMSlotEnvironmentUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Environment upper limit "
+        ::= { hh3cdevMSlotEnvironmentEntry 4 }
+
+
+hh3cDevMSlotEnvironmentLowerLimit OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Environment Lower limit"
+        ::= { hh3cdevMSlotEnvironmentEntry 5 }
+
+
+hh3cLinkUpDownTrapEnable  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        enableBoth(1) ,
+        disableBoth(2) ,
+        enableLinkUpTrapOnly(3) ,
+        enableLinkDownTrapOnly(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable/Disable linkUp/linkDown traps of the device, determining whether
+         to enable linkUp/linkDown traps with that of the interface.
+         When the value is enableBoth(1), the linkUp/linkDown traps are both
+         enabled.
+         When the value is disableBoth(2), the linkUp/linkDown traps are both
+         disabled.
+         When the value is enableLinkUpTrapOnly(3), the linkUp traps is enabled
+         and the linkDown traps is disabled.
+         When the value is enableLinkDownTrapOnly(4), the linkUp traps is
+         disabled and the linkDown traps is enabled. "
+        ::= { hh3cLswdevMMibObject  9 }
+
+hh3cdot1qTpFdbLearnStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Enable/Disable the address learning."
+        ::= { hh3cLswdevMMibObject  10 }
+
+
+
+hh3cCfmWriteFlash OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                write(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Write the current effective configuration into the Flash memory.
+                      This object does not support read operation."
+        ::= { hh3cLswdevMMibObject  11 }
+
+
+hh3cCfmEraseFlash OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                erase(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Delete the configuration from the Flash memory.
+                      This object does not support read operation."
+        ::= { hh3cLswdevMMibObject  12 }
+
+hh3cDevMFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the first trap time."
+    ::= { hh3cLswdevMMibObject 13 }
+
+hh3cdevMExternalAlarmStatus OBJECT IDENTIFIER ::= { hh3cLswdevMMibObject 14 }
+
+END
