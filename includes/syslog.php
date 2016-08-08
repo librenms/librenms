@@ -13,7 +13,7 @@ function get_cache($host, $value) {
         case 'device_id':
             // Try by hostname
             $ip = inet_pton($host);
-            if (var_export(inet_ntop($ip),1) == 'false') {
+            if (inet_ntop($ip) === false) {
                 $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
             }
             else {
