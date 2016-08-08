@@ -18,11 +18,14 @@ foreach ($graphs as $key => $text) {
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
 
-    echo '<h3>'.$text.'</h3>';
-
-    echo "<tr bgcolor='$row_colour'><td colspan=5>";
-
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">'.$text.'</h3>
+    </div>
+    <div class="panel-body">
+    <div class="row">';
     include 'includes/print-graphrow.inc.php';
-
-    echo '</td></tr>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }

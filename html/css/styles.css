@@ -43,8 +43,8 @@ ul ul ul { list-style: square outside; }
 }
 
 .pagemenu-selected {
-  font-weight: bold; 
-  background-color: #dfdfdf; 
+  font-weight: bold;
+  background-color: #dfdfdf;
 
   border: 1px solid #c0c0c0;
 
@@ -436,7 +436,7 @@ tr.list-device-ignored-up {
 }
 
 .device-head, a.list-device {
-  color: #1111aa;
+  color: #23527c;
 }
 
 a.list-device-down, a.list-device-down, a.list-device-down:visited {
@@ -1251,7 +1251,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   padding:1px;
   margin:0;
 }
-  
+
 
 /* Header
 -----------------------------------------------------------------------------*/
@@ -1332,15 +1332,15 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .div-normal {
-  
+
 }
 .div-alert {
-  border: 2px solid; 
+  border: 2px solid;
   #border-radius: 10px;
   border-color: #cc0000;
 }
 .div-ignore {
-  
+
 }
 .div-ignore-alert {
 
@@ -1749,7 +1749,7 @@ tr.search:nth-child(odd) {
     -o-user-select: none;
     user-select: none; // Default
 }
-		
+
 .zoomOut {
     top:30px;
 }
