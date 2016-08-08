@@ -13,7 +13,7 @@ matrix:
   - php: 7.0
     script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
   - php: hhvm
-    script: find . -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
+    script: find . -path './lib/influxdb-php' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1
   allow_failures:
   - php: 7.0
   - php: hhvm
