@@ -37,9 +37,9 @@ if (isset($options['f']) && $options['f'] == 0) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
-    $force_add = 1;
+    $force_add = true;
 } else {
-    $force_add = 0;
+    $force_add = false;
 }
 
 $port_assoc_mode = $config['default_port_association_mode'];
