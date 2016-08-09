@@ -57,13 +57,7 @@ if ($_POST['hostname']) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
         $poller_group = $_POST['poller_group'];
-        $force_add    = $_POST['force_add'];
-        if ($force_add == 'on') {
-            $force_add = 1;
-        }
-        else {
-            $force_add = 0;
-        }
+        $force_add    = ($_POST['force_add'] == 'on');
 
         $port_assoc_mode = $_POST['port_assoc_mode'];
         try {
