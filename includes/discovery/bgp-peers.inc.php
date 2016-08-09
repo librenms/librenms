@@ -157,7 +157,6 @@ if ($config['enable_bgp']) {
 
                             if (!isset($j_peerIndexes)) {
                                 $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
-                                print_r($j_bgp);
                                 foreach ($j_bgp as $index => $entry) {
                                     switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
                                         case 'ipv4':
