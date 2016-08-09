@@ -289,14 +289,13 @@ function add_device() {
         $message = "You haven't specified an SNMP version to use";
     }
     if (empty($message)) {
-        $result = addHost($hostname, $snmpver, $port, $transport, 1, $poller_group, $force_add);
-        if (is_numeric($result)) {
+        try {
+            $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add);
             $code    = 201;
             $status  = 'ok';
-            $message = "Device $hostname has been added successfully";
-        }
-        else {
-            $message = $result;
+            $message = "Device $hostname ($device_id) has been added successfully";
+        } catch (Exception $e) {
+            $message = $e->getMessage();
         }
     }
 

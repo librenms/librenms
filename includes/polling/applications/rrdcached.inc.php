@@ -55,7 +55,8 @@ if ($agent_data['app'][$name]) {
         while ($max == -1 || $count < $max) {
             $data .= fgets($sock, 128);
             if ($max == -1) {
-                $max = explode(' ', $data)[0] + 1;
+                $tmp_max = explode(' ', $data);
+                $max     = $tmp_max[0]+1;
             }
             $count++;
         }
