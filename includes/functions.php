@@ -255,7 +255,7 @@ function delete_device($id) {
  * @param string $port the port to connect to for snmp
  * @param string $transport udp or tcp
  * @param string $poller_group the poller group this device will belong to
- * @param string $force_add add even if the device isn't pingable
+ * @param boolean $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
  *
  * @return int returns the device_id of the added device
@@ -267,7 +267,7 @@ function delete_device($id) {
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex') {
     global $config;
 
     // Test Database Exists
@@ -291,10 +291,12 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     // Test reachability
-    $address_family = snmpTransportToAddressFamily($transport);
-    $ping_result = isPingable($host, $address_family);
-    if ($force_add == 1 || !$ping_result['result']) {
-        throw new HostUnreachablePingException("Could not ping $host");
+    if (!$force_add) {
+        $address_family = snmpTransportToAddressFamily($transport);
+        $ping_result = isPingable($host, $address_family);
+        if (!$ping_result['result']) {
+            throw new HostUnreachablePingException("Could not ping $host");
+        }
     }
 
     // if $snmpver isn't set, try each version of snmp
@@ -311,7 +313,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                if ($force_add == 1 || isSNMPable($device)) {
+                if ($force_add || isSNMPable($device)) {
                     $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                     $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
                     if ($result !== false) {
@@ -326,7 +328,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['community'] as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
-                if ($force_add == 1 || isSNMPable($device)) {
+                if ($force_add || isSNMPable($device)) {
                     $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                     $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
                     if ($result !== false) {
