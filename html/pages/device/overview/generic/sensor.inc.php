@@ -1,5 +1,5 @@
 <?php
-
+include($config['install_dir'] . "/html/pages/health/ipmi.rewrite.php");
 
 if ($sensor_class == 'state') {
     $sensors = dbFetchRows('SELECT * FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_type`, `sensor_index`+0, `sensor_oid`', array($sensor_class, $device['device_id']));
@@ -17,6 +17,7 @@ if (count($sensors)) {
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric='.strtolower($sensor_type).'/"><img src="images/icons/'.strtolower($sensor_type).'.png"><strong> '.$sensor_type.'</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
+
     foreach ($sensors as $sensor) {
         $state_translation = array();
         if (!empty($sensor['state_index_id'])) {
@@ -46,6 +47,8 @@ if (count($sensors)) {
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = generate_url($link_array);
 
+        $sensor['sensor_descr'] = truncate(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $known_ipmi_hosts), 48, '');
+
         $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
         foreach (array('day', 'week', 'month', 'year') as $period) {
             $graph_array['from']  = $config['time'][$period];
@@ -61,7 +64,7 @@ if (count($sensors)) {
         $graph_array['from'] = $config['time']['day'];
         $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
-        $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+
         if (!empty($state_translation['0']['state_descr'])) {
             $state_style="";
             switch ($state_translation['0']['state_generic_value']) {
