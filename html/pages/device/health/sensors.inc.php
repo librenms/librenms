@@ -11,7 +11,21 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     else {
         $row_colour = $list_colour_b;
     }
-    $sensor_descr = $sensor['sensor_descr'];
+
+    $known_ipmi = dbFetchRows('SELECT * FROM `ipmi_sensors` WHERE `hw_id` = ?', array($device['hardware']));
+    if(count($known_ipmi) > 0)
+    {
+        foreach($known_ipmi as $ipmis)
+        {
+            if($ipmis['sensor_ipmi'] == $sensor['sensor_descr'])
+            {
+                $sensor_descr = $ipmis['sensor_display'];
+            }
+        }
+     } else {
+        $sensor_descr = $sensor['sensor_descr'];
+    }
+
     $sensor_current = format_si($sensor['sensor_current']).$unit;
     $sensor_limit = format_si($sensor['sensor_limit']).$unit;
     $sensor_limit_low = format_si($sensor['sensor_limit_low']).$unit;
