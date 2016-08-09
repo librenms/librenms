@@ -7,7 +7,7 @@ if (is_numeric($vars['id'])) {
     if (is_numeric($vserver['device_id']) && ($auth || device_permitted($vserver['device_id']))) {
         $device = device_by_id_cache($vserver['device_id']);
 
-        $rrd_filename = rrd_name(device['hostname'], array('vserver', $vserver['classmap_id']));
+        $rrd_filename = rrd_name($device['hostname'], array('vserver', $vserver['classmap_id']));
 
         $title  = generate_device_link($device);
         $title .= ' :: Serverfarm :: '.htmlentities($vserver['classmap_id']);
