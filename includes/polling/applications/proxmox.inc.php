@@ -53,7 +53,7 @@ if (!is_dir($pmxcdir)) {
 dbUpdate(array('device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster), 'applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $name));
 
 if (count($pmxlines) > 0) {
-    $pmxcache = [];
+    $pmxcache = array();
 
     foreach ($pmxlines as $vm) {
         list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode('/', $vm, 5);
