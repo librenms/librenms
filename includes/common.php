@@ -16,6 +16,21 @@
  * the source code distribution for details.
  */
 
+function generate_priority_icon($priority) {
+    $map = array(
+        "emerg"     => "server_delete",
+        "alert"     => "cancel",
+        "crit"      => "application_lightning",
+        "err"       => "application_delete",
+        "warning"   => "application_error",
+        "notice"    => "application_edit",
+        "info"      => "application",
+        "debug"     => "bug",
+    );
+
+    return '<img src="images/16/' . $map[$priority] .'.png" title="' . $priority . '">';
+}
+
 function format_number_short($number, $sf) {
     // This formats a number so that we only send back three digits plus an optional decimal point.
     // Example: 723.42 -> 723    72.34 -> 72.3    2.23 -> 2.23

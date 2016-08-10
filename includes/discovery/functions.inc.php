@@ -53,9 +53,8 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
     }
 
     if (match_network($config['nets'], $ip)) {
-        $result = addHost($dst_host, '', '161', 'udp', '0', $config['distributed_poller_group']);
-        if (is_numeric($result)) {
-            $remote_device_id = $result;
+        try {
+            $remote_device_id = addHost($dst_host, '', '161', 'udp', $config['distributed_poller_group']);
             $remote_device = device_by_id_cache($remote_device_id, 1);
             echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
             discover_device($remote_device);
@@ -73,10 +72,10 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
             }
 
             return $remote_device_id;
-        } else {
-            if(substr($result, 0, 12) !== 'Already have') {
-                log_event("$method discovery of " . $dst_host . " ($ip) failed - " . $result);
-            }
+        } catch (HostExistsException $e) {
+            // already have this device
+        } catch (Exception $e) {
+            log_event("$method discovery of " . $dst_host . " ($ip) failed - " . $e->getMessage());
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
