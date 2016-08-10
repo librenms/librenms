@@ -11,7 +11,7 @@ $descr_type = "'".implode("', '", $config['customers_descr'])."'";
 
 foreach (dbFetchRows('SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` IN (?) AND `port_descr_descr` = ? AND D.device_id = I.device_id', array(array($descr_type), $vars['id'])) as $port) {
     $rrd_filename = get_port_rrdfile_path ($port['hostname'], $port['port_id']); // FIXME: Unification OK?
-    if (is_file($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_list[$i]['filename']  = $rrd_filename;
         $rrd_list[$i]['descr']     = $port['hostname'].'-'.$port['ifDescr'];
         $rrd_list[$i]['descr_in']  = shorthost($port['hostname']);

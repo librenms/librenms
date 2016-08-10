@@ -10,7 +10,7 @@
  */
 
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cisco-wwan-rssi.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cisco-wwan-rssi');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm              Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rssi='.$rrdfilename.':rssi:AVERAGE ';

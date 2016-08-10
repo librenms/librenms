@@ -64,8 +64,8 @@ $iter         = '0';
 $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
 
 foreach ($accs as $acc) {
-    $this_rrd = $config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
-    if (is_file($this_rrd)) {
+    $this_rrd = rrd_name($acc['hostname'], array('cip', $acc['ifIndex'], $acc['mac']));
+    if (rrdtool_check_rrd_exists($this_rrd)) {
         $mac  = formatmac($acc['mac']);
         $name = $mac;
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', array($acc['mac'], $acc['port_id']));

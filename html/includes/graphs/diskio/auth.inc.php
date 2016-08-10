@@ -6,7 +6,7 @@ if (is_numeric($vars['id'])) {
     if (is_numeric($disk['device_id']) && ($auth || device_permitted($disk['device_id']))) {
         $device = device_by_id_cache($disk['device_id']);
 
-        $rrd_filename = $config['rrd_dir'].'/'.$disk['hostname'].'/ucd_diskio-'.safename($disk['diskio_descr'].'.rrd');
+        $rrd_filename = rrd_name($disk['hostname'], array('ucd_diskio', $disk['diskio_descr']));
 
         $title  = generate_device_link($device);
         $title .= ' :: Disk :: '.htmlentities($disk['diskio_descr']);
