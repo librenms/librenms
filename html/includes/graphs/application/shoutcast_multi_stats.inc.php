@@ -24,16 +24,14 @@ require 'includes/graphs/common.inc.php';
 
 if ($width > '500') {
     $descr_len = 38;
-}
-else {
+} else {
     $descr_len  = 8;
     $descr_len += round(($width - 250) / 8);
 }
 
 if ($width > '500') {
     $rrd_options .= ' COMMENT:"'.substr(str_pad($unit_text, ($descr_len + 2)), 0, ($descr_len + 2))."  Current  Unique  Average    Peak\\n\"";
-}
-else {
+} else {
     $rrd_options .= ' COMMENT:"'.substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."  Now   Unique  Average    Peak\\n\"";
 }
 

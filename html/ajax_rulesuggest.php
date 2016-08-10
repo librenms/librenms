@@ -41,14 +41,14 @@ require_once '../includes/functions.php';
  * @param array  $obj  Object to sort
  * @return array
  */
-function levsort($base, $obj) {
+function levsort($base, $obj)
+{
     $ret = array();
     foreach ($obj as $elem) {
         $lev = levenshtein($base, $elem, 1, 10, 10);
         if ($lev == 0) {
             return array(array('name' => $elem));
-        }
-        else {
+        } else {
             while (isset($ret["$lev"])) {
                 $lev += 0.1;
             }
@@ -59,7 +59,6 @@ function levsort($base, $obj) {
 
     ksort($ret);
     return $ret;
-
 }
 
 header('Content-type: application/json');
@@ -76,8 +75,7 @@ if (isset($_GET['term'],$_GET['device_id'])) {
             foreach ($config['alert']['macros']['rule'] as $macro => $v) {
                 $chk[] = 'macros.'.$macro;
             }
-        }
-        else {
+        } else {
             $tmp = dbFetchRows('SHOW COLUMNS FROM '.$term[0]);
             foreach ($tmp as $tst) {
                 if (isset($tst['Field'])) {
@@ -87,8 +85,7 @@ if (isset($_GET['term'],$_GET['device_id'])) {
         }
 
         $current = true;
-    }
-    else {
+    } else {
         $tmp = dbFetchRows("SELECT TABLE_NAME FROM information_schema.COLUMNS WHERE COLUMN_NAME = 'device_id'");
         foreach ($tmp as $tst) {
             $chk[] = $tst['TABLE_NAME'].'.';

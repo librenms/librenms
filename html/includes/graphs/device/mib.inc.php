@@ -39,8 +39,7 @@ if ($count > 1) {
     $text_orig = 1;
     $colours = 'manycolours';
     include "includes/graphs/generic_multi_simplex_seperated.inc.php";
-}
-else {
+} else {
     $colours = 'mixed';
     $nototal = 0;
     include "includes/graphs/generic_multi_line.inc.php";

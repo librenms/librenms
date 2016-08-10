@@ -24,19 +24,15 @@ if (is_numeric($vars['id'])) {
                 $title       .= ' :: Port  '.generate_port_link($port);
                 $title       .= ' :: '.formatMac($acc['mac']);
                 $auth         = true;
-            }
-            else {
+            } else {
                 graph_error('file not found');
             }
-        }
-        else {
+        } else {
             graph_error('unauthenticated');
         }
-    }
-    else {
+    } else {
         graph_error('entry not found');
     }
-}
-else {
+} else {
     graph_error('invalid id');
 }

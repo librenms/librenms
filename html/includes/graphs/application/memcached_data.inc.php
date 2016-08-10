@@ -33,8 +33,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
 
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

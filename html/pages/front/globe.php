@@ -36,7 +36,7 @@ echo '<div class="container-fluid">
 ';
 
 include_once 'includes/common/globe.inc.php';
-echo implode(',',$common_output);
+echo implode(',', $common_output);
 
 echo '
         </div>
@@ -59,7 +59,7 @@ echo '                  </div>
         <div class="col-md-12">';
             $device['device_id'] = '-1';
             require_once('includes/common/alerts.inc.php');
-            echo implode('',$common_output);
+            echo implode('', $common_output);
             unset($device['device_id']);
 echo '      </div>
     </div>
@@ -94,18 +94,15 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
     echo("</div>");
-}
-else {
-
+} else {
     if ($_SESSION['userlevel'] == '10') {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
-    }
-    else {
+    } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
             P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
-  echo('<div class="container-fluid">
+    echo('<div class="container-fluid">
           <div class="row">
             <div class="col-md-12">
               &nbsp;

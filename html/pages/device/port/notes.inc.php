@@ -12,7 +12,7 @@
 $pagetitle[] = 'Notes';
 $port_id_notes = 'port_id_notes:' . $port['port_id'];
 $device_id = $device['device_id'];
-$data = get_dev_attrib($device,$port_id_notes);
+$data = get_dev_attrib($device, $port_id_notes);
 ?>
 
 <form class="form-horizontal" action="" method="post">
@@ -21,13 +21,13 @@ $data = get_dev_attrib($device,$port_id_notes);
     <div class="form-group">
         <div class="col-sm-10">
             <textarea class="form-control" rows="6" name="notes" id="port-notes"><?php
-echo htmlentities($data); ?></textarea>
+            echo htmlentities($data); ?></textarea>
         </div>
     </div>
     <div class="form-group">
         <div class="col-sm-10">
             <?php
-echo '
+            echo '
             <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-primary">Submit</button>
             ';
 ?>

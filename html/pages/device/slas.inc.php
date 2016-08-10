@@ -18,8 +18,7 @@ foreach ($slas as $sla) {
         if (isset($config['sla_type_labels'][$sla_type])) {
             $text = $config['sla_type_labels'][$sla_type];
         }
-    }
-    else {
+    } else {
         $text = ucfirst($sla_type);
     }
 

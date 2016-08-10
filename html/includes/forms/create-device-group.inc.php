@@ -25,33 +25,27 @@ $desc     = mres($_POST['desc']);
 
 if (is_array($pattern)) {
     $pattern = implode(' ', $pattern);
-}
-else if (!empty($_POST['pattern']) && !empty($_POST['condition']) && !empty($_POST['value'])) {
+} elseif (!empty($_POST['pattern']) && !empty($_POST['condition']) && !empty($_POST['value'])) {
     $pattern = '%'.$_POST['pattern'].' '.$_POST['condition'].' ';
     if (is_numeric($_POST['value'])) {
         $pattern .= $_POST['value'];
-    }
-    else {
+    } else {
         $pattern .= '"'.$_POST['value'].'"';
     }
 }
 
 if (empty($pattern)) {
     $update_message = 'ERROR: No group was generated';
-}
-else if (is_numeric($group_id) && $group_id > 0) {
+} elseif (is_numeric($group_id) && $group_id > 0) {
     if (EditDeviceGroup($group_id, $name, $desc, $pattern)) {
         $update_message = "Edited Group: <i>$name: $pattern</i>";
-    }
-    else {
+    } else {
         $update_message = 'ERROR: Failed to edit Group: <i>'.$pattern.'</i>';
     }
-}
-else {
+} else {
     if (AddDeviceGroup($name, $desc, $pattern)) {
         $update_message = "Added Group: <i>$name: $pattern</i>";
-    }
-    else {
+    } else {
         $update_message = 'ERROR: Failed to add Group: <i>'.$pattern.'</i>';
     }
 }

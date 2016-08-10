@@ -12,11 +12,9 @@ $temp_output = '
 ';
 
 if ($config['show_services']) {
-
     $temp_output .= '
       <th><a href="services/">Services</a></th>
 ';
-
 }
 
 $temp_output .= '
@@ -29,11 +27,9 @@ $temp_output .= '
       <td><a href="ports/format=list_detail/state=up/"><span class="green">'. $ports['up'] .'</span></a></td>
 ';
 if ($config['show_services']) {
-
     $temp_output .= '
       <td><a href="services/view=details/state=ok/"><span class="green">'. $services['up'] .'</span></a></td>
 ';
-
 }
 
 $temp_output .= '
@@ -45,11 +41,9 @@ $temp_output .= '
 ';
 
 if ($config['show_services']) {
-
     $temp_output .= '
       <td><a href="services/view=details/state=critical/"><span class="red">'. $services['down'] .'</span></a></td>
 ';
-
 }
 
 $temp_output .= '
@@ -61,7 +55,6 @@ $temp_output .= '
 ';
 
 if ($config['show_services']) {
-
     $temp_output .= '
       <td><a href="services/view=details/ignore=1/"><span class="grey">'. $services['ignored'] .'</span></a></td>
 ';
@@ -76,11 +69,9 @@ $temp_output .= '
 ';
 
 if ($config['show_services']) {
-
     $temp_output .= '
       <td><a href="services/view=details/disabled=1/"><span class="black">'. $services['disabled'] .'</span></a></td>
 ';
-
 }
 
 if ($config['summary_errors']) {
@@ -107,11 +98,9 @@ $temp_output .= '
 ';
 
 if ($config['show_services']) {
-
     $temp_output .= '
       <td><a href="services/"><span>'. $services['count'] .'</span></a></td>
 ';
-
 }
 
 $temp_output .= '

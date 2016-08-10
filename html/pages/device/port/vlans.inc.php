@@ -11,8 +11,7 @@ foreach ($vlans as $vlan) {
     $row++;
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 
@@ -23,11 +22,9 @@ foreach ($vlans as $vlan) {
 
     if ($vlan['state'] == 'blocking') {
         $class = 'red';
-    }
-    else if ($vlan['state'] == 'forwarding') {
+    } elseif ($vlan['state'] == 'forwarding') {
         $class = 'green';
-    }
-    else {
+    } else {
         $class = 'none';
     }
 
@@ -41,7 +38,7 @@ foreach ($vlans as $vlan) {
 
     $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan']));
     foreach ($otherports as $otherport) {
-    $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+        $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
     }
 
     ksort($vlan_ports);

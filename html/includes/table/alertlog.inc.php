@@ -14,8 +14,7 @@ if ($_POST['state'] >= 0) {
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
-}
-else {
+} else {
     $sql     = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ?";
     $param[] = array($_SESSION['user_id']);
 }
@@ -56,23 +55,19 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         $glyph_icon  = 'ok';
         $glyph_color = 'green';
         $text        = 'Ok';
-    }
-    else if ($alert_state == '1') {
+    } elseif ($alert_state == '1') {
         $glyph_icon  = 'remove';
         $glyph_color = 'red';
         $text        = 'Alert';
-    }
-    else if ($alert_state == '2') {
+    } elseif ($alert_state == '2') {
         $glyph_icon  = 'info-sign';
         $glyph_color = 'lightgrey';
         $text        = 'Ack';
-    }
-    else if ($alert_state == '3') {
+    } elseif ($alert_state == '3') {
         $glyph_icon  = 'arrow-down';
         $glyph_color = 'orange';
         $text        = 'Worse';
-    }
-    else if ($alert_state == '4') {
+    } elseif ($alert_state == '4') {
         $glyph_icon  = 'arrow-up';
         $glyph_color = 'khaki';
         $text        = 'Better';

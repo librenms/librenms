@@ -21,8 +21,7 @@ if ($_POST['search_type'] == 'ipv4') {
         $sql    .= " AND ipv4_prefixlen='?'";
         $param[] = array($prefix);
     }
-}
-else if ($_POST['search_type'] == 'ipv6') {
+} elseif ($_POST['search_type'] == 'ipv6') {
     $sql  = ' FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D';
     $sql .= $perms_sql;
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
@@ -33,8 +32,7 @@ else if ($_POST['search_type'] == 'ipv6') {
     if (!empty($prefix)) {
         $sql .= " AND ipv6_prefixlen = '$prefix'";
     }
-}
-else if ($_POST['search_type'] == 'mac') {
+} elseif ($_POST['search_type'] == 'mac') {
     $sql  = ' FROM `ports` AS I, `devices` AS D';
     $sql .= $perms_sql;
     $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%".str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['address']))."%' $where ";
@@ -51,11 +49,9 @@ if ($_POST['interface']) {
 
 if ($_POST['search_type'] == 'ipv4') {
     $count_sql = "SELECT COUNT(`ipv4_address_id`) $sql";
-}
-else if ($_POST['search_type'] == 'ipv6') {
+} elseif ($_POST['search_type'] == 'ipv6') {
     $count_sql = "SELECT COUNT(`ipv6_address_id`) $sql";
-}
-else if ($_POST['search_type'] == 'mac') {
+} elseif ($_POST['search_type'] == 'mac') {
     $count_sql = "SELECT COUNT(`port_id`) $sql";
 }
 
@@ -88,19 +84,16 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     if ($_POST['search_type'] == 'ipv6') {
         list($prefix, $length) = explode('/', $interface['ipv6_network']);
         $address               = Net_IPv6::compress($interface['ipv6_address']).'/'.$length;
-    }
-    else if ($_POST['search_type'] == 'mac') {
+    } elseif ($_POST['search_type'] == 'mac') {
         $address = formatMac($interface['ifPhysAddress']);
-    }
-    else {
+    } else {
         list($prefix, $length) = explode('/', $interface['ipv4_network']);
         $address               = $interface['ipv4_address'].'/'.$length;
     }
 
     if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
         $error_img = generate_port_link($interface, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
-    }
-    else {
+    } else {
         $error_img = '';
     }
 

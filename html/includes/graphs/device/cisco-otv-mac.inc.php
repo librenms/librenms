@@ -14,7 +14,7 @@
 require_once "../includes/component.php";
 $component = new component();
 $options['filter']['type'] = array('=','Cisco-OTV');
-$components = $component->getComponents($device['device_id'],$options);
+$components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -37,15 +37,14 @@ foreach ($components as $id => $array) {
             }
 
             // Grab a color from the array.
-            if ( isset($config['graph_colours']['mixed'][$count]) ) {
+            if (isset($config['graph_colours']['mixed'][$count])) {
                 $color = $config['graph_colours']['mixed'][$count];
-            }
-            else {
+            } else {
                 $color = $config['graph_colours']['oranges'][$count-7];
             }
 
             $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":count:AVERAGE ";
-            $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['endpoint'],0,15),15) . "'" . $stack;
+            $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['endpoint'], 0, 15), 15) . "'" . $stack;
             $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%4.0lf%s ";
             $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%4.0lf%s ";
             $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%4.0lf%s\\\l ";
@@ -56,7 +55,6 @@ foreach ($components as $id => $array) {
 
 if ($rrd_additions == "") {
     // We didn't add any data points.
-}
-else {
+} else {
     $rrd_options .= $rrd_additions;
 }

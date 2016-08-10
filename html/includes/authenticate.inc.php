@@ -4,6 +4,8 @@
 @ini_set('session.cookie_httponly', 1);
 require 'includes/PasswordHash.php';
 
+use PasswordHash\PasswordHash;
+
 session_start();
 
 // Preflight checks
@@ -40,8 +42,7 @@ if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $_SESSION['username'] = mres($_POST['username']);
     $_SESSION['password'] = $_POST['password'];
-}
-else if (isset($_GET['username']) && isset($_GET['password'])) {
+} elseif (isset($_GET['username']) && isset($_GET['password'])) {
     $_SESSION['username'] = mres($_GET['username']);
     $_SESSION['password'] = $_GET['password'];
 }
@@ -52,8 +53,7 @@ if (!isset($config['auth_mechanism'])) {
 
 if (file_exists('includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     include_once 'includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-}
-else {
+} else {
     print_error('ERROR: no valid auth_mechanism defined!');
     exit();
 }
@@ -82,7 +82,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
-            $token_id = $_SESSION['username'].'|'.$hasher->HashPassword($_SESSION['username'].$token);
+            $token_id = $_SESSION['username'].'|'.$hasher->hashPassword($_SESSION['username'].$token);
             // If we have been asked to remember the user then set the relevant cookies and create a session in the DB.
             setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
             setcookie('token', $token_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
@@ -104,8 +104,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }
-    }
-    else if (isset($_SESSION['username'])) {
+    } elseif (isset($_SESSION['username'])) {
         $auth_message = 'Authentication Failed';
         unset($_SESSION['authenticated']);
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
