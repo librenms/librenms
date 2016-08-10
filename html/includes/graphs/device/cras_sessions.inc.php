@@ -4,7 +4,7 @@ $scale_min = '0';
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/cras_sessions.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'cras_sessions');
 
 $rrd_options .= " DEF:email=$rrd_filename:email:AVERAGE";
 $rrd_options .= " DEF:ipsec=$rrd_filename:ipsec:AVERAGE";

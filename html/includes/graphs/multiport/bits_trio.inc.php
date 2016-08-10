@@ -16,7 +16,7 @@ $i = 1;
 foreach (explode(',', $_GET['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         if (strstr($inverse, 'a')) {
             $in  = 'OUT';
             $out = 'IN';
@@ -43,7 +43,7 @@ unset($plus);
 foreach (explode(',', $_GET['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         if (strstr($inverse, 'b')) {
             $in  = 'OUT';
             $out = 'IN';
@@ -70,7 +70,7 @@ unset($plus);
 foreach (explode(',', $_GET['idc']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         if (strstr($inverse, 'c')) {
             $in  = 'OUT';
             $out = 'IN';

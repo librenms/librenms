@@ -8,7 +8,7 @@ foreach ($rserver_db as $serverfarm) {
 }
 
 foreach ($rserver_array as $index => $serverfarm) {
-    $clean_index = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
+    $farm_id = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
 
     $oids = array(
              'cesServerFarmRserverTotalConns',
@@ -17,12 +17,12 @@ foreach ($rserver_array as $index => $serverfarm) {
             );
 
     $db_oids = array(
-                $clean_index                     => 'farm_id',
+                $farm_id                     => 'farm_id',
                 'cesServerFarmRserverStateDescr' => 'StateDescr',
                );
 
-    if (!is_array($serverfarms[$clean_index])) {
-        $rserver_id = dbInsert(array('device_id' => $device['device_id'], 'farm_id' => $clean_index, 'StateDescr' => $serverfarm['cesServerFarmRserverStateDescr']), 'loadbalancer_rservers');
+    if (!is_array($serverfarms[$farm_id])) {
+        $rserver_id = dbInsert(array('device_id' => $device['device_id'], 'farm_id' => $farm_id, 'StateDescr' => $serverfarm['cesServerFarmRserverStateDescr']), 'loadbalancer_rservers');
     }
     else {
         foreach ($db_oids as $db_oid => $db_value) {
@@ -32,11 +32,12 @@ foreach ($rserver_array as $index => $serverfarm) {
         $updated = dbUpdate($db_update, 'loadbalancer_rservers', '`rserver_id` = ?', $serverfarm['cesServerFarmRserverFailedConns']['farm_id']);
     }
 
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/rserver-'.$serverfarms[$clean_index]['rserver_id'].'.rrd';
+    $rrd_name = array('rserver', $serverfarms[$farm_id]['rserver_id']);
 
+    $rrd_def = array();
     foreach ($oids as $oid) {
-        $oid_ds      = truncate(str_replace('cesServerFarm', '', $oid), 19, '');
-        $rrd_create .= " DS:$oid_ds:GAUGE:600:-1:100000000";
+        $oid_ds    = truncate(str_replace('cesServerFarm', '', $oid), 19, '');
+        $rrd_def[] = "DS:$oid_ds:GAUGE:600:-1:100000000";
     }
 
     $fields = array();
@@ -51,18 +52,10 @@ foreach ($rserver_array as $index => $serverfarm) {
         $fields[$oid] = $value;
     }
 
-    $rrd_create .= ' '.$config['rrd_rra'];
-
-    if (isset($serverfarms[$clean_index])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
-        }
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array('farm_id' => $clean_index);
-        influx_update($device,'rservers',$tags,$fields);
-
+    if (isset($serverfarms[$farm_id])) {
+        $tags = compact('farm_id', 'rrd_name', 'rrd_def');
+        data_update($device,'rservers',$tags,$fields);
     }
 }//end foreach
 
-unset($oids, $oid, $serverfarm);
+unset($rrd_name, $rrd_def, $oids, $oid, $serverfarm);

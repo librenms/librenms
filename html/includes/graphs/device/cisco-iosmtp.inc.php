@@ -13,7 +13,7 @@
 
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
-$rrd_filename = $config['rrd_dir']."/".$device['hostname']."/cisco-iosmtp.rrd";
+$rrd_filename = rrd_name($device['hostname'], 'cisco-iosmtp');
 
 if (file_exists($rrd_filename)) {
 	$rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";

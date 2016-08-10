@@ -6,7 +6,7 @@ if (is_numeric($vars['id'])) {
     if (is_numeric($cef['device_id']) && ($auth || device_permitted($cef['device_id']))) {
         $device = device_by_id_cache($cef['device_id']);
 
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cefswitching-'.$cef['entPhysicalIndex'].'-'.$cef['afi'].'-'.$cef['cef_index'].'.rrd');
+        $rrd_filename = rrd_name($device['hostname'], array('cefswitching', $cef['entPhysicalIndex'], $cef['afi'], $cef['cef_index']));
 
         $title  = generate_device_link($device);
         $title .= ' :: CEF Switching :: '.htmlentities($cef['cef_descr']);

@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-650-dataRate.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-650-dataRate');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Mbps                        Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:receiveDataRate='.$rrdfilename.':receiveDataRate:AVERAGE ';

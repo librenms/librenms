@@ -38,7 +38,7 @@ if (1) {
 
     include 'includes/graphs/generic_multi_seperated.inc.php';
 }
-else if (is_file($rrd_file)) {
+else if (rrdtool_check_rrd_exists($rrd_file)) {
     $rrd_filename = $rrd_file;
 
     $ds_in  = 'INNUCASTPKTS';

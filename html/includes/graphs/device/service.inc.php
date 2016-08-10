@@ -33,8 +33,7 @@ else {
 }
 
 // We know our service. build the filename.
-$filename = "services-".$services[$vars['service']]['service_id'].".rrd";
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+$rrd_filename = rrd_name($device['hostname'], array('services', $services[$vars['service']]['service_id']));
 
 // if we have a script for this check, use it.
 $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($services[$vars['service']]['service_type']).'.inc.php';

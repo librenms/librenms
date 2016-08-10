@@ -27,7 +27,7 @@ $rrd_additions = "";
 $count = 0;
 foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'overlay') {
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("cisco-otv-".$array['label']."-vlan.rrd");
+        $rrd_filename = rrd_name($device['hostname'], array('cisco', 'otv', $array['label'], 'vlan'));
 
         if (file_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
