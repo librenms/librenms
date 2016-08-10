@@ -1344,6 +1344,7 @@ $ipmiSensorsNames = array(
                 "Temp 8" => "System zone",
                 "Temp 9" => "System zone",
                 "Temp 10" => "Storage zone",
+                "Power Meter" => "Power usage",
         ),
         "HP ProLiant BL460c G1" => array(
                 "Temp 1" => "System zone",
@@ -1355,5 +1356,6 @@ $ipmiSensorsNames = array(
                 "Temp 7" => "CPU 2",
                 "Temp 8" => "Memory zone",
                 "Temp 9" => "Ambient zone",
+                "Power Meter" => "Power usage",
         ),
 );

@@ -43,8 +43,13 @@ if (count($sensors)) {
         $link_array['page'] = 'graphs';
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = generate_url($link_array);
-	
-	$sensor['sensor_descr'] = truncate(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 48, '');
+
+        if($sensor['poller_type'] == "ipmi")
+        {
+            $sensor['sensor_descr'] = truncate(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 48, '');
+        } else {
+            $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+        }
 
         $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
         foreach (array('day', 'week', 'month', 'year') as $period) {
