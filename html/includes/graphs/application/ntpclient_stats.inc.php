@@ -5,7 +5,7 @@ require 'includes/graphs/common.inc.php';
 $colours      = 'mixed';
 $nototal      = (($width < 224) ? 1 : 0);
 $unit_text    = 'Milliseconds';
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpclient-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'ntpclient', $app['app_id']));
 $array        = array(
                  'offset'    => array('descr' => 'Offset'),
                  'jitter'    => array('descr' => 'Jitter'),
@@ -15,7 +15,7 @@ $array        = array(
 
 $i = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $vars) {
         $rrd_list[$i]['filename']   = $rrd_filename;
         $rrd_list[$i]['descr']  = $vars['descr'];

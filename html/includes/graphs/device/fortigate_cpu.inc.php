@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('fortigate_cpu.rrd');
+$rrd_filename = rrd_name($device['hostname'], 'fortigate_cpu');
 
 require 'includes/graphs/common.inc.php';
 

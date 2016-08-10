@@ -9,33 +9,25 @@
  * the source code distribution for details.
  */
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cisco-wwan-rssi.rrd";
 $rssi = snmp_get($device, "CISCO-WAN-3G-MIB::c3gCurrentGsmRssi.13", "-Ovqn", "CISCO-WAN-3G-MIB");
-
 if (is_numeric($rssi)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:rssi:GAUGE:600:-150:5000".$config['rrd_rra']);
-    }
+    $rrd_def = 'DS:rssi:GAUGE:600:-150:5000';
     $fields = array(
         'rssi' => $rssi,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cisco-wwan-rssi', $tags, $fields);
     $graphs['cisco_wwan_rssi'] = TRUE;
-    unset($rrd_filename,$rssi);
 }
 
-
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cisco-wwan-mnc.rrd";
 $mnc = snmp_get($device, "CISCO-WAN-3G-MIB::c3gGsmMnc.13", "-Ovqn", "CISCO-WAN-3G-MIB");
 if (is_numeric($mnc)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:mnc:GAUGE:600:0:U".$config['rrd_rra']);
-    }
+    $rrd_def = 'DS:mnc:GAUGE:600:0:U';
     $fields = array(
         'mnc' => $mnc,
     );
-    rrdtool_update($rrd_filename, $fields);
-    $graphs['cisco_wwan_mnc'] = TRUE;
-    unset($rrd_filename,$mnc);
+    $tags = compact('rrd_def');
+    data_update($device, 'cisco-wwan-rssi', $tags, $fields);
+    $graphs['cisco-wwan-mnc'] = TRUE;
 }
-
+unset($rrd_def, $rssi, $mnc, $fields, $tags);

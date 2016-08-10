@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/ipSystemStats-ipv6.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'ipSystemStats-ipv6');
 
 $rrd_options .= " DEF:InForwDatagrams=$rrd_filename:InForwDatagrams:AVERAGE";
 $rrd_options .= " DEF:InDelivers=$rrd_filename:InDelivers:AVERAGE";

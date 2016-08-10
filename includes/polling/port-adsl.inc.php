@@ -40,33 +40,32 @@
 // adslAturPerfValidIntervals.1 = 0
 // adslAturPerfInvalidIntervals.1 = 0
 if (isset($this_port['adslLineCoding'])) {
-    $rrdfile = get_port_rrdfile_path ($device['hostname'], $port_id, 'adsl');
-
-    $rrd_create  = ' --step 300';
-    $rrd_create .= ' DS:AtucCurrSnrMgn:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AtucCurrAtn:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AtucCurrOutputPwr:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AtucCurrAttainableR:GAUGE:600:0:U';
-    $rrd_create .= ' DS:AtucChanCurrTxRate:GAUGE:600:0:U';
-    $rrd_create .= ' DS:AturCurrSnrMgn:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AturCurrAtn:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AturCurrOutputPwr:GAUGE:600:0:635';
-    $rrd_create .= ' DS:AturCurrAttainableR:GAUGE:600:0:U';
-    $rrd_create .= ' DS:AturChanCurrTxRate:GAUGE:600:0:U';
-    $rrd_create .= ' DS:AtucPerfLofs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucPerfLoss:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucPerfLprs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucPerfESs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucPerfInits:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturPerfLofs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturPerfLoss:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturPerfLprs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturPerfESs:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucChanCorrectedBl:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturChanCorrectedBl:COUNTER:600:U:100000000000';
-    $rrd_create .= ' DS:AturChanUncorrectBl:COUNTER:600:U:100000000000';
-    $rrd_create .= $config['rrd_rra'];
+    $rrd_name = getPortRrdName($port_id, 'adsl');
+    $rrd_def = array(
+        'DS:AtucCurrSnrMgn:GAUGE:600:0:635',
+        'DS:AtucCurrAtn:GAUGE:600:0:635',
+        'DS:AtucCurrOutputPwr:GAUGE:600:0:635',
+        'DS:AtucCurrAttainableR:GAUGE:600:0:U',
+        'DS:AtucChanCurrTxRate:GAUGE:600:0:U',
+        'DS:AturCurrSnrMgn:GAUGE:600:0:635',
+        'DS:AturCurrAtn:GAUGE:600:0:635',
+        'DS:AturCurrOutputPwr:GAUGE:600:0:635',
+        'DS:AturCurrAttainableR:GAUGE:600:0:U',
+        'DS:AturChanCurrTxRate:GAUGE:600:0:U',
+        'DS:AtucPerfLofs:COUNTER:600:U:100000000000',
+        'DS:AtucPerfLoss:COUNTER:600:U:100000000000',
+        'DS:AtucPerfLprs:COUNTER:600:U:100000000000',
+        'DS:AtucPerfESs:COUNTER:600:U:100000000000',
+        'DS:AtucPerfInits:COUNTER:600:U:100000000000',
+        'DS:AturPerfLofs:COUNTER:600:U:100000000000',
+        'DS:AturPerfLoss:COUNTER:600:U:100000000000',
+        'DS:AturPerfLprs:COUNTER:600:U:100000000000',
+        'DS:AturPerfESs:COUNTER:600:U:100000000000',
+        'DS:AtucChanCorrectedBl:COUNTER:600:U:100000000000',
+        'DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000',
+        'DS:AturChanCorrectedBl:COUNTER:600:U:100000000000',
+        'DS:AturChanUncorrectBl:COUNTER:600:U:100000000000',
+    );
 
     $adsl_oids = array(
         'AtucCurrSnrMgn',
@@ -159,14 +158,8 @@ if (isset($this_port['adslLineCoding'])) {
         $fields[$oid] = $data;
     }
 
-    if (!is_file($rrdfile)) {
-        rrdtool_create($rrdfile, $rrd_create);
-    }
-
-    rrdtool_update($rrdfile, $fields);
-
-    $tags = array('ifName' => $port['ifName']);
-    influx_update($device,'adsl',$tags,$fields);
+    $tags = compact('ifName', 'rrd_name', 'rrd_def');
+    data_update($device, 'adsl', $tags, $fields);
 
     echo 'ADSL ('.$this_port['adslLineCoding'].'/'.formatRates($this_port['adslAtucChanCurrTxRate']).'/'.formatRates($this_port['adslAturChanCurrTxRate']).')';
 }//end if

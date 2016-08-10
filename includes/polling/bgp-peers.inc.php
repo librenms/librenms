@@ -157,16 +157,14 @@ if ($config['enable_bgp']) {
                 }
             }
 
-            $peerrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('bgp-'.$peer['bgpPeerIdentifier'].'.rrd');
-            if (!is_file($peerrrd)) {
-                $create_rrd = 'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000
-                    DS:bgpPeerInUpdates:COUNTER:600:U:100000000000
-                    DS:bgpPeerOutTotal:COUNTER:600:U:100000000000
-                    DS:bgpPeerInTotal:COUNTER:600:U:100000000000
-                    DS:bgpPeerEstablished:GAUGE:600:0:U '.$config['rrd_rra'];
-
-                rrdtool_create($peerrrd, $create_rrd);
-            }
+            $peer_rrd_name = safename('bgp-'.$peer['bgpPeerIdentifier']);
+            $peer_rrd_def = array(
+                'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000',
+                'DS:bgpPeerInUpdates:COUNTER:600:U:100000000000',
+                'DS:bgpPeerOutTotal:COUNTER:600:U:100000000000',
+                'DS:bgpPeerInTotal:COUNTER:600:U:100000000000',
+                'DS:bgpPeerEstablished:GAUGE:600:0:U'
+            );
 
             $fields = array(
                 'bgpPeerOutUpdates'    => $bgpPeerOutUpdates,
@@ -175,10 +173,13 @@ if ($config['enable_bgp']) {
                 'bgpPeerInTotal'       => $bgpPeerInTotalMessages,
                 'bgpPeerEstablished'   => $bgpPeerFsmEstablishedTime,
             );
-            rrdtool_update("$peerrrd", $fields);
 
-            $tags = array('bgpPeerIdentifier' => $peer['bgpPeerIdentifier']);
-            influx_update($device,'bgp',$tags,$fields);
+            $tags = array(
+                'bgpPeerIdentifier' => $peer['bgpPeerIdentifier'],
+                'rrd_name' => $peer_rrd_name,
+                'rrd_def' => $peer_rrd_def
+            );
+            data_update($device,'bgp',$tags,$fields);
 
             $peer['update']['bgpPeerState']              = $bgpPeerState;
             $peer['update']['bgpPeerAdminStatus']        = $bgpPeerAdminStatus;
@@ -323,15 +324,14 @@ if ($config['enable_bgp']) {
 
                     dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
 
-                    $cbgp_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi.rrd");
-                    if (!is_file($cbgp_rrd)) {
-                        $rrd_create = 'DS:AcceptedPrefixes:GAUGE:600:U:100000000000
-                            DS:DeniedPrefixes:GAUGE:600:U:100000000000
-                            DS:AdvertisedPrefixes:GAUGE:600:U:100000000000
-                            DS:SuppressedPrefixes:GAUGE:600:U:100000000000
-                            DS:WithdrawnPrefixes:GAUGE:600:U:100000000000 '.$config['rrd_rra'];
-                        rrdtool_create($cbgp_rrd, $rrd_create);
-                    }
+                    $cbgp_rrd_name = safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi");
+                    $cbgp_rrd_def = array(
+                        'DS:AcceptedPrefixes:GAUGE:600:U:100000000000',
+                        'DS:DeniedPrefixes:GAUGE:600:U:100000000000',
+                        'DS:AdvertisedPrefixes:GAUGE:600:U:100000000000',
+                        'DS:SuppressedPrefixes:GAUGE:600:U:100000000000',
+                        'DS:WithdrawnPrefixes:GAUGE:600:U:100000000000'
+                    );
 
                     $fields = array(
                         'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
@@ -340,10 +340,15 @@ if ($config['enable_bgp']) {
                         'SuppressedPrefixes'  => $cbgpPeerSuppressedPrefixes,
                         'WithdrawnPrefixes'   => $cbgpPeerWithdrawnPrefixes,
                     );
-                    rrdtool_update("$cbgp_rrd", $fields);
 
-                    $tags = array('bgpPeerIdentifier' => $peer['bgpPeerIdentifier'], 'afi' => $afi, 'safi' => $safi);
-                    influx_update($device,'cbgp',$tags,$fields);
+                    $tags = array(
+                        'bgpPeerIdentifier' => $peer['bgpPeerIdentifier'],
+                        'afi' => $afi,
+                        'safi' => $safi,
+                        'rrd_name' => $cbgp_rrd_name,
+                        'rrd_def' => $cbgp_rrd_def
+                    );
+                    data_update($device,'cbgp',$tags,$fields);
 
                 } //end foreach
             } //end if

@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/canopy-generic-freq.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-freq');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Ghz           Now     \\n'";
     $rrd_options .= ' DEF:freq='.$rrdfilename.':freq:AVERAGE ';
