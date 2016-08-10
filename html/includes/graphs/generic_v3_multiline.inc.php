@@ -93,7 +93,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' LINE2:'.$g_defname.$i.'#'.$colour.":'".$descr."'$stack";
     if ($addarea === 1)
     {
-        $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.$transparency.":'".$descr."'$stack";
+        $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.$transparency.":''$stack";
     }
     $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%8.0lf%s GPRINT:'.$t_defname.$i.'min:MIN:%8.0lf%s';
     $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%8.0lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%8.0lf%s\\n'";
