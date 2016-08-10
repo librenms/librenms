@@ -17,8 +17,8 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
 
     if (is_array($temp)) {
         //Create State Index
-        if (strpos($temp['primaryUnit']['cfwHardwareStatusDetail'], 'Failover Off') == false || strpos($temp['primaryUnit']['cfwHardwareStatusDetail'], 'not Configured') == false) {
-            
+        if (strstr($temp['netInterface']['cfwHardwareStatusDetail'], 'not Configured') == false) {
+
             $state_name = 'cfwHardwareStatus';
             $state_index_id = create_state_index($state_name);
 
@@ -49,7 +49,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
             }
 
             foreach ($temp as $index => $entry) {
-                $descr = ucwords($temp[$index]['cfwHardwareStatusDetail']);
+                $descr = ucwords(trim(preg_replace('/\s*\([^)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
                 if ($index == 'netInterface') {
                     $index = 4;
                 }
@@ -68,3 +68,4 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
         }
     }
 }
+
