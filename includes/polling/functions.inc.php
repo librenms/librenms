@@ -10,6 +10,13 @@ function poll_sensor($device, $class, $unit) {
         $sensor_value = '';
 
         if ($sensor['poller_type'] == 'snmp') {
+            if ($device['os'] == 'pbn') {
+                $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
+                }
+            else {
+                $mibdir = $config['mibdir'];
+            }
+
             if ($device['os'] == 'siklu') {
                 $mib = ':RADIO-BRIDGE-MIB';
             }
@@ -29,7 +36,7 @@ function poll_sensor($device, $class, $unit) {
                     for ($i = 0; $i < 5; $i++) {
                         d_echo("Attempt $i ");
 
-                        $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+                        $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib", $mibdir)));
                         preg_match('/[\d\.]+/', $sensor_value, $temp_response);
                         if (!empty($temp_response[0])) {
                             $sensor_value = $temp_response[0];
@@ -44,7 +51,7 @@ function poll_sensor($device, $class, $unit) {
                 }//end if
             }
             else if ($class == 'state') {
-                $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB')));
+                $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB', $mibdir)));
                 if (!is_numeric($sensor_value)) {
                     $state_value = dbFetchCell('SELECT `state_value` FROM `state_translations` LEFT JOIN `sensors_to_state_indexes` ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id` WHERE `sensors_to_state_indexes`.`sensor_id` = ? AND `state_translations`.`state_descr` LIKE ?', array($sensor['sensor_id'], $sensor_value));
                     d_echo('State value of ' . $sensor_value . ' is ' . $state_value . "\n");
@@ -56,10 +63,10 @@ function poll_sensor($device, $class, $unit) {
             else if ($class == 'signal') {
                $currentOS = $device['os'];
                include "includes/polling/signal/$currentOS.inc.php";
-               $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+               $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib", $mibdir)));
            }
             else if ($class == 'dbm') {
-                $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+                $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib", $mibdir)));
                 //iosxr does not expose dbm values through SNMP so we convert Watts to dbm to have a nice graph to show
                 if ($device['os'] == "iosxr") {
                     $sensor_value = round(10*log10($sensor_value/1000),3);
@@ -67,13 +74,14 @@ function poll_sensor($device, $class, $unit) {
             }
             else {
                 if ($sensor['sensor_type'] == 'apc') {
-                    $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB:PowerNet-MIB$mib")));
+                    $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB:PowerNet-MIB$mib", $mibdir)));
                 }
                 else {
-                    $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+                    $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib", $mibdir)));
                 }
             }//end if
             unset($mib);
+            unset($mibdir);
         }
         else if ($sensor['poller_type'] == 'agent') {
             if (isset($agent_sensors)) {
