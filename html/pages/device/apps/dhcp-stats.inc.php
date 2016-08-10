@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array(
-    'os-updates_packages' => 'OS updates',
+    'dhcp-stats_stats' => 'DHCP Stats',
 );
 
 foreach ($graphs as $key => $text) {
