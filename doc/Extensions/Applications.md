@@ -11,6 +11,8 @@ Different applications support a variety of ways collect data: by direct connect
 5. [PowerDNS Recursor](#powerdns-recursor) - Agent
 6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 7. [OS Updates](#os-updates) - extend SNMP
+8. [DHCP Stats](#dhcp-stats) - extend SNMP
+9. [Memcached](#memcached) - extend SNMP
 
 
 * [Agent Setup](#agent-setup)
@@ -142,6 +144,29 @@ extend osupdate /opt/os-updates.sh
 
 _Note_: apt-get depends on an updated package index. There are several ways to have your system run `apt-get update` automatically. The easiest is to create `/etc/apt/apt.conf.d/10periodic` and pasting the following in it: `APT::Periodic::Update-Package-Lists "1";`.
 If you have apticron, cron-apt or apt-listchanges installed and configured, chances are that packages are already updated periodically.
+
+### DHCP Stats
+A small shell script that reports current DHCP leases stats.
+
+##### Extend SNMP
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /opt/dhcp-status.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /opt/dhcp-status.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
+
+### Memcached
+1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/usr/local/bin` (or any other suitable location) on your remote server.
+2. Make the script executable: `chmod +x /usr/local/memcached`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend memcached /usr/local/bin/memcached
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
 Agent Setup
 -----------

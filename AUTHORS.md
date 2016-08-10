@@ -106,15 +106,16 @@ LibreNMS contributors:
 - Marc Runkel <marc@runkel.org> (mrunkel)
 - Josh Driver <keeperofdakeys@gmail.com> (keeperofdakeys)
 - Felix Eckhofer <felix@eckhofer.com> (tribut)
-- Vikram Adukia <adukia@dropbox.com> (justmedude) 
+- Vikram Adukia <adukia@dropbox.com> (justmedude)
 - Tijmen de Mes <tijmen@ag-projects.com> (tijmenNL)
 - Benjamin Busche <benjamin.busche@gmail.com> (optic00)
 - Brandon Boudrias <bt.boudrias@gmail.com> (brandune)
-- Andy Noyland <andrew@noyland.co.uk> (Zappatron) 
+- Andy Noyland <andrew@noyland.co.uk> (Zappatron)
 - Cercel Valentin <crc@nuamchefazi.ro> (crcro)
 - Ahmed Sajid <ahmed4343@hotmail.com> (ahmedsajid)
 - Karsten Schmidt <git@guggemand.dk> (guggemand)
 - Maxence POULAIN <maxence.poulain@eriador.info> (Linutux42)
+- Florian Beer <fb@42dev.eu> (florianbeer)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

@@ -111,6 +111,7 @@ else {
     echo ' | Prefixes: Unicast (';
     if ($vars['graph'] == 'prefixes_ipv4unicast') {
         echo "<span class='pagemenu-selected'>";
+        $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
     }
 
     echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast'));
@@ -122,6 +123,7 @@ else {
 
     if ($vars['graph'] == 'prefixes_ipv6unicast') {
         echo "<span class='pagemenu-selected'>";
+        $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
     }
 
     echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast'));
@@ -213,7 +215,7 @@ else {
         $where .= " AND (B.bgpPeerState != 'established')";
     }
 
-    $peer_query = 'select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id '.$where.' ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier';
+    $peer_query = "SELECT * FROM `bgpPeers` AS `B`, `devices` AS `D` WHERE `B`.`device_id` = `D`.`device_id` $where $extra_sql ORDER BY `D`.`hostname`, `B`.`bgpPeerRemoteAs`, `B`.`bgpPeerIdentifier`";
     foreach (dbFetchRows($peer_query) as $peer) {
         unset($alert, $bg_image);
 
