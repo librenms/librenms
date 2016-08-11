@@ -629,7 +629,7 @@ Output:
 ```text
 {
     "status": "ok",
-    "message": "Device localhost.localdomain has been added successfully"
+    "message": "Device localhost.localdomain (57) has been added successfully"
 }
 ```
 

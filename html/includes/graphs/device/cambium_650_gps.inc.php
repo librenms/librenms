@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-650-gps.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-650-gps');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'\\n'";
     $rrd_options .= ' DEF:gps='.$rrdfilename.':gps:AVERAGE ';

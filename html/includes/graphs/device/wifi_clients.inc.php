@@ -4,8 +4,8 @@ require 'includes/graphs/common.inc.php';
 
 $rrd_options .= ' -l 0 -E ';
 
-$radio1 = $config['rrd_dir'].'/'.$device['hostname'].'/wificlients-radio1.rrd';
-$radio2 = $config['rrd_dir'].'/'.$device['hostname'].'/wificlients-radio2.rrd';
+$radio1 = rrd_name($device['hostname'], 'wificlients-radio1');
+$radio2 = rrd_name($device['hostname'], 'wificlients-radio2');
 
 if (file_exists($radio1)) {
     $rrd_options .= " COMMENT:'                           Cur   Min  Max\\n'";

@@ -22,7 +22,7 @@ $count = 0;
 foreach ($config['poller_modules'] as $module => $module_status) {
     $rrd_filename = rrd_name($device['hostname'], array('poller-perf', $module));
     if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-        if (is_file($rrd_filename)) {
+        if (rrdtool_check_rrd_exists($rrd_filename)) {
             $ds['ds']       = 'poller';
             $ds['descr']    = $module;
             $ds['filename'] = $rrd_filename;

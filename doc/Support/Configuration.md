@@ -104,11 +104,9 @@ Settings to enable memcached - currently it's not recommended to run memcached u
 
 ```php
 $config['rrdcached']    = "unix:/var/run/rrdcached.sock"; // or a tcp connection 127.0.0.1:42217
-$config['rrdcached_dir'] = FALSE;
 ```
-To enable rrdcached you need to set at least the `rrdcached` option. If `rrdcached` is a tcp socket then you need to configure `rrdcached_dir` as well.
-This should be set based on your base directory for running rrdcached. For instance if -b for rrdcached is set to /var/lib/rrd but you are expecting
-LibreNMS to store them in /var/lib/rrd/librenms then you would need to set `rrdcached_dir` to librenms.
+To enable rrdcached you need to set at least the `rrdcached` option. Make sure rrdcached is started with the `-b` option set to the correct directoy, 
+as configured in `$config['rrd_dir`]`.
 
 #### WebUI Settings
 

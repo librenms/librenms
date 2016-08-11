@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array(
-    'dhcp-stats' => 'DHCP Stats',
+    'dhcp-stats_stats' => 'DHCP Stats',
 );
 
 foreach ($graphs as $key => $text) {

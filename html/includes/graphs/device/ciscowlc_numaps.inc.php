@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/ciscowlc.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'ciscowlc');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr']    = 'Number of APs';
