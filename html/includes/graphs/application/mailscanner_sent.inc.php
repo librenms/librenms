@@ -15,9 +15,9 @@ $colour_area_out     = 'CECEFF66';
 $colour_area_in_max  = 'CC88CC';
 $colour_area_out_max = 'FFEFAA';
 
-$mailscanner_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-mailscannerV2-'.$app['app_id'].'.rrd';
+$mailscanner_rrd = rrd_name($device['hostname'], array('app', 'mailscannerV2', $app['app_id']));
 
-if (is_file($mailscanner_rrd)) {
+if (rrdtool_check_rrd_exists($mailscanner_rrd)) {
     $rrd_filename = $mailscanner_rrd;
 }
 

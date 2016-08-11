@@ -9,7 +9,7 @@ $format = 'bytes';
 
 $ceph_pool_rrd = ceph_rrd('pool');
 
-if (is_file($ceph_pool_rrd)) {
+if (rrdtool_check_rrd_exists($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;
 }
 

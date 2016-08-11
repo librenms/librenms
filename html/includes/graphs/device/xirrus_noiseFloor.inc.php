@@ -24,7 +24,7 @@ $pallette = array(
 $rrd_options .= ' -E ';
 $rrd_options .= " COMMENT:'Noisefloor              Cur    Min    Max\\n'";
 $radioId=1;
-foreach(glob($config['rrd_dir'].'/'.$device['hostname'].'/xirrus_stats-*.rrd') as $rrd) {
+foreach(glob(rrd_name($device['hostname'], 'xirrus_stats-*')) as $rrd) {
     // get radio name
     preg_match("/xirrus_stats-iap([0-9]{1,2}).rrd/", $rrd, $out);
     list(,$radioId)=$out;

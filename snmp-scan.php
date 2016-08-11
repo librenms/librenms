@@ -42,7 +42,7 @@ require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
 function perform_snmp_scan($net) {
-    global $stats, $config, $quiet;
+    global $stats, $config, $debug;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
@@ -63,22 +63,30 @@ function perform_snmp_scan($net) {
             continue;
         }
         foreach (array('udp','tcp') as $transport) {
-            $result = addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $quiet, $config['distributed_poller_group'], 0);
-            if (is_numeric($result)) {
+            try {
+                addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $config['distributed_poller_group']);
                 $stats['added']++;
                 echo '+';
                 break;
-            } elseif (substr($result, 0, 12) === 'Already have') {
+            } catch (HostExistsException $e) {
                 $stats['known']++;
                 echo '*';
                 break;
-            } elseif (substr($result, 0 , 14) === 'Could not ping') {
+            } catch (HostUnreachablePingException $e) {
                 echo '.';
                 break;
-            } elseif ($transport == 'tcp') {
-                // tried both udp and tcp without success
-                $stats['failed']++;
-                echo '-';
+            } catch (HostUnreachableException $e) {
+                if ($debug) {
+                    print_error($e->getMessage() . " over $transport");
+                    foreach ($e->getReasons() as $reason) {
+                        echo "  $reason\n";
+                    }
+                }
+                if ($transport == 'tcp') {
+                    // tried both udp and tcp without success
+                    $stats['failed']++;
+                    echo '-';
+                }
             }
         }
     }
@@ -104,7 +112,6 @@ if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($con
 }
 if (isset($opts['d'])) {
     $debug = true;
-    $quiet = 0;
 }
 if (isset($opts['l'])) {
     echo '   * = Known Device;   . = Unpingable Device;   + = Added Device;   - = Failed To Add Device;'.PHP_EOL;

@@ -2,9 +2,9 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nginx-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'nginx', $app['app_id']));
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= ' -b 1000 ';
     $rrd_options .= ' -l 0 ';
     $rrd_options .= ' DEF:a='.$rrd_filename.':Requests:AVERAGE';

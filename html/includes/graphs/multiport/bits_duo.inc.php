@@ -15,7 +15,7 @@ $i = 1;
 foreach (explode(',', $_GET['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         $rrd_options .= ' DEF:inoctets'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
         $rrd_options .= ' DEF:outoctets'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
         $in_thing    .= $seperator.'inoctets'.$i.',UN,0,'.'inoctets'.$i.',IF';
@@ -33,7 +33,7 @@ unset($plus);
 foreach (explode(',', $_GET['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
     $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         $rrd_options .= ' DEF:inoctetsb'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
         $rrd_options .= ' DEF:outoctetsb'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
         $in_thingb   .= $seperator.'inoctetsb'.$i.',UN,0,'.'inoctetsb'.$i.',IF';

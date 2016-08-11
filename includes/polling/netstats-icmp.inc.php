@@ -33,36 +33,24 @@ if ($device['os'] != 'Snom') {
         'icmpOutAddrMaskReps',
     );
 
-    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/netstats-icmp.rrd';
+    $data = snmpwalk_cache_oid($device, 'icmp', array(), 'IP-MIB');
+    $data = $data[0];
 
-    $rrd_create = $config['rrd_rra'];
-
-    foreach ($oids as $oid) {
-        $oid_ds      = truncate($oid, 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
-        $snmpstring .= " $oid.0";
-    }
-
-    $data_array = snmpwalk_cache_oid($device, 'icmp', array(), 'IP-MIB');
-
-    $fields = $data_array[0];
-
-    unset($snmpstring);
-
-    if (isset($data_array[0]['icmpInMsgs']) && isset($data_array[0]['icmpOutMsgs'])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
+    if (isset($data['icmpInMsgs']) && isset($data['icmpOutMsgs'])) {
+        $rrd_def = array();
+        $fields = array();
+        foreach ($oids as $oid) {
+            $oid_ds    = truncate($oid, 19, '');
+            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
 
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array();
-        influx_update($device,'netstats-icmp',$tags,$fields);
+        $tags = compact('rrd_def');
+        data_update($device,'netstats-icmp',$tags,$fields);
 
         $graphs['netstat_icmp']      = true;
         $graphs['netstat_icmp_info'] = true;
     }
 
-    unset($oids, $data, $data_array, $oid, $protos);
+    unset($oids, $data, $rrd_def, $fields, $tags);
 }//end if

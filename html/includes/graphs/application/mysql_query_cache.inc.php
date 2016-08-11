@@ -2,47 +2,47 @@
 
 require 'includes/graphs/common.inc.php';
 
-$mysql_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'.rrd';
+$mysql_rrd = rrd_name($device['hostname'], array('app', mysql, $app['app_id']));
 
-if (is_file($mysql_rrd)) {
+if (rrdtool_check_rrd_exists($mysql_rrd)) {
     $rrd_filename = $mysql_rrd;
-}
 
-$array = array(
-          'QCQICe' => array(
-                       'descr'  => 'Queries in cache',
-                       'colour' => '22FF22',
-                      ),
-          'QCHs'   => array(
-                       'descr'  => 'Cache hits',
-                       'colour' => '0022FF',
-                      ),
-          'QCIs'   => array(
-                       'descr'  => 'Inserts',
-                       'colour' => 'FF0000',
-                      ),
-          'QCNCd'  => array(
-                       'descr'  => 'Not cached',
-                       'colour' => '00AAAA',
-                      ),
-          'QCLMPs' => array(
-                       'descr'  => 'Low-memory prunes',
-                       'colour' => 'FF00FF',
-                      ),
-         );
+    $array = array(
+        'QCQICe' => array(
+            'descr' => 'Queries in cache',
+            'colour' => '22FF22',
+        ),
+        'QCHs' => array(
+            'descr' => 'Cache hits',
+            'colour' => '0022FF',
+        ),
+        'QCIs' => array(
+            'descr' => 'Inserts',
+            'colour' => 'FF0000',
+        ),
+        'QCNCd' => array(
+            'descr' => 'Not cached',
+            'colour' => '00AAAA',
+        ),
+        'QCLMPs' => array(
+            'descr' => 'Low-memory prunes',
+            'colour' => 'FF00FF',
+        ),
+    );
 
-$i = 0;
-if (is_file($rrd_filename)) {
+
+    $rrd_list = array();
     foreach ($array as $ds => $vars) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $vars['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        // $rrd_list[$i]['colour'] = $vars['colour'];
-        $i++;
+        $rrd_list[] = array(
+            'filename' => $rrd_filename,
+            'descr' => $vars['descr'],
+            'ds' => $ds,
+//                'colour' => $vars['colour']
+        );
     }
 }
 else {
-    echo "file missing: $file";
+    echo "data missing: $mysql_rrd";
 }
 
 $colours   = 'mixed';
