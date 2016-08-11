@@ -33,7 +33,14 @@ class Plugins
     public static function load($file, $pluginName)
     {
         include $file;
-        $plugin = new $pluginName;
+        $pluginFullName = 'LibreNMS\\Plugins\\'.$pluginName;
+        if (class_exists($pluginName)) {
+            $plugin = new $pluginName;
+        } elseif (class_exists($pluginFullName)) {
+            $plugin = new $pluginFullName;
+        } else {
+            return null;
+        }
         $hooks  = get_class_methods($plugin);
 
         foreach ($hooks as $hookName) {
