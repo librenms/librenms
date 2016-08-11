@@ -24,39 +24,35 @@
  * @subpackage Polling
  */
 
-if (!empty($agent_data['app']['tinydns']) && $app['app_id'] > 0) {
+$name = 'tinydns';
+$app_id = $app['app_id'];
+if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     echo ' tinydns';
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-tinydns-'.$app['app_id'].'.rrd';
-    if (!is_file($rrd_filename)) {
-        rrdtool_create(
-            $rrd_filename,
-            '--step 300 
-			DS:a:COUNTER:600:0:125000000000 
-			DS:ns:COUNTER:600:0:125000000000 
-			DS:cname:COUNTER:600:0:125000000000 
-			DS:soa:COUNTER:600:0:125000000000 
-			DS:ptr:COUNTER:600:0:125000000000 
-			DS:hinfo:COUNTER:600:0:125000000000 
-			DS:mx:COUNTER:600:0:125000000000 
-			DS:txt:COUNTER:600:0:125000000000 
-			DS:rp:COUNTER:600:0:125000000000 
-			DS:sig:COUNTER:600:0:125000000000 
-			DS:key:COUNTER:600:0:125000000000 
-			DS:aaaa:COUNTER:600:0:125000000000 
-			DS:axfr:COUNTER:600:0:125000000000 
-			DS:any:COUNTER:600:0:125000000000 
-			DS:total:COUNTER:600:0:125000000000 
-			DS:other:COUNTER:600:0:125000000000 
-			DS:notauth:COUNTER:600:0:125000000000 
-			DS:notimpl:COUNTER:600:0:125000000000 
-			DS:badclass:COUNTER:600:0:125000000000 
-			DS:noquery:COUNTER:600:0:125000000000 '.$config['rrd_rra']
-        );
-    }//end if
+    $rrd_name = array('app', $name, $app_id);
+    $rrd_def = array(
+        'DS:a:COUNTER:600:0:125000000000',
+        'DS:ns:COUNTER:600:0:125000000000',
+        'DS:cname:COUNTER:600:0:125000000000',
+        'DS:soa:COUNTER:600:0:125000000000',
+        'DS:ptr:COUNTER:600:0:125000000000',
+        'DS:hinfo:COUNTER:600:0:125000000000',
+        'DS:mx:COUNTER:600:0:125000000000',
+        'DS:txt:COUNTER:600:0:125000000000',
+        'DS:rp:COUNTER:600:0:125000000000',
+        'DS:sig:COUNTER:600:0:125000000000',
+        'DS:key:COUNTER:600:0:125000000000',
+        'DS:aaaa:COUNTER:600:0:125000000000',
+        'DS:axfr:COUNTER:600:0:125000000000',
+        'DS:any:COUNTER:600:0:125000000000',
+        'DS:total:COUNTER:600:0:125000000000',
+        'DS:other:COUNTER:600:0:125000000000',
+        'DS:notauth:COUNTER:600:0:125000000000',
+        'DS:notimpl:COUNTER:600:0:125000000000',
+        'DS:badclass:COUNTER:600:0:125000000000',
+        'DS:noquery:COUNTER:600:0:125000000000'
+    );
 
-    rrdtool_update($rrd_filename, 'N:'.$agent_data['app']['tinydns']);
-
-    $tags = array('name' => 'tinydns', 'app_id' => $app['app_id']);
-    influx_update($device,'app',$tags,$fields);
+    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+    data_update($device, 'app', $tags, $fields);
 
 }//end if

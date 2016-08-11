@@ -46,7 +46,6 @@ foreach ($components as $id => $array) {
 
     // We only care about children of the selected policy.
     if ( ($array['qos-type'] == 2) && ($array['parent'] == $components[$vars['policy']]['sp-obj']) && ($array['sp-id'] == $components[$vars['policy']]['sp-id'])) {
-
         // Are we trying to only graph a single class?
         if (isset($vars['class'])) {
             // Yes, is this the selected class
@@ -62,7 +61,7 @@ foreach ($components as $id => $array) {
         // Add the class map to the graph
         if ($addtograph === true) {
             d_echo("\n  Class: ".$components[$id]['label']."\t+ added to the graph");
-            $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("port-".$array['ifindex']."-cbqos-".$array['sp-id']."-".$array['sp-obj'].".rrd");
+            $rrd_filename = rrd_name($device['hostname'], array('port', $array['ifindex'], 'cbqos', $array['sp-id'], $array['sp-obj']));
 
             if (file_exists($rrd_filename)) {
                 // Stack the area on the second and subsequent DS's

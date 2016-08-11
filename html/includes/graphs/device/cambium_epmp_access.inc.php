@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-epmp-access.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-access');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now     \\n'";
     $rrd_options .= ' DEF:entryAttempt='.$rrdfilename.':entryAttempt:AVERAGE ';

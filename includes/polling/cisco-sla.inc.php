@@ -35,20 +35,11 @@ foreach ($sla_table as &$sla) {
 unset($sla);
 
 foreach (dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0 AND `status` = 1', array($device['device_id'])) as $sla) {
-    echo 'SLA '.$sla['sla_nr'].': '.$sla['rtt_type'].' '.$sla['owner'].' '.$sla['tag'].'... ';
+    $sla_nr = $sla['sla_nr'];
+    echo 'SLA '. $sla_nr .': '.$sla['rtt_type'].' '.$sla['owner'].' '.$sla['tag'].'... ';
 
-    $slarrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('sla-'.$sla['sla_nr'].'.rrd');
-
-    if (!is_file($slarrd)) {
-        rrdtool_create(
-            $slarrd,
-            '--step 300 
-     DS:rtt:GAUGE:600:0:300000 '.$config['rrd_rra']
-        );
-    }
-
-    if (isset($sla_table[$sla['sla_nr']])) {
-        $slaval = $sla_table[$sla['sla_nr']];
+    if (isset($sla_table[$sla_nr])) {
+        $slaval = $sla_table[$sla_nr];
         echo $slaval['CompletionTime'].'ms at '.$slaval['TimeStr'];
         $val = $slaval['CompletionTime'];
     }
@@ -57,14 +48,14 @@ foreach (dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` =
         $val = 'U';
     }
 
+    $rrd_name = array('sla', $sla_nr);
+    $rrd_def = 'DS:rtt:GAUGE:600:0:300000';
     $fields = array(
         'rtt' => $val,
     );
 
-    rrdtool_update($slarrd, $fields);
-
-    $tags = array('sla_nr' => $sla['sla_nr']);
-    influx_update($device,'sla',$tags,$fields);
+    $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
+    data_update($device,'sla',$tags,$fields);
 
     echo "\n";
 }//end foreach

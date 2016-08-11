@@ -300,25 +300,29 @@ $version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-M
 $hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
 $hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
 
-$usersrrd  = $config['rrd_dir'].'/'.$device['hostname'].'/pulse_users.rrd';
 $users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
 
 if (is_numeric($users)) {
-    if (!is_file($usersrrd)) {
-        rrdtool_create($usersrrd, ' DS:users:GAUGE:600:0:U'.$config['rrd_rra']);
-    }
-    rrdtool_update($usersrrd, "N:$users");
+    $rrd_def = 'DS:users:GAUGE:600:0:U';
+    $fields = array(
+        'users' => $users
+    )
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_users', $tags, $fields);
     $graphs['pulse_users'] = true;
 }
 
-$sessrrd  = $config['rrd_dir'].'/'.$device['hostname'].'/pulse_sessions.rrd';
 $sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
 
 if (is_numeric($sessions)) {
-    if (!is_file($sessrrd)) {
-        rrdtool_create($sessrrd, ' DS:sessions:GAUGE:600:0:U '.$config['rrd_rra']);
+    $rrd_def = array(
+        'DS:sessions:GAUGE:600:0:U',
     }
-    rrdtool_update($sessrrd, "N:$sessions");
+    $fields = array(
+        'sessions' => $sessions
+    );
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_sessions', $tags, $fields);
     $graphs['pulse_sessions'] = true;
 }
 ```
@@ -353,7 +357,7 @@ html/includes/graphs/device/pulse_sessions.inc.php
 ```php
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('pulse_sessions.rrd');
+$rrd_filename = rrd_name($device['hostname'], 'pulse_sessions');
 
 require 'includes/graphs/common.inc.php';
 
@@ -381,7 +385,7 @@ html/includes/graphs/device/pulse_users.inc.php
 ```php
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('pulse_users.rrd');
+$rrd_filename = rrd_name($device['hostname'], 'pulse_users');
 
 require 'includes/graphs/common.inc.php';
 

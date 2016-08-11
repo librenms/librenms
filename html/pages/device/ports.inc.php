@@ -57,8 +57,11 @@ $graph_types = array(
     'upkts'     => 'Unicast Packets',
     'nupkts'    => 'Non-Unicast Packets',
     'errors'    => 'Errors',
-    'etherlike' => 'Etherlike',
 );
+
+if ($config['enable_ports_etherlike']) {
+    $graph_types['etherlike'] = 'Etherlike';
+}
 
 foreach ($graph_types as $type => $descr) {
     echo "$type_sep";

@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array(
-    'os-updates' => 'OS updates',
+    'os-updates_packages' => 'OS updates',
 );
 
 foreach ($graphs as $key => $text) {

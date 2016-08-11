@@ -37,9 +37,9 @@ if (isset($options['f']) && $options['f'] == 0) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
-    $force_add = 1;
+    $force_add = true;
 } else {
-    $force_add = 0;
+    $force_add = false;
 }
 
 $port_assoc_mode = $config['default_port_association_mode'];
@@ -49,7 +49,7 @@ if (isset ($options['p'])) {
     if (! in_array ($port_assoc_mode, $valid_assoc_modes)) {
         echo "Invalid port association mode '" . $port_assoc_mode . "'\n";
         echo 'Valid modes: ' . join (', ', $valid_assoc_modes) . "\n";
-        exit(2);
+        exit(1);
     }
 
     $cmd = array_shift($argv);
@@ -115,7 +115,7 @@ if (!empty($argv[1])) {
                     $v3['authalgo'] = $arg;
                 } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    exit(2);
+                    exit(1);
                 }
             }
 
@@ -139,7 +139,7 @@ if (!empty($argv[1])) {
                     $v3['cryptoalgo'] = $arg;
                 } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    exit(2);
+                    exit(1);
                 }
             }//end while
 
@@ -165,16 +165,20 @@ if (!empty($argv[1])) {
         }
     }//end if
 
-    $result = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-
-    if (is_numeric($result)) {
-        $device = device_by_id_cache($result);
-        echo 'Added device '.$device['hostname'].' ('.$result.")\n";
+    try {
+        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
+        $device = device_by_id_cache($device_id);
+        echo "Added device {$device['hostname']} ($device_id)\n";
         exit(0);
-    }
-    else {
-        print $console_color->convert("%rWe couldn't add this device:\n  " . $result . "%n\n");
-        exit(1);
+    } catch (HostUnreachableException $e) {
+        print_error($e->getMessage());
+        foreach ($e->getReasons() as $reason) {
+            echo "  $reason\n";
+        }
+        exit(2);
+    } catch (Exception $e){
+        print_error($e->getMessage());
+        exit(3);
     }
 } else {
 
@@ -197,5 +201,5 @@ if (!empty($argv[1])) {
     %rRemember to run discovery for the host afterwards.%n
 '
     );
-    exit(2);
+    exit(1);
 }

@@ -20,9 +20,9 @@ $colour_area_out     = 'FFDD88';
 $colour_area_in_max  = 'CC88CC';
 $colour_area_out_max = 'FFEFAA';
 
-$ntpdserver_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpdserver-'.$app['app_id'].'.rrd';
+$ntpdserver_rrd = rrd_name($device['hostname'], array('app', 'ntpdserver', $app['app_id']));
 
-if (is_file($ntpdserver_rrd)) {
+if (rrdtool_check_rrd_exists($ntpdserver_rrd)) {
     $rrd_filename = $ntpdserver_rrd;
 }
 
