@@ -38,7 +38,7 @@ if ($device['os_group'] == "cisco") {
             'active' => $active,
         );
 
-        $tags = copmact('rrd_def');
+        $tags = compact('rrd_def');
         data_update($device, 'cisco-iospri', $tags, $fields);
 
         $graphs['cisco-iospri'] = TRUE;
