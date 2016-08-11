@@ -28,13 +28,22 @@ if (isset($options['d'])) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', 1);
-}
-else {
+} else {
     $debug = false;
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
     // ini_set('error_reporting', 0);
+}
+
+if (isset($options['f'])) {
+    $config['noinfluxdb'] = true;
+}
+
+if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+    $influxdb = influxdb_connect();
+} else {
+    $influxdb = false;
 }
 
 rrdtool_pipe_open($rrd_process, $rrd_pipes);
