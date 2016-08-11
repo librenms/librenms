@@ -13,5 +13,5 @@ if ($auth || port_permitted($vp['port_id'])) {
     $title       .= ' :: Port  '.generate_port_link($port);
     $title       .= ' :: VP '.$vp['vp_id'];
     $auth         = true;
-    $rrd_filename = $config['rrd_dir'].'/'.$vp['hostname'].'/'.safename('vp-'.$vp['ifIndex'].'-'.$vp['vp_id'].'.rrd');
+    $rrd_filename = rrd_name($vp['hostname'], array('vp', $vp['ifIndex'], $vp['vp_id']));
 }

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/netstats-tcp.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'netstats-tcp');
 
 $stats = array(
     'tcpInSegs',

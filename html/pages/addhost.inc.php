@@ -57,20 +57,19 @@ if ($_POST['hostname']) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
         $poller_group = $_POST['poller_group'];
-        $force_add    = $_POST['force_add'];
-        if ($force_add == 'on') {
-            $force_add = 1;
-        }
-        else {
-            $force_add = 0;
-        }
+        $force_add    = ($_POST['force_add'] == 'on');
 
         $port_assoc_mode = $_POST['port_assoc_mode'];
-        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-        if (is_numeric($result)) {
-            print_message("Device added ($result)");
-        } else {
-            print_error('Error: ' . $result);
+        try {
+            $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
+            print_message("Device added ($device_id)");
+        } catch (HostUnreachableException $e) {
+            print_error($e->getMessage());
+            foreach ($e->getReasons() as $reason) {
+                print_error($reason);
+            }
+        } catch (Exception $e){
+            print_error($e->getMessage());
         }
     }
     else {
