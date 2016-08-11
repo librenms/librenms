@@ -52,34 +52,30 @@ if ($device['os_group'] == 'cisco') {
         $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets'];
     }
 
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cipsec_flow.rrd');
-    $rrd_create   = ' DS:Tunnels:GAUGE:600:0:U';
-    $rrd_create  .= ' DS:InOctets:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutOctets:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InDecompOctets:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutUncompOctets:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InPkts:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutPkts:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InDrops:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InReplayDrops:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutDrops:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InAuths:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutAuths:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InAuthFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutAuthFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InDencrypts:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutEncrypts:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:InDecryptFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:OutEncryptFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:ProtocolUseFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:NoSaFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= ' DS:SysCapFails:COUNTER:600:0:100000000000';
-    $rrd_create  .= $config['rrd_rra'];
-
-    if (is_file($rrd_filename) || $data['cipSecGlobalActiveTunnels']) {
-        if (!file_exists($rrd_filename)) {
-            rrdtool_create($rrd_filename, $rrd_create);
-        }
+    if ($data['cipSecGlobalActiveTunnels']) {
+        $rrd_def = array(
+            'DS:Tunnels:GAUGE:600:0:U',
+            'DS:InOctets:COUNTER:600:0:100000000000',
+            'DS:OutOctets:COUNTER:600:0:100000000000',
+            'DS:InDecompOctets:COUNTER:600:0:100000000000',
+            'DS:OutUncompOctets:COUNTER:600:0:100000000000',
+            'DS:InPkts:COUNTER:600:0:100000000000',
+            'DS:OutPkts:COUNTER:600:0:100000000000',
+            'DS:InDrops:COUNTER:600:0:100000000000',
+            'DS:InReplayDrops:COUNTER:600:0:100000000000',
+            'DS:OutDrops:COUNTER:600:0:100000000000',
+            'DS:InAuths:COUNTER:600:0:100000000000',
+            'DS:OutAuths:COUNTER:600:0:100000000000',
+            'DS:InAuthFails:COUNTER:600:0:100000000000',
+            'DS:OutAuthFails:COUNTER:600:0:100000000000',
+            'DS:InDencrypts:COUNTER:600:0:100000000000',
+            'DS:OutEncrypts:COUNTER:600:0:100000000000',
+            'DS:InDecryptFails:COUNTER:600:0:100000000000',
+            'DS:OutEncryptFails:COUNTER:600:0:100000000000',
+            'DS:ProtocolUseFails:COUNTER:600:0:100000000000',
+            'DS:NoSaFails:COUNTER:600:0:100000000000',
+            'DS:SysCapFails:COUNTER:600:0:100000000000'
+        );
 
         $fields = array(
             'Tunnels'          => $data['cipSecGlobalActiveTunnels'],
@@ -104,10 +100,9 @@ if ($device['os_group'] == 'cisco') {
             'NoSaFails'        => $data['cipSecGlobalNoSaFails'],
             'SysCapFails'      => $data['cipSecGlobalSysCapFails'],
         );
-        rrdtool_update($rrd_filename, $fields);
 
-        $tags = array();
-        influx_update($device,'cipsec_flow',$tags,$fields);
+        $tags = compact('rrd_def');
+        data_update($device,'cipsec_flow',$tags,$fields);
 
         $graphs['cipsec_flow_tunnels'] = true;
         $graphs['cipsec_flow_pkts']    = true;
@@ -117,5 +112,5 @@ if ($device['os_group'] == 'cisco') {
         echo ' cipsec_flow';
     }//end if
 
-    unset($data, $rrd_filename, $rrd_create, $rrd_update);
+    unset($data, $rrd_def);
 }//end if

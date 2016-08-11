@@ -34,9 +34,9 @@ if (is_array($hrstorage_array)) {
         }
 
         if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
-            $old_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('storage-hrstorage-'.safename($descr).'.rrd');
-            $new_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('mempool-hrstorage-'.$storage['hrStorageIndex'].'.rrd');
-            rename($old_rrdfile, $new_rrdfile);
+            $old_rrdfile = array('storage', 'hrstorage', $descr);
+            $new_rrdfile = array('mempool', 'hrstorage', $storage['hrStorageIndex']);
+            rrd_file_rename($device, $old_rrdfile, $new_rrdfile);
             $deny = 1;
         }
 
@@ -80,9 +80,6 @@ if (is_array($hrstorage_array)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $descr, $size, $units, $used);
         }
 
-        // $old_storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("hrStorage-" . $index . ".rrd");
-        // $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-hrstorage-" . $index . ".rrd");
-        // if (is_file($old_storage_rrd)) { rename($old_storage_rrd,$storage_rrd); }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }//end foreach
 }//end if

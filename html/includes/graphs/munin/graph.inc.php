@@ -25,7 +25,7 @@ else {
 $c_i = 0;
 $dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', array($mplug['mplug_id']));
 foreach ($dbq as $ds) {
-    $ds_filename = $plugfile.'_'.$ds['ds_name'].'.rrd';
+    $ds_filename = rrd_name($device['hostname'], 'munin/'.$mplug['mplug_type'].'_'.$ds['ds_name']);
     $ds_name     = $ds['ds_name'];
 
     $cmd_def .= ' DEF:'.$ds['ds_name'].'='.$ds_filename.':val:AVERAGE';

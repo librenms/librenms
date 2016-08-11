@@ -10,8 +10,9 @@ if ($device['os'] == 'pbn') {
 
     // specified MIB supported since build 16607
     if ($version[build] >= 16607) {
-        $perc     = snmp_get($device, "NMS-MEMORY-POOL-MIB::nmsMemoryPoolUtilization.0", '-OUvQ');
-        $memory_available = snmp_get($device, "NMS-MEMORY-POOL-MIB::nmsMemoryPoolTotalMemorySize.0", '-OUvQ');
+        $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
+        $perc = snmp_get($device, 'nmsMemoryPoolUtilization.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', $mibdir);
+        $memory_available = snmp_get($device, 'nmsMemoryPoolTotalMemorySize.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', $mibdir);
         $mempool['total'] = $memory_available;
 
         if (is_numeric($perc)) {
