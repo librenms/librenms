@@ -1346,3 +1346,16 @@ function get_ports_from_type($given_types) {
     $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
     return $ports;
 }
+
+function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
+{
+    if(count($rewriteArray[$hardwareId]) > 0) {
+        if($rewriteArray[$hardwareId][$sensorIpmi] != "") {
+            return $rewriteArray[$hardwareId][$sensorIpmi];
+        } else {
+            return $sensorIpmi;
+        }
+    } else {
+        return $sensorIpmi;
+    }
+}
