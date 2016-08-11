@@ -397,10 +397,9 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
 
-
-// Calix
+// Calix E7
 $os = 'calix';
-$config['os'][$os]['text']             = 'Calix E7';
+$config['os'][$os]['text']             = 'Calix';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['empty_ifdescr']    = 1;
