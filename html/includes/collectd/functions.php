@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-include 'html/includes/collectd/CollectdColor.php';
+include 'includes/collectd/CollectdColor.php';
 
 use LibreNMS\CollectdColor;
 
