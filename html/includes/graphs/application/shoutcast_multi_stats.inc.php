@@ -7,30 +7,17 @@ $unit_text  = 'ShoutCast Server';
 $total_text = 'Total of all ShoutCast Servers';
 $nototal    = 0;
 
-$rrddir = $config['rrd_dir'].'/'.$device['hostname'];
-$files  = array();
-$i      = 0;
-$x      = 0;
-
-if ($handle = opendir($rrddir)) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != '.' && $file != '..') {
-            if (stripos($file, 'app-shoutcast-'.$app['app_id']) !== false) {
-                array_push($files, $file);
-            }
-        }
-    }
-}
-
-foreach ($files as $id => $file) {
-    $hostname                 = str_ireplace('app-shoutcast-'.$app['app_id'].'-', '', $file);
-    $hostname                 = str_ireplace('.rrd', '', $hostname);
-    list($host, $port)        = explode('_', $hostname, 2);
-    $rrd_filenames[]          = $rrddir.'/'.$file;
-    $rrd_list[$i]['filename'] = $rrddir.'/'.$file;
-    $rrd_list[$i]['descr']    = $host.':'.$port;
-    $rrd_list[$i]['colour']   = $colour;
-    $i++;
+$rrd_list = array();
+$rrd_filenames = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], '*')));
+foreach ($rrd_filenames as $file) {
+    $pieces = explode('-', basename($file, '.rrd'));
+    $hostname = end($pieces);
+    list($host, $port) = explode('_', $hostname, 2);
+    $rrd_list[] = array(
+        'filename' => $file,
+        'descr'    => $host.':'.$port,
+//        'colour'   => $colour
+    );
 }
 
 require 'includes/graphs/common.inc.php';

@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-250-modulationMode.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-250-modulationMode');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Mode                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rxModulation='.$rrdfilename.':rxModulation:AVERAGE ';

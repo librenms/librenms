@@ -13,10 +13,23 @@ if (count($vp_rows)) {
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
 
+    $rrd_def = array(
+        'DS:incells:DERIVE:600:0:125000000000',
+        'DS:outcells:DERIVE:600:0:125000000000',
+        'DS:inpackets:DERIVE:600:0:125000000000',
+        'DS:outpackets:DERIVE:600:0:125000000000',
+        'DS:inpacketoctets:DERIVE:600:0:125000000000',
+        'DS:outpacketoctets:DERIVE:600:0:125000000000',
+        'DS:inpacketerrors:DERIVE:600:0:125000000000',
+        'DS:outpacketerrors:DERIVE:600:0:125000000000'
+    );
+
     foreach ($vp_rows as $vp) {
         echo '.';
 
-        $oid = $vp['ifIndex'].'.'.$vp['vp_id'];
+        $ifIndex = $vp['ifIndex'];
+        $vp_id = $vp['vp_id'];
+        $oid = $ifIndex .'.'. $vp_id;
 
         d_echo("$oid ");
 
@@ -27,25 +40,7 @@ if (count($vp_rows)) {
         $vp_update .= ':'.$t_vp['juniAtmVpStatsInPacketOctets'].':'.$t_vp['juniAtmVpStatsOutPacketOctets'];
         $vp_update .= ':'.$t_vp['juniAtmVpStatsInPacketErrors'].':'.$t_vp['juniAtmVpStatsOutPacketErrors'];
 
-        $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('vp-'.$vp['ifIndex'].'-'.$vp['vp_id'].'.rrd');
-
-        d_echo("$rrd ");
-
-        if (!is_file($rrd)) {
-            rrdtool_create(
-                $rrd,
-                '--step 300 
-                DS:incells:DERIVE:600:0:125000000000 
-                DS:outcells:DERIVE:600:0:125000000000 
-                DS:inpackets:DERIVE:600:0:125000000000 
-                DS:outpackets:DERIVE:600:0:125000000000 
-                DS:inpacketoctets:DERIVE:600:0:125000000000 
-                DS:outpacketoctets:DERIVE:600:0:125000000000 
-                DS:inpacketerrors:DERIVE:600:0:125000000000 
-                DS:outpacketerrors:DERIVE:600:0:125000000000 
-                '.$config['rrd_rra']
-            );
-        }
+        $rrd_name = array('vp', $ifIndex, $vp_id);
 
         $fields = array(
             'incells'         => $t_vp['juniAtmVpStatsInCells'],
@@ -58,14 +53,12 @@ if (count($vp_rows)) {
             'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'],
         );
 
-        rrdtool_update($rrd, $fields);
-
-        $tags = array('ifIndex' => $vp['ifIndex'], 'vp_id' => $vp['vp_id']);
-        influx_update($device,'atm-vp',$tags,$fields);
+        $tags = compact('ifIndex', 'vp_id', 'rrd_name', 'rrd_def');
+        data_update($device,'atm-vp',$tags,$fields);
 
     }//end foreach
 
     echo "\n";
 
-    unset($vp_cache);
+    unset($vp_cache, $rrd_def);
 }//end if

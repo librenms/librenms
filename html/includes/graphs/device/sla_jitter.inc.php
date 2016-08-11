@@ -15,7 +15,7 @@ $sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', array($vars[
 
 require 'includes/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = $config['rrd_dir']."/".$device['hostname']."/".safename('sla-'.$sla['sla_nr'].'-jitter.rrd');
+$rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'jitter'));
 
 if (file_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";

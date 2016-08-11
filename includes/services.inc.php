@@ -110,6 +110,7 @@ function discover_service($device, $service) {
 
 function poll_service($service) {
     global $config;
+
     $update = array();
     $old_status = $service['service_status'];
     $check_cmd = "";
@@ -126,17 +127,17 @@ function poll_service($service) {
         $check_cmd .= " " . $service['service_param'];
     }
 
+    $service_id = $service['service_id'];
     // Some debugging
-    d_echo("\nNagios Service - ".$service['service_id']."\n");
-    d_echo("Request:  ".$check_cmd."\n");
+    d_echo("\nNagios Service - $service_id\n");
+    d_echo("Request:  $check_cmd\n");
     list($new_status, $msg, $perf) = check_service($check_cmd);
-    d_echo("Response: ".$msg."\n");
+    d_echo("Response: $msg\n");
 
     // If we have performance data we will store it.
     if (count($perf) > 0) {
         // Yes, We have perf data.
-        $filename = "services-".$service['service_id'].".rrd";
-        $rrd_filename = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename ($filename);
+        $rrd_name = array('services', $service_id);
 
         // Set the DS in the DB if it is blank.
         $DS = array();
@@ -148,28 +149,28 @@ function poll_service($service) {
             $update['service_ds'] = json_encode($DS);
         }
 
-        // Create the RRD
-        if (!file_exists ($rrd_filename)) {
-            $rra = "";
-            foreach ($perf as $k => $v) {
-                if ($v['uom'] == 'c') {
-                    // This is a counter, create the DS as such
-                    $rra .= " DS:".$k.":COUNTER:600:0:U";
-                }
-                else {
-                    // Not a counter, must be a gauge
-                    $rra .= " DS:".$k.":GAUGE:600:0:U";
-                }
+        // rrd definition
+        $rrd_def = array();
+        foreach ($perf as $k => $v) {
+            if ($v['uom'] == 'c') {
+                // This is a counter, create the DS as such
+                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
             }
-            rrdtool_create ($rrd_filename, $rra . $config['rrd_rra']);
+            else {
+                // Not a counter, must be a gauge
+                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+            }
         }
 
-        // Update RRD
-        $rrd = array();
+        // Update data
+        $fields = array();
         foreach ($perf as $k => $v) {
-            $rrd[$k] = $v['value'];
+            $fields[$k] = $v['value'];
         }
-        rrdtool_update ($rrd_filename, $rrd);
+
+        $tags = compact('service_id', 'rrd_name', 'rrd_def');
+        //TODO not sure if we have $device at this point, if we do replace faked $device
+        data_update(array('hostname' => $service['hostname']), 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {

@@ -9,83 +9,75 @@
  * the source code distribution for details.
  */
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-transmitPower.rrd";
 $transmitPower = snmp_get($device, "transmitPower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($transmitPower)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:transmitPower:GAUGE:600:0:100".$config['rrd_rra']); 
-    }
-    $transmitPower = $transmitPower / 10;
+    $rrd_def = 'DS:transmitPower:GAUGE:600:0:100';
     $fields = array(
-        'transmitPower' => $transmitPower,
+        'transmitPower' => $transmitPower / 10,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-transmitPower', $tags, $fields);
     $graphs['cambium_650_transmitPower'] = TRUE;
 }
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-rawReceivePower.rrd";
 $rawReceivePower = snmp_get($device, "rawReceivePower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($rawReceivePower)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:rawReceivePower:GAUGE:600:-100:0".$config['rrd_rra']); 
-    }
-    $rawReceivePower = $rawReceivePower / 10;
+    $rrd_def = 'DS:rawReceivePower:GAUGE:600:-100:0';
     $fields = array(
-        'rawReceivePower' => $rawReceivePower,
+        'rawReceivePower' => $rawReceivePower / 10,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-rawReceivePower', $tags, $fields);
     $graphs['cambium_650_rawReceivePower'] = TRUE;
 }
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-modulationMode.rrd";
+
 $txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.15.0", "-Ovqn", "");
 $rxModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.14.0", "-Ovqn", "");
 if (is_numeric($txModulation) && is_numeric($rxModulation)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:txModulation:GAUGE:600:0:24 DS:rxModulation:GAUGE:600:0:24".$config['rrd_rra']); 
-    }   
+    $rrd_def = array(
+        'DS:txModulation:GAUGE:600:0:24',
+        'DS:rxModulation:GAUGE:600:0:24'
+    );
     $fields = array(
         'txModuation' => $txModulation,
         'rxModulation' => $rxModulation,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-modulationMode', $tags, $fields);
     $graphs['cambium_650_modulationMode'] = TRUE;
 }
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-dataRate.rrd";
 $receiveDataRate = snmp_get($device, "receiveDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 $transmitDataRate = snmp_get($device, "transmitDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 $aggregateDataRate = snmp_get($device, "aggregateDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric($aggregateDataRate)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:receiveDataRate:GAUGE:600:0:10000 DS:transmitDataRate:GAUGE:600:0:10000 DS:aggregateDataRate:GAUGE:600:0:10000".$config['rrd_rra']); 
-    }
-    $receiveDataRate = $receiveDataRate / 100;
-    $transmitDataRate = $transmitDataRate / 100;
-    $aggregateDataRate = $aggregateDataRate / 100;
-    $fields = array(
-        'receiveDataRate' => $receiveDataRate,
-        'transmitDataRate' => $transmitDataRate,
-        'aggregateDataRate' => $aggregateDataRate,
+    $rrd_def = array(
+        'DS:receiveDataRate:GAUGE:600:0:10000',
+        'DS:transmitDataRate:GAUGE:600:0:10000',
+        'DS:aggregateDataRate:GAUGE:600:0:10000'
     );
-    rrdtool_update($rrd_filename, $fields);
+    $fields = array(
+        'receiveDataRate' => $receiveDataRate / 100,
+        'transmitDataRate' => $transmitDataRate / 100,
+        'aggregateDataRate' => $aggregateDataRate / 100,
+    );
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-dataRate', $tags, $fields);
     $graphs['cambium_650_dataRate'] = TRUE;
 }
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-ssr.rrd";
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($ssr)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:ssr:GAUGE:600:-150:150".$config['rrd_rra']); 
-    }
+    $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
     $fields = array(
         'ssr' => $ssr,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-ssr', $tags, $fields);
     $graphs['cambium_650_ssr'] = TRUE;
 }
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cambium-650-gps.rrd";
 $gps = snmp_get($device, "tDDSynchronizationStatus.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if ($gps == 'locked') {
         $gps = 0;
@@ -118,12 +110,11 @@ if ($gps == 'locked') {
         $gps = 9;
     }
 if (is_numeric($gps)) {
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:gps:GAUGE:600:0:10".$config['rrd_rra']); 
-    }
+    $rrd_def = 'DS:gps:GAUGE:600:0:10';
     $fields = array(
         'gps' => $gps,
     );
-    rrdtool_update($rrd_filename, $fields);
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-650-gps', $tags, $fields);
     $graphs['cambium_650_gps'] = TRUE;
 }

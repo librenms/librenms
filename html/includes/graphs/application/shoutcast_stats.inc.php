@@ -1,8 +1,7 @@
 <?php
 
-$rrddir       = $config['rrd_dir'].'/'.$device['hostname'];
 $hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
-$rrd_filename = $rrddir.'/app-shoutcast-'.$app['app_id'].'-'.$hostname.'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
 
 require 'includes/graphs/common.inc.php';
 

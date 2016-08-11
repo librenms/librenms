@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/canopy-generic-whispGPSStats.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-whispGPSStats');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value    1 = Synched   2 = Lost Sync    3 = Generating   \\n'";
     $rrd_options .= ' DEF:whispGPSStats='.$rrdfilename.':whispGPSStats:AVERAGE ';

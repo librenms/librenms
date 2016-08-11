@@ -28,7 +28,7 @@ foreach ($segments as $pos => $segment) {
     else {
         list($name, $value) = explode('=', $segment);
         if ($value == '' || !isset($value)) {
-            $vars[$name] = yes;
+            $vars[$name] = 'yes';
         }
         else {
             $vars[$name] = $value;

@@ -10,7 +10,7 @@
  */
 
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/canopy-generic-450-slaveSNR.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-450-slaveSNR');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:vertical='.$rrdfilename.':vertical:AVERAGE ';

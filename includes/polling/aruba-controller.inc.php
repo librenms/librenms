@@ -44,34 +44,34 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
 
     echo "\n";
 
-    $rrdfile = $host_rrd.'/aruba-controller'.safename('.rrd');
-    if (!is_file($rrdfile)) {
-        rrdtool_create($rrdfile, ' --step 300 DS:NUMAPS:GAUGE:600:0:12500000000 DS:NUMCLIENTS:GAUGE:600:0:12500000000 '.$config['rrd_rra']);
-    }
+    $rrd_name = 'aruba-controller';
+    $rrd_def = array(
+        'DS:NUMAPS:GAUGE:600:0:12500000000',
+        'DS:NUMCLIENTS:GAUGE:600:0:12500000000'
+    );
 
     $fields = array(
         'NUMAPS'     => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
         'NUMCLIENTS' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
     );
-    $ret             = rrdtool_update($rrdfile, $fields);
 
-    $tags = array();
-    influx_update($device,'aruba-controller',$tags,$fields);
+    $tags = compact('rrd_name', 'rrd_def');
+    data_update($device,'aruba-controller',$tags,$fields);
 
     // also save the info about how many clients in the same place as the wireless module
-    $wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio1.rrd');
-
-    if (!is_file($wificlientsrrd)) {
-        rrdtool_create($wificlientsrrd, '--step 300 DS:wificlients:GAUGE:600:-273:10000 '.$config['rrd_rra']);
-    }
+    $rrd_name = 'wificlients-radio1';
+    $rrd_def = 'S:wificlients:GAUGE:600:-273:10000';
 
     $fields = array(
         'wificlients' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
     );
-    rrdtool_update($wificlientsrrd, $fields);
 
-    $tags = array('radio' => '1');
-    influx_update($device,'wificlients',$tags,$fields);
+    $tags = array(
+        'radio' => '1',
+        'rrd_name' => $rrd_name,
+        'rrd_def' => $rrd_def
+    );
+    data_update($device,'wificlients',$tags,$fields);
 
     $graphs['wifi_clients'] = true;
 
@@ -108,17 +108,17 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
 
         // if there is a numeric channel, assume the rest of the data is valid, I guess
         if (is_numeric($channel)) {
-            $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("arubaap-$name.$radionum.rrd");
-            if (!is_file($rrd_file)) {
-                $dslist  = 'DS:channel:GAUGE:600:0:200 ';
-                $dslist .= 'DS:txpow:GAUGE:600:0:200 ';
-                $dslist .= 'DS:radioutil:GAUGE:600:0:100 ';
-                $dslist .= 'DS:nummonclients:GAUGE:600:0:500 ';
-                $dslist .= 'DS:nummonbssid:GAUGE:600:0:200 ';
-                $dslist .= 'DS:numasoclients:GAUGE:600:0:500 ';
-                $dslist .= 'DS:interference:GAUGE:600:0:2000 ';
-                rrdtool_create($rrd_file, "--step 300 $dslist ".$config['rrd_rra']);
-            }
+            $rrd_name = array('arubaap',  $name.$radionum);
+
+            $rrd_def = array(
+                'DS:channel:GAUGE:600:0:200',
+                'DS:txpow:GAUGE:600:0:200',
+                'DS:radioutil:GAUGE:600:0:100',
+                'DS:nummonclients:GAUGE:600:0:500',
+                'DS:nummonbssid:GAUGE:600:0:200',
+                'DS:numasoclients:GAUGE:600:0:500',
+                'DS:interference:GAUGE:600:0:2000'
+            );
 
             $fields = array(
                 'channel'         => $channel,
@@ -130,11 +130,14 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 'interference'    => $interference,
             );
 
-            rrdtool_update($rrd_file, $fields);
+            $tags = array(
+                'name' => $name,
+                'radionum' => $radionum,
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def
+            );
 
-            $tags = array('name' => $name, 'radionum' => $radionum);
-            influx_update($device,'aruba',$tags,$fields);
-
+            data_update($device,'aruba',$tags,$fields);
         }
 
         // generate the mac address
