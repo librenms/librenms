@@ -214,7 +214,7 @@ if (isset($MetaGraphDefs[$type])) {
     }
 
     collectd_flush($identifiers);
-    $rrd_cmd = $MetaGraphDefs[$type]($host, $plugin, $type, $pinst, $all_tinst, $opts);
+    $rrd_cmd = $MetaGraphDefs[$type]($host, $plugin, $pinst, $type, $all_tinst, $opts);
 } else {
     if (!in_array(is_null($tinst) ? '' : $tinst, $all_tinst)) {
         return error404($host.'/'.$plugin.(!is_null($pinst) ? '-'.$pinst : '').'/'.$type.(!is_null($tinst) ? '-'.$tinst : ''), 'No rrd file found for graphing');

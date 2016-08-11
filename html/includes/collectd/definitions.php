@@ -1641,7 +1641,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
     $MetaGraphDefs['apache_scoreboard'] = 'meta_graph_apache_scoreboard';
     $MetaGraphDefs['mysql_commands']    = 'meta_graph_mysql_commands';
     $MetaGraphDefs['mysql_handler']     = 'meta_graph_mysql_commands';
-    $MetaGraphDefs['tcp_connections']     = 'meta_graph_tcp_connections';
+    $MetaGraphDefs['tcp_connections']   = 'meta_graph_tcp_connections';
 
     if (function_exists('load_graph_definitions_local')) {
         load_graph_definitions_local($logarithmic, $tinylegend);
@@ -1674,7 +1674,6 @@ function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_i
     }
     $opts['rrd_opts'] = array('-v', 'Mails');
 
-    $files = array();
     $opts['colors'] = array(
         'incoming' => '00e000',
         'active'   => 'a0e000',
@@ -1711,7 +1710,6 @@ function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_in
     }
     $opts['rrd_opts'] = array('-v', 'Bytes');
 
-    $files = array();
     $opts['colors'] = array(
         'incoming' => '00e000',
         'active'   => 'a0e000',
@@ -1748,7 +1746,6 @@ function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances
     }
     $opts['rrd_opts'] = array('-r', '-u', '100', 'COMMENT:Percent         Cur     Min      Ave     Max\l');
 
-    $files = array();
     $opts['colors'] = array(
         'idle'      => 'ffffff',
         'nice'      => '00e000',
@@ -1794,7 +1791,6 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
 
         # BYTES
 
-    $files = array();
     $opts['colors'] = array(
         'free'     => '00e000',
         'cached'   => '0000ff',
@@ -1833,7 +1829,6 @@ function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_in
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts']      = array('-v', 'Threads');
 
-    $files = array();
     $opts['colors'] = array(
         'total'   => 'F0A000',
         'running'  => 'FF0000',
@@ -1872,7 +1867,6 @@ function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_ins
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts']      = array('-b', '1024', '-v', 'Bytes');
 
-    $files = array();
     $opts['colors'] = array(
         'vm'   => 'F0A000',
         'vml'  => 'FF0000',
@@ -1911,8 +1905,6 @@ function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_
     $opts['number_format'] = '%5.2lf';
     $opts['rrd_opts']      = array('-v', 'Errors/s');
 
-    $files = array();
-
     while (list($k, $inst) = each($type_instances)) {
         $file = '';
         foreach ($config['datadirs'] as $datadir) {
@@ -1942,8 +1934,6 @@ function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $typ
     }
     $opts['rrd_opts'] = array('COMMENT:Issues/s               Cur    Ave     Min    Max\l');
     $opts['number_format'] = '%5.2lf';
-
-    $files = array();
 
     while (list($k, $inst) = each($type_instances)) {
         $file  = '';
@@ -1975,8 +1965,6 @@ function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = array('-v', 'Ops/s');
 
-    $files = array();
-
     while (list($k, $inst) = each($type_instances)) {
         $file  = '';
         foreach ($config['datadirs'] as $datadir) {
@@ -2006,7 +1994,6 @@ function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_inst
     }
     $opts['rrd_opts'] = array('COMMENT:Processes      Cur     Avg      Min     Max\l');
 
-    $files = array();
     $opts['colors'] = array(
         'running'  => '00e000',
         'sleeping' => '0000ff',
@@ -2047,7 +2034,6 @@ function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instance
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts']      = array('-b', '1024', 'COMMENT:Bytes        Cur     Avg     Min     Max\l');
 
-    $files = array();
     $opts['colors'] = array(
         'free'     => '00e000',
         'cached'   => '0000ff',
@@ -2084,7 +2070,7 @@ function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $
     }
     $opts['number_format'] = '%6.2lf%s';
     $opts['rrd_opts']      = array('COMMENT:Processes         Cur     Min      Ave     Max\l');
-    $files = array();
+
     $opts['colors'] = array(
         'open'         => '00e000',
         'waiting'      => '0000ff',
@@ -2131,7 +2117,6 @@ function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $ty
     #$opts['rrd_opts']      = array('-v', 'Connections');
     $opts['rrd_opts']      = array('COMMENT:Connections      Cur     Avg      Min     Max\l');
 
-    $files = array();
     $opts['colors'] = array(
         'ESTABLISHED' => '00e000',
         'SYN_SENT'    => '00e0ff',
