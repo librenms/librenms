@@ -8,7 +8,7 @@ $total_text = 'Total of all ShoutCast Servers';
 $nototal    = 0;
 
 $rrd_list = array();
-$rrd_filenames = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], '*')));
+$rrd_filenames = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id']), '*.rrd'));
 foreach ($rrd_filenames as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);
