@@ -4,7 +4,7 @@ $name = 'ceph';
 if (!empty($agent_data['app'][$name])) {
     $app_id = $app['app_id'];
 
-    foreach (explode('<', $agent_raw) as $section) {
+    foreach (explode('<', $agent_data['app'][$name]) as $section) {
         if (empty($section))
             continue;
         list($section, $data) = explode('>', $section);
