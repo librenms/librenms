@@ -33,14 +33,16 @@ if ($device['os_group'] == "cisco") {
 
         // Loop through the components and extract the data.
         foreach ($components as $key => &$array) {
+            $peer = $array['peer'];
 
             // Let's make sure the rrd is setup for this class.
-            $filename = "ntp-".$array['peer'].".rrd";
-            $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
-
-            if (!file_exists ($rrd_filename)) {
-                rrdtool_create ($rrd_filename, " DS:stratum:GAUGE:600:0:U DS:offset:GAUGE:600:0:U DS:delay:GAUGE:600:0:U DS:dispersion:GAUGE:600:0:U" . $config['rrd_rra']);
-            }
+            $rrd_name = array('ntp', $peer);
+            $rrd_def = array(
+                'DS:stratum:GAUGE:600:0:U',
+                'DS:offset:GAUGE:600:0:U',
+                'DS:delay:GAUGE:600:0:U',
+                'DS:dispersion:GAUGE:600:0:U',
+            );
 
             $array['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$array['UID']];
             // Set the status, 16 = Bad
@@ -57,7 +59,8 @@ if ($device['os_group'] == "cisco") {
             $rrd['offset'] = hexdec($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][23][$array['UID']]);
             $rrd['delay'] = hexdec($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][24][$array['UID']]);
             $rrd['dispersion'] = hexdec($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][25][$array['UID']]);
-            rrdtool_update ($rrd_filename, $rrd);
+            $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
+            data_update($device, 'ntp', $tags, $rrd);
 
             // Let's print some debugging info.
             d_echo("\n\nComponent: ".$key."\n");
