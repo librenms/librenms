@@ -10,7 +10,6 @@ if (!empty($agent_data['app'][$name])) {
         list($section, $data) = explode('>', $section);
 
         if ($section == "poolstats") {
-            $rrd_name = array('app', $name, $app_id, 'pool', $pool);
             $rrd_def = array(
                 'DS:ops:GAUGE:600:0:U',
                 'DS:wrbytes:GAUGE:600:0:U',
@@ -21,6 +20,7 @@ if (!empty($agent_data['app'][$name])) {
                 if (empty($line))
                     continue;
                 list($pool,$ops,$wrbytes,$rbytes) = explode(':', $line);
+                $rrd_name = array('app', $name, $app_id, 'pool', $pool);
 
                 print "Ceph Pool: $pool, IOPS: $ops, Wr bytes: $wrbytes, R bytes: $rbytes\n";
                 $fields = array(
@@ -33,7 +33,6 @@ if (!empty($agent_data['app'][$name])) {
             }
         }
         elseif ($section == "osdperformance") {
-            $rrd_name = array('app', $name, $app_id, 'osd', $osd);
             $rrd_def = array(
                 'DS:apply_ms:GAUGE:600:0:U',
                 'DS:commit_ms:GAUGE:600:0:U'
@@ -43,6 +42,7 @@ if (!empty($agent_data['app'][$name])) {
                 if (empty($line))
                     continue;
                 list($osd,$apply,$commit) = explode(':', $line);
+                $rrd_name = array('app', $name, $app_id, 'osd', $osd);
 
                 print "Ceph OSD: $osd, Apply: $apply, Commit: $commit\n";
                 $fields = array(
@@ -54,7 +54,6 @@ if (!empty($agent_data['app'][$name])) {
             }
         }
         elseif ($section == "df") {
-            $rrd_name = array('app', $name, $app_id, 'df', $df);
             $rrd_def = array(
                 'DS:avail:GAUGE:600:0:U',
                 'DS:used:GAUGE:600:0:U',
@@ -65,6 +64,7 @@ if (!empty($agent_data['app'][$name])) {
                 if (empty($line))
                     continue;
                 list($df,$avail,$used,$objects) = explode(':', $line);
+                $rrd_name = array('app', $name, $app_id, 'df', $df);
 
                 print "Ceph Pool DF: $pool, Avail: $avail, Used: $used, Objects: $objects\n";
                 $fields = array(
