@@ -84,7 +84,7 @@ if (!$where) {
     echo "-r                                           Do not create or update RRDs\n";
     echo "-f                                           Do not insert data into InfluxDB\n";
     echo "-d                                           Enable debugging output\n";
-    echo "-d                                           Enable verbose debugging output\n";
+    echo "-v                                           Enable verbose debugging output\n";
     echo "-m                                           Specify module(s) to be run\n";
     echo "\n";
     echo "No polling type specified!\n";
