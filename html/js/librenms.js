@@ -225,6 +225,17 @@ $(document).on("click", '.collapse-neighbors', function(event)
 });
 
 
+$(document).on("change", '#mode', function() {
+    $.post('ajax_mapview.php',
+        {
+            mapView: $(this).val()
+        },
+        function(data) {
+                location.reload();
+        },'json'
+    );
+});
+
 $(document).ready(function() {
     var lines = 'on';
     $("#linenumbers").button().click(function() {
