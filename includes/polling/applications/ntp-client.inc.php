@@ -1,38 +1,33 @@
 <?php
 
 // Polls ntp-client statistics from script via SNMP
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpclient-'.$app['app_id'].'.rrd';
 $options      = '-O qv';
 $oid          = 'nsExtendOutputFull.9.110.116.112.99.108.105.101.110.116';
-
 $ntpclient = snmp_get($device, $oid, $options);
 
+$name = 'ntpclient';
+$app_id = $app['app_id'];
 echo ' ntp-client';
 
 list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclient);
 
-if (!is_file($rrd_filename)) {
-    rrdtool_create(
-        $rrd_filename,
-        '--step 300 
-        DS:offset:GAUGE:600:-1000:1000 
-        DS:frequency:GAUGE:600:-1000:1000 
-        DS:jitter:GAUGE:600:-1000:1000 
-        DS:noise:GAUGE:600:-1000:1000 
-        DS:stability:GAUGE:600:-1000:1000 '.$config['rrd_rra']
-    );
-}
-
-$fields = array(
-                'offset'    => $offset,
-                'frequency' => $frequency,
-                'jitter'    => $jitter,
-                'noise'     => $noise,
-                'stability' => $stability,
+$rrd_name = array('app', $name, $app_id);
+$rrd_def = array(
+    'DS:offset:GAUGE:600:-1000:1000',
+    'DS:frequency:GAUGE:600:-1000:1000',
+    'DS:jitter:GAUGE:600:-1000:1000',
+    'DS:noise:GAUGE:600:-1000:1000',
+    'DS:stability:GAUGE:600:-1000:1000'
 );
 
-rrdtool_update($rrd_filename, $fields);
+$fields = array(
+    'offset'    => $offset,
+    'frequency' => $frequency,
+    'jitter'    => $jitter,
+    'noise'     => $noise,
+    'stability' => $stability,
+);
 
-$tags = array('name' => 'ntpclient', 'app_id' => $app['app_id']);
-influx_update($device,'app',$tags,$fields);
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $tags, $fields);
 

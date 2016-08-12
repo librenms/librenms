@@ -95,25 +95,19 @@ if ($device['os'] == 'netscaler') {
 
     $oids = array_merge($oids_gauge, $oids_counter);
 
-    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-stats-tcp.rrd';
-
-    $rrd_create = $config['rrd_rra'];
-
-    foreach ($oids_gauge as $oid) {
-        $oid_ds      = truncate(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 19, '');
-        $rrd_create .= " DS:$oid_ds:GAUGE:600:U:100000000000";
-    }
-
-    foreach ($oids_counter as $oid) {
-        $oid_ds          = truncate(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
-    }
-
     $data = snmpwalk_cache_oid($device, 'nsTcpStatsGroup', array(), 'NS-ROOT-MIB');
 
-    $fields = array();
+    $rrd_def = array();
+    foreach ($oids_gauge as $oid) {
+        $oid_ds    = truncate(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 19, '');
+        $rrd_def[] = "DS:$oid_ds:GAUGE:600:U:100000000000";
+    }
+    foreach ($oids_counter as $oid) {
+        $oid_ds    = truncate(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 19, '');
+        $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+    }
 
+    $fields = array();
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
             $rrdupdate = ':'.$data[0][$oid];
@@ -124,18 +118,12 @@ if ($device['os'] == 'netscaler') {
         $fields[$oid] = $rrdupdate;
     }
 
-    if (!file_exists($rrd_file)) {
-        rrdtool_create($rrd_file, $rrd_create);
-    }
-
-    rrdtool_update($rrd_file, $fields);
-
-    $tags = array();
-    influx_update($device,'netscaler-stats-tcp',$tags,$fields);
+    $tags = compact('rrd_def');
+    data_update($device,'netscaler-stats-tcp',$tags,$fields);
 
     $graphs['netscaler_tcp_conn'] = true;
     $graphs['netscaler_tcp_bits'] = true;
     $graphs['netscaler_tcp_pkts'] = true;
 }//end if
 
-unset($oids, $data, $data_array, $oid);
+unset($oids_gauge, $oids_counter, $oids, $data, $tags, $fields, $rrd_def);

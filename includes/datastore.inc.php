@@ -22,8 +22,11 @@ require_once $config['install_dir'] . "/includes/rrdtool.inc.php";
 require_once $config['install_dir'] . "/includes/influxdb.inc.php";
 
 
-/*
- * @return Copy of $arr with all keys beginning with 'rrd_' removed.
+/**
+ * Filter all elements with keys that start with 'rrd_'
+ *
+ * @param array $arr input array
+ * @return array Copy of $arr with all keys beginning with 'rrd_' removed.
  */
 function rrd_array_filter($arr)
 {
@@ -38,8 +41,19 @@ function rrd_array_filter($arr)
 } // rrd_array_filter
 
 
-/*
+/**
  * Datastore-independent function which should be used for all polled metrics.
+ *
+ * RRD Tags:
+ *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
+ *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
+ *   rrd_step             int: rrd step, defaults to 300
+ *
+ * @param array $device
+ * @param string $measurement Name of this measurement
+ * @param array $tags tags for the data (or to control rrdtool)
+ * @param array $fields
  */
 function data_update($device, $measurement, $tags, $fields)
 {

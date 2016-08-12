@@ -1,0 +1,332 @@
+--MibName=raisecomCommonManagement
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2002.5.24 by GONGGUIDONG
+-- This version of MIB is created just for management of base and user. 
+-- raisecomConfigLoadOperation add savingflashdb, synchronizingstartup, synchronizingflashdb by qiyun 20110506
+-- Added raisecomClockGroup.raisecomClockMode sub-node by XueChaomin 20081220
+-- remove UserManage and OnlineUpgrade group by guoxiaodan 20070716
+-- removed keepalve group by LIAOBIN 20070709
+-- raisecomEnableLogMethod add local_radius radius_local  by yjg 20070112
+-- modify RaisecomUserEntry by cjy 20060616
+-- add raisecomEnableLogPassword¡¢raisecomEnableLogOldPassword by cjy 20060616
+-- add rcNotificationGroup   by gongguidong 20041208
+-- add raisecomUserStatus    by gongguidong 20040205
+-- add online Upgrade group   by gongguidong 20040205
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- =======================================================================
+
+-- ===========================================================================
+
+--
+-- RAISECOM base management objects
+--            
+
+RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE ,
+		Integer32,
+		IpAddress,
+		Unsigned32
+			FROM SNMPv2-SMI
+		DisplayString,
+		TimeStamp,
+		RowStatus,
+		TruthValue
+			FROM SNMPv2-TC    
+		DateAndTime,
+		EnableVar
+			FROM SWITCH-TC       
+		raisecomAgent		
+			FROM RAISECOM-BASE-MIB;
+	
+	raisecomCommonManagement    MODULE-IDENTITY
+		LAST-UPDATED 	"200412170000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION  	
+		    "The MIB module defining objects for common management"
+		::= { raisecomAgent  2}  
+                
+	--groups                 
+	raisecomCommonFunctionGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 1}
+	
+	raisecomNotificationGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 4}
+	     
+	raisecomClockGroup	OBJECT IDENTIFIER ::= {raisecomCommonManagement 5}
+
+
+  	
+   -- raisecomCommonFunctionGroup
+
+    
+    raisecomConfigLoadOperation    OBJECT-TYPE
+        SYNTAX          INTEGER{
+        			ready(1),
+        			saving(2),
+        			erasing(3),
+        			reboot(4),
+        			restore(5),
+        			reload(6),
+        			savingflashdb(7),
+        			synchronizingstartup(8),
+        			synchronizingflashdb(9)
+        			}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Syetem Load Configuration .Includes to erase the start-up config,
+                         or to save the running config."
+    ::= { raisecomCommonFunctionGroup 1 }
+    
+    raisecomConfigLoadNotificationOnCompletion OBJECT-TYPE
+    	SYNTAX TruthValue
+    	ACCESS read-write
+    	STATUS mandatory
+   		DESCRIPTION
+		        "Specifies whether or not a  raisecomConfigLoadOnCompletion
+		        notification should be issued on completion of some 
+		        operation . If such a notification is desired, it is the
+		        responsibility of the management entity to ensure that the
+		        SNMP administrative model is configured in such a way as to
+		        allow the notification to be delivered."
+		DEFVAL { false }
+			::= {  raisecomCommonFunctionGroup 2 }
+	
+    raisecomConfigLoadState OBJECT-TYPE
+		SYNTAX  INTEGER {
+		        ready(1),
+		        running(2),
+		        successful(3),
+		        failed(4)
+		        }
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Specifies the state of this load configuration."
+			::= {  raisecomCommonFunctionGroup 3 } 
+    
+	raisecomSystemClock     OBJECT-TYPE
+        SYNTAX INTEGER       
+        UNITS "second"
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "Seconds elapsed from Jan. 1,1970,same as UNIX TIME. "
+        ::= { raisecomCommonFunctionGroup 4 }    
+    
+    
+  	raisecomConfigLoadMIBTraps      OBJECT IDENTIFIER ::= {raisecomCommonFunctionGroup 5} 
+  	   
+    raisecomConfigLoadCompletion TRAP-TYPE
+		    ENTERPRISE raisecomConfigLoadMIBTraps
+		    VARIABLES {
+		        raisecomConfigLoadOperation, raisecomConfigLoadState }
+		--  Status
+		--    mandatory
+		    DESCRIPTION
+		        "A raisecomConfigLoadeCompletion trap is sent at the completion
+		        of a load configuration. "
+		    ::= 1
+
+    raisecomWatchdog    OBJECT-TYPE
+        SYNTAX         EnableVar
+        MAX-ACCESS    read-write
+        STATUS          current
+        DESCRIPTION     "Set/get watchdog status."
+        DEFVAL { disable }
+		  ::= { raisecomCommonFunctionGroup 6}
+
+    raisecomClearRunningConfig        OBJECT-TYPE
+        SYNTAX	INTEGER{                             
+                        clearAll(1)
+                       }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "the operation to clear running-config" 
+          ::= { raisecomCommonFunctionGroup 7 }
+
+    raisecomReloadStartupConfig        OBJECT-TYPE 
+    	SYNTAX	INTEGER{                             
+                        clearAndReload(1)
+    			       }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The operation to reload startup-config file"
+         ::= { raisecomCommonFunctionGroup 8 }
+                          
+--raisecomNotificationGroup
+	raisecomObjectStatusDesc    OBJECT-TYPE
+		SYNTAX          OCTET STRING
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The object status description of the notification
+             			currently being sent."
+		::= { raisecomNotificationGroup 1 }
+
+	raisecomNotificationDesc    OBJECT-TYPE
+		SYNTAX          OCTET STRING
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The description of the notification
+             			currently being sent."
+		::= { raisecomNotificationGroup 2 }
+
+	raisecomNotificationLevel    OBJECT-TYPE
+		SYNTAX          OCTET STRING
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The notification severity level  of the notification
+             			currently being sent."
+		::= { raisecomNotificationGroup 3 }
+
+	raisecomNotificationCategory    OBJECT-TYPE
+		SYNTAX          OCTET STRING
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The notification category of the notification
+             			currently being sent.such as Environment,Complement"
+		::= { raisecomNotificationGroup 4 }
+               
+--raisecomClockGroup
+    raisecomClockDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current                
+    DESCRIPTION
+        "The current local date and time for the system.
+
+        Setting this object is equivalent to setting an automated
+        clock and calendar.  The value of the object will track the
+        date and time from the value set.  Note that due to hardware
+        limitations some systems may not be able to preserve such
+        meaning across reboots of the system, as indicated by
+        csyClockLostOnReboot.
+
+        A constant value of all zeros and length 8 indicates the
+        system is not aware of the present date and time.
+
+        This object may be read-only on some systems."
+    ::= { raisecomClockGroup 1 }
+
+	raisecomClockLostOnReboot OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indication of whether the system can preserve knowledge of
+        current date and time across a system reboot.
+
+        A value of 'true' indicates the clock must be reset from some
+        external source each time the system reboots.
+
+        A value of 'false' indicates the system has the ability to
+        keep time across reboots."
+    ::= { raisecomClockGroup 2 }   
+     
+--raisecom Summer Time
+raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
+  
+	raisecomSummerTimeEnable OBJECT-TYPE
+        SYNTAX        EnableVar 
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "An indication of whether the summertime feature 
+                       is enabled on this device. When this object
+                       is set to enable, then raisecomSummerTimeOffset, 
+                       raisecomSummerTimeRecurringStart and
+                       raisecomSummerTimeRecurringEnd  objects are set 
+                       to default values. When this object is set 
+                       to disable, then raisecomSummerTimeOffset, 
+                       raisecomSummerTimeRecurringStart,
+                       raisecomSummerTimeRecurringEnd objects are 
+                       not instantiated and the summertime feature 
+                       is disabled"
+        DEFVAL { false }
+        ::= { raisecomSummerTime 1 }
+
+	raisecomSummerTimeOffset  OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 1440) 
+        UNITS         "Minutes"
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The value of this object indicates number of 
+                       minutes to add  or to subtract during summertime.
+                       This object is not instantiated when 
+                       raisecomSummerTimeEnable object is set to disable."
+                       
+        DEFVAL { 60 }
+        ::= { raisecomSummerTime 2 }
+
+	raisecomSummerTimeRecurringStart OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (6))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Indicates summertime starts at this time every year.
+                       octets    contents     range
+                       1         week        1..5,ff last = ff 
+                       2       	 day         1..7 
+                                             where sunday = 1 saturday = 7
+                       4         month       1..12 
+                                             where january = 1 december = 12
+                       5         hour        0..23
+                       6         min         0..59
+                       For example, the first Monday in Feb at 13:30pm  
+                       should be given as
+                           01 02 00 02 0e 1e  
+                       For the last Tuesday in dec at 1:20am should be
+                       given as
+                          ff 03 00 0c 01 14 
+                       This object is not instantiated when 
+                       raisecomSummerTimeEnable object is set to disable."
+        ::= { raisecomSummerTime 3 } 
+
+	raisecomSummerTimeRecurringEnd OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (6))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Indicates summertime ends at this time every year.
+                       octets    contents      range
+                       1         week        1..5,ff where ff = last 
+                       2-3       day         1..7 
+                                             where sunday = 1 saturday = 7
+                       4         month       1..12 
+                                             where january = 1 december = 12
+                       5         hour        0..23
+                       6         min         0..59
+                      For example, the third friday in February at 3:30am 
+                      should be given as
+                            03 06 00 02 03 1e
+                          
+                       For the first Tuesday in May at 1:20am  should 
+                       be given as
+                           01 03 00 05 01 14
+                       This object is not instantiated when 
+                       raisecomSummerTimeEnable object is set to disable."
+        ::= { raisecomSummerTime 4 }
+           
+    raisecomClockMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+        			SYSCLK_DFLT(1),
+        			SYSCLK_TS(2),
+        			SYSCLK_AUX(3)        			
+        			}
+    MAX-ACCESS  read-write
+    STATUS      current                
+    DESCRIPTION
+        "System clock mode, which range from 1 to 3, stands for default mode, timestamp mode
+        and auxiliary clock mode respectively. It allows network administrator to change 
+        system clock mechanism by setting this variable. For instance, if administrator intend
+        to use auxiliary clock as system timer, whom is required to set this variable's value
+        as 3, i.e SYSCLK_AUX.
+        All supported values of this variable are listed as follows:
+        1: SYSCLK_DFLT   default mode
+        2: SYSCLK_TS     timestamp mode
+        3: SYSCLK_AUX    auxiliary clock mode."
+    ::= { raisecomClockGroup 4 }
+END

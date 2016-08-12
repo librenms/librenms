@@ -20,30 +20,18 @@ $colour_line_out = '000099';
 $colour_area_in  = 'CDEB8B';
 $colour_area_out = 'C3D9FF';
 
-$rrddir = $config['rrd_dir'].'/'.$device['hostname'];
-$files  = array();
-$i      = 0;
-
-if ($handle = opendir($rrddir)) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != '.' && $file != '..') {
-            if (stripos($file, 'app-shoutcast-'.$app['app_id']) != false) {
-                array_push($files, $file);
-            }
-        }
-    }
-}
-
-foreach ($files as $id => $file) {
-    $hostname                 = str_ireplace('app-shoutcast-'.$app['app_id'].'-', '', $file);
-    $hostname                 = str_ireplace('.rrd', '', $hostname);
-    list($host, $port)        = explode('_', $hostname, 2);
-    $rrd_filenames[]          = $rrddir.'/'.$file;
-    $rrd_list[$i]['filename'] = $rrddir.'/'.$file;
-    $rrd_list[$i]['descr']    = $host.':'.$port;
-    $rrd_list[$i]['ds_in']    = $ds_in;
-    $rrd_list[$i]['ds_out']   = $ds_out;
-    $i++;
+$rrd_list = array();
+$rrd_filenames = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], '*')));
+foreach ($rrd_filenames as $file) {
+    $pieces = explode('-', basename($file, '.rrd'));
+    $hostname = end($pieces);
+    list($host, $port) = explode('_', $hostname, 2);
+    $rrd_list[] = array(
+        'filename' => $file,
+        'descr'    => $host.':'.$port,
+        'ds_in'    => $ds_in,
+        'ds_out'   => $ds_out
+    );
 }
 
 require 'includes/graphs/generic_multi_bits_separated.inc.php';
