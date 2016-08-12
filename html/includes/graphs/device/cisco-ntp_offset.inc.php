@@ -27,7 +27,7 @@ $rrd_additions = "";
 
 $count = 0;
 foreach ($components as $id => $array) {
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("ntp-".$array['peer'].".rrd");
+    $rrd_filename = rrd_name($device['hostname'], array('ntp', $array['peer']));
 
     if (file_exists($rrd_filename)) {
         // Grab a color from the array.
