@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/ucd_ssRawInterrupts.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'ucd_ssRawInterrupts');
 
 $ds = 'value';
 

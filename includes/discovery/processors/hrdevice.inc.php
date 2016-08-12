@@ -63,15 +63,9 @@ if (is_array($hrDevice_array)) {
             $descr = str_replace('(TM)', '', $descr);
             $descr = str_replace('(R)', '', $descr);
 
-            $old_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('hrProcessor-'.$index.'.rrd');
-            $new_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-hr-'.$index.'.rrd');
-
-            d_echo("$old_rrd $new_rrd");
-
-            if (is_file($old_rrd)) {
-                rename($old_rrd, $new_rrd);
-                echo 'Moved RRD ';
-            }
+            $old_name = array('hrProcessor', $index);
+            $new_name = array('processor', 'hr', $index);
+            rrd_file_rename($device, $old_name, $new_name);
 
             if ($device['os'] == 'arista-eos' && $index == '1') {
                 unset($descr);

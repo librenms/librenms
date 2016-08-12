@@ -10,7 +10,7 @@
  */
 
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cisco-wwan-mnc.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cisco-wwan-mnc');
 if (file_exists($rrdfilename)) {
     $rrd_options .= ' DEF:mnc='.$rrdfilename.':mnc:LAST ';
     $rrd_options .= ' --lower-limit 0 ';
