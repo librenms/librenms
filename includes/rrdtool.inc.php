@@ -293,6 +293,26 @@ function rrd_name($host, $extra, $extension = ".rrd")
 } // rrd_name
 
 /**
+ * Generates a filename for a proxmox cluster rrd
+ *
+ * @param $pmxcluster
+ * @param $vmid
+ * @param $vmport
+ * @return string full path to the rrd.
+ */
+function proxmox_rrd_name($pmxcluster, $vmid, $vmport) {
+    global $config;
+
+    $pmxcdir = join('/', array($config['rrd_dir'], 'proxmox', safename($pmxcluster)));
+    // this is not needed for remote rrdcached
+    if (!is_dir($pmxcdir)) {
+        mkdir($pmxcdir, 0775, true);
+    }
+
+    return join('/', array($pmxcdir, safename($vmid.'_netif_'.$vmport.'.rrd')));
+}
+
+/**
  * Modify an rrd file's max value and trim the peaks as defined by rrdtool
  *
  * @param string $type only 'port' is supported at this time
@@ -358,7 +378,13 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
         rrd_file_rename($device, $oldname, $rrd_name);
     }
 
-    $rrd = rrd_name($device['hostname'], $rrd_name);
+    if (isset($tags['rrd_proxmox_name'])) {
+        $pmxvars = $tags['rrd_proxmox_name'];
+        $rrd = proxmox_rrd_name($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
+    } else {
+        $rrd = rrd_name($device['hostname'], $rrd_name);
+    }
+
     if ($tags['rrd_def']) {
         $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
         // add the --step and the rra definitions to the command
