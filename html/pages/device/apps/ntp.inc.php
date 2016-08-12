@@ -15,7 +15,7 @@ require_once "../includes/component.php";
 $component = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
-$options['type'] = 'Cisco-NTP';
+$options['type'] = 'ntp';
 $components = $component->getComponents($device['device_id'],$options);
 $components = $components[$device['device_id']];
 
@@ -64,7 +64,7 @@ global $config;
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
-        $graph_array['type']   = 'device_cisco-ntp_stratum';
+        $graph_array['type']   = 'device_ntp_stratum';
         require 'includes/print-graphrow.inc.php';
 
         ?>
@@ -83,7 +83,7 @@ global $config;
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
-        $graph_array['type']   = 'device_cisco-ntp_offset';
+        $graph_array['type']   = 'device_ntp_offset';
         require 'includes/print-graphrow.inc.php';
 
         ?>
@@ -102,7 +102,7 @@ global $config;
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
-        $graph_array['type']   = 'device_cisco-ntp_delay';
+        $graph_array['type']   = 'device_ntp_delay';
         require 'includes/print-graphrow.inc.php';
 
         ?>
@@ -121,7 +121,7 @@ global $config;
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
-        $graph_array['type']   = 'device_cisco-ntp_dispersion';
+        $graph_array['type']   = 'device_ntp_dispersion';
         require 'includes/print-graphrow.inc.php';
 
         ?>
