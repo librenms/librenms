@@ -79,7 +79,7 @@ function collectd_compare_host($a, $b)
 
 /**
  * Fetch list of hosts found in collectd's datadirs.
- * @return Sorted list of hosts (sorted by label from rigth to left)
+ * @return array Sorted list of hosts (sorted by label from rigth to left)
  */
 function collectd_list_hosts()
 {
@@ -107,7 +107,7 @@ function collectd_list_hosts()
 /**
  * Fetch list of plugins found in collectd's datadirs for given host.
  * @arg_host Name of host for which to return plugins
- * @return Sorted list of plugins (sorted alphabetically)
+ * @return array Sorted list of plugins (sorted alphabetically)
  */
 function collectd_list_plugins($arg_host)
 {
@@ -140,7 +140,7 @@ function collectd_list_plugins($arg_host)
  * Fetch list of plugin instances found in collectd's datadirs for given host+plugin
  * @arg_host Name of host
  * @arg_plugin Name of plugin
- * @return Sorted list of plugin instances (sorted alphabetically)
+ * @return array Sorted list of plugin instances (sorted alphabetically)
  */
 function collectd_list_pinsts($arg_host, $arg_plugin)
 {
@@ -180,7 +180,7 @@ function collectd_list_pinsts($arg_host, $arg_plugin)
  * @arg_host Name of host
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
- * @return Sorted list of types (sorted alphabetically)
+ * @return array Sorted list of types (sorted alphabetically)
  */
 function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
 {
@@ -221,7 +221,7 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
  * @arg_type Type
- * @return Sorted list of type instances (sorted alphabetically)
+ * @return array Sorted list of type instances (sorted alphabetically)
  */
 function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
 {
@@ -230,7 +230,7 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
     $tinsts    = array();
     $my_plugin = $arg_plugin.(strlen($arg_pinst) ? '-'.$arg_pinst : '');
     if (!preg_match(REGEXP_PLUGIN, $my_plugin)) {
-        return $types;
+        return $tinsts;
     }
 
     foreach ($config['datadirs'] as $datadir) {
@@ -276,7 +276,7 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
  * @param $type
  * @param $pinst
  * @param $tinst
- * @return Identifier that collectd's FLUSH command understands
+ * @return string Identifier that collectd's FLUSH command understands
  * @internal param Type $ name
  * @tinst Type instance
  */
@@ -313,11 +313,13 @@ function collectd_identifier($host, $plugin, $type, $pinst, $tinst)
 /**
  * Tell collectd that it should FLUSH all data it has regarding the
  * graph we are about to generate.
+ *
  * @host Host name
  * @plugin Plugin name
  * @pinst Plugin instance
  * @type Type name
  * @tinst Type instance
+ * @return bool
  */
 function collectd_flush($identifier)
 {
@@ -365,6 +367,7 @@ function collectd_flush($identifier)
     else {
         error_log(sprintf('graph.php: Failed to open unix-socket to collectd: %d: %s', $u_errno, $u_errmsg));
     }
+    return true;
 }//end collectd_flush()
 
 
@@ -386,7 +389,7 @@ function rrd_strip_quotes($str)
 /**
  * Determine useful information about RRD file
  * @file Name of RRD file to analyse
- * @return Array describing the RRD file
+ * @return array Array describing the RRD file
  */
 function rrd_info($file)
 {
@@ -476,7 +479,7 @@ function rrd_get_color($code, $line = true)
  * @param null $pinst
  * @param null $tinst
  * @param array $opts
- * @return Commandline to call RRDGraph in order to generate the final graph* @internal param $
+ * @return string|false Commandline to call RRDGraph in order to generate the final graph* @internal param $
  * @tinst
  * @opts
  */
@@ -656,7 +659,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
  * @param $type
  * @param null $pinst
  * @param null $tinst
- * @return Commandline to call RRDGraph in order to generate the final graph* @internal param $
+ * @return string|false Commandline to call RRDGraph in order to generate the final graph* @internal param $
  * @tinst
  * @opts
  */
@@ -735,7 +738,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, 
  * Draw stack-graph for set of RRD files
  * @opts Graph options like colors
  * @sources List of array(name, file, ds)
- * @return Commandline to call RRDGraph in order to generate the final graph
+ * @return string Commandline to call RRDGraph in order to generate the final graph
  */
 function collectd_draw_meta_stack(&$opts, &$sources)
 {
@@ -872,7 +875,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
  * Draw stack-graph for set of RRD files
  * @opts Graph options like colors
  * @sources List of array(name, file, ds)
- * @return Commandline to call RRDGraph in order to generate the final graph
+ * @return string Commandline to call RRDGraph in order to generate the final graph
  */
 function collectd_draw_meta_line(&$opts, &$sources)
 {
