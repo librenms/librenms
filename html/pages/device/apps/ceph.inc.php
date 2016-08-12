@@ -14,7 +14,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['id']     = $app['app_id'];
 
     if ($key == "ceph_poolstats") {
-        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'pool', '*'))) as $rrd_filename) {
+        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'pool'), '*')) as $rrd_filename) {
             if (preg_match("/.*-pool-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $graph_array['to']     = $config['time']['now'];
                 $graph_array['id']     = $app['app_id'];
@@ -40,7 +40,7 @@ foreach ($graphs as $key => $text) {
         }
     }
     elseif ($key == "ceph_osdperf") {
-        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'osd', '*'))) as $rrd_filename) {
+        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'osd'), '*')) as $rrd_filename) {
             $graph_array['to']     = $config['time']['now'];
             $graph_array['id']     = $app['app_id'];
             if (preg_match("/.*-osd-(.+)\.rrd$/", $rrd_filename, $osds)) {
@@ -56,7 +56,7 @@ foreach ($graphs as $key => $text) {
         }
     }
     elseif ($key == "ceph_df") {
-        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'df', '*'))) as $rrd_filename) {
+        foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'df'), '*')) as $rrd_filename) {
             if (preg_match("/.*-df-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $pool = $pools[1];
                 if ($pool == "c") {
