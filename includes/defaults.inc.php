@@ -714,7 +714,7 @@ $config['poller_modules']['cisco-voice']                 = 1;
 $config['poller_modules']['cisco-cbqos']                 = 1;
 $config['poller_modules']['stp']                         = 1;
 $config['poller_modules']['cisco-otv']                   = 1;
-$config['poller_modules']['cisco-ntp']                   = 1;
+$config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 
 // List of discovery modules. Need to be in this array to be
@@ -752,7 +752,7 @@ $config['discovery_modules']['charge']         = 1;
 $config['discovery_modules']['cisco-cbqos']    = 0;
 $config['discovery_modules']['stp']            = 1;
 $config['discovery_modules']['cisco-otv']      = 1;
-$config['discovery_modules']['cisco-ntp']      = 1;
+$config['discovery_modules']['ntp']            = 1;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;

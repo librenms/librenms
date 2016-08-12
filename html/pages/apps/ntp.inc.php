@@ -15,7 +15,7 @@ require_once "../includes/component.php";
 $component = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
-$options['type'] = 'Cisco-NTP';
+$options['type'] = 'ntp';
 $components = $component->getComponents(null,$options);
 
 print_optionbar_start();
@@ -112,7 +112,7 @@ print_optionbar_end();
             }
 
             if ($display === true) {
-                $link = generate_device_link($device,null,array('tab' => 'apps', 'app' => 'cisco-ntp'));
+                $link = generate_device_link($device,null,array('tab' => 'apps', 'app' => 'ntp'));
                 $count++;
 ?>
     <tr <?php echo $status; ?>>
@@ -130,13 +130,13 @@ print_optionbar_end();
 
                 // Which graph type do we want?
                 if ($vars['graph'] == "stratum") {
-                    $graph_array['type']   = 'device_cisco-ntp_stratum';
+                    $graph_array['type']   = 'device_ntp_stratum';
                 } elseif ($vars['graph'] == "offset") {
-                    $graph_array['type']   = 'device_cisco-ntp_offset';
+                    $graph_array['type']   = 'device_ntp_offset';
                 } elseif ($vars['graph'] == "delay") {
-                    $graph_array['type']   = 'device_cisco-ntp_delay';
+                    $graph_array['type']   = 'device_ntp_delay';
                 } elseif ($vars['graph'] == "dispersion") {
-                    $graph_array['type']   = 'device_cisco-ntp_dispersion';
+                    $graph_array['type']   = 'device_ntp_dispersion';
                 } else {
                     // No Graph
                     unset($graph_array);
