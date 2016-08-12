@@ -43,8 +43,7 @@ if (count($sensors)) {
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = generate_url($link_array);
 
-        if($sensor['poller_type'] == "ipmi")
-        {
+        if ($sensor['poller_type'] == "ipmi") {
             $sensor['sensor_descr'] = truncate(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 48, '');
         } else {
             $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');

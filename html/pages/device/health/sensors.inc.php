@@ -9,11 +9,10 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         $row_colour = $list_colour_b;
     }
 
-    if($sensor['poller_type'] == "ipmi")
-    {
+    if ($sensor['poller_type'] == "ipmi") {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames);
     } else {
-       $sensor_descr = $sensor['sensor_descr'];
+        $sensor_descr = $sensor['sensor_descr'];
     }
 
     $sensor_current = format_si($sensor['sensor_current']).$unit;
