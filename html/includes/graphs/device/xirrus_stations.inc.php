@@ -24,7 +24,7 @@ $pallette = array(
 $rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'Associated Stations    Cur     Min    Max\\n'";
 $radioId=1;
-foreach(glob(rrd_name($device['hostname'], 'xirrus_users-*')) as $rrd) {
+foreach(glob(rrd_name($device['hostname'], 'xirrus_users-', '*.rrd')) as $rrd) {
     // get radio name
     preg_match("/xirrus_users-iap([0-9]{1,2}).rrd/", $rrd, $out);
     list(,$radioId)=$out;
