@@ -14,7 +14,7 @@ if (!empty($agent_data['app'][$name])) {
                 if (empty($line))
                     continue;
                 list($pool,$ops,$wrbytes,$rbytes) = explode(':', $line);
-                $rrd_name = array('app', $name, $app_id, 'pool'.$pool);
+                $rrd_name = array('app', $name, $app_id, 'pool', $pool);
                 $rrd_def = array(
                     'DS:ops:GAUGE:600:0:U',
                     'DS:wrbytes:GAUGE:600:0:U',
@@ -36,7 +36,7 @@ if (!empty($agent_data['app'][$name])) {
                 if (empty($line))
                     continue;
                 list($osd,$apply,$commit) = explode(':', $line);
-                $rrd_name = array('app', $name, $app_id, 'osd'.$osd);
+                $rrd_name = array('app', $name, $app_id, 'osd', $osd);
                 $rrd_def = array(
                     'DS:apply_ms:GAUGE:600:0:U',
                     'DS:commit_ms:GAUGE:600:0:U'
