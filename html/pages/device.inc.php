@@ -412,9 +412,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog"></i>
               <span class="caret"></span></button>
               <ul class="dropdown-menu">
-                <li><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"> Launch</a></li>
-                <li><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"> SSH</a></li>
-                 <li><a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"> Telnet</a></li>';
+                <li><a href="https://'.$device['hostname'].'" target="_blank"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"> Web</a></li>
+                <li><a href="ssh://'.$device['hostname'].'" target="_blank"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"> SSH</a></li>
+                 <li><a href="telnet://'.$device['hostname'].'" target="_blank"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"> Telnet</a></li>';
               if (is_admin()) {
                 echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">

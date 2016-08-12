@@ -397,10 +397,9 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
 
-
-// Calix
+// Calix E7
 $os = 'calix';
-$config['os'][$os]['text']             = 'Calix E7';
+$config['os'][$os]['text']             = 'Calix';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['empty_ifdescr']    = 1;
@@ -1718,6 +1717,18 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['icon']             = 'huawei';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
+
+// Raisecom / ISCOM
+$os = 'raisecom';
+$config['os'][$os]['text']             = 'Raisecom ROAP';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['icon']             = 'raisecom';
 
 foreach ($config['os'] as $this_os => $blah) {
     if (isset($config['os'][$this_os]['group'])) {

@@ -59,17 +59,13 @@ if ($device['os_group'] == 'cisco') {
 
             d_echo("\n".$acc['hostname'].' '.$acc['ifDescr']."  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
-            $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
-
-            if (!is_file($rrdfile)) {
-                rrdtool_create(
-                    $rrdfile,
-                    'DS:IN:COUNTER:600:0:12500000000 
-                    DS:OUT:COUNTER:600:0:12500000000 
-                    DS:PIN:COUNTER:600:0:12500000000 
-                    DS:POUT:COUNTER:600:0:12500000000 '.$config['rrd_rra']
-                );
-            }
+            $rrd_name = array('cip', $ifIndex, $mac);
+            $rrd_dev = array(
+                'DS:IN:COUNTER:600:0:12500000000',
+                'DS:OUT:COUNTER:600:0:12500000000',
+                'DS:PIN:COUNTER:600:0:12500000000',
+                'DS:POUT:COUNTER:600:0:12500000000'
+            );
 
             // FIXME - use memcached to make sure these values don't go backwards?
             $fields = array(
@@ -78,10 +74,9 @@ if ($device['os_group'] == 'cisco') {
                 'PIN'  => $p_in,
                 'POUT' => $p_out,
             );
-            rrdtool_update($rrdfile, $fields);
 
-            $tags = array('ifIndex' => $acc['ifIndex'], 'mac' => $acc['mac']);
-            influx_update($device,'cip',$tags,$fields);
+            $tags = compact('ifIndex', 'mac', 'rrd_name', 'rrd_def');
+            data_update($device,'cip',$tags,$fields);
 
             if ($acc['update']) {
                 // Do Updates

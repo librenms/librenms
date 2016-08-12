@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/ucd_mem.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'ucd_mem');
 
 $rrd_options .= " '-b 1024'";
 

@@ -10,7 +10,6 @@ else {
 if (is_numeric($mplug['device_id']) && ($auth || device_permitted($mplug['device_id']))) {
     $device   = &$mplug;
     $title    = generate_device_link($device);
-    $plugfile = $config['rrd_dir'].'/'.$device['hostname'].'/munin/'.$mplug['mplug_type'];
     $title   .= ' :: Plugin :: '.$mplug['mplug_type'].' - '.$mplug['mplug_title'];
     $auth = true;
 }

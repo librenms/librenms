@@ -379,18 +379,12 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 unset($device['context_name']);
 unset($vrfs_lite_cisco);
 // Create device-wide statistics RRD
-$filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ospf-statistics.rrd');
-
-if (!is_file($filename)) {
-    rrdtool_create(
-        $filename,
-        '--step 300 
-            DS:instances:GAUGE:600:0:1000000 
-                DS:areas:GAUGE:600:0:1000000 
-                    DS:ports:GAUGE:600:0:1000000 
-                        DS:neighbours:GAUGE:600:0:1000000 '.$config['rrd_rra']
-                    );
-}
+$rrd_def = array(
+    'DS:instances:GAUGE:600:0:1000000',
+    'DS:areas:GAUGE:600:0:1000000',
+    'DS:ports:GAUGE:600:0:1000000',
+    'DS:neighbours:GAUGE:600:0:1000000'
+);
 
 $fields = array(
     'instances'   => $ospf_instance_count,
@@ -398,9 +392,8 @@ $fields = array(
     'ports'       => $ospf_port_count,
     'neighbours'  => $ospf_neighbour_count,
 );
-$ret        = rrdtool_update("$filename", $fields);
 
-$tags = array();
-influx_update($device,'ospf-statistics',$tags,$fields);
+$tags = compact('rrd_def');
+data_update($device, 'ospf-statistics', $tags, $fields);
 
 echo "\n";
