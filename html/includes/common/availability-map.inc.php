@@ -54,7 +54,7 @@ if (defined('show_settings')) {
 
     if ($mode == 0 || $mode == 2) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
-        $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime`, `D`.`os` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
         if (is_normal_user() === true) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
             $param = array(
@@ -83,8 +83,7 @@ if (defined('show_settings')) {
                 $host_down_count++;
             }
 
-            if($directpage == "yes")
-            {
+            if($directpage == "yes") {
                 $deviceIcon = getImage($device);
                 $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" ';
                 $temp_output[] = 'title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">';
@@ -104,7 +103,7 @@ if (defined('show_settings')) {
     }
 
     if ($mode == 1 || $mode == 2) {
-        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`device_id`, `D`.`os` from services S, devices D where `S`.`device_id` = `D`.`device_id`;';
+        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id`;';
         foreach (dbFetchRows($service_query) as $service) {
             if ($service['service_status'] == '0') {
                 $serviceLabel = "label-success";
@@ -116,8 +115,7 @@ if (defined('show_settings')) {
                 $service_down_count += 1;
             }
 
-            if($directpage == "yes")
-            {
+            if($directpage == "yes") {
                 $deviceIcon = getImage($service);
                 $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '"';
                 $temp_output[] = 'title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">';
@@ -136,8 +134,7 @@ if (defined('show_settings')) {
         }
     }
 
-    if($directpage == "yes")
-    {
+    if($directpage == "yes") {
         $temp_header[] = '<div class="page-availability-title-left">';
         $temp_header[] = '<span class="page-availability-title">Availability map for</span>';
         $temp_header[] = '<select id="mode" class="page-availability-report-select" name="mode">';
@@ -146,14 +143,11 @@ if (defined('show_settings')) {
         $temp_header[] = '<option value="2"' . ($mode == 2 ? 'selected' : '') . '>devices and services</option>';
         $temp_header[] = '</select></div>';
         $temp_header[] = '<div class="page-availability-title-right">';
-
     }
 
 
-    if ($mode == 0 || $mode == 2)
-    {
-        if($directpage == "yes")
-        {
+    if ($mode == 0 || $mode == 2) {
+        if($directpage == "yes") {
             $temp_header[] = '<div class="page-availability-report-host">';
             $temp_header[] = '<span>Hosts report:</span>';
             $temp_header[] = '<div style="float:right;">';
@@ -172,13 +166,10 @@ if (defined('show_settings')) {
         } else {
             $temp_header[] = '<div class="widget-availability-host">Total hosts <label class="label label-success">up</label> '.$host_up_count.' <label class="label label-warning">warning</label> '.$host_warn_count.' <label class="label label-danger">down</label> '.$host_down_count.'</div>';
         }
-
     }
 
-    if ($mode == 1 || $mode == 2)
-    {
-        if($directpage == "yes")
-        {
+    if ($mode == 1 || $mode == 2) {
+        if($directpage == "yes") {
 
             $temp_header[] = '<div class="page-availability-report-service">';
             $temp_header[] = '<span>Services report:</span>';
@@ -197,7 +188,7 @@ if (defined('show_settings')) {
     }
 
     $temp_header[] = '</div>';
-    $temp_header[] = '<br style="clear:both;"/>';
+    $temp_header[] = '<br style="clear:both;">';
 
     $common_output = array_merge($temp_header, $temp_output);
 }
