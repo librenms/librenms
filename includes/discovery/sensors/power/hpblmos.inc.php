@@ -13,7 +13,7 @@ if ($device['os'] == 'hpblmos') {
             $max_value = snmp_get($device, $psu_max_usage_oid.$psuid, '-Oqv');
 
             if (is_numeric($value)) {
-                discover_sensor($valid['sensor'], 'power', $device, $psu_usage_oid.$psuid, '1', $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
+                discover_sensor($valid['sensor'], 'power', $device, $psu_usage_oid.$psuid, $psuid, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
             }
         }
     }

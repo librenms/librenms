@@ -12,7 +12,7 @@ if ($device['os'] == 'hpblmos') {
             $value = snmp_get($device, $sensor_value_oid.$tempid, '-Oqve');
 
             if ($value > 0) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $sensor_value_oid.$tempid, '1', $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+                discover_sensor($valid['sensor'], 'temperature', $device, $sensor_value_oid.$tempid, $tempid, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
             }
         }
     }
