@@ -169,7 +169,7 @@ if (defined('show_settings')) {
             $temp_header[] = '</div>';
             $temp_header[] = '</div>';
         } else {
-            $temp_header[] = '<div class="widget-availability-host">Total hosts <label class="label label-success label-font-border">up</label> '.$host_up_count.' <label class="label label-warning label-font-border">warning</label> '.$host_warn_count.' <label class="label label-danger label-font-border">down</label> '.$host_down_count.'</div>';
+            $temp_header[] = '<div class="widget-availability-host">Total hosts <label class="label label-success label-font-border">up</label> '.$host_up_count.' <label class="label label-warning label-font-border">warn</label> '.$host_warn_count.' <label class="label label-danger label-font-border">down</label> '.$host_down_count.'</div>';
         }
     }
 
