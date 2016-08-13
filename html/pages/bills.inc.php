@@ -102,6 +102,7 @@ include 'includes/modal/new_bill.inc.php';
             <th data-column-id="total_data" data-align="right">Total</th>
             <th data-column-id="rate_95th" data-align="right">95th Percentile</th>
             <th data-column-id="overusage" data-sortable="false" data-align="center">Overusage</th>
+            <th data-column-id="predicted" data-sortable="false" data-align="center">Predicted</th>
             <th data-column-id="graph" data-sortable="false"></th>
             <th data-column-id="actions" data-sortable="false"></th>
         </thead>
