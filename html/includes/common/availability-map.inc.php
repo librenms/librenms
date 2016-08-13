@@ -50,6 +50,7 @@ if (defined('show_settings')) {
     $host_warn_count = 0;
     $host_down_count = 0;
     $service_up_count = 0;
+    $service_warn_count = 0;
     $service_down_count = 0;
 
     if ($mode == 0 || $mode == 2) {
@@ -69,7 +70,7 @@ if (defined('show_settings')) {
         foreach (dbFetchRows($sql, $param) as $device) {
             if ($device['status'] == '1') {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
-                    $deviceState = 'warning';
+                    $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
                     $host_warn_count++;
                 } else {
@@ -109,10 +110,14 @@ if (defined('show_settings')) {
                 $serviceLabel = "label-success";
                 $serviceState = "up";
                 $service_up_count++;
+            } elseif ($service['service_status'] == '1') {
+                $serviceLabel = "label-warning";
+                $serviceState = "warn";
+                $service_warn_count++;
             } else {
                 $serviceLabel = "label-danger";
                 $serviceState = "down";
-                $service_down_count += 1;
+                $service_down_count++;
             }
 
             if ($directpage == "yes") {
@@ -155,7 +160,7 @@ if (defined('show_settings')) {
             $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $host_up_count . '</span></div>';
             $temp_header[] = '</div>';
             $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-warning label-font-border">warning</label></div>';
+            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-warning label-font-border">warn</label></div>';
             $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $host_warn_count . '</span></div>';
             $temp_header[] = '</div>';
             $temp_header[] = '<div style="float:right;">';
@@ -177,12 +182,16 @@ if (defined('show_settings')) {
             $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_up_count . '</span></div>';
             $temp_header[] = '</div>';
             $temp_header[] = '<div style="float:right;">';
+            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-warning label-font-border">warn</label></div>';
+            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_warn_count . '</span></div>';
+            $temp_header[] = '</div>';
+            $temp_header[] = '<div style="float:right;">';
             $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-danger label-font-border">down</label></div>';
             $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_down_count . '</span></div>';
             $temp_header[] = '</div>';
             $temp_header[] = '</div>';
         } else {
-            $temp_header[] = '<div class="widget-availability-service">Total services <label class="label label-success label-font-border">up</label> '.$service_up_count.' <label class="label label-danger label-font-border">down</label> '.$service_down_count.'</div>';
+            $temp_header[] = '<div class="widget-availability-service">Total services <label class="label label-success label-font-border">up</label> '.$service_up_count.' <label class="label label-warning label-font-border">warn</label> '.$service_warn_count.' <label class="label label-danger label-font-border">down</label> '.$service_down_count.'</div>';
         }
     }
 
