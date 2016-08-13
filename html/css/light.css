@@ -114,7 +114,7 @@
   border:1px solid #D9534F;
 }
 
-.device-availability.warning {
+.device-availability.warn, .service-availability.warn {
   border:1px solid #FFB733;
 }
 
