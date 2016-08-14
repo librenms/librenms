@@ -15,30 +15,28 @@ if (defined('show_settings')) {
     $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
 
-    $common_output[] = '<form class="form-horizontal" onsubmit="return widget_settings(this)">';
-    $common_output[] = '<div class="form-group">';
-    $common_output[] = '<label for="tile_width" class="col-sm-4 control-label">Tile width</label>';
-    $common_output[] = '<div class="col-sm-6">';
-    $common_output[] = '<input class="form-control" name="tile_width" placeholder="I.e 10" value="'.$current_width.'">';
-    $common_output[] = '</div>';
-    $common_output[] = '</div>';
-    $common_output[] = '<div class="form-group">';
-    $common_output[] = '<label for="show_services" class="col-sm-4 control-label">Show</label>';
-    $common_output[] = '<div class="col-sm-6">';
-    $common_output[] = '<select class="form-control" name="mode">';
-    $common_output[] = '<option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>';
-    $common_output[] = '<option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>';
-    $common_output[] = '<option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>';
-    $common_output[] = '</select>';
-    $common_output[] = '</div>';
-    $common_output[] = '</div>';
-    $common_output[] = '<div class="form-group">';
-    $common_output[] = '<div class="col-sm-offset-6 col-sm-4">';
-    $common_output[] = '<button type="submit" class="btn btn-primary">Set</button>';
-    $common_output[] = '</div>';
-    $common_output[] = '</div>';
-    $common_output[] = '</form>';
-
+    $common_output[] = '
+    <form class="form-horizontal" onsubmit="return widget_settings(this)">
+    <div class="form-group">
+        <label for="tile_width" class="col-sm-4 control-label">Tile width</label>
+        <div class="col-sm-6">
+            <input class="form-control" name="tile_width" placeholder="I.e 10" value="'.$current_width.'">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="show_services" class="col-sm-4 control-label">Show</label>
+        <div class="col-sm-6">
+            <select class="form-control" name="mode">
+                <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
+                <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
+                <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-6 col-sm-4"><button type="submit" class="btn btn-primary">Set</button></div>
+    </div>
+    </form>';
 } else {
     require_once 'includes/object-cache.inc.php';
     $mode = isset($_SESSION["mapView"]) ? $_SESSION["mapView"] : 0;
@@ -86,18 +84,19 @@ if (defined('show_settings')) {
 
             if ($directpage == "yes") {
                 $deviceIcon = getImage($device);
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" ';
-                $temp_output[] = 'title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">';
-                $temp_output[] = '<div class="device-availability ' . $deviceState . '">';
-                $temp_output[] = '<label class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</label>';
-                $temp_output[] = '<span class="device-icon">' . $deviceIcon . '</span><br>';
-                $temp_output[] = '<span class="small">' . $device["hostname"] . '</span>';
-                $temp_output[] = '</div></a>';
+                $temp_output[] = '
+                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+                    <div class="device-availability '.$deviceState.'">
+                        <label class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</label>
+                        <span class="device-icon">'.$deviceIcon.'</span><br>
+                        <span class="small">'.$device["hostname"].'</span>
+                    </div>
+                </a>';
             } else {
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" ';
-                $temp_output[] = 'title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">';
-                $temp_output[] = '<label class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</label>';
-                $temp_output[] = '</a>';
+                $temp_output[] = '
+                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+                    <label class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</label>
+                </a>';
             }
 
         }
@@ -122,77 +121,65 @@ if (defined('show_settings')) {
 
             if ($directpage == "yes") {
                 $deviceIcon = getImage($service);
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '"';
-                $temp_output[] = 'title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">';
-                $temp_output[] = '<div class="service-availability ' . $serviceState . '">';
-                $temp_output[] = '<label class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</label>';
-                $temp_output[] = '<label class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</label>';
-                $temp_output[] = '<span class="device-icon">' . $deviceIcon . '</span><br>';
-                $temp_output[] = '<span class="small">' . $service["hostname"] . '</span>';
-                $temp_output[] = '</div></a>';
+                $temp_output[] = '
+                <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
+                    <div class="service-availability '.$serviceState.'">
+                        <label class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</label>
+                        <label class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</label>
+                        <span class="device-icon">'.$deviceIcon.'</span><br>
+                        <span class="small">'.$service["hostname"].'</span>
+                    </div>
+                </a>';
             } else {
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '"';
-                $temp_output[] = 'title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">';
-                $temp_output[] = '<label class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</label>';
-                $temp_output[] = '</a>';
+                $temp_output[] = '
+                <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
+                    <label class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</label>
+                </a>';
             }
         }
     }
 
     if ($directpage == "yes") {
-        $temp_header[] = '<div class="page-availability-title-left">';
-        $temp_header[] = '<span class="page-availability-title">Availability map for</span>';
-        $temp_header[] = '<select id="mode" class="page-availability-report-select" name="mode">';
-        $temp_header[] = '<option value="0" ' . ($mode == 0 ? 'selected' : '') . '>devices</option>';
-        $temp_header[] = '<option value="1"' . ($mode == 1 ? 'selected' : '') . '>services</option>';
-        $temp_header[] = '<option value="2"' . ($mode == 2 ? 'selected' : '') . '>devices and services</option>';
-        $temp_header[] = '</select></div>';
-        $temp_header[] = '<div class="page-availability-title-right">';
+        $temp_header[] = '
+        <div class="page-availability-title-left">
+            <span class="page-availability-title">Availability map for</span>
+            <select id="mode" class="page-availability-report-select" name="mode">
+                <option value="0"'.($mode == 0 ? 'selected' : '').'>devices</option>
+                <option value="1"'.($mode == 1 ? 'selected' : '').'>services</option>
+                <option value="2"'.($mode == 2 ? 'selected' : '').'>devices and services</option>
+            </select>
+        </div>
+        <div class="page-availability-title-right">';
     }
-
 
     if ($mode == 0 || $mode == 2) {
         if ($directpage == "yes") {
-            $temp_header[] = '<div class="page-availability-report-host">';
-            $temp_header[] = '<span>Hosts report:</span>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-success label-font-border">up</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $host_up_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-warning label-font-border">warn</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $host_warn_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-danger label-font-border">down</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $host_down_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '</div>';
+            $headerClass = 'page-availability-report-host';
         } else {
-            $temp_header[] = '<div class="widget-availability-host">Total hosts <label class="label label-success label-font-border">up</label> '.$host_up_count.' <label class="label label-warning label-font-border">warn</label> '.$host_warn_count.' <label class="label label-danger label-font-border">down</label> '.$host_down_count.'</div>';
+            $headerClass = 'widget-availability-host';
         }
+            $temp_header[] = '
+            <div class="'.$headerClass.'">
+                <span>Total hosts</span>
+                <label class="label label-success label-font-border label-border">up: '.$host_up_count.'</label>
+                <label class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</label>
+                <label class="label label-danger label-font-border label-border">down: '.$host_down_count.'</label>
+            </div>';
     }
 
     if ($mode == 1 || $mode == 2) {
         if ($directpage == "yes") {
-            $temp_header[] = '<div class="page-availability-report-service">';
-            $temp_header[] = '<span>Services report:</span>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-success label-font-border">up</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_up_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-warning label-font-border">warn</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_warn_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '<div style="float:right;">';
-            $temp_header[] = '<div class="small page-availability-report-entry"><label class="label label-danger label-font-border">down</label></div>';
-            $temp_header[] = '<div class="small page-availability-report-entry"><span>' . $service_down_count . '</span></div>';
-            $temp_header[] = '</div>';
-            $temp_header[] = '</div>';
+            $headerClass = 'page-availability-report-service';
         } else {
-            $temp_header[] = '<div class="widget-availability-service">Total services <label class="label label-success label-font-border">up</label> '.$service_up_count.' <label class="label label-warning label-font-border">warn</label> '.$service_warn_count.' <label class="label label-danger label-font-border">down</label> '.$service_down_count.'</div>';
+            $headerClass = 'widget-availability-service';
         }
+            $temp_header[] = '
+            <div class="'.$headerClass.'">
+                <span>Total services</span>
+                <label class="label label-success label-font-border label-border">up: '.$service_up_count.'</label>
+                <label class="label label-warning label-font-border label-border">warn: '.$service_warn_count.'</label>
+                <label class="label label-danger label-font-border label-border">down: '.$service_down_count.'</label>
+            </div>';
     }
 
     $temp_header[] = '</div>';
