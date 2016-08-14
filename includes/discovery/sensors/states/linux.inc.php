@@ -36,7 +36,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
             if ($state_index_id) {
                 $states = array(
                     array($state_index_id, 'enabled', 1, 2, 0),
-                    array($state_index_id, 'disabled', 1, 4, 2),
+                    array($state_index_id, 'disabled', 1, 3 , 2),
                 );
             }
 
