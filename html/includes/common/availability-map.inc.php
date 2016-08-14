@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-if (defined('show_settings')) {
+if (defined('SHOW_SETTINGS')) {
     $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
     $common_output[] = '
@@ -39,8 +39,7 @@ if (defined('show_settings')) {
         </div>
     </form>
     ';
-}
-else {
+} else {
     require_once 'includes/object-cache.inc.php';
     $mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $tile_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
@@ -57,8 +56,7 @@ else {
             $param = array(
                 $_SESSION['user_id']
                 );
-        }
-        else {
+        } else {
             $sql .= ' WHERE';
         }
         $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `hostname`";
@@ -69,13 +67,11 @@ else {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                     $btn_type = 'btn-warning';
                     $warn_count++;
-                }
-                else {
+                } else {
                     $btn_type = 'btn-success';
                     $up_count ++;
                 }
-            }
-            else {
+            } else {
                 $btn_type = 'btn-danger';
                 $down_count++;
             }
@@ -93,8 +89,7 @@ else {
             if ($service['service_status'] == '0') {
                 $btn_type = 'btn-success';
                 $up_count ++;
-            }
-            else {
+            } else {
                 $btn_type = 'btn-danger';
                 $down_count += 1;
             }

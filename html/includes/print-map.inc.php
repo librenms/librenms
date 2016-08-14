@@ -21,8 +21,7 @@ if (!empty($device['hostname'])) {
     $sql_array = array($device['hostname'], $device['hostname']);
     $mac_sql = ' AND `D`.`hostname` = ?';
     $mac_array = array($device['hostname']);
-}
-else {
+} else {
     $sql = ' ';
 }
 
@@ -51,7 +50,7 @@ if (is_numeric($vars['group'])) {
     }
 }
 
-if (in_array('mac',$config['network_map_items'])) {
+if (in_array('mac', $config['network_map_items'])) {
     $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
@@ -135,7 +134,7 @@ if (in_array('xdp', $config['network_map_items'])) {
                       ", $sql_array);
 }
 
-$list = array_merge($ports,$devices);
+$list = array_merge($ports, $devices);
 
 // Iterate though ports and links, generating a set of devices (nodes)
 // and links (edges) that make up the topology graph.
@@ -148,39 +147,33 @@ foreach ($list as $items) {
 
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>$items['local_hostname'],'title'=>generate_device_link($local_device,'',array(),'','','',0),'shape'=>'box');
+        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>$items['local_hostname'],'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $remote_device_id = $items['remote_device_id'];
     if (!array_key_exists($remote_device_id, $devices_by_id)) {
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>$items['remote_hostname'],'title'=>generate_device_link($remote_device,'',array(),'','','',0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>$items['remote_hostname'],'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $speed = $items['local_ifspeed']/1000/1000;
     if ($speed == 100) {
         $width = 3;
-    } 
-    elseif ($speed == 1000) {
+    } elseif ($speed == 1000) {
         $width = 5;
-    } 
-    elseif ($speed == 10000) {
+    } elseif ($speed == 10000) {
         $width = 10;
-    } 
-    elseif ($speed == 40000) {
+    } elseif ($speed == 40000) {
         $width = 15;
-    } 
-    elseif ($speed == 100000) {
+    } elseif ($speed == 100000) {
         $width = 20;
-    } 
-    else {
+    } else {
         $width = 1;
     }
     $link_in_used = ($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
     $link_out_used = ($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
     if ($link_in_used > $link_out_used) {
         $link_used = $link_in_used;
-    } 
-    else {
+    } else {
         $link_used = $link_out_used;
     }
     $link_used = round($link_used, -1);
@@ -200,7 +193,7 @@ foreach ($list as $items) {
         !array_key_exists($device_id2, $device_assoc_seen)) {
         $local_port = ifNameDescr($local_port);
         $remote_port = ifNameDescr($remote_port);
-        $links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
+        $links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),'width'=>$width,'color'=>$link_color);
     }
     $link_assoc_seen[$link_id1] = 1;
     $link_assoc_seen[$link_id2] = 1;
@@ -212,7 +205,6 @@ $nodes = json_encode(array_values($devices_by_id));
 $edges = json_encode($links);
 
 if (count($devices_by_id) > 1 && count($links) > 0) {
- 
 ?>
  
 <div id="visualization"></div>
@@ -251,12 +243,8 @@ echo $edges;
 </script>
 
 <?php
-
-} 
-else {
-
+} else {
     print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
-
 }
 
 $pagetitle[] = "Map";

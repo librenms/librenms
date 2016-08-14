@@ -31,7 +31,7 @@ foreach ($app_devices as $app_device) {
         $link = generate_url(array('page' => 'device', 'device' => $app_device['device_id'], 'tab' => 'apps', 'app' => $vars['app']));
 
         echo '<div class="pull-left">';
-        echo overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
+        echo overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
         echo '</div>';
     }
 

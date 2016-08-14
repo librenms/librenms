@@ -5,8 +5,7 @@ $row = 1;
 foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device['device_id'])) as $drive) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 
@@ -27,14 +26,13 @@ foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
              );
 
     foreach ($types as $graph_type) {
-
         $graph_array         = array();
         $graph_array['id']   = $drive['diskio_id'];
         $graph_array['type'] = $graph_type;
-        if($graph_array['type']=="diskio_ops") {
+        if ($graph_array['type']=="diskio_ops") {
             $graph_type_title="Ops/sec";
-        } 
-        if($graph_array['type']=="diskio_bits") {
+        }
+        if ($graph_array['type']=="diskio_bits") {
             $graph_type_title="bps";
         }
         echo "<div class='panel panel-default'>

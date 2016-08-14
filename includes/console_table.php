@@ -171,7 +171,7 @@ class Console_Table
      *                         extension.
      * @param boolean $color   Whether the data contains ansi color codes.
      */
-    function Console_Table(
+    function __construct(
         $align=CONSOLE_TABLE_ALIGN_LEFT,
         $border=CONSOLE_TABLE_BORDER_ASCII,
         $padding=1,

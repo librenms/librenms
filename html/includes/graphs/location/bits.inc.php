@@ -24,7 +24,7 @@ foreach ($devices as $device) {
             }
         }
 
-        $rrd_file = get_port_rrdfile_path ($device['hostname'], $int['port_id']);
+        $rrd_file = get_port_rrdfile_path($device['hostname'], $int['port_id']);
         if (rrdtool_check_rrd_exists($rrd_file) && $ignore != 1) {
             $rrd_filename              = $rrd_file; // FIXME: Can this be unified without side-effects?
             $rrd_list[$i]['filename']  = $rrd_filename;

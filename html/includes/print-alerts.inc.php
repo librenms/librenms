@@ -22,23 +22,19 @@ if ($alert_state != '') {
         $glyph_icon  = 'ok';
         $glyph_color = 'green';
         $text        = 'Ok';
-    }
-    else if ($alert_state == '1') {
+    } elseif ($alert_state == '1') {
         $glyph_icon  = 'remove';
         $glyph_color = 'red';
         $text        = 'Alert';
-    }
-    else if ($alert_state == '2') {
+    } elseif ($alert_state == '2') {
         $glyph_icon  = 'info-sign';
         $glyph_color = 'lightgrey';
         $text        = 'Ack';
-    }
-    else if ($alert_state == '3') {
+    } elseif ($alert_state == '3') {
         $glyph_icon  = 'arrow-down';
         $glyph_color = 'orange';
         $text        = 'Worse';
-    }
-    else if ($alert_state == '4') {
+    } elseif ($alert_state == '4') {
         $glyph_icon  = 'arrow-up';
         $glyph_color = 'khaki';
         $text        = 'Better';

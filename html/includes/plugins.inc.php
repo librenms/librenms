@@ -1,11 +1,15 @@
 <?php
 
-class Plugins {
+namespace LibreNMS;
+
+class Plugins
+{
 
     private static $plugins = array();
 
 
-    public static function start() {
+    public static function start()
+    {
         global $config;
         if (file_exists($config['plugin_dir'])) {
             // $plugin_files = scandir($config['plugin_dir']);
@@ -20,18 +24,23 @@ class Plugins {
             }
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
-
     }//end start()
 
 
     public static function load($file, $pluginName)
     {
         include $file;
-        $plugin = new $pluginName;
+        $pluginFullName = 'LibreNMS\\Plugins\\'.$pluginName;
+        if (class_exists($pluginName)) {
+            $plugin = new $pluginName;
+        } elseif (class_exists($pluginFullName)) {
+            $plugin = new $pluginFullName;
+        } else {
+            return null;
+        }
         $hooks  = get_class_methods($plugin);
 
         foreach ($hooks as $hookName) {
@@ -41,21 +50,19 @@ class Plugins {
         }
 
         return $plugin;
-
     }//end load()
 
 
-    public static function call($hook, $params=false) {
+    public static function call($hook, $params = false)
+    {
         if (count(self::$plugins[$hook]) != 0) {
             foreach (self::$plugins[$hook] as $name) {
                 if (!is_array($params)) {
                     call_user_func(array($name, $hook));
-                }
-                else {
+                } else {
                     call_user_func_array(array($name, $hook), $params);
                 }
             }
         }
-
     }//end call()
 }//end class

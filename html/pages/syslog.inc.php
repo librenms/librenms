@@ -109,6 +109,6 @@ $(function () {
 <?php
 print_optionbar_end();
 require_once 'includes/common/syslog.inc.php';
-echo implode('',$common_output);
+echo implode('', $common_output);
 ?>
 

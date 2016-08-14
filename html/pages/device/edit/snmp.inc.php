@@ -32,15 +32,13 @@ if ($_POST['editing']) {
 
         if ($_POST['timeout']) {
             $update['timeout'] = $timeout;
-        }
-        else {
+        } else {
             $update['timeout'] = array('NULL');
         }
 
         if ($_POST['retries']) {
             $update['retries'] = $retries;
-        }
-        else {
+        } else {
             $update['retries'] = array('NULL');
         }
 
@@ -55,8 +53,7 @@ if ($_POST['editing']) {
             if (is_numeric($max_repeaters) && $max_repeaters != 0) {
                 set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
                 $max_repeaters_set = true;
-            }
-            else {
+            } else {
                 del_dev_attrib($device, 'snmp_max_repeaters');
                 $max_repeaters_set = true;
             }
@@ -64,22 +61,18 @@ if ($_POST['editing']) {
             if ($rows_updated > 0) {
                 $update_message = $rows_updated.' Device record updated.';
                 $updated        = 1;
-            }
-            else if ($rows_updated = '-1') {
+            } elseif ($rows_updated = '-1') {
                 if ($max_repeaters_set === true) {
                     $update_message = 'SNMP Max repeaters updated, no other changes made';
-                }
-                else {
+                } else {
                     $update_message = 'Device record unchanged. No update necessary.';
                 }
                 $updated        = -1;
-            }
-            else {
+            } else {
                 $update_message = 'Device record update error.';
                 $updated        = 0;
             }
-        }
-        else {
+        } else {
             $update_message = 'Could not connect to device with new SNMP details';
             $updated        = 0;
         }
@@ -91,8 +84,7 @@ $descr  = $device['purpose'];
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-else if ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 
@@ -144,11 +136,12 @@ echo "      </select>
 ";
 
 foreach (get_port_assoc_modes() as $pam) {
-    $pam_id = get_port_assoc_mode_id ($pam);
+    $pam_id = get_port_assoc_mode_id($pam);
     echo "           <option value='$pam_id'";
 
-    if ($pam_id == $device['port_association_mode'])
+    if ($pam_id == $device['port_association_mode']) {
         echo " selected='selected'";
+    }
 
     echo ">$pam</option>\n";
 }
@@ -276,8 +269,7 @@ function changeForm() {
 <?php
 if ($snmpver == 'v3' || $device['snmpver'] == 'v3') {
     echo "$('#snmpv1_2').toggle();";
-}
-else {
+} else {
     echo "$('#snmpv3').toggle();";
 }
 

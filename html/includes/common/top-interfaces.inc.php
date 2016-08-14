@@ -25,7 +25,7 @@
  * @subpackage Widgets
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
 <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
@@ -95,8 +95,7 @@ $(function() {
 }
 </style>
     ';
-}
-else {
+} else {
     $interval = $widget_settings['time_interval'];
     (integer) $lastpoll_seconds = ($interval * 60);
     (integer) $interface_count = $widget_settings['interface_count'];
@@ -112,8 +111,7 @@ else {
             ORDER BY total DESC
             LIMIT :count
         ';
-    }
-    else {
+    } else {
         $query = '
             SELECT ports.*, devices.*, ports.ifInOctets_rate + ports.ifOutOctets_rate as total
             FROM ports

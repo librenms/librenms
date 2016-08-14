@@ -1,6 +1,6 @@
 <?php
 
-$rrd_file = get_port_rrdfile_path ($device['hostname'], $port['port_id']);
+$rrd_file = get_port_rrdfile_path($device['hostname'], $port['port_id']);
 
 // FIXME uhh..
 if (1) {
@@ -37,8 +37,7 @@ if (1) {
     $nototal = 1;
 
     include 'includes/graphs/generic_multi_seperated.inc.php';
-}
-else if (rrdtool_check_rrd_exists($rrd_file)) {
+} elseif (rrdtool_check_rrd_exists($rrd_file)) {
     $rrd_filename = $rrd_file;
 
     $ds_in  = 'INNUCASTPKTS';
