@@ -15,7 +15,7 @@ Different applications support a variety of ways collect data: by direct connect
 9. [Memcached](#memcached) - extend SNMP
 10. [Unbound](#unbound) - Agent
 11. [Proxmox](#proxmos) - extend SNMP
-
+12. [Raspberry PI](#raspberry-pi) - extend SNMP
 
 * [Agent Setup](#agent-setup)
 
@@ -196,6 +196,23 @@ Restart your unbound after changing the configuration,v erify it is working by r
 (Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Proxmox` on the Applications tab.
+
+### Raspberry PI
+SNMP extend script to get your PI data into your host.
+
+##### Extend SNMP
+1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/opt/` (or any other suitable location) on your PI host.
+2. Make the script executable: `chmod +x /opt/raspberry.sh`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend raspberry /opt/raspberry.sh
+```
+4. Edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: ALL
+```
+5. Restart snmpd on PI host
+
 
 Agent Setup
 -----------
