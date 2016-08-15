@@ -153,6 +153,10 @@ function rrdtool($command, $filename, $options, $timeout = 0)
 {
     global $config, $debug, $rrd_pipes, $console_color;
     
+    // do not ovewrite files when creating
+    if ($command == 'create') {
+        $options .= ' -O';
+    }
     // rrdcached commands: >=1.5.5: all, >=1.5 all: except tune, <1.5: all except tune and create
     if ($config['rrdcached'] &&
         (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||
@@ -175,7 +179,10 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     ) {
         print $console_color->convert('[%rRRD Disabled%n]');
         $output = array(null, null);
-    } else if ($command == 'create' && rrdtool_check_rrd_exists($filename)){ // do not ovewrite files when creating
+    } elseif ($command == 'create' &&
+        version_compare($config['rrdtool_version'], '1.5', '<') &&
+        file_exists($filename)
+        ) { // do not ovewrite RRD if already exist and RRDTool ver. < 1.5
         print $console_color->convert('[%yRRD file ' . $filename . ' already exist%n]');
         $output = array(null, null);
     } else {
