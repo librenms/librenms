@@ -152,7 +152,7 @@ function rrdtool_graph($graph_file, $options)
 function rrdtool($command, $filename, $options, $timeout = 0)
 {
     global $config, $debug, $rrd_pipes, $console_color;
-    
+
     // do not ovewrite files when creating
     if ($command == 'create') {
         $options .= ' -O';
@@ -181,9 +181,9 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $output = array(null, null);
     } elseif ($command == 'create' &&
         version_compare($config['rrdtool_version'], '1.5', '<') &&
-        file_exists($filename)
+        is_file($filename)
         ) { // do not ovewrite RRD if already exist and RRDTool ver. < 1.5
-        print $console_color->convert('[%yRRD file ' . $filename . ' already exist%n]');
+        d_echo('[RRD file ' . $filename . ' already exist]');
         $output = array(null, null);
     } else {
         if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
