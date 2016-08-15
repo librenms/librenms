@@ -158,11 +158,11 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     }
                     // normalize MAC address if present
                     if ($lldp['lldpRemChassisIdSubtype'] == 'macAddress') {
-                        $remote_mac_address = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemChassisId']));
+                        $remote_port_mac_address = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
                     }
                     // get remote device hostname from db by MAC address and replace lldpRemSysName if absent
-                    if (!$remote_device_id && $remote_mac_address) {
-                        $remote_device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE ifPhysAddress = ? AND `deleted` = ?', array($remote_mac_address, '0'));
+                    if (!$remote_device_id && $remote_port_mac_address) {
+                        $remote_device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE ifPhysAddress = ? AND `deleted` = ?', array($remote_port_mac_address, '0'));
                         if ($remote_device_id) {
                             $remote_device_hostname = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = ?', array($remote_device_id));
                         }    
@@ -173,7 +173,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     if ($remote_device_id) {
                         $if             = $lldp['lldpRemPortDesc'];
                         $id             = $lldp['lldpRemPortId'];
-                        $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_mac_address, $remote_device_id));
+                        $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_port_mac_address, $remote_device_id));
                     }
                     else {
                         $remote_port_id = '0';
