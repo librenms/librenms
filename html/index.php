@@ -68,6 +68,8 @@ require 'includes/functions.inc.php';
 require 'includes/vars.inc.php';
 require 'includes/plugins.inc.php';
 
+use LibreNMS\Plugins;
+
 $config['memcached']['ttl'] = $config['time']['now']+300;
 
 Plugins::start();
