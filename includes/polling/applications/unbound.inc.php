@@ -15,7 +15,7 @@ foreach ($lines as $line) {
 	$unbound[$var] = $value;
 }
 #Unbound Queries
-$rrd_name =  array('app', $name."-queries",$app_id);
+$rrd_name =  array('app', $name,'queries',$app_id);
 $rrd_def = array(
 	'DS:type0:DERIVE:600:0:125000000000',
 	'DS:A:DERIVE:600:0:125000000000',
