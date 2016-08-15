@@ -11,6 +11,7 @@
 # Others #
 ##########
 *.swp
+/composer.lock
 Thumbs.db
 config.php
 html/plugins/*
@@ -20,4 +21,4 @@ logs
 nbproject
 patches
 rrd
-
+/vendor
