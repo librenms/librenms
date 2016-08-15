@@ -9,7 +9,7 @@ if (!empty($agent_data['app'][$name])) {
 }
 #Format Data
 $lines = explode("\n",$rawdata);
-$unbound = [];
+$unbound = array();
 foreach ($lines as $line) {
 	list($var,$value) = explode('=',$line);
 	$unbound[$var] = $value;
