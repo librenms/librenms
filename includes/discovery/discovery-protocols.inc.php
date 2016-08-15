@@ -157,7 +157,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                     }
                     // normalize MAC address if present
-                    $remote_port_mac_address = ''
+                    $remote_port_mac_address = '';
                     if ($lldp['lldpRemPortIdSubtype'] == 'macAddress') {
                         $remote_port_mac_address = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
                     }
