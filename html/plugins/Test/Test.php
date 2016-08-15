@@ -1,5 +1,7 @@
 <?php
 
+namespace LibreNMS\Plugins;
+
 class Test {
 
     public function menu() {
