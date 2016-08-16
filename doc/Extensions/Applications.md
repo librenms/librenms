@@ -168,6 +168,24 @@ extend memcached /usr/local/bin/memcached
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
+### Unbound
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+
+Unbound configuration:
+
+```text
+# Enable extended statistics.
+server:
+        statistics-interval: 0
+        extended-statistics: yes
+        # set to yes if graphing tool needs it
+        statistics-cumulative: no
+```
+
+Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+
 Agent Setup
 -----------
 
