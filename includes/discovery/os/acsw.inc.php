@@ -7,9 +7,6 @@ if (!$os) {
     if (strstr($sysDescr, 'Application Control Engine')) {
         $os = 'acsw';
     }
-    if (strstr($sysDescr, 'ACE')) {
-        $os = 'acsw';
-    }
 }
 
 if (!$os) {
