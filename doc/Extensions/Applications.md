@@ -13,6 +13,7 @@ Different applications support a variety of ways collect data: by direct connect
 7. [OS Updates](#os-updates) - extend SNMP
 8. [DHCP Stats](#dhcp-stats) - extend SNMP
 9. [Memcached](#memcached) - extend SNMP
+10. [Unbound]($unbound) - Agent
 
 
 * [Agent Setup](#agent-setup)
