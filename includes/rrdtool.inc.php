@@ -179,6 +179,12 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     ) {
         print $console_color->convert('[%rRRD Disabled%n]');
         $output = array(null, null);
+    } elseif ($command == 'create' &&
+        version_compare($config['rrdtool_version'], '1.5', '<') &&
+        is_file($filename)
+        ) { // do not ovewrite RRD if already exist and RRDTool ver. < 1.5
+        d_echo('[RRD file ' . $filename . ' already exist]');
+        $output = array(null, null);
     } else {
         if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
             // dump existing data
