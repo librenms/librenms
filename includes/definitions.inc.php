@@ -574,6 +574,16 @@ $config['os'][$os]['over'][4]['graph'] = 'device_ciscowlc_numclients';
 $config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
+$os = 'acano';
+$config['os'][$os]['group']            = 'cisco';
+$config['os'][$os]['text']             = 'Acano OS';
+$config['os'][$os]['type']             = 'collaboration';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['icon']             = 'cisco';
+
 $os = 'waas';
 $config['os'][$os]['group']            = 'cisco';
 $config['os'][$os]['text']             = 'Cisco WAAS';
@@ -597,6 +607,17 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'cisco';
+
+$os = 'ise';
+$config['os'][$os]['text']             = 'Cisco Identity Services Engine';
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['icon']             = 'cisco';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // Brocade NOS
 $os = 'nos';
@@ -1926,8 +1947,17 @@ $config['os'][$os]['over'][1]['text']  = 'Wifi Clients';
 $config['os'][$os]['over'][2]['graph'] = 'device_xirrus_rssi';
 $config['os'][$os]['over'][2]['text']  = 'Signal RSSI';
 
-
-
+// McAfee SIEM
+$os = 'nitro';
+$config['os'][$os]['text'] = 'McAfee SIEM Nitro';
+$config['os'][$os]['type'] = 'appliance';
+$config['os'][$os]['icon'] = 'mcafee';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text'] = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text'] = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text'] = 'Memory Usage';
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
