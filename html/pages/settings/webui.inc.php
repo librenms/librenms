@@ -25,6 +25,13 @@ $availability_map_conf = array(
     ),
 );
 
+$dashboard_conf = array(
+    array('name'               => 'webui.default_dashboard_id',
+          'descr'              => 'Set global default dashboard id',
+          'type'               => 'text',
+    ),
+);
+
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
@@ -33,6 +40,7 @@ echo '
 echo generate_dynamic_config_panel('Graph settings', $config_groups, $graph_conf);
 echo generate_dynamic_config_panel('Search settings', $config_groups, $search_conf);
 echo generate_dynamic_config_panel('Availability map settings', $config_groups, $availability_map_conf);
+echo generate_dynamic_config_panel('Dashboard settings', $config_groups, $dashboard_conf);
 
 echo '
     </form>
