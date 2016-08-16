@@ -17,7 +17,7 @@ if ($device['os'] == 'hpblmos') {
                 $current_id = $split_oid[(count($split_oid) - 1)];
                 $current_oid = $psu_usage_oid.$current_id;
                 $psu_max_oid = $psu_max_usage_oid.$current_id;
-                $descr = 'PSU '.$psuid.' output';
+                $descr = 'PSU '.$current_id.' output';
                 $value = snmp_get($device, $current_oid, '-Oqv');
                 $max_value = snmp_get($device, $psu_max_oid, '-Oqv');
                 discover_sensor($valid['sensor'], 'power', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
