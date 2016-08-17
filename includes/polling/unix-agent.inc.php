@@ -59,6 +59,7 @@ if ($device['os_group'] == 'unix') {
             "mysql",
             "nginx",
             "powerdns",
+            "powerdns-recursor",
             "proxmox",
             "rrdcached",
             "tinydns");

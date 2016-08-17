@@ -172,17 +172,21 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $cmd = "$command $filename $options";
     }
 
+    if ($debug) {
+        c_echo('RRD[%g'.$cmd."%n] \n"));
+    }
+
     // do not write rrd files, but allow read-only commands
     if ($config['norrd'] && !in_array($command,
             array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))
     ) {
         c_echo('[%rRRD Disabled%n]');
         $output = array(null, null);
-    } elseif ($command == 'create' &&
-        version_compare($config['rrdtool_version'], '1.5', '<') &&
-        is_file($filename)
-        ) { // do not ovewrite RRD if already exist and RRDTool ver. < 1.5
-        d_echo('[RRD file ' . $filename . ' already exist]');
+    } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.5', '<') && is_file($filename)) {
+        // do not overwrite RRD if it already exists and RRDTool ver. < 1.5
+        if ($debug) {
+            c_echo('RRD[%g' . $filename . " already exists%n]\n"));
+        }
         $output = array(null, null);
     } else {
         if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
@@ -197,8 +201,7 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $output = array(stream_get_contents($rrd_pipes[1]), stream_get_contents($rrd_pipes[2]));
     }
 
-    if ($debug) {
-        c_echo('RRD[%g' . $cmd . "%n] \n");
+    if ($vdebug) {
         echo 'RRDtool Output: ';
         echo $output[0];
         echo $output[1];
