@@ -191,6 +191,11 @@ $config['overview_show_sysDescr'] = TRUE;
 Enable or disable the sysDescr output for a device.
 
 ```php
+$config['force_ip_to_sysname'] = false;
+```
+When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+
+```php
 $config['device_traffic_iftype'][] = '/loopback/';
 ```
 Interface types that aren't graphed in the WebUI. The default array contains more items, please see includes/defaults.inc.php for the full list.
