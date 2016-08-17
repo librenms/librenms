@@ -628,9 +628,13 @@ function d_echo($text, $no_debug_text = null) {
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
  *
  * @param string $string the string to print with console color
+ * @param bool $enabled if set to false, this function does nothing
  */
-function c_echo($string)
+function c_echo($string, $enabled = true)
 {
+    if(!$enabled) {
+        return;
+    }
     global $console_color;
 
     if($console_color) {

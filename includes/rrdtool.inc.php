@@ -172,21 +172,17 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $cmd = "$command $filename $options";
     }
 
-    if ($debug) {
-        c_echo('RRD[%g'.$cmd."%n] \n"));
-    }
+    c_echo("RRD[%g$cmd%n]\n", $debug);
 
     // do not write rrd files, but allow read-only commands
     if ($config['norrd'] && !in_array($command,
             array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))
     ) {
-        c_echo('[%rRRD Disabled%n]');
+        c_echo("[%rRRD Disabled%n]\n");
         $output = array(null, null);
     } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.5', '<') && is_file($filename)) {
         // do not overwrite RRD if it already exists and RRDTool ver. < 1.5
-        if ($debug) {
-            c_echo('RRD[%g' . $filename . " already exists%n]\n"));
-        }
+        c_echo("RRD[%g$filename already exists%n]\n", $debug);
         $output = array(null, null);
     } else {
         if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
