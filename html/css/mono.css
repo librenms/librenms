@@ -98,3 +98,109 @@
   0% { transform: rotate(0deg); transform: rotate(0deg); }
   100% { transform: rotate(360deg); transform: rotate(360deg); }
 }
+
+.device-availability, .service-availability{
+  color:#000000;
+  float:left;
+  width:166px;
+  height:64px;
+  margin:10px;
+  padding:8px;
+  border-radius:5px;
+  text-align:center;
+}
+
+.device-availability.up, .service-availability.up {
+  border:1px solid #5CB85C;
+}
+
+.device-availability.down, .service-availability.down {
+  border:1px solid #D9534F;
+}
+
+.device-availability.warn, .service-availability.warn {
+  border:1px solid #FFB733;
+}
+
+.availability-label {
+  float:right;
+  margin:-8px;
+}
+
+.service-name-label {
+  float:left;
+  margin:-8px;
+}
+
+.report-up {
+  color:#5CB85C;
+}
+
+.report-warning {
+  color:#FFB733;
+}
+
+.report-down {
+  color:#D9534F;
+}
+
+.page-availability-title-left {
+  width:50%;
+  float:left;
+  height:40px;
+}
+
+.page-availability-title-right {
+  width:50%;
+  float:left;
+  text-align:right;
+}
+
+.page-availability-title {
+  font-size:18px;
+  font-weight: bold;
+}
+
+.page-availability-report-select {
+  font-size:16px;
+  border:none;
+  font-weight:bold;
+  padding-right:10px;
+  margin-left:10px;
+}
+
+
+.page-availability-report-host {
+  float:right;
+  text-align:right;
+  padding-left:10px;
+}
+
+.page-availability-report-service {
+  float:right;
+  text-align:right;
+}
+
+.widget-availability {
+  float:left;
+  margin:2px;
+}
+
+.widget-availability-host {
+  float:left;
+  margin-bottom: 10px;
+}
+
+.widget-availability-service {
+  float:right;
+  margin-bottom: 10px;
+}
+
+.label-font-border {
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  font-size: 10px;
+}
+
+.label-font-border.label-border {
+  margin:0px 2px 0px 2px;
+}
