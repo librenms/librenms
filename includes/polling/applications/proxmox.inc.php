@@ -40,6 +40,15 @@ $app_id = $app['app_id'];
 
 if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];
+} elseif (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
+    $options = '-O qv';
+    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
+    $proxmox = snmp_get($device, $oid, $options);
+    $proxmox = preg_replace('/^.+\n/', '', $proxmox);
+    $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
+}
+
+if ($proxmox) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(array('device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster),
