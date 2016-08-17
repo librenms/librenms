@@ -181,8 +181,7 @@ Unbound configuration:
 server:
         statistics-interval: 0
         extended-statistics: yes
-        # set to yes if graphing tool needs it
-        statistics-cumulative: no
+        statistics-cumulative: yes
 ```
 
 Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
