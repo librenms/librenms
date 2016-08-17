@@ -14,6 +14,7 @@ Different applications support a variety of ways collect data: by direct connect
 8. [DHCP Stats](#dhcp-stats) - extend SNMP
 9. [Memcached](#memcached) - extend SNMP
 10. [Unbound](#unbound) - Agent
+11. [Proxmox](#proxmos) - extend SNMP
 
 
 * [Agent Setup](#agent-setup)
@@ -185,6 +186,16 @@ server:
 ```
 
 Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+
+### Proxmox
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+`wget https://github.com/librenms/librenms-agent/blob/master/agent-local/proxmox -o /usr/local/bin/proxmox`
+2. Make the script executable: `chmod +x /usr/local/proxmox`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+`extend proxmox /usr/local/bin/proxmox`
+(Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check `Proxmox` on the Applications tab.
 
 Agent Setup
 -----------
