@@ -151,7 +151,7 @@ On at least Ubuntu 14.04 (and possibly other distributions and versions as well)
 Restart nginx:
 
     service nginx restart
-    
+
 Restart php5-fpm:
 
     service php5-fpm restart

@@ -34,7 +34,7 @@ sql-mode=""
 
 ### Web Server ###
 
-#### Install / Configure Nginx 
+#### Install / Configure Nginx
 
 `apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
 
@@ -113,7 +113,11 @@ vim /etc/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-`service snmpd restart`
+```bash
+curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+service snmpd restart
+```
 
 #### Cron job
 
@@ -142,10 +146,10 @@ We now suggest that you add localhost as your first device from within the WebUI
 
 Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
 
- - (Performance tuning)[http://docs.librenms.org/Support/Performance]
- - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
- - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
- - (Auto discovery)[http://docs.librenms.org/Extensions/Auto-Discovery/]
+ - [Performance tuning](http://docs.librenms.org/Support/Performance)
+ - [Alerting](http://docs.librenms.org/Extensions/Alerting/)
+ - [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
+ - [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
 
 #### Closing
 
