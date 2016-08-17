@@ -147,11 +147,10 @@ function rrdtool_graph($graph_file, $options)
  * @global $config
  * @global $debug
  * @global $rrd_pipes
- * @global $console_color
  */
 function rrdtool($command, $filename, $options, $timeout = 0)
 {
-    global $config, $debug, $rrd_pipes, $console_color;
+    global $config, $debug, $rrd_pipes;
 
     // do not ovewrite files when creating
     if ($command == 'create') {
@@ -177,7 +176,7 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     if ($config['norrd'] && !in_array($command,
             array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))
     ) {
-        print $console_color->convert('[%rRRD Disabled%n]');
+        c_echo('[%rRRD Disabled%n]');
         $output = array(null, null);
     } elseif ($command == 'create' &&
         version_compare($config['rrdtool_version'], '1.5', '<') &&
@@ -199,7 +198,7 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     }
 
     if ($debug) {
-        print $console_color->convert('RRD[%g'.$cmd."%n] \n");
+        c_echo('RRD[%g' . $cmd . "%n] \n");
         echo 'RRDtool Output: ';
         echo $output[0];
         echo $output[1];
