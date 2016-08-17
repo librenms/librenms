@@ -58,5 +58,4 @@ $fields = array (
 	);
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-$status = true;
 unset($lines , $unbound, $rrd_name, $rrd_def, $fields, $tags);
