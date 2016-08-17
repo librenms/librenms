@@ -122,7 +122,10 @@ $ifmib_oids = array(
 );
 
 echo 'Caching Oids: ';
-$port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+
+if (!in_array($device['hardware'], $config['os'][$device['os']]['bad_ifXEntry'])) {
+    $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+}
 
 $hc_test = array_slice($port_stats, 0, 1);
 if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
