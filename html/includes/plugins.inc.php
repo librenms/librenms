@@ -1,7 +1,5 @@
 <?php
 
-namespace LibreNMS;
-
 class Plugins {
 
     private static $plugins = array();
@@ -33,14 +31,7 @@ class Plugins {
     public static function load($file, $pluginName)
     {
         include $file;
-        $pluginFullName = 'LibreNMS\\Plugins\\' . $pluginName;
-        if (class_exists($pluginFullName)) {
-            $plugin = new $pluginFullName;
-        } elseif (class_exists($pluginName)) {
-            $plugin = new $pluginName;
-        } else {
-            return null;
-        }
+        $plugin = new $pluginName;
         $hooks  = get_class_methods($plugin);
 
         foreach ($hooks as $hookName) {
