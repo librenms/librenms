@@ -116,6 +116,8 @@ LibreNMS contributors:
 - Karsten Schmidt <git@guggemand.dk> (guggemand)
 - Maxence POULAIN <maxence.poulain@eriador.info> (Linutux42)
 - Florian Beer <fb@42dev.eu> (florianbeer)
+- Vladislav Solovei <vladsol2009@gmail.com> (vladsol)
+- Daniel van Dorp <daniel@vandorp.biz> (djvdorp)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
