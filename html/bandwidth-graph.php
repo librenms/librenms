@@ -43,11 +43,11 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require_once 'includes/jpgraph/src/jpgraph.php';
-require_once 'includes/jpgraph/src/jpgraph_line.php';
-require_once 'includes/jpgraph/src/jpgraph_bar.php';
-require_once 'includes/jpgraph/src/jpgraph_utils.inc.php';
-require_once 'includes/jpgraph/src/jpgraph_date.php';
+require_once 'lib/jpgraph/jpgraph.php';
+require_once 'lib/jpgraph/jpgraph_line.php';
+require_once 'lib/jpgraph/jpgraph_bar.php';
+require_once 'lib/jpgraph/jpgraph_utils.inc.php';
+require_once 'lib/jpgraph/jpgraph_date.php';
 
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
