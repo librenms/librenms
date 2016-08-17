@@ -624,6 +624,11 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'tpconductor';
+$config['os'][$os]['text']		= 'TelePresence Conductor';
+$config['os'][$os]['type']		= 'collaboration';
+$config['os'][$os]['icon']		= 'cisco';
+
 // Brocade NOS
 $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
