@@ -13,6 +13,7 @@ Different applications support a variety of ways collect data: by direct connect
 7. [OS Updates](#os-updates) - extend SNMP
 8. [DHCP Stats](#dhcp-stats) - extend SNMP
 9. [Memcached](#memcached) - extend SNMP
+10. [Unbound](#unbound) - Agent
 
 
 * [Agent Setup](#agent-setup)
@@ -167,6 +168,23 @@ extend memcached /usr/local/bin/memcached
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
+
+### Unbound
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+
+Unbound configuration:
+
+```text
+# Enable extended statistics.
+server:
+        statistics-interval: 0
+        extended-statistics: yes
+        statistics-cumulative: yes
+```
+
+Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
 
 Agent Setup
 -----------
