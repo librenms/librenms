@@ -210,20 +210,14 @@ function rrdtool($command, $filename, $options, $timeout = 0)
 
 /**
  * Checks if the rrd file exists on the server
- * This will perform a remote check if using rrdcached and rrdtool >= 1.5
+ * This will perform a remote check if using rrdcached and rrdtool >= 1.5 (broken)
  *
  * @param $filename
  * @return bool
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('last', $filename, '', 30); // wait up to 30 seconds
-        return strpos(implode($chk), "$filename': No such file or directory") === false;
-    } else {
-        return is_file($filename);
-    }
+    return is_file($filename);
 }
 
 /**
