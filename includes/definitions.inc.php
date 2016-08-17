@@ -574,6 +574,11 @@ $config['os'][$os]['over'][4]['graph'] = 'device_ciscowlc_numclients';
 $config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
+$os = 'vcs';
+$config['os'][$os]['text']		= 'Video Communication Server';
+$config['os'][$os]['type']		= 'collaboration';
+$config['os'][$os]['icon']		= 'cisco';
+
 $os = 'acano';
 $config['os'][$os]['group']            = 'cisco';
 $config['os'][$os]['text']             = 'Acano OS';
@@ -618,6 +623,11 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'tpconductor';
+$config['os'][$os]['text']		= 'TelePresence Conductor';
+$config['os'][$os]['type']		= 'collaboration';
+$config['os'][$os]['icon']		= 'cisco';
 
 // Brocade NOS
 $os = 'nos';
