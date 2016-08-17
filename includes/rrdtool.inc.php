@@ -150,7 +150,7 @@ function rrdtool_graph($graph_file, $options)
  */
 function rrdtool($command, $filename, $options, $timeout = 0)
 {
-    global $config, $debug, $rrd_pipes;
+    global $config, $debug, $vdebug, $rrd_pipes;
 
     // do not ovewrite files when creating
     if ($command == 'create') {
