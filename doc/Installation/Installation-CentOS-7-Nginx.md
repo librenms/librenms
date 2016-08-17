@@ -137,7 +137,11 @@ vim /etc/snmpd/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-`service snmpd restart`
+```bash
+curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+service snmpd restart
+```
 
 #### Cron job
 
