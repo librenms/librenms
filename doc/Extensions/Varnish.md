@@ -13,7 +13,7 @@ Varnish is caching software that sits logically between an HTTP client and an HT
 
 In this example we will assume your Apache 2.4.X HTTP server is working and
 configured to process HTTP requests on port 80.  If not, please see
-[Using HTTPd Apache2](http://librenms.readthedocs.org/Installation/Installation-(RHEL-CentOS)/#using-httpd-apache2)
+[Installing LibreNMS](http://librenms.readthedocs.org/Installation/Installing-CentOS-7-Apache)
 
 
 #### Install Varnish 4.0 RPM ####
