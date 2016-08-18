@@ -62,6 +62,17 @@ function getDates($dayofmonth, $months=0) {
 
 }//end getDates()
 
+function getPredictedUsage($bill_day, $cur_used) {
+
+    $tmp = getDates($bill_day, 0);
+    $start = new DateTime($tmp[0], new DateTimeZone(date_default_timezone_get()));
+    $end   = new DateTime($tmp[1], new DateTimeZone(date_default_timezone_get()));
+    $now   = new DateTime(date("Y-m-d"), new DateTimeZone(date_default_timezone_get()));
+    $total = $end->diff($start)->format("%a");
+    $since = $now->diff($start)->format("%a");
+    return($cur_used/$since*$total);
+
+}
 
 function getValue($host, $port, $id, $inout) {
     global $config;
