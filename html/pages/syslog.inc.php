@@ -44,7 +44,7 @@ print_optionbar_start();
                             <option value="">All Programs</option>
                                 <?php
                                 foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
-                                    echo '"<option value="'.$data['program'].'"';
+                                    echo '"<option value="'.mres($data['program']).'"';
                                     if ($data['program'] == $vars['program']) {
                                         echo ' selected';
                                     }
@@ -59,7 +59,7 @@ print_optionbar_start();
                             <option value="">All Priorities</option>
                                 <?php
                                 foreach (dbFetchRows('SELECT DISTINCT `priority` FROM `syslog` ORDER BY `level`') as $data) {
-                                    echo '"<option value="'.$data['priority'].'"';
+                                    echo '"<option value="'.mres($data['priority']).'"';
                                     if ($data['priority'] == $vars['priority']) {
                                         echo ' selected';
                                     }
