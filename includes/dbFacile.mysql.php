@@ -24,7 +24,7 @@
 
 
 function dbQuery($sql, $parameters=array()) {
-    global $fullSql, $debug, $sql_debug, $console_color;
+    global $fullSql, $debug, $sql_debug;
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
@@ -32,7 +32,7 @@ function dbQuery($sql, $parameters=array()) {
                 echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
             }
             else {
-                print $console_color->convert("\nSQL[%y".$fullSql.'%n] ');
+                c_echo("\nSQL[%y".$fullSql.'%n] ');
             }
         }
         else {
