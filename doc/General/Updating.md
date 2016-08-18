@@ -12,7 +12,7 @@ structure if updates are available.
 LibreNMS follows the master branch on github for daily updates.
 You can change to the monthly releases by setting:
 
-    $config['update_channel'] == 'release';
+    $config['update_channel'] = 'release';
 
 ## Disabling automatic updates ##
 LibreNMS by default performs updates on a daily basis. This can be disabled
