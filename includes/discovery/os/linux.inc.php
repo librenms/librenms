@@ -52,7 +52,7 @@ if (!$os) {
                 $os = 'airos-af';
             }
         }
-        elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false && strstr($sysObjectId, ".1.3.6.1.4.1.8072.3.2.10" === false)) {
+        elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
             $os = 'pktj';
             $pktj_mibs = array (
                "rxCounter"       => "GANDI-MIB",  // RX Packets
@@ -76,9 +76,7 @@ if (!$os) {
             // Check for Synology DSM
             $hrSystemInitialLoadParameters = trim(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'));
 
-            if (strstr($sysObjectId, ".1.3.6.1.4.1.8072.3.2.10")) {
-                $os = 'dsm';
-            } elseif (strpos($hrSystemInitialLoadParameters, 'syno_hw_version') !== false) {
+            if (strpos($hrSystemInitialLoadParameters, 'syno_hw_version') !== false) {
                 $os = 'dsm';
             }
             else {
