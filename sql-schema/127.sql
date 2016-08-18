@@ -1,1 +1,1 @@
-UPDATE `applications` SET `app_type` = 'ntpd' WHERE `applications`.`app_type` = 'ntpd-server';
+ALTER TABLE `slas` ADD `opstatus` TINYINT(1) NOT NULL DEFAULT '0' AFTER `status`;
