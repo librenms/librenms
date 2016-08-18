@@ -34,6 +34,7 @@ echo('
     <div class="col-md-6">
 ');
 require 'includes/dev-overview-data.inc.php';
+use LibreNMS\Plugins;
 Plugins::call('device_overview_container',array($device));
 
 require 'overview/ports.inc.php';
