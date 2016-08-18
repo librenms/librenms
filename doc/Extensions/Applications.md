@@ -170,7 +170,6 @@ extend memcached /usr/local/bin/memcached
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
-<<<<<<< HEAD
 ### Unbound
 
 ##### Agent
