@@ -1,7 +1,7 @@
 <?php
 
 if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.14988.2')) {
+    if (is_numeric(snmp_get($device, 'SNMPv2-SMI::enterprises.14988.2', '-Oqv', ''))) {
         $os = 'swos';
     }
 }
