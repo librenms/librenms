@@ -65,7 +65,7 @@ if (!empty($data)) {
         'dlg-only-drops' => 'DS:dlg-only-drops:DERIVE:600:0:U',
         'dont-outqueries' => 'DS:dont-outqueries:DERIVE:600:0:U',
         'edns-ping-matches' => 'DS:edns-ping-matches:DERIVE:600:0:U',
-        'edns-ping-mismatches' => 'DS:edns-ping-mismatches:DERIVE:600:0:U',
+        'edns-ping-mismatches' => 'DS:edns-ping-mismatch:DERIVE:600:0:U',
         'failed-host-entries' => 'DS:failed-host-entries:GAUGE:600:0:U',
         'ipv6-outqueries' => 'DS:ipv6-outqueries:DERIVE:600:0:U',
         'ipv6-questions' => 'DS:ipv6-questions:DERIVE:600:0:U',
