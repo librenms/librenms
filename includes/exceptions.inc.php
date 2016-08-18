@@ -68,3 +68,7 @@ class HostUnreachableException extends Exception
 class HostUnreachablePingException extends HostUnreachableException {}
 
 class HostUnreachableSnmpException extends HostUnreachableException {}
+
+// ---- rrdtool Exceptions ----
+
+class FileExistsException extends Exception {};
