@@ -146,25 +146,24 @@ function rrdtool_graph($graph_file, $options)
  * @global $config
  * @global $debug
  * @global $rrd_pipes
- * @global $console_color
  */
 function rrdtool($command, $filename, $options)
 {
-    global $config, $vdebug, $rrd_async_pipes, $rrd_sync_pipes, $console_color;
+    global $config, $debug, $vdebug, $rrd_async_pipes, $rrd_sync_pipes;
 
     try {
         $cmd = rrdtool_build_command($command, $filename, $options);
     } catch (FileExistsException $e) {
-        d_echo($console_color->convert('RRD[%g' . $filename . " already exists%n]\n"));
+        c_echo('RRD[%g' . $filename . " already exists%n]\n", $debug);
         return array(null, null);
     }
 
-    d_echo($console_color->convert('RRD[%g'.$cmd."%n] \n"));
+    c_echo("RRD[%g$cmd%n]\n", $debug);
 
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
     if ($config['norrd'] && !in_array($command, $ro_commands)) {
-        print $console_color->convert('[%rRRD Disabled%n]');
+        c_echo('[%rRRD Disabled%n]');
         return array(null, null);
     }
 

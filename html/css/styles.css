@@ -1969,7 +1969,7 @@ label {
 }
 
 .label-font-border {
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
   font-size: 10px;
 }
 
