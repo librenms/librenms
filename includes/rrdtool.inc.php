@@ -147,11 +147,10 @@ function rrdtool_graph($graph_file, $options)
  * @global $config
  * @global $debug
  * @global $rrd_pipes
- * @global $console_color
  */
 function rrdtool($command, $filename, $options, $timeout = 0)
 {
-    global $config, $debug, $rrd_pipes, $console_color;
+    global $config, $debug, $vdebug, $rrd_pipes;
 
     // do not ovewrite files when creating
     if ($command == 'create') {
@@ -173,17 +172,17 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $cmd = "$command $filename $options";
     }
 
+    c_echo("RRD[%g$cmd%n]\n", $debug);
+
     // do not write rrd files, but allow read-only commands
     if ($config['norrd'] && !in_array($command,
             array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))
     ) {
-        print $console_color->convert('[%rRRD Disabled%n]');
+        c_echo("[%rRRD Disabled%n]\n");
         $output = array(null, null);
-    } elseif ($command == 'create' &&
-        version_compare($config['rrdtool_version'], '1.5', '<') &&
-        is_file($filename)
-        ) { // do not ovewrite RRD if already exist and RRDTool ver. < 1.5
-        d_echo('[RRD file ' . $filename . ' already exist]');
+    } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.5', '<') && is_file($filename)) {
+        // do not overwrite RRD if it already exists and RRDTool ver. < 1.5
+        c_echo("RRD[%g$filename already exists%n]\n", $debug);
         $output = array(null, null);
     } else {
         if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
@@ -198,8 +197,7 @@ function rrdtool($command, $filename, $options, $timeout = 0)
         $output = array(stream_get_contents($rrd_pipes[1]), stream_get_contents($rrd_pipes[2]));
     }
 
-    if ($debug) {
-        print $console_color->convert('RRD[%g'.$cmd."%n] \n");
+    if ($vdebug) {
         echo 'RRDtool Output: ';
         echo $output[0];
         echo $output[1];
@@ -210,20 +208,14 @@ function rrdtool($command, $filename, $options, $timeout = 0)
 
 /**
  * Checks if the rrd file exists on the server
- * This will perform a remote check if using rrdcached and rrdtool >= 1.5
+ * This will perform a remote check if using rrdcached and rrdtool >= 1.5 (broken)
  *
  * @param $filename
  * @return bool
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('last', $filename, '', 30); // wait up to 30 seconds
-        return strpos(implode($chk), "$filename': No such file or directory") === false;
-    } else {
-        return is_file($filename);
-    }
+    return is_file($filename);
 }
 
 /**

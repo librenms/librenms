@@ -119,6 +119,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         
         $overuse_formatted    = format_si($overuse).'bps';
         $used                 = $rate_95th;
+        $tmp_used             = $bill['rate_95th'];
         $rate_95th            = "<b>$rate_95th</b>";
     }
     else if (strtolower($bill['bill_type']) == 'quota') {
@@ -133,7 +134,8 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         
         $overuse_formatted    = format_bytes_billing($overuse);
         $used                 = $total_data;        
-        $total_data            = "<b>$total_data</b>";
+        $tmp_used             = $bill['total_data'];
+        $total_data           = "<b>$total_data</b>";
     }
 
     $background        = get_percentage_colours($percent);
@@ -150,6 +152,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $actions .= "<a href='" . generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) . 
             "'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a> ";
     }
+    $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));
     
     $response[] = array(
         'bill_name'     => $bill_name,
@@ -162,6 +165,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         'rate_95th'     => $rate_95th,
         'used'          => $used,
         'overusage'     => $overuse_formatted,
+        'predicted'     => $predicted,
         'graph'         => $bar,
         'actions'       => $actions
     );

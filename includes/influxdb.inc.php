@@ -46,7 +46,7 @@ function influxdb_connect() {
 }// end influxdb_connect
 
 function influx_update($device,$measurement,$tags=array(),$fields) {
-    global $influxdb,$config,$console_color;
+    global $influxdb, $config;
     if ($influxdb !== false) {
         $tmp_fields = array();
         $tmp_tags['hostname'] = $device['hostname'];
@@ -87,7 +87,7 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             }
         }
         else {
-            print $console_color->convert('[%gInfluxDB Disabled%n] ', false);
+            c_echo("[%gInfluxDB Disabled%n]\n");
         }//end if
     }//end if
 }// end influx_update
