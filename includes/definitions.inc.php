@@ -613,6 +613,11 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'cisco';
 
+$os = 'vccodec';
+$config['os'][$os]['text']             = 'TelePresence Codec';
+$config['os'][$os]['type']             = 'collaboration';
+$config['os'][$os]['icon']             = 'cisco';
+
 $os = 'ise';
 $config['os'][$os]['text']             = 'Cisco Identity Services Engine';
 $config['os'][$os]['type']             = 'server';
