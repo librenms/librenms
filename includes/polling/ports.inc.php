@@ -410,12 +410,12 @@ foreach ($ports as $port) {
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
-            d_echo 'HighSpeed ';
+            d_echo('HighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
-        } elseif (isset($this_port['ifSpeed'] && is_numeric($this_port['ifSpeed'])) {
-            d_echo 'ifSpeed ';
+        } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
+            d_echo('ifSpeed ');
         } else {
-            d_echo 'No ifSpeed ';
+            d_echo('No ifSpeed ');
             $this_port['ifSpeed'] = 0;
         }
 
