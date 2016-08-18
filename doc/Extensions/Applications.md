@@ -13,9 +13,13 @@ Different applications support a variety of ways collect data: by direct connect
 7. [OS Updates](#os-updates) - extend SNMP
 8. [DHCP Stats](#dhcp-stats) - extend SNMP
 9. [Memcached](#memcached) - extend SNMP
+<<<<<<< HEAD
 10. [Unbound](#unbound) - Agent
 11. [Proxmox](#proxmos) - extend SNMP
 12. [Raspberry PI](#raspberry-pi) - extend SNMP
+=======
+10. [Raspberry PI](#raspberry-pi) - extend SNMP
+>>>>>>> 4a4718fa7dadbc1b9fc38359745fb7f9cc8ab9e9
 
 * [Agent Setup](#agent-setup)
 
@@ -170,6 +174,7 @@ extend memcached /usr/local/bin/memcached
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
 
+<<<<<<< HEAD
 ### Unbound
 
 ##### Agent
@@ -197,6 +202,8 @@ Restart your unbound after changing the configuration,v erify it is working by r
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Proxmox` on the Applications tab.
 
+=======
+>>>>>>> 4a4718fa7dadbc1b9fc38359745fb7f9cc8ab9e9
 ### Raspberry PI
 SNMP extend script to get your PI data into your host.
 
