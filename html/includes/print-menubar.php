@@ -506,7 +506,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
           <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Plugins</span></a>
           <ul class="dropdown-menu">
 <?php
-Plugins::call('menu');
+\LibreNMS\Plugins::call('menu');
 
 if ($_SESSION['userlevel'] >= '10') {
     if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
