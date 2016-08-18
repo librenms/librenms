@@ -95,28 +95,18 @@ function isCli() {
     }
 }
 
-function print_error($text, $quiet = false) {
-    if ($quiet) {
-        return;
-    }
-
+function print_error($text) {
     if (isCli()) {
-        global $console_color;
-        print $console_color->convert("%r".$text."%n\n", false);
+        c_echo("%r".$text."%n\n");
     }
     else {
         echo('<div class="alert alert-danger"><img src="images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
     }
 }
 
-function print_message($text, $quiet = false) {
-    if ($quiet) {
-        return;
-    }
-
+function print_message($text) {
     if (isCli()) {
-        global $console_color;
-        print $console_color->convert("%g".$text."%n\n", false);
+        c_echo("%g".$text."%n\n");
     }
     else {
         echo('<div class="alert alert-success"><img src="images/16/tick.png" align="absmiddle"> '.$text.'</div>');
@@ -124,8 +114,6 @@ function print_message($text, $quiet = false) {
 }
 
 function delete_port($int_id) {
-    global $config;
-
     $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.port_id = ? AND D.device_id = P.device_id", array($int_id));
 
     $interface_tables = array('adjacencies', 'ipaddr', 'ip6adjacencies', 'ip6addr', 'mac_accounting', 'bill_ports', 'pseudowires', 'ports');
@@ -635,6 +623,26 @@ function d_echo($text, $no_debug_text = null) {
     }
 } // d_echo
 
+/**
+ * Output using console color if possible
+ * https://github.com/pear/Console_Color2/blob/master/examples/documentation
+ *
+ * @param string $string the string to print with console color
+ * @param bool $enabled if set to false, this function does nothing
+ */
+function c_echo($string, $enabled = true)
+{
+    if(!$enabled) {
+        return;
+    }
+    global $console_color;
+
+    if($console_color) {
+        echo $console_color->convert($string);
+    } else {
+        echo preg_replace('/%((%)|.)/', '', $string);
+    }
+}
 
 /*
  * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
