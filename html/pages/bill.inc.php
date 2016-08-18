@@ -180,6 +180,13 @@ if (bill_permitted($bill_id)) {
             - Average rate <?php echo formatRates($rate_average) ?>
         </td>
         <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+<?php
+            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
+?>
+            </td>
 <?php
         }
         else if ($bill_data['bill_type'] == 'cdr') {
@@ -196,6 +203,13 @@ if (bill_permitted($bill_id)) {
         <td style="width: 210px;">
             <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?>
         </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+<?php
+            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+?>
+            </td>
 
 <?php   }//end if
 ?>
