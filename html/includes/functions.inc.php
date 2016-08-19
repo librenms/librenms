@@ -18,7 +18,8 @@
  * @param string $t Value to compare $vars[$v] to
  * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
  */
-function var_eq($v, $t) {
+function var_eq($v, $t)
+{
     global $vars;
     if (isset($vars[$v]) && $vars[$v] == $t) {
         return true;
@@ -32,7 +33,8 @@ function var_eq($v, $t) {
  * @param string $v Name of the var to get
  * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
  */
-function var_get($v) {
+function var_get($v)
+{
     global $vars;
     if (isset($vars[$v])) {
         return $vars[$v];
@@ -42,11 +44,11 @@ function var_get($v) {
 }
 
 
-function data_uri($file, $mime) {
+function data_uri($file, $mime)
+{
     $contents = file_get_contents($file);
     $base64   = base64_encode($contents);
     return ('data:'.$mime.';base64,'.$base64);
-
 }//end data_uri()
 
 
@@ -86,11 +88,11 @@ function nicecase($item)
         default:
             return ucfirst($item);
     }
-
 }//end nicecase()
 
 
-function toner2colour($descr, $percent) {
+function toner2colour($descr, $percent)
+{
     $colour = get_percentage_colours(100 - $percent);
 
     if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
@@ -119,17 +121,17 @@ function toner2colour($descr, $percent) {
     }
 
     return $colour;
-
 }//end toner2colour()
 
 
-function generate_link($text, $vars, $new_vars=array()) {
+function generate_link($text, $vars, $new_vars = array())
+{
     return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';
-
 }//end generate_link()
 
 
-function generate_url($vars, $new_vars=array()) {
+function generate_url($vars, $new_vars = array())
+{
     $vars = array_merge($vars, $new_vars);
 
     $url = $vars['page'].'/';
@@ -142,17 +144,17 @@ function generate_url($vars, $new_vars=array()) {
     }
 
     return ($url);
-
 }//end generate_url()
 
 
-function escape_quotes($text) {
+function escape_quotes($text)
+{
     return str_replace('"', "\'", str_replace("'", "\'", $text));
-
 }//end escape_quotes()
 
 
-function generate_overlib_content($graph_array, $text) {
+function generate_overlib_content($graph_array, $text)
+{
     global $config;
 
     $overlib_content = '<div class=overlib><span class=overlib-text>'.$text.'</span><br />';
@@ -164,55 +166,47 @@ function generate_overlib_content($graph_array, $text) {
     $overlib_content .= '</div>';
 
     return $overlib_content;
-
 }//end generate_overlib_content()
 
 
-function get_percentage_colours($percentage) {
+function get_percentage_colours($percentage)
+{
     $background = array();
     if ($percentage > '90') {
         $background['left']  = 'c4323f';
         $background['right'] = 'C96A73';
-    }
-
-    else if ($percentage > '75') {
+    } elseif ($percentage > '75') {
         $background['left']  = 'bf5d5b';
         $background['right'] = 'd39392';
-    }
-
-    else if ($percentage > '50') {
+    } elseif ($percentage > '50') {
         $background['left']  = 'bf875b';
         $background['right'] = 'd3ae92';
-    }
-
-    else if ($percentage > '25') {
+    } elseif ($percentage > '25') {
         $background['left']  = '5b93bf';
         $background['right'] = '92b7d3';
-    }
-
-    else {
+    } else {
         $background['left']  = '9abf5b';
         $background['right'] = 'bbd392';
     }
 
     return ($background);
-
 }//end get_percentage_colours()
 
 
-function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image',$absolute_size=0) {
+function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
+{
     return '<img class="'.$class.'" width="'.$width.'" height="'.$height.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
-
 }//end generate_minigraph_image()
 
 
-function generate_device_url($device, $vars=array()) {
+function generate_device_url($device, $vars = array())
+{
     return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
-
 }//end generate_device_url()
 
 
-function generate_device_link($device, $text=null, $vars=array(), $start=0, $end=0, $escape_text=1, $overlib=1) {
+function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+{
     global $config;
 
     if (!$start) {
@@ -228,15 +222,13 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
         $text = $device['hostname'];
     }
 
-    $text = ip_to_sysname($device,$text);
+    $text = ip_to_sysname($device, $text);
 
     if (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
-    }
-    else if (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
+    } elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
         $graphs = $config['os'][$device['os_group']]['over'];
-    }
-    else {
+    } else {
         $graphs = $config['os']['default']['over'];
     }
 
@@ -282,22 +274,20 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
 
     if ($overlib == 0) {
         $link = $contents;
-    }
-    else {
+    } else {
         $link = overlib_link($url, $text, escape_quotes($contents), $class);
     }
 
     if (device_permitted($device['device_id'])) {
         return $link;
-    }
-    else {
+    } else {
         return $device['hostname'];
     }
-
 }//end generate_device_link()
 
 
-function overlib_link($url, $text, $contents, $class) {
+function overlib_link($url, $text, $contents, $class)
+{
     global $config;
 
     $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
@@ -305,19 +295,18 @@ function overlib_link($url, $text, $contents, $class) {
     $output   = '<a class="'.$class.'" href="'.$url.'"';
     if ($config['web_mouseover'] === false) {
         $output .= '>';
-    }
-    else {
+    } else {
         $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
     }
 
     $output .= $text.'</a>';
 
     return $output;
-
 }//end overlib_link()
 
 
-function generate_graph_popup($graph_array) {
+function generate_graph_popup($graph_array)
+{
     global $config;
 
     // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
@@ -345,17 +334,17 @@ function generate_graph_popup($graph_array) {
 
     // $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
     return overlib_link($graph_array['link'], $graph, $content, null);
-
 }//end generate_graph_popup()
 
 
-function print_graph_popup($graph_array) {
+function print_graph_popup($graph_array)
+{
     echo generate_graph_popup($graph_array);
-
 }//end print_graph_popup()
 
 
-function permissions_cache($user_id) {
+function permissions_cache($user_id)
+{
     $permissions = array();
     foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'") as $device) {
         $permissions['device'][$device['device_id']] = 1;
@@ -370,29 +359,27 @@ function permissions_cache($user_id) {
     }
 
     return $permissions;
-
 }//end permissions_cache()
 
 
-function bill_permitted($bill_id) {
+function bill_permitted($bill_id)
+{
     global $permissions;
 
     if ($_SESSION['userlevel'] >= '5') {
         $allowed = true;
-    }
-    else if ($permissions['bill'][$bill_id]) {
+    } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end bill_permitted()
 
 
-function port_permitted($port_id, $device_id=null) {
+function port_permitted($port_id, $device_id = null)
+{
     global $permissions;
 
     if (!is_numeric($device_id)) {
@@ -401,23 +388,20 @@ function port_permitted($port_id, $device_id=null) {
 
     if ($_SESSION['userlevel'] >= '5') {
         $allowed = true;
-    }
-    else if (device_permitted($device_id)) {
+    } elseif (device_permitted($device_id)) {
         $allowed = true;
-    }
-    else if ($permissions['port'][$port_id]) {
+    } elseif ($permissions['port'][$port_id]) {
         $allowed = true;
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end port_permitted()
 
 
-function application_permitted($app_id, $device_id=null) {
+function application_permitted($app_id, $device_id = null)
+{
     global $permissions;
 
     if (is_numeric($app_id)) {
@@ -427,61 +411,55 @@ function application_permitted($app_id, $device_id=null) {
 
         if ($_SESSION['userlevel'] >= '5') {
             $allowed = true;
-        }
-        else if (device_permitted($device_id)) {
+        } elseif (device_permitted($device_id)) {
             $allowed = true;
-        }
-        else if ($permissions['application'][$app_id]) {
+        } elseif ($permissions['application'][$app_id]) {
             $allowed = true;
-        }
-        else {
+        } else {
             $allowed = false;
         }
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end application_permitted()
 
 
-function device_permitted($device_id) {
+function device_permitted($device_id)
+{
     global $permissions;
 
     if ($_SESSION['userlevel'] >= '5') {
         $allowed = true;
-    }
-    else if ($permissions['device'][$device_id]) {
+    } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end device_permitted()
 
 
-function print_graph_tag($args) {
+function print_graph_tag($args)
+{
     echo generate_graph_tag($args);
-
 }//end print_graph_tag()
 
 
-function generate_graph_tag($args) {
+function generate_graph_tag($args)
+{
     $urlargs = array();
     foreach ($args as $key => $arg) {
         $urlargs[] = $key.'='.urlencode($arg);
     }
 
     return '<img src="graph.php?'.implode('&amp;', $urlargs).'" border="0" />';
-
 }//end generate_graph_tag()
 
-function generate_lazy_graph_tag($args) {
+function generate_lazy_graph_tag($args)
+{
     global $config;
     $urlargs = array();
     $w = 0;
@@ -501,21 +479,20 @@ function generate_lazy_graph_tag($args) {
         $urlargs[] = $key."=".urlencode($arg);
     }
 
-    if(isset($lazy_w)) {
+    if (isset($lazy_w)) {
         $w=$lazy_w;
     }
 
     if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs).'" border="0" />';
+    } else {
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs).'" border="0" />';
     }
-    else {
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
-    }
-
 }//end generate_lazy_graph_tag()
 
 
-function generate_graph_js_state($args) {
+function generate_graph_js_state($args)
+{
     // we are going to assume we know roughly what the graph url looks like here.
     // TODO: Add sensible defaults
     $from   = (is_numeric($args['from']) ? $args['from'] : 0);
@@ -535,15 +512,14 @@ document.graphLegend = '$legend';
 STATE;
 
     return $state;
-
 }//end generate_graph_js_state()
 
 
-function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background) {
+function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
+{
     if ($percent > '100') {
         $size_percent = '100';
-    }
-    else {
+    } else {
         $size_percent = $percent;
     }
 
@@ -559,11 +535,11 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
         ';
 
     return $output;
-
 }//end print_percentage_bar()
 
 
-function generate_entity_link($type, $entity, $text=null, $graph_type=null) {
+function generate_entity_link($type, $entity, $text = null, $graph_type = null)
+{
     global $config, $entity_cache;
 
     if (is_numeric($entity)) {
@@ -571,28 +547,28 @@ function generate_entity_link($type, $entity, $text=null, $graph_type=null) {
     }
 
     switch ($type) {
-    case 'port':
-        $link = generate_port_link($entity, $text, $graph_type);
-        break;
+        case 'port':
+            $link = generate_port_link($entity, $text, $graph_type);
+            break;
 
-    case 'storage':
-        if (empty($text)) {
-            $text = $entity['storage_descr'];
-        }
+        case 'storage':
+            if (empty($text)) {
+                $text = $entity['storage_descr'];
+            }
 
-        $link = generate_link($text, array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
-        break;
+            $link = generate_link($text, array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
+            break;
 
-    default:
-        $link = $entity[$type.'_id'];
+        default:
+            $link = $entity[$type.'_id'];
     }
 
     return ($link);
-
 }//end generate_entity_link()
 
 
-function generate_port_link($port, $text=null, $type=null, $overlib=1, $single_graph=0) {
+function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
+{
     global $config;
 
     $graph_array = array();
@@ -644,46 +620,44 @@ function generate_port_link($port, $text=null, $type=null, $overlib=1, $single_g
 
     if ($overlib == 0) {
         return $content;
-    }
-    else if (port_permitted($port['port_id'], $port['device_id'])) {
+    } elseif (port_permitted($port['port_id'], $port['device_id'])) {
         return overlib_link($url, $text, $content, $class);
-    }
-    else {
+    } else {
         return fixifName($text);
     }
-
 }//end generate_port_link()
 
 
-function generate_port_url($port, $vars=array()) {
+function generate_port_url($port, $vars = array())
+{
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
-
 }//end generate_port_url()
 
 
-function generate_peer_url($peer, $vars=array()) {
+function generate_peer_url($peer, $vars = array())
+{
     return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
-
 }//end generate_peer_url()
 
 
-function generate_bill_url($bill, $vars=array()) {
+function generate_bill_url($bill, $vars = array())
+{
     return generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']), $vars);
-
 }//end generate_bill_url()
 
 
-function generate_port_image($args) {
+function generate_port_image($args)
+{
     if (!$args['bg']) {
         $args['bg'] = 'FFFFFF';
     }
 
     return "<img src='graph.php?type=".$args['graph_type'].'&amp;id='.$args['port_id'].'&amp;from='.$args['from'].'&amp;to='.$args['to'].'&amp;width='.$args['width'].'&amp;height='.$args['height'].'&amp;bg='.$args['bg']."'>";
-
 }//end generate_port_image()
 
 
-function generate_port_thumbnail($port) {
+function generate_port_thumbnail($port)
+{
     global $config;
     $port['graph_type'] = 'port_bits';
     $port['from']       = $config['time']['day'];
@@ -691,31 +665,31 @@ function generate_port_thumbnail($port) {
     $port['width']      = 150;
     $port['height']     = 21;
     return generate_port_image($port);
-
 }//end generate_port_thumbnail()
 
 
-function print_port_thumbnail($args) {
+function print_port_thumbnail($args)
+{
     echo generate_port_link($args, generate_port_image($args));
-
 }//end print_port_thumbnail()
 
 
-function print_optionbar_start($height=0, $width=0, $marginbottom=5) {
+function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
+{
     echo '
         <div class="well well-sm">
         ';
-
 }//end print_optionbar_start()
 
 
-function print_optionbar_end() {
+function print_optionbar_end()
+{
     echo '  </div>';
-
 }//end print_optionbar_end()
 
 
-function geteventicon($message) {
+function geteventicon($message)
+{
     if ($message == 'Device status changed to Down') {
         $icon = 'server_connect.png';
     }
@@ -742,44 +716,42 @@ function geteventicon($message) {
 
     if (isset($icon)) {
         return $icon;
-    }
-    else {
+    } else {
         return false;
     }
-
 }//end geteventicon()
 
 
-function overlibprint($text) {
+function overlibprint($text)
+{
     return "onmouseover=\"return overlib('".$text."');\" onmouseout=\"return nd();\"";
-
 }//end overlibprint()
 
 
-function humanmedia($media) {
+function humanmedia($media)
+{
     global $rewrite_iftype;
     array_preg_replace($rewrite_iftype, $media);
     return $media;
-
 }//end humanmedia()
 
 
-function humanspeed($speed) {
+function humanspeed($speed)
+{
     $speed = formatRates($speed);
     if ($speed == '') {
         $speed = '-';
     }
 
     return $speed;
-
 }//end humanspeed()
 
 
-function devclass($device) {
+function devclass($device)
+{
     if (isset($device['status']) && $device['status'] == '0') {
         $class = 'list-device-down';
-    }
-    else {
+    } else {
         $class = 'list-device';
     }
 
@@ -795,18 +767,17 @@ function devclass($device) {
     }
 
     return $class;
-
 }//end devclass()
 
 
-function getlocations() {
+function getlocations()
+{
     $locations           = array();
 
     // Fetch regular locations
     if ($_SESSION['userlevel'] >= '5') {
         $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D GROUP BY location ORDER BY location');
-    }
-    else {
+    } else {
         $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
     }
 
@@ -821,11 +792,11 @@ function getlocations() {
 
     sort($locations);
     return $locations;
-
 }//end getlocations()
 
 
-function foldersize($path) {
+function foldersize($path)
+{
     $total_size  = 0;
     $files       = scandir($path);
     $total_files = 0;
@@ -836,8 +807,7 @@ function foldersize($path) {
                 $size        = foldersize(rtrim($path, '/').'/'.$t);
                 $total_size += $size;
             }
-        }
-        else {
+        } else {
             $size        = filesize(rtrim($path, '/').'/'.$t);
             $total_size += $size;
             $total_files++;
@@ -848,11 +818,11 @@ function foldersize($path) {
         $total_size,
         $total_files,
     );
-
 }//end foldersize()
 
 
-function generate_ap_link($args, $text=null, $type=null) {
+function generate_ap_link($args, $text = null, $type = null)
+{
     global $config;
 
     $args = ifNameDescr($args);
@@ -898,30 +868,29 @@ function generate_ap_link($args, $text=null, $type=null) {
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
         return overlib_link($url, $text, $content, null);
-    }
-    else {
+    } else {
         return fixifName($text);
     }
-
 }//end generate_ap_link()
 
 
-function generate_ap_url($ap, $vars=array()) {
+function generate_ap_url($ap, $vars = array())
+{
     return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
-
 }//end generate_ap_url()
 
-function report_this_text($message) {
+function report_this_text($message)
+{
     global $config;
     return $message.'\nPlease report this to the '.$config['project_name'].' developers at '.$config['project_issues'].'\n';
-
 }//end report_this_text()
 
 
 // Find all the files in the given directory that match the pattern
 
 
-function get_matching_files($dir, $match='/\.php$/') {
+function get_matching_files($dir, $match = '/\.php$/')
+{
     global $config;
 
     $list = array();
@@ -936,22 +905,22 @@ function get_matching_files($dir, $match='/\.php$/') {
     }
 
     return $list;
-
 }//end get_matching_files()
 
 
 // Include all the files in the given directory that match the pattern
 
 
-function include_matching_files($dir, $match='/\.php$/') {
+function include_matching_files($dir, $match = '/\.php$/')
+{
     foreach (get_matching_files($dir, $match) as $file) {
         include_once $file;
     }
-
 }//end include_matching_files()
 
 
-function generate_pagination($count, $limit, $page, $links=2) {
+function generate_pagination($count, $limit, $page, $links = 2)
+{
     $end_page   = ceil($count / $limit);
     $start      = (($page - $links) > 0) ? ($page - $links) : 1;
     $end        = (($page + $links) < $end_page) ? ($page + $links) : $end_page;
@@ -980,75 +949,72 @@ function generate_pagination($count, $limit, $page, $links=2) {
     $return    .= "<li class='$link_class'><a href='' onClick='changePage($end_page,event);'>&raquo;</a></li>";
     $return    .= '</ul>';
     return ($return);
-
 }//end generate_pagination()
 
 
-function is_admin() {
+function is_admin()
+{
     if ($_SESSION['userlevel'] >= '10') {
         $allowed = true;
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end is_admin()
 
 
-function is_read() {
+function is_read()
+{
     if ($_SESSION['userlevel'] == '5') {
         $allowed = true;
-    }
-    else {
+    } else {
         $allowed = false;
     }
 
     return $allowed;
-
 }//end is_read()
 
-function is_demo_user() {
+function is_demo_user()
+{
 
     if ($_SESSION['userlevel'] == 11) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }// end is_demo_user();
 
-function is_normal_user() {
+function is_normal_user()
+{
 
     if (is_admin() === false && is_read() === false && is_demo_user() === false) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }// end is_normal_user()
 
-function demo_account() {
+function demo_account()
+{
     print_error("You are logged in as a demo account, this page isn't accessible to you");
-
 }//end demo_account()
 
 
-function get_client_ip() {
+function get_client_ip()
+{
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }
-    else {
+    } else {
         $client_ip = $_SERVER['REMOTE_ADDR'];
     }
 
     return $client_ip;
-
 }//end get_client_ip()
 
 
-function shorten_interface_type($string) {
+function shorten_interface_type($string)
+{
     return str_ireplace(
         array(
             'FastEthernet',
@@ -1066,44 +1032,41 @@ function shorten_interface_type($string) {
         ),
         $string
     );
-
 }//end shorten_interface_type()
 
 
-function clean_bootgrid($string) {
+function clean_bootgrid($string)
+{
     $output = str_replace(array("\r", "\n"), '', $string);
     $output = addslashes($output);
     return $output;
-
 }//end clean_bootgrid()
 
 
 // Insert new config items
-function add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc) {
+function add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc)
+{
     if (dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config')) {
         $db_inserted = 1;
-    }
-    else {
+    } else {
         $db_inserted = 0;
     }
 
     return ($db_inserted);
-
 }//end add_config_item()
 
 
-function get_config_by_group($group) {
+function get_config_by_group($group)
+{
     $group = array($group);
     $items = array();
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
         $val = $config_item['config_value'];
         if (filter_var($val, FILTER_VALIDATE_INT)) {
             $val = (int) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
+        } elseif (filter_var($val, FILTER_VALIDATE_FLOAT)) {
             $val = (float) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
+        } elseif (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
             $val = (boolean) $val;
         }
 
@@ -1115,11 +1078,11 @@ function get_config_by_group($group) {
     }
 
     return $items;
-
 }//end get_config_by_group()
 
 
-function get_config_like_name($name) {
+function get_config_like_name($name)
+{
     $name  = array($name);
     $items = array();
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
@@ -1127,24 +1090,24 @@ function get_config_like_name($name) {
     }
 
     return $items;
-
 }//end get_config_like_name()
 
 
-function get_config_by_name($name) {
+function get_config_by_name($name)
+{
     $config_item = dbFetchRow('SELECT * FROM `config` WHERE `config_name` = ?', array($name));
     return $config_item;
-
 }//end get_config_by_name()
 
 
-function set_config_name($name, $config_value) {
+function set_config_name($name, $config_value)
+{
     return dbUpdate(array('config_value' => $config_value), 'config', '`config_name`=?', array($name));
-
 }//end set_config_name()
 
 
-function get_url() {
+function get_url()
+{
     // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
     // http://stackoverflow.com/users/184600/ma%C4%8Dek
     return sprintf(
@@ -1153,11 +1116,11 @@ function get_url() {
         $_SERVER['SERVER_NAME'],
         $_SERVER['REQUEST_URI']
     );
-
 }//end get_url()
 
 
-function alert_details($details) {
+function alert_details($details)
+{
     if (!is_array($details)) {
         $details = json_decode(gzuncompress($details), true);
     }
@@ -1179,8 +1142,7 @@ function alert_details($details) {
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
-            }
-            else {
+            } else {
                 $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].' - '.$tmp_alerts['error'].';&nbsp;';
             }
             $fallback      = false;
@@ -1200,26 +1162,25 @@ function alert_details($details) {
     }//end foreach
 
     return $fault_detail;
-
 }//end alert_details()
 
-function dynamic_override_config($type, $name, $device) {
-    $attrib_val = get_dev_attrib($device,$name);
+function dynamic_override_config($type, $name, $device)
+{
+    $attrib_val = get_dev_attrib($device, $name);
     if ($attrib_val == 'true') {
         $checked = 'checked';
-    }
-    else {
+    } else {
         $checked = '';
     }
     if ($type == 'checkbox') {
         return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
-    }
-    elseif ($type == 'text') {
+    } elseif ($type == 'text') {
         return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" value="'.$attrib_val.'">';
     }
 }//end dynamic_override_config()
 
-function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$items=array(),$transport='') {
+function generate_dynamic_config_panel($title, $config_groups, $items = array(), $transport = '', $end_panel = true)
+{
     $anchor = md5($title);
     $output = '
 <div class="panel panel-default">
@@ -1247,14 +1208,12 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
             ';
             if ($item['type'] == 'checkbox') {
                 $output .= '<input id="'.$item['name'].'" type="checkbox" name="global-config-check" '.$config_groups[$item['name']]['config_checked'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$config_groups[$item['name']]['config_id'].'">';
-            }
-            elseif ($item['type'] == 'text') {
+            } elseif ($item['type'] == 'text') {
                 $output .= '
                 <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 ';
-            }
-            elseif ($item['type'] == 'select') {
+            } elseif ($item['type'] == 'select') {
                 $output .= '
                 <select id="'.$config_groups[$item['name']]['name'].'" class="form-control" name="global-config-select" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 ';
@@ -1289,9 +1248,10 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     return $output;
 }//end generate_dynamic_config_panel()
 
-function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param) {
+function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param)
+{
     $ripe_whois_url = 'https://stat.ripe.net/data/'. $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
-    return json_decode(file_get_contents($ripe_whois_url) , true);
+    return json_decode(file_get_contents($ripe_whois_url), true);
 }//end get_ripe_api_whois_data_json()
 
 /**
@@ -1301,11 +1261,12 @@ function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param) {
  * @param $types mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
-function get_ports_from_type($given_types) {
+function get_ports_from_type($given_types)
+{
     global $config;
 
     # Make the arg an array if it isn't, so subsequent steps only have to handle arrays.
-    if(!is_array($given_types)) {
+    if (!is_array($given_types)) {
         $given_types = array($given_types);
     }
 
@@ -1314,16 +1275,14 @@ function get_ports_from_type($given_types) {
     #  configured value if it's an array or a string. Or append the argument itself if there's no matching
     #  entry in config.
     $search_types = array();
-    foreach($given_types as $type) {
-        if(isset($config[$type.'_descr']) === true) {
+    foreach ($given_types as $type) {
+        if (isset($config[$type.'_descr']) === true) {
             if (is_array($config[$type.'_descr']) === true) {
                 $search_types = array_merge($search_types, $config[$type.'_descr']);
-            }
-            else {
+            } else {
                 $search_types[] = $config[$type.'_descr'];
             }
-        }
-        else {
+        } else {
             $search_types[] = $type;
         }
     }
@@ -1335,7 +1294,7 @@ function get_ports_from_type($given_types) {
     $or = '';
     $type_param = array();
 
-    foreach($search_types as $type) {
+    foreach ($search_types as $type) {
         if (!empty($type)) {
             $type            = strtr($type, '@', '%');
             $type_where     .= " $or `port_descr_type` LIKE ?";
@@ -1352,8 +1311,8 @@ function get_ports_from_type($given_types) {
 
 function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
 {
-    if(count($rewriteArray[$hardwareId]) > 0) {
-        if($rewriteArray[$hardwareId][$sensorIpmi] != "") {
+    if (count($rewriteArray[$hardwareId]) > 0) {
+        if ($rewriteArray[$hardwareId][$sensorIpmi] != "") {
             return $rewriteArray[$hardwareId][$sensorIpmi];
         } else {
             return $sensorIpmi;

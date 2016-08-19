@@ -15,6 +15,3 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:sub10RadioLclDataRa:MIN:%3.2lf ';
     $rrd_options .= ' GPRINT:sub10RadioLclDataRa:MAX:%3.2lf\\\l ';
 }
-
-
-

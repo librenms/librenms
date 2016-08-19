@@ -42,8 +42,7 @@ if (!empty($filter_device)) {
     $tmp_output .= '
             "<input type=\"hidden\" name=\"hostname\" id=\"hostname\" value=\"'. $filter_device .'\">"+
 ';
-}
-else {
+} else {
     $tmp_output .= '
             "<div class=\"form-group\"><select name=\"hostname\" id=\"hostname\" class=\"form-control input-sm\">"+
             "<option value=\"\">All devices</option>"+
@@ -51,8 +50,7 @@ else {
 
     if (is_admin() === true || is_read() === true) {
         $results = dbFetchRows("SELECT `hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-    }
-    else {
+    } else {
         $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
     }
 
@@ -64,10 +62,9 @@ else {
         $tmp_output .= '">'.$data['hostname'].'</option>"+';
     }
 
-$tmp_output .= '
+    $tmp_output .= '
                 "</select>&nbsp;</div>"+
 ';
-
 }
 
 if (empty($filter_device)) {

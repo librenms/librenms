@@ -12,16 +12,14 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($vars)) {
             $rrd_list[$i]['descr'] = $vars['descr'];
-        }
-        else {
+        } else {
             $rrd_list[$i]['descr'] = $vars;
         }
 
         $rrd_list[$i]['ds'] = $ds;
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

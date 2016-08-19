@@ -24,8 +24,7 @@ if ($_GET['inverse']) {
     $in      = 'out';
     $out     = 'in';
     $inverse = true;
-}
-else {
+} else {
     $in  = 'in';
     $out = 'out';
 }
@@ -36,22 +35,19 @@ if ($_GET['legend'] == 'no') {
 
 if (isset($_GET['nototal'])) {
     $nototal = ((bool) $_GET['nototal']);
-}
-else {
+} else {
     $nototal = true;
 }
 
 if (isset($_GET['nodetails'])) {
     $nodetails = ((bool) $_GET['nodetails']);
-}
-else {
+} else {
     $nodetails = false;
 }
 
 if (isset($_GET['noagg'])) {
     $noagg = ((bool) $_GET['noagg']);
-}
-else {
+} else {
     $noagg = true;
 }
 
@@ -101,8 +97,7 @@ if ($height < '99') {
 
 if ($width <= '300') {
     $rrd_options .= ' --font LEGEND:7:'.$config['mono_font'].' --font AXIS:6:'.$config['mono_font'];
-}
-else {
+} else {
     $rrd_options .= ' --font LEGEND:8:'.$config['mono_font'].' --font AXIS:7:'.$config['mono_font'];
 }
 

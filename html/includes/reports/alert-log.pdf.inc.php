@@ -15,23 +15,20 @@ if ($_GET['string']) {
 
 if ($_SESSION['userlevel'] >= '5') {
     $query = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where ORDER BY `humandate` DESC";
-}
-else {
+} else {
     $query   = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ? ORDER BY `humandate` DESC";
     $param[] = $_SESSION['user_id'];
 }
 
 if (isset($_GET['start']) && is_numeric($_GET['start'])) {
     $start = mres($_GET['start']);
-}
-else {
+} else {
     $start = 0;
 }
 
 if (isset($_GET['results']) && is_numeric($_GET['results'])) {
     $numresults = mres($_GET['results']);
-}
-else {
+} else {
     $numresults = 250;
 }
 
@@ -45,20 +42,16 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
         if ($alert_state == '0') {
             $glyph_color = 'green';
             $text        = 'Ok';
-        }
-        else if ($alert_state == '1') {
+        } elseif ($alert_state == '1') {
             $glyph_color = 'red';
             $text        = 'Alert';
-        }
-        else if ($alert_state == '2') {
+        } elseif ($alert_state == '2') {
             $glyph_color = 'lightgrey';
             $text        = 'Ack';
-        }
-        else if ($alert_state == '3') {
+        } elseif ($alert_state == '3') {
             $glyph_color = 'orange';
             $text        = 'Worse';
-        }
-        else if ($alert_state == '4') {
+        } elseif ($alert_state == '4') {
             $glyph_color = 'khaki';
             $text        = 'Better';
         }
@@ -92,8 +85,7 @@ EOD;
 foreach ($data as $log) {
     if ($log[3] == 'Alert') {
         $tr_col = '#d39392';
-    }
-    else {
+    } else {
         $tr_col = '#bbd392';
     }
 

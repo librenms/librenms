@@ -65,9 +65,8 @@ if ($vars['view'] == 'incoming') {
             $hostname = str_replace('.rrd', '', $host);
             $host     = device_by_name($src);
             if ($config['smokeping']['integration'] === true) {
-                $dest = device_by_name(str_replace("_",".",$hostname));
-            }
-            else {
+                $dest = device_by_name(str_replace("_", ".", $hostname));
+            } else {
                 $dest = $host;
             }
             if (is_numeric($host['device_id'])) {
@@ -83,8 +82,7 @@ if ($vars['view'] == 'incoming') {
             }
         }
     }//end if
-}
-else if ($vars['view'] == 'outgoing') {
+} elseif ($vars['view'] == 'outgoing') {
     if (count($smokeping_files['out'][$device['hostname']])) {
         $graph_array['type']   = 'device_smokeping_out_all_avg';
         $graph_array['device'] = $device['device_id'];

@@ -34,8 +34,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_list[$i]['colour']   = $vars['colour'];
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

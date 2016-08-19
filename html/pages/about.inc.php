@@ -10,7 +10,7 @@ $git_log = `git log -10`;
         <h4 class="modal-title" id="myModalLabel">Local git log</h4>
       </div>
       <div class="modal-body">
-	<pre><?php echo htmlspecialchars($git_log, ENT_COMPAT,'ISO-8859-1', true); ?></pre>
+    <pre><?php echo htmlspecialchars($git_log, ENT_COMPAT, 'ISO-8859-1', true); ?></pre>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -71,15 +71,13 @@ $stat_vlans = dbFetchCell('SELECT COUNT(vlan_id) FROM `vlans`');
 $callback_status = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'enabled'");
 if ($callback_status == 1) {
      $stats_checked = 'checked';
-}
-else {
+} else {
      $stats_checked = '';
 }
 
 if (extension_loaded('curl')) {
     $callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
-}
-else {
+} else {
     $callback = "PHP Curl module isn't installed, please install this, restart your web service and refresh this page.";
 }
 
