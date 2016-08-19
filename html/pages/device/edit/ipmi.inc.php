@@ -8,37 +8,32 @@ if ($_POST['editing']) {
 
         if ($ipmi_hostname != '') {
             set_dev_attrib($device, 'ipmi_hostname', $ipmi_hostname);
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'ipmi_hostname');
         }
 
         if ($ipmi_username != '') {
             set_dev_attrib($device, 'ipmi_username', $ipmi_username);
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'ipmi_username');
         }
 
         if ($ipmi_password != '') {
             set_dev_attrib($device, 'ipmi_password', $ipmi_password);
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'ipmi_password');
         }
 
         $update_message = 'Device IPMI data updated.';
         $updated        = 1;
-    }
-    else {
+    } else {
         include 'includes/error-no-perm.inc.php';
     }//end if
 }//end if
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-else if ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 

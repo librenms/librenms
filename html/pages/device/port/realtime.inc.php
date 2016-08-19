@@ -6,8 +6,7 @@ $no_refresh = true;
 if (!isset($vars['interval'])) {
     if ($device['os'] == 'linux') {
         $vars['interval'] = '15';
-    }
-    else {
+    } else {
         $vars['interval'] = '2';
     }
 }

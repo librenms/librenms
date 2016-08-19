@@ -1,6 +1,6 @@
 <?php
 session_start();
-if( empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
+if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
 } else {
     $_SESSION = $_POST;
@@ -9,7 +9,7 @@ if( empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 $stage = $_POST['stage'];
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if(file_exists('../config.php') && $stage != "6") {
+if (file_exists('../config.php') && $stage != "6") {
     header("Location: /");
     exit;
 }
@@ -18,8 +18,7 @@ if(file_exists('../config.php') && $stage != "6") {
 // $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
 if (PHP_VERSION_ID < 70000) {
     $modules = array('gd','mysql','snmp','mcrypt');
-}
-else {
+} else {
     $modules = array('gd','mysqli','snmp','mcrypt');
 }
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
@@ -30,7 +29,7 @@ $add_user = @$_POST['add_user'] ?: '';
 $add_pass = @$_POST['add_pass'] ?: '';
 $add_email = @$_POST['add_email'] ?: '';
 
-if($stage == "4" || $stage == "3") {
+if ($stage == "4" || $stage == "3") {
     // Ok now let's set the db connection up
     $config['db_host']=$dbhost;
     $config['db_user']=$dbuser;
@@ -41,55 +40,52 @@ if($stage == "4" || $stage == "3") {
 require '../includes/defaults.inc.php';
 $config['db']['extension']='mysqli';
 // Work out the install directory
-$cur_dir = explode('/',__DIR__);
+$cur_dir = explode('/', __DIR__);
 $check = end($cur_dir);
-if( empty($check) ) {
+if (empty($check)) {
     $install_dir = array_pop($cur_dir);
 }
 unset($check);
 $install_dir = array_pop($cur_dir);
-$install_dir = implode('/',$cur_dir);
+$install_dir = implode('/', $cur_dir);
 $config['install_dir'] = $install_dir;
 $config['log_dir'] = $install_dir.'/logs';
-if($_POST['stage'] == "3" || $_POST['stage'] == "4") {
+if ($_POST['stage'] == "3" || $_POST['stage'] == "4") {
     require_once '../includes/definitions.inc.php';
 }
 require '../includes/functions.php';
 require 'includes/functions.inc.php';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
-if($stage == 2 || $stage == 3) {
-    $database_link = mysqli_connect('p:'.$dbhost,$dbuser,$dbpass,$dbname);
-    if(mysqli_connect_error()) {
+if ($stage == 2 || $stage == 3) {
+    $database_link = mysqli_connect('p:'.$dbhost, $dbuser, $dbpass, $dbname);
+    if (mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
-    }
-    elseif ($stage != 3) {
-        if($_SESSION['build-ok'] == true) {
+    } elseif ($stage != 3) {
+        if ($_SESSION['build-ok'] == true) {
                     $stage = 3;
                     $msg = "It appears that the database is already setup so have moved onto stage $stage";
         }
     }
     $_SESSION['stage'] = $stage;
-}
-elseif($stage == "4") {
+} elseif ($stage == "4") {
     // Now check we have a username, password and email before adding new user
-    if(empty($add_user) || empty($add_pass) || empty($add_email)) {
+    if (empty($add_user) || empty($add_pass) || empty($add_email)) {
         $stage = 3;
         $msg = "You haven't entered enough information to add the user account, please check below and re-try";
     }
-}
-elseif($stage == "6") {
+} elseif ($stage == "6") {
     session_destroy();
     // If we get here then let's do some final checks.
-    if(!file_exists("../config.php")) {
+    if (!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = "5";
     }
 }
 
-if(empty($stage)) {
+if (empty($stage)) {
     $stage = '0';
 }
 
@@ -139,8 +135,7 @@ $complete = 1;
     </div>
 <?php
 
-if(!empty($msg)) {
-
+if (!empty($msg)) {
 ?>
     <div class="row">
       <div class="col-md-3">
@@ -172,8 +167,7 @@ if(!empty($msg)) {
 
 <?php
 
-if($stage == 0) {
-
+if ($stage == 0) {
 ?>
 
     <div class="row">
@@ -197,50 +191,46 @@ if($stage == 0) {
           </tr>
 <?php
 
-    foreach ($modules as $extension) {
-        if (extension_loaded("$extension")) {
-            $ext_loaded = 'yes';
-            $row_class = 'success';
-        }
-        else {
-            $ext_loaded = 'no';
-            $row_class = 'danger';
-            $complete = 0;
-        }
+foreach ($modules as $extension) {
+    if (extension_loaded("$extension")) {
+        $ext_loaded = 'yes';
+        $row_class = 'success';
+    } else {
+        $ext_loaded = 'no';
+        $row_class = 'danger';
+        $complete = 0;
+    }
 
-        echo("   <tr class='$row_class'>
+    echo("   <tr class='$row_class'>
             <td>$extension</td>
             <td>$ext_loaded</td>");
-        if($ext_loaded == 'no') {
-            echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
-        }
-        else {
-            echo("<td></td>");
-        }
-        echo("</tr>");
+    if ($ext_loaded == 'no') {
+        echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
+    } else {
+        echo("<td></td>");
     }
+    echo("</tr>");
+}
 
     // Check for pear install
     @include_once 'System.php';
 
-    if(class_exists('System') === true) {
-        $ext_loaded = 'yes';
-        $row_class = 'success';
-    }
-    else {
-        $ext_loaded = 'no';
-        $row_class = 'danger';
-    }
+if (class_exists('System') === true) {
+    $ext_loaded = 'yes';
+    $row_class = 'success';
+} else {
+    $ext_loaded = 'no';
+    $row_class = 'danger';
+}
 
     echo("     <tr class='$row_class'>
         <td>pear</td>
         <td>$ext_loaded</td>");
-    if($ext_loaded == 'no') {
-        echo("<td>apt-get install php-pear / yum install php-pear</td>");
-    }
-    else {
-        echo("<td></td>");
-    }
+if ($ext_loaded == 'no') {
+    echo("<td>apt-get install php-pear / yum install php-pear</td>");
+} else {
+    echo("<td></td>");
+}
     echo("</tr>");
 ?>
         </table>
@@ -254,7 +244,9 @@ if($stage == 0) {
       <div class="col-md-6">
         <form class="form-inline" role="form" method="post">
           <input type="hidden" name="stage" value="1">
-          <button type="submit" class="btn btn-success" <?php if($complete == '0') echo "disabled='disabled'"; ?>>Next Stage</button>
+          <button type="submit" class="btn btn-success" <?php if ($complete == '0') {
+                echo "disabled='disabled'";
+} ?>>Next Stage</button>
         </form>
       </div>
       <div class="col-md-3">
@@ -262,9 +254,7 @@ if($stage == 0) {
     </div>
 
 <?php
-}
-elseif($stage == 1) {
-
+} elseif ($stage == 1) {
 ?>
 
     <div class="row">
@@ -305,9 +295,7 @@ elseif($stage == 1) {
     </div>
 
 <?php
-
-}
-elseif($stage == "2") {
+} elseif ($stage == "2") {
 ?>
     <div class="row">
      <div class="col-md-3">
@@ -325,12 +313,11 @@ elseif($stage == "2") {
     $_SESSION['last'] = time();
     ob_end_flush();
     ob_start();
-    if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
-        require '../build-base.php';
-    }
-    else {
-        require '../includes/sql-schema/update.php';
-    }
+if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
+    require '../build-base.php';
+} else {
+    require '../includes/sql-schema/update.php';
+}
     $_SESSION['out'] .= ob_get_clean();
     ob_end_clean();
     ob_start();
@@ -359,9 +346,7 @@ elseif($stage == "2") {
       </div>
     </div>
 <?php
-}
-elseif($stage == "5") {
-
+} elseif ($stage == "5") {
 ?>
     <div class="row">
       <div class="col-md-3">
@@ -419,20 +404,18 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;
 EOD;
 
-if(!file_exists("../config.php")) {
+if (!file_exists("../config.php")) {
     $conf = fopen("../config.php", 'w');
     if ($conf != false) {
-        if(fwrite($conf, "<?php\n") === FALSE) {
+        if (fwrite($conf, "<?php\n") === false) {
             echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
             echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
-        }
-        else {
+        } else {
             $config_file = stripslashes($config_file);
-            fwrite($conf,$config_file);
+            fwrite($conf, $config_file);
             echo("<div class='alert alert-success'>The config file has been created</div>");
         }
-    }
-    else {
+    } else {
         echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
         echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
     }
@@ -454,9 +437,7 @@ if(!file_exists("../config.php")) {
       </div>
     </div>
 <?php
-
-}
-elseif($stage == "3") {
+} elseif ($stage == "3") {
 ?>
     <div class="row">
       <div class="col-md-3">
@@ -493,8 +474,7 @@ elseif($stage == "3") {
       </div>
     </div>
 <?php
-}
-elseif($stage == "4") {
+} elseif ($stage == "4") {
     $proceed = 1;
 ?>
     <div class="row">
@@ -503,23 +483,20 @@ elseif($stage == "4") {
       <div class="col-md-6">
 <?php
     require 'includes/authenticate.inc.php';
-    if (auth_usermanagement()) {
-        if (!user_exists($add_user)) {
-            if (adduser($add_user,$add_pass,'10',$add_email)) {
-                echo("<div class='alert alert-success'>User has been added successfully</div>");
-                $proceed = 0;
-            }
-            else {
-                echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
-            }
+if (auth_usermanagement()) {
+    if (!user_exists($add_user)) {
+        if (adduser($add_user, $add_pass, '10', $add_email)) {
+            echo("<div class='alert alert-success'>User has been added successfully</div>");
+            $proceed = 0;
+        } else {
+            echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
         }
-        else {
-            echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
-        }
+    } else {
+        echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
     }
-    else {
-        echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
-    }
+} else {
+    echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
+}
 
 ?>
         <form class="form-horizontal" role="form" method="post">
@@ -528,15 +505,16 @@ elseif($stage == "4") {
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
-          <button type="submit" class="btn btn-success" <?php if($proceed == "1") echo "disabled='disabled'"; ?>>Generate Config</button>
+          <button type="submit" class="btn btn-success" <?php if ($proceed == "1") {
+                echo "disabled='disabled'";
+} ?>>Generate Config</button>
         </form>
       </div>
       <div class="col-md-3">
       </div>
     </div>
 <?php
-}
-elseif($stage == "6") {
+} elseif ($stage == "6") {
 ?>
     <div class="row">
         <div class="col-md-offset-3 col-md-6">

@@ -127,13 +127,21 @@ include 'includes/modal/new_bill.inc.php';
                     </select>
                     <select name='bill_type' id='bill_type' class="form-control input-sm">
                       <option value=''>All Types</option>
-                      <option value='cdr' <?php if ($_GET['bill_type'] === 'cdr') { echo 'selected'; } ?>>CDR</option>
-                      <option value='quota' <?php if ($_GET['bill_type'] === 'quota') { echo 'selected'; } ?>>Quota</option>
+                      <option value='cdr' <?php if ($_GET['bill_type'] === 'cdr') {
+                            echo 'selected';
+} ?>>CDR</option>
+                      <option value='quota' <?php if ($_GET['bill_type'] === 'quota') {
+                            echo 'selected';
+} ?>>Quota</option>
                     </select>
                     <select name='state' id='state' class="form-control input-sm">
                       <option value=''>All States</option>
-                      <option value='under' <?php if ($_GET['state'] === 'under') { echo 'selected'; } ?>>Under Quota</option>
-                      <option value='over' <?php if ($_GET['state'] === 'over') { echo 'selected'; } ?>>Over Quota</option>
+                      <option value='under' <?php if ($_GET['state'] === 'under') {
+                            echo 'selected';
+} ?>>Under Quota</option>
+                      <option value='over' <?php if ($_GET['state'] === 'over') {
+                            echo 'selected';
+} ?>>Over Quota</option>
                     </select>
                   </fieldset>
                 </span>
@@ -165,13 +173,13 @@ include 'includes/modal/new_bill.inc.php';
     });
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });
         
-<?php 
-    if ($vars['view'] == 'add') {
-?>
-        $(function() {
-            $('#create-bill').modal('show');    
-        });
 <?php
-    }    
+if ($vars['view'] == 'add') {
+?>
+$(function() {
+    $('#create-bill').modal('show');    
+});
+<?php
+}
 ?>
 </script>

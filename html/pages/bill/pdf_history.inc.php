@@ -35,8 +35,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_hist` WHERE `bill_id`= ? AND `id` = ? 
             $history['in']        = format_number($row['rate_95th_in'], $config['billing']['base']).'B';
             $history['out']       = format_number($row['rate_95th_out'], $config['billing']['base']).'B';
             $history['overusage'] = (($row['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$history['background']['left'].'; ">'.format_number(($row['bill_overuse'] * 1000)).'</span>' );
-        }
-        else {
+        } else {
             $history['allowed']   = formatStorage(($row['bill_allowed'] * $config['billing']['base'] * $config['billing']['base']));
             $history['used']      = formatStorage(($row['traf_total'] * $config['billing']['base'] * $config['billing']['base']));
             $history['in']        = formatStorage(($row['traf_in'] * $config['billing']['base'] * $config['billing']['base']));
@@ -91,33 +90,32 @@ $html .= $css;
 // GB Convert (1000 vs 1024)
 
 
-function gbConvert($data) {
+function gbConvert($data)
+{
     global $config;
 
     $count = strlen($data);
     $div   = floor($count / 4);
     $res   = round(($data / pow(1000, $div) * pow($config['billing']['base'], $div)));
     return $res;
-
 }//end gbConvert()
 
 
 // Generate graphs
 
 
-function genGraphs($bill_id, $imgtype, $from, $to, $bittype='Quota') {
+function genGraphs($bill_id, $imgtype, $from, $to, $bittype = 'Quota')
+{
     $http = ((empty($_SERVER['HTTPS'])) ? 'http' : 'https' );
     $res  = $http.'://'.$_SERVER['HTTP_HOST'].'/';
     if ($imgtype == 'bitrate') {
         $res .= 'billing-graph.php?bill_id='.$bill_id;
         if ($bittype == 'Quota') {
             $res .= '&ave=yes';
-        }
-        else if ($bittype == 'CDR') {
+        } elseif ($bittype == 'CDR') {
             $res .= '&95th=yes';
         }
-    }
-    else {
+    } else {
         $res .= 'bandwidth-graph.php?bill_id='.$bill_id;
     }
 
@@ -129,14 +127,14 @@ function genGraphs($bill_id, $imgtype, $from, $to, $bittype='Quota') {
     }
 
     return $res;
-
 }//end genGraphs()
 
 
 // Device Information
 
 
-function listBillPorts($bill_id) {
+function listBillPorts($bill_id)
+{
     $device = array();
     $res    = '';
     $res   .= '<table>';
@@ -170,14 +168,14 @@ function listBillPorts($bill_id) {
 
     $res .= '</table>';
     return $res;
-
 }//end listBillPorts()
 
 
 // Bitrate Graph overview
 
 
-function graphOverviewBitrate($bill_id, $history) {
+function graphOverviewBitrate($bill_id, $history)
+{
     global $pdf;
     $img = array();
 
@@ -186,14 +184,14 @@ function graphOverviewBitrate($bill_id, $history) {
     $res            = '';
     $res           .= '<tcpdf method="Image" params="'.$bitrate.'" />';
     return $res;
-
 }//end graphOverviewBitrate()
 
 
 // Transfer Graph overview
 
 
-function graphOverviewTransfer($bill_id, $history) {
+function graphOverviewTransfer($bill_id, $history)
+{
     global $pdf;
     $img = array();
 
@@ -205,14 +203,14 @@ function graphOverviewTransfer($bill_id, $history) {
     $res           .= '<tcpdf method="Image" params="'.$bw_day.'" />';
     $res           .= '<tcpdf method="Image" params="'.$bw_hour.'" />';
     return $res;
-
 }//end graphOverviewTransfer()
 
 
 // Transfer overview
 
 
-function transferOverview($bill_id, $history) {
+function transferOverview($bill_id, $history)
+{
     global $list_colour_a, $list_colour_b, $config;
 
     $i     = 0;
@@ -258,7 +256,6 @@ function transferOverview($bill_id, $history) {
     $res       .= '  </tr>';
     $res       .= '</table>';
     return $res;
-
 }//end transferOverview()
 
 

@@ -6,8 +6,7 @@ if ($_SESSION['userlevel'] >= '10') {
     foreach (dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `authlog` ORDER BY `datetime` DESC LIMIT 0,250") as $entry) {
         if ($bg == $list_colour_a) {
             $bg = $list_colour_b;
-        }
-        else {
+        } else {
             $bg = $list_colour_a;
         }
 
@@ -30,7 +29,6 @@ if ($_SESSION['userlevel'] >= '10') {
     $pagetitle[] = 'Authlog';
 
     echo '</table>';
-}
-else {
+} else {
     include 'includes/error-no-perm.inc.php';
 }//end if

@@ -2,8 +2,7 @@
 
 if ($device['status'] == '0') {
     $class = 'alert-danger';
-}
-else {
+} else {
     $class = '';
 }
 
@@ -40,11 +39,9 @@ echo '
 
 if (isset($config['os'][$device['os']]['over'])) {
     $graphs = $config['os'][$device['os']]['over'];
-}
-else if (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
+} elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
     $graphs = $config['os'][$device['os_group']]['over'];
-}
-else {
+} else {
     $graphs = $config['os']['default']['over'];
 }
 

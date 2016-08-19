@@ -9,10 +9,14 @@
   <label class="col-sm-4 control-label" for="bill_type">Billing Type</label>
   <div class="col-sm-8">
     <label class="radio-inline">
-      <input type="radio" name="bill_type" id="bill_type_cdr" value="cdr" <?php if ($bill_data['bill_type'] == 'cdr') { echo "checked"; } ?> onchange="javascript: billType();" /> CDR 95th
+      <input type="radio" name="bill_type" id="bill_type_cdr" value="cdr" <?php if ($bill_data['bill_type'] == 'cdr') {
+            echo "checked";
+} ?> onchange="javascript: billType();" /> CDR 95th
     </label>
     <label class="radio-inline">
-      <input type="radio" name="bill_type" id="bill_type_quota" value="quota" <?php if ($bill_data['bill_type'] == 'quota') { echo "checked"; } ?> onchange="javascript: billType();" /> Quota
+      <input type="radio" name="bill_type" id="bill_type_quota" value="quota" <?php if ($bill_data['bill_type'] == 'quota') {
+            echo "checked";
+} ?> onchange="javascript: billType();" /> Quota
     </label>
   </div>
 </div>
@@ -49,10 +53,10 @@
   <div class="col-sm-2">
     <select name="bill_day" class="form-control input-sm">
     <?php
-        for ($x = 1; $x < 32; $x++) {
-            $sel = $bill_data['bill_day'] == $x ? "selected " : "";
-            echo "<option $sel value='$x'>$x</option>\n";
-        }
+    for ($x = 1; $x < 32; $x++) {
+        $sel = $bill_data['bill_day'] == $x ? "selected " : "";
+        echo "<option $sel value='$x'>$x</option>\n";
+    }
     ?>
     </select>
   </div>

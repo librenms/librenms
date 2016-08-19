@@ -11,7 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (defined('show_settings')) {
+if (defined('SHOW_SETTINGS')) {
     $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
 
@@ -98,7 +98,6 @@ if (defined('show_settings')) {
                     <label class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</label>
                 </a>';
             }
-
         }
     }
 

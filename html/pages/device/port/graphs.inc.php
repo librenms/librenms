@@ -1,6 +1,6 @@
 <?php
 
-if (file_exists(get_port_rrdfile_path ($device['hostname'], $port['port_id']))) {
+if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id']))) {
     $iid = $id;
     echo '<div class="panel panel-default">
             <div class="panel-heading">
@@ -41,7 +41,7 @@ if (file_exists(get_port_rrdfile_path ($device['hostname'], $port['port_id']))) 
         include 'includes/print-interface-graphs.inc.php';
     echo '</div></div>';
 
-    if (is_file(get_port_rrdfile_path ($device['hostname'], $port['port_id'], 'dot3'))) {
+    if (is_file(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Ethernet Errors</h3>

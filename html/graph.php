@@ -22,8 +22,7 @@ if (isset($_GET['debug'])) {
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -40,8 +39,8 @@ require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/rrdtool.inc.php';
-if($config['allow_unauth_graphs'] != true) {
-  require_once 'includes/authenticate.inc.php';
+if ($config['allow_unauth_graphs'] != true) {
+    require_once 'includes/authenticate.inc.php';
 }
 require 'includes/graphs/graph.inc.php';
 
