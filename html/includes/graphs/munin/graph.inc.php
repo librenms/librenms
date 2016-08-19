@@ -8,8 +8,7 @@ require 'includes/graphs/common.inc.php';
 
 if ($width > '500') {
     $descr_len = 24;
-}
-else {
+} else {
     $descr_len  = 14;
     $descr_len += round(($width - 230) / 8.2);
 }
@@ -17,8 +16,7 @@ else {
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len)."   Current   Average  Maximum\l'";
     $rrd_options .= " COMMENT:'\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len)."   Current   Average  Maximum\l'";
 }
 
@@ -43,8 +41,7 @@ foreach ($dbq as $ds) {
 
             $colour = $config['graph_colours']['mixed'][$c_i];
             $c_i++;
-        }
-        else {
+        } else {
             $colour = $ds['colour'];
         }
 

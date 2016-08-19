@@ -16,7 +16,7 @@ $component = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'ntp';
-$components = $component->getComponents(null,$options);
+$components = $component->getComponents(null, $options);
 
 print_optionbar_start();
 
@@ -93,75 +93,74 @@ print_optionbar_end();
 <?php
     $count = 0;
     // Loop through each device in the componenet array
-    foreach ($components as $devid => $comp) {
-        $device = device_by_id_cache($devid);
+foreach ($components as $devid => $comp) {
+    $device = device_by_id_cache($devid);
 
-        // Loop through each component
-        foreach ($comp as $compid => $array) {
-            $display = true;
-            if ($vars['view'] == 'error') {
-                // Only display peers with errors
-                if ($array['status'] != 2) {
-                    $display = false;
-                }
+    // Loop through each component
+    foreach ($comp as $compid => $array) {
+        $display = true;
+        if ($vars['view'] == 'error') {
+            // Only display peers with errors
+            if ($array['status'] != 2) {
+                $display = false;
             }
-            if ($array['status'] == 2) {
-                $status = 'class="danger"';
-            } else {
-                $status = '';
-            }
+        }
+        if ($array['status'] == 2) {
+            $status = 'class="danger"';
+        } else {
+            $status = '';
+        }
 
-            if ($display === true) {
-                $link = generate_device_link($device,null,array('tab' => 'apps', 'app' => 'ntp'));
-                $count++;
+        if ($display === true) {
+            $link = generate_device_link($device, null, array('tab' => 'apps', 'app' => 'ntp'));
+            $count++;
 ?>
-    <tr <?php echo $status; ?>>
-        <td><?php echo $link; ?></td>
-        <td><?php echo $array['peer']; ?></td>
-        <td><?php echo $array['stratum']; ?></td>
-        <td><?php echo $array['error']; ?></td>
-    </tr>
+<tr <?php echo $status; ?>>
+    <td><?php echo $link; ?></td>
+    <td><?php echo $array['peer']; ?></td>
+    <td><?php echo $array['stratum']; ?></td>
+    <td><?php echo $array['error']; ?></td>
+</tr>
 <?php
-                $graph_array = array();
-                $graph_array['device'] = $device['device_id'];
-                $graph_array['height'] = '100';
-                $graph_array['width']  = '215';
-                $graph_array['to']     = $config['time']['now'];
+            $graph_array = array();
+            $graph_array['device'] = $device['device_id'];
+            $graph_array['height'] = '100';
+            $graph_array['width']  = '215';
+            $graph_array['to']     = $config['time']['now'];
 
-                // Which graph type do we want?
-                if ($vars['graph'] == "stratum") {
-                    $graph_array['type']   = 'device_ntp_stratum';
-                } elseif ($vars['graph'] == "offset") {
-                    $graph_array['type']   = 'device_ntp_offset';
-                } elseif ($vars['graph'] == "delay") {
-                    $graph_array['type']   = 'device_ntp_delay';
-                } elseif ($vars['graph'] == "dispersion") {
-                    $graph_array['type']   = 'device_ntp_dispersion';
-                } else {
-                    // No Graph
-                    unset($graph_array);
-                }
+            // Which graph type do we want?
+if ($vars['graph'] == "stratum") {
+    $graph_array['type']   = 'device_ntp_stratum';
+} elseif ($vars['graph'] == "offset") {
+    $graph_array['type']   = 'device_ntp_offset';
+} elseif ($vars['graph'] == "delay") {
+    $graph_array['type']   = 'device_ntp_delay';
+} elseif ($vars['graph'] == "dispersion") {
+    $graph_array['type']   = 'device_ntp_dispersion';
+} else {
+    // No Graph
+    unset($graph_array);
+}
 
-                // Do we want a graph.
-                if (is_array($graph_array)) {
-                    echo '<tr>';
-                    echo '<td colspan="4">';
-                    require 'includes/print-graphrow.inc.php';
-                    echo '</td>';
-                    echo '</tr>';
-                }
-
-            } // End if display
-        } // End foreach component
-    } // End foreach device
+            // Do we want a graph.
+if (is_array($graph_array)) {
+    echo '<tr>';
+    echo '<td colspan="4">';
+    require 'includes/print-graphrow.inc.php';
+    echo '</td>';
+    echo '</tr>';
+}
+        } // End if display
+    } // End foreach component
+} // End foreach device
 
     // If there are no results, let the user know.
-    if ($count == 0) {
+if ($count == 0) {
 ?>
-        <tr>
-            <td colspan="4" align="center">No Matching NTP Peers</td>
-        </tr>
+<tr>
+    <td colspan="4" align="center">No Matching NTP Peers</td>
+</tr>
 <?php
-    }
+}
 ?>
 </table>

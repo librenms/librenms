@@ -19,8 +19,7 @@ echo '
           </tr>
         </thead>';
 foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'") as $instance) {
-
-	$device             = device_by_id_cache($instance['device_id']);
+    $device             = device_by_id_cache($instance['device_id']);
     $area_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '" . $device['device_id'] . "'");
     $port_count         = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '" . $device['device_id'] . "'");
     $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '" . $device['device_id'] . "'");
@@ -40,7 +39,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'en
         $asbr_status_color = 'success';
     }
 
-   echo '
+    echo '
         <tbody>
           <tr>
             <td></td>

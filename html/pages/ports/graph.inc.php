@@ -3,8 +3,7 @@
 foreach ($ports as $port) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 
@@ -16,8 +15,7 @@ foreach ($ports as $port) {
 
     if ($port['in_errors'] > 0 || $port['out_errors'] > 0) {
         $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
-    }
-    else {
+    } else {
         $error_img = '';
     }
 
@@ -28,15 +26,13 @@ foreach ($ports as $port) {
 
         if ($_SESSION['widescreen']) {
             $width = 357;
-        }
-        else {
+        } else {
             $width = 315;
         }
 
         if ($_SESSION['widescreen']) {
             $width_div = 438;
-        }
-        else {
+        } else {
             $width_div = 393;
         }
 

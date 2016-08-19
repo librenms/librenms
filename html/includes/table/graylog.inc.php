@@ -17,8 +17,7 @@ $filter_range = mres($_POST['range']);
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $query = 'message:"'.$searchPhrase.'"';
-}
-else {
+} else {
     $query = '*';
 }
 
@@ -52,7 +51,7 @@ $context = stream_context_create(array(
     )
 ));
 
-$messages = json_decode(file_get_contents($graylog_url, false, $context),true);
+$messages = json_decode(file_get_contents($graylog_url, false, $context), true);
 
 foreach ($messages['messages'] as $message) {
     $response[] = array(
@@ -66,8 +65,7 @@ foreach ($messages['messages'] as $message) {
 
 if (empty($messages['total_results'])) {
     $total = 0;
-}
-else {
+} else {
     $total = $messages['total_results'];
 }
 

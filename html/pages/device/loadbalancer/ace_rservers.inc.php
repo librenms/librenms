@@ -59,15 +59,13 @@ $i = '0';
 foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = ? ORDER BY `farm_id`', array($device['device_id'])) as $rserver) {
     if (is_integer($i / 2)) {
         $bg_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $bg_colour = $list_colour_b;
     }
 
     if ($rserver['StateDescr'] == 'Server is now operational') {
         $rserver_class = 'green';
-    }
-    else {
+    } else {
         $rserver_class = 'red';
     }
 

@@ -8,8 +8,7 @@ if ($format == 'octets' || $format == 'bytes') {
     $units  = 'Bps';
     $format = 'bits';
     // FIXME bits? or bytes?
-}
-else {
+} else {
     $units  = 'bps';
     $format = 'bits';
 }

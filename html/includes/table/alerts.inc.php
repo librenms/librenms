@@ -20,7 +20,7 @@ $alert_severities = array(
     'critical' => 3
 );
 
-$show_recovered = FALSE;
+$show_recovered = false;
 
 if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`='.$_POST['device_id'];
@@ -34,15 +34,14 @@ if (is_numeric($_POST['acknowledged'])) {
 if (is_numeric($_POST['state'])) {
     $where .= " AND `alerts`.`state`=".$_POST['state'];
     if ($_POST['state'] == $alert_states['recovered']) {
-        $show_recovered = TRUE;
+        $show_recovered = true;
     }
 }
 
 if (isset($_POST['min_severity'])) {
     if (is_numeric($_POST['min_severity'])) {
         $min_severity_id = $_POST['min_severity'];
-    }
-    else if (!empty($_POST['min_severity'])) {
+    } elseif (!empty($_POST['min_severity'])) {
         $min_severity_id = $alert_severities[$_POST['min_severity']];
     }
     if (isset($min_severity_id)) {
@@ -117,20 +116,17 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $col   = 'green';
         $extra = 'success';
         $msg   = 'ok';
-    }
-    else if ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
+    } elseif ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
         $ico   = 'volume-up';
         $col   = 'red';
         $extra = 'danger';
         $msg   = 'alert';
         if ((int) $alert['state'] === 3) {
             $msg = 'worse';
-        }
-        else if ((int) $alert['state'] === 4) {
+        } elseif ((int) $alert['state'] === 4) {
             $msg = 'better';
         }
-    }
-    else if ((int) $alert['state'] === 2) {
+    } elseif ((int) $alert['state'] === 2) {
         $ico   = 'volume-off';
         $col   = '#800080';
         $extra = 'warning';
@@ -144,8 +140,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $severity = $alert['severity'];
     if ($alert['state'] == 3) {
         $severity .= ' <strong>+</strong>';
-    }
-    else if ($alert['state'] == 4) {
+    } elseif ($alert['state'] == 4) {
         $severity .= ' <strong>-</strong>';
     }
 

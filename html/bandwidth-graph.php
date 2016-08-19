@@ -20,8 +20,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -53,17 +52,14 @@ if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
             $bill_id = $_GET['bill_id'];
-        }
-        else {
+        } else {
             echo 'Unauthorised Access Prohibited.';
             exit;
         }
-    }
-    else {
+    } else {
         $bill_id = $_GET['bill_id'];
     }
-}
-else {
+} else {
     echo 'Unauthorised Access Prohibited.';
     exit;
 }
@@ -76,8 +72,7 @@ if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
     }
     $start        = $histrow['from'];
     $end          = $histrow['to'];
-} 
-else {
+} else {
     $start        = $_GET[from];
     $end          = $_GET[to];
 }
@@ -105,7 +100,7 @@ if ($imgtype == 'historical') {
     $i = '0';
 
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', array($bill_id)) as $data) {
-    $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
+        $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
         $dateto        = strftime('%e %b %Y', strtotime($data['bill_dateto']));
         $datelabel     = $datefrom."\n".$dateto;
         $traf['in']    = $data['traf_in'];
@@ -115,8 +110,7 @@ if ($imgtype == 'historical') {
         if ($data['bill_type'] == 'Quota') {
             $traf['allowed'] = $data['bill_allowed'];
             $traf['overuse'] = $data['bill_overuse'];
-        }
-        else {
+        } else {
             $traf['allowed'] = '0';
             $traf['overuse'] = '0';
         }
@@ -146,8 +140,7 @@ if ($imgtype == 'historical') {
 
     $yaxistitle = 'Gigabytes';
     $graph_name = 'Historical bandwidth over the last 12 billing periods';
-}
-else {
+} else {
     $data    = array();
     $average = 0;
     if ($imgtype == 'day') {
@@ -173,8 +166,7 @@ else {
                 array_push($tot_data, 0);
             }
         }
-    }
-    else if ($imgtype == 'hour') {
+    } elseif ($imgtype == 'hour') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC', array($bill_id, $start, $end)) as $data) {
             $traf['in']    = (isset($data['traf_in']) ? $data['traf_in'] : 0);
             $traf['out']   = (isset($data['traf_out']) ? $data['traf_out'] : 0);
@@ -261,8 +253,7 @@ if ($imgtype == 'historical') {
     $lineplot_allow->SetWeight(1);
 
     $gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
-}
-else {
+} else {
     $lineplot_allow = new LinePlot($ave_data);
     // $lineplot_allow->SetLegend("Average per ".$imgtype);
     $lineplot_allow->SetLegend('Average');
