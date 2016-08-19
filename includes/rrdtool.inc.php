@@ -75,8 +75,11 @@ function rrdtool_terminate() {
  */
 function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
-    d_echo(stream_get_contents($rrd_pipes[1]));
-    d_echo(stream_get_contents($rrd_pipes[2]));
+    global $vdebug;
+    if ($vdebug) {
+        d_echo(stream_get_contents($rrd_pipes[1]));
+        d_echo(stream_get_contents($rrd_pipes[2]));
+    }
 
     fclose($rrd_pipes[0]);
     fclose($rrd_pipes[1]);
@@ -220,6 +223,9 @@ function rrdtool_build_command($command, $filename, $options)
         !($command == 'create' && version_compare($config['rrdtool_version'], '1.5.5', '<')) &&
         !($command == 'tune' && $config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '<'))
     ) {
+        // only relative paths if using rrdcached
+        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+
         return "$command $filename $options --daemon " . $config['rrdcached'];
     }
 

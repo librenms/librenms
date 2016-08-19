@@ -36,27 +36,28 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         global $config;
         $config['rrdcached'] = '';
         $config['rrdtool_version'] = '1.4';
+        $config['rrd_dir'] = '/opt/librenms/rrd';
 
-        $cmd = rrdtool_build_command('create', 'f', 'o');
-        $this->assertEquals('create f o', $cmd);
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('tune', 'f', 'o');
-        $this->assertEquals('tune f o', $cmd);
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('update', 'f', 'o');
-        $this->assertEquals('update f o', $cmd);
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
 
 
         $config['rrdtool_version'] = '1.6';
 
-        $cmd = rrdtool_build_command('create', 'f', 'o');
-        $this->assertEquals('create f o -O', $cmd);
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('create /opt/librenms/rrd/f o -O', $cmd);
 
-        $cmd = rrdtool_build_command('tune', 'f', 'o');
-        $this->assertEquals('tune f o', $cmd);
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('update', 'f', 'o');
-        $this->assertEquals('update f o', $cmd);
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
     }
 
     public function testBuildCommandRemote()
@@ -64,26 +65,27 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         global $config;
         $config['rrdcached'] = 'server:42217';
         $config['rrdtool_version'] = '1.4';
+        $config['rrd_dir'] = '/opt/librenms/rrd';
 
-        $cmd = rrdtool_build_command('create', 'f', 'o');
-        $this->assertEquals('create f o', $cmd);
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('tune', 'f', 'o');
-        $this->assertEquals('tune f o', $cmd);
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
+        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('update', 'f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
 
 
         $config['rrdtool_version'] = '1.6';
 
-        $cmd = rrdtool_build_command('create', 'f', 'o');
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create f o -O --daemon server:42217', $cmd);
 
-        $cmd = rrdtool_build_command('tune', 'f', 'o');
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('tune f o --daemon server:42217', $cmd);
 
-        $cmd = rrdtool_build_command('update', 'f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
 
     }
@@ -95,6 +97,7 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         $config['rrdtool_version'] = '1.4';
 
         $this->setExpectedException('FileExistsException');
+        // use this file, since it is guaranteed to exist
         rrdtool_build_command('create', __FILE__, 'o');
     }
 
