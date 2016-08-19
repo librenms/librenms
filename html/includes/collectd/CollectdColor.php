@@ -1,4 +1,25 @@
 <?php
+/**
+ * CollectdColor.php
+ *
+ * Color functions class for Collectd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ */
 namespace LibreNMS;
 
 class CollectdColor
@@ -29,8 +50,11 @@ class CollectdColor
                     if ($value == 'random') {
                         $this->randomize();
                     } else {
-                        if (preg_match('/([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])/',
-                            $value, $matches)) {
+                        if (preg_match(
+                            '/([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])/',
+                            $value,
+                            $matches
+                        )) {
                             $this->r = (('0x' . $matches[1]) / 255.0);
                             $this->g = (('0x' . $matches[2]) / 255.0);
                             $this->b = (('0x' . $matches[3]) / 255.0);
@@ -45,7 +69,6 @@ class CollectdColor
                 }
             }
         }//end if
-
     }//end __construct()
 
 
@@ -64,7 +87,6 @@ class CollectdColor
         }
 
         $this->b = ($min + ((rand(0, 255) / 255.0) * ($max - $min)));
-
     }//end randomize()
 
 
@@ -83,7 +105,6 @@ class CollectdColor
         $this->r = ($alpha * $this->r + ((1.0 - $alpha) * $bg_r));
         $this->g = ($alpha * $this->g + ((1.0 - $alpha) * $bg_g));
         $this->b = ($alpha * $this->b + ((1.0 - $alpha) * $bg_b));
-
     }//end fade()
 
 
@@ -94,7 +115,6 @@ class CollectdColor
             'g' => $this->g,
             'b' => $this->b,
         );
-
     }//end as_array()
 
 
@@ -104,6 +124,5 @@ class CollectdColor
         $g = (int)($this->g * 255);
         $b = (int)($this->b * 255);
         return sprintf('%02x%02x%02x', $r > 255 ? 255 : $r, $g > 255 ? 255 : $g, $b > 255 ? 255 : $b);
-
     }
 }

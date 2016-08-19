@@ -18,15 +18,13 @@ if ($_POST['hostname']) {
         $hostname = mres($_POST['hostname']);
         if ($_POST['port']) {
             $port = mres($_POST['port']);
-        }
-        else {
+        } else {
             $port = $config['snmp']['port'];
         }
 
         if ($_POST['transport']) {
             $transport = mres($_POST['transport']);
-        }
-        else {
+        } else {
             $transport = 'udp';
         }
 
@@ -37,8 +35,7 @@ if ($_POST['hostname']) {
 
             $snmpver = mres($_POST['snmpver']);
             print_message("Adding host $hostname communit".(count($config['snmp']['community']) == 1 ? 'y' : 'ies').' '.implode(', ', $config['snmp']['community'])." port $port using $transport");
-        }
-        else if ($_POST['snmpver'] === 'v3') {
+        } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
                    'authlevel'  => mres($_POST['authlevel']),
                    'authname'   => mres($_POST['authname']),
@@ -52,8 +49,7 @@ if ($_POST['hostname']) {
 
             $snmpver = 'v3';
             print_message("Adding SNMPv3 host $hostname port $port");
-        }
-        else {
+        } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
         $poller_group = $_POST['poller_group'];
@@ -68,11 +64,10 @@ if ($_POST['hostname']) {
             foreach ($e->getReasons() as $reason) {
                 print_error($reason);
             }
-        } catch (Exception $e){
+        } catch (Exception $e) {
             print_error($e->getMessage());
         }
-    }
-    else {
+    } else {
         print_error("You don't have the necessary privileges to add hosts.");
     }//end if
     echo '    </div>
@@ -135,8 +130,9 @@ foreach ($config['snmp']['transports'] as $transport) {
 
 foreach (get_port_assoc_modes() as $mode) {
     $selected = "";
-    if ($mode == $config['default_port_association_mode'])
+    if ($mode == $config['default_port_association_mode']) {
         $selected = "selected";
+    }
 
     echo "          <option value=\"$mode\" $selected>$mode</option>\n";
 }

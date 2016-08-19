@@ -52,8 +52,7 @@ switch ($vars['order']) {
 
 if ($vars['by'] == 'desc') {
     $by = 'desc';
-}
-else {
+} else {
     $by = 'asc';
 }
 
@@ -77,8 +76,7 @@ foreach ($heads as $head => $extra) {
         if ($by == 'asc') {
             $bhead = 'desc';
             $icon .= 'up';
-        }
-        else {
+        } else {
             $icon .= 'down';
         }
 
@@ -88,8 +86,7 @@ foreach ($heads as $head => $extra) {
     echo '<th><a href="' . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'processes', 'order'=>$lhead, 'by'=>$bhead)) . '"><span'.$icon.'>&nbsp;';
     if (!empty($extra)) {
         echo "<abbr title='$extra'>$head</abbr>";
-    }
-    else {
+    } else {
         echo $head;
     }
 

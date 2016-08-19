@@ -31,14 +31,12 @@ if (!empty($ifName) && is_numeric($port_id)) {
         if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName:'.$ifName);
             log_event("$ifName Port ifAlias cleared manually", $device, 'interface', $port_id);
-        }
-        else {
+        } else {
             set_dev_attrib($device, 'ifName:'.$ifName, 1);
             log_event("$ifName Port ifAlias set manually: $descr", $device, 'interface', $port_id);
         }
         $status = 'ok';
-    }
-    else {
+    } else {
         $status = 'na';
     }
 }

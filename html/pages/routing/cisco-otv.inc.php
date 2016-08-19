@@ -5,7 +5,7 @@ $COMPONENT = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'Cisco-OTV';
-$COMPONENTS = $COMPONENT->getComponents(null,$options);
+$COMPONENTS = $COMPONENT->getComponents(null, $options);
 
 foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
     $LINK = generate_url(array('page' => 'device', 'device' => $DEVICE_ID, 'tab' => 'routing', 'proto' => 'cisco-otv'));
@@ -22,8 +22,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                 if ($OVERLAY['status'] == 0) {
                     $OVERLAY_STATUS = "<span class='green pull-right'>Normal</span>";
                     $GLI = "";
-                }
-                else {
+                } else {
                     $OVERLAY_STATUS = "<span class='pull-right'>".$OVERLAY['error']." - <span class='red'>Alert</span></span>";
                     $GLI = "list-group-item-danger";
                 }
@@ -36,8 +35,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                             if ($ADJACENCY['status'] == 0) {
                                 $ADJ_STATUS = "<span class='green pull-right'>Normal</span>";
                                 $GLI = "";
-                            }
-                            else {
+                            } else {
                                 $ADJ_STATUS = "<span class='pull-right'>".$ADJACENCY['error']." - <span class='red'>Alert</span></span>";
                                 $GLI = "list-group-item-danger";
                             }

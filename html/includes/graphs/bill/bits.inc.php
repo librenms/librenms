@@ -4,7 +4,7 @@
 $i = 0;
 
 foreach ($ports as $port) {
-    $rrd_file = get_port_rrdfile_path ($port['hostname'], $port['port_id']);
+    $rrd_file = get_port_rrdfile_path($port['hostname'], $port['port_id']);
     if (rrdtool_check_rrd_exists($rrd_file)) {
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr']    = $port['ifDescr'];
@@ -27,8 +27,7 @@ if ($bill['bill_type'] == 'cdr') {
     $custom_graph  = " COMMENT:'\\r' ";
     $custom_graph .= ' HRULE:'.$rates['rate_95th']."#cc0000:'95th %ile \: ".formatRates($rates['rate_95th']).' ('.$rates['dir_95th'].') (CDR\: '.formatRates($bill['bill_cdr']).")'";
     $custom_graph .= ' HRULE:'.($rates['rate_95th'] * -1).'#cc0000';
-}
-else if ($bill['bill_type'] == 'quota') {
+} elseif ($bill['bill_type'] == 'quota') {
     $custom_graph  = " COMMENT:'\\r' ";
     $custom_graph .= ' HRULE:'.$rates['rate_average']."#cc0000:'Usage \: ".format_bytes_billing($rates['total_data']).' ('.formatRates($rates['rate_average']).")'";
     $custom_graph .= ' HRULE:'.($rates['rate_average'] * -1).'#cc0000';
