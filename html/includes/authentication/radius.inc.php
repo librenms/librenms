@@ -25,11 +25,6 @@ function authenticate($username, $password) {
     }
 }
 
-function reauthenticate() {
-    return 0;
-}
-
-
 function passwordscanchange() {
     // not supported so return 0
     return 0;

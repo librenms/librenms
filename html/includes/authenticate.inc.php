@@ -22,7 +22,7 @@ if (!is_writable($config['temp_dir'])) {
 // Clear up any old sessions
 dbDelete('session', '`session_expiry` <  ?', array(time()));
 
-if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
+if ($vars['page'] == 'logout') {
     dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
     dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
     unset($_SESSION);
@@ -39,11 +39,11 @@ if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
 // We are only interested in login details passed via POST.
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $_SESSION['username'] = mres($_POST['username']);
-    $_SESSION['password'] = $_POST['password'];
+    $_tmp_password = $_POST['password'];
 }
 else if (isset($_GET['username']) && isset($_GET['password'])) {
     $_SESSION['username'] = mres($_GET['username']);
-    $_SESSION['password'] = $_GET['password'];
+    $_tmp_password = $_GET['password'];
 }
 
 if (!isset($config['auth_mechanism'])) {
@@ -60,8 +60,8 @@ else {
 
 $auth_success = 0;
 
-if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {
-    if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_SESSION['password'])) {
+if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {
+    if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_tmp_password)) {
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
         if (!$_SESSION['authenticated']) {
@@ -77,26 +77,26 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
         }
 
         if (isset($_POST['remember'])) {
-            $sess_id  = session_id();
+            $session_time = time() + (60 * 60 * 24 * $config['auth_remember']);
+        } else {
+            $session_time = time() + (60 * 60);
+        }
+
+        $sess_id  = session_id();
+        if (isset($_tmp_password)) {
             $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
             $token_id = $_SESSION['username'].'|'.$hasher->HashPassword($_SESSION['username'].$token);
-            // If we have been asked to remember the user then set the relevant cookies and create a session in the DB.
-            setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('token', $token_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('auth', $auth, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session');
         }
-
-        if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth'])) {
-            // If we have the remember me cookies set then update session expiry times to keep us logged in.
-            $sess_id = session_id();
-            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session', 'session_auth=?', array($_COOKIE['auth']));
-            setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('token', $_COOKIE['token'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('auth', $_COOKIE['auth'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
+        setcookie('sess_id', $sess_id, $session_time, '/', null, false, true);
+        setcookie('auth', $auth, $session_time, '/', null, false, true);
+        setcookie('token', $token_id, $session_time, '/', null, false, true);
+        if (!isset($_tmp_password)) {
+            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
+        } else {
+            dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => $session_time), 'session');
         }
 
         $permissions = permissions_cache($_SESSION['user_id']);

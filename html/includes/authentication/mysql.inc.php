@@ -33,22 +33,6 @@ function authenticate($username, $password) {
 
 }//end authenticate()
 
-
-function reauthenticate($sess_id, $token) {
-    list($uname,$hash) = explode('|', $token);
-    $session           = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'", array(), true);
-    $hasher            = new PasswordHash(8, false);
-    if ($hasher->CheckPassword($uname.$session['session_token'], $hash)) {
-        $_SESSION['username'] = $uname;
-        return 1;
-    }
-    else {
-        return 0;
-    }
-
-}//end reauthenticate()
-
-
 function passwordscanchange($username='') {
     /*
      * By default allow the password to be modified, unless the existing
