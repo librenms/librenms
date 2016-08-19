@@ -17,15 +17,13 @@ $colourset = 'mixed';
 
 if ($width > '500') {
     $descr_len = 18;
-}
-else {
+} else {
     $descr_len = (12 + round(($width - 275) / 8));
 }
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev                              \l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
@@ -36,8 +34,7 @@ if ($src['hostname'] == $config['own_hostname']) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '_', $device['hostname']).'.rrd';
     }
-}
-else {
+} else {
     $filename = $filename_dir . $device['hostname'] .'~'.$src['hostname'].'.rrd';
     if (!file_exists($filename)) {
         // Try with dots in hostname replaced by underscores

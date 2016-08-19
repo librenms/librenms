@@ -13,7 +13,7 @@
  */
 
 if (is_admin() === false) {
-	header('Content-type: text/plain');
+    header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -54,8 +54,7 @@ if ($sub_type == 'new-maintenance') {
     if (empty($message)) {
         if (empty($schedule_id)) {
             $schedule_id = dbInsert(array('start' => $start, 'end' => $end, 'title' => $title, 'notes' => $notes), 'alert_schedule');
-        }
-        else {
+        } else {
             dbUpdate(array('start' => $start, 'end' => $end, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($schedule_id));
         }
 
@@ -72,8 +71,7 @@ if ($sub_type == 'new-maintenance') {
                 $item   = dbInsert(array('schedule_id' => $schedule_id, 'target' => $target), 'alert_schedule_items');
                 if ($item > 0) {
                     array_push($items, $item);
-                }
-                else {
+                } else {
                     $fail = 1;
                 }
             }
@@ -85,13 +83,11 @@ if ($sub_type == 'new-maintenance') {
 
                 dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
                 $message = 'Issue scheduling maintenance';
-            }
-            else {
+            } else {
                 $status  = 'ok';
                 $message = 'Scheduling maintenance ok';
             }
-        }
-        else {
+        } else {
             $message = 'Issue scheduling maintenance';
         }//end if
     }//end if
@@ -100,8 +96,7 @@ if ($sub_type == 'new-maintenance') {
         'status'  => $status,
         'message' => $message,
     );
-}
-else if ($sub_type == 'parse-maintenance') {
+} elseif ($sub_type == 'parse-maintenance') {
     $schedule_id = mres($_POST['schedule_id']);
     $schedule    = dbFetchRow('SELECT * FROM `alert_schedule` WHERE `schedule_id`=?', array($schedule_id));
     $items       = array();
@@ -117,8 +112,7 @@ else if ($sub_type == 'parse-maintenance') {
         'notes'   => $schedule['notes'],
         'targets' => $items,
     );
-}
-else if ($sub_type == 'del-maintenance') {
+} elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
     dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
     dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));

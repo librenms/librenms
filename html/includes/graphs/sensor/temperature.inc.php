@@ -15,8 +15,7 @@ $rrd_options .= ' CDEF:sensor_diff=sensor_max,sensor_min,-';
 $rrd_options .= ' AREA:sensor_min';
 $rrd_options .= ' AREA:sensor_diff#c5c5c5::STACK';
 
-if($sensor['poller_type'] == "ipmi")
-{
+if ($sensor['poller_type'] == "ipmi") {
     $rrd_options .= " LINE1.5:sensor#cc0000:'".rrdtool_escape(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 21)."'";
 } else {
     $rrd_options .= " LINE1.5:sensor#cc0000:'".rrdtool_escape($sensor['sensor_descr'], 21)."'";
@@ -33,4 +32,3 @@ if (is_numeric($sensor['sensor_limit'])) {
 if (is_numeric($sensor['sensor_limit_low'])) {
     $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes';
 }
-

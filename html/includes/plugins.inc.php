@@ -2,12 +2,14 @@
 
 namespace LibreNMS;
 
-class Plugins {
+class Plugins
+{
 
     private static $plugins = array();
 
 
-    public static function start() {
+    public static function start()
+    {
         global $config;
         if (file_exists($config['plugin_dir'])) {
             // $plugin_files = scandir($config['plugin_dir']);
@@ -22,11 +24,9 @@ class Plugins {
             }
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
-
     }//end start()
 
 
@@ -50,21 +50,19 @@ class Plugins {
         }
 
         return $plugin;
-
     }//end load()
 
 
-    public static function call($hook, $params=false) {
+    public static function call($hook, $params = false)
+    {
         if (count(self::$plugins[$hook]) != 0) {
             foreach (self::$plugins[$hook] as $name) {
                 if (!is_array($params)) {
                     call_user_func(array($name, $hook));
-                }
-                else {
+                } else {
                     call_user_func_array(array($name, $hook), $params);
                 }
             }
         }
-
     }//end call()
 }//end class

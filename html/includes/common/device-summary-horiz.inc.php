@@ -35,8 +35,7 @@ $temp_output = '
       '.($config['summary_errors'] ? '<td><a href="ports/format=list_detail/errors=1/"><span class="black"> '.$ports['errored'].'</span></a></td>' : '').'
     </tr>';
 if ($config['show_services']) {
-
-$temp_output .= '
+    $temp_output .= '
     <tr class="active">
       <td><a href="services/">Services</a></td>
       <td><a href="services/"><span>'.$services['count'].'</span></a></td>

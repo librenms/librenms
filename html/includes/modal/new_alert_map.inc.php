@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-map" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -187,7 +186,6 @@ $('#map-submit').click('', function(e) {
 </script>
 
 <?php
-
 }
 
 ?>

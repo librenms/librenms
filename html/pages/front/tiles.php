@@ -18,35 +18,33 @@
 
 $no_refresh   = true;
 $default_dash = 0;
-if (($tmp = dbFetchCell('SELECT dashboard FROM users WHERE user_id=?',array($_SESSION['user_id']))) != 0) {
+if (($tmp = dbFetchCell('SELECT dashboard FROM users WHERE user_id=?', array($_SESSION['user_id']))) != 0) {
     $default_dash = $tmp;
-}
-else if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SESSION['user_id'])) == 0) {
-    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
-    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$vars['dashboard']),'users_widgets','user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0));
+} elseif (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?', array($_SESSION['user_id'])) == 0) {
+    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']), 'dashboards');
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array($_SESSION['user_id'],0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$vars['dashboard']), 'users_widgets', 'user_id = ? && dashboard_id = ?', array($_SESSION['user_id'],0));
     }
 }
 if (!empty($vars['dashboard'])) {
     $orig = $vars['dashboard'];
-    $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? && dashboard_id = ? order by dashboard_id limit 1',array($_SESSION['user_id'],$vars['dashboard']));
+    $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? && dashboard_id = ? order by dashboard_id limit 1', array($_SESSION['user_id'],$vars['dashboard']));
     if (empty($vars['dashboard'])) {
-        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ? && dashboards.access > 0',array($orig));
+        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ? && dashboards.access > 0', array($orig));
     }
 }
 if (empty($vars['dashboard'])) {
     if ($default_dash != 0) {
-        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ?',array($default_dash));
-    }
-    else {
-        $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
+        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ?', array($default_dash));
+    } else {
+        $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1', array($_SESSION['user_id']));
     }
     if (isset($orig)) {
         $msg_box[] = array('type' => 'error', 'message' => 'Dashboard <code>#'.$orig.'</code> does not exist! Loaded <code>'.$vars['dashboard']['dashboard_name'].'</code> instead.','title' => 'Requested Dashboard Not Found!');
     }
 }
 $data = array();
-foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `dashboard_id`=?',array($vars['dashboard']['dashboard_id'])) as $items) {
+foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `dashboard_id`=?', array($vars['dashboard']['dashboard_id'])) as $items) {
     $data[] = $items;
 }
 if (empty($data)) {
@@ -54,7 +52,7 @@ if (empty($data)) {
 }
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
-$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ? ORDER BY `dashboard_name`",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
+$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ? ORDER BY `dashboard_name`", array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
 
 if (empty($vars['bare']) || $vars['bare'] == "no") {
 ?>
@@ -75,7 +73,7 @@ $nodash = 0;
 if (sizeof($dashboards) > 0 || $vars['dashboard']['user_id'] != $_SESSION['user_id']) {
     foreach ($dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-            echo '          <li><a href="'.rtrim($config['base_url'],'/').'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
+            echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
             $nodash = 1;
         }
     }
@@ -83,13 +81,13 @@ if (sizeof($dashboards) > 0 || $vars['dashboard']['user_id'] != $_SESSION['user_
 if ($nodash == 0) {
     echo  '          <li><a>No other Dashboards</a></li>';
 }
-$shared_dashboards = dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE dashboards.access > 0 && dashboards.user_id != ? && dashboards.dashboard_id != ?",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
+$shared_dashboards = dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE dashboards.access > 0 && dashboards.user_id != ? && dashboards.dashboard_id != ?", array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
 if (!empty($shared_dashboards)) {
     echo '          <li role="separator" class="divider"></li>';
     echo '          <li class="dropdown-header">Shared Dashboards</li>';
     foreach ($shared_dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-            echo '          <li><a href="'.rtrim($config['base_url'],'/').'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
+            echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
         }
     }
 }
@@ -136,7 +134,7 @@ if (!empty($shared_dashboards)) {
               <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>" style="width:160px;">
               <select class="form-control" name="access" style="width:160px;">
 <?php
-foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
+foreach (array('Private','Shared (Read)','Shared') as $k => $v) {
     echo '                <option value="'.$k.'"'.($vars['dashboard']['access'] == $k ? 'selected' : '').'>'.$v.'</option>';
 }
 ?>
@@ -397,7 +395,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview";
+                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview";
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -420,7 +418,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
+                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -443,7 +441,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview/dashboard="+data.dashboard_id;
+                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard="+data.dashboard_id;
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -505,7 +503,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 }
             });
         }
-	return false;
+    return false;
     }
 
     function widget_reload(id,data_type) {

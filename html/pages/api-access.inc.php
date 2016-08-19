@@ -13,9 +13,9 @@
  */
 
 if ($_SESSION['userlevel'] >= '10') {
-if (empty($_POST['token'])) {
-    $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
-}
+    if (empty($_POST['token'])) {
+        $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
+    }
 
 ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -125,8 +125,7 @@ echo '
 foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN users AS U ON AT.user_id=U.user_id ORDER BY AT.user_id') as $api) {
     if ($api['disabled'] == '1') {
         $api_disabled = 'checked';
-    }
-    else {
+    } else {
         $api_disabled = '';
     }
     echo '
@@ -215,7 +214,6 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
 </script>
 
 <?php
-}
-else {
+} else {
     include 'includes/error-no-perm.inc.php';
 }//end if

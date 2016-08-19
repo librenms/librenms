@@ -16,7 +16,7 @@ $component = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'ntp';
-$components = $component->getComponents($device['device_id'],$options);
+$components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
 global $config;
@@ -31,24 +31,24 @@ global $config;
     </tr>
     </thead>
 <?php
-    foreach ($components as $peer) {
-        $string = $peer['peer'].":".$peer['port'];
-        if ($peer['status'] == 2) {
-            $status = $peer['error'];
-            $error = 'class="danger"';
-        } else {
-            $status = 'Ok';
-            $error = '';
-        }
-?>
-    <tr <?php echo $error; ?>>
-        <td><?php echo $string; ?></td>
-        <td><?php echo $peer['stratum']; ?></td>
-        <td><?php echo $peer['peerref']; ?></td>
-        <td><?php echo $status; ?></td>
-    </tr>
-<?php
+foreach ($components as $peer) {
+    $string = $peer['peer'].":".$peer['port'];
+    if ($peer['status'] == 2) {
+        $status = $peer['error'];
+        $error = 'class="danger"';
+    } else {
+        $status = 'Ok';
+        $error = '';
     }
+?>
+<tr <?php echo $error; ?>>
+<td><?php echo $string; ?></td>
+<td><?php echo $peer['stratum']; ?></td>
+<td><?php echo $peer['peerref']; ?></td>
+<td><?php echo $status; ?></td>
+</tr>
+<?php
+}
 ?>
 </table>
 

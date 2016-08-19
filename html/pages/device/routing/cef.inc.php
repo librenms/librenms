@@ -55,8 +55,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
     if (!is_integer($i / 2)) {
         $bg_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $bg_colour = $list_colour_b;
     }
 
@@ -65,8 +64,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
     if (!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn']) {
         $parent_entity = dbFetchRow('SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $entity['entPhysicalContainedIn']));
         $entity_descr  = $entity['entPhysicalName'].' ('.$parent_entity['entPhysicalModelName'].')';
-    }
-    else {
+    } else {
         $entity_descr = $entity['entPhysicalName'].' ('.$entity['entPhysicalModelName'].')';
     }
 
@@ -75,20 +73,20 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
         <td>';
 
     switch ($cef['cef_path']) {
-    case 'RP RIB':
-        echo '<a title="Process switching with CEF assistance.">RP RIB</a>';
-        break;
+        case 'RP RIB':
+            echo '<a title="Process switching with CEF assistance.">RP RIB</a>';
+            break;
 
-    case 'RP LES':
-        echo '<a title="Low-end switching. Centralized CEF switch path.">RP LES</a>';
-        break;
+        case 'RP LES':
+            echo '<a title="Low-end switching. Centralized CEF switch path.">RP LES</a>';
+            break;
 
-    case 'RP PAS':
-        echo '<a title="CEF turbo switch path.">RP PAS</a>';
-        break;
+        case 'RP PAS':
+            echo '<a title="CEF turbo switch path.">RP PAS</a>';
+            break;
 
-    default:
-        echo $cef['cef_path'];
+        default:
+            echo $cef['cef_path'];
     }
 
     echo '</td>';

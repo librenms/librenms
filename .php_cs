@@ -3,9 +3,6 @@
 
 
 $finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->exclude('html/includes/geshi')
-    ->exclude('html/includes/jpgraph')
-    ->exclude('html/includes/Slim')
     ->exclude('html/lib')
     ->exclude('lib')
     ->exclude('logs')

@@ -15,7 +15,7 @@ foreach ($app_list as $app) {
     $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?', array($app['app_type']));
 
     foreach ($app_devices as $app_device) {
-    $graph_type = $graphs[$app['app_type']][0];
+        $graph_type = $graphs[$app['app_type']][0];
 
         $graph_array['type']      = 'application_'.$app['app_type'].'_'.$graph_type;
         $graph_array['id']        = $app_device['app_id'];
