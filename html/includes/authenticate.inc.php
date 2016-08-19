@@ -67,7 +67,6 @@ if (!$_SESSION['authenticated']) {
     $authenticated = false;
     $pw_success = false;
     $cookie_success = false;
-    $twofactor_success = false;
 
     if (isset($form_username)) {
         /* try password auth */
@@ -96,6 +95,7 @@ if (!$_SESSION['authenticated']) {
 
     if ($authenticated) {
         if (!$_SESSION['username']) {
+            unset($_SESSION['authenticated']);
             print_error("ERROR: auth_mechanism did not set session username: pw: $pw_success, cookie: $cookie_success");
             exit();
         }
@@ -104,7 +104,6 @@ if (!$_SESSION['authenticated']) {
 
         if (isset($_POST['remember'])) {
             $sess_id  = session_id();
-            $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
