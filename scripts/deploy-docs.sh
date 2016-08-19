@@ -14,7 +14,7 @@ git remote add origin $FULL_REPO
 git fetch
 git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
-git checkout gh-pages
+git checkout master
 
 cd ../
 
@@ -25,4 +25,4 @@ cd out
 touch .
 git add -A .
 git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
-git push -q origin gh-pages
+git push -q origin master 
