@@ -18,7 +18,7 @@
  * @param bool $dual_process start an additional process that's output should be read after every command
  * @return bool the process(s) have been successfully started
  */
-function rrdtool_initialize($dual_process = false)
+function rrdtool_initialize($dual_process = true)
 {
     global $config, $rrd_async_process, $rrd_async_pipes, $rrd_sync_process, $rrd_sync_pipes;
 
@@ -235,7 +235,13 @@ function rrdtool_build_command($command, $filename, $options)
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    return is_file($filename);
+    global $config;
+    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+        $chk = rrdtool('last', $filename, '');
+        return strpos(implode($chk), "$filename': No such file or directory") === false;
+    } else {
+        return is_file($filename);
+    }
 }
 
 /**
