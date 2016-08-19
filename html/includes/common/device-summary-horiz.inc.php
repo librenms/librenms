@@ -5,7 +5,7 @@ $temp_output = '
 <div class="panel panel-default panel-condensed table-responsive">
 <table class="table table-hover table-condensed table-striped">
   <thead>
-    <tr class="info">
+    <tr>
       <th>&nbsp;</th>
       <th><span class="grey">Total</span></th>
       <th><span class="green">Up</span></th>
@@ -16,7 +16,7 @@ $temp_output = '
     </tr>
   </thead>
   <tbody>
-    <tr class="active">
+    <tr>
       <td><a href="devices/">Devices</a></td>
       <td><a href="devices/"><span>'.$devices['count'].'</span></a></td>
       <td><a href="devices/state=up/format=list_detail/"><span class="green"> '.$devices['up'].'</span></a></td>
@@ -25,7 +25,7 @@ $temp_output = '
       <td><a href="devices/disabled=1/format=list_detail/"><span class="black"> '.$devices['disabled'].'</span></a></td>
       '.($config['summary_errors'] ? '<td>-</td>' : '').'
     </tr>
-    <tr class="active">
+    <tr>
       <td><a href="ports/">Ports</a></td>
       <td><a href="ports/"><span>'.$ports['count'].'</span></a></td>
       <td><a href="ports/format=list_detail/state=up/"><span class="green"> '.$ports['up'].'</span></a></td>
@@ -37,7 +37,7 @@ $temp_output = '
 if ($config['show_services']) {
 
 $temp_output .= '
-    <tr class="active">
+    <tr>
       <td><a href="services/">Services</a></td>
       <td><a href="services/"><span>'.$services['count'].'</span></a></td>
       <td><a href="services/state=ok/view=details/"><span class="green">'.$services['up'].'</span></a></td>
