@@ -35,13 +35,16 @@ if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
     exit;
 }
 
+unset($form_password);
+unset($form_username);
+
 // We are only interested in login details passed via POST.
 if (isset($_POST['username']) && isset($_POST['password'])) {
-    $_SESSION['username'] = mres($_POST['username']);
-    $_SESSION['password'] = $_POST['password'];
+    $form_username = mres($_POST['username']);
+    $form_password = $_POST['password'];
 } elseif (isset($_GET['username']) && isset($_GET['password'])) {
-    $_SESSION['username'] = mres($_GET['username']);
-    $_SESSION['password'] = $_GET['password'];
+    $form_username = mres($_GET['username']);
+    $form_password = $_GET['password'];
 }
 
 if (!isset($config['auth_mechanism'])) {
@@ -55,27 +58,44 @@ if (file_exists('includes/authentication/'.$config['auth_mechanism'].'.inc.php')
     exit();
 }
 
-$auth_success = 0;
+if (!$_SESSION['authenticated']) {
+    $authenticated = false;
+    $pw_success = false;
+    $cookie_success = false;
 
-if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {
-    if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_SESSION['password'])) {
+    if (isset($form_username)) {
+        /* try password auth */
+        $_SESSION['username'] = $form_username;
+        $pw_success = authenticate($form_username, $form_password);
+    } elseif (isset($_COOKIE['sess_id'],$_COOKIE['token'])) {
+        /* trying cookie auth */
+        $cookie_success = reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']);
+    }
+
+    if ($pw_success || $cookie_success) {
+        if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
+            include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
+            twofactor_auth();
+        }
+
+        if (!$config['twofactor'] || $_SESSION['twofactor']) {
+            $authenticated = true;
+            $_SESSION['authenticated'] = true;
+            dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
+        }
+    }
+
+    if ($authenticated) {
+        if (!$_SESSION['username']) {
+            unset($_SESSION['authenticated']);
+            print_error("ERROR: auth_mechanism did not set session username: pw: $pw_success, cookie: $cookie_success");
+            exit();
+        }
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
-        if (!$_SESSION['authenticated']) {
-            if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
-                include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
-                twofactor_auth();
-            }
-
-            if (!$config['twofactor'] || $_SESSION['twofactor']) {
-                $_SESSION['authenticated'] = true;
-                dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
-            }
-        }
 
         if (isset($_POST['remember'])) {
             $sess_id  = session_id();
-            $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
@@ -87,21 +107,12 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session');
         }
 
-        if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth'])) {
-            // If we have the remember me cookies set then update session expiry times to keep us logged in.
-            $sess_id = session_id();
-            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session', 'session_auth=?', array($_COOKIE['auth']));
-            setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('token', $_COOKIE['token'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            setcookie('auth', $_COOKIE['auth'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-        }
-
         $permissions = permissions_cache($_SESSION['user_id']);
-        if (isset($_POST['username'])) {
+        if ($pw_success) {
             header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }
-    } elseif (isset($_SESSION['username'])) {
+    } elseif (isset($form_username)) {
         global $auth_error;
         if (isset($auth_error)) {
             $auth_message = $auth_error;
@@ -110,5 +121,15 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
         }
         unset($_SESSION['authenticated']);
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
+    }
+} else {
+    /* we have a valid, authenticated session */
+    if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth'])) {
+        // If we have the remember me cookies set then update session expiry times to keep us logged in.
+        $sess_id = session_id();
+        dbUpdate(array('session_value' => $sess_id, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session', 'session_auth=?', array($_COOKIE['auth']));
+        setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
+        setcookie('token', $_COOKIE['token'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
+        setcookie('auth', $_COOKIE['auth'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
     }
 }
