@@ -152,7 +152,8 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
 ### OS Updates
-A small shell script that checks your system package manager for any available updates (supports yum/apt-get/zypper package managers).
+A small shell script that checks your system package manager for any available updates. Supports apt-get/pacman/yum/zypper package managers).
+For pacman users automatically refreshing the database, it is recommended you use an alternative database location `--dbpath=/var/lib/pacman/checkupdate`
 
 ##### Extend SNMP
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
