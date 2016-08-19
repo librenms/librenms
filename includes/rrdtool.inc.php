@@ -153,7 +153,7 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     global $config, $debug, $vdebug, $rrd_pipes;
 
     // do not ovewrite files when creating
-    if ($command == 'create') {
+    if ($command == 'create' && version_compare($config['rrdtool_version'], '1.4.3', '>=')) {
         $options .= ' -O';
     }
     // rrdcached commands: >=1.5.5: all, >=1.5 all: except tune, <1.5: all except tune and create
@@ -180,8 +180,8 @@ function rrdtool($command, $filename, $options, $timeout = 0)
     ) {
         c_echo("[%rRRD Disabled%n]\n");
         $output = array(null, null);
-    } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.5', '<') && is_file($filename)) {
-        // do not overwrite RRD if it already exists and RRDTool ver. < 1.5
+    } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.4.3', '<') && is_file($filename)) {
+        // do not overwrite RRD if it already exists and RRDTool ver. < 1.4.3
         c_echo("RRD[%g$filename already exists%n]\n", $debug);
         $output = array(null, null);
     } else {

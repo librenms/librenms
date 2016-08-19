@@ -1,0 +1,9 @@
+body {
+    background-image:none !important;
+}
+
+.dropdown-menu {
+    max-height: 400px !important;
+    overflow-x: hidden !important;
+}
+
