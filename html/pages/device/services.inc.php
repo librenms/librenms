@@ -49,72 +49,68 @@ if (count($services) > '0') {
 ?>
         <table class="table table-hover table-condensed table-striped">
 <?php
-    foreach ($services as $service) {
-        $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
-        if ($service['service_status'] == 0) {
-            $status = "<span class='green'>Ok</span>";
-        }
-        elseif ($service['service_status'] == 1) {
-            $status = "<span class='red'>Warning</span>";
-        }
-        elseif ($service['service_status'] == 2) {
-            $status = "<span class='red'>Critical</span>";
-        }
-        else {
-            $status = "<span class='grey'>Unknown</span>";
-        }
+foreach ($services as $service) {
+    $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
+    if ($service['service_status'] == 0) {
+        $status = "<span class='green'>Ok</span>";
+    } elseif ($service['service_status'] == 1) {
+        $status = "<span class='red'>Warning</span>";
+    } elseif ($service['service_status'] == 2) {
+        $status = "<span class='red'>Critical</span>";
+    } else {
+        $status = "<span class='grey'>Unknown</span>";
+    }
 ?>
-            <tr id="row_<?php echo $service['service_id']?>">
-                <td>
-                    <div class="col-sm-12">
-                        <div class="col-sm-2"><?php echo $service['service_type']?></div>
-                        <div class="col-sm-6"><?php echo $service['service_desc']?></div>
-                        <div class="col-sm-2"><?php echo $status?></div>
-                        <div class="pull-right">
-                            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
-                            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
-                        </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div class="col-sm-8"><?php echo nl2br(trim($service['service_message']))?></div>
-                        <div class="col-sm-4"><?php echo formatUptime(time() - $service['service_changed'])?></div>
-                    </div>
+    <tr id="row_<?php echo $service['service_id']?>">
+        <td>
+            <div class="col-sm-12">
+                <div class="col-sm-2"><?php echo $service['service_type']?></div>
+                <div class="col-sm-6"><?php echo $service['service_desc']?></div>
+                <div class="col-sm-2"><?php echo $status?></div>
+                <div class="pull-right">
+                    <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
+                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="col-sm-8"><?php echo nl2br(trim($service['service_message']))?></div>
+                <div class="col-sm-4"><?php echo formatUptime(time() - $service['service_changed'])?></div>
+            </div>
 <?php
-        if ($vars['view'] == 'details') {
-            // if we have a script for this check, use it.
-            $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service['service_type']).'.inc.php';
-            if (is_file($check_script)) {
-                include $check_script;
+if ($vars['view'] == 'details') {
+    // if we have a script for this check, use it.
+    $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service['service_type']).'.inc.php';
+    if (is_file($check_script)) {
+        include $check_script;
 
-                // If we have a replacement DS use it.
-                if (isset($check_ds)) {
-                    $service['service_ds'] = $check_ds;
-                }
-            }
-
-            $graphs = json_decode($service['service_ds'],TRUE);
-            foreach ($graphs as $k => $v) {
-                $graph_array['device'] = $device['device_id'];
-                $graph_array['type'] = 'device_service';
-                $graph_array['service'] = $service['service_id'];
-                $graph_array['ds'] = $k;
-?>
-                    <div class="col-sm-12">
-<?php
-                include 'includes/print-graphrow.inc.php';
-?>
-                    </div>
-<?php
-            }
+        // If we have a replacement DS use it.
+        if (isset($check_ds)) {
+            $service['service_ds'] = $check_ds;
         }
     }
+
+    $graphs = json_decode($service['service_ds'], true);
+    foreach ($graphs as $k => $v) {
+        $graph_array['device'] = $device['device_id'];
+        $graph_array['type'] = 'device_service';
+        $graph_array['service'] = $service['service_id'];
+        $graph_array['ds'] = $k;
+?>
+            <div class="col-sm-12">
+<?php
+        include 'includes/print-graphrow.inc.php';
+?>
+            </div>
+<?php
+    }
+}
+}
 ?>
                 </td>
             </tr>
         </table>
 <?php
-}
-else {
+} else {
 ?>
         <div class='row col-sm-12'>No Services</div>
 <?php

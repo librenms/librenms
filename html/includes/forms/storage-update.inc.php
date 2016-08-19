@@ -31,19 +31,15 @@ $data = mres($_POST['data']);
 
 if (!is_numeric($device_id)) {
     $message = 'Missing device id';
-}
-elseif (!is_numeric($storage_id)) {
+} elseif (!is_numeric($storage_id)) {
     $message = 'Missing storage id';
-}
-elseif (!is_numeric($data)) {
+} elseif (!is_numeric($data)) {
     $message = 'Missing value';
-}
-else {
-    if (dbUpdate(array('storage_perc_warn'=>$data), 'storage', '`storage_id`=? AND `device_id`=?',array($storage_id,$device_id))) {
+} else {
+    if (dbUpdate(array('storage_perc_warn'=>$data), 'storage', '`storage_id`=? AND `device_id`=?', array($storage_id,$device_id))) {
         $message = 'Storage information updated';
         $status = 'ok';
-    }
-    else {
+    } else {
         $message = 'Could not update storage information';
     }
 }

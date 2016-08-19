@@ -2,12 +2,10 @@
 
 if ($int_colour) {
     $row_colour = $int_colour;
-}
-else {
+} else {
     if (!is_integer($i / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 }

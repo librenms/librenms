@@ -14,15 +14,14 @@ if ($_POST['editing']) {
 
         if ($override_sysLocation_bool) {
             $override_sysLocation = 1;
-        }
-        else {
+        } else {
             $override_sysLocation = 0;
         }
 
-        dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?' ,array($device['device_id']));
+        dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?', array($device['device_id']));
 
         if (isset($override_sysLocation_string)) {
-            dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?' ,array($device['device_id']));
+            dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?', array($device['device_id']));
         }
 
         #FIXME needs more sanity checking! and better feedback
@@ -35,16 +34,13 @@ if ($_POST['editing']) {
             $update_message = "Device record updated.";
             $updated = 1;
             $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
-        }
-        elseif ($rows_updated = '-1') {
+        } elseif ($rows_updated = '-1') {
             $update_message = "Device record unchanged. No update necessary.";
             $updated = -1;
-        }
-        else {
+        } else {
             $update_message = "Device record update error.";
         }
-    }
-    else {
+    } else {
         include 'includes/error-no-perm.inc.php';
     }
 }
@@ -56,8 +52,7 @@ $override_sysLocation_string = $device['location'];
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-elseif ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 
@@ -72,7 +67,7 @@ elseif ($update_message) {
     </div>
     <div class="col-md-1 col-md-offset-2">
         <?php
-        if($config['enable_clear_discovery'] == 1) {
+        if ($config['enable_clear_discovery'] == 1) {
         ?>
             <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>
         <?php
@@ -114,25 +109,33 @@ elseif ($update_message) {
 <div class="form-group">
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">
-      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation) echo(' checked="1"'); ?> />
+      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation) {
+            echo(' checked="1"');
+} ?> />
     </div>
 </div>
 <div class="form-group">
     <div class="col-sm-2"></div>
     <div class="col-sm-6">
-      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) echo(' disabled="1"'); ?> value="<?php echo($override_sysLocation_string); ?>" />
+      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) {
+            echo(' disabled="1"');
+} ?> value="<?php echo($override_sysLocation_string); ?>" />
     </div>
 </div>
 <div class="form-group">
     <label for="disabled" class="col-sm-2 control-label">Disable:</label>
     <div class="col-sm-6">
-      <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) echo("checked=checked"); ?> />
+      <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) {
+            echo("checked=checked");
+} ?> />
     </div>
 </div>
 <div class="form-group">
     <label for="ignore" class="col-sm-2 control-label">Ignore</label>
     <div class="col-sm-6">
-       <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) echo("checked=checked"); ?> />
+       <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) {
+            echo("checked=checked");
+} ?> />
     </div>
 </div>
 <div class="row">

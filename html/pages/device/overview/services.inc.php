@@ -2,7 +2,7 @@
 
 if ($services['total']) {
     // Build the string.
-    foreach (service_get ($device['device_id']) as $data) {
+    foreach (service_get($device['device_id']) as $data) {
         if ($data['service_status'] == '0') {
             // Ok
             $status = 'green';
@@ -16,7 +16,7 @@ if ($services['total']) {
             // Unknown
             $status = 'grey';
         }
-        $string .= $break . '<a class=' . $status . '>' . strtolower ($data['service_type']) . '</a>';
+        $string .= $break . '<a class=' . $status . '>' . strtolower($data['service_type']) . '</a>';
         $break = ', ';
     }
     ?>

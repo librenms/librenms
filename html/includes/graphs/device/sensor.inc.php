@@ -4,8 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 if ($_GET['width'] > '300') {
     $descr_len = '40';
-}
-else {
+} else {
     $descr_len = '22';
 }
 

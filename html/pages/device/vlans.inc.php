@@ -13,8 +13,7 @@ echo "<span style='font-weight: bold;'>VLANs</span> &#187; ";
 if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
     if (isset($vars['graph'])) {
         $graph_type = 'port_'.$vars['graph'];
-    }
-    else {
+    } else {
         $graph_type = 'port_bits';
     }
 }

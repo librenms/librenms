@@ -13,5 +13,5 @@ if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
 
     $auth = true;
 
-    $rrd_filename = get_port_rrdfile_path ($device['hostname'], $port['port_id']);
+    $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
 }

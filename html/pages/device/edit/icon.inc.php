@@ -10,24 +10,20 @@ if ($_POST['editing']) {
             $update_message = 'Device icon updated.';
             $updated        = 1;
             $device         = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
-        }
-        else if ($rows_updated = '-1') {
+        } elseif ($rows_updated = '-1') {
             $update_message = 'Device icon unchanged. No update necessary.';
             $updated        = -1;
-        }
-        else {
+        } else {
             $update_message = 'Device icon update error.';
         }
-    }
-    else {
+    } else {
         include 'includes/error-no-perm.inc.php';
     }
 }
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-else if ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 
