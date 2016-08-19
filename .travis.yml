@@ -43,8 +43,8 @@ before_script:
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
 
-
 script:
   - if [[ $PHP_L == 1 ]]; then find . -path './vendor' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1; fi
   - if [[ $PHP_L_OLD == 1 ]]; then find . -regextype posix-extended -regex "\./(lib/influxdb-php|vendor)" -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1; fi
   - if [[ $PHP_CS == 1 ]]; then vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 --ignore=html/lib/* .; fi
+  - phpunit
