@@ -1956,6 +1956,7 @@ label {
 .widget-availability {
   float:left;
   margin:2px;
+  curosr: pointer;
 }
 
 .widget-availability-host {
