@@ -153,6 +153,7 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 
 ### OS Updates
 A small shell script that checks your system package manager for any available updates. Supports apt-get/pacman/yum/zypper package managers).
+
 For pacman users automatically refreshing the database, it is recommended you use an alternative database location `--dbpath=/var/lib/pacman/checkupdate`
 
 ##### Extend SNMP
