@@ -194,14 +194,15 @@ function rrdtool($command, $filename, $options)
 
 /**
  * Build a command for rrdtool
+ * Shortens the filename as needed
  * Determines if --daemon and -O should be used
  *
  * @internal
- * @param $command
- * @param $filename
- * @param $options
- * @return string
- * @throws FileExistsException if rrdtool <1.4.3 &&
+ * @param string $command The base rrdtool command.  Usually create, update, last.
+ * @param string $filename The full path to the rrd file
+ * @param string $options Options for the command possibly including the rrd definition
+ * @return string returns a full command ready to be piped to rrdtool
+ * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
  */
 function rrdtool_build_command($command, $filename, $options)
 {
@@ -234,10 +235,10 @@ function rrdtool_build_command($command, $filename, $options)
 
 /**
  * Checks if the rrd file exists on the server
- * This will perform a remote check if using rrdcached and rrdtool >= 1.5 (broken)
+ * This will perform a remote check if using rrdcached and rrdtool >= 1.5
  *
- * @param $filename
- * @return bool
+ * @param string $filename full path to the rrd file
+ * @return bool whether or not the passed rrd file exists
  */
 function rrdtool_check_rrd_exists($filename)
 {
@@ -380,6 +381,7 @@ function rrdtool_tune($type, $filename, $max)
         $options = "--maximum " . implode(":$max --maximum ", $fields) . ":$max";
         rrdtool('tune', $filename, $options);
     }
+    return true;
 } // rrdtool_tune
 
 
