@@ -17,4 +17,4 @@ Alias /librenms /opt/librenms/html
 The `RewriteBase` directive in `html/.htaccess` must be rewritten to reference the subdirectory name. Assuming LibreNMS is running at http://example.com/librenms/,
 you will need to change `RewriteBase /` to `RewriteBase /librenms`.
 
-Finally, ensure `$config["base_url"]` -- if configured -- is correct as well.
+Finally, set `$config["base_url"] = '/librenms/';` in config.php.
