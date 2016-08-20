@@ -65,7 +65,7 @@ if (is_admin() === true) {
 <div class="container-fluid">
     <div class="row">
 <?php
-foreach (dbFetchRows("SELECT `config_group` FROM `config` GROUP BY `config_group`") as $sub_page) {
+foreach (dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''") as $sub_page) {
     $sub_page = $sub_page['config_group'];
 ?>
 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
