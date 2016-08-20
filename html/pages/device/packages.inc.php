@@ -8,8 +8,7 @@ foreach (dbFetchRows('SELECT * FROM `packages` WHERE `device_id` = ? ORDER BY `n
     echo '<td width=200><a href="'.generate_url($vars, array('name' => $entry['name'])).'">'.$entry['name'].'</a></td>';
     if ($build != '') {
         $dbuild = '-'.$entry['build'];
-    }
-    else {
+    } else {
         $dbuild = '';
     }
 

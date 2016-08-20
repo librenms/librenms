@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
  *   This file is included with Observium. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
  *
- * @package    observium
+ * @package    librenms
  * @subpackage graphing
  * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
  * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
@@ -30,9 +30,8 @@ if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= " :: Port  ".generate_port_link($port);
-    $auth   = TRUE;
-}
-else {
+    $auth   = true;
+} else {
     echo("Unauthenticad");
     die;
 }
@@ -45,7 +44,7 @@ $ifname=ifLabel($port);
 $ifname=$ifname['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 
-if($_GET['title']) {
+if ($_GET['title']) {
     $ifname = $_GET['title'];
 }
 
@@ -53,10 +52,9 @@ if($_GET['title']) {
 $scale_type="follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
 $nb_plot=240;                   //NB plot in graph
 
-if(is_numeric($_GET['interval'])) {
+if (is_numeric($_GET['interval'])) {
     $time_interval=$_GET['interval'];
-}
-else {
+} else {
     $time_interval=1;      //Refresh time Interval
 }
 

@@ -11,8 +11,7 @@
 
 if ($bg == '#ffffff') {
     $bg = '#e5e5e5';
-}
-else {
+} else {
     $bg = '#ffffff';
 }
 
@@ -52,8 +51,7 @@ if ($if_list) {
         $ifclass         = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
         if ($bg == '#ffffff') {
             $bg = '#e5e5e5';
-        }
-        else {
+        } else {
             $bg = '#ffffff';
         }
 
@@ -74,7 +72,7 @@ if ($if_list) {
 
         echo '<br />';
 
-        if (file_exists(get_port_rrdfile_path ($port['hostname'], $port['port_id']))) {
+        if (file_exists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
             $graph_type = 'port_bits';
 
             include 'includes/print-interface-graphs.inc.php';
@@ -82,8 +80,7 @@ if ($if_list) {
 
         echo '</td></tr>';
     }
-}
-else {
+} else {
     echo 'None found.</td></tr>';
 }
 

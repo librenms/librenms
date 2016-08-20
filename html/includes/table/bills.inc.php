@@ -11,8 +11,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 if (!empty($_POST['bill_type'])) {
     if ($prev) {
         $wheres[] = 'bill_history.bill_type = ?';
-    }
-    else {
+    } else {
         $wheres[] = 'bill_type = ?';
     }
     $param[] = $_POST['bill_type'];
@@ -21,16 +20,13 @@ if (!empty($_POST['state'])) {
     if ($_POST['state'] === 'under') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th <= bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total <= bill_history.bill_allowed))";
-        }
-        else {
+        } else {
             $wheres[] = "((bill_type = 'cdr' AND rate_95th <= bill_cdr) OR (bill_type = 'quota' AND total_data <= bill_quota))";
         }
-    } 
-    else if ($_POST['state'] === 'over') {
+    } elseif ($_POST['state'] === 'over') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th > bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total > bill_allowed))";
-        }
-        else {
+        } else {
             $wheres[] = "((bill_type = 'cdr' AND rate_95th > bill_cdr) OR (bill_type = 'quota' AND total_data > bill_quota))";
         }
     }
@@ -42,8 +38,7 @@ if ($prev) {
         INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
         INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
 ';
-}
-else {
+} else {
     $select = "SELECT bills.*,
         IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
     ";
@@ -86,8 +81,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     if ($prev) {
         $datefrom = $bill['bill_datefrom'];
         $dateto   = $bill['bill_dateto'];
-    }
-    else {
+    } else {
         $day_data = getDates($bill['bill_day']);
         $datefrom = $day_data['0'];
         $dateto   = $day_data['1'];
@@ -103,8 +97,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     if ($prev) {
         $percent = $bill['bill_percent'];
         $overuse = $bill['bill_overuse'];
-    } 
-    else {
+    } else {
     }
 
     if (strtolower($bill['bill_type']) == 'cdr') {
@@ -121,8 +114,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $used                 = $rate_95th;
         $tmp_used             = $bill['rate_95th'];
         $rate_95th            = "<b>$rate_95th</b>";
-    }
-    else if (strtolower($bill['bill_type']) == 'quota') {
+    } elseif (strtolower($bill['bill_type']) == 'quota') {
         $type       = 'Quota';
         $allowed    = format_bytes_billing($bill['bill_allowed']);
         $in         = format_bytes_billing($bill['traf_in']);
@@ -133,7 +125,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         }
         
         $overuse_formatted    = format_bytes_billing($overuse);
-        $used                 = $total_data;        
+        $used                 = $total_data;
         $tmp_used             = $bill['total_data'];
         $total_data           = "<b>$total_data</b>";
     }
@@ -149,7 +141,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $actions    = "";
     
     if (!$prev && is_admin()) {
-        $actions .= "<a href='" . generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) . 
+        $actions .= "<a href='" . generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) .
             "'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a> ";
     }
     $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));

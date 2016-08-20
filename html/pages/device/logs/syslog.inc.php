@@ -9,17 +9,17 @@
     <div class="col-md-4">
       <select name="program" class="form-control" id="program">
         <option value="">All Programs</option>
-          <?php
-          $datas = dbFetchRows('SELECT `program` FROM `syslog` WHERE device_id = ? GROUP BY `program` ORDER BY `program`', array($device['device_id']));
-          foreach ($datas as $data) {
-              echo "<option value='".$data['program']."'";
-              if ($data['program'] == $_POST['program']) {
-                  echo 'selected';
-              }
+            <?php
+            $datas = dbFetchRows('SELECT `program` FROM `syslog` WHERE device_id = ? GROUP BY `program` ORDER BY `program`', array($device['device_id']));
+            foreach ($datas as $data) {
+                echo "<option value='".$data['program']."'";
+                if ($data['program'] == $_POST['program']) {
+                    echo 'selected';
+                }
 
-              echo '>'.$data['program'].'</option>';
-          }
-          ?>
+                echo '>'.$data['program'].'</option>';
+            }
+            ?>
       </select>
     </div>
     <div class="col-md-4">

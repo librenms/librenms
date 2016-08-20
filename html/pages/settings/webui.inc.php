@@ -23,8 +23,8 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('Graph settings',true,$config_groups,$graph_conf);
-echo generate_dynamic_config_panel('Search settings',true,$config_groups,$search_conf);
+echo generate_dynamic_config_panel('Graph settings', $config_groups, $graph_conf);
+echo generate_dynamic_config_panel('Search settings', $config_groups, $search_conf);
 
 echo '
     </form>

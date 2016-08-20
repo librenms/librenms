@@ -43,16 +43,14 @@ print_optionbar_end();
 
 if (is_file('pages/device/loadbalancer/'.mres($vars['type']).'.inc.php')) {
     include 'pages/device/loadbalancer/'.mres($vars['type']).'.inc.php';
-}
-else {
+} else {
     foreach ($loadbalancer_tabs as $type) {
         if ($type != 'overview') {
             if (is_file('pages/device/loadbalancer/overview/'.mres($type).'.inc.php')) {
                 $g_i++;
                 if (!is_integer($g_i / 2)) {
                     $row_colour = $list_colour_a;
-                }
-                else {
+                } else {
                     $row_colour = $list_colour_b;
                 }
 
@@ -63,8 +61,7 @@ else {
 
                 echo '</div>';
                 echo '</div>';
-            }
-            else {
+            } else {
                 $graph_title = $type_text[$type];
                 $graph_type  = 'device_'.$type;
 

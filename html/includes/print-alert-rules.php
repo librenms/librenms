@@ -95,8 +95,7 @@ require_once 'includes/modal/delete_alert_rule.inc.php';
 <?php
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
-}
-else {
+} else {
     $results = 50;
 }
 
@@ -154,8 +153,7 @@ $count_query = $count_query.$query;
 $count       = dbFetchCell($count_query, $param);
 if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
     $page_number = 1;
-}
-else {
+} else {
     $page_number = $_POST['page_number'];
 }
 
@@ -172,8 +170,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         if ((int) $sub['state'] === 0) {
             $ico = 'ok';
             $col = 'success';
-        }
-        elseif ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
+        } elseif ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $ico   = 'remove';
             $col   = 'danger';
             $extra = 'danger';
@@ -188,16 +185,14 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         $ico   = 'pause';
         $col   = '';
         $extra = 'active';
-    }
-    else {
+    } else {
         $alert_checked = 'checked';
     }
 
     $rule_extra = json_decode($rule['extra'], true);
     if ($rule['device_id'] == ':-1' || $rule['device_id'] == '-1') {
         $popover_msg = 'Global alert rule';
-    }
-    else {
+    } else {
         $popover_msg = 'Device specific rule';
     }
     echo "<tr class='".$extra."' id='row_".$rule['id']."'>";

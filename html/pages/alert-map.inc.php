@@ -13,8 +13,7 @@ foreach (dbFetchRows('SELECT alert_map.target,alert_map.id,alert_rules.name FROM
     if ($link['target'][0] == 'g') {
         $link['target'] = substr($link['target'], 1);
         $link['target'] = '<a href="'.generate_url(array('page' => 'devices', 'group' => $link['target'])).'">'.ucfirst(dbFetchCell('SELECT name FROM device_groups WHERE id = ?', array($link['target']))).'</a>';
-    }
-    else if (is_numeric($link['target'])) {
+    } elseif (is_numeric($link['target'])) {
         $link['target'] = '<a href="'.generate_url(array('page' => 'device', 'device' => $link['target'])).'">'.dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', array($link['target'])).'</a>';
     }
 

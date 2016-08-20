@@ -14,7 +14,7 @@ $i = 1;
 
 foreach (explode(',', $_GET['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
-    $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
+    $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (rrdtool_check_rrd_exists($rrd_file)) {
         $rrd_options .= ' DEF:inoctets'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
         $rrd_options .= ' DEF:outoctets'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
@@ -32,7 +32,7 @@ unset($plus);
 
 foreach (explode(',', $_GET['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
-    $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
+    $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (rrdtool_check_rrd_exists($rrd_file)) {
         $rrd_options .= ' DEF:inoctetsb'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
         $rrd_options .= ' DEF:outoctetsb'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
@@ -48,8 +48,7 @@ foreach (explode(',', $_GET['idb']) as $ifid) {
 if ($inverse) {
     $in  = 'out';
     $out = 'in';
-}
-else {
+} else {
     $in  = 'in';
     $out = 'out';
 }
@@ -83,8 +82,7 @@ if ($legend == 'no') {
     $rrd_options .= ' LINE1.25:inbits_tot#006600:';
     $rrd_options .= ' LINE1.25:doutbits_tot#000099:';
     $rrd_options .= ' LINE0.5:nothing#555555:';
-}
-else {
+} else {
     $rrd_options .= " COMMENT:bps\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
     $rrd_options .= ' AREA:inbits_tot#cdeb8b:Peering\ In\ ';
     $rrd_options .= ' GPRINT:inbitsb:LAST:%6.2lf%s';

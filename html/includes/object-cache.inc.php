@@ -18,21 +18,18 @@ $services = new ObjCache('services');
 
 if ($devices['down']) {
     $devices['bgcolour'] = '#ffcccc';
-}
-else {
+} else {
     $devices['bgcolour'] = 'transparent';
 }
 
 if ($ports['down']) {
     $ports['bgcolour'] = '#ffcccc';
-}
-else {
+} else {
     $ports['bgcolour'] = '#e5e5e5';
 }
 
 if ($services['down']) {
     $services['bgcolour'] = '#ffcccc';
-}
-else {
+} else {
     $services['bgcolour'] = 'transparent';
 }
