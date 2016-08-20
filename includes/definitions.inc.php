@@ -1906,6 +1906,12 @@ $config['os'][$os]['icon']             = 'hwg';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// HWGroup STE2
+$os = 'hwg-ste2';
+$config['os'][$os]['text']             = 'HWg STE2';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'hwg';
+
 // EATON PDU
 $os = 'eatonpdu';
 $config['os'][$os]['text']             = 'Eaton PDU';
