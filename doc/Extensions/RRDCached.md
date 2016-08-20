@@ -107,5 +107,5 @@ Disk I/O can be found under the menu Devices>All Devices>[localhost hostname]>He
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
 
-[1]: http://librenms.readthedocs.org/Installation/Installation-(RHEL-CentOS)/#add-localhost
+[1]: http://librenms.readthedocs.org/Installation/Installation-CentOS-7-Apache/
 "Add localhost to LibreNMS"

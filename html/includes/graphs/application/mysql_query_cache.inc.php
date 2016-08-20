@@ -40,8 +40,7 @@ if (rrdtool_check_rrd_exists($mysql_rrd)) {
 //                'colour' => $vars['colour']
         );
     }
-}
-else {
+} else {
     echo "data missing: $mysql_rrd";
 }
 

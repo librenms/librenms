@@ -75,11 +75,9 @@ $sql_param = array();
 if (isset($vars['state'])) {
     if ($vars['state'] == 'ok') {
         $state = '0';
-    }
-    elseif ($vars['state'] == 'critical') {
+    } elseif ($vars['state'] == 'critical') {
         $state = '2';
-    }
-    elseif ($vars['state'] == 'warning') {
+    } elseif ($vars['state'] == 'warning') {
         $state = '1';
     }
 }
@@ -103,8 +101,7 @@ if (isset($state)) {
 if ($_SESSION['userlevel'] >= '5') {
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';
     $host_par = array();
-}
-else {
+} else {
     $host_sql = 'SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY D.hostname ORDER BY D.hostname';
     $host_par = array($_SESSION['user_id']);
 }
@@ -113,23 +110,20 @@ $shift = 1;
 foreach (dbFetchRows($host_sql, $host_par) as $device) {
     $device_id       = $device['device_id'];
     $device_hostname = $device['hostname'];
-    $devlink = generate_device_link($device,null,array('tab' => 'services'));
+    $devlink = generate_device_link($device, null, array('tab' => 'services'));
     if ($shift == 1) {
         array_unshift($sql_param, $device_id);
         $shift = 0;
-    }
-    else {
+    } else {
         $sql_param[0] = $device_id;
     }
 
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where", $sql_param) as $service) {
         if ($service['service_status'] == '2') {
             $status = "<span class='red'><b>".$service['service_type']."</b></span>";
-        }
-        else if ($service['service_status'] == '0') {
+        } elseif ($service['service_status'] == '0') {
             $status = "<span class='green'><b>".$service['service_type']."</b></span>";
-        }
-        else {
+        } else {
             $status = "<span class='grey'><b>".$service['service_type']."</b></span>";
         }
 ?>

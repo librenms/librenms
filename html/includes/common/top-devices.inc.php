@@ -25,7 +25,7 @@
  * @subpackage Widgets
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
@@ -52,8 +52,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
   </div>
 </form>
     ';
-}
-else {
+} else {
     $interval = $widget_settings['time_interval'];
     (integer) $interval_seconds = ($interval * 60);
     (integer) $device_count = $widget_settings['device_count'];
@@ -73,8 +72,7 @@ else {
             ORDER BY total desc
             LIMIT :count
             ';
-    }
-    else {
+    } else {
         $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d, `devices_perms` AS `P`
@@ -105,13 +103,21 @@ else {
     <tr>
       <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>
       <td class="text-left">'.generate_device_link(
-        $result,
-        generate_minigraph_image(
-        $result, $config['time']['day'],
-        $config['time']['now'],
-        'device_bits',
-        'no', 150, 21),
-        array(), 0, 0, 0).'
+            $result,
+            generate_minigraph_image(
+                $result,
+                $config['time']['day'],
+                $config['time']['now'],
+                'device_bits',
+                'no',
+                150,
+                21
+            ),
+            array(),
+            0,
+            0,
+            0
+        ).'
       </td>
     </tr>
         ';

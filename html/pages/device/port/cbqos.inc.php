@@ -11,10 +11,11 @@
  * the source code distribution for details.
  */
 
-function find_child($components,$parent,$level) {
+function find_child($components, $parent, $level)
+{
     global $vars;
 
-    foreach($components as $id => $array) {
+    foreach ($components as $id => $array) {
         if ($array['qos-type'] == 3) {
             continue;
         }
@@ -26,12 +27,10 @@ function find_child($components,$parent,$level) {
                 $linkvars = array_merge($vars, array('policy' => $id));
                 unset($linkvars['class']);
                 echo('<a href="' . generate_url($linkvars) . '">' . $array['label'] . '</a>');
-            }
-            elseif ($array['qos-type'] == 2) {
+            } elseif ($array['qos-type'] == 2) {
                 // Its a class, we need to make it a link.
                 echo('<a href="' . generate_url($vars, array('policy' => $parent,'class' => $id)) . '">' . $array['label'] . '</a>');
-            }
-            else {
+            } else {
                 // Unknown, no link
                 echo $array['label'];
             }
@@ -39,7 +38,7 @@ function find_child($components,$parent,$level) {
                 echo ' ('.$array['match'].')';
             }
 
-            find_child($components,$id,$level+1);
+            find_child($components, $id, $level+1);
 
             echo "</li>";
             echo "</ul>";
@@ -50,7 +49,7 @@ function find_child($components,$parent,$level) {
 if (!isset($vars['policy'])) {
     // not set, find the first parent and use it.
     foreach ($components as $id => $array) {
-        if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex'])  && ($array['parent'] == 0) ) {
+        if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex'])  && ($array['parent'] == 0)) {
             // Found the first policy
             $vars['policy'] = $id;
             continue;
@@ -64,10 +63,10 @@ echo "<div class='col-md-6'><ul class='mktree' id='ingress'>";
 echo '<div><strong><i class="fa fa-sign-in"></i>&nbsp;Ingress Policy:</strong></div>';
 $found = false;
 foreach ($components as $id => $array) {
-    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 1)  && ($array['parent'] == 0) ) {
+    if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 1)  && ($array['parent'] == 0)) {
         echo "<li class='liOpen'>";
         echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
-        find_child($components,$id,1);
+        find_child($components, $id, 1);
         echo "</li>";
         $found = true;
     }
@@ -83,10 +82,10 @@ echo "<div class='col-md-6'><ul class='mktree' id='egress'>";
 echo '<div><strong><i class="fa fa-sign-out"></i>&nbsp;Egress Policy:</strong></div>';
 $found = false;
 foreach ($components as $id => $array) {
-    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 2)  && ($array['parent'] == 0) ) {
+    if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 2)  && ($array['parent'] == 0)) {
         echo "<li class='liOpen'>";
         echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
-        find_child($components,$id,1);
+        find_child($components, $id, 1);
         echo "</li>";
         $found = true;
     }
@@ -99,7 +98,7 @@ echo "</ul></div>\n\n";
 
 // Let's make sure the policy we are trying to access actually exists.
 foreach ($components as $id => $array) {
-    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($id == $vars['policy']) ) {
+    if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($id == $vars['policy'])) {
         // The policy exists.
 
         echo "<div class='col-md-12'>&nbsp;</div>\n\n";

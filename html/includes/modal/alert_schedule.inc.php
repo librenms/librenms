@@ -12,8 +12,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -54,7 +53,7 @@ if(is_admin() !== false) {
                     <div class="form-group">
                         <label for="end" class="col-sm-4 control-label">End: </label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'],strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                            <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
                         </div>
                     </div>
                     <div class="form-group">
@@ -221,5 +220,4 @@ $(function () {
 
 </script>
 <?php
-
 }

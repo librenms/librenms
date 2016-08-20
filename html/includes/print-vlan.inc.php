@@ -2,8 +2,7 @@
 
 if (!is_integer($i / 2)) {
     $bg_colour = $list_colour_a;
-}
-else {
+} else {
     $bg_colour = $list_colour_b;
 }
 
@@ -39,8 +38,7 @@ foreach ($vlan_ports as $port) {
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '').'</div>
    </div>';
-    }
-    else {
+    } else {
         echo $vlan['port_sep'].generate_port_link($port, makeshortif($port['label']));
         $vlan['port_sep'] = ', ';
         if ($port['untagged']) {

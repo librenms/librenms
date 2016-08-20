@@ -35,33 +35,33 @@ if ($_SESSION['userlevel'] < '5') {
 
     var container = document.getElementById('visualization');
     <?php
-$groups = array();
-$max_count = 0;
+    $groups = array();
+    $max_count = 0;
 
-foreach(dbFetchRows($query, $param) as $return_value) {
-    $date = $return_value['Date'];
-    $count = $return_value['totalCount'];
-    if ($count > $max_count) {
-        $max_count = $count;
-    }
+    foreach (dbFetchRows($query, $param) as $return_value) {
+        $date = $return_value['Date'];
+        $count = $return_value['totalCount'];
+        if ($count > $max_count) {
+            $max_count = $count;
+        }
 
-    $severity = $return_value['Severity'];
-    $data[] = array(
+        $severity = $return_value['Severity'];
+        $data[] = array(
         'x' => $date,
         'y' => $count,
         'group' => $severity
-    );
-    if (!in_array($severity, $groups)) {
-        array_push($groups, $severity);
+            );
+        if (!in_array($severity, $groups)) {
+            array_push($groups, $severity);
+        }
     }
-}
 
-$graph_data = _json_encode($data);
+    $graph_data = _json_encode($data);
 ?>
     var groups = new vis.DataSet();
 <?php
 
-foreach($groups as $group) {
+foreach ($groups as $group) {
     echo "groups.add({id: '$group', content: '$group' })\n";
 }
 
@@ -69,7 +69,7 @@ foreach($groups as $group) {
 
     var items =
         <?php
-echo $graph_data; ?>
+        echo $graph_data; ?>
     ;
     var dataset = new vis.DataSet(items);
     var options = {
@@ -84,16 +84,16 @@ echo $graph_data; ?>
             customRange: {
                left: {
                     min: 0, max: <?php
-echo $max_count; ?>
+                    echo $max_count; ?>
                 }
             }
         },
         zoomMin: 86400, //24hrs
         zoomMax: <?php
-$first_date = reset($data);
-$last_date = end($data);
-$milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
-echo $milisec_diff;
+        $first_date = reset($data);
+        $last_date = end($data);
+        $milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
+        echo $milisec_diff;
 ?>,
         orientation:'top'
     };

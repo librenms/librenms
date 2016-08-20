@@ -13,7 +13,7 @@
  */
 
 if (is_admin() === false) {
-	header('Content-type: text/plain');
+    header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 

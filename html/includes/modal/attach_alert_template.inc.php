@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
@@ -33,9 +33,9 @@ if(is_admin() === false) {
                             <option></option>
 <?php
 
-    foreach(dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
-        echo '<option value="'.$rule['id'].'">'.$rule['name'].'</option>';
-    }
+foreach (dbFetchRows("SELECT `id`,`rule`,`name` FROM `alert_rules`", array()) as $rule) {
+    echo '<option value="'.$rule['id'].'">'.$rule['name'].'</option>';
+}
 ?>
                         </select>
                     </div>

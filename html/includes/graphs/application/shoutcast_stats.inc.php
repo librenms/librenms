@@ -27,8 +27,7 @@ if ($width >= 355) {
     $rrd_options .= ' GPRINT:max:LAST:"from%8.2lf"';
     $rrd_options .= ' GPRINT:bitrate:LAST:"(bitrate\:%8.2lf%s"';
     $rrd_options .= " COMMENT:\")\\n\"";
-}
-else {
+} else {
     $rrd_options .= " GPRINT:cur:LAST:\"\:%8.2lf\\n\"";
 }
 

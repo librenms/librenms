@@ -136,8 +136,7 @@ print_optionbar_end();
 
 if (is_file('pages/device/health/'.mres($vars['metric']).'.inc.php')) {
     include 'pages/device/health/'.mres($vars['metric']).'.inc.php';
-}
-else {
+} else {
     foreach ($datas as $type) {
         if ($type != 'overview') {
             $graph_title         = $type_text[$type];
