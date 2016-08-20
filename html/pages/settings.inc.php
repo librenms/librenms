@@ -95,7 +95,6 @@ if (is_admin() === true) {
         echo '<div class="table-responsive">' . a2t($config) . '</div>';
 
         if ($debug && $_SESSION['userlevel'] >= '10') {
-
             echo("<pre>");
             print_r($config);
             echo("</pre>");
