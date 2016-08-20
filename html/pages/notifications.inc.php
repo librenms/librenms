@@ -22,7 +22,9 @@
  * @subpackage Notifications
  */
 
-$notifications = new ObjCache('notifications');
+use LibreNMS\ObjectCache;
+
+$notifications = new ObjectCache('notifications');
 ?>
 <div class="container">
   <div class="row">
