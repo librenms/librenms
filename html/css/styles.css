@@ -1663,7 +1663,6 @@ tr.search:nth-child(odd) {
 
 .gridster li {
     font-size: 1em;
-    text-align: center;
     line-height: 100%;
 }
 
@@ -1705,6 +1704,7 @@ tr.search:nth-child(odd) {
     padding: 0.8em;
     background-color: #000000;
     color: #ffffff;
+    text-align: center;
     -webkit-border-top-left-radius: 4px;
      -moz-border-top-right-radius: 4px;
           border-top-left-radius: 4px;
