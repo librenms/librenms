@@ -87,7 +87,7 @@ if (defined('SHOW_SETTINGS')) {
                 $temp_output[] = '
                 <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
                     <div class="device-availability '.$deviceState.'">
-                        <label class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</label>
+                        <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
                         <span class="small">'.$device["hostname"].'</span>
                     </div>
@@ -95,7 +95,7 @@ if (defined('SHOW_SETTINGS')) {
             } else {
                 $temp_output[] = '
                 <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
-                    <label class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</label>
+                    <span class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</span>
                 </a>';
             }
         }
@@ -123,8 +123,8 @@ if (defined('SHOW_SETTINGS')) {
                 $temp_output[] = '
                 <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
                     <div class="service-availability '.$serviceState.'">
-                        <label class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</label>
-                        <label class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</label>
+                        <span class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</span>
+                        <span class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
                         <span class="small">'.$service["hostname"].'</span>
                     </div>
@@ -132,7 +132,7 @@ if (defined('SHOW_SETTINGS')) {
             } else {
                 $temp_output[] = '
                 <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
-                    <label class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</label>
+                    <span class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</span>
                 </a>';
             }
         }
@@ -160,9 +160,9 @@ if (defined('SHOW_SETTINGS')) {
             $temp_header[] = '
             <div class="'.$headerClass.'">
                 <span>Total hosts</span>
-                <label class="label label-success label-font-border label-border">up: '.$host_up_count.'</label>
-                <label class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</label>
-                <label class="label label-danger label-font-border label-border">down: '.$host_down_count.'</label>
+                <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
+                <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
+                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>
             </div>';
     }
 
@@ -175,9 +175,9 @@ if (defined('SHOW_SETTINGS')) {
             $temp_header[] = '
             <div class="'.$headerClass.'">
                 <span>Total services</span>
-                <label class="label label-success label-font-border label-border">up: '.$service_up_count.'</label>
-                <label class="label label-warning label-font-border label-border">warn: '.$service_warn_count.'</label>
-                <label class="label label-danger label-font-border label-border">down: '.$service_down_count.'</label>
+                <span class="label label-success label-font-border label-border">up: '.$service_up_count.'</span>
+                <span class="label label-warning label-font-border label-border">warn: '.$service_warn_count.'</span>
+                <span class="label label-danger label-font-border label-border">down: '.$service_down_count.'</span>
             </div>';
     }
 
