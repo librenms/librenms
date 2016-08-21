@@ -89,6 +89,9 @@ git push origin issue-123
 
 If after do this you get some merge conflicts then you need to resolve these before carrying on.
 
+Please try to squash all commits into one, this isn't essential as we can do this when we merge but it would 
+be helpful to do this before you submit your pull request.
+
 Now you will be ready to submit a pull request from within GitHub. To do this, go to your GitHub page for the LibreNMS
 repo. Now select the branch you have just been working on (issue-123) from the drop down to the left and then click
 'Pull Request'. Fill in the details to describe the work you have done and click 'Create pull request'.
