@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Exceptions\HostUnreachableException;
+
 $no_refresh = true;
 
 if ($_SESSION['userlevel'] < 10) {

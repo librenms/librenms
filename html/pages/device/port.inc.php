@@ -88,8 +88,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '".$port['
 }
 
 // Are there any CBQoS components for this device?
-require_once "../includes/component.php";
-$component = new component();
+$component = new LibreNMS\Component();
 $options = array();         // Re-init array in case it has been declared previously.
 $options['filter']['type'] = array('=','Cisco-CBQOS');
 $components = $component->getComponents($device['device_id'], $options);

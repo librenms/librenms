@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-require_once "../includes/component.php";
-$component = new component();
+$component = new LibreNMS\Component();
 $options['filter']['type'] = array('=','Cisco-OTV');
 $components = $component->getComponents($device['device_id'], $options);
 

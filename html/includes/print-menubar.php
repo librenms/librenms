@@ -1,7 +1,7 @@
 <?php
-require $config['install_dir'].'/includes/object-cache.inc.php';
-
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
+
+use LibreNMS\ObjectCache;
 
 $service_status   = get_service_status();
 $typeahead_limit  = $config['webui']['global_search_result_limit'];
@@ -247,7 +247,7 @@ if ($_SESSION['userlevel'] >= '10') {
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
 <?php
-$ports = new ObjCache('ports');
+$ports = new ObjectCache('ports');
 
 if ($ports['errored'] > 0) {
     echo('            <li><a href="ports/errors=1/"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Errored ('.$ports['errored'].')</a></li>');
@@ -435,8 +435,7 @@ $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
 $routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
 
-require_once "../includes/component.php";
-$component = new component();
+$component = new LibreNMS\Component();
 $options['type'] = 'Cisco-OTV';
 $otv = $component->getComponents(null, $options);
 $routing_count['cisco-otv'] = count($otv);
@@ -533,7 +532,7 @@ if (is_file("includes/print-menubar-custom.inc.php")) {
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
 <?php
-    $notifications = new ObjCache('notifications');
+    $notifications = new ObjectCache('notifications');
     $style = '';
 if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
     $style = 'style="background-color:grey; color:white;"';
@@ -544,7 +543,7 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
 <?php
-    $notifications = new ObjCache('notifications');
+    $notifications = new ObjectCache('notifications');
     echo ('<li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span> Notifications</a></li>');
 ?>
           <li role="presentation" class="divider"></li>

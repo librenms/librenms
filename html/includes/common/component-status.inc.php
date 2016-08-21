@@ -1,7 +1,6 @@
 <?php
 
-require_once "../includes/component.php";
-$OBJCOMP = new component();
+$OBJCOMP = new LibreNMS\Component();
 
 $common_output[] = '
 <div>

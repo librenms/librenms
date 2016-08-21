@@ -12,15 +12,31 @@
  *
  */
 
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+
+
+// initialize the class loader and add custom mappings
+require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->mapClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
+$classLoader->mapClass('Console_Table', $config['install_dir'] . '/includes/console_table.php');
+$classLoader->mapClass('PHPMailer', $config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
+$classLoader->mapClass('SMTP', $config['install_dir'] . "/includes/phpmailer/class.smtp.php");
+$classLoader->mapClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
+$classLoader->register();
+
 // Include from PEAR
 
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
 // Includes
-include_once($config['install_dir'] . "/includes/exceptions.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
-
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/datastore.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
@@ -29,14 +45,8 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
-include_once($config['install_dir'] . "/includes/console_colour.php");
 
 $console_color = new Console_Color2();
-
-if ($config['alerts']['email']['enable']) {
-    include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
-    include_once($config['install_dir'] . "/includes/phpmailer/class.smtp.php");
-}
 
 function array_sort($array, $on, $order=SORT_ASC) {
     $new_array = array();
@@ -691,8 +701,6 @@ function parse_email($emails) {
 function send_mail($emails,$subject,$message,$html=false) {
     global $config;
     if( is_array($emails) || ($emails = parse_email($emails)) ) {
-        if( !class_exists("PHPMailer",false) )
-            include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
         $mail = new PHPMailer();
         $mail->Hostname = php_uname('n');
         if (empty($config['email_from']))
@@ -1370,30 +1378,7 @@ function dnslookup($device,$type=false,$return=false) {
 }//end dnslookup
 
 
-/**
- * Reursive Filter Iterator to iterate directories and locate .rrd files.
- *
- * @method boolean isDir()
- *
-**/
 
-class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
-
-    public function accept() {
-        $filename = $this->current()->getFilename();
-        if ($filename[0] === '.') {
-            // Ignore hidden files and directories
-            return false;
-        }
-        if ($this->isDir()) {
-            // We want to search into directories
-            return true;
-        }
-        // Matches files with .rrd in the filename.
-        // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
-        return strpos($filename, '.rrd') !== false;
-    }
-}
 
 /**
  * Run rrdtool info on a file path

@@ -1,8 +1,8 @@
 <?php
 /**
- * exceptions.inc.php
+ * HostUnreachableException.php
  *
- * Custom Exception definitions
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,17 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+namespace LibreNMS\Exceptions;
 
-// ---- addHost Excpetions ----
-class HostExistsException extends Exception {}
 
-class HostIpExistsException extends HostExistsException {}
-
-class InvalidPortAssocModeException extends Exception {}
-
-class SnmpVersionUnsupportedException extends Exception {}
-
-class HostUnreachableException extends Exception
+class HostUnreachableException extends \Exception
 {
     protected $reasons = array();
 
@@ -64,7 +57,3 @@ class HostUnreachableException extends Exception
         return $this->reasons;
     }
 }
-
-class HostUnreachablePingException extends HostUnreachableException {}
-
-class HostUnreachableSnmpException extends HostUnreachableException {}

@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-require_once "../includes/component.php";
-$component = new component();
+$component = new LibreNMS\Component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'ntp';
