@@ -232,7 +232,7 @@ extend raspberry /opt/raspberry.sh
 ```
 4. Edit your sudo users (usually `visudo`) and add at the bottom:
 ```
-snmp ALL=(ALL) NOPASSWD: /opt/raspberry.sh
+snmp ALL=(ALL) NOPASSWD: /opt/raspberry.sh, /usr/bin/vcgencmd*
 ```
 5. Restart snmpd on PI host
 

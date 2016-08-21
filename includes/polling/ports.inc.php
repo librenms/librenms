@@ -409,10 +409,14 @@ foreach ($ports as $port) {
             $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
         }
 
-        // Overwrite ifSpeed with ifHighSpeed if it's over 1G
-        if (is_numeric($this_port['ifHighSpeed']) && ($this_port['ifSpeed'] > '1000000000' || $this_port['ifSpeed'] == 0)) {
-            echo 'HighSpeed ';
+        if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
+            d_echo('HighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
+        } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
+            d_echo('ifSpeed ');
+        } else {
+            d_echo('No ifSpeed ');
+            $this_port['ifSpeed'] = 0;
         }
 
         // Overwrite ifDuplex with dot3StatsDuplexStatus if it exists
