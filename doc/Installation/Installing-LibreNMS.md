@@ -18,11 +18,12 @@ If you want to install yourself then we have some new documentation which should
 
 [RHEL / CentOS 7 Nginx](http://docs.librenms.org/Installation/Installation-CentOS-7-Nginx/)
 
+### Old Install Docs
 If the above are missing or incomplete then you can try our old docs below.
 
 [Debian/Ubuntu](http://docs.librenms.org/Installation/Installation-Ubuntu-1404-Apache/)
 
-[RHEL/CentOS](http://docs.librenms.org/Installation/Installation-CentOS-6-Apache-Nginx/
+[RHEL/CentOS](http://docs.librenms.org/Installation/Installation-CentOS-6-Apache-Nginx/)
 
 [Debian/Ubuntu Lighttpd](http://docs.librenms.org/Installation/Installation-Ubuntu-1404-Lighttpd/)
 
