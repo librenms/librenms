@@ -36,7 +36,6 @@ pages:
     - General/Credits.md
     - General/Updating.md
     - General/Welcome-to-Observium-users.md
-    - General/Welcome-to-Observium-users.md
 - Extensions:
     - Extensions/Alerting.md
     - Extensions/Applications.md
