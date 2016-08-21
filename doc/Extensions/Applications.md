@@ -17,8 +17,7 @@ Different applications support a variety of ways collect data: by direct connect
 11. [Unbound](#unbound) - Agent
 12. [Proxmox](#proxmos) - extend SNMP
 13. [Raspberry PI](#raspberry-pi) - extend SNMP
-
-* [Agent Setup](#agent-setup)
+14. [Agent Setup](#agent-setup)
 
 ### BIND9 aka named
 
