@@ -1,6 +1,6 @@
 site_name: LibreNMS Docs
-theme: mkdocs
 docs_dir: doc
+theme_dir: 'librenms_theme'
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
@@ -12,6 +12,7 @@ site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms
 repo_name: GitHub
+google_analytics: ['UA-79149977-2', 'docs.librenms.org']
 pages:
 - Home: index.md
 - Installation:
