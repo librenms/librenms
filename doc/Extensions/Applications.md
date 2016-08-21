@@ -7,16 +7,16 @@ Different applications support a variety of ways collect data: by direct connect
 1. [BIND9/named](#bind9-aka-named) - Agent
 2. [MySQL](#mysql) - Agent
 3. [NGINX](#nginx) - Agent
-4. [NTPD] (#ntpd-server) - extend SNMP, Agent
-4. [PowerDNS](#powerdns) - Agent
-5. [PowerDNS Recursor](#powerdns-recursor) - Agent
-6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-7. [OS Updates](#os-updates) - extend SNMP
-8. [DHCP Stats](#dhcp-stats) - extend SNMP
-9. [Memcached](#memcached) - extend SNMP
-10. [Unbound](#unbound) - Agent
-11. [Proxmox](#proxmos) - extend SNMP
-12. [Raspberry PI](#raspberry-pi) - extend SNMP
+4. [NTPD](#ntpd-server) - extend SNMP, Agent
+5. [PowerDNS](#powerdns) - Agent
+6. [PowerDNS Recursor](#powerdns-recursor) - Agent
+7. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
+8. [OS Updates](#os-updates) - extend SNMP
+9. [DHCP Stats](#dhcp-stats) - extend SNMP
+10. [Memcached](#memcached) - extend SNMP
+11. [Unbound](#unbound) - Agent
+12. [Proxmox](#proxmos) - extend SNMP
+13. [Raspberry PI](#raspberry-pi) - extend SNMP
 
 * [Agent Setup](#agent-setup)
 
