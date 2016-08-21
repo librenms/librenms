@@ -307,7 +307,7 @@ foreach ($modules as $module) {
         // Loop through the rrd_dir
         $rrd_directory = new RecursiveDirectoryIterator($config['rrd_dir']);
         // Filter out any non rrd files
-        $rrd_directory_filter = new RRDRecursiveFilterIterator($rrd_directory);
+        $rrd_directory_filter = new LibreNMS\RRDRecursiveFilterIterator($rrd_directory);
         $rrd_iterator = new RecursiveIteratorIterator($rrd_directory_filter);
         $rrd_total = iterator_count($rrd_iterator);
         $rrd_iterator->rewind(); // Rewind iterator in case iterator_count left iterator in unknown state

@@ -1,7 +1,9 @@
 <?php
-
-/*
- * Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
+/**
+ * ObjectCache.php
+ *
+ * -Description-
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,18 +16,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2015 Daniel Preussker <f0o@devilcode.org>
+ * @copyright  2015 LibreNMS
+ * @author     Daniel Preussker (f0o) <f0o@devilcode.org>
  */
 
-/*
- * Object-Cache
- * @author f0o <f0o@devilcode.org>
- * @copyright 2015 f0o, LibreNMS
- * @license GPL
- * @package LibreNMS
- * @subpackage Cache
- */
+namespace LibreNMS;
 
-class ObjCache implements ArrayAccess {
+use ArrayAccess;
+
+class ObjectCache implements ArrayAccess {
 
     private $data = array();
 
@@ -33,9 +36,8 @@ class ObjCache implements ArrayAccess {
 
 
     /**
-     * Initialize ObjCache
+     * Initialize ObjectCache
      * @param string $obj Name of Object
-     * @return void
      */
     public function __construct($obj) {
         global $config;

@@ -4,8 +4,7 @@ $row = 1;
 
 $device_id = $_POST['device_id'];
 
-require_once "../includes/component.php";
-$OBJCOMP = new component();
+$OBJCOMP = new LibreNMS\Component();
 
 // Add a filter if supplied
 if (isset($searchPhrase) && !empty($searchPhrase)) {
