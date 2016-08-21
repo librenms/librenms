@@ -1,6 +1,7 @@
 #!/bin/bash
 GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
+THEME_REPO="https://github.com/librenms-docs/librenms_theme.git"
 
 pip install --user mkdocs
 pip install --user pymdown-extensions
@@ -17,6 +18,8 @@ git config user.email "travis@librenms.org"
 git checkout master
 
 cd ../
+
+git clone $THEME_REPO
 
 mkdocs build --clean
 
