@@ -25,6 +25,10 @@
  * @subpackage Discovery
  */
 
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostUnreachablePingException;
+
 $ts = microtime(true);
 
 chdir(dirname($argv[0]));
@@ -32,14 +36,13 @@ chdir(dirname($argv[0]));
 require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
+require 'includes/functions.php';
+require 'includes/discovery/functions.inc.php';
 
 if ($config['autodiscovery']['snmpscan'] == false) {
     echo 'SNMP-Scan disabled.'.PHP_EOL;
     exit(2);
 }
-
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
 
 function perform_snmp_scan($net) {
     global $stats, $config, $debug, $vdebug;

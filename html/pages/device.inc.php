@@ -209,8 +209,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'vrf';
         }
 
-        require_once "../includes/component.php";
-        $component = new component();
+        $component = new LibreNMS\Component();
         $options['type'] = 'Cisco-OTV';
         $options['filter']['device_id'] = array('=',$device['device_id']);
         $otv = $component->getComponents(null, $options);

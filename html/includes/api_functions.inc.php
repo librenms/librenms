@@ -13,7 +13,6 @@
  */
 
 require_once '../includes/functions.php';
-require_once '../includes/component.php';
 require_once '../includes/device-groups.inc.php';
 if (file_exists('../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
        include '../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
@@ -513,7 +512,7 @@ function get_components()
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $COMPONENT = new component();
+    $COMPONENT = new LibreNMS\Component();
     $components = $COMPONENT->getComponents($device_id, $options);
 
     $output       = array(
@@ -541,7 +540,7 @@ function add_components()
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $COMPONENT = new component();
+    $COMPONENT = new LibreNMS\Component();
     $component = $COMPONENT->createComponent($device_id, $ctype);
 
     $output       = array(
@@ -566,7 +565,7 @@ function edit_components()
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $COMPONENT = new component();
+    $COMPONENT = new LibreNMS\Component();
 
     if ($COMPONENT->setComponentPrefs($device_id, $data)) {
         // Edit Success.
@@ -599,7 +598,7 @@ function delete_components()
     $router   = $app->router()->getCurrentRoute()->getParams();
     $cid = $router['component'];
 
-    $COMPONENT = new component();
+    $COMPONENT = new LibreNMS\Component();
     if ($COMPONENT->deleteComponent($cid)) {
         // Edit Success.
         $code     = 200;

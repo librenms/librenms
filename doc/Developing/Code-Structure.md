@@ -3,7 +3,10 @@
 This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.
 
 ### doc/
-This is the location of all the documentation for LibreNMS, this is in GitHub markdown format and can be viewed (online)[http://docs.librenms.org/]
+This is the location of all the documentation for LibreNMS, this is in GitHub markdown format and can be viewed [online](http://docs.librenms.org/)
+
+### LibreNMS/
+Any classes should be under this directory, with a directory structure that matches the namespace.  One class per file. See [PSR-0](http://www.php-fig.org/psr/psr-0/) for details.
 
 ### html/
 All web accessible files are located here.

@@ -16,8 +16,7 @@ $message    = 'Error with config';
 // enable/disable components on devices.
 $device_id    = intval($_POST['device']);
 
-require_once "../includes/component.php";
-$OBJCOMP = new component();
+$OBJCOMP = new LibreNMS\Component();
 
 // Go get the component array.
 $COMPONENTS = $OBJCOMP->getComponents($device_id);

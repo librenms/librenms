@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-require '../includes/console_colour.php';
-require '../includes/console_table.php';
 require '../includes/defaults.inc.php';
 require '../config.php';
 require_once '../includes/definitions.inc.php';
