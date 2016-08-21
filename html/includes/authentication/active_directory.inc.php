@@ -181,6 +181,7 @@ function deluser($username)
     dbDelete('ports_perms', '`user_name` =  ?', array($username));
     dbDelete('users_prefs', '`user_name` =  ?', array($username));
     dbDelete('users', '`user_name` =  ?', array($username));
+    dbDelete('session', '`session_username` =  ?', array($username));
     return dbDelete('users', '`username` =  ?', array($username));
 }
 
