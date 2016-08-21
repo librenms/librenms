@@ -82,19 +82,16 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
 
         $sess_id  = session_id();
         if (isset($_tmp_password)) {
-            $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
             $token_id = $_SESSION['username'].'|'.$hasher->HashPassword($_SESSION['username'].$token);
-        }
-        setcookie('sess_id', $sess_id, $session_time, '/', null, false, true);
-        setcookie('auth', $auth, $session_time, '/', null, false, true);
-        setcookie('token', $token_id, $session_time, '/', null, false, true);
-        if (!isset($_tmp_password)) {
-            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
-        } else {
+            setcookie('sess_id', $sess_id, $session_time, '/', null, false, true);
+            setcookie('auth', $auth, $session_time, '/', null, false, true);
+            setcookie('token', $token_id, $session_time, '/', null, false, true);
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => $session_time), 'session');
+        } else {
+            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
         }
 
         $permissions = permissions_cache($_SESSION['user_id']);
