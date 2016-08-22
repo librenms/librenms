@@ -58,9 +58,10 @@ class ClassLoader
      */
     public static function psrLoad($name)
     {
-        global $config, $vdebug;
+        global $vdebug;
+
         $file = str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $name) . '.php';
-        $fullFile = $config['install_dir'] ? $config['install_dir'] . '/' . $file : $file;
+        $fullFile = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR .  $file;
 
         if($vdebug) {
             echo __CLASS__ . " [[ $name > $fullFile ]]\n";
