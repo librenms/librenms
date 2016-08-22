@@ -23,10 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
-
-include 'includes/exceptions.inc.php';
-include 'includes/rrdtool.inc.php';
+namespace LibreNMS\Tests;
 
 class RrdtoolTest extends \PHPUnit_Framework_TestCase
 {
@@ -96,7 +93,7 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         $config['rrdcached'] = '';
         $config['rrdtool_version'] = '1.4';
 
-        $this->setExpectedException('FileExistsException');
+        $this->setExpectedException('LibreNMS\Exceptions\FileExistsException');
         // use this file, since it is guaranteed to exist
         rrdtool_build_command('create', __FILE__, 'o');
     }
