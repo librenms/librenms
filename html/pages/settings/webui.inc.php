@@ -18,6 +18,13 @@ $graph_conf = array(
     ),
 );
 
+$availability_map_conf = array(
+    array('name'               => 'webui.old_availability_map',
+          'descr'              => 'Availability map old view',
+          'type'               => 'checkbox',
+    ),
+);
+
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
@@ -25,6 +32,7 @@ echo '
 
 echo generate_dynamic_config_panel('Graph settings', $config_groups, $graph_conf);
 echo generate_dynamic_config_panel('Search settings', $config_groups, $search_conf);
+echo generate_dynamic_config_panel('Availability map settings', $config_groups, $availability_map_conf);
 
 echo '
     </form>
