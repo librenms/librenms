@@ -1993,6 +1993,12 @@ $config['os'][$os]['over'][1]['text'] = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text'] = 'Memory Usage';
 
+// Hytera repeaters
+$os = "hytera";
+$config['os'][$os]['text'] = 'Hytera Repeater';
+$config['os'][$os]['type'] = 'wireless';
+$config['os'][$os]['icon'] = 'hytera';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
