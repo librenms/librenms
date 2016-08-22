@@ -22,7 +22,7 @@ require 'includes/functions.php';
 
 $iter = '0';
 
-rrdtool_pipe_open($rrd_process, $rrd_pipes);
+rrdtool_initialize();
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
@@ -158,4 +158,4 @@ if ($poller_time > 300) {
 }
 echo "\nCompleted in $poller_time sec\n";
 
-rrdtool_pipe_close($rrd_process, $rrd_pipes);
+rrdtool_terminate();

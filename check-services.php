@@ -46,11 +46,11 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = false;
 }
 
-rrdtool_pipe_open($rrd_process, $rrd_pipes);
+rrdtool_initialize();
 
 foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC') as $service) {
     // Run the polling function
     poll_service($service);
 
 } //end foreach
-rrdtool_pipe_close($rrd_process, $rrd_pipes);
+rrdtool_terminate();
