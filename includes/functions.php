@@ -20,16 +20,6 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 
 
-// initialize the class loader and add custom mappings
-require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
-$classLoader->registerClass('Console_Table', $config['install_dir'] . '/includes/console_table.php');
-$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
-$classLoader->registerClass('SMTP', $config['install_dir'] . "/includes/phpmailer/class.smtp.php");
-$classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
-$classLoader->register();
-
 // Include from PEAR
 
 include_once("Net/IPv4.php");
