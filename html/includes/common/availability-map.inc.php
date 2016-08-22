@@ -78,33 +78,40 @@ if (defined('SHOW_SETTINGS')) {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                     $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
+                    $deviceLabelOld = 'availability-map-oldview-box-warn';
                     $host_warn_count++;
                 } else {
                     $deviceState = 'up';
                     $deviceLabel = 'label-success';
+                    $deviceLabelOld = 'availability-map-oldview-box-up';
                     $host_up_count++;
                 }
             } else {
                 $deviceState = 'down';
                 $deviceLabel = 'label-danger';
+                $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
 
-            if ($directpage == "yes") {
-                $deviceIcon = getImage($device);
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+            if ($config['availability-map-newview'] == 1) {
+                if ($directpage == "yes") {
+                    $deviceIcon = getImage($device);
+                    $temp_output[] = '
+                    <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
                     <div class="device-availability '.$deviceState.'">
                         <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
                         <span class="small">'.$device["hostname"].'</span>
                     </div>
-                </a>';
+                    </a>';
+                } else {
+                    $temp_output[] = '
+                    <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+                        <span class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</span>
+                    </a>';
+                }
             } else {
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
-                    <span class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</span>
-                </a>';
+                $temp_output[] = '<a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'"><div class="'.$deviceLabelOld.'"></div></a>';
             }
         }
     }
@@ -116,34 +123,41 @@ if (defined('SHOW_SETTINGS')) {
             foreach ($services as $service) {
                 if ($service['service_status'] == '0') {
                     $serviceLabel = "label-success";
+                    $serviceLabelOld = 'availability-map-oldview-box-up';
                     $serviceState = "up";
                     $service_up_count++;
                 } elseif ($service['service_status'] == '1') {
                     $serviceLabel = "label-warning";
+                    $serviceLabelOld = 'availability-map-oldview-box-warn';
                     $serviceState = "warn";
                     $service_warn_count++;
                 } else {
                     $serviceLabel = "label-danger";
+                    $serviceLabelOld = 'availability-map-oldview-box-down';
                     $serviceState = "down";
                     $service_down_count++;
                 }
 
-                if ($directpage == "yes") {
-                    $deviceIcon = getImage($service);
-                    $temp_output[] = '
-                    <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                        <div class="service-availability ' . $serviceState . '">
-                            <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
-                            <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
-                            <span class="device-icon">' . $deviceIcon . '</span><br>
-                            <span class="small">' . $service["hostname"] . '</span>
-                        </div>
-                    </a>';
+                if ($config['availability-map-newview'] == 1) {
+                    if ($directpage == "yes") {
+                        $deviceIcon = getImage($service);
+                        $temp_output[] = '
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                            <div class="service-availability ' . $serviceState . '">
+                                <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
+                                <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
+                                <span class="device-icon">' . $deviceIcon . '</span><br>
+                                <span class="small">' . $service["hostname"] . '</span>
+                            </div>
+                        </a>';
+                    } else {
+                        $temp_output[] = '
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                            <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
+                        </a>';
+                    }
                 } else {
-                    $temp_output[] = '
-                    <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                        <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
-                    </a>';
+                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="'.$serviceLabelOld.'"></div></a>';
                 }
             }
         } else {
