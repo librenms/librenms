@@ -23,19 +23,18 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-// get the librenms install directory
+// get the current LibreNMS install directory
 $install_dir = realpath(__DIR__ . '/..');
 
 require_once $install_dir . '/LibreNMS/ClassLoader.php';
 
 // initialize the class loader
 $loader = new LibreNMS\ClassLoader();
-$loader->registerDir('tests', 'LibreNMS\Tests');
+$loader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 $loader->register();
 
 require_once $install_dir . '/includes/defaults.inc.php';
-require_once $install_dir . '/config.php';
-require_once $install_dir . '/includes/definitions.inc.php';
 
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/syslog.php';
+
