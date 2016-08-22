@@ -15,6 +15,14 @@
 require_once '../includes/defaults.inc.php';
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
+
+// initialize the class loader and add custom mappings
+require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->mapClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
+$classLoader->mapClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
+$classLoader->register();
+
 require_once '../includes/common.php';
 require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
