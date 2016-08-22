@@ -1,71 +1,100 @@
 <?php
-
-/*
- * Observium
+/**
+ * rrdtool.inc.php
  *
- *   This file is part of Observium.
+ * Helper for processing rrd requests efficiently
  *
- * @package    observium
- * @subpackage rrdtool
- * @author     Adam Armstrong <adama@memetic.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
  * @copyright  (C) 2006 - 2012 Adam Armstrong
+ * @copyright  2016 Tony Murray
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use LibreNMS\Exceptions\FileExistsException;
 
 /**
  * Opens up a pipe to RRDTool using handles provided
  *
- * @param $rrd_process
- * @param $rrd_pipes
- * @global $config
- * @return boolean
+ * @param bool $dual_process start an additional process that's output should be read after every command
+ * @return bool the process(s) have been successfully started
  */
-function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
+function rrdtool_initialize($dual_process = true)
 {
-    global $config;
+    global $config, $rrd_async_process, $rrd_async_pipes, $rrd_sync_process, $rrd_sync_pipes;
 
-    $command = $config['rrdtool'].' -';
+    $command = $config['rrdtool'] . ' -';
 
-    $descriptorspec = array(
-        0 => array(
-            'pipe',
-            'r',
-        ),
-        // stdin is a pipe that the child will read from
-        1 => array(
-            'pipe',
-            'w',
-        ),
-        // stdout is a pipe that the child will write to
-        2 => array(
-            'pipe',
-            'w',
-        ),
-        // stderr is a pipe that the child will write to
+    $descriptor_spec = array(
+        0 => array('pipe', 'r'), // stdin  is a pipe that the child will read from
+        1 => array('pipe', 'w'), // stdout is a pipe that the child will write to
+        2 => array('pipe', 'w'), // stderr is a pipe that the child will write to
     );
 
     $cwd = $config['rrd_dir'];
     $env = array();
 
-    $rrd_process = proc_open($command, $descriptorspec, $rrd_pipes, $cwd, $env);
+    if(!is_resource($rrd_async_process)) {
+        $rrd_async_process = proc_open($command, $descriptor_spec, $rrd_async_pipes, $cwd, $env);
+        stream_set_blocking($rrd_async_pipes[1], false);
+        stream_set_blocking($rrd_async_pipes[2], false);
+    }
 
-    stream_set_blocking($rrd_pipes[1], false);
-    stream_set_blocking($rrd_pipes[2], false);
+    if ($dual_process && !is_resource($rrd_sync_process)) {
+        $rrd_sync_process = proc_open($command, $descriptor_spec, $rrd_sync_pipes, $cwd, $env);
+        stream_set_blocking($rrd_sync_pipes[1], false);
+        stream_set_blocking($rrd_sync_pipes[2], false);
+    }
 
-    return is_resource($rrd_process);
+    return is_resource($rrd_async_process) && ($dual_process ? is_resource($rrd_sync_process) : true);
 }
 
+/**
+ * Close all open rrdtool processes.
+ * This should be done before exiting a script that has called rrdtool_initilize()
+ *
+ * @return bool indicates success
+ */
+function rrdtool_terminate() {
+    global $rrd_async_process, $rrd_async_pipes, $rrd_sync_process, $rrd_sync_pipes;
+
+    $ret = rrdtool_pipe_close($rrd_async_process, $rrd_async_pipes);
+    if ($rrd_sync_pipes) {
+        $ret = rrdtool_pipe_close($rrd_sync_process, $rrd_sync_pipes) && $ret;
+    }
+
+    return $ret;
+}
 
 /**
  * Closes the pipe to RRDTool
  *
+ * @internal
  * @param  resource $rrd_process
  * @param  array $rrd_pipes
  * @return integer
  */
 function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
-    d_echo(stream_get_contents($rrd_pipes[1]));
-    d_echo(stream_get_contents($rrd_pipes[2]));
+    global $vdebug;
+    if ($vdebug) {
+        d_echo(stream_get_contents($rrd_pipes[1]));
+        d_echo(stream_get_contents($rrd_pipes[2]));
+    }
 
     fclose($rrd_pipes[0]);
     fclose($rrd_pipes[1]);
@@ -73,9 +102,7 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
-    $return_value = proc_close($rrd_process);
-
-    return $return_value;
+    return proc_close($rrd_process);
 }
 
 
@@ -89,39 +116,30 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
  */
 function rrdtool_graph($graph_file, $options)
 {
-    global $config, $debug;
+    global $config, $debug, $rrd_async_pipes;
 
-    rrdtool_pipe_open($rrd_process, $rrd_pipes);
-
-    if (is_resource($rrd_process)) {
-        // $pipes now looks like this:
-        // 0 => writeable handle connected to child stdin
-        // 1 => readable handle connected to child stdout
-        // Any error output will be appended to /tmp/error-output.txt
+    if (rrdtool_initialize(false)) {
         if ($config['rrdcached']) {
             $options = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $options);
-
-            fwrite($rrd_pipes[0], 'graph --daemon ' . $config['rrdcached'] . " $graph_file $options");
+            fwrite($rrd_async_pipes[0], 'graph --daemon ' . $config['rrdcached'] . " $graph_file $options");
         } else {
-            fwrite($rrd_pipes[0], "graph $graph_file $options");
+            fwrite($rrd_async_pipes[0], "graph $graph_file $options");
         }
 
-        fclose($rrd_pipes[0]);
+        fclose($rrd_async_pipes[0]);
 
         $line = "";
         $data = "";
         while (strlen($line) < 1) {
-            $line = fgets($rrd_pipes[1], 1024);
+            $line = fgets($rrd_async_pipes[1], 1024);
             $data .= $line;
         }
 
-        $return_value = rrdtool_pipe_close($rrd_process, $rrd_pipes);
+        $return_value = rrdtool_terminate();
 
         if ($debug) {
             echo '<p>';
-            if ($debug) {
-                echo "graph $graph_file $options";
-            }
+            echo "graph $graph_file $options";
 
             echo '</p><p>';
             echo "command returned $return_value ($data)\n";
@@ -142,59 +160,42 @@ function rrdtool_graph($graph_file, $options)
  * @param string $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
  * @param string $filename The full patth to the rrd file
  * @param string $options rrdtool command options
- * @param integer $timeout seconds give up waiting for output, default 0
  * @return array the output of stdout and stderr in an array
  * @global $config
  * @global $debug
  * @global $rrd_pipes
  */
-function rrdtool($command, $filename, $options, $timeout = 0)
+function rrdtool($command, $filename, $options)
 {
-    global $config, $debug, $vdebug, $rrd_pipes;
+    global $config, $debug, $vdebug, $rrd_async_pipes, $rrd_sync_pipes;
 
-    // do not ovewrite files when creating
-    if ($command == 'create' && version_compare($config['rrdtool_version'], '1.4.3', '>=')) {
-        $options .= ' -O';
-    }
-    // rrdcached commands: >=1.5.5: all, >=1.5 all: except tune, <1.5: all except tune and create
-    if ($config['rrdcached'] &&
-        (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||
-        (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") ||
-        ($command != "create" && $command != "tune"))
-        ) {
-
-        // only relative paths if using rrdcached
-        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
-
-        // using rrdcached, append --daemon
-        $cmd = "$command $filename $options --daemon ".$config['rrdcached'];
-    } else {
-        $cmd = "$command $filename $options";
+    try {
+        $cmd = rrdtool_build_command($command, $filename, $options);
+    } catch (FileExistsException $e) {
+        c_echo('RRD[%g' . $filename . " already exists%n]\n", $debug);
+        return array(null, null);
     }
 
     c_echo("RRD[%g$cmd%n]\n", $debug);
 
     // do not write rrd files, but allow read-only commands
-    if ($config['norrd'] && !in_array($command,
-            array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))
-    ) {
-        c_echo("[%rRRD Disabled%n]\n");
-        $output = array(null, null);
-    } elseif ($command == 'create' && version_compare($config['rrdtool_version'], '1.4.3', '<') && is_file($filename)) {
-        // do not overwrite RRD if it already exists and RRDTool ver. < 1.4.3
-        c_echo("RRD[%g$filename already exists%n]\n", $debug);
-        $output = array(null, null);
+    $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
+    if ($config['norrd'] && !in_array($command, $ro_commands)) {
+        c_echo('[%rRRD Disabled%n]');
+        return array(null, null);
+    }
+
+    // send the command!
+    if($command == 'last' && $rrd_sync_pipes) {
+        fwrite($rrd_sync_pipes[0], $cmd . "\n");
+
+        // this causes us to block until we receive output for up to the timeout in seconds
+        stream_select($r = $rrd_sync_pipes, $w = null, $x = null, 10);
+        $output = array(stream_get_contents($rrd_sync_pipes[1]), stream_get_contents($rrd_sync_pipes[2]));
+
     } else {
-        if ($timeout > 0 && stream_select($r = $rrd_pipes, $w = null, $x = null, 0)) {
-            // dump existing data
-            stream_get_contents($rrd_pipes[1]);
-        }
-
-        fwrite($rrd_pipes[0], $cmd . "\n");
-
-        // this causes us to block until we receive output for up to $timeout seconds
-        stream_select($r = $rrd_pipes, $w = null, $x = null, $timeout);
-        $output = array(stream_get_contents($rrd_pipes[1]), stream_get_contents($rrd_pipes[2]));
+        fwrite($rrd_async_pipes[0], $cmd . "\n");
+        $output = array(stream_get_contents($rrd_async_pipes[1]), stream_get_contents($rrd_async_pipes[2]));
     }
 
     if ($vdebug) {
@@ -207,15 +208,62 @@ function rrdtool($command, $filename, $options, $timeout = 0)
 }
 
 /**
- * Checks if the rrd file exists on the server
- * This will perform a remote check if using rrdcached and rrdtool >= 1.5 (broken)
+ * Build a command for rrdtool
+ * Shortens the filename as needed
+ * Determines if --daemon and -O should be used
  *
- * @param $filename
- * @return bool
+ * @internal
+ * @param string $command The base rrdtool command.  Usually create, update, last.
+ * @param string $filename The full path to the rrd file
+ * @param string $options Options for the command possibly including the rrd definition
+ * @return string returns a full command ready to be piped to rrdtool
+ * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+ */
+function rrdtool_build_command($command, $filename, $options)
+{
+    global $config;
+
+    if ($command == 'create') {
+        // <1.4.3 doesn't support -O, so make sure the file doesn't exist
+        if (version_compare($config['rrdtool_version'], '1.4.3', '<')) {
+            if (is_file($filename)) {
+                throw new FileExistsException();
+            }
+        } else {
+            $options .= ' -O';
+        }
+    }
+
+    // no remote for create < 1.5.5 and tune < 1.5
+    if ($config['rrdcached'] &&
+        !($command == 'create' && version_compare($config['rrdtool_version'], '1.5.5', '<')) &&
+        !($command == 'tune' && $config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '<'))
+    ) {
+        // only relative paths if using rrdcached
+        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+
+        return "$command $filename $options --daemon " . $config['rrdcached'];
+    }
+
+    return "$command $filename $options";
+}
+
+/**
+ * Checks if the rrd file exists on the server
+ * This will perform a remote check if using rrdcached and rrdtool >= 1.5
+ *
+ * @param string $filename full path to the rrd file
+ * @return bool whether or not the passed rrd file exists
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    return is_file($filename);
+    global $config;
+    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+        $chk = rrdtool('last', $filename, '');
+        return strpos(implode($chk), "$filename': No such file or directory") === false;
+    } else {
+        return is_file($filename);
+    }
 }
 
 /**
@@ -348,6 +396,7 @@ function rrdtool_tune($type, $filename, $max)
         $options = "--maximum " . implode(":$max --maximum ", $fields) . ":$max";
         rrdtool('tune', $filename, $options);
     }
+    return true;
 } // rrdtool_tune
 
 
@@ -383,7 +432,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
         $rrd = rrd_name($device['hostname'], $rrd_name);
     }
 
-    if ($tags['rrd_def']) {
+    if ($tags['rrd_def'] && !rrdtool_check_rrd_exists($rrd)) {
         $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
         // add the --step and the rra definitions to the command
         $newdef = "--step $step " . implode(' ', $rrd_def) . $config['rrd_rra'];
