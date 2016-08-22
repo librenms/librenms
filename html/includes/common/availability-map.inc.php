@@ -28,14 +28,14 @@ if (defined('SHOW_SETTINGS')) {
         <div class="col-sm-6">
             <select class="form-control" name="mode">';
 
-            if ($config['show_services'] == 0) {
-                $common_output[] = '<option value="0" selected="selected">only devices</option>';
-            } else {
-                $common_output[] = '
-                <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
-                <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
-                <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>';
-            }
+    if ($config['show_services'] == 0) {
+        $common_output[] = '<option value="0" selected="selected">only devices</option>';
+    } else {
+        $common_output[] = '
+        <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
+        <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
+        <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>';
+    }
 
     $common_output[] ='
             </select>
@@ -93,7 +93,7 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
-            if ($config['availability-map-newview'] == 1) {
+            if ($config['webui']['old_availability_map'] == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getImage($device);
                     $temp_output[] = '
@@ -138,7 +138,7 @@ if (defined('SHOW_SETTINGS')) {
                     $service_down_count++;
                 }
 
-                if ($config['availability-map-newview'] == 1) {
+                if ($config['webui']['old_availability_map'] == 0) {
                     if ($directpage == "yes") {
                         $deviceIcon = getImage($service);
                         $temp_output[] = '
@@ -173,14 +173,14 @@ if (defined('SHOW_SETTINGS')) {
             <span class="page-availability-title">Availability map for</span>
             <select id="mode" class="page-availability-report-select" name="mode">';
 
-            if ($config['show_services'] == 0) {
-                $temp_header[] = '<option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>';
-            } else {
-                $temp_header[] = '
-                    <option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>
-                    <option value="1"' .($mode == 1 ? 'selected':'').'>only services</option>
-                    <option value="2"' .($mode == 2 ? 'selected':'').'>devices and services</option>';
-            }
+        if ($config['show_services'] == 0) {
+            $temp_header[] = '<option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>';
+        } else {
+            $temp_header[] = '
+                <option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>
+                <option value="1"' .($mode == 1 ? 'selected':'').'>only services</option>
+                <option value="2"' .($mode == 2 ? 'selected':'').'>devices and services</option>';
+        }
 
         $temp_header[] =
             '</select>
