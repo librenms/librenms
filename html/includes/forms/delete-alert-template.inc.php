@@ -20,13 +20,11 @@ if (is_admin() === false) {
 if (!is_numeric($_POST['template_id'])) {
     echo 'ERROR: No template selected';
     exit;
-}
-else {
+} else {
     if (dbDelete('alert_templates', '`id` =  ?', array($_POST['template_id']))) {
         echo 'Alert template has been deleted.';
         exit;
-    }
-    else {
+    } else {
         echo 'ERROR: Alert template has not been deleted.';
         exit;
     }

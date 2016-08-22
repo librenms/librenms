@@ -19,20 +19,20 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
         <td colspan='2'>";
 
     switch ($entry['']['cc6kxbarModuleModeSwitchingMode']) {
-    case 'busmode':
-        // echo '<a title="Modules in this mode don't use fabric. Backplane is used for both lookup and data forwarding.">Bus</a>';
-        break;
+        case 'busmode':
+            // echo '<a title="Modules in this mode don't use fabric. Backplane is used for both lookup and data forwarding.">Bus</a>';
+            break;
 
-    case 'crossbarmode':
-        echo '<a title="Modules in this mode use backplane for forwarding decision and fabric for data forwarding.">Crossbar</a>';
-        break;
+        case 'crossbarmode':
+            echo '<a title="Modules in this mode use backplane for forwarding decision and fabric for data forwarding.">Crossbar</a>';
+            break;
 
-    case 'dcefmode':
-        echo '<a title="Modules in this mode use fabric for data forwarding and local forwarding is enabled.">DCEF</a>';
-        break;
+        case 'dcefmode':
+            echo '<a title="Modules in this mode use fabric for data forwarding and local forwarding is enabled.">DCEF</a>';
+            break;
 
-    default:
-        echo $entry['']['cc6kxbarModuleModeSwitchingMode'];
+        default:
+            echo $entry['']['cc6kxbarModuleModeSwitchingMode'];
     }
 
     echo '</td>
@@ -42,8 +42,7 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
         if (is_numeric($subindex)) {
             if ($fabric['cc6kxbarModuleChannelFabStatus'] == 'ok') {
                 $fabric['mode_class'] = 'green';
-            }
-            else {
+            } else {
                 $fabric['mode_class'] = 'red';
             }
 

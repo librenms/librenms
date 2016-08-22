@@ -2,11 +2,12 @@
 
 namespace LibreNMS\Plugins;
 
-class Test {
+class Test
+{
 
-    public function menu() {
+    public function menu()
+    {
         echo '<li><a href="plugin/p='.get_class().'">'.get_class().'</a></li>';
-
     }//end menu()
 
 

@@ -26,13 +26,15 @@ define('REGEXP_PLUGIN', '/^[a-zA-Z0-9_.-]+$/');
 /*
  * Read input variable from GET, POST or COOKIE taking
  * care of magic quotes
- * @name Name of value to return
- * @array User-input array ($_GET, $_POST or $_COOKIE)
- * @default Default value
- * @return $default if name in unknown in $array, otherwise
+ *
+ * @param string $name Name of value to return
+ * @param array $array User-input array ($_GET, $_POST or $_COOKIE)
+ * @param string $default Default value
+ * @return string $default if name in unknown in $array, otherwise
  *         input value with magic quotes stripped off
  */
-function read_var($name, &$array, $default=null) {
+function read_var($name, &$array, $default = null)
+{
     if (isset($array[$name])) {
         if (is_array($array[$name])) {
             if (get_magic_quotes_gpc()) {
@@ -42,22 +44,17 @@ function read_var($name, &$array, $default=null) {
                 }
 
                 return $ret;
-            }
-            else {
+            } else {
                 return $array[$name];
             }
-        }
-        else if (is_string($array[$name]) && get_magic_quotes_gpc()) {
+        } elseif (is_string($array[$name]) && get_magic_quotes_gpc()) {
             return stripslashes($array[$name]);
-        }
-        else {
+        } else {
             return $array[$name];
         }
-    }
-    else {
+    } else {
         return $default;
     }
-
 }//end read_var()
 
 
@@ -65,7 +62,8 @@ function read_var($name, &$array, $default=null) {
  * Alphabetically compare host names, comparing label
  * from tld to node name
  */
-function collectd_compare_host($a, $b) {
+function collectd_compare_host($a, $b)
+{
     $ea = explode('.', $a);
     $eb = explode('.', $b);
     $i  = (count($ea) - 1);
@@ -77,19 +75,19 @@ function collectd_compare_host($a, $b) {
     }
 
     return 0;
-
 }//end collectd_compare_host()
 
 
 /**
  * Fetch list of hosts found in collectd's datadirs.
- * @return Sorted list of hosts (sorted by label from rigth to left)
+ * @return array Sorted list of hosts (sorted by label from rigth to left)
  */
-function collectd_list_hosts() {
+function collectd_list_hosts()
+{
     global $config;
 
     $hosts = array();
-    foreach($config['datadirs'] as $datadir) {
+    foreach ($config['datadirs'] as $datadir) {
         if ($d = @opendir($datadir)) {
             while (($dent = readdir($d)) !== false) {
                 if ($dent != '.' && $dent != '..' && is_dir($datadir.'/'.$dent) && preg_match(REGEXP_HOST, $dent)) {
@@ -97,8 +95,7 @@ function collectd_list_hosts() {
                 }
             }
             closedir($d);
-        }
-        else {
+        } else {
             error_log('Failed to open datadir: '.$datadir);
         }
     }
@@ -110,10 +107,12 @@ function collectd_list_hosts() {
 
 /**
  * Fetch list of plugins found in collectd's datadirs for given host.
- * @arg_host Name of host for which to return plugins
- * @return Sorted list of plugins (sorted alphabetically)
+ *
+ * @param string $arg_host Name of host for which to return plugins
+ * @return array Sorted list of plugins (sorted alphabetically)
  */
-function collectd_list_plugins($arg_host) {
+function collectd_list_plugins($arg_host)
+{
     global $config;
 
     $plugins = array();
@@ -123,8 +122,7 @@ function collectd_list_plugins($arg_host) {
                 if ($dent != '.' && $dent != '..' && is_dir($datadir.'/'.$arg_host.'/'.$dent)) {
                     if ($i = strpos($dent, '-')) {
                         $plugins[] = substr($dent, 0, $i);
-                    }
-                    else {
+                    } else {
                         $plugins[] = $dent;
                     }
                 }
@@ -137,17 +135,18 @@ function collectd_list_plugins($arg_host) {
     $plugins = array_unique($plugins);
     sort($plugins);
     return $plugins;
-
 }//end collectd_list_plugins()
 
 
 /**
  * Fetch list of plugin instances found in collectd's datadirs for given host+plugin
- * @arg_host Name of host
- * @arg_plugin Name of plugin
- * @return Sorted list of plugin instances (sorted alphabetically)
+ *
+ * @param string $arg_host Name of host
+ * @param string $arg_plugin Name of plugin
+ * @return array Sorted list of plugin instances (sorted alphabetically)
  */
-function collectd_list_pinsts($arg_host, $arg_plugin) {
+function collectd_list_pinsts($arg_host, $arg_plugin)
+{
     global $config;
 
     $pinsts = array();
@@ -158,8 +157,7 @@ function collectd_list_pinsts($arg_host, $arg_plugin) {
                     if ($i = strpos($dent, '-')) {
                         $plugin = substr($dent, 0, $i);
                         $pinst  = substr($dent, ($i + 1));
-                    }
-                    else {
+                    } else {
                         $plugin = $dent;
                         $pinst  = '';
                     }
@@ -177,7 +175,6 @@ function collectd_list_pinsts($arg_host, $arg_plugin) {
     $pinsts = array_unique($pinsts);
     sort($pinsts);
     return $pinsts;
-
 }//end collectd_list_pinsts()
 
 
@@ -186,9 +183,10 @@ function collectd_list_pinsts($arg_host, $arg_plugin) {
  * @arg_host Name of host
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
- * @return Sorted list of types (sorted alphabetically)
+ * @return array Sorted list of types (sorted alphabetically)
  */
-function collectd_list_types($arg_host, $arg_plugin, $arg_pinst) {
+function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
+{
     global $config;
 
     $types     = array();
@@ -204,8 +202,7 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst) {
                     $dent = substr($dent, 0, (strlen($dent) - 4));
                     if ($i = strpos($dent, '-')) {
                         $types[] = substr($dent, 0, $i);
-                    }
-                    else {
+                    } else {
                         $types[] = $dent;
                     }
                 }
@@ -218,7 +215,6 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst) {
     $types = array_unique($types);
     sort($types);
     return $types;
-
 }//end collectd_list_types()
 
 
@@ -228,15 +224,16 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst) {
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
  * @arg_type Type
- * @return Sorted list of type instances (sorted alphabetically)
+ * @return array Sorted list of type instances (sorted alphabetically)
  */
-function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type) {
+function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
+{
     global $config;
 
     $tinsts    = array();
     $my_plugin = $arg_plugin.(strlen($arg_pinst) ? '-'.$arg_pinst : '');
     if (!preg_match(REGEXP_PLUGIN, $my_plugin)) {
-        return $types;
+        return $tinsts;
     }
 
     foreach ($config['datadirs'] as $datadir) {
@@ -247,8 +244,7 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type) {
                     if ($i = strpos($dent, '-')) {
                         $type  = substr($dent, 0, $i);
                         $tinst = substr($dent, ($i + 1));
-                    }
-                    else {
+                    } else {
                         $type  = $dent;
                         $tinst = '';
                     }
@@ -266,7 +262,6 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type) {
     $tinsts = array_unique($tinsts);
     sort($tinsts);
     return $tinsts;
-
 }//end collectd_list_tinsts()
 
 
@@ -275,14 +270,16 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type) {
  * (e.g. virtualisation is collected on host for individual VMs and can be
  *  symlinked to the VM's hostname, support FLUSH for these by flushing
  *  on the host-identifier instead of VM-identifier)
- * @host Host name
- * @plugin Plugin name
- * @pinst Plugin instance
- * @type Type name
- * @tinst Type instance
- * @return Identifier that collectd's FLUSH command understands
+ *
+ * @param string $host Hostname
+ * @param string $plugin Plugin name
+ * @param string $type
+ * @param string $pinst Plugin instance
+ * @param string $tinst Type instance
+ * @return string Identifier that collectd's FLUSH command understands
  */
-function collectd_identifier($host, $plugin, $pinst, $type, $tinst) {
+function collectd_identifier($host, $plugin, $type, $pinst, $tinst)
+{
     global $config;
     $rrd_realpath    = null;
     $orig_identifier = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, strlen($pinst) ? '-' : '', $pinst, $type, strlen($tinst) ? '-' : '', $tinst);
@@ -305,24 +302,21 @@ function collectd_identifier($host, $plugin, $pinst, $type, $tinst) {
 
     if (is_null($identifier)) {
         return $orig_identifier;
-    }
-    else {
+    } else {
         return $identifier;
     }
-
 }//end collectd_identifier()
 
 
 /**
  * Tell collectd that it should FLUSH all data it has regarding the
  * graph we are about to generate.
- * @host Host name
- * @plugin Plugin name
- * @pinst Plugin instance
- * @type Type name
- * @tinst Type instance
+ *
+ * @param string $identifier
+ * @return bool
  */
-function collectd_flush($identifier) {
+function collectd_flush($identifier)
+{
     global $config;
 
     if (!$config['collectd_sock']) {
@@ -341,8 +335,7 @@ function collectd_flush($identifier) {
             foreach ($identifier as $val) {
                 $cmd .= sprintf(' identifier="%s"', $val);
             }
-        }
-        else {
+        } else {
             $cmd .= sprintf(' identifier="%s"', $identifier);
         }
 
@@ -368,31 +361,33 @@ function collectd_flush($identifier) {
     else {
         error_log(sprintf('graph.php: Failed to open unix-socket to collectd: %d: %s', $u_errno, $u_errmsg));
     }
-
+    return true;
 }//end collectd_flush()
 
 /**
  * Helper function to strip quotes from RRD output
- * @str RRD-Info generated string
- * @return String with one surrounding pair of quotes stripped
+ *
+ * @param string $str RRD-Info generated string
+ * @return string String with one surrounding pair of quotes stripped
  */
-function rrd_strip_quotes($str) {
+function rrd_strip_quotes($str)
+{
     if ($str[0] == '"' && $str[(strlen($str) - 1)] == '"') {
         return substr($str, 1, (strlen($str) - 2));
-    }
-    else {
+    } else {
         return $str;
     }
-
 }//end rrd_strip_quotes()
 
 
 /**
  * Determine useful information about RRD file
- * @file Name of RRD file to analyse
- * @return Array describing the RRD file
+ *
+ * @param string $file Name of RRD file to analyse
+ * @return array Array describing the RRD file
  */
-function rrd_info($file) {
+function rrd_info($file)
+{
     $info = array('filename' => $file);
 
     $rrd = popen(RRDTOOL.' info '.escapeshellarg($file), 'r');
@@ -422,8 +417,7 @@ function rrd_info($file) {
 
                     $info['DS']["$ds"]["$ds_key"] = rrd_strip_quotes($value);
                 }
-            }
-            else if (strncmp($key, 'rra[', 4) == 0) {
+            } elseif (strncmp($key, 'rra[', 4) == 0) {
                 // RRD definition
                 $p   = strpos($key, ']');
                 $rra = substr($key, 4, ($p - 4));
@@ -440,8 +434,7 @@ function rrd_info($file) {
 
                     $info['RRA']["$rra"]["$rra_key"] = rrd_strip_quotes($value);
                 }
-            }
-            else if (strpos($key, '[') === false) {
+            } elseif (strpos($key, '[') === false) {
                 $info[$key] = rrd_strip_quotes($value);
             }//end if
         }//end while
@@ -450,11 +443,11 @@ function rrd_info($file) {
     }//end if
 
     return $info;
-
 }//end rrd_info()
 
 
-function rrd_get_color($code, $line=true) {
+function rrd_get_color($code, $line = true)
+{
     global $config;
     $name = ($line ? 'f_' : 'h_').$code;
     if (!isset($config['rrd_colors'][$name])) {
@@ -466,28 +459,27 @@ function rrd_get_color($code, $line=true) {
     }
 
     return $config['rrd_colors'][$name];
-
 }//end rrd_get_color()
 
 
 /**
  * Draw RRD file based on it's structure
  *
- * @host
- * @plugin
- * @pinst
- * @type
- * @tinst
- * @opts
- * @return Commandline to call RRDGraph in order to generate the final graph
+ * @param $host
+ * @param $plugin
+ * @param $type
+ * @param null $pinst
+ * @param null $tinst
+ * @param array $opts
+ * @return string|false Commandline to call RRDGraph in order to generate the final graph* @internal param $
  */
-function collectd_draw_rrd($host, $plugin, $pinst=null, $type, $tinst=null, $opts=array()) {
+function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, $opts = array())
+{
     global $config;
     $timespan_def = null;
     if (!isset($opts['timespan'])) {
         $timespan_def = reset($config['timespan']);
-    }
-    else {
+    } else {
         foreach ($config['timespan'] as &$ts) {
             if ($ts['name'] == $opts['timespan']) {
                 $timespan_def = $ts;
@@ -510,8 +502,7 @@ function collectd_draw_rrd($host, $plugin, $pinst=null, $type, $tinst=null, $opt
             $rrdinfo = rrd_info($datadir.'/'.$rrdfile.'.rrd');
             if (isset($rrdinfo['RRA']) && is_array($rrdinfo['RRA'])) {
                 break;
-            }
-            else {
+            } else {
                 $rrdinfo = null;
             }
         }
@@ -530,11 +521,9 @@ function collectd_draw_rrd($host, $plugin, $pinst=null, $type, $tinst=null, $opt
     while (list($k, $v) = each($rrdinfo['RRA'])) {
         if ($v['cf'] == 'MAX') {
             $has_max = true;
-        }
-        else if ($v['cf'] == 'AVERAGE') {
+        } elseif ($v['cf'] == 'AVERAGE') {
             $has_avg = true;
-        }
-        else if ($v['cf'] == 'MIN') {
+        } elseif ($v['cf'] == 'MIN') {
             $has_min = true;
         }
     }
@@ -644,23 +633,22 @@ function collectd_draw_rrd($host, $plugin, $pinst=null, $type, $tinst=null, $opt
     }
 
     return $cmd;
-
 }//end collectd_draw_rrd()
 
 
 /**
  * Draw RRD file based on it's structure
  *
- * @timespan
- * @host
- * @plugin
- * @pinst
- * @type
- * @tinst
- * @opts
- * @return   Commandline to call RRDGraph in order to generate the final graph
+ * @param $timespan
+ * @param $host
+ * @param $plugin
+ * @param $type
+ * @param null $pinst
+ * @param null $tinst
+ * @return false|string Commandline to call RRDGraph in order to generate the final graph* @internal param $
  */
-function collectd_draw_generic($timespan, $host, $plugin, $pinst=null, $type, $tinst=null) {
+function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, $tinst = null)
+{
     global $config, $GraphDefs;
     $timespan_def = null;
     foreach ($config['timespan'] as &$ts) {
@@ -727,23 +715,22 @@ function collectd_draw_generic($timespan, $host, $plugin, $pinst=null, $type, $t
     }
 
     return false;
-
 }//end collectd_draw_generic()
 
 
 /**
  * Draw stack-graph for set of RRD files
- * @opts Graph options like colors
- * @sources List of array(name, file, ds)
- * @return Commandline to call RRDGraph in order to generate the final graph
+ * @param array $opts Graph options like colors
+ * @param array $sources List of array(name, file, ds)
+ * @return string Commandline to call RRDGraph in order to generate the final graph
  */
-function collectd_draw_meta_stack(&$opts, &$sources) {
+function collectd_draw_meta_stack(&$opts, &$sources)
+{
     global $config;
     $timespan_def = null;
     if (!isset($opts['timespan'])) {
         $timespan_def = reset($config['timespan']);
-    }
-    else {
+    } else {
         foreach ($config['timespan'] as &$ts) {
             if ($ts['name'] == $opts['timespan']) {
                 $timespan_def = $ts;
@@ -841,8 +828,7 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
 
         if (isset($opts['colors'][$inst_name])) {
             $line_color = new CollectdColor($opts['colors'][$inst_name]);
-        }
-        else {
+        } else {
             $line_color = new CollectdColor('random');
         }
 
@@ -866,23 +852,22 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
     }
 
     return $rrdcmd;
-
 }//end collectd_draw_meta_stack()
 
 
 /**
  * Draw stack-graph for set of RRD files
- * @opts Graph options like colors
- * @sources List of array(name, file, ds)
- * @return Commandline to call RRDGraph in order to generate the final graph
+ * @param array $opts Graph options like colors
+ * @param array $sources List of array(name, file, ds)
+ * @return string Commandline to call RRDGraph in order to generate the final graph
  */
-function collectd_draw_meta_line(&$opts, &$sources) {
+function collectd_draw_meta_line(&$opts, &$sources)
+{
     global $config;
     $timespan_def = null;
     if (!isset($opts['timespan'])) {
         $timespan_def = reset($config['timespan']);
-    }
-    else {
+    } else {
         foreach ($config['timespan'] as &$ts) {
             if ($ts['name'] == $opts['timespan']) {
                 $timespan_def = $ts;
@@ -964,8 +949,7 @@ function collectd_draw_meta_line(&$opts, &$sources) {
 
         if (isset($opts['colors'][$inst_name])) {
             $line_color = new CollectdColor($opts['colors'][$inst_name]);
-        }
-        else {
+        } else {
             $line_color = new CollectdColor('random');
         }
 
@@ -985,5 +969,4 @@ function collectd_draw_meta_line(&$opts, &$sources) {
     }
 
     return $rrdcmd;
-
 }//end collectd_draw_meta_line()

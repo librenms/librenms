@@ -23,8 +23,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_list[$i]['colour'] = $config['graph_colours'][$colours][$i];
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

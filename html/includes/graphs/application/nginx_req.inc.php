@@ -16,7 +16,6 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " GPRINT:a:LAST:'%6.2lf %s'";
     $rrd_options .= " GPRINT:a:AVERAGE:'%6.2lf %s'";
     $rrd_options .= " GPRINT:a:MAX:'%6.2lf %s\\n'";
-}
-else {
+} else {
     $error_msg = 'Missing RRD';
 }

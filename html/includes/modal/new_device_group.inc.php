@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-group" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -60,8 +59,8 @@ if(is_admin() !== false) {
                         <select id='condition' name='condition' placeholder='Condition' class='form-control has-feedback'>
                                 <option value='='>Equals</option>
                                 <option value='!='>Not Equals</option>
-				<option value='~'>Like</option>
-				<option value='!~'>Not Like</option>
+                <option value='~'>Like</option>
+                <option value='!~'>Not Like</option>
                                 <option value='>'>Larger than</option>
                                 <option value='>='>Larger than or Equals</option>
                                 <option value='<'>Smaller than</option>
@@ -244,5 +243,4 @@ $( "#name, #suggest, #value" ).blur(function() {
 </script>
 
 <?php
-
 }

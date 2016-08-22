@@ -18,8 +18,7 @@ $cols = array(
 foreach ($cols as $sort => $col) {
     if (isset($vars['sort']) && $vars['sort'] == $sort) {
         echo '<th>'.$col.' *</th>';
-    }
-    else {
+    } else {
         echo '<th><a href="'.generate_url($vars, array('sort' => $sort)).'">'.$col.'</a></th>';
     }
 }
@@ -35,11 +34,9 @@ foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
         if ($port['ifAdminStatus'] == 'down') {
             $ports_disabled++;
-        }
-        else if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'down') {
+        } elseif ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'down') {
             $ports_down++;
-        }
-        else if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'up') {
+        } elseif ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'up') {
             $ports_up++;
         }
 
@@ -51,8 +48,7 @@ foreach ($ports as $port) {
 
         if ((isset($port['in_errors']) && $port['in_errors'] > 0) || (isset($ports['out_errors']) && $port['out_errors'] > 0)) {
             $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
-        }
-        else {
+        } else {
             $error_img = '';
         }
 

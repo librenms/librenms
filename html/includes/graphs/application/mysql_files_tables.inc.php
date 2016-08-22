@@ -14,14 +14,13 @@ $array = array(
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $vars) {
-    $rrd_list[$i]['filename']  = $rrd_filename;
+        $rrd_list[$i]['filename']  = $rrd_filename;
         $rrd_list[$i]['descr'] = $vars['descr'];
         $rrd_list[$i]['ds']    = $ds;
         // $rrd_list[$i]['colour'] = $vars['colour'];
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

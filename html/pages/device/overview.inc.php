@@ -12,14 +12,12 @@ $services['total'] = array_sum($services);
 
 if ($services[2]) {
     $services_colour = $warn_colour_a;
-}
-else {
+} else {
     $services_colour = $list_colour_a;
 }
 if ($ports['down']) {
     $ports_colour = $warn_colour_a;
-}
-else {
+} else {
     $ports_colour = $list_colour_a;
 }
 
@@ -34,8 +32,8 @@ echo('
     <div class="col-md-6">
 ');
 require 'includes/dev-overview-data.inc.php';
-use LibreNMS\Plugins;
-Plugins::call('device_overview_container',array($device));
+
+LibreNMS\Plugins::call('device_overview_container', array($device));
 
 require 'overview/ports.inc.php';
 echo('
@@ -47,7 +45,7 @@ require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
 
-if(is_array($entity_state['group']['c6kxbar'])) {
+if (is_array($entity_state['group']['c6kxbar'])) {
     require 'overview/c6kxbar.inc.php';
 }
 

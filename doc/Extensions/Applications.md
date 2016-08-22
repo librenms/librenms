@@ -7,18 +7,17 @@ Different applications support a variety of ways collect data: by direct connect
 1. [BIND9/named](#bind9-aka-named) - Agent
 2. [MySQL](#mysql) - Agent
 3. [NGINX](#nginx) - Agent
-4. [NTPD] (#ntpd-server) - extend SNMP, Agent
-4. [PowerDNS](#powerdns) - Agent
-5. [PowerDNS Recursor](#powerdns-recursor) - Agent
-6. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-7. [OS Updates](#os-updates) - extend SNMP
-8. [DHCP Stats](#dhcp-stats) - extend SNMP
-9. [Memcached](#memcached) - extend SNMP
-10. [Unbound](#unbound) - Agent
-11. [Proxmox](#proxmos) - extend SNMP
-12. [Raspberry PI](#raspberry-pi) - extend SNMP
-
-* [Agent Setup](#agent-setup)
+4. [NTPD](#ntpd-server) - extend SNMP, Agent
+5. [PowerDNS](#powerdns) - Agent
+6. [PowerDNS Recursor](#powerdns-recursor) - Agent
+7. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
+8. [OS Updates](#os-updates) - extend SNMP
+9. [DHCP Stats](#dhcp-stats) - extend SNMP
+10. [Memcached](#memcached) - extend SNMP
+11. [Unbound](#unbound) - Agent
+12. [Proxmox](#proxmos) - extend SNMP
+13. [Raspberry PI](#raspberry-pi) - extend SNMP
+14. [Agent Setup](#agent-setup)
 
 ### BIND9 aka named
 
@@ -152,7 +151,9 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
    _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
 ### OS Updates
-A small shell script that checks your system package manager for any available updates (supports yum/apt-get/zypper package managers).
+A small shell script that checks your system package manager for any available updates. Supports apt-get/pacman/yum/zypper package managers).
+
+For pacman users automatically refreshing the database, it is recommended you use an alternative database location `--dbpath=/var/lib/pacman/checkupdate`
 
 ##### Extend SNMP
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
@@ -230,7 +231,7 @@ extend raspberry /opt/raspberry.sh
 ```
 4. Edit your sudo users (usually `visudo`) and add at the bottom:
 ```
-snmp ALL=(ALL) NOPASSWD: /opt/raspberry.sh
+snmp ALL=(ALL) NOPASSWD: /opt/raspberry.sh, /usr/bin/vcgencmd*
 ```
 5. Restart snmpd on PI host
 

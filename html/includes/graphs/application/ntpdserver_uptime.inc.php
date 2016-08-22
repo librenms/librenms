@@ -24,8 +24,7 @@ $rrd_options .= ' CDEF:cuptime=uptime,86400,/';
 
 if ($width < 224) {
     $rrd_options .= " 'COMMENT:Days         Cur      Min     Max     Avg\\n'";
-}
-else {
+} else {
     $rrd_options .= " 'COMMENT:Days      Current  Minimum  Maximum  Average\\n'";
 }
 

@@ -16,7 +16,7 @@ $i = 0;
 foreach ($stats as $stat => $color) {
     $i++;
     $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr']    = ucfirst ($stat);
+    $rrd_list[$i]['descr']    = ucfirst($stat);
     $rrd_list[$i]['ds']       = $stat;
 
     # Set up DEFs
@@ -26,10 +26,9 @@ foreach ($stats as $stat => $color) {
     $rrd_options .= " 'CDEF:cdef".$stat."=".$stat.",1,*'";
 
     # Set up area graphing with stacking
-    if ( $i == "0" ) {
+    if ($i == "0") {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat)."'";
-    } 
-    else {
+    } else {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat).":STACK'";
     }
 

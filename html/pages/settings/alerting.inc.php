@@ -188,8 +188,7 @@ $config_groups = get_config_by_group('alerting');
 
 if (isset($config['base_url'])) {
     $callback = $config['base_url'].'/'.$_SERVER['REQUEST_URI'].'/';
-}
-else {
+} else {
     $callback = get_url().'/';
 }
 
@@ -292,8 +291,8 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('General alert settings',true,$config_groups,$general_conf);
-echo generate_dynamic_config_panel('Email transport',true,$config_groups,$mail_conf,'mail');
+echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
+echo generate_dynamic_config_panel('Email transport', $config_groups, $mail_conf, 'mail');
 
 echo '
         <div class="panel panel-default">
@@ -353,8 +352,7 @@ foreach ($api_urls as $api_url) {
                         <div class="col-sm-1">';
 if (empty($config_groups['alert.transports.pagerduty']['config_value']) === false) {
     echo "<i class='fa fa-check-square-o fa-col-success fa-3x'></i>";
-}
-else {
+} else {
     echo "<i class='fa fa-check-square-o fa-col-danger fa-3x'></i>";
 }
 

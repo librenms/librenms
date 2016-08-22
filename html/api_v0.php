@@ -140,7 +140,7 @@ $app->group(
                         );
                     }
                 );
-		// End Routing
+            // End Routing
                 // Resources section
                 $app->group(
                     '/resources',

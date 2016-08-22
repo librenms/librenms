@@ -5,8 +5,7 @@ require 'includes/graphs/common.inc.php';
 $i = 0;
 if ($width > '500') {
     $descr_len = 18;
-}
-else {
+} else {
     $descr_len  = 8;
     $descr_len += round(($width - 260) / 9.5);
 }
@@ -20,8 +19,7 @@ if ($width > '500') {
     }
 
     $rrd_options .= " COMMENT:'\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."     Now         Ave          Max\l'";
 }
 
@@ -39,8 +37,7 @@ foreach ($rrd_list as $rrd) {
 
     if (isset($rrd['descr_in'])) {
         $descr = rrdtool_escape($rrd['descr_in'], $descr_len).'  In';
-    }
-    else {
+    } else {
         $descr = rrdtool_escape($rrd['descr'], $descr_len).'  In';
     }
 

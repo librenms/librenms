@@ -1,8 +1,7 @@
 <?php
-if( $config['twofactor'] && isset($twofactorform) ) {
-  echo twofactor_form();
-}
-else {
+if ($config['twofactor'] && isset($twofactorform)) {
+    echo twofactor_form();
+} else {
 ?>
       <div class="row">
         <div class="col-md-offset-4 col-md-4">
@@ -53,13 +52,13 @@ else {
                     // -->
                     </script>
                     <?php
-                    }
+}
                     ?>
                     </div>
                   </div>
-                  <?php
+                    <?php
                     if (isset($config['login_message'])) {
-                      echo('<div class="panel-footer"><center>'.$config['login_message'].'</center></div>');
+                        echo('<div class="panel-footer"><center>'.$config['login_message'].'</center></div>');
                     }
                     ?>
                 </div>

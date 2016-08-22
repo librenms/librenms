@@ -30,7 +30,6 @@ if ($rowCount != -1) {
 $sql = "SELECT `ps`.*, `p`.* $sql";
 
 foreach (dbFetchRows($sql, array($device_id)) as $stp_ports_db) {
-
     $bridge_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedBridge']));
     $root_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedRoot']));
 

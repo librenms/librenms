@@ -39,7 +39,7 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('Email transport',true,$config_groups,$mail_conf,'mail');
+echo generate_dynamic_config_panel('Email transport',$config_groups,$mail_conf,'mail');
 
 echo '
     </form>

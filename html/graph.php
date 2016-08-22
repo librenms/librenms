@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage graphing
  * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
@@ -22,8 +22,7 @@ if (isset($_GET['debug'])) {
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -34,14 +33,21 @@ else {
 require_once '../includes/defaults.inc.php';
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
+
+// initialize the class loader and add custom mappings
+require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->mapClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
+$classLoader->mapClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
+$classLoader->register();
+
 require_once '../includes/common.php';
-require_once '../includes/console_colour.php';
 require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/rrdtool.inc.php';
-if($config['allow_unauth_graphs'] != true) {
-  require_once 'includes/authenticate.inc.php';
+if ($config['allow_unauth_graphs'] != true) {
+    require_once 'includes/authenticate.inc.php';
 }
 require 'includes/graphs/graph.inc.php';
 
