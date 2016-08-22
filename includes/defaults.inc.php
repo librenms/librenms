@@ -21,7 +21,7 @@
 //
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
-error_reporting(E_ERROR);
+error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 function set_debug($debug) {
 
