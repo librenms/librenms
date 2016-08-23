@@ -27,10 +27,7 @@ if ($vars['page'] == 'logout') {
     dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
     unset($_SESSION);
     unset($_COOKIE);
-    setcookie('sess_id', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
-    setcookie('token', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
-    setcookie('auth', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
-    session_destroy();
+    destroy_cookies();
     $auth_message = 'Logged Out';
     header('Location: ' . $config['base_url']);
     exit;
@@ -108,7 +105,20 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
         }
     } elseif (isset($_SESSION['username'])) {
         $auth_message = 'Authentication Failed';
+        destroy_cookies();
         unset($_SESSION['authenticated']);
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
     }
+}
+
+/**
+ * Destroys users cookies
+ */
+function destroy_cookies()
+{
+    global $config;
+    setcookie('sess_id', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
+    setcookie('token', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
+    setcookie('auth', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
+    session_destroy();
 }
