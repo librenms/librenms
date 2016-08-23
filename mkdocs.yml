@@ -23,11 +23,7 @@ pages:
     - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
     - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
     - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-#    - Older Docs: Installation/Installing-LibreNMS.md
-    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
-    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
-    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
-    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
+    - Older Docs: Installation/Installing-LibreNMS.md
     - Migrating from Observium: Installation/Migrating-from-Observium.md
 - General:
     - General/Acknowledgement.md
@@ -89,3 +85,10 @@ pages:
     - Support/Performance.md
     - Support/Poller Support.md
     - Support/Support-New-OS.md
+- hidden:
+    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
+    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
+    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
+    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
+    - Installation/Installation-(Debian-Ubuntu).md
+    - Installation/Installation-(RHEL-CentOS).md
