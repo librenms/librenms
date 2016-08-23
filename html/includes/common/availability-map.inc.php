@@ -59,9 +59,17 @@ if (defined('SHOW_SETTINGS')) {
     $service_warn_count = 0;
     $service_down_count = 0;
 
+    if ($config['webui']['availability_map_sort_status'] == 1) {
+        $deviceOrderBy = 'status';
+        $serviceOrderBy = '`S`.`service_status` DESC';
+    } else {
+        $deviceOrderBy = 'hostname';
+        $serviceOrderBy = '`D`.`hostname`';
+    }
+
     if ($mode == 0 || $mode == 2) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
-        $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
         if (is_normal_user() === true) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
             $param = array(
@@ -70,7 +78,7 @@ if (defined('SHOW_SETTINGS')) {
         } else {
             $sql .= ' WHERE';
         }
-        $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `hostname`";
+        $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `".$deviceOrderBy."`";
         $temp_output = array();
 
         foreach (dbFetchRows($sql, $param) as $device) {
@@ -93,6 +101,18 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
+            if ($config['webui']['availability_map_sysname'] == 1) {
+                $deviceDisplay = $device["sysName"];
+            } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
+                if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+                    $deviceDisplay = $device['sysName'];
+                } else {
+                    $deviceDisplay = $device['hostname'];
+                }
+            } else {
+                $deviceDisplay = $device['hostname'];
+            }
+
             if ($config['webui']['old_availability_map'] == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getImage($device);
@@ -101,7 +121,7 @@ if (defined('SHOW_SETTINGS')) {
                     <div class="device-availability '.$deviceState.'">
                         <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
-                        <span class="small">'.$device["hostname"].'</span>
+                        <span class="small">'.$deviceDisplay.'</span>
                     </div>
                     </a>';
                 } else {
@@ -117,7 +137,7 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
-        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id`;';
+        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
         $services = dbFetchRows($service_query);
         if (count($services) > 0) {
             foreach ($services as $service) {
@@ -137,6 +157,18 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = "down";
                     $service_down_count++;
                 }
+                
+                if ($config['webui']['availability_map_sysname'] == 1) {
+                    $serviceDisplay = $service["sysName"];
+                } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
+                    if (filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+                        $serviceDisplay = $service['sysName'];
+                    } else {
+                        $serviceDisplay = $service['hostname'];
+                    }
+                } else {
+                    $serviceDisplay = $service['hostname'];
+                }
 
                 if ($config['webui']['old_availability_map'] == 0) {
                     if ($directpage == "yes") {
@@ -147,7 +179,7 @@ if (defined('SHOW_SETTINGS')) {
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
                                 <span class="device-icon">' . $deviceIcon . '</span><br>
-                                <span class="small">' . $service["hostname"] . '</span>
+                                <span class="small">' . $serviceDisplay . '</span>
                             </div>
                         </a>';
                     } else {
