@@ -11,10 +11,10 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 if (defined('SHOW_SETTINGS')) {
     $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
-
     $common_output[] = '
     <form class="form-horizontal" onsubmit="return widget_settings(this)">
     <div class="form-group">
@@ -26,10 +26,18 @@ if (defined('SHOW_SETTINGS')) {
     <div class="form-group">
         <label for="show_services" class="col-sm-4 control-label">Show</label>
         <div class="col-sm-6">
-            <select class="form-control" name="mode">
-                <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
-                <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
-                <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>
+            <select class="form-control" name="mode">';
+
+    if ($config['show_services'] == 0) {
+        $common_output[] = '<option value="0" selected="selected">only devices</option>';
+    } else {
+        $common_output[] = '
+        <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
+        <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
+        <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>';
+    }
+
+    $common_output[] ='
             </select>
         </div>
     </div>
@@ -39,10 +47,10 @@ if (defined('SHOW_SETTINGS')) {
     </form>';
 } else {
     require_once 'includes/object-cache.inc.php';
-    $mode = isset($_SESSION["mapView"]) ? $_SESSION["mapView"] : 0;
 
-    $widget_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
-    $tile_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
+    $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
+    $widget_mode = json_decode($sql['settings']);
+    $mode = isset($_SESSION["mapView"]) ? $_SESSION["mapView"] : $widget_mode->{'mode'};
 
     $host_up_count = 0;
     $host_warn_count = 0;
@@ -70,83 +78,112 @@ if (defined('SHOW_SETTINGS')) {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                     $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
+                    $deviceLabelOld = 'availability-map-oldview-box-warn';
                     $host_warn_count++;
                 } else {
                     $deviceState = 'up';
                     $deviceLabel = 'label-success';
+                    $deviceLabelOld = 'availability-map-oldview-box-up';
                     $host_up_count++;
                 }
             } else {
                 $deviceState = 'down';
                 $deviceLabel = 'label-danger';
+                $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
 
-            if ($directpage == "yes") {
-                $deviceIcon = getImage($device);
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+            if ($config['webui']['old_availability_map'] == 0) {
+                if ($directpage == "yes") {
+                    $deviceIcon = getImage($device);
+                    $temp_output[] = '
+                    <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
                     <div class="device-availability '.$deviceState.'">
                         <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
                         <span class="small">'.$device["hostname"].'</span>
                     </div>
-                </a>';
+                    </a>';
+                } else {
+                    $temp_output[] = '
+                    <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
+                        <span class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</span>
+                    </a>';
+                }
             } else {
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'">
-                    <span class="label '.$deviceLabel.' widget-availability label-font-border">'.$deviceState.'</span>
-                </a>';
+                $temp_output[] = '<a href="'.generate_url(array('page' => 'device', 'device' => $device['device_id'])).'" title="'.$device['hostname']." - ".formatUptime($device['uptime']).'"><div class="'.$deviceLabelOld.'"></div></a>';
             }
         }
     }
 
-    if ($mode == 1 || $mode == 2) {
+    if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
         $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id`;';
-        foreach (dbFetchRows($service_query) as $service) {
-            if ($service['service_status'] == '0') {
-                $serviceLabel = "label-success";
-                $serviceState = "up";
-                $service_up_count++;
-            } elseif ($service['service_status'] == '1') {
-                $serviceLabel = "label-warning";
-                $serviceState = "warn";
-                $service_warn_count++;
-            } else {
-                $serviceLabel = "label-danger";
-                $serviceState = "down";
-                $service_down_count++;
-            }
+        $services = dbFetchRows($service_query);
+        if (count($services) > 0) {
+            foreach ($services as $service) {
+                if ($service['service_status'] == '0') {
+                    $serviceLabel = "label-success";
+                    $serviceLabelOld = 'availability-map-oldview-box-up';
+                    $serviceState = "up";
+                    $service_up_count++;
+                } elseif ($service['service_status'] == '1') {
+                    $serviceLabel = "label-warning";
+                    $serviceLabelOld = 'availability-map-oldview-box-warn';
+                    $serviceState = "warn";
+                    $service_warn_count++;
+                } else {
+                    $serviceLabel = "label-danger";
+                    $serviceLabelOld = 'availability-map-oldview-box-down';
+                    $serviceState = "down";
+                    $service_down_count++;
+                }
 
-            if ($directpage == "yes") {
-                $deviceIcon = getImage($service);
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
-                    <div class="service-availability '.$serviceState.'">
-                        <span class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</span>
-                        <span class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</span>
-                        <span class="device-icon">'.$deviceIcon.'</span><br>
-                        <span class="small">'.$service["hostname"].'</span>
-                    </div>
-                </a>';
-            } else {
-                $temp_output[] = '
-                <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
-                    <span class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</span>
-                </a>';
+                if ($config['webui']['old_availability_map'] == 0) {
+                    if ($directpage == "yes") {
+                        $deviceIcon = getImage($service);
+                        $temp_output[] = '
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                            <div class="service-availability ' . $serviceState . '">
+                                <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
+                                <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
+                                <span class="device-icon">' . $deviceIcon . '</span><br>
+                                <span class="small">' . $service["hostname"] . '</span>
+                            </div>
+                        </a>';
+                    } else {
+                        $temp_output[] = '
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                            <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
+                        </a>';
+                    }
+                } else {
+                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="'.$serviceLabelOld.'"></div></a>';
+                }
             }
+        } else {
+            $temp_output [] = '';
         }
     }
+
+
 
     if ($directpage == "yes") {
         $temp_header[] = '
         <div class="page-availability-title-left">
             <span class="page-availability-title">Availability map for</span>
-            <select id="mode" class="page-availability-report-select" name="mode">
-                <option value="0"'.($mode == 0 ? 'selected' : '').'>devices</option>
-                <option value="1"'.($mode == 1 ? 'selected' : '').'>services</option>
-                <option value="2"'.($mode == 2 ? 'selected' : '').'>devices and services</option>
-            </select>
+            <select id="mode" class="page-availability-report-select" name="mode">';
+
+        if ($config['show_services'] == 0) {
+            $temp_header[] = '<option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>';
+        } else {
+            $temp_header[] = '
+                <option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>
+                <option value="1"' .($mode == 1 ? 'selected':'').'>only services</option>
+                <option value="2"' .($mode == 2 ? 'selected':'').'>devices and services</option>';
+        }
+
+        $temp_header[] =
+            '</select>
         </div>
         <div class="page-availability-title-right">';
     }
@@ -166,7 +203,7 @@ if (defined('SHOW_SETTINGS')) {
             </div>';
     }
 
-    if ($mode == 1 || $mode == 2) {
+    if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
         if ($directpage == "yes") {
             $headerClass = 'page-availability-report-service';
         } else {

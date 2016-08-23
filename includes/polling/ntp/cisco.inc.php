@@ -13,8 +13,7 @@
 
 $module = 'ntp';
 
-require_once 'includes/component.php';
-$component = new component();
+$component = new LibreNMS\Component();
 $options = array();
 $options['filter']['type'] = array('=',$module);
 $options['filter']['disabled'] = array('=',0);

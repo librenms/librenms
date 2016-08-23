@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+use LibreNMS\Exceptions\HostExistsException;
+
 function discover_new_device($hostname, $device = '', $method = '', $interface = '') {
     global $config;
 

@@ -12,6 +12,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Exceptions\HostUnreachableException;
+
 chdir(dirname($argv[0]));
 
 require 'includes/defaults.inc.php';

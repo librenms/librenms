@@ -15,8 +15,7 @@ if ($device['os_group'] == "cisco") {
 
     $module = 'Cisco-CBQOS';
 
-    require_once 'includes/component.php';
-    $component = new component();
+    $component = new LibreNMS\Component();
     $options['filter']['type'] = array('=',$module);
     $options['filter']['disabled'] = array('=',0);
     $options['filter']['ignore'] = array('=',0);

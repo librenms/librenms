@@ -2,7 +2,6 @@
 
 @ini_set('session.use_only_cookies', 1);
 @ini_set('session.cookie_httponly', 1);
-require 'lib/PasswordHash.php';
 
 session_start();
 
@@ -85,7 +84,7 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
             $token_id = $_SESSION['username'].'|'.$hasher->HashPassword($_SESSION['username'].$token);
         } else {
             $auth     = $_COOKIE['auth'];
-            $token_id = $_COOKIE['token_id'];
+            $token_id = $_COOKIE['token'];
         }
        
         setcookie('sess_id', $sess_id, $session_time, '/', null, false, true);

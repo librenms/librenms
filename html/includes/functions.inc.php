@@ -1219,11 +1219,19 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 ';
                 if (!empty($item['options'])) {
                     foreach ($item['options'] as $option) {
-                        $output .= '<option value="'.$option.'"';
-                        if ($option == $config_groups[$item['name']]['config_value']) {
+                        if (gettype($option) == 'string') {
+                            /* for backwards-compatibility */
+                            $tmp_opt = $option;
+                            $option = array(
+                                'value' => $tmp_opt,
+                                'description' => $tmp_opt,
+                            );
+                        }
+                        $output .= '<option value="'.$option['value'].'"';
+                        if ($option['value'] == $config_groups[$item['name']]['config_value']) {
                             $output .= ' selected';
                         }
-                        $output .= '>'.$option.'</option>';
+                        $output .= '>'.$option['description'].'</option>';
                     }
                 }
                 $output .='
