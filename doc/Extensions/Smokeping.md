@@ -1,3 +1,4 @@
+source: Extensions/Smokeping.md
 # Smokeping integration
 
 We currently have two ways to use Smokeping with LibreNMS, the first is using the included script generator to generate the config for Smokeping. The

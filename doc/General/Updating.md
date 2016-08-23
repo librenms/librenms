@@ -1,3 +1,4 @@
+source: General/Updating.md
 ## Updating your install ##
 
 If you would like to perform a manual update

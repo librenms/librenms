@@ -1,3 +1,4 @@
+source: Support/Support-New-OS.md
 This document will explain how to add basic and full support for a new OS. **Some knowledge in PHP is needed for the full support.**
 
 
@@ -247,7 +248,8 @@ includes/polling/mempools/pulse-mem.inc.php
 <?php
 
 // Simple hard-coded poller for Pulse Secure
-echo 'Pulse Secure MemPool'.'\n';
+echo 'Pulse Secure MemPool'.'
+';
 
 if ($device['os'] == 'pulse') {
   $perc     = str_replace('"', "", snmp_get($device, "PULSESECURE-PSG-MIB::iveMemoryUtil.0", '-OvQ'));
@@ -259,8 +261,10 @@ if ($device['os'] == 'pulse') {
     $mempool['free'] = ($memory_available - $mempool['used']);
   }
 
-  echo "PERC " .$perc."%\n";
-  echo "Avail " .$mempool['total']."\n";
+  echo "PERC " .$perc."%
+";
+  echo "Avail " .$mempool['total']."
+";
 
 }
 ```

@@ -1,3 +1,4 @@
+source: Extensions/Plugin-System.md
 # Developing for the Plugin System
 
 This documentation will hopefully give you a basis for how to write a plugin for LibreNMS.

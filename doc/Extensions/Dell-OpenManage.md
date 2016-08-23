@@ -1,3 +1,4 @@
+source: Extensions/Dell-OpenManage.md
 Dell OpenManage Support
 -----------------------
 

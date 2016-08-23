@@ -1,3 +1,4 @@
+source: General/Changelog.md
 ### July 2016
 
 #### Bug fixes

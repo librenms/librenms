@@ -1,3 +1,4 @@
+source: Developing/Dynamic-Config.md
 # Adding new config options to WebUI
 
 Adding support for users to update a new config option via the WebUI is now a lot easier for general options. This

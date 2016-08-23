@@ -1,3 +1,4 @@
+source: Extensions/Oxidized.md
 # Oxidized integration
 
 You can integrate LibreNMS with [Oxidized](https://github.com/ytti/oxidized-web) in two ways:

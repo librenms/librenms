@@ -1,3 +1,4 @@
+source: Extensions/Authentication.md
 # Authentication modules
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
