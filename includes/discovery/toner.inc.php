@@ -29,7 +29,16 @@ if ($config['enable_printers']) {
                     if ($descr != '') {
                         $current  = snmp_get($device, $toner_oid, '-Oqv');
                         $capacity = snmp_get($device, $capacity_oid, '-Oqv');
-                        $current  = ($current / $capacity * 100);
+                        //fix for ricoh devices returning garbage
+                        if ($current == '-3') {
+                            $current = 50;
+                        } elseif ($current == '-100') {
+                            $current = 0;
+                        } else {
+                            //normal devices returning toner values
+                            $current = ($current / $capacity * 100);
+                        }
+
                         $type     = 'jetdirect';
                         if (isHexString($descr)) {
                             $descr = snmp_hexstring($descr);
