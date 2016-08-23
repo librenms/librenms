@@ -24,11 +24,7 @@ dbDelete('session', '`session_expiry` <  ?', array(time()));
 
 if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
     dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
-    dbDelete(
-        'session',
-        '`session_username` =  ? AND session_value = ?',
-        array($_SESSION['username'], $_COOKIE['sess_id'])
-    );
+    dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
     unset($_SESSION);
     unset($_COOKIE);
     setcookie('sess_id', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
@@ -86,10 +82,7 @@ if (!$_SESSION['authenticated']) {
         if (!$config['twofactor'] || $_SESSION['twofactor']) {
             $authenticated = true;
             $_SESSION['authenticated'] = true;
-            dbInsert(
-                array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'),
-                'authlog'
-            );
+            dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
         }
     }
 
@@ -112,20 +105,10 @@ if (!$_SESSION['authenticated']) {
             setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
             setcookie('token', $token_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
             setcookie('auth', $auth, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-            dbInsert(
-                array(
-                    'session_username' => $_SESSION['username'],
-                    'session_value' => $sess_id,
-                    'session_token' => $token,
-                    'session_auth' => $auth,
-                    'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']
-                ),
-                'session'
-            );
+            dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session');
         }
 
         $permissions = permissions_cache($_SESSION['user_id']);
-
         if ($pw_success) {
             header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
             exit;
@@ -133,35 +116,16 @@ if (!$_SESSION['authenticated']) {
     } elseif (isset($form_username)) {
         $auth_message = 'Authentication Failed';
         unset($_SESSION['authenticated']); // just in case
-        dbInsert(
-            array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'),
-            'authlog'
-        );
+        dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
     }
 } else {
     /* we have a valid, authenticated session */
     if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth'])) {
         // If we have the remember me cookies set then update session expiry times to keep us logged in.
         $sess_id = session_id();
-        dbUpdate(
-            array(
-                'session_value' => $sess_id,
-                'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']
-            ),
-            'session',
-            'session_auth=?',
-            array($_COOKIE['auth'])
-        );
+        dbUpdate(array('session_value' => $sess_id, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session', 'session_auth=?', array($_COOKIE['auth']));
         setcookie('sess_id', $sess_id, (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
-        setcookie(
-            'token',
-            $_COOKIE['token'],
-            (time() + 60 * 60 * 24 * $config['auth_remember']),
-            '/',
-            null,
-            false,
-            true
-        );
+        setcookie('token', $_COOKIE['token'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
         setcookie('auth', $_COOKIE['auth'], (time() + 60 * 60 * 24 * $config['auth_remember']), '/', null, false, true);
     }
 }
