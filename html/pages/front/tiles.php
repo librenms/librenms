@@ -32,9 +32,9 @@ if ($default_dash == 0 && dbFetchCell(
     'SELECT dashboard_id FROM dashboards WHERE user_id=?',
     array($_SESSION['user_id'])
 ) == 0) {
-    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
-    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$vars['dashboard']),'users_widgets','user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0));
+    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default', 'user_id'=>$_SESSION['user_id']), 'dashboards');
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array($_SESSION['user_id'],0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$vars['dashboard']), 'users_widgets', 'user_id = ? && dashboard_id = ?', array($_SESSION['user_id'], 0));
     }
 }
 if (!empty($vars['dashboard'])) {
