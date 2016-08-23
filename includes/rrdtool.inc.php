@@ -102,7 +102,7 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
-    return proc_close($rrd_process);
+    return proc_terminate($rrd_process);
 }
 
 
