@@ -30,10 +30,12 @@ if ($config['enable_printers']) {
                         $current  = snmp_get($device, $toner_oid, '-Oqv');
                         $capacity = snmp_get($device, $capacity_oid, '-Oqv');
                         //fix for ricoh devices returning garbage
-                        if ($current == '-3') {
-                            $current = 50;
-                        } elseif ($current == '-100') {
-                            $current = 0;
+                        if ($os == 'ricoh') {
+                            if ($current == '-3') {
+                                $current = 50;
+                            } elseif ($current == '-100') {
+                                $current = 0;
+                            }
                         } else {
                             //normal devices returning toner values
                             $current = ($current / $capacity * 100);
