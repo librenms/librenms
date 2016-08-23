@@ -71,6 +71,7 @@ pages:
 - Developing:
     - Developing/Code-Guidelines.md
     - Developing/Code-Structure.md
+    - Developing/Creating-Documentation.md
     - Developing/Dynamic-Config.md
     - Developing/Sensor-State-Support.md
     - Developing/Style-Guidelines.md
