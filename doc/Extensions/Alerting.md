@@ -137,16 +137,16 @@ Templates can be matched against several rules.
 
 Default Template:
 ```text
-%title
-Severity: %severity
-{if %state == 0}Time elapsed: %elapsed{/if}
-Timestamp: %timestamp
-Unique-ID: %uid
-Rule: {if %name}%name{else}%rule{/if}
-{if %faults}Faults:
-{foreach %faults}  #%key: %value.string
-{/foreach}{/if}
-Alert sent to: {foreach %contacts}%value <%key> {/foreach}
+%title\r\n
+Severity: %severity\r\n
+{if %state == 0}Time elapsed: %elapsed{/if}\r\n
+Timestamp: %timestamp\r\n
+Unique-ID: %uid\r\n
+Rule: {if %name}%name{else}%rule{/if}\r\n
+{if %faults}Faults:\r\n
+{foreach %faults}  #%key: %value.string\r\n
+{/foreach}{/if}\r\n
+Alert sent to: {foreach %contacts}%value <%key> {/foreach}\r\n
 ```
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
