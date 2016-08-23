@@ -18,12 +18,23 @@
 
 $no_refresh   = true;
 $default_dash = 0;
-if (($tmp = dbFetchCell('SELECT dashboard FROM users WHERE user_id=?', array($_SESSION['user_id']))) != 0) {
+$tmp = dbFetchCell(
+    'SELECT dashboard FROM users WHERE user_id=?',
+    array($_SESSION['user_id'])
+);
+if ($tmp != 0) {
     $default_dash = $tmp;
-} elseif (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?', array($_SESSION['user_id'])) == 0) {
-    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']), 'dashboards');
+} elseif ((int)$config['webui']['default_dashboard_id']) {
+    // if the user hasn't set their default page, and there is a global default set
+    $default_dash = (int)$config['webui']['default_dashboard_id'];
+}
+if ($default_dash == 0 && dbFetchCell(
+    'SELECT dashboard_id FROM dashboards WHERE user_id=?',
+    array($_SESSION['user_id'])
+) == 0) {
+    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default', 'user_id'=>$_SESSION['user_id']), 'dashboards');
     if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array($_SESSION['user_id'],0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$vars['dashboard']), 'users_widgets', 'user_id = ? && dashboard_id = ?', array($_SESSION['user_id'],0));
+        dbUpdate(array('dashboard_id'=>$vars['dashboard']), 'users_widgets', 'user_id = ? && dashboard_id = ?', array($_SESSION['user_id'], 0));
     }
 }
 if (!empty($vars['dashboard'])) {

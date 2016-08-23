@@ -143,6 +143,16 @@ A number of home pages are provided within the install and can be found in html/
 setting `front_page`. The other options are used to alter the look of those pages that support it (default.php supports these options).
 
 ```php
+// This option exists in the web UI, edit it under Global Settings -> webui
+$config['webui']['default_dashboard_id'] = 0;
+```
+Allows the specification of a global default dashboard page for any user who
+has not set one in their user preferences.  Should be set to dashboard_id of an
+existing dashboard that is shared or shared(read).  Otherwise, the system will
+automatically create each user an empty dashboard called `Default` on their
+first login.
+
+```php
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 ```
 This is the default message on the login page displayed to users.
