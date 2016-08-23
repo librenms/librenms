@@ -101,7 +101,7 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
-            if ($config['webui']['availability_map_sysname'] == 1) {
+            if ($config['force_ip_to_sysname'] === true) {
                 $deviceDisplay = $device["sysName"];
             } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
                 if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
@@ -157,8 +157,8 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = "down";
                     $service_down_count++;
                 }
-                
-                if ($config['webui']['availability_map_sysname'] == 1) {
+
+                if ($config['force_ip_to_sysname'] === true) {
                     $serviceDisplay = $service["sysName"];
                 } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
                     if (filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
