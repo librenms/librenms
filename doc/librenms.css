@@ -7,3 +7,11 @@ body {
     overflow-x: hidden !important;
 }
 
+.navbar-fixed-top {
+    top: -70px;
+    position: relative;
+}
+
+#dropdown-hidden {
+    display: none;
+}
