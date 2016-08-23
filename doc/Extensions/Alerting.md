@@ -138,19 +138,12 @@ Templates can be matched against several rules.
 Default Template:
 ```text
 %title
-
 Severity: %severity
-
-{if %state == 0}Time elapsed: %elapsed
-{/if}
+{if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
-
 Unique-ID: %uid
-
 Rule: {if %name}%name{else}%rule{/if}
-
 {if %faults}Faults:
-
 {foreach %faults}  #%key: %value.string
 {/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}

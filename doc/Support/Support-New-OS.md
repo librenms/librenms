@@ -248,8 +248,7 @@ includes/polling/mempools/pulse-mem.inc.php
 <?php
 
 // Simple hard-coded poller for Pulse Secure
-echo 'Pulse Secure MemPool'.'
-';
+echo 'Pulse Secure MemPool'.'\n';
 
 if ($device['os'] == 'pulse') {
   $perc     = str_replace('"', "", snmp_get($device, "PULSESECURE-PSG-MIB::iveMemoryUtil.0", '-OvQ'));
@@ -261,10 +260,8 @@ if ($device['os'] == 'pulse') {
     $mempool['free'] = ($memory_available - $mempool['used']);
   }
 
-  echo "PERC " .$perc."%
-";
-  echo "Avail " .$mempool['total']."
-";
+  echo "PERC " .$perc."%\n";
+  echo "Avail " .$mempool['total']."\n";
 
 }
 ```

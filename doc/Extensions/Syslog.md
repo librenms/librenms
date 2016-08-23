@@ -54,8 +54,7 @@ source s_net {
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
-") template-escape(yes));
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM\n") template-escape(yes));
 };
 
 ########################
@@ -103,8 +102,7 @@ Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing
 # Feed syslog messages to librenms
 $ModLoad omprog
 
-$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%
-"
+$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%\n"
 
 :inputname, isequal, "imudp" action(type="omprog"
                                     binary="/opt/librenms/syslog.php"
@@ -119,8 +117,7 @@ This is an example for rsyslog 5 (default on Debian 7):
 ```bash
 # Feed syslog messages to librenms
 $ModLoad omprog
-$template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%
-"
+$template librenms,"%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%\n"
 
 $ActionOMProgBinary /opt/librenms/syslog.php
 *.* :omprog:;librenms
