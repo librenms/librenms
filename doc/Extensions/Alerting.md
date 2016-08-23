@@ -139,14 +139,13 @@ Default Template:
 ```text
 %title\r\n
 Severity: %severity\r\n
-{if %state == 0}Time elapsed: %elapsed{/if}\r\n
+{if %state == 0}Time elapsed: %elapsed\r\n{/if}
 Timestamp: %timestamp\r\n
 Unique-ID: %uid\r\n
 Rule: {if %name}%name{else}%rule{/if}\r\n
 {if %faults}Faults:\r\n
-{foreach %faults}  #%key: %value.string\r\n
-{/foreach}{/if}\r\n
-Alert sent to: {foreach %contacts}%value <%key> {/foreach}\r\n
+{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
+Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
