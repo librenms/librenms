@@ -28,7 +28,21 @@ $availability_map_conf = array(
 $dashboard_conf = array(
     array('name'               => 'webui.default_dashboard_id',
           'descr'              => 'Set global default dashboard id',
-          'type'               => 'text',
+          'type'               => 'select',
+          'options'            => dbFetchRows(
+              "SELECT 0 as `value`, 'no default dashboard' as `description`
+               UNION ALL
+               SELECT `dashboards`.`dashboard_id` as `value`,
+                 CONCAT( `users`.`username`, ':', `dashboards`.`dashboard_name`,
+                   CASE
+                     WHEN `dashboards`.`access` = 1 THEN ' (shared, read-only)'
+                     WHEN `dashboards`.`access` = 2 THEN ' (shared, read-write)'
+                     ELSE ''
+                   END
+                 ) as `description`
+               FROM `dashboards` JOIN `users` ON `users`.`user_id` = `dashboards`.`user_id`
+               WHERE `dashboards`.`access` > 0;"
+          ),
     ),
 );
 
