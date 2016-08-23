@@ -11,7 +11,7 @@
  */
 
 if (!$os) {
-    if (strstr(sysObjectId, '.1.3.6.1.4.1.21796.4.9')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.21796.4.9')) {
         $os = 'hwg-ste2';
     }
 }
