@@ -1,3 +1,4 @@
+source: Extensions/RRDCached.md
 # Setting up RRDCached
 
 This document will explain how to setup RRDCached for LibreNMS.

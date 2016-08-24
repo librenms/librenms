@@ -1,3 +1,4 @@
+source: Extensions/Memcached.md
 # Memcached
 
 LibreNMS can store SQL results in memcached to achieve performance advantages of in-memory value storage and removing work load for frequent queries off the MySQL backend.

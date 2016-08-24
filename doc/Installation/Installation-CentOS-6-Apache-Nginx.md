@@ -1,3 +1,4 @@
+source: Installation/Installation-CentOS-6-Apache-Nginx.md
 NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.x.
 
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.

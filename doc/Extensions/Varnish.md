@@ -1,3 +1,4 @@
+source: Extensions/Varnish.md
 # Varnish Installation Guide #
 
 This document explains how to install Varnish Reverse Proxy for LibreNMS.

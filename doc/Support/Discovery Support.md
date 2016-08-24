@@ -1,3 +1,4 @@
+source: Support/Discovery Support.md
 ### discovery.php
 
 This document will explain how to use discovery.php to debug issues or manually running to process data.
