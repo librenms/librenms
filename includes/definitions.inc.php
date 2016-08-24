@@ -1999,6 +1999,19 @@ $config['os'][$os]['text'] = 'Hytera Repeater';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'hytera';
 
+// Sonus GSX
+$os = 'sonus-gsx';
+$config['os'][$os]['text']             = 'Sonus GSX';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'sonus';
+
+// Sonus SBC
+$os = 'sonus-sbc';
+$config['os'][$os]['text']             = 'Sonus SBC';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'sonus';
+
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
