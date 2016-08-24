@@ -1,3 +1,4 @@
+source: index.md
 ### Welcome to the LibreNMS docs
 
 Some of these docs are work in progress or may be missing configuration examples for varying distros.
@@ -11,5 +12,3 @@ The docs should provide you with information on various elements to the software
   - [Contributing to LibreNMS](http://docs.librenms.org/General/Contributing/)
   - Developing for LibreNMS
   - Available extensions (features)
-
-
