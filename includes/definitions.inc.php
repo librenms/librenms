@@ -1905,6 +1905,10 @@ $os = 'hwg-ste2';
 $config['os'][$os]['text']             = 'HWg STE2';
 $config['os'][$os]['type']             = 'environment';
 $config['os'][$os]['icon']             = 'hwg';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+$config['os'][$os]['over'][1]['graph'] = 'device_humidity';
+$config['os'][$os]['over'][1]['text']  = 'Humidity';
 
 // EATON PDU
 $os = 'eatonpdu';
