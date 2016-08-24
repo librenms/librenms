@@ -17,7 +17,7 @@ if ($device['os'] == 'hwg-ste2') {
     $descr = 'Input 1 Humidity';
     $humidity = snmp_get($device, $oid, '-Osqnv');
 
-    if ($humidity) {
+    if ($humidity !== false) {
         discover_sensor($valid['sensor'], 'humidity', $device, $oid, '1', $sensorType, $descr, '1', '1', null, null, null, null, $humidity);
     }
 }

@@ -17,7 +17,7 @@ if ($device['os'] == 'hwg-ste2') {
     $descr = 'Input 2 Temperature';
     $temperature = snmp_get($device, $oid, '-Osqnv');
 
-    if ($temperature) {
+    if ($temperature !== false) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, '1', $sensorType, $descr, '1', '1', null, null, null, null, $temperature);
     }
 }
