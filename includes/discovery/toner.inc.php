@@ -22,14 +22,42 @@ if ($config['enable_printers']) {
                 $split_oid       = explode('.', $oid);
                 $index           = $split_oid[(count($split_oid) - 1)];
                 if (is_numeric($role)) {
-                    $toner_oid    = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
-                    $descr_oid    = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
-                    $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
-                    $descr        = trim(str_replace("\n", '', str_replace('"', '', snmp_get($device, $descr_oid, '-Oqv'))));
+                    //ricoh using private oids to expose toner levels
+                    if ($os == 'ricoh') {
+                        $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$index";
+                        $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$index";
+                    } else {
+                        $toner_oid    = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
+                        $descr_oid    = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
+                        $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
+                    }
+
+                    $descr = trim(str_replace("\n", '', str_replace('"', '', snmp_get($device, $descr_oid, '-Oqv'))));
+
                     if ($descr != '') {
                         $current  = snmp_get($device, $toner_oid, '-Oqv');
-                        $capacity = snmp_get($device, $capacity_oid, '-Oqv');
-                        $current  = ($current / $capacity * 100);
+
+                        //ricoh private mibs returns values as percent, no capacity is disclosed as it is not needed
+                        if ($os == 'ricoh') {
+                            $capacity = 100;
+                        } else {
+                            $capacity = snmp_get($device, $capacity_oid, '-Oqv');
+                        }
+
+                        //fix for ricoh devices returning garbage and devices returning percentage
+                        if ($os == 'ricoh') {
+                            if ($current == '-3') {
+                                $current = 50;
+                            } elseif ($current == '-100') {
+                                $current = 0;
+                            } else {
+                                $current = ($current / $capacity * 100);
+                            }
+                        } else {
+                            //normal devices returning toner values
+                            $current = ($current / $capacity * 100);
+                        }
+
                         $type     = 'jetdirect';
                         if (isHexString($descr)) {
                             $descr = snmp_hexstring($descr);
