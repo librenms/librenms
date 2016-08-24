@@ -101,16 +101,15 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
-            if ($config['force_ip_to_sysname'] === true) {
-                $deviceDisplay = $device["sysName"];
-            } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
+
+            if ($config['webui']['availability_map_sysname_mix'] == 1) {
                 if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
                     $deviceDisplay = $device['sysName'];
                 } else {
                     $deviceDisplay = $device['hostname'];
                 }
             } else {
-                $deviceDisplay = $device['hostname'];
+                $deviceDisplay = ip_to_sysname($device,$device['hostname']);
             }
 
             if ($config['webui']['old_availability_map'] == 0) {
@@ -158,16 +157,15 @@ if (defined('SHOW_SETTINGS')) {
                     $service_down_count++;
                 }
 
-                if ($config['force_ip_to_sysname'] === true) {
-                    $serviceDisplay = $service["sysName"];
-                } elseif ($config['webui']['availability_map_sysname_mix'] == 1) {
+
+                if ($config['webui']['availability_map_sysname_mix'] == 1) {
                     if (filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
                         $serviceDisplay = $service['sysName'];
                     } else {
                         $serviceDisplay = $service['hostname'];
                     }
                 } else {
-                    $serviceDisplay = $service['hostname'];
+                    $serviceDisplay = ip_to_sysname($service, $service['hostname']);
                 }
 
                 if ($config['webui']['old_availability_map'] == 0) {
