@@ -640,6 +640,7 @@ foreach ($ports as $port) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
 
+        $port_descr_type = $port['port_descr_type'];
         $tags = compact('ifName', 'port_descr_type', 'rrd_name', 'rrd_def');
         rrdtool_data_update($device, 'ports', $tags, $fields);
 
