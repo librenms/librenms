@@ -145,7 +145,6 @@ echo "
 <?php
 $versions = version_info(false);
 $project_name    = $config['project_name'];
-$project_version = $config['version'];
 $apache_version  = str_replace('Apache/', '', $_SERVER['SERVER_SOFTWARE']);
 $php_version     = $versions['php_ver'];
 $mysql_version   = $versions['mysql_ver'];
