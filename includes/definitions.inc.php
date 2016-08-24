@@ -2561,8 +2561,7 @@ $config['device_types'][$i]['icon'] = 'appliance.png';
 //
 // No changes below this line #
 //
-$config['version']              = '2015.master';
-$config['project_name_version'] = $config['project_name'].' '.$config['version'];
+$config['project_name_version'] = $config['project_name'];
 
 if (isset($config['rrdgraph_def_text'])) {
     $config['rrdgraph_def_text'] = str_replace('  ', ' ', $config['rrdgraph_def_text']);
