@@ -86,8 +86,7 @@ git push origin issue-123
 If you need to rebase against master then you can do this with:
 
 ```bash
-git fetch upstream master
-git rebase upstream/master
+git pull upstream master
 git push origin issue-123
 ```
 
