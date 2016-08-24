@@ -1,3 +1,4 @@
+source: Support/Configuration.md
 The options shown below also contain the default values.
 
 If you would like to alter any of these then please add your config option to `config.php`.

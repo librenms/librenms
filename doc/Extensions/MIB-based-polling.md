@@ -1,3 +1,4 @@
+source: Extensions/MIB-based-polling.md
 ## WARNING ##
 
 MIB-based polling is experimental.  It might overload your LibreNMS server,

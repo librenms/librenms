@@ -1,3 +1,4 @@
+source: Installation/Installation-CentOS-7-Nginx.md
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 ### DB Server ###

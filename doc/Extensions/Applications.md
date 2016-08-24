@@ -1,3 +1,4 @@
+source: Extensions/Applications.md
 Applications
 ------------
 You can use Application support to graph performance statistics from many applications.

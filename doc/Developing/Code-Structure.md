@@ -1,3 +1,4 @@
+source: Developing/Code-Structure.md
 # Code structure.
 
 This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.
@@ -54,5 +55,3 @@ Simple enough, this is where all of the rrd files are created. They are stored i
 
 ### sql-schema/
 In here are all of the SQL schema files. These are used to setup a new instance of LibreNMS automatically when build-base.php is called or when an update is done and includes/sql-schema/update.php is called.
-
-

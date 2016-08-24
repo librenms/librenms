@@ -1,3 +1,4 @@
+source: Support/FAQ.md
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)
