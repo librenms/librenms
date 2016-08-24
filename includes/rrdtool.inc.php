@@ -260,7 +260,8 @@ function rrdtool_check_rrd_exists($filename)
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
         $chk = rrdtool('last', $filename, '');
-        return strpos(implode($chk), "$filename': No such file or directory") === false;
+        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+        return !str_contains(implode($chk), "$filename': No such file or directory");
     } else {
         return is_file($filename);
     }
