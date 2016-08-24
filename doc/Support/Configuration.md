@@ -328,7 +328,6 @@ $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires
 $config['enable_vrfs']                  = 1; # Enable VRFs
-$config['enable_printers']              = 0; # Enable Printer support
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 ```
 
