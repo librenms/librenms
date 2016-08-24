@@ -33,9 +33,14 @@ namespace LibreNMS;
 class ClassLoader
 {
     /**
-     * @var array stores dynamically added class > file mappings
+     * @var array stores dynamically added class > file mappings ($classMap[fullclass] = $file)
      */
     private $classMap;
+
+    /**
+     * @var array stores dynamically added namespace > directory mappings ($dirMap[namespace][$dir] =1)
+     */
+    private $dirMap;
 
     /**
      * ClassLoader constructor.
@@ -43,6 +48,7 @@ class ClassLoader
     public function __construct()
     {
         $this->classMap = array();
+        $this->dirMap = array();
     }
 
     /**
@@ -52,9 +58,10 @@ class ClassLoader
      */
     public static function psrLoad($name)
     {
-        global $config, $vdebug;
+        global $vdebug;
+
         $file = str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $name) . '.php';
-        $fullFile = $config['install_dir'] ? $config['install_dir'] . '/' . $file : $file;
+        $fullFile = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR .  $file;
 
         if($vdebug) {
             echo __CLASS__ . " [[ $name > $fullFile ]]\n";
@@ -73,7 +80,8 @@ class ClassLoader
     public function customLoad($name)
     {
         global $vdebug;
-        if (array_key_exists($name, $this->classMap)) {
+
+        if (isset($this->classMap[$name])) {
             $file = $this->classMap[$name];
 
             if($vdebug) {
@@ -82,29 +90,70 @@ class ClassLoader
 
             if (is_readable($file)) {
                 include $file;
+                return;
+            }
+        }
+
+        list($namespace, $class) = $this->splitNamespace($name);
+        if (isset($this->dirMap[$namespace])) {
+            foreach (array_keys($this->dirMap[$namespace]) as $dir) {
+                $file = $dir . DIRECTORY_SEPARATOR . $class . '.php';
+
+                if($vdebug) {
+                    echo __CLASS__ . " (( $name > $file ))\n";
+                }
+
+                if (is_readable($file)) {
+                    include $file;
+                    return;
+                }
             }
         }
     }
 
     /**
-     * Add or set a custom class > file mapping
+     * Register a custom class > file mapping
      *
      * @param string $class The full class name
      * @param string $file The path to the file containing the class, full path is preferred
      */
-    public function mapClass($class, $file)
+    public function registerClass($class, $file)
     {
         $this->classMap[$class] = $file;
     }
 
     /**
-     * Remove a class from the list of class > file mappings
+     * Unregister a class from the list of class > file mappings
      *
      * @param string $class The full class name
      */
-    public function unMapClass($class)
+    public function unregisterClass($class)
     {
         unset($this->classMap[$class]);
+    }
+
+    /**
+     * Register a directory to search for classes in.
+     * If a namespace is specified, it will search for
+     * classes with that exact namespace in those directories.
+     *
+     * @param string $dir directory containing classes with filename = class.php
+     * @param string $namespace the namespace of the classes
+     */
+    public function registerDir($dir, $namespace = '')
+    {
+        $this->dirMap[$namespace][$dir] = 1;
+    }
+
+    /**
+     * Unregister a directory
+     *
+     * @param string $dir the directory to remove
+     * @param string $namespace the namespace of the classes
+     */
+    public function unregisterDir($dir, $namespace = '')
+    {
+        unset($this->dirMap[$namespace][$dir]);
     }
 
     /**
@@ -124,5 +173,16 @@ class ClassLoader
     {
         spl_autoload_unregister(array($this, 'customLoad'));
         spl_autoload_unregister(__NAMESPACE__.'\ClassLoader::psrLoad');
+    }
+
+    /**
+     * Split a class into namspace/classname
+     * @param string $class the full class name to split
+     * @return array of the split class [namespace, classname]
+     */
+    private function splitNamespace($class) {
+        $parts = explode('\\', $class);
+        $last = array_pop($parts);
+        return array(implode('\\', $parts), $last);
     }
 }

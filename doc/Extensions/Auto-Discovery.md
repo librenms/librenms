@@ -1,3 +1,4 @@
+source: Extensions/Auto-Discovery.md
 # Auto discovery support
 
 ### Getting started with auto discovery.

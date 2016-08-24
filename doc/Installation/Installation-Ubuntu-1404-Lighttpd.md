@@ -1,3 +1,4 @@
+source: Installation/Installation-Ubuntu-1404-Lighttpd.md
 > NOTE: What follows is a very rough list of commands. I have taken the INSTALL.md and modified it for Lighttpd on Debian 7
 
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.

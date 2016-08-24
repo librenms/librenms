@@ -1,3 +1,4 @@
+source: API/API-Docs.md
 - API
 <a name="top"></a>
 - [`Structure`](#api-structure)

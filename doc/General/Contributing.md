@@ -1,3 +1,4 @@
+source: General/Contributing.md
 All contributors to LibreNMS retain copyright to their own code and are not
 required to sign over their rights to any other party.
 

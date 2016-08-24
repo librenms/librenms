@@ -125,7 +125,7 @@ else {
     $influxdb = false;
 }
 
-rrdtool_pipe_open($rrd_process, $rrd_pipes);
+rrdtool_initialize();
 
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
@@ -158,7 +158,7 @@ echo ("\n".'MySQL: Cell['.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fet
 echo "\n";
 
 logfile($string);
-rrdtool_pipe_close($rrd_process, $rrd_pipes);
+rrdtool_terminate();
 unset($config);
 // Remove this for testing
 // print_r(get_defined_vars());

@@ -1,3 +1,4 @@
+source: Extensions/Component.md
 Table of Content:
 
 - [About](#about)
@@ -305,4 +306,3 @@ To see an example of how the component module can used, please see the following
     - includes/polling/cisco-otv.inc.php
     - html/includes/graphs/device/cisco-otv-mac.inc.php
     - html/pages/routing/cisco-otv.inc.php
-

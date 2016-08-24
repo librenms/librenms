@@ -1,3 +1,4 @@
+source: Installation/Installing-LibreNMS.md
 # Installing LibreNMS
 
 We have some pre-built VirtualBox images you can use to get started:

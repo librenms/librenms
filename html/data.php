@@ -15,6 +15,7 @@
 require_once '../includes/defaults.inc.php';
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
+
 require_once '../includes/common.php';
 require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
