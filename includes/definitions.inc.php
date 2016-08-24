@@ -2546,12 +2546,10 @@ $config['device_types'][$i]['text'] = 'Storage';
 $config['device_types'][$i]['type'] = 'storage';
 $config['device_types'][$i]['icon'] = 'storage.png';
 
-if (isset($config['enable_printers']) && $config['enable_printers']) {
-    $i++;
-    $config['device_types'][$i]['text'] = 'Printers';
-    $config['device_types'][$i]['type'] = 'printer';
-    $config['device_types'][$i]['icon'] = 'printer.png';
-}
+$i++;
+$config['device_types'][$i]['text'] = 'Printers';
+$config['device_types'][$i]['type'] = 'printer';
+$config['device_types'][$i]['icon'] = 'printer.png';
 
 $i++;
 $config['device_types'][$i]['text'] = 'Appliance';
