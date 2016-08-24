@@ -35,26 +35,30 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         $config['rrdtool_version'] = '1.4';
         $config['rrd_dir'] = '/opt/librenms/rrd';
 
-        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
+        $file = '/opt/librenms/rrd/f';
+        $options = 'DEF:time_o=/opt/librenms/rrd/overmind/agent.rrd:time:AVERAGE CDEF:time=time_o,1000,/';
 
-        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
+        $cmd = rrdtool_build_command('create', $file, $options);
+        $this->assertEquals("create $file $options", $cmd);
+        
+        $cmd = rrdtool_build_command('tune', $file, $options);
+        $this->assertEquals("tune $file $options", $cmd);
+        
+        $cmd = rrdtool_build_command('update', $file, $options);
+        $this->assertEquals("update $file $options", $cmd);
 
 
         $config['rrdtool_version'] = '1.6';
 
-        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('create /opt/librenms/rrd/f o -O', $cmd);
+        $cmd = rrdtool_build_command('create', $file, $options);
+        $this->assertEquals("create $file $options -O", $cmd);
 
-        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
+        $cmd = rrdtool_build_command('tune', $file, $options);
+        $this->assertEquals("tune $file $options", $cmd);
 
-        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
+        $cmd = rrdtool_build_command('update', $file, $options);
+        $this->assertEquals("update $file $options", $cmd);
     }
 
     public function testBuildCommandRemote()
@@ -64,26 +68,31 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         $config['rrdtool_version'] = '1.4';
         $config['rrd_dir'] = '/opt/librenms/rrd';
 
-        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
+        $file = '/opt/librenms/rrd/f';
+        $expected_file = 'f';
+        $options = 'DEF:time_o=/opt/librenms/rrd/overmind/agent.rrd:time:AVERAGE CDEF:time=time_o,1000,/';
+        $expected_options = 'DEF:time_o=overmind/agent.rrd:time:AVERAGE CDEF:time=time_o,1000,/';
 
-        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
+        $cmd = rrdtool_build_command('create', $file, $options);
+        $this->assertEquals("create $file $options", $cmd);
 
-        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('update f o --daemon server:42217', $cmd);
+        $cmd = rrdtool_build_command('tune', $file, $options);
+        $this->assertEquals("tune $file $options", $cmd);
+
+        $cmd = rrdtool_build_command('update', $file, $options);
+        $this->assertEquals("update $expected_file $expected_options --daemon server:42217", $cmd);
 
 
         $config['rrdtool_version'] = '1.6';
 
-        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('create f o -O --daemon server:42217', $cmd);
+        $cmd = rrdtool_build_command('create', $file, $options);
+        $this->assertEquals("create $expected_file $expected_options -O --daemon server:42217", $cmd);
 
-        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('tune f o --daemon server:42217', $cmd);
+        $cmd = rrdtool_build_command('tune', $file, $options);
+        $this->assertEquals("tune $expected_file $expected_options --daemon server:42217", $cmd);
 
-        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
-        $this->assertEquals('update f o --daemon server:42217', $cmd);
+        $cmd = rrdtool_build_command('update', $file, $options);
+        $this->assertEquals("update $expected_file $expected_options --daemon server:42217", $cmd);
 
     }
 
