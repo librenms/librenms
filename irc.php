@@ -273,7 +273,7 @@ class ircbot {
                 return $this->irc_raw('PONG '.$ex[1]);
             }
 
-            if ($ex[1] == 376 || ($ex[1] == 'MODE' && $ex[2] == $this->nick)) {
+            if ($ex[1] == 376 || $ex[1] == 422 || ($ex[1] == 'MODE' && $ex[2] == $this->nick)) {
                 if ($this->j == 2) {
                     $this->joinChan();
                     $this->j = 0;
