@@ -56,7 +56,6 @@ class Proc
 
     public function sendInput($data)
     {
-        d_echo("Sent process input: $data\n");
         if (!ends_with($data, PHP_EOL)) {
             $data .= PHP_EOL;
         }
@@ -66,13 +65,11 @@ class Proc
 
     public function getOutput()
     {
-        d_echo('Getting process output.' . PHP_EOL);
         return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
     }
 
     public function waitForOutput($timeout = 10)
     {
-        d_echo('Waiting for process output.' . PHP_EOL);
         $pipes = array($this->_pipes[1], $this->_pipes[2]);
         $w = null;
         $x = null;

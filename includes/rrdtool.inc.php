@@ -56,10 +56,7 @@ function rrdtool_initialize($dual_process = true)
         $rrd_sync_process = new Proc($command, $descriptor_spec, $cwd);
     }
 
-    $started = rrdtool_running($rrd_async_process) && ($dual_process ? rrdtool_running($rrd_sync_process) : true);
-    d_echo('rrdtool started: ' . var_export($started, 1) . PHP_EOL);
-
-    return $started;
+    return rrdtool_running($rrd_async_process) && ($dual_process ? rrdtool_running($rrd_sync_process) : true);
 }
 
 /**
@@ -106,17 +103,14 @@ function rrdtool_graph($graph_file, $options)
     global $config, $debug, $rrd_async_process;
 
     if (rrdtool_initialize(false)) {
-
         $cmd = rrdtool_build_command('graph', $graph_file, $options);
         $rrd_async_process->sendInput($cmd);
 
         $output = implode($rrd_async_process->waitForOutput());
 
-        $return_value = rrdtool_close();
-
         if ($debug) {
             echo "<p>$cmd</p>";
-            echo "<p>command returned $return_value ($output)</p>";
+            echo "<p>command returned ($output)</p>";
         }
 
         return $output;
@@ -134,9 +128,8 @@ function rrdtool_graph($graph_file, $options)
  * @param string $filename The full patth to the rrd file
  * @param string $options rrdtool command options
  * @return array the output of stdout and stderr in an array
- * @global $config
- * @global $debug
- * @global $rrd_pipes
+ * @throws FileExistsException thrown when a create command is set to rrdtool < 1.4 and the rrd already exists
+ * @throws Exception thrown when the rrdtool process(s) cannot be started
  */
 function rrdtool($command, $filename, $options)
 {
@@ -159,15 +152,17 @@ function rrdtool($command, $filename, $options)
     }
 
     // send the command!
-    if($command == 'last' && rrdtool_running($rrd_sync_process)) {
+    if ($command == 'last' && rrdtool_initialize(true)) {
         $rrd_sync_process->sendInput($cmd . "\n");
 
         // this causes us to block until we receive output for up to the timeout in seconds
         $output = $rrd_sync_process->waitForOutput();
 
-    } else {
+    } elseif (rrdtool_initialize(false)) {
         $rrd_async_process->sendInput($cmd . "\n");
         $output = $rrd_async_process->getOutput();
+    } else {
+        throw new Exception('rrdtool could not start');
     }
 
     if ($vdebug) {
