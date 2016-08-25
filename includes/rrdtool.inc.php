@@ -123,7 +123,7 @@ function rrdtool_graph($graph_file, $options)
     global $config, $debug;
 
     $cmd = rrdtool_build_command('graph', $graph_file, $options);
-    $output = shell_exec($config['rrdtool'] . ' ' . $cmd);
+    $output = shell_exec("cd $config[rrd_dir]; $config[rrdtool] $cmd");
 
     if ($debug) {
         echo "<p>$cmd</p>";
@@ -239,8 +239,12 @@ function rrdtool_build_command($command, $filename, $options)
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+    global $config, $rrd_sync_process;
+    if (
+        $config['rrdcached'] &&
+        is_resource($rrd_sync_process) &&
+        version_compare($config['rrdtool_version'], '1.5', '>=')
+    ) {
         $chk = rrdtool('last', $filename, '');
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
         return !str_contains(implode($chk), "$filename': No such file or directory");
