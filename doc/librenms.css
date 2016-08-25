@@ -8,10 +8,9 @@ body {
     overflow-x: hidden !important;
 }
 
-/* pushdown the content when the header flows to two lines */
-.navbar-fixed-top {
-    top: -70px;
-    position: relative;
+/* push down the content when the header flows to two lines */
+.bs-sidebar {
+    margin-top: 45px;
 }
 
 /* hide the menu called hidden, used to generate unlinked docs */
