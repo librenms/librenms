@@ -4,7 +4,7 @@ source: General/Updating.md
 If you would like to perform a manual update
 then you can do this by running the following command as the **librenms** user:
 
-	./daily.sh
+`./daily.sh`
 
 This will update both the core LibreNMS files but also update the database
 structure if updates are available.
@@ -13,12 +13,12 @@ structure if updates are available.
 LibreNMS follows the master branch on github for daily updates.
 You can change to the monthly releases by setting:
 
-    $config['update_channel'] = 'release';
+`$config['update_channel'] = 'release';`
 
 ## Disabling automatic updates ##
 LibreNMS by default performs updates on a daily basis. This can be disabled
 by ensuring:
 
-	$config['update'] = 0;
+`$config['update'] = 0;`
 
 is no longer commented out. 

@@ -1,6 +1,8 @@
 source: Extensions/Plugin-System.md
 # Developing for the Plugin System
 
+> This will most likely be deprecated in favour of adding the possible extensions to the core code base.
+
 This documentation will hopefully give you a basis for how to write a plugin for LibreNMS.
 
 A test plugin is available on GitHub: https://github.com/laf/Test

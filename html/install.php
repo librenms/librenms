@@ -397,9 +397,6 @@ $config_file = <<<"EOD"
 #\$config\['nets'\]\[\] = "172.16.0.0/12";
 #\$config\['nets'\]\[\] = "192.168.0.0/16";
 
-# following is necessary for poller-wrapper
-# poller-wrapper is released public domain
-\$config\['poller-wrapper'\]\['alerter'\] = FALSE;
 # Uncomment the next line to disable daily updates
 #\$config\['update'\] = 0;
 EOD;
