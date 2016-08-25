@@ -116,28 +116,21 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
  *
  * @param string $graph_file
  * @param string $options
- * @return integer
+ * @return string returns the output from the command
  */
 function rrdtool_graph($graph_file, $options)
 {
     global $config, $debug;
 
     $cmd = rrdtool_build_command('graph', $graph_file, $options);
-
-    exec($config['rrdtool'] . ' ' . $cmd, $output, $return_value);
-
-    $data = implode(PHP_EOL, $output);
+    $output = shell_exec($config['rrdtool'] . ' ' . $cmd);
 
     if ($debug) {
-        echo '<p>';
-        echo "graph $graph_file $options";
-
-        echo '</p><p>';
-        echo "command returned $return_value ($data)\n";
-        echo '</p>';
+        echo "<p>$cmd</p>";
+        echo "<p>command output ($output)</p>";
     }
 
-    return $data;
+    return $output;
 }
 
 
