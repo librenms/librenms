@@ -9,21 +9,13 @@ $config['db_pass'] = 'PASSWORD';
 $config['db_name'] = 'librenms';
 $config['db']['extension'] = 'mysqli';// mysql or mysqli
 
-### Memcached config - We use this to store realtime usage
-$config['memcached']['enable']  = FALSE;
-$config['memcached']['host']    = 'localhost';
-$config['memcached']['port']    = 11211;
-
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 $config['user'] = 'librenms';
 
-### Locations - it is recommended to keep the default
-#$config['install_dir']  = "/opt/librenms";
-
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
-#$config['base_url']        = "http://librenms.company.com";
+$config['base_url']        = "/";
 
 ### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.
@@ -41,9 +33,6 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['nets'][] = "172.16.0.0/12";
 #$config['nets'][] = "192.168.0.0/16";
 
-# following is necessary for poller-wrapper
-# poller-wrapper is released public domain
-$config['poller-wrapper']['alerter'] = FALSE;
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
 
@@ -55,3 +44,9 @@ $config['rrd_purge'] = 0;
 
 # Set default port association mode for new devices (default: ifIndex)
 #$config['default_port_association_mode'] = 'ifIndex';
+
+# Enable the in-built billing extension
+$config['enable_billing'] = 1;
+
+# Enable the in-built services support (Nagios plugins)
+$config['show_services'] = 1;

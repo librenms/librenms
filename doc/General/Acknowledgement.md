@@ -35,5 +35,3 @@ LibreNMS 3rd party acknowledgements
   - html/graph-realtime.php: BSD (original?)
   - html/includes/collectd/: GPLv2 only
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
-  - scripts/*/mysql: GPLv2 only
-  - check_mk (scripts/check_mk*): GPLv2

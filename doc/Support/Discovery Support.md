@@ -6,18 +6,21 @@ This document will explain how to use discovery.php to debug issues or manually 
 #### Command options
 ```bash
 -h <device id> | <device hostname wildcard>  Poll single device
-   -h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
-   -h even                                      Poll even numbered devices (same as -i 2 -n 1)
-   -h all                                       Poll all devices
-   -h new                                       Poll all devices that have not had a discovery run before
+-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
+-h even                                      Poll even numbered devices (same as -i 2 -n 1)
+-h all                                       Poll all devices
+-h new                                       Poll all devices that have not had a discovery run before
+--os <os_name>                               Poll devices only with specified operating system
+--type <type>                                Poll devices only with specified type
+-i <instances> -n <number>                   Poll as instance <number> of <instances>
+                                             Instances start at 0. 0-3 for -n 4
 
-   -i <instances> -n <number>                   Poll as instance <number> of <instances>
-                                                Instances start at 0. 0-3 for -n 4
+Debugging and testing options:
+-d                                           Enable debugging output
+-v                                           Enable verbose debugging output
+-m                                           Specify single module to be run
 
 
-   Debugging and testing options:
-   -d                                           Enable debugging output
-   -m                                           Specify single module to be run
 ```
 
 `-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
@@ -26,15 +29,16 @@ new will poll only those devices that have recently been added or have been sele
 
 `-i` This can be used to stagger the discovery process.
 
-`-d` Enables debugging output (verbose output) so that you can see what is happening during a discovery run. This includes
-things like rrd updates, SQL queries and response from snmp.
+`-d` Enables debugging output (verbose output but with most sensitive data masked) so that you can see what is happening during a discovery run. This includes things like rrd updates, SQL queries and response from snmp.
+
+`-v` Enables verbose debugging output with all data in tact.
 
 `-m` This enables you to specify the module you want to run for discovery.
 
 #### Discovery config
 
 These are the default discovery config items. You can globally disable a module by setting it to 0. If you just want to
-disable it for one device then you can do this within the WebUI -> Settings -> Modules.
+disable it for one device then you can do this within the WebUI -> Device -> Settings -> Modules.
 
 ```php
 $config['discovery_modules']['os']                        = 1;
@@ -160,14 +164,11 @@ Multiple Modules
 ./discovery.php -h localhost -m ports,entity-physical -d
 ```
 
-It is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details
-amongst other items including port descriptions.
+Using `-d` shouldn't output much sensitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
 
 The output will contain:
 
 DB Updates
-
-RRD Updates
 
 SNMP Response
 
