@@ -105,7 +105,7 @@ function rrdtool_graph($graph_file, $options)
 {
     global $config, $debug, $rrd_async_process;
 
-    if (rrdtool_initialize($config['rrdcached'])) {
+    if (rrdtool_initialize(false)) {
 
         $cmd = rrdtool_build_command('graph', $graph_file, $options);
         $rrd_async_process->sendInput($cmd);
@@ -159,7 +159,7 @@ function rrdtool($command, $filename, $options)
     }
 
     // send the command!
-    if($command == 'last' && $rrd_sync_process->isRunning()) {
+    if($command == 'last' && rrdtool_running($rrd_sync_process)) {
         $rrd_sync_process->sendInput($cmd . "\n");
 
         // this causes us to block until we receive output for up to the timeout in seconds
