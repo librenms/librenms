@@ -158,4 +158,4 @@ if ($poller_time > 300) {
 }
 echo "\nCompleted in $poller_time sec\n";
 
-rrdtool_terminate();
+rrdtool_close();
