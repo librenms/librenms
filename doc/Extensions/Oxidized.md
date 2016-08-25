@@ -57,13 +57,13 @@ LibreNMS is able to reload the Oxidized list of nodes, each time a device is add
 To do so, edit the option in Global Settings>External Settings>Oxidized Integration or add the following to your config.php.
 
 ```php
-$config['oxidized']['reload_nodes'] = TRUE;
+$config['oxidized']['reload_nodes'] = true;
 
 ```
 
 #### Using Groups
 
-To return a group to Oxidized you can do this by matching a regex for either hostname, os or location. The order is hostname is matched first, if nothing is found then os is tried and then location is attempted.
+To return a group to Oxidized you can do this by matching a regex for either `hostname`, `os` or `location`. The order is `hostname` is matched first, if nothing is found then `os` is tried and then `location` is attempted.
 The first match found will be used. To match on the device hostnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
 
 ```php

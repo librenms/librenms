@@ -80,11 +80,13 @@ pull request then commit away.
 ```bash
 git add path/to/new/files/or/folders
 git commit -a -m 'Added feature to do X, Y and Z'
-git checkout master
+git push origin issue-123
+```
+
+If you need to rebase against master then you can do this with:
+
+```bash
 git pull upstream master
-git push origin master
-git checkout issue-123
-git pull origin master
 git push origin issue-123
 ```
 
@@ -97,13 +99,7 @@ Now you will be ready to submit a pull request from within GitHub. To do this, g
 repo. Now select the branch you have just been working on (issue-123) from the drop down to the left and then click
 'Pull Request'. Fill in the details to describe the work you have done and click 'Create pull request'.
 
-Thanks for your first pull request :) Now, that might have been a simple update, if things get a bit more complicated
-then you will need to break down your pull request into separate commits (still a single pull request). This is usually
-done when:
-
-- You want to add / update MIBS. Do this in a separate commit including the link to where you got them from.
-- You are adding say 3 related features in one go, try and break them down into 3 separate commits.
-- Icons for new OS support need to be added as a separate commit including a link to where you got the logo from.
+Thanks for your first pull request :)
 
 Ok, that should get you started on the contributing path. If you have any other questions then stop by our IRC Channel
 on Freenode ##librenms.
