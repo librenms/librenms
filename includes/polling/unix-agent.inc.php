@@ -58,6 +58,7 @@ if ($device['os_group'] == 'unix') {
             "ceph",
             "mysql",
             "nginx",
+            "ntpd",
             "powerdns",
             "powerdns-recursor",
             "proxmox",
