@@ -84,9 +84,9 @@ $graphs['dhcp-stats'] = array(
 );
 
 $graphs['freeswitch'] = array(
-	'peak',
-	'callsIn',
-	'callsOut',
+    'peak',
+    'callsIn',
+    'callsOut',
 );
 
 print_optionbar_start();
