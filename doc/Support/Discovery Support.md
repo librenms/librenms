@@ -164,7 +164,7 @@ Multiple Modules
 ./discovery.php -h localhost -m ports,entity-physical -d
 ```
 
-Using `-d` shouldn't output much sesnitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
+Using `-d` shouldn't output much sensitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
 
 The output will contain:
 

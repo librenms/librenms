@@ -10,33 +10,19 @@ a more seamless merge.
 > All of these commands should be run from within the librenms directory and can be run as the librenms user 
 unless otherwise noted.
 
-### Syntax checks
-If you run PHP 5.3, 5.4 or HHVM please run:
+Install composer (you can skip this if composer is already installed).
 
-`find . -regextype posix-extended -regex "\./(lib/influxdb-php|vendor)" -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1`
+`curl -sS https://getcomposer.org/installer | php`
 
-If you run PHP 5.5 or above then please run:
+Composer will now be installed into /opt/librenms/composer.phar.
 
-`find . -path './vendor' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1`
+Now install the dependencies we require:
 
-### PSR-2 Compliance
-This will ensure that your code standards match PSR-2 which is what our code base follows. To run this you need to install `phpcs`:
+`composer install`
 
-`sudo pear install PHP_CodeSniffer`
+Once composer is installed you can now run the code validation script:
 
-You can then run:
+`./scripts/pre-commit.php`
 
-`phpcs -n -p --colors --extensions=php --standard=PSR2 --ignore=html/lib/* --ignore=html/plugins/ html`
-
-### Test suite
-For this you will need `phpunit`, this can be installed using the following commands:
-
-```bash
-wget https://phar.phpunit.de/phpunit.phar
-chmod +x phpunit.phar
-sudo mv phpunit.phar /usr/local/bin/phpunit
-```
-
-Now you can run the tests by entering `phpunit`.
-
-If all of the above tests complete ok then please submit your pull request. 
+If you see `Tests ok, submit away :)` then all is well. If you see other output then it should contain 
+what you need to resolve the issues and re-test.

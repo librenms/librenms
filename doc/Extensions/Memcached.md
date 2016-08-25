@@ -13,7 +13,7 @@ $config['memcached']['port']    = 11211;
 
 By default values are kept for 4 Minutes inside the memcached, you can adjust this retention time by modifying the `$config['memcached']['ttl']` value to any desired amount of seconds.
 
-> This means that you can see what appears to be stale data for upto 4 minutes. If you edit an alert rule for example then those changes may not show immediately.
+> This means that you can see what appears to be stale data for up to 4 minutes. If you edit an alert rule for example then those changes may not show immediately.
 
 It's strongly discouraged to set this above `300` (5 Minutes) to avoid interference with the polling, discovery and alerting processes.
 
