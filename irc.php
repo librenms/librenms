@@ -178,7 +178,6 @@ class ircbot {
             if($this->config['irc_conn_timeout']) {
                 $inactive_seconds = time() - $this->last_activity;
                 $max_inactive = $this->config['irc_conn_timeout'];
-
                 if( $inactive_seconds > $max_inactive) {
                     $this->log("No data from server since " . $max_inactive . " seconds. Restarting.");
                     break;
