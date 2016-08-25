@@ -91,6 +91,10 @@ function rrdtool_terminate() {
 function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
     global $vdebug;
+
+    // attempt to gracefully close the process
+    fwrite($rrd_pipes[0], "quit\n");
+
     if ($vdebug) {
         d_echo(stream_get_contents($rrd_pipes[1]));
         d_echo(stream_get_contents($rrd_pipes[2]));
@@ -112,44 +116,21 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
  *
  * @param string $graph_file
  * @param string $options
- * @return integer
+ * @return string returns the output from the command
  */
 function rrdtool_graph($graph_file, $options)
 {
-    global $config, $debug, $rrd_async_pipes;
+    global $config, $debug;
 
-    if (rrdtool_initialize(false)) {
-        if ($config['rrdcached']) {
-            $options = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $options);
-            fwrite($rrd_async_pipes[0], 'graph --daemon ' . $config['rrdcached'] . " $graph_file $options");
-        } else {
-            fwrite($rrd_async_pipes[0], "graph $graph_file $options");
-        }
+    $cmd = rrdtool_build_command('graph', $graph_file, $options);
+    $output = shell_exec("cd $config[rrd_dir]; $config[rrdtool] $cmd");
 
-        fclose($rrd_async_pipes[0]);
-
-        $line = "";
-        $data = "";
-        while (strlen($line) < 1) {
-            $line = fgets($rrd_async_pipes[1], 1024);
-            $data .= $line;
-        }
-
-        $return_value = rrdtool_terminate();
-
-        if ($debug) {
-            echo '<p>';
-            echo "graph $graph_file $options";
-
-            echo '</p><p>';
-            echo "command returned $return_value ($data)\n";
-            echo '</p>';
-        }
-
-        return $data;
-    } else {
-        return 0;
+    if ($debug) {
+        echo "<p>$cmd</p>";
+        echo "<p>command output ($output)</p>";
     }
+
+    return $output;
 }
 
 
@@ -241,6 +222,7 @@ function rrdtool_build_command($command, $filename, $options)
     ) {
         // only relative paths if using rrdcached
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+        $options = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $options);
 
         return "$command $filename $options --daemon " . $config['rrdcached'];
     }
@@ -257,8 +239,12 @@ function rrdtool_build_command($command, $filename, $options)
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+    global $config, $rrd_sync_process;
+    if (
+        $config['rrdcached'] &&
+        is_resource($rrd_sync_process) &&
+        version_compare($config['rrdtool_version'], '1.5', '>=')
+    ) {
         $chk = rrdtool('last', $filename, '');
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
         return !str_contains(implode($chk), "$filename': No such file or directory");
