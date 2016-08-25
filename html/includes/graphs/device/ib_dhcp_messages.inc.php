@@ -6,7 +6,7 @@ $rrd_filename = rrd_name($device['hostname'], 'ib_dhcp_messages');
 $rrd_options .= " --vertical-label='Messages per minute'";
 
 $stats = array(
-    'request' 	=> '#FFAB00FF',
+    'request'   => '#FFAB00FF',
     'ack'       => '#007283FF',
     'discover'  => '#74C366FF',
     'offer'     => '#B1441EFF',
@@ -21,7 +21,7 @@ $i = 0;
 foreach ($stats as $stat => $color) {
     $i++;
     $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr']    = ucfirst ($stat);
+    $rrd_list[$i]['descr']    = ucfirst($stat);
     $rrd_list[$i]['ds']       = $stat;
 
     # Set up DEFs
@@ -31,10 +31,9 @@ foreach ($stats as $stat => $color) {
     $rrd_options .= " 'CDEF:cdef".$stat."=".$stat.",60,*'";
 
     # Set up area graphing with stacking
-    if ( $i == "0" ) {
+    if ($i == "0") {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat)."'";
-    } 
-    else {
+    } else {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat).":STACK'";
     }
 
@@ -54,4 +53,3 @@ $current_pad = str_pad("", $filler, ' ', STR_PAD_LEFT);
 $rrd_options .= " 'GPRINT:cdeftotal:LAST:".$current_pad."Current\:%8.0lf'";
 $rrd_options .= " 'GPRINT:cdeftotal:AVERAGE:Average\:%8.0lf'";
 $rrd_options .= " 'GPRINT:cdeftotal:MAX:Maximum\:%8.0lf\\n'";
-

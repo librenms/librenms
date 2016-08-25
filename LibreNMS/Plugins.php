@@ -1,13 +1,38 @@
 <?php
+/**
+ * Plugins.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2016
+ * @author
+ */
 
 namespace LibreNMS;
 
-class Plugins {
+class Plugins
+{
 
     private static $plugins = array();
 
 
-    public static function start() {
+    public static function start()
+    {
         global $config;
         if (file_exists($config['plugin_dir'])) {
             // $plugin_files = scandir($config['plugin_dir']);
@@ -22,11 +47,9 @@ class Plugins {
             }
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
-
     }//end start()
 
 
@@ -50,21 +73,19 @@ class Plugins {
         }
 
         return $plugin;
-
     }//end load()
 
 
-    public static function call($hook, $params=false) {
+    public static function call($hook, $params = false)
+    {
         if (count(self::$plugins[$hook]) != 0) {
             foreach (self::$plugins[$hook] as $name) {
                 if (!is_array($params)) {
                     call_user_func(array($name, $hook));
-                }
-                else {
+                } else {
                     call_user_func_array(array($name, $hook), $params);
                 }
             }
         }
-
     }//end call()
 }//end class

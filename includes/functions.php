@@ -12,15 +12,21 @@
  *
  */
 
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+
+
 // Include from PEAR
 
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
 // Includes
-include_once($config['install_dir'] . "/includes/exceptions.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
-
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/datastore.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
@@ -29,14 +35,8 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
-include_once($config['install_dir'] . "/includes/console_colour.php");
 
 $console_color = new Console_Color2();
-
-if ($config['alerts']['email']['enable']) {
-    include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
-    include_once($config['install_dir'] . "/includes/phpmailer/class.smtp.php");
-}
 
 function array_sort($array, $on, $order=SORT_ASC) {
     $new_array = array();
@@ -691,8 +691,6 @@ function parse_email($emails) {
 function send_mail($emails,$subject,$message,$html=false) {
     global $config;
     if( is_array($emails) || ($emails = parse_email($emails)) ) {
-        if( !class_exists("PHPMailer",false) )
-            include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
         $mail = new PHPMailer();
         $mail->Hostname = php_uname('n');
         if (empty($config['email_from']))
@@ -1370,30 +1368,7 @@ function dnslookup($device,$type=false,$return=false) {
 }//end dnslookup
 
 
-/**
- * Reursive Filter Iterator to iterate directories and locate .rrd files.
- *
- * @method boolean isDir()
- *
-**/
 
-class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
-
-    public function accept() {
-        $filename = $this->current()->getFilename();
-        if ($filename[0] === '.') {
-            // Ignore hidden files and directories
-            return false;
-        }
-        if ($this->isDir()) {
-            // We want to search into directories
-            return true;
-        }
-        // Matches files with .rrd in the filename.
-        // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
-        return strpos($filename, '.rrd') !== false;
-    }
-}
 
 /**
  * Run rrdtool info on a file path
@@ -1478,3 +1453,73 @@ function report_this($message) {
     return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
 
 }//end report_this()
+
+function hytera_h2f($number,$nd)
+{
+    if (strlen(str_replace(" ","",$number)) == 4) {
+        $hex = '';
+        for ($i = 0; $i < strlen($number); $i++) {
+            $byte = strtoupper(dechex(ord($number{$i})));
+            $byte = str_repeat('0', 2 - strlen($byte)).$byte;
+            $hex.=$byte." ";
+        }
+        $number = $hex;
+        unset($hex);
+    }
+    $r = '';
+    $y = explode(' ', $number);
+    foreach ($y as $z) {
+        $r = $z . '' . $r;
+    }
+
+    $hex = array();
+    $number = substr($r, 0, -1);
+    //$number = str_replace(" ", "", $number);
+    for ($i=0; $i<strlen($number); $i++) {
+        $hex[]=substr($number,$i,1);
+    }
+
+    $dec = array();
+    $hexCount = count($hex);
+    for ($i=0; $i<$hexCount; $i++) {
+        $dec[]=hexdec($hex[$i]);
+    }
+
+    $binfinal = "";
+    $decCount = count($dec);
+    for ($i=0; $i<$decCount; $i++) {
+        $binfinal.=sprintf("%04d",decbin($dec[$i]));
+    }
+
+    $sign=substr($binfinal,0,1);
+    $exp=substr($binfinal,1,8);
+    $exp=bindec($exp);
+    $exp-=127;
+    $scibin=substr($binfinal,9);
+    $binint=substr($scibin,0,$exp);
+    $binpoint=substr($scibin,$exp);
+    $intnumber=bindec("1".$binint);
+
+    $tmppoint = "";
+    for ($i=0; $i<strlen($binpoint); $i++) {
+        $tmppoint[]=substr($binpoint,$i,1);
+    }
+
+    $tmppoint=array_reverse($tmppoint);
+    $tpointnumber=number_format($tmppoint[0]/2,strlen($binpoint),'.','');
+
+    $pointnumber = "";
+    for ($i=1; $i<strlen($binpoint); $i++) {
+        $pointnumber=number_format($tpointnumber/2,strlen($binpoint),'.','');
+        $tpointnumber=$tmppoint[$i+1].substr($pointnumber,1);
+    }
+
+    $floatfinal=$intnumber+$pointnumber;
+
+    if ($sign==1) {
+        $floatfinal=-$floatfinal;
+    }
+
+    return number_format($floatfinal,$nd,'.','');
+}
+

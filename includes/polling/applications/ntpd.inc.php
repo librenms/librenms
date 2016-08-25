@@ -54,5 +54,5 @@ if ($agent_data['app']['ntpd']) {
     );
 }
 
-$tags = compact('name', 'app_id', 'rdd_name', 'rrd_def');
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

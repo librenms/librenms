@@ -23,64 +23,56 @@
  */
 header('Content-type: text/plain');
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 $ok = '';
 $error = '';
 $name = mres($_POST['name']);
-if(!empty($name)) {
-    if( is_numeric($_REQUEST['template_id']) && $_REQUEST['rule_id'] ) {
+if (!empty($name)) {
+    if (is_numeric($_REQUEST['template_id']) && $_REQUEST['rule_id']) {
         //Update the template/rule mapping
 
-        if( is_array($_REQUEST['rule_id']) ) {
-            $_REQUEST['rule_id'] = implode(",",$_REQUEST['rule_id']);
+        if (is_array($_REQUEST['rule_id'])) {
+            $_REQUEST['rule_id'] = implode(",", $_REQUEST['rule_id']);
         }
-        if( substr($_REQUEST['rule_id'], 0,1) != "," ){
+        if (substr($_REQUEST['rule_id'], 0, 1) != ",") {
             $_REQUEST['rule_id'] = ",".$_REQUEST['rule_id'];
         }
-        if( substr($_REQUEST['rule_id'],-1,1) != "," ){
+        if (substr($_REQUEST['rule_id'], -1, 1) != ",") {
             $_REQUEST['rule_id'] .= ",";
         }
-        if(dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
+        if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
             $ok = "Updated template and rule id mapping";
-        }
-        else {
+        } else {
             $error ="Failed to update the template and rule id mapping";
         }
-    }
-    elseif( $_REQUEST['template'] && is_numeric($_REQUEST['template_id']) ) {
+    } elseif ($_REQUEST['template'] && is_numeric($_REQUEST['template_id'])) {
         //Update template-text
 
-        if($ret = dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
+        if ($ret = dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
             $ok = "Updated template";
-        }
-        else {
+        } else {
             $error = "Failed to update the template";
         }
-    }
-    elseif( $_REQUEST['template'] ) {
+    } elseif ($_REQUEST['template']) {
         //Create new template
 
-        if(dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
+        if (dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
             $ok = "Alert template has been created.";
-        }
-        else {
+        } else {
             $error = "Could not create alert template";
         }
-    }
-    else {
+    } else {
         $error = "We could not work out what you wanted to do!";
     }
-}
-else {
+} else {
     $error = "You haven't given your template a name, it feels sad :( - $name";
 }
 
-if(!empty( $ok )) {
+if (!empty($ok)) {
     die("$ok");
-}
-else {
+} else {
     die("ERROR: $error");
 }

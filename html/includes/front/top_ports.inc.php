@@ -27,8 +27,7 @@ if (is_admin() === true || is_read() === true) {
         ORDER BY total desc
         LIMIT $top
         ";
-}
-else {
+} else {
     $query   = "
         SELECT *, I.ifInOctets_rate + I.ifOutOctets_rate as total
         FROM ports as I, devices as d,

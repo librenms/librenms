@@ -6,8 +6,7 @@ foreach ($datas as $type) {
             $g_i++;
             if (!is_integer($g_i / 2)) {
                 $row_colour = $list_colour_a;
-            }
-            else {
+            } else {
                 $row_colour = $list_colour_b;
             }
 
@@ -18,8 +17,7 @@ foreach ($datas as $type) {
 
             echo '</div>';
             echo '</div>';
-        }
-        else {
+        } else {
             $graph_title = $type_text[$type];
             $graph_type  = 'device_'.$type;
 

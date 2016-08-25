@@ -15,8 +15,7 @@ echo '<table cellspacing="0" cellpadding="5" border="0">';
 foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', array($interface['port_id'])) as $vp) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 
@@ -44,7 +43,7 @@ foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', array($interfa
         $graph_array_zoom           = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width']  = '400';
-        echo overlib_link('#', generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
+        echo overlib_link('#', generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
     }
 
     echo '</td></tr>';

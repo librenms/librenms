@@ -21,10 +21,9 @@
 //
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
-error_reporting(E_ERROR);
+error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 function set_debug($debug) {
-
     if (isset($debug)) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 0);
@@ -32,15 +31,26 @@ function set_debug($debug) {
         ini_set('allow_url_fopen', 0);
         ini_set('error_reporting', E_ALL);
     }
-
 }//end set_debug()
+
+// set install_dir
+$config['install_dir'] = realpath(__DIR__ . '/..');
+
+// initialize the class loader and add custom mappings
+require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
+$classLoader->registerClass('Console_Table', $config['install_dir'] . '/includes/console_table.php');
+$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
+$classLoader->registerClass('SMTP', $config['install_dir'] . "/includes/phpmailer/class.smtp.php");
+$classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
+$classLoader->register();
 
 // Default directories
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
 
 $config['temp_dir']    = '/tmp';
-$config['install_dir'] = '/opt/'.$config['project_id'];
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
@@ -439,8 +449,6 @@ $config['enable_vrfs'] = 1;
 // Enable VRFs
 $config['enable_vrf_lite_cisco'] = 1;
 // Enable routes for VRF lite cisco
-$config['enable_printers'] = 0;
-// Enable Printer support
 $config['enable_sla'] = 0;
 // Enable Cisco SLA collection and display
 // Ports extension modules

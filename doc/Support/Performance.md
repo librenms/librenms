@@ -1,3 +1,4 @@
+source: Support/Performance.md
 # Performance optimisations
 
 This document will give you some guidance on optimising your setup.
@@ -57,5 +58,3 @@ The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the op
 
 If your install uses hostnames for devices and you have quite a lot then it's advisable to setup a local recursive dns instance on the 
 LibreNMS server. Something like pdns-recursor can be used and then configure `/etc/resolv.conf` to use 127.0.0.1 for queries.
-
-

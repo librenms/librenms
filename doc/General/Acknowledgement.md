@@ -1,3 +1,4 @@
+source: General/Acknowledgement.md
 LibreNMS 3rd party acknowledgements
 -----------------------------------
 
@@ -36,5 +37,3 @@ LibreNMS 3rd party acknowledgements
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/check_mk*): GPLv2
-
-

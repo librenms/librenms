@@ -1,3 +1,4 @@
+source: Extensions/Syslog.md
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.

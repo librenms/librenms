@@ -22,7 +22,7 @@
  * @subpackage Widgets
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'">
@@ -55,13 +55,11 @@ if( defined('show_settings') || empty($widget_settings) ) {
     </div>
   </div>
 </form>';
-}
-else {
+} else {
     $widget_settings['title'] = $widget_settings['image_title'];
     if (strstr($widget_settings['image_url'], '?')) {
         $widget_settings['image_url'] .= "&".mt_rand();
-    }
-    else {
+    } else {
         $widget_settings['image_url'] .= "?".mt_rand();
     }
     $common_output[]          = '<a target="_blank" href="'.$widget_settings['target_url'].'"><img class="minigraph-image" style="max-width: '.$widget_dimensions['x'].'px; max-height:'.$widget_dimensions['y'].'px;" src="'.$widget_settings['image_url'].'"/></a>';

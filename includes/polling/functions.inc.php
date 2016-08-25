@@ -27,11 +27,11 @@ function poll_sensor($device, $class, $unit) {
             if ($class == 'temperature') {
                 if ($device['os'] == 'netapp') {
                     include 'includes/polling/temperatures/netapp.inc.php';
-                }
-                else if ($device['os'] == 'canopy') {
+                } elseif ($device['os'] == 'canopy') {
                     include 'includes/polling/temperatures/canopy.inc.php';
-                }
-                else {
+                } elseif ($device['os'] == 'hytera') {
+                    require_once 'includes/polling/temperatures/hytera.inc.php';
+                } else {
                     // Try 5 times to get a valid temp reading
                     for ($i = 0; $i < 5; $i++) {
                         d_echo("Attempt $i ");
@@ -49,8 +49,9 @@ function poll_sensor($device, $class, $unit) {
                         // end if
                     }
                 }//end if
-            }
-            else if ($class == 'state') {
+            } elseif ($class == "voltage" && $device['os'] == 'hytera') {
+                require_once "includes/polling/voltages/hytera.inc.php";
+            } elseif ($class == 'state') {
                 $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB', $mibdir)));
                 if (!is_numeric($sensor_value)) {
                     $state_value = dbFetchCell('SELECT `state_value` FROM `state_translations` LEFT JOIN `sensors_to_state_indexes` ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id` WHERE `sensors_to_state_indexes`.`sensor_id` = ? AND `state_translations`.`state_descr` LIKE ?', array($sensor['sensor_id'], $sensor_value));

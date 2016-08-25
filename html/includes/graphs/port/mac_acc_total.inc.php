@@ -3,8 +3,7 @@
 $port = mres($_GET['id']);
 if ($_GET['stat']) {
     $stat = mres($_GET['stat']);
-}
-else {
+} else {
     $stat = 'bits';
 }
 
@@ -12,8 +11,7 @@ $sort = mres($_GET['sort']);
 
 if (is_numeric($_GET['topn'])) {
     $topn = $_GET['topn'];
-}
-else {
+} else {
     $topn = '10';
 }
 
@@ -27,26 +25,21 @@ if ($stat == 'pkts') {
     $prefix     = 'P';
     if ($sort == 'in') {
         $sort = 'cipMacHCSwitchedPkts_input_rate';
-    }
-    else if ($sort == 'out') {
+    } elseif ($sort == 'out') {
         $sort = 'cipMacHCSwitchedPkts_output_rate';
-    }
-    else {
+    } else {
         $sort = 'bps';
     }
-}
-else if ($stat == 'bits') {
+} elseif ($stat == 'bits') {
     $units      = 'bps';
     $unit       = 'B';
     $multiplier = '8';
     $colours    = 'greens';
     if ($sort == 'in') {
         $sort = 'cipMacHCSwitchedBytes_input_rate';
-    }
-    else if ($sort == 'out') {
+    } elseif ($sort == 'out') {
         $sort = 'cipMacHCSwitchedBytes_output_rate';
-    }
-    else {
+    } else {
         $sort = 'bps';
     }
 }//end if
@@ -89,8 +82,7 @@ foreach ($accs as $acc) {
             if ($peer_info) {
                 $asn    = 'AS'.$peer_info['bgpPeerRemoteAs'];
                 $astext = $peer_info['astext'];
-            }
-            else {
+            } else {
                 unset($as);
                 unset($astext);
                 unset($asn);

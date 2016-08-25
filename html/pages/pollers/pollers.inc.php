@@ -30,11 +30,9 @@ foreach (dbFetchRows($query) as $poller) {
     $old = ($poller['now'] - $poller['then']);
     if ($old >= 300) {
         $row_class = 'danger';
-    }
-    else if ($old >= 280 && $old < 300) {
+    } elseif ($old >= 280 && $old < 300) {
         $row_class = 'warning';
-    }
-    else {
+    } else {
         $row_class = 'success';
     }
 

@@ -26,13 +26,15 @@ $interval = mres($_POST['interval']);
 $mute     = mres($_POST['mute']);
 $invert   = mres($_POST['invert']);
 $name     = mres($_POST['name']);
-if ($_POST['proc'] != "") { $proc = $_POST['proc']; }
-else { $proc = ""; }
+if ($_POST['proc'] != "") {
+    $proc = $_POST['proc'];
+} else {
+    $proc = "";
+}
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
-}
-else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
+} elseif (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
     $device_id = $_POST['device_id'];
     if (!is_numeric($count)) {
         $count = '-1';
@@ -42,15 +44,13 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
     $interval_sec = convert_delay($interval);
     if ($mute == 'on') {
         $mute = true;
-    }
-    else {
+    } else {
         $mute = false;
     }
 
     if ($invert == 'on') {
         $invert = true;
-    }
-    else {
+    } else {
         $invert = false;
     }
 
@@ -65,12 +65,10 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
     if (is_numeric($alert_id) && $alert_id > 0) {
         if (dbUpdate(array('rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'name' => $name, 'proc' => $proc), 'alert_rules', 'id=?', array($alert_id)) >= 0) {
             $update_message = "Edited Rule: <i>$name: $rule</i>";
-        }
-        else {
+        } else {
             $update_message = 'ERROR: Failed to edit Rule: <i>'.$rule.'</i>';
         }
-    }
-    else {
+    } else {
         if (is_array($_POST['maps'])) {
             $device_id = ':'.$device_id;
         }
@@ -86,13 +84,11 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
                     unset($ret,$target,$raw,$rule,$msg,$map_id);
                 }
             }
-        }
-        else {
+        } else {
             $update_message = 'ERROR: Failed to add Rule: <i>'.$rule.'</i>';
         }
     }//end if
-}
-else {
+} else {
     $update_message = 'ERROR: invalid device ID or not a global alert';
 }//end if
 echo $update_message;

@@ -1,0 +1,1885 @@
+-- MIB NAME     : HYTERA-REPEATER-MIB
+-- LAST-UPDATED : 201402151323Z
+-- REVISION     : 201402151323Z
+-- ORGANIZATION : hytera
+-- CONTACT-INFO :
+-- DESCRIPTION  : 1. The MIB is for hytera repeater management based on SNMPv1.
+--                2. The read community and write community are all set as public.
+--                3. After setting an object, you should restart the repeater to make
+--                   sure it works by setting the rptRestart object to 1.
+
+HYTERA-REPEATER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	private, enterprises, IpAddress, Counter, Gauge, TimeTicks
+	    FROM RFC1155-SMI
+	OBJECT-TYPE
+	    FROM RFC-1212;
+
+hyteraRepeaterMIB OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297
+	::= { enterprises 40297 }
+
+product OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1
+	::= { hyteraRepeaterMIB 1 }
+
+repeater OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2
+	::= { product 2 }
+
+
+-- groups in repeater
+
+rptRealTimeInfo OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.1
+	::= { repeater 1 }
+	
+rptControl OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.2
+	::= { repeater 2 }
+	
+rptLog OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.3
+	::= { repeater 3 }
+	
+rptSystemInfo OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.4
+	::= { repeater 4 }
+	
+rptConfiguration OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.5
+	::= { repeater 5 }
+	
+
+-- the rptRealTimeInfo group
+
+-- The rptRealTimeInfo group is consist of two sub groups, rptAlarmInfo group
+-- and rptDataInfo group. The rptAlarmInfo group contains all the real time
+-- alarm information of the repeater. The rptDataInfo group contains all the
+-- real time data of the repeater.
+
+rptAlarmInfo OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.1.1
+	::= { rptRealTimeInfo 1 }
+
+rptVoltageAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The voltage alarm.
+		 normal(0), low voltage alarm(1), high voltage alarm(2), abnormal(3).
+		 The abnormal condition is used for RD960. For the RD960 do not distinguish
+		 low voltage alarm and high voltage alarm, we use abnormal to replace them."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.1
+	::= { rptAlarmInfo 1 }
+
+rptTemperatureAlarm OBJECT-TYPE				
+	SYNTAX  INTEGER (0..2)
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The temperature alarm.
+		 normal(0), low temperature alarm(1), high temperature alarm(2)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.2
+	::= { rptAlarmInfo 2 }
+
+rptFanAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The fan alarm.
+		 normal(0), alarm(1).
+		 The object is not supported yet."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.3
+	::= { rptAlarmInfo 3 }
+
+rptForwardAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (-1..1)
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The forward power alarm.
+		 undefined(-1), normal(0), alarm(1).
+		 The object is not supported yet."
+	DEFVAL { -1 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.4
+	::= { rptAlarmInfo 4 }
+
+rptReflectedAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (-1..1)
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The reflected power alarm.
+		 undefined(-1), normal(0), alarm(1).
+		 The object is not supported yet."
+	DEFVAL { -1 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.5
+	::= { rptAlarmInfo 5 }
+
+rptVswrAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The voltage standing wave radio alarm.
+		 normal(0), alarm(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.6
+	::= { rptAlarmInfo 6 }
+
+rptTxPllAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The transmitting PLL alarm.
+		 normal(0), alarm(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.7
+	::= { rptAlarmInfo 7 }
+
+rptRxPllAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The receiving PLL alarm.
+		 normal(0), alarm(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.8
+	::= { rptAlarmInfo 8 }
+
+rptBatteryVoltageAlarm OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The battery voltage alarm.
+		 normal(0), abnormal(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.1.1.9
+	::= { rptAlarmInfo 9 }
+
+rptDataInfo OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.1.2
+	::= { rptRealTimeInfo 2 }
+
+rptVoltage OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The voltage.
+		 It should be changed to float format.
+		 If the repeater is rd620 and rd960, the value is invalid."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.1
+	::= { rptDataInfo 1 }
+
+rptPaTemprature OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The temperature.
+		 It should be changed to float format.
+		 The value is invalid, if the repeater is rd960."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.2
+	::= { rptDataInfo 2 }
+
+rptFanSpeed OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The fan speed.
+		 The object is not supported yet."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.3
+	::= { rptDataInfo 3 }
+
+rptVswr OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The VSWR.
+		 It should be changed to float format. "
+	-- 1.3.6.1.4.1.40297.1.2.1.2.4
+	::= { rptDataInfo 4 }
+
+rptTxFwdPower OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4)) 		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The forward power.
+		 It should be changed to float format.
+		 The value is invalid, if the repeater is rd960 or rd620."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.5
+	::= { rptDataInfo 5 }
+
+rptTxRefPower OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The reflected power.
+		 It should be changed to float format.
+		 The value is invalid, if the repeater is rd960 or rd620."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.6
+	::= { rptDataInfo 6 }
+
+rptDataInfoBak1 OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))			
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The backup object.
+		 The object is not supported yet."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.7
+	::= { rptDataInfo 7 }
+
+rptDataInfoBak2 OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4)) 			
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The backup object.
+		The object is not supported yet."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.8
+	::= { rptDataInfo 8 }
+
+rptSlot1Rssi OBJECT-TYPE
+	SYNTAX  INTEGER 			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The RSSI value of slot1.
+		 unit: dB."
+	DEFVAL { -200 }
+	-- 1.3.6.1.4.1.40297.1.2.1.2.9
+	::= { rptDataInfo 9 }
+
+rptSlot2Rssi OBJECT-TYPE
+	SYNTAX  INTEGER 			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The RSSI value of slot2.
+		 unit: dB.
+		 The value is valid only in digital model."
+	DEFVAL { -200 }
+	-- 1.3.6.1.4.1.40297.1.2.1.2.10
+	::= { rptDataInfo 10 }
+
+rptSupplyPowerType OBJECT-TYPE
+	SYNTAX  INTEGER 			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of power.
+		 DC(0), Battery(1)."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.11
+	::= { rptDataInfo 11 }
+
+rptBatteryConnect OBJECT-TYPE
+	SYNTAX  INTEGER 			
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The battery connecting condition.
+		 disconnected(0), connected(1)."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.12
+	::= { rptDataInfo 12 }
+
+rptBatteryVoltage OBJECT-TYPE
+	SYNTAX  OCTET STRING(SIZE(4))			
+	MAX-ACCESS read-only
+	STATUS  optional
+	DESCRIPTION
+		"The battery voltage.
+		 The object is not supported yet."
+	-- 1.3.6.1.4.1.40297.1.2.1.2.13
+	::= { rptDataInfo 13 }
+
+-- the rptControl group
+
+-- the rptControl group contains some basic control of the repeater, such as
+-- repeater reseting, work channel switching and transmit power adjusting.
+-- We can get some working information of the repeater also.
+-- Some objects in this group is read-only, which may give some refrence for
+-- controlling.
+
+rptRestart OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Restart the repeater.
+		 do nothing(0), reset(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.1
+	::= { rptControl 1 }
+
+rptChannelNumber OBJECT-TYPE
+	SYNTAX INTEGER (0..15)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The current channel number in the zone."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.2
+	::= { rptControl 2 }
+
+rptChannelType OBJECT-TYPE
+	SYNTAX INTEGER (0..2)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current channel type.
+		 digital(0), analog(1), mixed(2)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.3
+	::= { rptControl 3 }
+
+rptControlObjBak1 OBJECT-TYPE
+	SYNTAX INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS optional
+	DESCRIPTION
+		"The backup object.
+		 The object is not supported yet."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.4
+	::= { rptControl 4 }
+
+rptTxPowerLevel OBJECT-TYPE
+	SYNTAX INTEGER (0|2)							
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The transmit power level.
+		 high(0), low(2)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.5
+	::= { rptControl 5 }
+
+rptKnockdown OBJECT-TYPE
+	SYNTAX INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The status of repeating.
+		 repeating(0), knockdown(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.6
+	::= { rptControl 6 }
+
+rptRadioState OBJECT-TYPE
+	SYNTAX INTEGER (0..1)			
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The status of the repeater's normal function.
+		 enable(0), disable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.2.7
+	::= { rptControl 7 }
+
+rptSnmpTrapIp OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "The SNMP trapping IP address.
+     The default value is 230.37.0.0."
+  -- 1.3.6.1.4.1.40297.1.2.2.8
+  ::= { rptControl 8 }
+
+rptSnmpTrapPort OBJECT-TYPE
+  SYNTAX INTEGER (162)
+  MAX-ACCESS read-only
+  STATUS mandatory
+  DESCRIPTION
+    "The SNMP trapping port."
+  DEFVAL { 162 }
+  -- 1.3.6.1.4.1.40297.1.2.2.9
+  ::= { rptControl 9 }
+
+rptchannelParaTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ChannelParaEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+	  "The table of channel's parameters relevant to the repeater's channels."
+  -- 1.3.6.1.4.1.40297.1.2.2.10
+	::= { rptControl 10 }
+
+channelParaEntry OBJECT-TYPE
+	SYNTAX ChannelParaEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	  "The channel's parameters for one of the repeater's channels."
+	INDEX { channelParaIndex  }
+        -- 1.3.6.1.4.1.40297.1.2.2.10.1
+	::= { rptchannelParaTable 1 }
+
+ChannelParaEntry ::= SEQUENCE {
+	channelParaIndex   INTEGER,
+	actChannelAlias  OCTET STRING,
+  actChannelType  INTEGER,		
+	actTxPower   INTEGER,
+	actChannelNo  INTEGER,
+	actChannelSubNo  INTEGER
+}
+
+channelParaIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The index of the table which uniquely identifies the channel's parameters."
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.1
+	::= { channelParaEntry 1 }
+
+actChannelAlias OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(32))
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The channel alias.
+	   It is an unicode string"
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.2
+	::= { channelParaEntry 2 }
+
+actChannelType  OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The channel type.
+	   digital(0), analog(1), mixed(2)."
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.3
+	::= { channelParaEntry 3 }
+	
+actTxPower  OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The transmit power level.
+	   high(0), low(2)."
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.4
+	::= { channelParaEntry 4 }
+	
+actChannelNo  OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The channel number in the repeater's zone."
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.5
+	::= { channelParaEntry 5 }
+	
+actChannelSubNo  OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The channel number in the group of same type."
+  -- 1.3.6.1.4.1.40297.1.2.2.10.1.6
+	::= { channelParaEntry 6 }
+
+rptForbid OBJECT-TYPE
+	SYNTAX INTEGER (0..1)			
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The status of the repeater's all function.
+		 nomal(0), forbid(1).
+		 If the repeater is forbided, you can only wake up it by setting
+		 the rptRadioStatus object to 0 in local RDAC model."
+	-- 1.3.6.1.4.1.40297.1.2.2.11
+	::= { rptControl 11 }
+	
+	
+-- the rptLog group
+
+-- The rptLog group contains all records of alarm in the history, include alarm
+-- name, alarm status and alarm time. We can clear all records by setting the
+-- clearLog object to 1.
+
+logTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LogEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+	  "The table of alarm records."
+	-- 1.3.6.1.4.1.40297.1.2.3.1
+	::= { rptLog 1 }
+
+logEntry OBJECT-TYPE
+	SYNTAX LogEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	  "The record's content."
+	INDEX { logIndex }
+	-- 1.3.6.1.4.1.40297.1.2.3.1.1
+	::= { logTable 1 }
+
+LogEntry ::= SEQUENCE {
+	logIndex INTEGER,
+	alarmName INTEGER,		
+	alarmStatus INTEGER,
+	logTime INTEGER
+}
+
+logIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..100)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The index of the table which uniquely identifies the alram record."
+	-- 1.3.6.1.4.1.40297.1.2.3.1.1.1
+	::= { logEntry 1 }
+
+alarmName OBJECT-TYPE
+	SYNTAX INTEGER (0..9|65535)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The alarm name.
+	   temperature alarm(0), fan alarm(1), vswr alarm(2), low forward power alarm(3),
+     low voltage alarm(4), high voltage alarm(5), tx unlock alarm(6),
+     rx unlock alarm(7), battery voltage alarm(8), invalid(65535)."
+  DEFVAL { 65535 }
+	-- 1.3.6.1.4.1.40297.1.2.3.1.1.2
+	::= { logEntry 2 }
+
+alarmStatus  OBJECT-TYPE
+	SYNTAX INTEGER (0..1|65535)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION	
+	  "The alarm status.
+	   alarm recove(0), alarm happen(1), invalid(65535)."
+  DEFVAL { 65535 }
+	-- 1.3.6.1.4.1.40297.1.2.3.1.1.3
+	::= { logEntry 3 }
+
+logTime OBJECT-TYPE
+	SYNTAX INTEGER (-1..134217728)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The alarm time.
+	   unit: second.
+	   The time is the time lapsed since the repeater starting up. If the value
+	   is -1, the record is invalid."
+  DEFVAL { -1 }
+	-- 1.3.6.1.4.1.40297.1.2.3.1.1.4
+	::= { logEntry 4 }
+
+clearLog OBJECT-TYPE
+	SYNTAX INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS	mandatory
+	DESCRIPTION	
+	  "Clear the log.
+	   do nothing(0), clear log(0)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.3.2
+	::= { rptLog 2 }
+
+recordCount OBJECT-TYPE
+	SYNTAX INTEGER (0..100)
+	MAX-ACCESS read-only
+	STATUS	mandatory
+	DESCRIPTION	
+	  "The number of records."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.3.3
+	::= { rptLog 3 }
+
+latestRecordPosition OBJECT-TYPE
+	SYNTAX INTEGER (0..100)
+	MAX-ACCESS read-only
+	STATUS	mandatory
+	DESCRIPTION	
+	  "The row number of the latest record.
+	   If the value is 0, there is no valid record in the table."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.3.4
+	::= { rptLog 4 }
+	
+	
+-- the rptSystemInfo group
+
+-- The rptSystemInfo group contains repeater firmware and run-time system information.
+
+rptModelName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The model name.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.1
+	::= { rptSystemInfo 1 }
+
+rptModelNo OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..64))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The model number.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.2
+	::= { rptSystemInfo 2 }
+
+rptFirmwareVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The firmware version.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.3
+	::= { rptSystemInfo 3 }
+
+rptRcdbVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The RCDB version.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.4
+	::= { rptSystemInfo 4 }
+
+rptSerialNo OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The serial number.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.5
+	::= { rptSystemInfo 5 }	
+
+rptRadioAlias OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The repeater alias.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.6
+	::= { rptSystemInfo 6 }
+
+rptRadioID OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The ID of the repeater."
+	-- 1.3.6.1.4.1.40297.1.2.4.7
+	::= { rptSystemInfo 7 }
+
+rptCurChannelType OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of the wroking channel.
+		 digital(0), analog(1), mixed(2)."
+	-- 1.3.6.1.4.1.40297.1.2.4.8
+	::= { rptSystemInfo 8 }
+
+rptChannelName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The name of the current channel.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.9
+	::= { rptSystemInfo 9 }
+
+rptCurTxFreq OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current transmitting frequency.
+		 unit: Hz."
+	-- 1.3.6.1.4.1.40297.1.2.4.10
+	::= { rptSystemInfo 10 }
+
+rptCurRxFreq OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current receiving frequency.
+		 unit: Hz."
+	-- 1.3.6.1.4.1.40297.1.2.4.11
+	::= { rptSystemInfo 11 }
+
+rptWorkState OBJECT-TYPE
+	SYNTAX  INTEGER		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The work status of the repeater.
+		 receive(0), transmit(1)."
+	-- 1.3.6.1.4.1.40297.1.2.4.12
+	::= { rptSystemInfo 12 }
+	
+rptCurZoneAlias OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(32))
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The alias of the current zone.
+		 It is an unicode string."
+	-- 1.3.6.1.4.1.40297.1.2.4.13
+	::= { rptSystemInfo 13 }
+	
+	
+-- the rptConfiguration group
+
+-- The rptConfiguration group is consist of four sub groups, rptBasicSetting
+-- group, rptDigitalChannelSetting group, rptAnalogChannelSetting group,
+-- rptMixedChannelSetting group and rptServiceSetting group. The rptBasicSetting
+-- group contains some basic cofiguration parameters of the system. The
+-- rptDigitalChannelSetting group contains some configuration parameters of the
+-- digital channel. The rptAnalogChannelSetting group contains some configuration
+-- parameters of the analog channel. The rptMixedChannelSetting group contains
+-- some configuration parameters of the mixed channel. The rptServiceSetting group
+-- contains some configuration parameters of the service.
+
+rptBasicSetting OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.5.1
+	::= { rptConfiguration 1 }
+
+powerOn OBJECT IDENTIFIER
+	--1.3.6.1.4.1.40297.1.2.5.1.1
+	::= { rptBasicSetting 1 }
+
+designatedPowerOnChn OBJECT-TYPE
+        SYNTAX  INTEGER (0..1)			
+        MAX-ACCESS read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "Designate the power on channel.
+         disable(0), enable(1)."
+        DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.1.1
+	::= { powerOn 1 }
+
+powerOnChannelNo OBJECT-TYPE
+	SYNTAX  INTEGER (0..15|65535)				
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The the power on channel number.
+		 invalid(65535)."
+  DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.1.2
+	::= { powerOn 2 }
+
+microphone OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.1.2
+	::= { rptBasicSetting 2 }
+
+internalMicGain OBJECT-TYPE
+	SYNTAX  INTEGER (4..36)			
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The gain of the internal microphone.
+		 It is double of the real value."
+	DEFVAL { 24 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.2.1
+	::= { microphone 1 }
+
+externalMicGain OBJECT-TYPE
+	SYNTAX  INTEGER (4..36)				
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The gain of the external microphone.
+		 It is double of the real value."
+	DEFVAL { 24 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.2.2
+	::= { microphone 2 }
+	
+multiCTCCDCTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF MultiCTCCDCEntry
+	MAX-ACCESS  not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	"The table of subaudio frequency."
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3
+	::= { rptBasicSetting 3 }
+
+multiCTCCDCEntry OBJECT-TYPE
+	SYNTAX MultiCTCCDCEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	"The subaudio frequency."
+	INDEX { ctcssIndex }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1
+	::= { multiCTCCDCTable 1 }
+
+MultiCTCCDCEntry ::= SEQUENCE {
+	ctcssIndex INTEGER,
+	txCtcssFrequency INTEGER,		
+	txCtcssType INTEGER,
+	rxCtcssFrequency INTEGER,
+	rxCtcssType INTEGER
+}
+
+ctcssIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"The index of the table which uniquely identifies the subaudio frequency."
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1.1
+	::= { multiCTCCDCEntry 1 }
+
+txCtcssFrequency OBJECT-TYPE
+	SYNTAX INTEGER (0|19..492|670..2541)		
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The transmitting subaudio frequency.
+		 The value is limitted to the range. The range is changed with the type:
+                 0        (txCtcssType: none)
+                 19~492   (txCtcssType: CDCSS or CDCSS invert)
+                 670~2541 (txCtcssType: CTCSS)
+     The value is 10 times of the real value when the type is CTCSS.
+     The value in first row is unable to be set.
+     It's not able to be set, unless the rxCtcssType in the same row is not none.
+     It will be set to the matched minimum available value automatically, when the
+     txCtcssType in the same row is changed."
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1.2
+	::= { multiCTCCDCEntry 2 }
+	
+txCtcssType OBJECT-TYPE
+	SYNTAX INTEGER (0..3)				
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	"The type of the transmitting subaudio frequency.
+	 none(0), CTCSS(1), CDCSS(2), CDCSS invert(3).
+	 The value in first row is unable to be set.
+   It's not able to be set, unless the rxCtcssType in the same row is not none."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1.3
+	::= { multiCTCCDCEntry 3 }
+	
+rxCtcssFrequency OBJECT-TYPE
+	SYNTAX INTEGER (0|19..492|670..2541)		
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The receiving subaudio frequency.
+		 The value is limitted to the range and is not allowed to duplicate but 0.
+		 The range is changed with the type:0
+                 0        (rxCtcssType: none)
+                 19~492   (rxCtcssType: CDCSS or CDCSS invert)
+                 670~2541 (rxCtcssType: CTCSS)
+     The value is 10 times of the real value when the type is CTCSS.
+     The value in first row is unable to be set.
+     It will be set to the matched minimum available value automatically, when the
+     rxCtcssType in the same row is changed."
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1.4
+	::= { multiCTCCDCEntry 4 }
+	
+rxCtcssType OBJECT-TYPE
+	SYNTAX INTEGER (0..3)		
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The type of the receiving subaudio frequency.
+	   none(0), CTCSS(1), CDCSS(2), CDCSS invert(3).
+	   It must be set according to line sequence.
+     The value in first row is unable to be set."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.3.1.5
+	::= { multiCTCCDCEntry 5 }
+
+audioPriority OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.1.4
+	::= { rptBasicSetting 4 }
+
+pathPriority OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)				
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The transmit path priority.
+		 PTT request(0), repeat request(1), first come first send(2)."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.4.1
+	::= { audioPriority 1 }
+
+pttPriority OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)				
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The PTT priority.
+		 external PTT(0), front PTT(1), remote PTT(2), first come first send(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.4.2
+	::= { audioPriority 2 }
+
+jitterBufferLenth OBJECT-TYPE			
+	SYNTAX  INTEGER (1..8)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The jitter buffer length."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.5
+	::= { rptBasicSetting 5 }
+
+analogCallHangTime OBJECT-TYPE		
+	SYNTAX  INTEGER (0..70)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The analog call hang time.
+		 unit: second."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.6
+	::= { rptBasicSetting 6 }
+
+repeatRequestPriority OBJECT-TYPE		
+	SYNTAX  INTEGER (0..2)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The repeat request priority.
+		 local repeating(0), IP connect repeating(1), first come first send(2)."
+	DEFVAL { 2 }
+	-- 1.3.6.1.4.1.40297.1.2.5.1.7
+	::= { rptBasicSetting 7 }
+
+
+rptDigitalChannelSetting OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.2	
+	::= { rptConfiguration 2 }
+
+digitalChnTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DigitalChnEntry
+    MAX-ACCESS  not-accessible
+    STATUS  mandatory
+	DESCRIPTION
+		"The table of digital channel's configuration parameters relevant to the
+		 repeater's digital channels."
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1
+	::= { rptDigitalChannelSetting 1 }
+
+digitalChnEntry  OBJECT-TYPE
+	SYNTAX  DigitalChnEntry
+	MAX-ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The digital channel's configuration parameters for one of the repeater's digital channels."
+	INDEX { digitalChnIndex }
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1
+	::= { digitalChnTable 1 }
+
+DigitalChnEntry ::= SEQUENCE {
+	digitalChnIndex  INTEGER,
+	digitalColorCode  INTEGER,
+	digitalIpMultisiteConnect  INTEGER,
+	digitalReceiveFrequency  INTEGER,
+	digitalTransmitFrequency  INTEGER,
+	digitalTxContactName  INTEGER
+}
+
+digitalChnIndex  OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)
+	MAX-ACCESS  read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The index of the table which uniquely identifies the digital channel's parameter.
+		 It also represents the channel number which is counted from 1."
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.1
+	::= { digitalChnEntry 1 }	
+
+digitalColorCode  OBJECT-TYPE
+	SYNTAX  INTEGER (0..15)
+	MAX-ACCESS  read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The color code."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.2
+	::= { digitalChnEntry 2 }
+
+digitalIpMultisiteConnect  OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)				
+	MAX-ACCESS  read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The multisite connecting based on network.
+		 None(0), slot1(1), slot2(2), slot1&slot2(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.3
+	::= { digitalChnEntry 3 }
+
+digitalReceiveFrequency  OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)				
+	MAX-ACCESS  read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The receiving frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.4
+	::= { digitalChnEntry 4 }
+
+digitalTransmitFrequency  OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)
+	MAX-ACCESS  read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The transmitting frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.5
+	::= { digitalChnEntry 5 }
+
+digitalTxContactName  OBJECT-TYPE
+	SYNTAX  INTEGER (0..512)
+	MAX-ACCESS  read-write
+	STATUS mandatory
+	DESCRIPTION
+		"The row number of transmitting contact name.
+		 none(0), row number(1~512).
+		 The value is limmited by the number of rows in contact table."
+	-- 1.3.6.1.4.1.40297.1.2.5.2.1.1.6
+	::= { digitalChnEntry 6 }
+
+rptAnalogChannelSetting OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.3	
+	::= { rptConfiguration 3 }
+
+analogChnTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AnalogChnEntry
+        MAX-ACCESS  not-accessible
+        STATUS  mandatory
+	DESCRIPTION
+		"The table of analog channel's configuration parameters relevant to the
+		 repeater's analog channels."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1
+	::= { rptAnalogChannelSetting 1 }
+
+analogChnEntry  OBJECT-TYPE
+	SYNTAX  AnalogChnEntry
+	MAX-ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The analog channel's configuration parameters for one of the repeater's analog channels."
+	INDEX { analogChnIndex }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1
+	::= { analogChnTable 1 }
+
+AnalogChnEntry ::= SEQUENCE {
+	analogChnIndex  INTEGER,
+	analogCarrierSquelchLevel  INTEGER,
+	analogMultiCtcCdc  INTEGER,
+	analogPreEmp  INTEGER,
+	analogScrambler  INTEGER,
+	analogFlatAudio  INTEGER,
+	analogReceiveFrequency  INTEGER,
+	analogRxCtcCdcType  INTEGER,
+	analogRxCtcss  INTEGER,
+	analogRxCdcss  INTEGER,
+	analogTransmitFrequency  INTEGER,
+	analogTxCtcCdcType  INTEGER,
+	analogTxCtcss  INTEGER,
+	analogTxCdcss  INTEGER
+}
+
+analogChnIndex  OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index of the table which uniquely identifies the analog channel's parameters.
+		 It also represents the channel number which is counted from 1."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.1
+	::= { analogChnEntry  1 }
+
+analogCarrierSquelchLevel OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The carrier squelch level.
+		 open(0), normal(1), tight(2)"
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.2
+	::= { analogChnEntry  2 }
+
+analogMultiCtcCdc OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)		
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The multiCtcCdc control.
+		 disable(0), enable(1).
+		 It can't be set to enable until the analogRxCtcCdcType is not 0
+		 and there is some valid data is multiCTCCDCTable."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.3
+	::= { analogChnEntry  3 }
+
+analogPreEmp OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)		
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The pre-emphasis control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.4
+	::= { analogChnEntry  4 }
+
+analogScrambler OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)	
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The scrambler control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.5
+	::= { analogChnEntry  5 }
+
+analogFlatAudio OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The flat audio control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.6
+	::= { analogChnEntry  6 }
+
+analogReceiveFrequency OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The receiving frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.7
+	::= { analogChnEntry  7 }
+
+analogRxCtcCdcType OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of receiving subaudio frequency.
+		 none(0), CTCSS(1), CDCSS(2), CDCSS invert(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.8
+	::= { analogChnEntry  8 }
+
+analogRxCtcss OBJECT-TYPE
+	SYNTAX  INTEGER (670..2541|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of receiving CTCSS.
+		 It's 10 times of the real value.
+		 65535 is an invalid value.
+		 The value is restricted by analogRxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.9
+	::= { analogChnEntry  9 }
+
+analogRxCdcss OBJECT-TYPE
+	SYNTAX  INTEGER (19..492|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of receiving CDCSS.
+		 65535 is an invalid value.
+		 The value is restricted by analogRxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.10
+	::= { analogChnEntry  10 }
+
+analogTransmitFrequency OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The transmitting frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.11
+	::= { analogChnEntry  11 }
+
+analogTxCtcCdcType OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of transmitting subaudio frequency.
+		 none(0), CTCSS(1), CDCSS(2), CDCSS invert(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.12
+	::= { analogChnEntry  12 }
+
+analogTxCtcss OBJECT-TYPE
+	SYNTAX  INTEGER (670..2541|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of transmitting CTCSS.
+		 It's 10 times of the real value.
+		 65535 is an invalid value.
+		 The value is limited by analogTxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.13
+	::= { analogChnEntry  13 }
+
+analogTxCdcss OBJECT-TYPE
+	SYNTAX  INTEGER (19..492|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of transmitting CDCSS.
+		 65535 is an invalid value.
+		 The value is restricted by analogTxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.3.1.1.14
+	::= { analogChnEntry  14 }
+
+
+rptMixedChannelSetting OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.4	
+	::= { rptConfiguration 4 }
+
+mixedChnTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MixedChnEntry
+    MAX-ACCESS  not-accessible
+    STATUS  mandatory
+	DESCRIPTION
+		"The table of mixed channel's configuration parameters relevant to the
+		 repeater's mixed channels."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1
+	::= { rptMixedChannelSetting 1 }
+
+mixedChnEntry  OBJECT-TYPE
+	SYNTAX  MixedChnEntry
+	MAX-ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The mixed channel's configuration parameters for one of the repeater's mixed channels."
+	INDEX { analogChnIndex }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1
+	::= { mixedChnTable  1 }
+
+MixedChnEntry ::= SEQUENCE {
+	mixedChnIndex  INTEGER,
+	mixedCarrierSquelchLevel  INTEGER,
+	mixedTxContactName INTEGER,
+	mixedIpMultisiteConnect INTEGER,
+	mixedColorCode INTEGER,
+	mixedTxChannelType INTEGER,
+	mixedPreEmp INTEGER,
+	mixedScrambler INTEGER,
+	mixedFlatAudio INTEGER,
+	mixedMultiCtcCdc INTEGER,
+	mixedReceiveFrequency INTEGER,
+	mixedRxCtcCdcType INTEGER,
+	mixedRxCtcss INTEGER,
+	mixedRxCdcss INTEGER,
+	mixedTransmitFrequency INTEGER,
+	mixedTxCtcCdcType INTEGER,
+	mixedTxCtcss INTEGER,
+	mixedTxCdcss INTEGER
+}
+
+mixedChnIndex OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)		
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The index of the table which uniquely identifies the mixed channel's parameters.
+		 It also represents the channel number which is counted from 1."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.1
+	::= { mixedChnEntry  1 }
+
+mixedCarrierSquelchLevel OBJECT-TYPE
+	SYNTAX  INTEGER (0..2)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The carrier squelch level control.
+		 open(0), normal(1), tight(2)."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.2
+	::= { mixedChnEntry  2 }
+
+mixedTxContactName OBJECT-TYPE
+	SYNTAX  INTEGER (0..512)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The row number of transmitting contact name.
+		 none(0), row number(1~512).
+		 The value is limited to the numbers of row in the contact table."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.3
+	::= { mixedChnEntry  3 }
+
+mixedIpMultisiteConnect OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The multisite connecting based on network.
+		 none(0), slot1(1), slot 2(2), slot1&slot2(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.4
+	::= { mixedChnEntry  4 }
+
+mixedColorCode OBJECT-TYPE
+	SYNTAX  INTEGER (0..15)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The color code."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.5
+	::= { mixedChnEntry  5 }
+
+mixedTxChannelType OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of transmitting channel.
+		 digital(0), analog(1)."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.6
+	::= { mixedChnEntry  6 }
+
+mixedPreEmp OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)		
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The pre-emphasis control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.7
+	::= { mixedChnEntry  7 }
+
+mixedScrambler OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The scrambler control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.8
+	::= { mixedChnEntry  8 }
+
+mixedFlatAudio OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The flat audio control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.9
+	::= { mixedChnEntry  9 }
+
+mixedMultiCtcCdc OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The multiCtcCdc control.
+		 disable(0), enable(1).
+		 It can't be set to enable until the mixedRxCtcCdcType is not 0
+		 and there is some valid data in multiCTCCDC Table."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.10
+	::= { mixedChnEntry  10 }
+
+mixedReceiveFrequency OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The receiving frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.11
+	::= { mixedChnEntry  11 }
+
+mixedRxCtcCdcType OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of receiving subaudio frequency.
+		 none(0), CTCSS(1), CDCSS(2), CDCSS invert(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.12
+	::= { mixedChnEntry  12 }
+
+mixedRxCtcss OBJECT-TYPE
+	SYNTAX  INTEGER (670..2541|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of receiving CTCSS.
+		 It's 10 times of the real value.
+		 65535 is an invalid value.
+		 The value is restricted by analogRxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.13
+	::= { mixedChnEntry  13 }
+
+mixedRxCdcss OBJECT-TYPE
+	SYNTAX  INTEGER (19..492|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of receiving CDCSS.
+		 65535 is an invalid value.
+		 The value is restricted by analogRxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.14
+	::= { mixedChnEntry  14 }
+
+mixedTransmitFrequency OBJECT-TYPE
+	SYNTAX  INTEGER (100000000..550000000)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The transmitting frequency.
+		 unit: Hz.
+		 The value is limitted by the assigned frequency range and the last digit
+		 should be 0 or 5."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.15
+	::= { mixedChnEntry  15 }
+
+mixedTxCtcCdcType OBJECT-TYPE
+	SYNTAX  INTEGER (0..3)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of transmitting subaudio frequency.
+		 none(0), CTCSS(1), CDCSS(2), CDCSS invert(3)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.16
+	::= { mixedChnEntry  16 }
+
+mixedTxCtcss OBJECT-TYPE
+	SYNTAX  INTEGER (670..2541|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of transmitting CTCSS.
+		 It's 10 times of the real value.
+		 65535 is an invalid value.
+		 The value is restricted by analogTxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.17
+	::= { mixedChnEntry  17 }
+
+mixedTxCdcss OBJECT-TYPE
+	SYNTAX  INTEGER (19..492|65535)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of transmitting CDCSS.
+		 65535 is an invalid value.
+		 The value is restricted by analogTxCtcCdcType."
+	-- 1.3.6.1.4.1.40297.1.2.5.4.1.1.18
+	::= { mixedChnEntry  18 }
+
+
+rptServiceSetting OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.40297.1.2.5.5	
+	::= { rptConfiguration 5 }
+
+groupCallHangTime OBJECT-TYPE
+	SYNTAX  INTEGER (0..60)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The group call hang time.
+		 unit: second.
+		 The value is 2 times of the real value and should not be greater than the
+		 value of sit."
+	DEFVAL { 6 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.1
+	::= { rptServiceSetting 1 }
+
+privateCallHangTime OBJECT-TYPE
+	SYNTAX  INTEGER (0..60)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The private call hang time.
+		 unit: second.
+		 The value is 2 times of the real value and should not be greater than the
+		 value of sit."
+	DEFVAL { 6 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.2
+	::= { rptServiceSetting 2 }
+
+emergencyCallHangTime OBJECT-TYPE
+	SYNTAX  INTEGER (0..60)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The emergency call hang time.
+		 unit: second.
+		 The value is 2 times of the real value and should not be greater than the
+		 value of sit."
+	DEFVAL { 8 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.3
+	::= { rptServiceSetting 3 }
+
+sit OBJECT-TYPE
+	SYNTAX  INTEGER (0|2..120)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The sit.
+		 unit: second.
+		 transmit always(0), the value of sit(2~120).
+         The value is 2 times of the real value and should not be less than
+         groupCallHangTime, privateCallHangTime and emergencyCallHangTime."
+	DEFVAL { 12 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.4
+	::= { rptServiceSetting 4 }
+
+txPreambleDuration OBJECT-TYPE
+	SYNTAX  INTEGER (0..144)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The preamble duration.
+		 unit: milisecond.
+		 The value is 1/60 times of the real value."
+	DEFVAL { 16 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.5
+	::= { rptServiceSetting 5 }
+
+beaconTxMode OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The beacon transmit mode.
+		 local(0), network(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.6
+	::= { rptServiceSetting 6 }
+
+beaconDuration OBJECT-TYPE
+	SYNTAX  INTEGER (0|4..150)	
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The beacon duration.
+		 unit: milisecond.
+		 disable(0), beacon duration(4~150).
+		 The value is 1/120 times of the real value"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.7
+	::= { rptServiceSetting 7 }
+
+beaconInterval OBJECT-TYPE
+	SYNTAX  INTEGER (10..600)	
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The beacon interval.
+		 unit: second."
+	DEFVAL { 60 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.8
+	::= { rptServiceSetting 8 }
+
+multisiteAccessManagement OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)	
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The multisite access management control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.9
+	::= { rptServiceSetting 9 }
+
+accessManagement OBJECT-TYPE
+	SYNTAX  INTEGER (0..1)	
+	MAX-ACCESS read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The access management control.
+		 disable(0), enable(1)."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.10
+	::= { rptServiceSetting 10 }
+	
+multisiteAccessManageTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF MultisiteAccessManageEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+	  "The table of multisite access management's parameters relevant to the
+	   multisite access management."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11
+	::= { rptServiceSetting 11 }
+
+multisiteAccessManageEntry OBJECT-TYPE
+	SYNTAX MultisiteAccessManageEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	  "The multisite management parameters."
+	INDEX { mutisiteAccessManageIndex  }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11.1
+	::= { multisiteAccessManageTable 1 }
+
+MultisiteAccessManageEntry ::= SEQUENCE {
+	multisiteAccessManageIndex  INTEGER,
+	multisiteStartId  INTEGER,		
+	multisiteIdLength  INTEGER,
+	multisiteAccessCallType  INTEGER
+}
+
+multisiteAccessManageIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..32)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The index of the table which uniquely identifies the multisite access
+	   management's parameters."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11.1.1
+	::= { multisiteAccessManageEntry 1 }
+
+multisiteStartId OBJECT-TYPE
+	SYNTAX INTEGER (0..16776415)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The start ID.
+	   invalid record(0), start ID(1~16776415).
+	   It can't be set until multisiteAccessManagement is enable and the previous
+	   row is set. If it is set, the matched multisiteIdLength and
+	   multisiteAccessCallType will be set to 100 and 1 automaticly."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11.1.2
+	::= { multisiteAccessManageEntry 2 }
+	
+multisiteIdLength OBJECT-TYPE
+	SYNTAX INTEGER (1..255|65535)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The ID length.
+	   invalid(65535), ID length(1~255).
+	   It can't be set until the multisiteAccessManagement is enable and the
+	   matched multisiteStartId is set."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11.1.3
+	::= { multisiteAccessManageEntry 3 }
+	
+multisiteAccessCallType OBJECT-TYPE
+	SYNTAX INTEGER (0..1|65535)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The call type.
+	   private call(0), group call(1), invalid(65535).
+     It can't be set until multisiteAccessManagement is enable."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.11.1.4
+	::= { multisiteAccessManageEntry 4 }
+	
+contactTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+	  "The table of contacts.
+	   It is not allowed to add a new contact information."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12
+	::= { rptServiceSetting 12 }
+
+contactEntry OBJECT-TYPE
+	SYNTAX ContactEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	  "The contact information."
+	INDEX { contactIndex }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12.1
+	::= { contactTable 1 }
+
+ContactEntry ::= SEQUENCE {
+	contactIndex  INTEGER,
+	callAlias  OCTET STRING,
+  contactCallType INTEGER,		
+	callId  INTEGER
+}
+
+contactIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..512)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The index of the table which uniquely identifies the contact information."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12.1.1
+	::= { contactEntry 1 }
+
+callAlias OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(32))
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The call alias.
+	   It is an unicode string.
+	   The value should be exclusive."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12.1.2
+	::= { contactEntry 2 }
+
+contactCallType OBJECT-TYPE
+	SYNTAX INTEGER (0..2|65535)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The call type.
+	   private call(0), group call(1), all call(2), invalid(65535).
+     If the contactCallType is all call, the matched callId will be set to
+     16777215 automatically. The number of all call contact must be less than 2."
+	DEFVAL { 1 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12.1.3
+	::= { contactEntry 3 }
+	
+callId OBJECT-TYPE
+	SYNTAX INTEGER (0..16776415|16777215)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The call ID.
+	   invalid(0), call ID(1~16776415,16777215).
+	   The callId should be exclusive in the group of same call type."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.12.1.4
+	::= { contactEntry 4 }
+	
+accessManageTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AccessManageEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+	  "The table of access management's parameters relevant to the access management."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.13
+	::= { rptServiceSetting 13 }
+
+accessManageEntry OBJECT-TYPE
+	SYNTAX AccessManageEntry
+	MAX-ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	  "The access management parameters."
+	INDEX { accessManageIndex  }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.13.1
+	::= { accessManageTable 1 }
+
+AccessManageEntry ::= SEQUENCE {
+	accessManageIndex  INTEGER,
+	startId  INTEGER,		
+	idLength  INTEGER
+}
+
+accessManageIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..32)
+	MAX-ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	  "The index of the table which uniquely identifies the access management's
+	   parameters."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.13.1.1
+	::= { accessManageEntry 1 }
+
+startId OBJECT-TYPE
+	SYNTAX INTEGER (0..16776415)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The start ID.
+	   invalid record(0), start ID(1~16776415).
+	   It can't be set until accessManagement is enable and the previous
+	   row is set. If it is set, the matched idLength will be set to 100
+	   automaticly."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.13.1.2
+	::= { accessManageEntry 2 }
+	
+idLength OBJECT-TYPE
+	SYNTAX INTEGER (1..255|65535)
+	MAX-ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+	  "The ID length.
+	   invalid(65535), ID length(1~255).
+	   It can't be set until the accessManagement is enable and the
+	   matched startId is set."
+	-- 1.3.6.1.4.1.40297.1.2.5.5.13.1.3
+	::= { accessManageEntry 3 }
+
+repeatTOTTime OBJECT-TYPE
+	SYNTAX  INTEGER (0|3..120)	
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The repeat TOT time.
+		 unit: second.
+		 The value is 1/5 times of the real value."
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.14
+	::= { rptServiceSetting 14 }
+
+rerepeatTOTTime OBJECT-TYPE
+	SYNTAX  INTEGER (1..60)	
+	MAX-ACCESS read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The rerepeat TOT time.
+		 unit: second."
+	DEFVAL { 5 }
+	-- 1.3.6.1.4.1.40297.1.2.5.5.15
+	::= { rptServiceSetting 15 }
+
+END
