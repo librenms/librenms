@@ -377,13 +377,13 @@ class ircbot {
 
         if ($this->ssl && $this->config['irc_disable_ssl_check']) {
             $ssl_context_params = array('ssl'=>array('allow_self_signed'=> true, 'verify_peer' => false, 'verify_peer_name' => false ));
-            $ssl_context = stream_context_create($context_params);
+            $ssl_context = stream_context_create($ssl_context_params);
             $this->socket['irc'] = stream_socket_client($server.':'.$this->port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $ssl_context);
         }
         else {
             $this->socket['irc'] = fsockopen($server, $this->port);
         }
-        
+
         if (!is_resource($this->socket['irc'])) {
             return $this->connect($try + 1);
         }
