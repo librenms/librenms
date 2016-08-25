@@ -1,5 +1,6 @@
 <?php
 
+require_once $config['install_dir'].'/includes/common.php';
 require_once $config['install_dir'].'/includes/dbFacile.php';
 require_once $config['install_dir'].'/includes/mergecnf.inc.php';
 
