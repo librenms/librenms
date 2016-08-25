@@ -109,7 +109,7 @@ if (defined('SHOW_SETTINGS')) {
                     $deviceDisplay = $device['hostname'];
                 }
             } else {
-                $deviceDisplay = ip_to_sysname($device,$device['hostname']);
+                $deviceDisplay = ip_to_sysname($device, $device['hostname']);
             }
 
             if ($config['webui']['old_availability_map'] == 0) {
