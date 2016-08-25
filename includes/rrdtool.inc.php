@@ -88,7 +88,7 @@ function rrdtool_terminate() {
  * @param  array $rrd_pipes
  * @return integer
  */
-function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
+function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
     global $vdebug;
 
