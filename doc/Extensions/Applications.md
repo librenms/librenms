@@ -88,7 +88,7 @@ extend dhcpstats /opt/dhcp-status.sh
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -o /etc/snmp/mailscanner.php
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
 ```
 2. Make the script executable (chmod +x /etc/snmp/mailscanner.php)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
@@ -158,7 +158,7 @@ Supports NTPD Server (not client, that is separate)
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntpd-server.php -o /etc/snmp/ntpd-server.php
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntpd-server.php -O /etc/snmp/ntpd-server.php
 ```
 2. Make the script executable (chmod +x /etc/snmp/ntdp-server.php)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
@@ -222,7 +222,7 @@ This script uses `rec_control get-all` to collect stats.
 
 ### Proxmox
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
-`wget https://github.com/librenms/librenms-agent/blob/master/agent-local/proxmox -o /usr/local/bin/proxmox`
+`wget https://github.com/librenms/librenms-agent/blob/master/agent-local/proxmox -O /usr/local/bin/proxmox`
 2. Make the script executable: `chmod +x /usr/local/proxmox`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
