@@ -154,6 +154,15 @@ $app->group(
                     }
                 );
                 // End Resources
+                // Service section
+                $app->group(
+                	'/services',
+                	function () use ($app) {
+                		$app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
+                	}
+                );
+                $app->get('/services', 'authToken', 'list_services')->name('list_services');
+                // End Service
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');
