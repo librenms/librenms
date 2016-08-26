@@ -52,6 +52,10 @@ source: API/API-Docs.md
         - [`get_bill`](#api-route-23)
     - [`resources`](#api-resources)
         - [`list_arp`](#api-resources-list_arp)
+    - [`services`](#api-services)
+        - [`list_services`](#api-services-list_services)
+        - [`get_service_for_host`](#api-services-get_service_for_host)
+
 Describes the API structure.
 
 # <a name="api-structure">`Structure`</a> [`top`](#top)
@@ -1436,6 +1440,71 @@ Output:
             "mac_address": "da160e5c2002",
             "ipv4_address": "1.1.1.1",
             "context_name": ""
+        }
+    ]
+}
+```
+
+### <a name="api-services-list_services">Function: `list_services`</a> [`top`](#top)
+
+Retrieve all services
+
+Route: /api/v0/services
+
+Input:
+
+ - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+ - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=0&type=tcp
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "services": [
+        {
+            "Need example"
+        }
+    ]
+}
+```
+### <a name="api-services-get_service_for_host">Function: `get_service_for_host`</a> [`top`](#top)
+
+Retrieve services for device
+
+Route: /api/v0/services/:hostname
+
+ - id or hostname is the specific device
+
+Input:
+
+ - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+ - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=0&type=tcp
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "services": [
+        {
+            "Need example"
         }
     ]
 }
