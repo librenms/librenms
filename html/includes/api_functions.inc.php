@@ -1307,6 +1307,11 @@ function list_services()
     $status   = 'ok';
     $code     = 200;
     $message  = '';
+    $host_par = array();
+    $sql_param = array();
+    $services = array();
+    $where    = '';
+    $devicewhere = '';
     
     // Filter BY STATE
     if (isset($_GET['state'])) {
@@ -1337,7 +1342,6 @@ function list_services()
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id '.$where.' GROUP BY D.hostname ORDER BY D.hostname';
     
     // SERVICE
-    $shift = 1;
     foreach (dbFetchRows($host_sql, $host_par) as $device) {
         $device_id = $device['device_id'];
         $sql_param[0] = $device_id;
