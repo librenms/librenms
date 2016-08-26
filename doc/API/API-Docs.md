@@ -1470,9 +1470,38 @@ Output:
     "err-msg": "",
     "count": 1,
     "services": [
-        {
-            "Need example"
-        }
+        [
+            {
+                "service_id": "13",
+                "device_id": "1",
+                "service_ip": "demo1.yourdomian.net",
+                "service_type": "ntp_peer",
+                "service_desc": "NTP",
+                "service_param": "-H 192.168.1.10",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1470962470",
+                "service_message": "NTP OK: Offset -0.000717 secs",
+                "service_disabled": "0",
+                "service_ds": "{\"offset\":\"s\"}"
+            }
+        ],
+        [
+            {
+                "service_id": "2",
+                "device_id": "2",
+                "service_ip": "demo2.yourdomian.net",
+                "service_type": "esxi_hardware.py",
+                "service_desc": "vmware hardware",
+                "service_param": "-H 192.168.1.11 -U USER -P PASS -p",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1471702206",
+                "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
+                "service_disabled": "0",
+                "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
+            }
+        ]
     ]
 }
 ```
@@ -1503,9 +1532,22 @@ Output:
     "err-msg": "",
     "count": 1,
     "services": [
-        {
-            "Need example"
-        }
+        [
+            {
+                "service_id": "2",
+                "device_id": "2",
+                "service_ip": "demo2.yourdomian.net",
+                "service_type": "esxi_hardware.py",
+                "service_desc": "vmware hardware",
+                "service_param": "-H 192.168.1.11 -U USER -P PASS -p",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1471702206",
+                "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
+                "service_disabled": "0",
+                "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
+            }
+        ]
     ]
 }
 ```
