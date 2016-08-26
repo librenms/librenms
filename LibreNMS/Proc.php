@@ -2,7 +2,7 @@
 /**
  * Proc.php
  *
- * -Description-
+ * Executes a process with proc_open() and guarantees it is terminated on exit
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,9 +29,31 @@ use Exception;
 
 class Proc
 {
+    /**
+     * @var resource the process this object is responsible for
+     */
     private $_process;
+    /**
+     * @var array array of process pipes [stdin,stdout,stderr]
+     */
     private $_pipes;
 
+    /**
+     * @var bool if this process is synchronous (waits for output)
+     */
+    private $_synchronous;
+
+    /**
+     * Create and run a new process
+     * Most arguments match proc_open()
+     *
+     * @param string $cmd the command to execute
+     * @param array $descriptorspec the definition of pipes to initialize
+     * @param null $cwd working directory to change to
+     * @param array|null $env array of environment variables to set
+     * @param bool $blocking set the output pipes to blocking (default: false)
+     * @throws Exception the command was unable to execute
+     */
     public function __construct($cmd, $descriptorspec, $cwd = null, $env = null, $blocking = false)
     {
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
@@ -40,8 +62,13 @@ class Proc
         }
         stream_set_blocking($this->_pipes[1], $blocking);
         stream_set_blocking($this->_pipes[2], $blocking);
+        $this->_synchronous = true;
     }
 
+    /**
+     * Called when this object goes out of scope or php exits
+     * If it is still running, terminate the process
+     */
     public function __destruct()
     {
         if ($this->isRunning()) {
@@ -49,60 +76,81 @@ class Proc
         }
     }
 
+    /**
+     * Get one of the pipes
+     * 0 - stdin
+     * 1 - stdout
+     * 2 - stderr
+     *
+     * @param int $nr pipe number (0-2)
+     * @return resource the pipe handle
+     */
     public function pipe($nr)
     {
         return $this->_pipes[$nr];
     }
 
-    public function sendInput($data)
+
+    /**
+     * Send a command to this process and return the output
+     * the output may not correspond to this command if this
+     * process is not synchronous
+     * If the command isn't terminated with a newline, add one
+     *
+     * @param $command
+     * @return array
+     */
+    public function sendCommand($command)
     {
-        if (!ends_with($data, PHP_EOL)) {
-            $data .= PHP_EOL;
+        if (!ends_with($command, PHP_EOL)) {
+            $command .= PHP_EOL;
         }
+        $this->sendInput($command);
 
-        fwrite($this->_pipes[0], $data);
-    }
-
-    public function getOutput()
-    {
-        return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
-    }
-
-    public function waitForOutput($timeout = 10)
-    {
-        $pipes = array($this->_pipes[1], $this->_pipes[2]);
-        $w = null;
-        $x = null;
-
-        stream_select($pipes, $w, $x, $timeout);
         return $this->getOutput();
     }
 
-    public function terminate($signal = 15)
+    /**
+     * Send data to stdin
+     *
+     * @param string $data the string to send
+     */
+    public function sendInput($data)
     {
-        $status = $this->getStatus();
-
-        fclose($this->_pipes[1]);
-        fclose($this->_pipes[2]);
-
-        $ret = proc_terminate($this->_process, $signal);
-
-        if (!$ret) {
-            // try harder
-            $pid = $status['pid'];
-            $ret = posix_kill($pid, 9); //9 is the SIGKILL signal
-            proc_close($this->_process);
-
-            if (!$ret) {
-                throw new Exception("Terminate failed!");
-            }
-        }
+        fwrite($this->_pipes[0], $data);
     }
 
+    /**
+     * Gets the current output of the process
+     * If this process is set to synchronous, wait for output
+     *
+     * @param int $timeout time to wait for output, only applies if this process is synchronous
+     * @return array [stdout, stderr]
+     */
+    public function getOutput($timeout = 15)
+    {
+        if ($this->_synchronous) {
+            $pipes = array($this->_pipes[1], $this->_pipes[2]);
+            $w = null;
+            $x = null;
+
+            stream_select($pipes, $w, $x, $timeout);
+        }
+        return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
+    }
+
+    /**
+     * Attempt to gracefully close this process
+     * optionally send one last piece of input
+     * such as a quit command
+     *
+     * @param string $cmd the final command to send
+     * @return int the exit status of this process (-1 means error)
+     */
     public function close($cmd = null)
     {
         if (isset($cmd)) {
-            fwrite($this->_pipes[0], $cmd . PHP_EOL);
+            $this->sendInput($cmd);
         }
 
         fclose($this->_pipes[0]);
@@ -112,14 +160,78 @@ class Proc
         return proc_close($this->_process);
     }
 
+    /**
+     * Forcibly close this process
+     * Please attempt to run close() instead of this
+     * This will be called when this object is destroyed if the process is still running
+     *
+     * @param int $signal the signal to send
+     * @throws Exception
+     */
+    public function terminate($signal = 15)
+    {
+        $status = $this->getStatus();
+
+        fclose($this->_pipes[1]);
+        fclose($this->_pipes[2]);
+
+        $closed = proc_terminate($this->_process, $signal);
+
+        if (!$closed) {
+            // try harder
+            $pid = $status['pid'];
+            $killed = posix_kill($pid, 9); //9 is the SIGKILL signal
+            proc_close($this->_process);
+
+            if (!$killed) {
+                throw new Exception("Terminate failed!");
+            }
+        }
+    }
+
+    /**
+     * Get the status of this process
+     * see proc_get_status()
+     *
+     * @return array status array
+     */
     public function getStatus()
     {
         return proc_get_status($this->_process);
     }
 
+    /**
+     * Check if this process is running
+     *
+     * @return bool
+     */
     public function isRunning()
     {
+        if(!is_resource($this->_process)) {
+            return false;
+        }
         $st = $this->getStatus();
-        return $st['running'];
+        return isset($st['running']);
+    }
+
+    /**
+     * If this process waits for output
+     * @return boolean
+     */
+    public function isSynchronous()
+    {
+        return $this->_synchronous;
+    }
+
+    /**
+     * Set this process as synchronous, by default processes are synchronous
+     * It is advisable not to change this mid way as output could get mixed up
+     * or you could end up blocking until the getOutput timeout expires
+     *
+     * @param boolean $synchronous
+     */
+    public function setSynchronous($synchronous)
+    {
+        $this->_synchronous = $synchronous;
     }
 }

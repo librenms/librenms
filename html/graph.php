@@ -43,7 +43,7 @@ if ($config['allow_unauth_graphs'] != true) {
     require_once 'includes/authenticate.inc.php';
 }
 
-rrdtool_initialize();
+rrdtool_initialize(false);
 
 require 'includes/graphs/graph.inc.php';
 

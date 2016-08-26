@@ -2,7 +2,7 @@
 /**
  * rrdtool.inc.php
  *
- * Helper for processing rrd requests efficiently
+ * Helper for processing rrdtool requests efficiently
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ use LibreNMS\Proc;
  */
 function rrdtool_initialize($dual_process = true)
 {
-    global $config, $rrd_async_process, $rrd_sync_process;
+    global $config, $rrd_sync_process, $rrd_async_process;
 
     $command = $config['rrdtool'] . ' -';
 
@@ -48,15 +48,16 @@ function rrdtool_initialize($dual_process = true)
 
     $cwd = $config['rrd_dir'];
 
-    if(!rrdtool_running($rrd_async_process)) {
-        $rrd_async_process = new Proc($command, $descriptor_spec, $cwd);
-    }
-
-    if($dual_process && !rrdtool_running($rrd_sync_process)) {
+    if (!rrdtool_running($rrd_sync_process)) {
         $rrd_sync_process = new Proc($command, $descriptor_spec, $cwd);
     }
 
-    return rrdtool_running($rrd_async_process) && ($dual_process ? rrdtool_running($rrd_sync_process) : true);
+    if ($dual_process && !rrdtool_running($rrd_async_process)) {
+        $rrd_async_process = new Proc($command, $descriptor_spec, $cwd);
+        $rrd_async_process->setSynchronous(false);
+    }
+
+    return rrdtool_running($rrd_sync_process) && ($dual_process ? rrdtool_running($rrd_async_process) : true);
 }
 
 /**
@@ -65,29 +66,25 @@ function rrdtool_initialize($dual_process = true)
  * @param $process
  * @return bool
  */
-function rrdtool_running(&$process) {
+function rrdtool_running(&$process)
+{
     return isset($process) && $process instanceof Proc && $process->isRunning();
 }
 
 /**
  * Close all open rrdtool processes.
  * This should be done before exiting a script that has called rrdtool_initilize()
- *
- * @return bool indicates success
  */
 function rrdtool_close()
 {
-    global $rrd_async_process, $rrd_sync_process;
+    global $rrd_sync_process, $rrd_async_process;
 
-    if (rrdtool_running($rrd_async_process)) {
-        $rrd_async_process->close('quit');
-    }
     if (rrdtool_running($rrd_sync_process)) {
         $rrd_sync_process->close('quit');
     }
-
-
-    return !(rrdtool_running($rrd_async_process) && rrdtool_running($rrd_sync_process));
+    if (rrdtool_running($rrd_async_process)) {
+        $rrd_async_process->close('quit');
+    }
 }
 
 /**
@@ -100,13 +97,12 @@ function rrdtool_close()
  */
 function rrdtool_graph($graph_file, $options)
 {
-    global $config, $debug, $rrd_async_process;
+    global $debug, $rrd_sync_process;
 
     if (rrdtool_initialize(false)) {
         $cmd = rrdtool_build_command('graph', $graph_file, $options);
-        $rrd_async_process->sendInput($cmd);
 
-        $output = implode($rrd_async_process->waitForOutput());
+        $output = implode($rrd_sync_process->sendCommand($cmd));
 
         if ($debug) {
             echo "<p>$cmd</p>";
@@ -146,21 +142,18 @@ function rrdtool($command, $filename, $options)
 
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
-    if ($config['norrd'] && !in_array($command, $ro_commands)) {
+    if (!empty($config['norrd']) && !in_array($command, $ro_commands)) {
         c_echo('[%rRRD Disabled%n]');
         return array(null, null);
     }
 
     // send the command!
-    if ($command == 'last' && rrdtool_initialize(true)) {
-        $rrd_sync_process->sendInput($cmd . "\n");
-
-        // this causes us to block until we receive output for up to the timeout in seconds
-        $output = $rrd_sync_process->waitForOutput();
-
-    } elseif (rrdtool_initialize(false)) {
-        $rrd_async_process->sendInput($cmd . "\n");
-        $output = $rrd_async_process->getOutput();
+    if ($command == 'last' && rrdtool_initialize(false)) {
+        // send this to our synchronous process so output is guaranteed
+        $output = $rrd_sync_process->sendCommand($cmd);
+    } elseif (rrdtool_initialize()) {
+        // don't care about the return of other commands, so send them to the faster async process
+        $output = $rrd_async_process->sendCommand($cmd);
     } else {
         throw new Exception('rrdtool could not start');
     }
@@ -315,7 +308,8 @@ function rrd_name($host, $extra, $extension = ".rrd")
  * @param $vmport
  * @return string full path to the rrd.
  */
-function proxmox_rrd_name($pmxcluster, $vmid, $vmport) {
+function proxmox_rrd_name($pmxcluster, $vmid, $vmport)
+{
     global $config;
 
     $pmxcdir = join('/', array($config['rrd_dir'], 'proxmox', safename($pmxcluster)));
@@ -390,7 +384,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
     $rrd_name = $tags['rrd_name'] ?: $measurement;
     $step = $tags['rrd_step'] ?: 300;
     $oldname = $tags['rrd_oldname'];
-    if (isset($oldname) && !empty($oldname)) {
+    if (!empty($oldname)) {
         rrd_file_rename($device, $oldname, $rrd_name);
     }
 
