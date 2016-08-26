@@ -46,7 +46,7 @@ if (count($slas > 0)) {
         $rrd_name = array('sla', $sla_nr);
         $rrd_def = 'DS:rtt:GAUGE:600:0:300000';
         $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-        data_update($device,'sla',$tags,$fields);
+        data_update($device, 'sla', $tags, $fields);
 
         // Let's gather some per-type metrics.
         switch ($rtt_type) {
@@ -79,8 +79,8 @@ if (count($slas > 0)) {
                     'DS:AvgDSJ:GAUGE:600:0:U',
                 );
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                data_update($device,'sla',$tags,$jitter);
-                $metrics = array_merge($metrics,$jitter);
+                data_update($device, 'sla', $tags, $jitter);
+                $metrics = array_merge($metrics, $jitter);
                 break;
         }
 

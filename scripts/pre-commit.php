@@ -117,7 +117,7 @@ function check_style($passthru = false)
 
 
     $cs_exclude = '--ignore=html/lib/* --ignore=html/plugins/';
-    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude html";
+    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude html includes";
 
     $cs_output = '';
     if ($passthru) {

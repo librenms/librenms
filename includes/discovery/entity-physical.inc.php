@@ -1,20 +1,17 @@
 <?php
 
 if ($config['enable_inventory']) {
-
     echo "\nCaching OIDs:";
 
     if ($device['os'] == 'junos') {
         $entity_array = array();
         echo ' jnxBoxAnatomy';
         $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
-    }
-    elseif ($device['os'] == 'timos') {
+    } elseif ($device['os'] == 'timos') {
         $entity_array = array();
         echo 'tmnxHwObjs';
         $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
-    }
-    else {
+    } else {
         $entity_array = array();
         echo ' entPhysicalEntry';
         $entity_array = snmpwalk_cache_oid($device, 'entPhysicalEntry', $entity_array, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
@@ -43,9 +40,8 @@ if ($config['enable_inventory']) {
             $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
             // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
             // using str_replace to remove all dots should fix this even if it changes in future
-            $entPhysicalIndex = str_replace('.','',$entPhysicalIndex);
-        }
-        elseif ($device['os'] == 'timos') {
+            $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+        } elseif ($device['os'] == 'timos') {
             $entPhysicalDescr        = $entry['tmnxCardTypeDescription'];
             $entPhysicalContainedIn  = $entry['tmnxHwContainedIn'];
             $entPhysicalClass        = $entry['tmnxHwClass'];
@@ -61,9 +57,8 @@ if ($config['enable_inventory']) {
             $entPhysicalIsFRU        = $entry['tmnxHwIsFRU'];
             $entPhysicalAlias        = $entry['tmnxHwAlias'];
             $entPhysicalAssetID      = $entry['tmnxHwAssetID'];
-            $entPhysicalIndex = str_replace('.','',$entPhysicalIndex);
-        }
-        else {
+            $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+        } else {
             $entPhysicalDescr        = $entry['entPhysicalDescr'];
             $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];
             $entPhysicalClass        = $entry['entPhysicalClass'];
@@ -87,8 +82,7 @@ if ($config['enable_inventory']) {
 
         if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
             unset($ifIndex);
-        }
-        else {
+        } else {
             $ifIndex_array = explode('.', $ifIndex);
             $ifIndex       = $ifIndex_array[1];
         }
@@ -122,8 +116,7 @@ if ($config['enable_inventory']) {
                 );
                 dbUpdate($update_data, 'entPhysical', 'device_id=? AND entPhysicalIndex=?', array($device['device_id'], $entPhysicalIndex));
                 echo '.';
-            }
-            else {
+            } else {
                 $insert_data = array(
                     'device_id'               => $device['device_id'],
                     'entPhysicalIndex'        => $entPhysicalIndex,
@@ -155,8 +148,7 @@ if ($config['enable_inventory']) {
             $valid[$entPhysicalIndex] = 1;
         }//end if
     }//end foreach
-}
-else {
+} else {
     echo 'Disabled!';
 }//end if
 

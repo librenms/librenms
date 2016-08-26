@@ -3,7 +3,6 @@
 echo 'PBN MemPool'.'\n';
 
 if ($device['os'] == 'pbn') {
-    
     // find out wich build number we have
     preg_match('/^.* Build (?<build>\d+)/', $device['version'], $version);
     d_echo($version);
@@ -20,7 +19,7 @@ if ($device['os'] == 'pbn') {
             $mempool['free'] = ($memory_available - $mempool['used']);
         }
 
-  echo "PERC " .$perc."%\n";
-  echo "Avail " .$mempool['total']."\n";
+        echo "PERC " .$perc."%\n";
+        echo "Avail " .$mempool['total']."\n";
     }
 }

@@ -8,7 +8,7 @@ $hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-M
 # Create ddns update rrd
 ##############
 $mibs = '+IB-DNSONE-MIB';
-$oids = 
+$oids =
     'IB-DNSONE-MIB::ibDDNSUpdateSuccess.0 ' .
     'IB-DNSONE-MIB::ibDDNSUpdateFailure.0 ' .
     'IB-DNSONE-MIB::ibDDNSUpdatePrerequisiteReject.0 ' .
@@ -64,10 +64,10 @@ $graphs['ib_dns_performance'] = true;
 # Create dns request return code graph
 ##################
 $mibs = '+IB-DNSONE-MIB';
-$oids = 
+$oids =
     'IB-DNSONE-MIB::ibBindZoneFailure.\"summary\" ' .
     'IB-DNSONE-MIB::ibBindZoneNxDomain.\"summary\" ' .
-    'IB-DNSONE-MIB::ibBindZoneNxRRset.\"summary\" ' . 
+    'IB-DNSONE-MIB::ibBindZoneNxRRset.\"summary\" ' .
     'IB-DNSONE-MIB::ibBindZoneSuccess.\"summary\"';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
@@ -95,8 +95,8 @@ $graphs['ib_dns_request_return_codes'] = true;
 # Create dhcp messages graph
 ##################
 $mibs = '+IB-DHCPONE-MIB';
-$oids = 
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfAcks.0 ' . 
+$oids =
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfAcks.0 ' .
     'IB-DHCPONE-MIB::ibDhcpTotalNoOfDeclines.0 ' .
     'IB-DHCPONE-MIB::ibDhcpTotalNoOfDiscovers.0 ' .
     'IB-DHCPONE-MIB::ibDhcpTotalNoOfInforms.0 ' .
@@ -135,4 +135,3 @@ $fields = array(
 $tags = compact('rrd_def');
 data_update($device, 'ib_dhcp_messages', $tags, $fields);
 $graphs['ib_dhcp_messages'] = true;
-

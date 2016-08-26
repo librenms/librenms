@@ -19,7 +19,7 @@ if (is_numeric($cambiumSTADLRSSI) && is_numeric($cambiumSTADLSNR)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-RFStatus', $tags, $fields);
-    $graphs['cambium_epmp_RFStatus'] = TRUE;
+    $graphs['cambium_epmp_RFStatus'] = true;
 }
 
 $cambiumGPSNumTrackedSat = snmp_get($device, "cambiumGPSNumTrackedSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -35,7 +35,7 @@ if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-gps', $tags, $fields);
-    $graphs['cambium_epmp_gps'] = TRUE;
+    $graphs['cambium_epmp_gps'] = true;
 }
 
 $cambiumSTAUplinkMCSMode = snmp_get($device, "cambiumSTAUplinkMCSMode.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -51,7 +51,7 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-modulation', $tags, $fields);
-    $graphs['cambium_epmp_modulation'] = TRUE;
+    $graphs['cambium_epmp_modulation'] = true;
 }
 
 $registeredSM = snmp_get($device, "cambiumAPNumberOfConnectedSTA.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -62,7 +62,7 @@ if (is_numeric($registeredSM)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-registeredSM', $tags, $fields);
-    $graphs['cambium_epmp_registeredSM'] = TRUE;
+    $graphs['cambium_epmp_registeredSM'] = true;
 }
 
 $sysNetworkEntryAttempt = snmp_get($device, "sysNetworkEntryAttempt.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -81,7 +81,7 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-access', $tags, $fields);
-    $graphs['cambium_epmp_access'] = TRUE;
+    $graphs['cambium_epmp_access'] = true;
 }
 
 $gpsSync = snmp_get($device, "cambiumEffectiveSyncSource.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -92,7 +92,7 @@ if (is_numeric($gpsSync)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-gpsSync', $tags, $fields);
-    $graphs['cambium_epmp_gpsSync'] = TRUE;
+    $graphs['cambium_epmp_gpsSync'] = true;
 }
 
 $freq = snmp_get($device, "cambiumSTAConnectedRFFrequency.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -103,5 +103,5 @@ if (is_numeric($freq)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-epmp-freq', $tags, $fields);
-    $graphs['cambium_epmp_freq'] = TRUE;
+    $graphs['cambium_epmp_freq'] = true;
 }

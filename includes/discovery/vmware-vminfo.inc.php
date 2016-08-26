@@ -45,8 +45,7 @@ if (($device['os'] == 'vmware') || ($device['os'] == 'linux')) {
             log_event(mres($vmwVmDisplayName)." ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered", $device, 'system', $vmid);
             echo '+';
             // FIXME eventlog
-        }
-        else {
+        } else {
             echo '.';
         }
 

@@ -14,7 +14,7 @@
 $module = 'ntp';
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'],array('type'=>$module));
+$components = $component->getComponents($device['device_id'], array('type'=>$module));
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -32,7 +32,7 @@ $cntpPeersVarEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.168.1.2.1.1',
  * False == no object found - this is not an error, no objects exist
  * null  == timeout or something else that caused an error, there may be objects but we couldn't get it.
  */
-if ( is_null($cntpPeersVarEntry) ) {
+if (is_null($cntpPeersVarEntry)) {
     // We have to error here or we will end up deleting all our components.
     echo "Error\n";
 } else {
@@ -81,7 +81,7 @@ if ( is_null($cntpPeersVarEntry) ) {
 
         if (!$component_key) {
             // The component doesn't exist, we need to ADD it - ADD.
-            $new_component = $component->createComponent($device['device_id'],$module);
+            $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
             echo "+";
@@ -90,7 +90,6 @@ if ( is_null($cntpPeersVarEntry) ) {
             $components[$component_key] = array_merge($components[$component_key], $array);
             echo ".";
         }
-
     }
 
     /*
@@ -115,9 +114,8 @@ if ( is_null($cntpPeersVarEntry) ) {
     }
 
     // Write the Components back to the DB.
-    $component->setComponentPrefs($device['device_id'],$components);
+    $component->setComponentPrefs($device['device_id'], $components);
     echo "\n";
-
 } // End if not error
 
 $module = strtolower($module);

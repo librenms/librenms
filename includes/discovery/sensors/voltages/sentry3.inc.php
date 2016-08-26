@@ -21,9 +21,22 @@ if ($device['os'] == 'sentry3') {
             $oid              = '1.3.6.1.4.1.1718.3.2.2.1.11.1.'.$index;
             $current          = (snmp_get($device, $oid, '-Oqv') / $divisor);
 
-            discover_sensor($valid['sensor'], 'voltage', $device,
-                $oid, $index, $type,
-                $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor(
+                $valid['sensor'],
+                'voltage',
+                $device,
+                $oid,
+                $index,
+                $type,
+                $descr,
+                $divisor,
+                '1',
+                null,
+                null,
+                null,
+                null,
+                $current
+            );
         }
     }
 }//end if

@@ -9,7 +9,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     $state = "raspberry_codec";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
     for ($codec = 8; $codec < 14; $codec++) {
-        switch($codec) {
+        switch ($codec) {
             case "8":
                 $descr = "H264 codec";
                 break;

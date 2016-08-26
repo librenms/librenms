@@ -111,15 +111,14 @@ if ($device['os'] == 'netscaler') {
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
             $rrdupdate = ':'.$data[0][$oid];
-        }
-        else {
+        } else {
             $rrdupdate = 'U';
         }
         $fields[$oid] = $rrdupdate;
     }
 
     $tags = compact('rrd_def');
-    data_update($device,'netscaler-stats-tcp',$tags,$fields);
+    data_update($device, 'netscaler-stats-tcp', $tags, $fields);
 
     $graphs['netscaler_tcp_conn'] = true;
     $graphs['netscaler_tcp_bits'] = true;
