@@ -23,6 +23,10 @@ $availability_map_conf = array(
           'descr'              => 'Availability map old view',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'webui.availability_map_sort_status',
+        'descr'                => 'Sort devices by status',
+        'type'                 => 'checkbox',
+    ),
 );
 
 $dashboard_conf = array(
