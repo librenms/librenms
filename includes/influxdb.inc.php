@@ -82,7 +82,7 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             try {
                 $result = $influxdb->writePoints($points);
             } catch (Exception $e) {
-                d_echo("Caught exception: ", $e->getMessage(), "\n");
+                d_echo("Caught exception: " . $e->getMessage() . PHP_EOL);
                 d_echo($e->getTrace());
             }
         }
