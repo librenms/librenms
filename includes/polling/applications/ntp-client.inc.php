@@ -1,9 +1,8 @@
 <?php
 
-// Polls ntp-client statistics from script via SNMP
-$options      = '-O qv';
-$oid          = 'nsExtendOutputFull.9.110.116.112.99.108.105.101.110.116';
-$ntpclient = snmp_get($device, $oid, $options);
+// NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ntpclient"
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.110.116.112.99.108.105.101.110.116';
+$ntpclient = snmp_get($device, $oid, '-Oqv');
 
 $name = 'ntpclient';
 $app_id = $app['app_id'];

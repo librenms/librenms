@@ -6,8 +6,9 @@ if (!empty($agent_data['app'][$name])) {
     $nginx = $agent_data['app'][$name];
 }
 else {
-    // Polls nginx statistics from script via SNMP
-    $nginx = snmp_get($device, 'nsExtendOutputFull.5.110.103.105.110.120', '-Ovq', 'NET-SNMP-EXTEND-MIB');
+    // NET-SNMP-EXTEND-MIB::nsExtendOutputFull."nginx"
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120';
+    $nginx = snmp_get($device, $oid, '-Ovq');
 }
 
 echo ' nginx';
