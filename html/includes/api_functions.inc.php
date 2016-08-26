@@ -1320,7 +1320,7 @@ function list_services()
     }
     
     // GET BY HOST
-    if(isset($router['hostname'])) {
+    if (isset($router['hostname'])) {
         $hostname = $router['hostname'];
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         
@@ -1339,8 +1339,8 @@ function list_services()
     // SERVICE
     $shift = 1;
     foreach (dbFetchRows($host_sql, $host_par) as $device) {
-        $device_id		= $device['device_id'];
-        $sql_param[0]	= $device_id;
+        $device_id = $device['device_id'];
+        $sql_param[0] = $device_id;
         
         // FILTER BY TYPE
         if (isset($_GET['type'])) {
@@ -1348,7 +1348,7 @@ function list_services()
             $sql_param[1] = $_GET['type'];
         }
 
-        $services[] 	= dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
+        $services[] = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
     }
     $count = count($services);
     $output = array(
