@@ -1222,6 +1222,7 @@ function get_devices_by_group()
             $message = 'No devices found in group ' . $name;
         } else {
             $message = "Found $count in group $name";
+            $status = 'ok';
             $code = 200;
         }
     }
