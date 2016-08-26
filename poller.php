@@ -158,7 +158,7 @@ echo ("\n".'MySQL: Cell['.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fet
 echo "\n";
 
 logfile($string);
-rrdtool_terminate();
+rrdtool_close();
 unset($config);
 // Remove this for testing
 // print_r(get_defined_vars());
