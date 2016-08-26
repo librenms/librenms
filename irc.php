@@ -29,6 +29,8 @@ error_reporting(E_ERROR);
 
 class ircbot {
 
+    private $last_activity = '';
+
     private $data = '';
 
     private $authd = array();
@@ -149,6 +151,8 @@ class ircbot {
             $this->connect_alert();
         }
 
+        $this->last_activity = time();
+
         $this->j = 2;
 
         $this->connect();
@@ -170,6 +174,16 @@ class ircbot {
             if ($this->config['irc_alert']) {
                 $this->alertData();
             }
+            
+            if ($this->config['irc_conn_timeout']) {
+                $inactive_seconds = time() - $this->last_activity;
+                $max_inactive = $this->config['irc_conn_timeout'];
+                if ($inactive_seconds > $max_inactive) {
+                    $this->log("No data from server since " . $max_inactive . " seconds. Restarting.");
+                    break;
+                }
+            }
+
 
             usleep($this->tick);
         }
@@ -267,6 +281,7 @@ class ircbot {
 
     private function getData() {
         if (($data = $this->read('irc')) !== false) {
+            $this->last_activity = time();
             $this->data = $data;
             $ex         = explode(' ', $this->data);
             if ($ex[0] == 'PING') {
