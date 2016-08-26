@@ -12,11 +12,17 @@
  * the source code distribution for details.
  */
 
+$select_modes = array(
+    '0' => 'only devices',
+    '1' => 'only services',
+    '2' => 'devices and services',
+);
+
 if (defined('SHOW_SETTINGS')) {
     if (isset($widget_settings['mode'])) {
-        $current_mode = $widget_settings['mode'];
+        $mode = $widget_settings['mode'];
     } else {
-        $current_mode = 0;
+        $mode = 0;
     }
 
     if (isset($widget_settings['tile_width'])) {
@@ -41,12 +47,15 @@ if (defined('SHOW_SETTINGS')) {
     if ($config['show_services'] == 0) {
         $common_output[] = '<option value="0" selected="selected">only devices</option>';
     } else {
-        $common_output[] = '
-        <option value="0" '.($current_mode == 0 ? 'selected':'').'>only devices</option>
-        <option value="1"' .($current_mode == 1 ? 'selected':'').'>only services</option>
-        <option value="2"' .($current_mode == 2 ? 'selected':'').'>devices and services</option>';
+        foreach ($select_modes as $mode_select => $option) {
+            if ($mode_select == $mode) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+            $common_output[] = '<option value="'.$mode_select.'" '.$selected.'>'.$option.'</option>';
+        }
     }
-
     $common_output[] ='
             </select>
         </div>
@@ -195,12 +204,16 @@ if (defined('SHOW_SETTINGS')) {
             <select id="mode" class="page-availability-report-select" name="mode">';
 
         if ($config['show_services'] == 0) {
-            $temp_header[] = '<option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>';
+            $temp_header[] = '<option value="0" selected>only devices</option>';
         } else {
-            $temp_header[] = '
-                <option value="0" '.($mode == 0 ? 'selected':'').'>only devices</option>
-                <option value="1"' .($mode == 1 ? 'selected':'').'>only services</option>
-                <option value="2"' .($mode == 2 ? 'selected':'').'>devices and services</option>';
+            foreach ($select_modes as $mode_select => $option) {
+                if ($mode_select == $mode) {
+                    $selected = 'selected';
+                } else {
+                    $selected = '';
+                }
+                $temp_header[] = '<option value="'.$mode_select.'" '.$selected.'>'.$option.'</option>';
+            }
         }
 
         $temp_header[] =
@@ -209,14 +222,17 @@ if (defined('SHOW_SETTINGS')) {
         <div class="page-availability-title-right">';
     }
 
+    if ($directpage == "yes") {
+        $deviceClass = 'page-availability-report-host';
+        $serviceClass = 'page-availability-report-host';
+    } else {
+        $deviceClass = 'widget-availability-host';
+        $serviceClass = 'widget-availability-service';
+    }
+
     if ($mode == 0 || $mode == 2) {
-        if ($directpage == "yes") {
-            $headerClass = 'page-availability-report-host';
-        } else {
-            $headerClass = 'widget-availability-host';
-        }
-            $temp_header[] = '
-            <div class="'.$headerClass.'">
+        $temp_header[] = '
+            <div class="'.$deviceClass.'">
                 <span>Total hosts</span>
                 <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
                 <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
@@ -225,13 +241,8 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
-        if ($directpage == "yes") {
-            $headerClass = 'page-availability-report-service';
-        } else {
-            $headerClass = 'widget-availability-service';
-        }
-            $temp_header[] = '
-            <div class="'.$headerClass.'">
+        $temp_header[] = '
+            <div class="'.$serviceClass.'">
                 <span>Total services</span>
                 <span class="label label-success label-font-border label-border">up: '.$service_up_count.'</span>
                 <span class="label label-warning label-font-border label-border">warn: '.$service_warn_count.'</span>
