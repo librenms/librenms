@@ -13,8 +13,18 @@
  */
 
 if (defined('SHOW_SETTINGS')) {
-    $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
-    $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
+    if (isset($widget_settings['mode'])) {
+        $current_mode = $widget_settings['mode'];
+    } else {
+        $current_mode = 0;
+    }
+
+    if (isset($widget_settings['tile_width'])) {
+        $current_width = $widget_settings['tile_width'];
+    } else {
+        $current_width = 10;
+    }
+
     $common_output[] = '
     <form class="form-horizontal" onsubmit="return widget_settings(this)">
     <div class="form-group">
@@ -50,7 +60,12 @@ if (defined('SHOW_SETTINGS')) {
 
     $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
     $widget_mode = json_decode($sql['settings']);
-    $mode = isset($_SESSION["mapView"]) ? $_SESSION["mapView"] : $widget_mode->{'mode'};
+
+    if (isset($_SESSION["mapView"])) {
+        $mode = $_SESSION["mapView"];
+    } else {
+        $mode = $widget_mode->{'mode'};
+    }
 
     $host_up_count = 0;
     $host_warn_count = 0;
@@ -101,17 +116,6 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
-
-            if ($config['webui']['availability_map_sysname_mix'] == 1) {
-                if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-                    $deviceDisplay = $device['sysName'];
-                } else {
-                    $deviceDisplay = $device['hostname'];
-                }
-            } else {
-                $deviceDisplay = ip_to_sysname($device, $device['hostname']);
-            }
-
             if ($config['webui']['old_availability_map'] == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getImage($device);
@@ -120,7 +124,7 @@ if (defined('SHOW_SETTINGS')) {
                     <div class="device-availability '.$deviceState.'">
                         <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
-                        <span class="small">'.$deviceDisplay.'</span>
+                        <span class="small">'.ip_to_sysname($device, $device['hostname']).'</span>
                     </div>
                     </a>';
                 } else {
@@ -157,45 +161,32 @@ if (defined('SHOW_SETTINGS')) {
                     $service_down_count++;
                 }
 
-
-                if ($config['webui']['availability_map_sysname_mix'] == 1) {
-                    if (filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($service['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-                        $serviceDisplay = $service['sysName'];
-                    } else {
-                        $serviceDisplay = $service['hostname'];
-                    }
-                } else {
-                    $serviceDisplay = ip_to_sysname($service, $service['hostname']);
-                }
-
                 if ($config['webui']['old_availability_map'] == 0) {
                     if ($directpage == "yes") {
                         $deviceIcon = getImage($service);
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                            <div class="service-availability ' . $serviceState . '">
-                                <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
-                                <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
-                                <span class="device-icon">' . $deviceIcon . '</span><br>
-                                <span class="small">' . $serviceDisplay . '</span>
+                        <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
+                            <div class="service-availability '.$serviceState.'">
+                                <span class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</span>
+                                <span class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</span>
+                                <span class="device-icon">'.$deviceIcon.'</span><br>
+                                <span class="small">'.ip_to_sysname($service, $service['hostname']).'</span>
                             </div>
                         </a>';
                     } else {
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                            <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
+                        <a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'">
+                            <span class="label '.$serviceLabel.' widget-availability label-font-border">'.$service['service_type'].' - '.$serviceState.'</span>
                         </a>';
                     }
                 } else {
-                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="'.$serviceLabelOld.'"></div></a>';
+                    $temp_output[] = '<a href="'.generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])).'" title="'.$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'].'"><div class="'.$serviceLabelOld.'"></div></a>';
                 }
             }
         } else {
             $temp_output [] = '';
         }
     }
-
-
 
     if ($directpage == "yes") {
         $temp_header[] = '
