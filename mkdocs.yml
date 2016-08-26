@@ -76,6 +76,7 @@ pages:
     - Developing/Sensor-State-Support.md
     - Developing/Style-Guidelines.md
     - Developing/Using-Git.md
+    - Developing/Validating-Code.md
 - API: API/API-Docs.md
 - Support:
     - Support/Configuration.md
