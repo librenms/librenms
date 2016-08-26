@@ -28,7 +28,7 @@ Different applications support a variety of ways collect data: by direct connect
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -o /etc/snmp/apache-stats.py
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
 ```
 2. Make the script executable (chmod +x /etc/snmp/apache-stats.py)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
@@ -37,7 +37,7 @@ extend apache /etc/snmp/apache-stats.py
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
-
+(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
 
 
 ### BIND9 aka named
