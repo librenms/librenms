@@ -21,7 +21,6 @@ require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require 'includes/polling/functions.inc.php';
 require 'includes/alerts.inc.php';
-require 'includes/console_table.php';
 
 $options = getopt('l:u:r::');
 
