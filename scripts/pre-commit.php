@@ -42,15 +42,15 @@ $all = empty($commands);
 $ret = 0;
 
 // run tests
-if ($all || check_opt($commands, 'l', 'lint')) {
+if (($all || check_opt($commands, 'l', 'lint')) && !getenv('SKIP_LINT_CHECK')) {
     $ret += check_lint($passthru, $command_only);
 }
 
-if ($all || check_opt($commands, 's', 'style')) {
+if (($all || check_opt($commands, 's', 'style')) && !getenv('SKIP_STYLE_CHECK')) {
     $ret += check_style($passthru, $command_only);
 }
 
-if ($all || check_opt($commands, 'u', 'unit')) {
+if (($all || check_opt($commands, 'u', 'unit')) && !getenv('SKIP_UNIT_CHECK')) {
     $ret += check_unit($passthru, $command_only);
 }
 
