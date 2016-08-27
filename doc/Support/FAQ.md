@@ -19,6 +19,7 @@ source: Support/FAQ.md
  - [My device doesn't finish polling within 300 seconds](#faq19)
  - [Things aren't working correctly?](#faq18)
  - [What do the values mean in my graphs?](#faq21)
+ - [How can I move my LibreNMS install to another server?](#faq22)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -143,7 +144,7 @@ Re-run `./validate.php` once you've resolved any issues raised.
 
 You have an odd issue - we'd suggest you join our irc channel to discuss.
 
-#### <a name="faq22"> What do the values mean in my graphs?</a>
+#### <a name="faq21"> What do the values mean in my graphs?</a>
 
 The values you see are reported as metric values. Thanks to a post on [Reddit](https://www.reddit.com/r/networking/comments/4xzpfj/rrd_graph_interface_error_label_what_is_the_m/) 
 here are those values:
@@ -162,6 +163,18 @@ here are those values:
 10^12   T - tera
 10^15   P - peta
 ```
+
+#### <a name="faq22"> How can I move my LibreNMS install to another server?</a>
+
+If you are moving from one CPU architecture to another then you will need to dump the rrd files and re-create them. If you are in 
+this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).
+
+If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:
+
+  - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.
+  - Dump the MySQL database `librenms` and import this into your new server.
+  - Copy the `rrd/` folder to the new server.
+  - Copy the `config.php` file to the new server. 
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
