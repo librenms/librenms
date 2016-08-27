@@ -1,7 +1,6 @@
 source: Developing/Creating-Documentation.md
 # Creating Documentation
 
-### Writing documentation
 One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.
 
 When you are adding a new feature or extension, we need to have full documentation to go along with it. It's quite 
@@ -17,30 +16,3 @@ simple to do this:
 
 Please ensure you add the document to the relevant section within `pages` of `mkdocs.yml` so that it's in the correct menu and is built.
 Forgetting this step will result in your document never seeing the light of day :)
-
-### Building documentation
-Our build process in GitHub automatically builds http://docs.librenms.org from everything in the `doc/` folder. You can simulate this 
-process to test what the docs will look like before you submit your PR.
-
-We use [mkdocs](http://www.mkdocs.org/) to build the documentation so you need to install that first (we assume you have `pip` installed):
-
-```bash
-pip install --user mkdocs
-pip install --user pymdown-extensions
-```
-
-Now you will need to install the LibreNMS theme:
-
-```bash
-git clone https://github.com/librenms-docs/librenms_theme.git
-```
-
-Now you are ready to build your docs and check them, you can do this with mkdocs:
-
-```bash
-mkdocs serve
-```
-
-This will launch a web service on localhost port 8000. You can change the port or bind the web server to a different IP by adding 
-` -a 0.0.0.0:8080`
-
