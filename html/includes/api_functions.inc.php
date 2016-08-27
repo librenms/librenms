@@ -1222,6 +1222,7 @@ function get_devices_by_group()
             $message = 'No devices found in group ' . $name;
         } else {
             $message = "Found $count in group $name";
+            $status = 'ok';
             $code = 200;
         }
     }
@@ -1352,7 +1353,7 @@ function list_services()
             $sql_param[1] = $_GET['type'];
         }
 
-        $services[] = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
+        $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
     }
     $count = count($services);
     $output = array(
