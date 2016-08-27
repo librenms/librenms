@@ -790,56 +790,19 @@ Output:
 ```text
 [
      {
-         "status": "error",
-         "message": "Found 1 in group LinuxServers",
-         "count": 1,
+         "status": "ok",
+         "message": "Found 3 in group LinuxServers",
+         "count": 3,
          "devices": [
-             {
-                 "device_id": "1",
-                 "hostname": "localhost",
-                 "sysName": "hostname",
-                 "community": "librenms",
-                 "authlevel": null,
-                 "authname": null,
-                 "authpass": null,
-                 "authalgo": null,
-                 "cryptopass": null,
-                 "cryptoalgo": null,
-                 "snmpver": "v2c",
-                 "port": "161",
-                 "transport": "udp",
-                 "timeout": null,
-                 "retries": null,
-                 "bgpLocalAs": null,
-                 "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                 "sysDescr": "Linux li1045-133.members.linode.com 4.1.5-x86_64-linode61 #7 SMP Mon Aug 24 13:46:31 EDT 2015 x86_64",
-                 "sysContact": "",
-                 "version": "4.1.5-x86_64-linode61",
-                 "hardware": "Generic x86 64-bit",
-                 "features": "CentOS 7.1.1503",
-                 "location": "",
-                 "os": "linux",
-                 "status": "1",
-                 "status_reason": "",
-                 "ignore": "0",
-                 "disabled": "0",
-                 "uptime": "4615964",
-                 "agent_uptime": "0",
-                 "last_polled": "2015-12-12 13:20:04",
-                 "last_poll_attempted": null,
-                 "last_polled_timetaken": "1.90",
-                 "last_discovered_timetaken": "79.53",
-                 "last_discovered": "2015-12-12 12:34:21",
-                 "last_ping": "2015-12-12 13:20:04",
-                 "last_ping_timetaken": "0.08",
-                 "purpose": null,
-                 "type": "server",
-                 "serial": null,
-                 "icon": null,
-                 "poller_group": "0",
-                 "override_sysLocation": "0",
-                 "notes": "Nope"
-             }
+            {
+                "device_id": "15"
+            },
+            {
+                "device_id": "18"
+            },
+            {
+                "device_id": "20"
+            }
          ]
      }
 ]
