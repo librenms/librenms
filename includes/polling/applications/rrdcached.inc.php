@@ -70,14 +70,14 @@ if ($agent_data['app'][$name]) {
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
     'DS:queue_length:GAUGE:600:0:U',
-    'DS:updates_received:COUNTER:600:0:U',
-    'DS:flushes_received:COUNTER:600:0:U',
-    'DS:updates_written:COUNTER:600:0:U',
-    'DS:data_sets_written:COUNTER:600:0:U',
+    'DS:updates_received:DERIVE:600:0:U',
+    'DS:flushes_received:DERIVE:600:0:U',
+    'DS:updates_written:DERIVE:600:0:U',
+    'DS:data_sets_written:DERIVE:600:0:U',
     'DS:tree_nodes_number:GAUGE:600:0:U',
     'DS:tree_depth:GAUGE:600:0:U',
-    'DS:journal_bytes:COUNTER:600:0:U',
-    'DS:journal_rotate:COUNTER:600:0:U'
+    'DS:journal_bytes:DERIVE:600:0:U',
+    'DS:journal_rotate:DERIVE:600:0:U'
 );
 
 $fields = array();

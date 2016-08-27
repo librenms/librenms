@@ -1,18 +1,19 @@
 <?php
 
-// Polls Apache statistics from script via SNMP
+
 $name = 'apache';
 $app_id = $app['app_id'];
+
+echo " $name";
+
 if (!empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
 }
 else {
-    $options = '-O qv';
-    $oid     = 'nsExtendOutputFull.6.97.112.97.99.104.101';
-    $apache  = snmp_get($device, $oid, $options);
+    // NET-SNMP-EXTEND-MIB::nsExtendOutputFull."apache"
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.97.112.97.99.104.101';
+    $apache = snmp_get($device, $oid, '-Oqv');
 }
-
-echo ' apache';
 
 list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $bytesperreq, $busyworkers, $idleworkers, $score_wait, $score_start,

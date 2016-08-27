@@ -3,17 +3,17 @@
 // FIXME - this is lame
 $name = 'mysql';
 $app_id = $app['app_id'];
+
+echo " $name";
+
 if (!empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 }
 else {
-    // Polls MySQL  statistics from script via SNMP
-    $mysql_cmd  = $config['snmpget'].' -m NET-SNMP-EXTEND-MIB -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
-    $mysql_cmd .= ' nsExtendOutputFull.5.109.121.115.113.108';
-    $mysql      = shell_exec($mysql_cmd);
+    // NET-SNMP-EXTEND-MIB::nsExtendOutputFull."mysql"
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108';
+    $mysql = snmp_get($device, $oid, '-Oqv');
 }
-
-echo ' mysql';
 
 // General Stats
 $mapping = array(
