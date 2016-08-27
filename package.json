@@ -1,0 +1,10 @@
+{
+  "name": "LibreNMS",
+  "version": "201607",
+  "description": "LibreNMS is an autodiscovering network monitoring system",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/librenms/librenms.git"
+  },
+  "license": "GPLv3"
+}
