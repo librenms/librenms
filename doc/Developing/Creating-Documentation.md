@@ -44,8 +44,3 @@ mkdocs serve
 This will launch a web service on localhost port 8000. You can change the port or bind the web server to a different IP by adding 
 ` -a 0.0.0.0:8080`
 
-You can also build the documentation as html files to place them somewhere to test. To do this run:
-
-```bash
-mkdocs build --clean
-```
