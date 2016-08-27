@@ -1,4 +1,6 @@
-### LibreNMS core team:
+LibreNMS is a fork of [Observium][1].
+
+LibreNMS core team:
 - Paul Gear <paul@librenms.org> (paulgear)
 - Neil Lathwood <neil@librenms.org> (laf)
 - Daniel Preussker <f0o@librenms.org> (f0o)
@@ -6,7 +8,7 @@
 - Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
 - Tony Murray <tonym@librenms.org> (murrant)
 
-### LibreNMS contributors:
+LibreNMS contributors:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
@@ -121,6 +123,7 @@
 - Bennett Blodinger <bennett.blodinger@gmail.com> (benwa)
 - Michael Hansen <nerdalertdk@gmail.com> (nerdalertdk) 
 
+[1]: http://observium.org/ "Observium web site"
 Observium was written by:
 - Adam Armstrong
 - Tom Laermans
