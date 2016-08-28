@@ -1881,6 +1881,7 @@ label {
   padding:8px;
   border-radius:5px;
   text-align:center;
+  white-space: nowrap;
 }
 
 .device-availability.up, .service-availability.up {
