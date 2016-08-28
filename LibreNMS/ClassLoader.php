@@ -25,7 +25,6 @@
 
 namespace LibreNMS;
 
-
 /**
  * Class ClassLoader
  * @package LibreNMS
@@ -63,7 +62,7 @@ class ClassLoader
         $file = str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $name) . '.php';
         $fullFile = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR .  $file;
 
-        if($vdebug) {
+        if ($vdebug) {
             echo __CLASS__ . " [[ $name > $fullFile ]]\n";
         }
 
@@ -84,7 +83,7 @@ class ClassLoader
         if (isset($this->classMap[$name])) {
             $file = $this->classMap[$name];
 
-            if($vdebug) {
+            if ($vdebug) {
                 echo __CLASS__ . " (( $name > $file ))\n";
             }
 
@@ -99,7 +98,7 @@ class ClassLoader
             foreach (array_keys($this->dirMap[$namespace]) as $dir) {
                 $file = $dir . DIRECTORY_SEPARATOR . $class . '.php';
 
-                if($vdebug) {
+                if ($vdebug) {
                     echo __CLASS__ . " (( $name > $file ))\n";
                 }
 
@@ -180,7 +179,8 @@ class ClassLoader
      * @param string $class the full class name to split
      * @return array of the split class [namespace, classname]
      */
-    private function splitNamespace($class) {
+    private function splitNamespace($class)
+    {
         $parts = explode('\\', $class);
         $last = array_pop($parts);
         return array(implode('\\', $parts), $last);

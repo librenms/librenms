@@ -120,7 +120,7 @@ function check_style($passthru = false, $command_only = false)
     );
 
     $cs_exclude = build_excludes('--ignore=', $cs_excludes);
-    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./html ./includes";
+    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
 
     if ($command_only) {
         echo $cs_cmd . PHP_EOL;

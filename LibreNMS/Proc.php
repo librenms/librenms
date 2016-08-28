@@ -207,7 +207,7 @@ class Proc
      */
     public function isRunning()
     {
-        if(!is_resource($this->_process)) {
+        if (!is_resource($this->_process)) {
             return false;
         }
         $st = $this->getStatus();

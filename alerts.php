@@ -41,8 +41,7 @@ if (file_exists($config['install_dir'].'/.alerts.lock')) {
 
 if ($lock === true) {
     exit(1);
-}
-else {
+} else {
     file_put_contents($config['install_dir'].'/.alerts.lock', getmypid());
 }
 
@@ -57,8 +56,7 @@ if (isset($options['d'])) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', 1);
-}
-else {
+} else {
     $debug = false;
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -86,7 +84,8 @@ unlink($config['install_dir'].'/.alerts.lock');
  * @param integer $rule   Rule-ID
  * @return boolean
  */
-function IsRuleValid($device, $rule) {
+function IsRuleValid($device, $rule)
+{
     global $rulescache;
     if (empty($rulescache[$device]) || !isset($rulescache[$device])) {
         foreach (GetRules($device) as $chk) {
@@ -99,7 +98,6 @@ function IsRuleValid($device, $rule) {
     }
 
     return false;
-
 }//end IsRuleValid()
 
 
@@ -108,7 +106,8 @@ function IsRuleValid($device, $rule) {
  * @param array $alert
  * @return boolean
  */
-function IssueAlert($alert) {
+function IssueAlert($alert)
+{
     global $config;
     if (dbFetchCell('SELECT attrib_value FROM devices_attribs WHERE attrib_type = "disable_notify" && device_id = ?', array($alert['device_id'])) == '1') {
         return true;
@@ -129,7 +128,6 @@ function IssueAlert($alert) {
     }
 
     return true;
-
 }//end IssueAlert()
 
 
@@ -137,7 +135,8 @@ function IssueAlert($alert) {
  * Issue ACK notification
  * @return void
  */
-function RunAcks() {
+function RunAcks()
+{
     foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state = 2 && alerts.open = 1') as $alert) {
         $tmp   = array(
             $alert['rule_id'],
@@ -156,7 +155,6 @@ function RunAcks() {
         IssueAlert($alert);
         dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
     }
-
 }//end RunAcks()
 
 
@@ -164,7 +162,8 @@ function RunAcks() {
  * Run Follow-Up alerts
  * @return void
  */
-function RunFollowUp() {
+function RunFollowUp()
+{
     global $config;
     foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.state > 0 && alerts.open = 0') as $alert) {
         $tmp   = array(
@@ -193,12 +192,11 @@ function RunFollowUp() {
         if ($n > $o) {
             $ret  .= ' Worsens';
             $state = 3;
-            $alert['details']['diff'] = array_diff($chk,$alert['details']['rule']);
-        }
-        elseif ($n < $o) {
+            $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
+        } elseif ($n < $o) {
             $ret  .= ' Betters';
             $state = 4;
-            $alert['details']['diff'] = array_diff($alert['details']['rule'],$chk);
+            $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
         }
 
         if ($state > 0 && $n > 0) {
@@ -210,7 +208,6 @@ function RunFollowUp() {
             echo $ret.' ('.$o.'/'.$n.")\r\n";
         }
     }//end foreach
-
 }//end RunFollowUp()
 
 
@@ -218,7 +215,8 @@ function RunFollowUp() {
  * Run all alerts
  * @return void
  */
-function RunAlerts() {
+function RunAlerts()
+{
     global $config;
     foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1') as $alert) {
         $tmp   = array(
@@ -248,8 +246,7 @@ function RunAlerts() {
             if (!empty($rextra['delay'])) {
                 if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance_window']) < $rextra['delay'])) {
                     continue;
-                }
-                else {
+                } else {
                     $alert['details']['delay'] = time();
                     $updet = true;
                 }
@@ -263,8 +260,7 @@ function RunAlerts() {
                 $updet = true;
                 $noiss = false;
             }
-        }
-        else {
+        } else {
             // This is the new way
             if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay']) {
                 continue;
@@ -273,8 +269,7 @@ function RunAlerts() {
             if (!empty($rextra['interval'])) {
                 if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance_window']) < $rextra['interval']) {
                     continue;
-                }
-                else {
+                } else {
                     $alert['details']['interval'] = time();
                     $updet = true;
                 }
@@ -318,7 +313,6 @@ function RunAlerts() {
             dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
         }
     }//end foreach
-
 }//end RunAlerts()
 
 
@@ -327,7 +321,8 @@ function RunAlerts() {
  * @param array $obj Alert-Array
  * @return void
  */
-function ExtTransports($obj) {
+function ExtTransports($obj)
+{
     global $config;
     $tmp = false;
     // To keep scrutinizer from naging because it doesnt understand eval
@@ -348,12 +343,10 @@ function ExtTransports($obj) {
             if ($tmp === true) {
                 echo 'OK';
                 log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
-            }
-            elseif ($tmp === false) {
+            } elseif ($tmp === false) {
                 echo 'ERROR';
                 log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
-            }
-            else {
+            } else {
                 echo 'ERROR: '.$tmp."\r\n";
                 log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."' Error: ".$tmp, $obj['device_id']);
             }
@@ -361,7 +354,6 @@ function ExtTransports($obj) {
 
         echo '; ';
     }
-
 }//end ExtTransports()
 
 
@@ -370,7 +362,8 @@ function ExtTransports($obj) {
  * @param array  $obj Alert-Array
  * @return string
  */
-function FormatAlertTpl($obj) {
+function FormatAlertTpl($obj)
+{
     $tpl    = $obj["template"];
     $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
     $parsed = $msg;
@@ -381,23 +374,19 @@ function FormatAlertTpl($obj) {
     while (++$x < $s) {
         if ($msg[$x] == '{' && $buff == '') {
             $buff .= $msg[$x];
-        }
-        elseif ($buff == '{ ') {
+        } elseif ($buff == '{ ') {
             $buff = '';
-        }
-        elseif ($buff != '') {
+        } elseif ($buff != '') {
             $buff .= $msg[$x];
         }
 
         if ($buff == '{if') {
             $pos = $x;
             $if  = true;
-        }
-        elseif ($buff == '{foreach') {
+        } elseif ($buff == '{foreach') {
             $pos = $x;
             $for = true;
-        }
-        elseif ($buff == '{calc') {
+        } elseif ($buff == '{calc') {
             $pos  = $x;
             $calc = true;
         }
@@ -413,24 +402,21 @@ function FormatAlertTpl($obj) {
                     '"; if( ',
                     ' ) { $ret .= "',
                 );
-            }
-            elseif ($for) {
+            } elseif ($for) {
                 $for    = false;
                 $o      = 8;
                 $native = array(
                     '"; foreach( ',
                     ' as $key=>$value) { $ret .= "',
                 );
-            }
-            elseif ($calc) {
+            } elseif ($calc) {
                 $calc   = false;
                 $o      = 5;
                 $native = array(
                     '"; $ret .= (float) (0+(',
                     ')); $ret .= "',
                 );
-            }
-            else {
+            } else {
                 continue;
             }
 
@@ -443,7 +429,6 @@ function FormatAlertTpl($obj) {
 
     $parsed = populate($parsed);
     return RunJail($parsed, $obj);
-
 }//end FormatAlertTpl()
 
 
@@ -452,7 +437,8 @@ function FormatAlertTpl($obj) {
  * @param array $alert Alert-Result from DB
  * @return array
  */
-function DescribeAlert($alert) {
+function DescribeAlert($alert)
+{
     $obj              = array();
     $i                = 0;
     $device           = dbFetchRow('SELECT hostname, sysName, location, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
@@ -472,17 +458,14 @@ function DescribeAlert($alert) {
     if ($alert['state'] >= 1) {
         if (!empty($tpl['title'])) {
             $obj['title'] = $tpl['title'];
-        }
-        else {
+        } else {
             $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
         }
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
-        }
-        elseif ($alert['state'] == 3) {
+        } elseif ($alert['state'] == 3) {
             $obj['title'] .= ' got worse';
-        }
-        elseif ($alert['state'] == 4) {
+        } elseif ($alert['state'] == 4) {
             $obj['title'] .= ' got better';
         }
 
@@ -496,11 +479,10 @@ function DescribeAlert($alert) {
             }
         }
         $obj['elapsed'] = TimeFormat(time() - strtotime($alert['time_logged']));
-        if( !empty($extra['diff']) ) {
+        if (!empty($extra['diff'])) {
             $obj['diff'] = $extra['diff'];
         }
-    }
-    elseif ($alert['state'] == 0) {
+    } elseif ($alert['state'] == 0) {
         $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
         if (empty($id['id'])) {
             return false;
@@ -509,15 +491,13 @@ function DescribeAlert($alert) {
         $extra          = json_decode(gzuncompress($id['details']), true);
         if (!empty($tpl['title_rec'])) {
             $obj['title'] = $tpl['title_rec'];
-        }
-        else {
+        } else {
             $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
         }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
         $obj['faults']  = false;
-    }
-    else {
+    } else {
         return 'Unknown State';
     }//end if
     $obj['uid']       = $alert['id'];
@@ -527,11 +507,10 @@ function DescribeAlert($alert) {
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
-    if (strstr($obj['title'],'%')) {
+    if (strstr($obj['title'], '%')) {
         $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
     }
     return $obj;
-
 }//end DescribeAlert()
 
 
@@ -540,7 +519,8 @@ function DescribeAlert($alert) {
  * @param integer $secs Seconds elapsed
  * @return string
  */
-function TimeFormat($secs) {
+function TimeFormat($secs)
+{
     $bit = array(
         'y' => $secs / 31556926 % 12,
         'w' => $secs / 604800 % 52,
@@ -561,7 +541,6 @@ function TimeFormat($secs) {
     }
 
     return join(' ', $ret);
-
 }//end TimeFormat()
 
 
@@ -571,11 +550,11 @@ function TimeFormat($secs) {
  * @param array  $obj  Object with variables
  * @return string|mixed
  */
-function RunJail($code, $obj) {
+function RunJail($code, $obj)
+{
     $ret = '';
     eval($code);
     return $ret;
-
 }//end RunJail()
 
 
@@ -585,21 +564,20 @@ function RunJail($code, $obj) {
  * @param boolean $wrap Wrap variable for text-usage (default: true)
  * @return string
  */
-function populate($txt, $wrap=true) {
+function populate($txt, $wrap = true)
+{
     preg_match_all('/%([\w\.]+)/', $txt, $m);
     foreach ($m[1] as $tmp) {
         $orig = $tmp;
         $rep  = false;
         if ($tmp == 'key' || $tmp == 'value') {
             $rep = '$'.$tmp;
-        }
-        else {
+        } else {
             if (strstr($tmp, '.')) {
                 $tmp = explode('.', $tmp, 2);
                 $pre = '$'.$tmp[0];
                 $tmp = $tmp[1];
-            }
-            else {
+            } else {
                 $pre = '$obj';
             }
 
@@ -613,5 +591,4 @@ function populate($txt, $wrap=true) {
     }//end foreach
 
     return $txt;
-
 }//end populate()
