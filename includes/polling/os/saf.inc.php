@@ -15,4 +15,3 @@
 list(,$version,,$hardware,$serial,,) = explode(";", $poll_device['sysDescr']);
 list(,$hardware) = explode(":", $hardware);
 list(,$serial) = explode(":", $serial);
-

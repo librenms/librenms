@@ -5,7 +5,7 @@ $dataRate = snmpwalk_cache_oid($device, 'XIRRUS-MIB::realtimeMonitorAverageDataR
 $noiseFloor = snmpwalk_cache_oid($device, 'XIRRUS-MIB::realtimeMonitorNoiseFloor', array(), 'XIRRUS-MIB');
 $associations=array();
 
-foreach($radios as $idx => $radio) {
+foreach ($radios as $idx => $radio) {
     $radioName = $radio['realtimeMonitorIfaceName'];
     $associations[$radioName]=0;
 
@@ -32,13 +32,14 @@ if ($config['xirrus_disable_stations']!=true) {
     // station associations
     // custom RRDs and graph as each AP may have 16 radios
     $assoc = snmpwalk_cache_oid($device, 'XIRRUS-MIB::stationAssociationIAP', array(), 'XIRRUS-MIB');
-    foreach($assoc as $s) {
+    foreach ($assoc as $s) {
         $radio = array_pop($s);
         $associations[$radio]++;
     }
-    unset($radio); unset($assoc);
+    unset($radio);
+    unset($assoc);
     // write to rrds
-    foreach($associations as $radio => $count) {
+    foreach ($associations as $radio => $count) {
         $measurement = 'xirrus_users';
         $rrd_name = array($measurement, $radio);
         $rrd_def = 'DS:stations:GAUGE:600:0:3200';
@@ -48,15 +49,15 @@ if ($config['xirrus_disable_stations']!=true) {
         $tags = compact('radio', 'rrd_name', 'rrd_def');
         data_update($device, $measurement, $tags, $fields);
     }
-    $graphs['xirrus_stations'] = TRUE;
+    $graphs['xirrus_stations'] = true;
 } else {
-    $graphs['xirrus_stations'] = FALSE;
+    $graphs['xirrus_stations'] = false;
 }
 
-$graphs['xirrus_rssi'] = TRUE;
-$graphs['xirrus_dataRates'] = TRUE;
-$graphs['xirrus_noiseFloor'] = TRUE;
-$graphs['xirrus_stations'] = TRUE;
+$graphs['xirrus_rssi'] = true;
+$graphs['xirrus_dataRates'] = true;
+$graphs['xirrus_noiseFloor'] = true;
+$graphs['xirrus_stations'] = true;
 
 // cleanup
 unset($rrd_def, $radios, $rssi, $radioName, $associations, $tags, $fields, $measurement);

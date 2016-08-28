@@ -2,7 +2,8 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
         "phpunit/phpunit": "4.*",
+        "jakub-onderka/php-parallel-lint": "*",
+        "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*"
     }
 }
-

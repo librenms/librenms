@@ -16,8 +16,7 @@ if ($device['os_group'] == 'cisco') {
                 echo " $vlan_id";
                 if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
                     echo '.';
-                }
-                else {
+                } else {
                     dbInsert(array('device_id' => $device['device_id'], 'vlan_domain' => $vtpdomain_id, 'vlan_vlan' => $vlan_id, 'vlan_name' => $vlan['vtpVlanName'], 'vlan_type' => $vlan['vtpVlanType']), 'vlans');
                     echo '+';
                 }

@@ -1,6 +1,5 @@
 <?php
 if ($device['os'] == 'pbn') {
-    
     echo 'PBN-MEMORY-POOL: ';
 
     // find out wich build number we have
@@ -9,7 +8,6 @@ if ($device['os'] == 'pbn') {
 
     // specified MIB supported since build 16607
     if ($version[build] >= 16607) {
-
         $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
         $usage = snmp_get($device, 'nmsMemoryPoolUtilization.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', $mibdir);
 

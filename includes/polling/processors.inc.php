@@ -9,8 +9,7 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
     $file = $config['install_dir'].'/includes/polling/processors/'. $processor_type .'.inc.php';
     if (is_file($file)) {
         include $file;
-    }
-    else {
+    } else {
         $proc = snmp_get($device, $processor['processor_oid'], '-O Uqnv', '""');
     }
 
@@ -32,7 +31,7 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
     );
 
     $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
-    data_update($device,'processors',$tags,$fields);
+    data_update($device, 'processors', $tags, $fields);
 
     dbUpdate(array('processor_usage' => $proc), 'processors', '`processor_id` = ?', array($processor['processor_id']));
 }//end foreach

@@ -46,7 +46,7 @@ if ($device['os'] != 'Snom') {
         }
 
         $tags = compact('rrd_def');
-        data_update($device,'netstats-icmp',$tags,$fields);
+        data_update($device, 'netstats-icmp', $tags, $fields);
 
         $graphs['netstat_icmp']      = true;
         $graphs['netstat_icmp_info'] = true;

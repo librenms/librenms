@@ -11,8 +11,7 @@ if (is_array($diskio_array)) {
                 $inserted = dbInsert(array('device_id' => $device['device_id'], 'diskio_index' => $index, 'diskio_descr' => $entry['diskIODevice']), 'ucd_diskio');
                 echo '+';
                 d_echo($sql." - $inserted inserted ");
-            }
-            else {
+            } else {
                   echo '.';
                   // FIXME Need update code here!
             }
