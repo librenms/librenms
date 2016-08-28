@@ -7,7 +7,8 @@
  * @param integer $i VM ID
  * @return integer|boolean The port-ID if the port exists, false if it doesn't exist
  */
-function proxmox_port_exists($i, $c, $p) {
+function proxmox_port_exists($i, $c, $p)
+{
     if ($row = dbFetchRow("SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?", array($p, $c, $i))) {
         return $row['id'];
     }
@@ -22,7 +23,8 @@ function proxmox_port_exists($i, $c, $p) {
  * @param array   $pmxcache Reference to the Proxmox VM Cache
  * @return boolean true if the VM exists, false if it doesn't
  */
-function proxmox_vm_exists($i, $c, &$pmxcache) {
+function proxmox_vm_exists($i, $c, &$pmxcache)
+{
 
     if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
         return true;
@@ -51,8 +53,12 @@ if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($age
 if ($proxmox) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
-    dbUpdate(array('device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster),
-        'applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $name));
+    dbUpdate(
+        array('device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster),
+        'applications',
+        '`device_id` = ? AND `app_type` = ?',
+        array($device['device_id'], $name)
+    );
 
     if (count($pmxlines) > 0) {
         $pmxcache = array();
@@ -94,8 +100,12 @@ if ($proxmox) {
             }
 
             if ($portid = proxmox_port_exists($vmid, $pmxcluster, $vmport) !== false) {
-                dbUpdate(array('last_seen' => array('NOW()')), 'proxmox_ports', '`vm_id` = ? AND `port` = ?',
-                    array($pmxcache[$pmxcluster][$vmid], $vmport));
+                dbUpdate(
+                    array('last_seen' => array('NOW()')),
+                    'proxmox_ports',
+                    '`vm_id` = ? AND `port` = ?',
+                    array($pmxcache[$pmxcluster][$vmid], $vmport)
+                );
             } else {
                 dbInsert(array('vm_id' => $pmxcache[$pmxcluster][$vmid], 'port' => $vmport), 'proxmox_ports');
             }

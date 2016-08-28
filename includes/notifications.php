@@ -31,19 +31,22 @@ require_once $config['install_dir'].'/includes/functions.php';
  * Pull notifications from remotes
  * @return array Notifications
  */
-function get_notifications() {
+function get_notifications()
+{
     global $config;
     $obj = array();
-    foreach ($config['notifications'] as $name=>$url) {
+    foreach ($config['notifications'] as $name => $url) {
         echo '[ '.date('r').' ] '.$url.' ';
-        $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))),true);
+        $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
         if (isset($feed['channel'])) {
             $feed = parse_rss($feed);
         } else {
             $feed = parse_atom($feed);
         }
-        array_walk($feed,function(&$items,$key,$url) { $items['source'] = $url; },$url);
-        $obj = array_merge($obj,$feed);
+        array_walk($feed, function (&$items, $key, $url) {
+            $items['source'] = $url;
+        }, $url);
+        $obj = array_merge($obj, $feed);
         echo '('.sizeof($obj).')'.PHP_EOL;
     }
     $obj = array_sort($obj, 'datetime');
@@ -54,11 +57,12 @@ function get_notifications() {
  * Post notifications to users
  * @return null
  */
-function post_notifications() {
+function post_notifications()
+{
     $notifs = get_notifications();
     echo '[ '.date('r').' ] Updating DB ';
     foreach ($notifs as $notif) {
-        if (dbFetchCell('select 1 from notifications where checksum = ?',array($notif['checksum'])) != 1 && dbInsert('notifications',$notif) > 0) {
+        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert('notifications', $notif) > 0) {
             echo '.';
         }
     }
@@ -71,16 +75,17 @@ function post_notifications() {
  * @param array $feed RSS Object
  * @return array Parsed Object
  */
-function parse_rss($feed) {
+function parse_rss($feed)
+{
     $obj = array();
-    if( !array_key_exists('0',$feed['channel']['item']) ) {
+    if (!array_key_exists('0', $feed['channel']['item'])) {
         $feed['channel']['item'] = array( $feed['channel']['item'] );
     }
     foreach ($feed['channel']['item'] as $item) {
         $obj[] = array(
             'title'=>$item['title'],
             'body'=>$item['description'],
-            'checksum'=>hash('sha512',$item['title'].$item['description']),
+            'checksum'=>hash('sha512', $item['title'].$item['description']),
             'datetime'=>strftime('%F', strtotime($item['pubDate']))
             );
     }
@@ -92,16 +97,17 @@ function parse_rss($feed) {
  * @param array $feed Atom Object
  * @return array Parsed Object
  */
-function parse_atom($feed) {
+function parse_atom($feed)
+{
     $obj = array();
-    if( !array_key_exists('0',$feed['entry']) ) {
+    if (!array_key_exists('0', $feed['entry'])) {
         $feed['entry'] = array( $feed['entry'] );
     }
     foreach ($feed['entry'] as $item) {
         $obj[] = array(
             'title'=>$item['title'],
             'body'=>$item['content'],
-            'checksum'=>hash('sha512',$item['title'].$item['content']),
+            'checksum'=>hash('sha512', $item['title'].$item['content']),
             'datetime'=>strftime('%F', strtotime($item['updated']))
             );
     }

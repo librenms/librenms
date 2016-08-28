@@ -40,9 +40,8 @@ if ($device['os'] != 'Snom') {
     }
 
     if (isset($fields['tcpInSegs']) && isset($fields['tcpOutSegs'])) {
-
         $tags = compact('rrd_def');
-        data_update($device,'netstats-tcp',$tags,$fields);
+        data_update($device, 'netstats-tcp', $tags, $fields);
 
         $graphs['netstat_tcp'] = true;
     }

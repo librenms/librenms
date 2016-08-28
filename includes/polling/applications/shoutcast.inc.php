@@ -44,6 +44,5 @@ foreach ($servers as $item => $server) {
 
         $tags = compact('name', 'app_id', 'host', 'port', 'rrd_name', 'rrd_def');
         data_update($device, 'app', $tags, $fields);
-
     }//end if
 }//end foreach

@@ -11,14 +11,12 @@
  */
 
 if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
-
     $temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', array(), 'CISCO-FIREWALL-MIB');
     $cur_oid = '.1.3.6.1.4.1.9.9.147.1.2.1.1.1.3.';
 
     if (is_array($temp)) {
         //Create State Index
         if (strstr($temp['netInterface']['cfwHardwareStatusDetail'], 'not Configured') == false) {
-
             $state_name = 'cfwHardwareStatus';
             $state_index_id = create_state_index($state_name);
 
@@ -36,7 +34,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
                     array($state_index_id,'active',0,9,0) ,
                     array($state_index_id,'standby',0,10,0)
                  );
-                foreach($states as $value){ 
+                foreach ($states as $value) {
                     $insert = array(
                         'state_index_id' => $value[0],
                         'state_descr' => $value[1],
@@ -52,11 +50,9 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
                 $descr = ucwords(trim(preg_replace('/\s*\([^)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
                 if ($index == 'netInterface') {
                     $index = 4;
-                }
-                elseif ($index == 'primaryUnit') {
+                } elseif ($index == 'primaryUnit') {
                     $index = 6;
-                }
-                elseif ($index == 'secondaryUnit') {
+                } elseif ($index == 'secondaryUnit') {
                     $index = 7;
                 }
                 //Discover Sensors
@@ -68,4 +64,3 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
         }
     }
 }
-

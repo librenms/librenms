@@ -177,7 +177,7 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
     );
 
     $tags = compact('rrd_def');
-    data_update($device,'ucd_load',$tags,$fields);
+    data_update($device, 'ucd_load', $tags, $fields);
 
     $graphs['ucd_load'] = 'TRUE';
 }

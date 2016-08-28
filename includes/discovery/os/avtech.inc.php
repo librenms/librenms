@@ -4,4 +4,3 @@ if (!$os) {
         $os = 'avtech';
     }
 }
-
