@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Exceptions;
 
-
 class HostUnreachableSnmpException extends HostUnreachableException
 {
 

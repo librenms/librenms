@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Exceptions;
 
-
 class HostUnreachableException extends \Exception
 {
     protected $reasons = array();
