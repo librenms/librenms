@@ -29,7 +29,7 @@ source: General/Changelog.md
     - Brocade FABOS ([PR3959](https://github.com/librenms/librenms/pull/3959), [PR3988](https://github.com/librenms/librenms/pull/3988))
     - JunOS ([PR3976](https://github.com/librenms/librenms/pull/3976))
     - Dell PowerConnect ([PR3998](https://github.com/librenms/librenms/pull/3998), [PR4007](https://github.com/librenms/librenms/pull/4007))
-    - Commware ([PR3967](https://github.com/librenms/librenms/pull/3967))
+    - Comware ([PR3967](https://github.com/librenms/librenms/pull/3967))
     - Calix E5 ([PR3864](https://github.com/librenms/librenms/pull/3864))
     - Raisecom ([PR3992](https://github.com/librenms/librenms/pull/3864))
     - Cisco ISE ([PR4063](https://github.com/librenms/librenms/pull/4063))
@@ -52,7 +52,7 @@ source: General/Changelog.md
     - Improved Apps overview page ([PR3954](https://github.com/librenms/librenms/pull/3954))
     - Improved Syslog page ([PR3955](https://github.com/librenms/librenms/pull/3955), [PR3971](https://github.com/librenms/librenms/pull/3971))
     - Rewrite availability map ([PR4043](https://github.com/librenms/librenms/pull/4043))
-    - Add predicated usage to billing overview ([PR4049](https://github.com/librenms/librenms/pull/4049))
+    - Add predicted usage to billing overview ([PR4049](https://github.com/librenms/librenms/pull/4049))
   - API
     - Added services calls to API ([PR4215](https://github.com/librenms/librenms/pull/4215))
   - Discovery / Polling
