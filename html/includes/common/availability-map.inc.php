@@ -133,7 +133,7 @@ if (defined('SHOW_SETTINGS')) {
                     <div class="device-availability '.$deviceState.'">
                         <span class="availability-label label '.$deviceLabel.' label-font-border">'.$deviceState.'</span>
                         <span class="device-icon">'.$deviceIcon.'</span><br>
-                        <span class="small">'.ip_to_sysname($device, $device['hostname']).'</span>
+                        <span class="small">'.shorthost(ip_to_sysname($device, $device['hostname'])).'</span>
                     </div>
                     </a>';
                 } else {
@@ -179,7 +179,7 @@ if (defined('SHOW_SETTINGS')) {
                                 <span class="service-name-label label '.$serviceLabel.' label-font-border">'.$service["service_type"].'</span>
                                 <span class="availability-label label '.$serviceLabel.' label-font-border">'.$serviceState.'</span>
                                 <span class="device-icon">'.$deviceIcon.'</span><br>
-                                <span class="small">'.ip_to_sysname($service, $service['hostname']).'</span>
+                                <span class="small">'.shorthost(ip_to_sysname($service, $service['hostname'])).'</span>
                             </div>
                         </a>';
                     } else {
