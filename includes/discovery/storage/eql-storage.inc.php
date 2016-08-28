@@ -24,8 +24,7 @@ if (is_array($eql_storage)) {
         $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
         if (is_int($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
-        }
-        else {
+        } else {
             // Trying to search the last '.' and take something after it as index
             $arrindex = explode(".", $index);
             $newindex = (int)(end($arrindex))+0;

@@ -21,4 +21,3 @@
  $version = str_replace('"', '', $version);
  $serial = str_replace('"', '', $serial);
  $hardware = str_replace('"', '', $hardware);
-

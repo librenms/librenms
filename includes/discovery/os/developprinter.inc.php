@@ -9,7 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if(!$os) {
+if (!$os) {
     if (strstr($sysObjectId, '.1.3.6.1.4.1.18334.1.2.1.2.1.50.2.2')) {
         $os = 'developprinter';
     }

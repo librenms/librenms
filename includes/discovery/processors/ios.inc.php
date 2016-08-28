@@ -12,8 +12,7 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
             if (isset($entry['cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.'.$index;
                 $usage     = $entry['cpmCPUTotal5minRev'];
-            }
-            else if (isset($entry['cpmCPUTotal5min'])) {
+            } elseif (isset($entry['cpmCPUTotal5min'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.'.$index;
                 $usage     = $entry['cpmCPUTotal5min'];
             }

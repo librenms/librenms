@@ -25,8 +25,7 @@ if (!isset($debug)) {
     $options = getopt('d');
     if (isset($options['d'])) {
         $debug = true;
-    }
-    else {
+    } else {
         $debug = false;
     }
 }
@@ -34,8 +33,7 @@ if (!isset($debug)) {
 $insert = 0;
 
 if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
-}
-else {
+} else {
     $db_rev = 0;
     $insert = 1;
 }
@@ -95,10 +93,9 @@ $limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
-
-        if (isset($_SESSION['stage']) ) {
+        if (isset($_SESSION['stage'])) {
             $limit++;
-            if ( time()-$_SESSION['last'] > 45 ) {
+            if (time()-$_SESSION['last'] > 45) {
                 $_SESSION['offset'] = $limit;
                 $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
                 return;
@@ -126,8 +123,7 @@ foreach ($filelist as $file) {
                     if ($line[0] != '#') {
                         if ($config['db']['extension'] == 'mysqli') {
                             $update = mysqli_query($database_link, $line);
-                        }
-                        else {
+                        } else {
                             $update = mysql_query($line);
                         }
                         if (!$update) {
@@ -135,8 +131,7 @@ foreach ($filelist as $file) {
                             if ($debug) {
                                 if ($config['db']['extension'] == 'mysqli') {
                                     echo mysqli_error($database_link)."\n";
-                                }
-                                else {
+                                } else {
                                     echo mysql_error()."\n";
                                 }
                             }
@@ -147,12 +142,10 @@ foreach ($filelist as $file) {
 
             if ($db_rev < 5) {
                 echo " done.\n";
-            }
-            else {
+            } else {
                 echo " done ($err errors).\n";
             }
-        }
-        else {
+        } else {
             echo " Could not open file!\n";
         }//end if
 
@@ -160,8 +153,7 @@ foreach ($filelist as $file) {
         $db_rev = $filename;
         if ($insert) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
-        }
-        else {
+        } else {
             dbUpdate(array('version' => $db_rev), 'dbSchema');
         }
     }//end if
@@ -169,8 +161,7 @@ foreach ($filelist as $file) {
 
 if ($updating) {
     echo "-- Done\n";
-    if( isset($_SESSION['stage']) ) {
+    if (isset($_SESSION['stage'])) {
         $_SESSION['build-ok'] = true;
     }
 }
-

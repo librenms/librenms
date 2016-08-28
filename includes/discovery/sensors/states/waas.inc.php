@@ -11,7 +11,6 @@
  */
 
 if ($device['os_group'] == 'cisco' && $device['os'] == 'waas') {
-
     $temp = snmp_get($device, "cwoTfoStatsLoadStatus.0", "-Ovqe", "CISCO-WAN-OPTIMIZATION-MIB");
     $cur_oid = '.1.3.6.1.4.1.9.9.762.1.2.1.13.0';
     $index = '0';
@@ -29,7 +28,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'waas') {
                 array($state_index_id,'yellow',0,3,1) ,
                 array($state_index_id,'red',0,4,2)
              );
-            foreach($states as $value){ 
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],

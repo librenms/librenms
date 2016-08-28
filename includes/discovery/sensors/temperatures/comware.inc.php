@@ -18,7 +18,6 @@ if ($device['os'] == 'comware') {
     ));
     
     if (!empty($entphydata)) {
-        
         $tempdata = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperature', array(), 'HH3C-ENTITY-EXT-MIB');
         
         foreach ($entphydata as $index) {
@@ -28,7 +27,6 @@ if ($device['os'] == 'comware') {
                     discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $tempindex, 'temp-' . $tempindex, 'comware', $index['entPhysicalName'], '1', '1', null, null, null, null, $value['hh3cEntityExtTemperature'], 'snmp', $index);
                 }
             }
-            
         }
     }
     

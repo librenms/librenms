@@ -40,8 +40,7 @@ if ($device['os'] == 'ios') {
         );
 
         $tags = compact('index', 'subindex', 'rrd_name', 'rrd_def');
-        data_update($device,'c6kxbar',$tags,$fields);
-
+        data_update($device, 'c6kxbar', $tags, $fields);
     }//end foreach
 
     // print_r($entPhysical_state);
@@ -61,8 +60,7 @@ foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', arra
              $entity['key'],
             )
         );
-    }
-    else {
+    } else {
         if ($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] != $entity['value']) {
             echo 'no match!';
         }

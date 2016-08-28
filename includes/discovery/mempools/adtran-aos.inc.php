@@ -31,4 +31,3 @@ if ($device['os'] == 'adtran-aos') {
         discover_mempool($valid_mempool, $device, 0, 'adtran-aos', 'Memory', '1', null, null);
     }
 }
-
