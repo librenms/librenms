@@ -8,11 +8,11 @@ if (!empty($agent_data[$name])) {
     return;
 }
 # Format Data
-$lines = explode("\n",$rawdata);
+$lines = explode("\n", $rawdata);
 $freeswitch = array();
 foreach ($lines as $line) {
-	list($var,$value) = explode('=',$line);
-	$freeswitch[$var] = $value;
+    list($var,$value) = explode('=', $line);
+    $freeswitch[$var] = $value;
 }
 # Freeswitch stats
 $rrd_name =  array('app', $name, 'stats', $app_id);
@@ -29,10 +29,10 @@ $fields = array (
         'calls' => $freeswitch['Calls'],
         'channels' => $freeswitch['Channels'],
         'peak' => $freeswitch['Peak'],
-	'in_failed' => $freeswitch['InFailed'],
-	'in_okay' => $freeswitch['InTotal']-$freeswitch['InFailed'],
-	'out_failed' => $freeswitch['OutFailed'],
-	'out_okay' => $freeswitch['OutTotal']-$freeswitch['OutFailed']
+    'in_failed' => $freeswitch['InFailed'],
+    'in_okay' => $freeswitch['InTotal']-$freeswitch['InFailed'],
+    'out_failed' => $freeswitch['OutFailed'],
+    'out_okay' => $freeswitch['OutTotal']-$freeswitch['OutFailed']
     );
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

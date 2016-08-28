@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'netonix') {
-
     $temp = snmpwalk_cache_multi_oid($device, '.1.3.6.1.4.1.46242.5.1.2', array());
     $cur_oid = '.1.3.6.1.4.1.';
 
@@ -33,7 +32,7 @@ if ($device['os'] == 'netonix') {
                 array($state_index_id,'24V',0,2,0) ,
                 array($state_index_id,'48V',0,3,1) ,
              );
-            foreach($states as $value){ 
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],

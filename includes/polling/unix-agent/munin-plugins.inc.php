@@ -35,8 +35,7 @@ if (!empty($agent_data['munin'])) {
             if (preg_match('/^graph_/', $key)) {
                 list(,$key)            = explode('_', $key);
                 $plugin['graph'][$key] = $value;
-            }
-            else {
+            } else {
                 list($metric,$key)               = explode('.', $key);
                 $plugin['values'][$metric][$key] = $value;
             }
@@ -54,8 +53,7 @@ if (!empty($agent_data['munin'])) {
                 'mplug_info'     => ($plugin['graph']['info'] == null ? array('NULL') : $plugin['graph']['info']),
             );
             $mplug_id = dbInsert($insert, 'munin_plugins');
-        }
-        else {
+        } else {
             $mplug_id = $plugins_db[$plugin_type]['id'];
         }
 
@@ -97,7 +95,7 @@ if (!empty($agent_data['munin'])) {
                     'rrd_def'  => 'DS:val:' . $data['type'] . ':600:U:U',
                     'rrd_name' => $base_rrd_name . '_' . $name
                 );
-                data_update($device,'munin-plugins',$tags,$fields);
+                data_update($device, 'munin-plugins', $tags, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = array(
@@ -123,8 +121,7 @@ if (!empty($agent_data['munin'])) {
                     $ds_id  = dbInsert($insert, 'munin_plugins_ds');
                 }//end if
             }//end foreach
-        }
-        else {
+        } else {
             echo "No ID!\n";
         }//end if
     }//end foreach

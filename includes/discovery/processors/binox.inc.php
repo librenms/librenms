@@ -14,9 +14,8 @@
 
 
 if ($device['os'] == 'binox') {
-    if  (strpos($device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
+    if (strpos($device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
         if ($device['version'] == '2.4.R3.1.1') {
-
             echo 'Telco Systems:';
             $descr = 'Processor';
             $usage = snmp_get($device, '.1.3.6.1.4.1.738.10.111.1.1.3.1.1.0', '-Ovq');
@@ -25,9 +24,7 @@ if ($device['os'] == 'binox') {
             if (is_numeric($usage)) {
                 discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.738.10.111.1.1.3.1.1.0', '0', 'binox', $descr, '1', $usage, null, null);
             }
-        }
-
-        else {
+        } else {
             echo 'Telco Systems:';
             $descr = 'Processor';
             $usage = snmp_get($device, '.1.3.6.1.4.1.738.10.111.3.1.1.0', '-Ovq');

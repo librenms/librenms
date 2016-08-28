@@ -23,7 +23,6 @@ $stpprotocol = snmp_get($device, 'dot1dStpProtocolSpecification.0', '-Oqv', 'RST
 // FIXME I don't know what "unknown" means, perhaps MSTP? (saw it on some cisco devices)
 // But we can try to retrieve data
 if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
-    
     // set time multiplier to convert from centiseconds to seconds
     // all time values are stored in databese as seconds
     $tm = '0.01';
@@ -62,20 +61,19 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     $time_since_change = snmp_get($device, 'dot1dStpTimeSinceTopologyChange.0', '-Ovt', 'RSTP-MIB');
     if ($time_since_change > '100') {
         $time_since_change = substr($time_since_change, 0, -2); // convert to seconds since change
-    }
-    else {
+    } else {
         $time_since_change = '0';
     }
     $stp['timeSinceTopologyChange'] = $time_since_change;
 
-    // designated root is stored in format 2 octet bridge priority + MAC address, so we need to normalize it 
+    // designated root is stored in format 2 octet bridge priority + MAC address, so we need to normalize it
     $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[0]['dot1dStpDesignatedRoot']));
     $dr = substr($dr, -12); //remove first two octets
     $stp['designatedRoot'] = $dr;
 
     // normalize the MAC
     $mac_array = explode(':', $mac_raw);
-    foreach($mac_array as &$octet) {
+    foreach ($mac_array as &$octet) {
         if (strlen($octet) < 2) {
             $octet = "0" . $octet; // add suppressed 0
         }
@@ -85,8 +83,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     // I'm the boss?
     if ($stp['bridgeAddress'] == $stp['designatedRoot']) {
         $stp['rootBridge'] = '1';
-    }
-    else {
+    } else {
         $stp['rootBridge'] = '0';
     }
 
@@ -94,25 +91,24 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
     if ($stp_raw[0]['version'] == '3') {
         echo "RSTP ";
-    }
-    else { 
+    } else {
         echo "STP ";
     }
 
     if (!$stp_db['bridgeAddress'] && $stp['bridgeAddress']) {
-        dbInsert($stp,'stp');
+        dbInsert($stp, 'stp');
         log_event('STP added, bridge address: '.$stp['bridgeAddress'], $device, 'stp');
         echo '+';
     }
     
     if ($stp_db['bridgeAddress'] && !$stp['bridgeAddress']) {
-        dbDelete('stp','device_id = ?', array($device['device_id']));
+        dbDelete('stp', 'device_id = ?', array($device['device_id']));
         log_event('STP removed', $device, 'stp');
         echo '-';
     }
 
     // STP port related stuff
-    foreach ($stp_raw as $port => $value){
+    foreach ($stp_raw as $port => $value) {
         if ($port) { // $stp_raw[0] ist not port related so we skip this one
             $stp_port = array(
                 'priority'              => $stp_raw[$port]['dot1dStpPortPriority'],
@@ -148,8 +144,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                     $dp = $stp_raw[$port]['dot1dStpPortDesignatedPort'] - $dp_value;
                     $stp_port['designatedPort'] = $dp;
                 }
-            }
-            else {
+            } else {
                 // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
                 $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
                 $stp_port['designatedPort'] = hexdec($dp);
@@ -159,18 +154,18 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
             // Write to db
             if (!dbFetchCell('SELECT 1 FROM `ports_stp` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $stp_port['port_id']))) {
-                dbInsert($stp_port,'ports_stp');
+                dbInsert($stp_port, 'ports_stp');
                 echo '+';
             }
         }
     }
 
-    // Delete STP ports from db if absent in SNMP query     
+    // Delete STP ports from db if absent in SNMP query
     $stp_port_db = dbFetchRows('SELECT * FROM `ports_stp` WHERE `device_id` = ?', array($device['device_id']));
     //d_echo($stp_port_db);
-    foreach($stp_port_db as $port => $value){
+    foreach ($stp_port_db as $port => $value) {
         $if_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $value['port_id']));
-        if ($if_index != $stp_raw[$if_index]['dot1dStpPort']){
+        if ($if_index != $stp_raw[$if_index]['dot1dStpPort']) {
             dbDelete('ports_stp', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $value['port_id']));
             echo '-';
         }

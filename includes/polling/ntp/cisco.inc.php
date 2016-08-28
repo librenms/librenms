@@ -18,7 +18,7 @@ $options = array();
 $options['filter']['type'] = array('=',$module);
 $options['filter']['disabled'] = array('=',0);
 $options['filter']['ignore'] = array('=',0);
-$components = $component->getComponents($device['device_id'],$options);
+$components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -73,8 +73,7 @@ if (count($components > 0)) {
     } // End foreach components
 
     // Write the Components back to the DB.
-    $component->setComponentPrefs($device['device_id'],$components);
-
+    $component->setComponentPrefs($device['device_id'], $components);
 } // end if count components
 
 // Clean-up after yourself!

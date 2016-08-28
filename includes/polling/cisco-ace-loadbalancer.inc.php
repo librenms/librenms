@@ -23,8 +23,7 @@ foreach ($rserver_array as $index => $serverfarm) {
 
     if (!is_array($serverfarms[$farm_id])) {
         $rserver_id = dbInsert(array('device_id' => $device['device_id'], 'farm_id' => $farm_id, 'StateDescr' => $serverfarm['cesServerFarmRserverStateDescr']), 'loadbalancer_rservers');
-    }
-    else {
+    } else {
         foreach ($db_oids as $db_oid => $db_value) {
             $db_update[$db_value] = $serverfarm[$db_oid];
         }
@@ -45,8 +44,7 @@ foreach ($rserver_array as $index => $serverfarm) {
     foreach ($oids as $oid) {
         if (is_numeric($serverfarm[$oid])) {
             $value = $serverfarm[$oid];
-        }
-        else {
+        } else {
             $value = '0';
         }
         $fields[$oid] = $value;
@@ -54,7 +52,7 @@ foreach ($rserver_array as $index => $serverfarm) {
 
     if (isset($serverfarms[$farm_id])) {
         $tags = compact('farm_id', 'rrd_name', 'rrd_def');
-        data_update($device,'rservers',$tags,$fields);
+        data_update($device, 'rservers', $tags, $fields);
     }
 }//end foreach
 

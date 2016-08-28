@@ -1,9 +1,8 @@
 <?php
 
-if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!= 0) ){
+if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!= 0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-}
-else {  
+} else {
     $vrfs_lite_cisco = array(array('context_name'=>null));
 }
 foreach ($vrfs_lite_cisco as $vrf) {
@@ -26,10 +25,9 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 dbInsert(array('ipv4_network' => $network,'context_name' => $device['context_name']), 'ipv4_networks');
                 // echo("Create Subnet $network\n");
                 echo 'S';
-            }
-            else {
+            } else {
                 //Update Context
-                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_networks', '`ipv4_network` = ?', array($network) );
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_networks', '`ipv4_network` = ?', array($network));
                 echo 's';
             }
 
@@ -39,17 +37,15 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 dbInsert(array('ipv4_address' => $oid, 'ipv4_prefixlen' => $cidr, 'ipv4_network_id' => $ipv4_network_id, 'port_id' => $port_id, 'context_name' => $device['context_name']), 'ipv4_addresses');
                 // echo("Added $oid/$cidr to $port_id ( $hostname $ifIndex )\n $i_query\n");
                 echo '+';
-            }
-            else {
+            } else {
                 //Update Context
-                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_addresses', 'ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?',array($oid, $cidr, $port_id) );
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_addresses', 'ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?', array($oid, $cidr, $port_id));
                 echo '.';
             }
 
             $full_address            = "$oid/$cidr|$ifIndex";
             $valid_v4[$full_address] = 1;
-        } 
-        else {
+        } else {
             echo '!';
         }//end if
     }//end foreach

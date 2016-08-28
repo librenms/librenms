@@ -15,20 +15,18 @@ if (is_array($hrstorage_array)) {
 
         switch ($fstype) {
             case 'hrStorageVirtualMemory':
-            case 'hrStorageRam';
-            case 'hrStorageOther';
-            case 'nwhrStorageDOSMemory';
-            case 'nwhrStorageMemoryAlloc';
-            case 'nwhrStorageMemoryPermanent';
-            case 'nwhrStorageMemoryAlloc';
-            case 'nwhrStorageCacheBuffers';
-            case 'nwhrStorageCacheMovable';
-            case 'nwhrStorageCacheNonMovable';
-            case 'nwhrStorageCodeAndDataMemory';
-            case 'nwhrStorageDOSMemory';
-            case 'nwhrStorageIOEngineMemory';
-            case 'nwhrStorageMSEngineMemory';
-            case 'nwhrStorageUnclaimedMemory';
+            case 'hrStorageRam':
+            case 'hrStorageOther':
+            case 'nwhrStorageDOSMemory':
+            case 'nwhrStorageMemoryAlloc':
+            case 'nwhrStorageMemoryPermanent':
+            case 'nwhrStorageCacheBuffers':
+            case 'nwhrStorageCacheMovable':
+            case 'nwhrStorageCacheNonMovable':
+            case 'nwhrStorageCodeAndDataMemory':
+            case 'nwhrStorageIOEngineMemory':
+            case 'nwhrStorageMSEngineMemory':
+            case 'nwhrStorageUnclaimedMemory':
                 $deny = 1;
                 break;
         }

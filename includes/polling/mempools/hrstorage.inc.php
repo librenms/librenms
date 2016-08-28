@@ -4,8 +4,7 @@
 if (!is_array($storage_cache['hrstorage'])) {
     $storage_cache['hrstorage'] = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
     d_echo($storage_cache);
-}
-else {
+} else {
     d_echo('Cached!');
 }
 
