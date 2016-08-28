@@ -28,8 +28,7 @@ if (is_array($hrDevice_array)) {
             $descr_array = explode(':', $entry['hrDeviceDescr']);
             if ($descr_array['1']) {
                 $descr = $descr_array['1'];
-            }
-            else {
+            } else {
                 $descr = $descr_array['0'];
             }
 

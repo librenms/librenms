@@ -120,14 +120,14 @@ function check_style($passthru = false, $command_only = false)
     );
 
     $cs_exclude = build_excludes('--ignore=', $cs_excludes);
-    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./html";
+    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./html ./includes";
 
     if ($command_only) {
         echo $cs_cmd . PHP_EOL;
         return 250;
     }
 
-    echo 'Checking PSR-2 style... ';
+    echo 'Running style check... ';
 
     if ($passthru) {
         echo PHP_EOL;

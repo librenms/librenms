@@ -23,6 +23,6 @@ if ($device['os'] == "binos") {
     $percent    = (($used / $total) * 100);
 
     if (is_numeric($used)) {
-        discover_mempool($valid_mempool, $device, 0, "binos", "Memory", "1", NULL, NULL);
+        discover_mempool($valid_mempool, $device, 0, "binos", "Memory", "1", null, null);
     }
 }

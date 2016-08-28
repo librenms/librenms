@@ -17,7 +17,7 @@ if (is_numeric($rssi)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cisco-wwan-rssi', $tags, $fields);
-    $graphs['cisco_wwan_rssi'] = TRUE;
+    $graphs['cisco_wwan_rssi'] = true;
 }
 
 $mnc = snmp_get($device, "CISCO-WAN-3G-MIB::c3gGsmMnc.13", "-Ovqn", "CISCO-WAN-3G-MIB");
@@ -28,6 +28,6 @@ if (is_numeric($mnc)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cisco-wwan-rssi', $tags, $fields);
-    $graphs['cisco-wwan-mnc'] = TRUE;
+    $graphs['cisco-wwan-mnc'] = true;
 }
 unset($rrd_def, $rssi, $mnc, $fields, $tags);

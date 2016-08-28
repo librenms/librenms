@@ -5,8 +5,7 @@ $name = 'apache';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
-}
-else {
+} else {
     $options = '-O qv';
     $oid     = 'nsExtendOutputFull.6.97.112.97.99.104.101';
     $apache  = snmp_get($device, $oid, $options);
@@ -68,4 +67,3 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-

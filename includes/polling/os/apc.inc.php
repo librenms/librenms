@@ -89,7 +89,6 @@ if ($AOSrev == '') {
         // InfraStruxure
         $version = trim(snmp_get($device, 'PowerNet-MIB::isxModularPduIdentMonitorCardFirmwareAppRev.0', '-OQv', '', ''), '"');
     }
-}
-else {
+} else {
     $version = "AOS $AOSrev / App $APPrev";
 }//end if

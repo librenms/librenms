@@ -16,7 +16,8 @@ if ($config['influxdb']['enable'] === true) {
     include $config['install_dir'].'/lib/influxdb-php/vendor/autoload.php';
 }//end if
 
-function influxdb_connect() {
+function influxdb_connect()
+{
     global $config;
 
     $influxdb_cred = '';
@@ -28,30 +29,27 @@ function influxdb_connect() {
     d_echo($config['influxdb']['transport'] . " transport being used");
     if ($config['influxdb']['transport'] == 'http') {
         $influxdb_conn = 'influxdb';
-    }
-    elseif ($config['influxdb']['transport'] == 'https') {
+    } elseif ($config['influxdb']['transport'] == 'https') {
         $influxdb_conn = 'https+influxdb';
-    }
-    elseif ($config['influxdb']['transport'] == 'udp') {
+    } elseif ($config['influxdb']['transport'] == 'udp') {
         $influxdb_conn = 'udp+influxdb';
-    }
-    else {
+    } else {
         echo 'InfluxDB support enabled but no valid transport details provided';
         return false;
     }
 
     $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url, $config['influxdb']['timeout'], $config['influxdb']['verifySSL']);
     return($db);
-
 }// end influxdb_connect
 
-function influx_update($device,$measurement,$tags=array(),$fields) {
+function influx_update($device, $measurement, $tags, $fields)
+{
     global $influxdb, $config;
     if ($influxdb !== false) {
         $tmp_fields = array();
         $tmp_tags['hostname'] = $device['hostname'];
         foreach ($tags as $k => $v) {
-            $v = preg_replace(array('/ /','/,/','/=/'),array('\ ','\,','\='), $v);
+            $v = preg_replace(array('/ /','/,/','/=/'), array('\ ','\,','\='), $v);
             if (empty($v)) {
                 $v = '_blank_';
             }
@@ -59,9 +57,9 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
         }
         foreach ($fields as $k => $v) {
             $tmp_fields[$k] = force_influx_data($v);
-            if( $tmp_fields[$k] === null) {
-               unset($tmp_fields[$k]);
-           }
+            if ($tmp_fields[$k] === null) {
+                unset($tmp_fields[$k]);
+            }
         }
         
         d_echo("\nInfluxDB data:\n");
@@ -82,13 +80,11 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             try {
                 $result = $influxdb->writePoints($points);
             } catch (Exception $e) {
-                d_echo("Caught exception: ", $e->getMessage(), "\n");
+                d_echo("Caught exception: " . $e->getMessage() . PHP_EOL);
                 d_echo($e->getTrace());
             }
-        }
-        else {
+        } else {
             c_echo("[%gInfluxDB Disabled%n]\n");
         }//end if
     }//end if
 }// end influx_update
-

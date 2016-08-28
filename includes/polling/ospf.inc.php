@@ -44,7 +44,7 @@ $ospf_port_oids = array(
     'ospfIfRtrPriority',
     'ospfIfTransitDelay',
     'ospfIfRetransInterval',
-    'ospfIfHelloInterval', 
+    'ospfIfHelloInterval',
     'ospfIfRtrDeadInterval',
     'ospfIfPollInterval',
     'ospfIfState',
@@ -77,8 +77,7 @@ $ospf_nbr_oids     = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
 
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} 
-else {
+} else {
     $vrfs_lite_cisco = array(array('context_name' => null));
 }
 
@@ -130,8 +129,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     dbUpdate($ospf_instance_update, 'ospf_instances', '`device_id` = ? AND `ospf_instance_id` = ? AND `context_name`=? ', array($device['device_id'], $ospf_instance_id, $device['context_name']));
                     echo 'U';
                     unset($ospf_instance_update);
-                }
-                else {
+                } else {
                     echo '.';
                 }
 
@@ -192,16 +190,14 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     dbUpdate($ospf_area_update, 'ospf_areas', '`device_id` = ? AND `ospfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_id, $device['context_name']));
                     echo 'U';
                     unset($ospf_area_update);
-                }
-                else {
+                } else {
                     echo '.';
                 }
 
                 unset($ospf_area_poll);
                 unset($ospf_area_db);
                 $ospf_area_count++;
-            }
-            else {
+            } else {
                 dbDelete('ospf_ports', '`device_id` = ? AND `ospfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_db['ospfAreaId'], $device['context_name']));
             }//end if
         }//end foreach
@@ -248,8 +244,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
                 if ($ospf_port_poll['ospfAddressLessIf']) {
                     $ospf_port_poll['port_id'] = @dbFetchCell('SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $ospf_port_poll['ospfAddressLessIf']));
-                }
-                else {
+                } else {
                     $ospf_port_poll['port_id'] = @dbFetchCell('SELECT A.`port_id` FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ? AND A.context_name = ?', array($ospf_port_poll['ospfIfIpAddress'], $device['device_id'], $device['context_name']));
                 }
 
@@ -266,16 +261,14 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     dbUpdate($ospf_port_update, 'ospf_ports', '`device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
                     echo 'U';
                     unset($ospf_port_update);
-                }
-                else {
+                } else {
                     echo '.';
                 }
 
                 unset($ospf_port_poll);
                 unset($ospf_port_db);
                 $ospf_port_count++;
-            }
-            else {
+            } else {
                 dbDelete('ospf_ports', '`device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_db['ospf_port_id'], $device['context_name']));
                 // ("DELETE FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'");
                 echo '-';
@@ -336,8 +329,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                 if ($ospf_nbr_db[$device['context_name']]['port_id'] != $ospf_nbr_poll['port_id']) {
                     if (!empty($ospf_nbr_poll['port_id'])) {
                         $ospf_nbr_update = array('port_id' => $ospf_nbr_poll['port_id']);
-                    }
-                    else {
+                    } else {
                         $ospf_nbr_update = array('port_id' => array('NULL'));
                     }
                 }
@@ -357,16 +349,14 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     dbUpdate($ospf_nbr_update, 'ospf_nbrs', '`device_id` = ? AND `ospf_nbr_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_nbr_id, $device['context_name']));
                     echo 'U';
                     unset($ospf_nbr_update);
-                }
-                else {
+                } else {
                     echo '.';
                 }
 
                 unset($ospf_nbr_poll);
                 unset($ospf_nbr_db);
                 $ospf_nbr_count++;
-            }
-            else {
+            } else {
                 dbDelete('ospf_nbrs', '`device_id` = ? AND `ospf_nbr_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_nbr_db['ospf_nbr_id'], $device['context_name']));
                 echo '-';
             }//end if
