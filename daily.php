@@ -24,8 +24,7 @@ if ($options['f'] === 'update') {
 
     if ($config['update_channel'] == 'master') {
         exit(1);
-    }
-    elseif ($config['update_channel'] == 'release') {
+    } elseif ($config['update_channel'] == 'release') {
         exit(3);
     }
     exit(0);
@@ -54,8 +53,7 @@ if ($options['f'] === 'syslog') {
             if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $config['syslog_purge'])) > 0) {
                 $rows = $limit;
                 echo 'Syslog cleared for entries over '.$config['syslog_purge']." days 1000 limit\n";
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -145,8 +143,8 @@ if ($options['f'] === 'purgeusers') {
         foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
             $users[] = $user['user'];
         }
-        $del_users = '"'.implode('","',$users).'"';
-        if (dbDelete('users', "username NOT IN ($del_users)",array($del_users))) {
+        $del_users = '"'.implode('","', $users).'"';
+        if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
             echo "Removed users that haven't logged in for $purge days";
         }
     }

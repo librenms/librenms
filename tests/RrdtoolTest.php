@@ -84,7 +84,6 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
 
         $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
-
     }
 
     public function testBuildCommandException()
@@ -97,5 +96,4 @@ class RrdtoolTest extends \PHPUnit_Framework_TestCase
         // use this file, since it is guaranteed to exist
         rrdtool_build_command('create', __FILE__, 'o');
     }
-
 }

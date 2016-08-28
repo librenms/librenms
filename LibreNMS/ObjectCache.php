@@ -28,7 +28,8 @@ namespace LibreNMS;
 
 use ArrayAccess;
 
-class ObjectCache implements ArrayAccess {
+class ObjectCache implements ArrayAccess
+{
 
     private $data = array();
 
@@ -39,13 +40,13 @@ class ObjectCache implements ArrayAccess {
      * Initialize ObjectCache
      * @param string $obj Name of Object
      */
-    public function __construct($obj) {
+    public function __construct($obj)
+    {
         global $config;
         $this->obj = $obj;
         if (isset($GLOBALS['_ObjCache'][$obj])) {
             $this->data = $GLOBALS['_ObjCacheSkell'][$obj];
-        }
-        else {
+        } else {
             if (!is_array($GLOBALS['_ObjCacheSkell'])) {
                 $GLOBALS['_ObjCacheSkell'] = array();
             }
@@ -64,7 +65,6 @@ class ObjectCache implements ArrayAccess {
                 }
             }
         }//end if
-
     }//end __construct()
 
 
@@ -73,13 +73,13 @@ class ObjectCache implements ArrayAccess {
      * @param string $obj Name of Data-Object
      * @return boolean
      */
-    public function offsetExists($obj) {
+    public function offsetExists($obj)
+    {
         if (isset($this->data[$obj])) {
             return true;
         }
 
         return false;
-
     }//end offsetExists()
 
 
@@ -88,15 +88,14 @@ class ObjectCache implements ArrayAccess {
      * @param string $obj Name of Data-Object
      * @return mixed
      */
-    public function offsetGet($obj) {
+    public function offsetGet($obj)
+    {
         if (isset($this->data[$obj])) {
             if (isset($this->data[$obj]['value'])) {
                 return $this->data[$obj]['value'];
-            }
-            else if (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
+            } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
-            }
-            else {
+            } else {
                 $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], $this->data[$obj]['params']);
                 if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
                     $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
@@ -104,7 +103,6 @@ class ObjectCache implements ArrayAccess {
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             }
         }
-
     }//end offsetGet()
 
 
@@ -114,14 +112,14 @@ class ObjectCache implements ArrayAccess {
      * @param mixed  $value Value
      * @return boolean
      */
-    public function offsetSet($obj, $value) {
+    public function offsetSet($obj, $value)
+    {
         if (!is_array($this->data[$obj])) {
             $this->data[$obj] = array();
         }
 
         $this->data[$obj]['value'] = $value;
         return $this->data[$obj]['value'];
-
     }//end offsetSet()
 
 
@@ -130,11 +128,9 @@ class ObjectCache implements ArrayAccess {
      * @param string $obj Name of Data-Object
      * @return mixed
      */
-    public function offsetUnset($obj) {
+    public function offsetUnset($obj)
+    {
         unset($this->data[$obj]['value']);
         return true;
-
     }//end offsetUnset()
-
-
 }//end class
