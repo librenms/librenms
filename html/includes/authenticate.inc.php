@@ -91,7 +91,6 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
         setcookie('token', $token_id, $session_time, '/', null, false, true);
 
         if (isset($_tmp_password)) {
-            //echo "$sess_id, $token, $auth";exit;
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => $session_time), 'session');
         } else {
             dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
