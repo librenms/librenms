@@ -4,15 +4,18 @@ issue_tracker_pattern: https://github.com/librenms/librenms/issues/\1
 break: "## Changelog"
 output_file_name: "doc/General/Changelog.md"
 message_groups:
-  Devices:
-    - devices
-    - newdevice
-  Features:
-    - feature
-    - feat
   Bugfixes:
     - fix
     - bugfix
+  Devices:
+    - devices
+    - newdevice
+  WebUI:
+    - webui
+    - web
+  Features:
+    - feature
+    - feat
   Documentation:
     - docs
     - doc
