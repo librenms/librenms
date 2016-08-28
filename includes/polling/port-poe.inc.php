@@ -54,7 +54,7 @@ if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
     );
 
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
-    data_update($device,'poe',$tags,$fields);
+    data_update($device, 'poe', $tags, $fields);
 
     echo 'PoE ';
 }//end if

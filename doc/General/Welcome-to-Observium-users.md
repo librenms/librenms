@@ -1,3 +1,4 @@
+source: General/Welcome-to-Observium-users.md
 Welcome to Observium users
 --------------------------
 
@@ -58,8 +59,6 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "LibreNMS README"
 [3]: http://fisheye.observium.org/rdiff/Observium?csid=3251&u&N
 "Link to Observium license change"
-[4]: https://github.com/librenms/librenms/blob/master/doc/General/Roadmap.md
-"LibreNMS ROADMAP"
 [5]: https://github.com/librenms/librenms/blob/master/LICENSE.txt
 "LibreNMS copy of GPL v3"
 [6]: http://www.gnu.org/philosophy/free-sw.html
@@ -72,4 +71,3 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "LibreNMS issue database at GitHub"
 [10]: https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/
 "Migrating from Observium to LibreNMS"
-

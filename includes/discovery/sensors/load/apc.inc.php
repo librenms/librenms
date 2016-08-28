@@ -24,8 +24,7 @@ if ($device['os'] == 'apc') {
         if (empty($oids)) {
             $oids        = snmp_get($device, $item['AdvOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
             $current_oid = $item['AdvOid'];
-        }
-        else {
+        } else {
             $current_oid = $item['HighPrecOid'];
         }
 
@@ -39,8 +38,7 @@ if ($device['os'] == 'apc') {
 
             if (stristr($current_oid, 'HighPrec')) {
                 $current = ($oids / $item['divisor']);
-            }
-            else {
+            } else {
                 $current         = $oids;
                 $item['divisor'] = 1;
             }

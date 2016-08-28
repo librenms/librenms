@@ -11,7 +11,7 @@
  */
 if (!$os) {
     if (strpos($sysObjectId, '1.3.6.1.4.1.8744.1') !== false) {
-        $split_oid = explode('.',$sysObjectId);
+        $split_oid = explode('.', $sysObjectId);
         $model_oid = $split_oid[count($split_oid)-1];
         if ($model_oid >= 40 && $model_oid < 60 || $model_oid = 67) {
             $os = 'hpmsm';

@@ -89,8 +89,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Supply Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Supply Temperature';
         }
 
@@ -112,8 +111,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Return Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Return Temperature';
         }
 
@@ -134,8 +132,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Remote Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Remote Temperature';
         }
 

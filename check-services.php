@@ -53,4 +53,4 @@ foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
     poll_service($service);
 
 } //end foreach
-rrdtool_terminate();
+rrdtool_close();

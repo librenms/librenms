@@ -29,24 +29,34 @@ $storage_cache20 = array();
 d_echo($storage);
 
 foreach ($storage_cache1['eql-storage'] as $index => $ventry) {
-    if (!array_key_exists('eqliscsiVolumeName', $ventry)) continue;
-    if (is_int($index)) $iind = $index;
-    else {
+    if (!array_key_exists('eqliscsiVolumeName', $ventry)) {
+        continue;
+    }
+    if (is_int($index)) {
+        $iind = $index;
+    } else {
         $arrindex = explode(".", $index);
         $iind = (int)(end($arrindex))+0;
     }
-    if (is_int($iind)) $storage_cache10[$iind] = $ventry;
+    if (is_int($iind)) {
+        $storage_cache10[$iind] = $ventry;
+    }
 }
 d_echo($storage_cache10);
 
 foreach ($storage_cache2['eql-storage'] as $index => $vsentry) {
-    if (!array_key_exists('eqliscsiVolumeStatusAvailable', $vsentry)) continue;
-    if (is_int($index)) $iind = $index;
-    else {
+    if (!array_key_exists('eqliscsiVolumeStatusAvailable', $vsentry)) {
+        continue;
+    }
+    if (is_int($index)) {
+        $iind = $index;
+    } else {
         $arrindex = explode(".", $index);
         $iind = (int)(end($arrindex))+0;
-    }        
-    if (is_int($iind)) $storage_cache20[$iind] = $vsentry;
+    }
+    if (is_int($iind)) {
+        $storage_cache20[$iind] = $vsentry;
+    }
 }
 d_echo($storage_cache20);
 

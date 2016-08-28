@@ -20,8 +20,7 @@ $perc = $entry['jnxOperatingBuffer'];
 // FIX ME -- Maybe another OID? Some equipment do not provide jnxOperatingDRAMSize like MX960
 if ($entry['jnxOperatingDRAMSize']) {
     $memory_available = $entry['jnxOperatingDRAMSize'];
-}
-else {
+} else {
     $memory_available = ($entry['jnxOperatingMemory'] * 1024 * 1024);
 }
 

@@ -8,7 +8,7 @@ if ($device['os'] == 'mgeups') {
 
     $numPhase = count(explode("\n", $oids));
     for ($i = 1; $i <= $numPhase; $i++) {
-    unset($current);
+        unset($current);
         $current_oid = ".1.3.6.1.4.1.705.1.7.2.1.5.$i";
         $descr       = 'Output';
         if ($numPhase > 1) {

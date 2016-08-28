@@ -71,4 +71,3 @@ function data_update($device, $measurement, $tags, $fields)
     rrdtool_data_update($device, $measurement, $tags, $fields);
     influx_update($device, $measurement, rrd_array_filter($tags), $fields);
 } // data_update
-

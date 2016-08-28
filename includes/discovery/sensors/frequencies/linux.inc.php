@@ -9,9 +9,8 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     $sensor_type = "raspberry_freq";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
 
-    for($freq = 6; $freq < 8; $freq++) {
-        switch($freq)
-        {
+    for ($freq = 6; $freq < 8; $freq++) {
+        switch ($freq) {
             case "6":
                 $descr = "ARM";
                 break;

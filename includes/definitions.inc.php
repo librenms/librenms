@@ -1,13 +1,13 @@
 <?php
 
+require_once $config['install_dir'].'/includes/common.php';
 require_once $config['install_dir'].'/includes/dbFacile.php';
 require_once $config['install_dir'].'/includes/mergecnf.inc.php';
 
 // Connect to database
 if ($config['db']['extension'] == 'mysqli') {
     $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-}
-else {
+} else {
     $database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 }
 
@@ -15,17 +15,15 @@ if (!$database_link) {
     echo '<h2>MySQL Error</h2>';
     if ($config['db']['extension'] == 'mysqli') {
         echo mysqli_error($database_link);
-    }
-    else {
+    } else {
         echo mysql_error();
     }
-die;
+    die;
 }
 
 if ($config['db']['extension'] == 'mysqli') {
     $database_db = mysqli_select_db($database_link, $config['db_name']);
-}
-else {
+} else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
@@ -34,8 +32,7 @@ if ($config['memcached']['enable'] === true) {
         $config['memcached']['ttl']      = 60;
         $config['memcached']['resource'] = new Memcached();
         $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    }
-    else {
+    } else {
         echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
         echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
         $config['memcached']['enable'] = 0;
@@ -575,9 +572,9 @@ $config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
 $os = 'vcs';
-$config['os'][$os]['text']		= 'Video Communication Server';
-$config['os'][$os]['type']		= 'collaboration';
-$config['os'][$os]['icon']		= 'cisco';
+$config['os'][$os]['text']      = 'Video Communication Server';
+$config['os'][$os]['type']      = 'collaboration';
+$config['os'][$os]['icon']      = 'cisco';
 
 $os = 'acano';
 $config['os'][$os]['group']            = 'cisco';
@@ -630,22 +627,22 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'primeinfrastructure';
-$config['os'][$os]['text']		= 'Prime Infrastructure';
-$config['os'][$os]['type']		= 'server';
-$config['os'][$os]['icon']		= 'cisco';
-$config['os'][$os]['over'][0]['graph']	= 'device_bits';
-$config['os'][$os]['over'][0]['text']	= 'Device Traffic';
-$config['os'][$os]['over'][1]['graph']	= 'device_processor';
-$config['os'][$os]['over'][1]['text']	= 'CPU Usage';
-$config['os'][$os]['over'][2]['graph']	= 'device_mempool';
-$config['os'][$os]['over'][2]['text']	= 'Memory Usage';
-$config['os'][$os]['over'][3]['graph']	= 'device_storage';
-$config['os'][$os]['over'][3]['text']	= 'Storage Usage';
+$config['os'][$os]['text']      = 'Prime Infrastructure';
+$config['os'][$os]['type']      = 'server';
+$config['os'][$os]['icon']      = 'cisco';
+$config['os'][$os]['over'][0]['graph']  = 'device_bits';
+$config['os'][$os]['over'][0]['text']   = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph']  = 'device_processor';
+$config['os'][$os]['over'][1]['text']   = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph']  = 'device_mempool';
+$config['os'][$os]['over'][2]['text']   = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph']  = 'device_storage';
+$config['os'][$os]['over'][3]['text']   = 'Storage Usage';
 
 $os = 'tpconductor';
-$config['os'][$os]['text']		= 'TelePresence Conductor';
-$config['os'][$os]['type']		= 'collaboration';
-$config['os'][$os]['icon']		= 'cisco';
+$config['os'][$os]['text']      = 'TelePresence Conductor';
+$config['os'][$os]['type']      = 'collaboration';
+$config['os'][$os]['icon']      = 'cisco';
 
 // Brocade NOS
 $os = 'nos';
@@ -1905,6 +1902,10 @@ $os = 'hwg-ste2';
 $config['os'][$os]['text']             = 'HWg STE2';
 $config['os'][$os]['type']             = 'environment';
 $config['os'][$os]['icon']             = 'hwg';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+$config['os'][$os]['over'][1]['graph'] = 'device_humidity';
+$config['os'][$os]['over'][1]['text']  = 'Humidity';
 
 // EATON PDU
 $os = 'eatonpdu';
@@ -1998,6 +1999,19 @@ $os = "hytera";
 $config['os'][$os]['text'] = 'Hytera Repeater';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'hytera';
+
+// Sonus GSX
+$os = 'sonus-gsx';
+$config['os'][$os]['text']             = 'Sonus GSX';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'sonus';
+
+// Sonus SBC
+$os = 'sonus-sbc';
+$config['os'][$os]['text']             = 'Sonus SBC';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'sonus';
+
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
@@ -2529,12 +2543,10 @@ $config['device_types'][$i]['text'] = 'Storage';
 $config['device_types'][$i]['type'] = 'storage';
 $config['device_types'][$i]['icon'] = 'storage.png';
 
-if (isset($config['enable_printers']) && $config['enable_printers']) {
-    $i++;
-    $config['device_types'][$i]['text'] = 'Printers';
-    $config['device_types'][$i]['type'] = 'printer';
-    $config['device_types'][$i]['icon'] = 'printer.png';
-}
+$i++;
+$config['device_types'][$i]['text'] = 'Printers';
+$config['device_types'][$i]['type'] = 'printer';
+$config['device_types'][$i]['icon'] = 'printer.png';
 
 $i++;
 $config['device_types'][$i]['text'] = 'Appliance';
@@ -2544,8 +2556,7 @@ $config['device_types'][$i]['icon'] = 'appliance.png';
 //
 // No changes below this line #
 //
-$config['version']              = '2015.master';
-$config['project_name_version'] = $config['project_name'].' '.$config['version'];
+$config['project_name_version'] = $config['project_name'];
 
 if (isset($config['rrdgraph_def_text'])) {
     $config['rrdgraph_def_text'] = str_replace('  ', ' ', $config['rrdgraph_def_text']);

@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'drac') {
-
     $temp = snmpwalk_cache_multi_oid($device, 'virtualDiskTable', array(), 'IDRAC-MIB-SMIv2');
     $cur_oid = '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.';
 
@@ -28,7 +27,7 @@ if ($device['os'] == 'drac') {
                 array($state_index_id,'failed',0,3,2) ,
                 array($state_index_id,'degraded',0,4,1)
              );
-            foreach($states as $value){ 
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],

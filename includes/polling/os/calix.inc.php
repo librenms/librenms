@@ -26,7 +26,6 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $version = str_replace('"', '', $version);
         $serial = str_replace('"', '', $serial);
         $hardware = str_replace('"', '', $hardware);
-
     }
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.3') !== false) { // E5-120
@@ -39,7 +38,6 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $version = str_replace('"', '', $version);
         $serial = str_replace('"', '', $serial);
         $hardware = str_replace('"', '', $hardware);
-
     }
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.2') !== false) { // E5-111
@@ -52,7 +50,6 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $version = str_replace('"', '', $version);
         $serial = str_replace('"', '', $serial);
         $hardware = str_replace('"', '', $hardware);
-
     }
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.1') !== false) { // E5-110

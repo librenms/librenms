@@ -13,7 +13,7 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
         'procs' => $hrSystem[0]['hrSystemProcesses'],
     );
 
-    data_update($device,'hr_processes',$tags,$fields);
+    data_update($device, 'hr_processes', $tags, $fields);
 
     $graphs['hr_processes'] = true;
     echo ' Processes';
@@ -27,7 +27,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
         'users' => $hrSystem[0]['hrSystemNumUsers'],
     );
 
-    data_update($device,'hr_users',$tags,$fields);
+    data_update($device, 'hr_users', $tags, $fields);
 
     $graphs['hr_users'] = true;
     echo ' Users';

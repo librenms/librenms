@@ -23,10 +23,9 @@ dbDelete('session', '`session_expiry` <  ?', array(time()));
 
 if ($vars['page'] == 'logout') {
     dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
-    dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
+    destroy_cookies();
     unset($_SESSION);
     unset($_COOKIE);
-    destroy_cookies();
     $auth_message = 'Logged Out';
     header('Location: ' . $config['base_url']);
     exit;
@@ -58,6 +57,7 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
     if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_tmp_password)) {
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
+        $sess_id  = session_id();
         if (!$_SESSION['authenticated']) {
             if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
                 include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
@@ -73,10 +73,9 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
         if (isset($_POST['remember'])) {
             $session_time = time() + (60 * 60 * 24 * $config['auth_remember']);
         } else {
-            $session_time = time() + (60 * 60);
+            $session_time = time() + 60 * 60 * 24;
         }
 
-        $sess_id  = session_id();
         if (isset($_tmp_password)) {
             $token    = strgen();
             $auth     = strgen();
@@ -92,6 +91,7 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
         setcookie('token', $token_id, $session_time, '/', null, false, true);
 
         if (isset($_tmp_password)) {
+            //echo "$sess_id, $token, $auth";exit;
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => $session_time), 'session');
         } else {
             dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
@@ -116,6 +116,7 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
 function destroy_cookies()
 {
     global $config;
+    dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
     setcookie('sess_id', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
     setcookie('token', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
     setcookie('auth', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
