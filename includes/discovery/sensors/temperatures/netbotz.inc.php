@@ -17,9 +17,22 @@ if ($device['os'] == 'netbotz') {
             $descr            = preg_replace('/Temperature  /', '', $descr);
             $descr            = trim($descr);
             if ($temperature != '0' && $temperature <= '1000') {
-                discover_sensor($valid['sensor'], 'temperature', $device,
-                    $temperature_oid, $temperature_id, 'netbotz',
-                    $descr, '1', '1', null, null, null, null, $temperature);
+                discover_sensor(
+                    $valid['sensor'],
+                    'temperature',
+                    $device,
+                    $temperature_oid,
+                    $temperature_id,
+                    'netbotz',
+                    $descr,
+                    '1',
+                    '1',
+                    null,
+                    null,
+                    null,
+                    null,
+                    $temperature
+                );
             }
         }
     }

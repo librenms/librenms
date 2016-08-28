@@ -1,7 +1,6 @@
 <?php
 
 if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['type'] == 'wireless') {
-
     if ($device['os'] == 'airos') {
         echo "It Is Airos\n";
         include 'includes/polling/mib/ubnt-airmax-mib.inc.php';

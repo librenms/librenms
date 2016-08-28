@@ -34,7 +34,6 @@ if (count($diskio_data)) {
         );
 
         data_update($device, 'ucd_diskio', $tags, $fields);
-
     }//end foreach
 
     echo "\n";

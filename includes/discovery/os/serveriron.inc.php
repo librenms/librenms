@@ -13,7 +13,6 @@ if (!$os) {
                         "snL4unsuccessfulConn"          => "FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB",  // Unsuccessfull connection
         );
 
-        register_mibs($device,  $serviron_mibs, "includes/discovery/os/serveriron.inc.php");
-
+        register_mibs($device, $serviron_mibs, "includes/discovery/os/serveriron.inc.php");
     }
 }

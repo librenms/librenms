@@ -3,14 +3,11 @@
 if (empty($os)) {
     if (strstr($sysDescr, 'Cisco Internetwork Operating System Software')) {
         $os = 'ios';
-    }
-    else if (strstr($sysDescr, 'IOS (tm)')) {
+    } elseif (strstr($sysDescr, 'IOS (tm)')) {
         $os = 'ios';
-    }
-    else if (strstr($sysDescr, 'Cisco IOS Software')) {
+    } elseif (strstr($sysDescr, 'Cisco IOS Software')) {
         $os = 'ios';
-    }
-    else if (strstr($sysDescr, 'Global Site Selector')) {
+    } elseif (strstr($sysDescr, 'Global Site Selector')) {
         $os = 'ios';
     }
 

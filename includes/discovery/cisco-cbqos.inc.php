@@ -12,11 +12,10 @@
  */
 
 if ($device['os_group'] == 'cisco') {
-
     $module = 'Cisco-CBQOS';
 
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'],array('type'=>$module));
+    $components = $component->getComponents($device['device_id'], array('type'=>$module));
 
     // We only care about our device id.
     $components = $components[$device['device_id']];
@@ -36,16 +35,14 @@ if ($device['os_group'] == 'cisco') {
      * False == no object found - this is not an error, there is no QOS configured
      * null  == timeout or something else that caused an error, there may be QOS configured but we couldn't get it.
      */
-    if ( is_null($tblcbQosServicePolicy) || is_null($tblcbQosObjects) || is_null($tblcbQosPolicyMapCfg) || is_null($tblcbQosClassMapCfg) || is_null($tblcbQosMatchStmtCfg) ) {
+    if (is_null($tblcbQosServicePolicy) || is_null($tblcbQosObjects) || is_null($tblcbQosPolicyMapCfg) || is_null($tblcbQosClassMapCfg) || is_null($tblcbQosMatchStmtCfg)) {
         // We have to error here or we will end up deleting all our QoS components.
         echo "Error\n";
-    }
-    else {
+    } else {
         // No Error, lets process things.
         d_echo("QoS Objects Found:\n");
 
         foreach ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.2'] as $spid => $array) {
-
             foreach ($array as $spobj => $index) {
                 $result = array();
 
@@ -88,17 +85,15 @@ if ($device['os_group'] == 'cisco') {
                         d_echo("    If-Index: ".$result['ifindex']."\n");
                         d_echo("    Type: 2 - Class-Map\n");
                         $result['label'] = $tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.1'][$index];
-                        if($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index] != "") {
+                        if ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index] != "") {
                             $result['label'] .= " - ".$tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index];
                         }
                         d_echo("    Label: ".$result['label']."\n");
                         if ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.3'][$index] == 2) {
                             $result['map-type'] = 'Match-All';
-                        }
-                        elseif ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.3'][$index] == 3) {
+                        } elseif ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.3'][$index] == 3) {
                             $result['map-type'] = 'Match-Any';
-                        }
-                        else {
+                        } else {
                             $result['map-type'] = 'None';
                         }
 
@@ -131,7 +126,7 @@ if ($device['os_group'] == 'cisco') {
             $component_key = false;
 
             // Loop over our components to determine if the component exists, or we need to add it.
-        foreach ($components as $compid => $child) {
+            foreach ($components as $compid => $child) {
                 if ($child['UID'] === $array['UID']) {
                     $component_key = $compid;
                 }
@@ -139,17 +134,15 @@ if ($device['os_group'] == 'cisco') {
 
             if (!$component_key) {
                 // The component doesn't exist, we need to ADD it - ADD.
-                $new_component = $component->createComponent($device['device_id'],$module);
+                $new_component = $component->createComponent($device['device_id'], $module);
                 $component_key = key($new_component);
                 $components[$component_key] = array_merge($new_component[$component_key], $array);
                 echo "+";
-            }
-            else {
+            } else {
                 // The component does exist, merge the details in - UPDATE.
                 $components[$component_key] = array_merge($components[$component_key], $array);
                 echo ".";
             }
-
         }
 
         /*
@@ -174,9 +167,7 @@ if ($device['os_group'] == 'cisco') {
         }
 
         // Write the Components back to the DB.
-        $component->setComponentPrefs($device['device_id'],$components);
+        $component->setComponentPrefs($device['device_id'], $components);
         echo "\n";
-
     } // End if not error
-
 }

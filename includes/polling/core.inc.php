@@ -37,8 +37,7 @@ if (empty($uptime)) {
 
         $uptime = floor($hrSystemUptime / 100);
         echo 'Using hrSystemUptime ('.$uptime."s)\n";
-    }
-    else {
+    } else {
         $uptime = floor($poll_device['sysUpTime'] / 100);
         echo 'Using SNMP Agent Uptime ('.$uptime."s)\n";
     }//end if

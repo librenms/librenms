@@ -137,5 +137,4 @@ if (is_numeric(snmp_get($device, 'ubntRadioFreq.1', '-OUqnv', 'UBNT-AirMAX-MIB',
 
     unset($graph, $oids, $oid);
     poll_mib_def($device, 'UBNT-AirMAX-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs);
-
 }//end if

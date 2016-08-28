@@ -7,8 +7,7 @@ require_once $config['install_dir'].'/includes/mergecnf.inc.php';
 // Connect to database
 if ($config['db']['extension'] == 'mysqli') {
     $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-}
-else {
+} else {
     $database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 }
 
@@ -16,17 +15,15 @@ if (!$database_link) {
     echo '<h2>MySQL Error</h2>';
     if ($config['db']['extension'] == 'mysqli') {
         echo mysqli_error($database_link);
-    }
-    else {
+    } else {
         echo mysql_error();
     }
-die;
+    die;
 }
 
 if ($config['db']['extension'] == 'mysqli') {
     $database_db = mysqli_select_db($database_link, $config['db_name']);
-}
-else {
+} else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
@@ -35,8 +32,7 @@ if ($config['memcached']['enable'] === true) {
         $config['memcached']['ttl']      = 60;
         $config['memcached']['resource'] = new Memcached();
         $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    }
-    else {
+    } else {
         echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
         echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
         $config['memcached']['enable'] = 0;
@@ -576,9 +572,9 @@ $config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
 $os = 'vcs';
-$config['os'][$os]['text']		= 'Video Communication Server';
-$config['os'][$os]['type']		= 'collaboration';
-$config['os'][$os]['icon']		= 'cisco';
+$config['os'][$os]['text']      = 'Video Communication Server';
+$config['os'][$os]['type']      = 'collaboration';
+$config['os'][$os]['icon']      = 'cisco';
 
 $os = 'acano';
 $config['os'][$os]['group']            = 'cisco';
@@ -631,22 +627,22 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'primeinfrastructure';
-$config['os'][$os]['text']		= 'Prime Infrastructure';
-$config['os'][$os]['type']		= 'server';
-$config['os'][$os]['icon']		= 'cisco';
-$config['os'][$os]['over'][0]['graph']	= 'device_bits';
-$config['os'][$os]['over'][0]['text']	= 'Device Traffic';
-$config['os'][$os]['over'][1]['graph']	= 'device_processor';
-$config['os'][$os]['over'][1]['text']	= 'CPU Usage';
-$config['os'][$os]['over'][2]['graph']	= 'device_mempool';
-$config['os'][$os]['over'][2]['text']	= 'Memory Usage';
-$config['os'][$os]['over'][3]['graph']	= 'device_storage';
-$config['os'][$os]['over'][3]['text']	= 'Storage Usage';
+$config['os'][$os]['text']      = 'Prime Infrastructure';
+$config['os'][$os]['type']      = 'server';
+$config['os'][$os]['icon']      = 'cisco';
+$config['os'][$os]['over'][0]['graph']  = 'device_bits';
+$config['os'][$os]['over'][0]['text']   = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph']  = 'device_processor';
+$config['os'][$os]['over'][1]['text']   = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph']  = 'device_mempool';
+$config['os'][$os]['over'][2]['text']   = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph']  = 'device_storage';
+$config['os'][$os]['over'][3]['text']   = 'Storage Usage';
 
 $os = 'tpconductor';
-$config['os'][$os]['text']		= 'TelePresence Conductor';
-$config['os'][$os]['type']		= 'collaboration';
-$config['os'][$os]['icon']		= 'cisco';
+$config['os'][$os]['text']      = 'TelePresence Conductor';
+$config['os'][$os]['type']      = 'collaboration';
+$config['os'][$os]['icon']      = 'cisco';
 
 // Brocade NOS
 $os = 'nos';

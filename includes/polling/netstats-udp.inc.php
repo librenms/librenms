@@ -25,15 +25,13 @@ if ($device['os'] != 'Snom') {
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
             $value = $data[0][$oid];
-        }
-        else {
+        } else {
             $value = 'U';
         }
         $fields[$oid] = $value;
     }
 
     if (isset($data[0]['udpInDatagrams']) && isset($data[0]['udpOutDatagrams'])) {
-
         $tags = compact('rrd_def');
         data_update($device, 'netstats-udp', $tags, $fields);
 

@@ -28,8 +28,7 @@ foreach ($serverfarm_array as $index => $vserver) {
 
     if (!is_array($classmaps[$classmap])) {
         $classmap_in = dbInsert(array('device_id' => $device['device_id'], 'classmap_id' => $classmap_id, 'classmap' => $classmap, 'serverstate' => $vserver['slbVServerState']), 'loadbalancer_vservers');
-    }
-    else {
+    } else {
         foreach ($db_oids as $db_oid => $db_value) {
             $db_update[$db_value] = $vserver[$db_oid];
         }
@@ -48,8 +47,7 @@ foreach ($serverfarm_array as $index => $vserver) {
     foreach ($oids as $oid) {
         if (is_numeric($vserver[$oid])) {
             $value = $vserver[$oid];
-        }
-        else {
+        } else {
             $value = '0';
         }
         $fields[$oid] = $value;

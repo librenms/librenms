@@ -17,11 +17,12 @@ d_echo($port_stats);
 // or maybe other means in the future. The default port association mode still is ifIndex for
 // compatibility reasons.
 $port_association_mode = $config['default_port_association_mode'];
-if ($device['port_association_mode'])
-    $port_association_mode = get_port_assoc_mode_name ($device['port_association_mode']);
+if ($device['port_association_mode']) {
+    $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
+}
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
-$ports_mapped = get_ports_mapped ($device['device_id']);
+$ports_mapped = get_ports_mapped($device['device_id']);
 $ports_db = $ports_mapped['ports'];
 
 //
@@ -43,32 +44,26 @@ foreach ($port_stats as $ifIndex => $port) {
     $ifName = $port['ifName'];
 
     // Get port_id according to port_association_mode used for this device
-    $port_id = get_port_id ($ports_mapped, $port, $port_association_mode);
+    $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
 
     if (is_port_valid($port, $device)) {
-
         // Port newly discovered?
         if (! is_array($ports_db[$port_id])) {
             $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
-        }
-
-        // Port re-discovered after previous deletion?
-        else if ($ports_db[$port_id]['deleted'] == '1') {
+        } // Port re-discovered after previous deletion?
+        elseif ($ports_db[$port_id]['deleted'] == '1') {
             dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($port_id));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
-        }
-        else {
+        } else {
             echo '.';
         }
 
         // We've seen it. Remove it from the cache.
         unset($ports_l[$ifIndex]);
-    }
-
-    // Port vanished (mark as deleted)
+    } // Port vanished (mark as deleted)
     else {
         if (is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != '1') {
