@@ -23,7 +23,7 @@ require 'includes/discovery/functions.inc.php';
 $start         = microtime(true);
 $runtime_stats = array();
 $sqlparams     = array();
-$options       = getopt('h:m:i:n:d::v::a::q',array('os:','type:'));
+$options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
@@ -42,25 +42,20 @@ if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';
         $options['i'] = '2';
-    }
-    else if ($options['h'] == 'even') {
+    } elseif ($options['h'] == 'even') {
         $options['n'] = '0';
         $options['i'] = '2';
-    }
-    else if ($options['h'] == 'all') {
+    } elseif ($options['h'] == 'all') {
         $where = ' ';
         $doing = 'all';
-    }
-    else if ($options['h'] == 'new') {
+    } elseif ($options['h'] == 'new') {
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
-    }
-    else if ($options['h']) {
+    } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
             $where = "AND `device_id` = '".$options['h']."'";
             $doing = $options['h'];
-        }
-        else {
+        } else {
             $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
             $doing = $options['h'];
         }
@@ -92,8 +87,7 @@ if (isset($options['d']) || isset($options['v'])) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', 1);
-}
-else {
+} else {
     $debug = false;
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -129,7 +123,7 @@ if (!empty($config['distributed_poller_group'])) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC",$sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
 

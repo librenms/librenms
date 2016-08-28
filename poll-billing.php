@@ -49,7 +49,8 @@ foreach (dbFetchRows('SELECT * FROM `bills`') as $bill_data) {
 }
 
 
-function CollectData($bill_id) {
+function CollectData($bill_id)
+{
     $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', array($bill_id));
 
     $now = dbFetchCell('SELECT NOW()');
@@ -77,25 +78,20 @@ function CollectData($bill_id) {
 
             if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['in_measurement'], $tmp_period)-delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
-            }
-            elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
+            } elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
                 $port_data['in_delta'] = ($port_data['in_measurement'] - $port_data['last_in_measurement']);
-            }
-            else {
+            } else {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             
             if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
-            }
-            elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
+            } elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
                 $port_data['out_delta'] = ($port_data['out_measurement'] - $port_data['last_out_measurement']);
-            }
-            else {
+            } else {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
             }
-        }
-        else {
+        } else {
             $port_data['in_delta'] = '0';
             $port_data['out_delta'] = '0';
         }
@@ -120,8 +116,7 @@ function CollectData($bill_id) {
         $prev_out_delta = $last_data[out_delta];
         $prev_timestamp = $last_data[timestamp];
         $period         = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($prev_timestamp)."')");
-    }
-    else {
+    } else {
         $prev_delta     = '0';
         $period         = '0';
         $prev_in_delta  = '0';
@@ -136,11 +131,9 @@ function CollectData($bill_id) {
 
     if (!empty($period) && $period < '0') {
         logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
-    }
-    else {
+    } else {
         dbInsert(array('bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => $delta, 'in_delta' => $in_delta, 'out_delta' => $out_delta), 'bill_data');
     }
-
 }//end CollectData()
 
 

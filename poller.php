@@ -39,21 +39,17 @@ $options = getopt('h:m:i:n:r::d::v::a::f::');
 if ($options['h'] == 'odd') {
     $options['n'] = '1';
     $options['i'] = '2';
-}
-else if ($options['h'] == 'even') {
+} elseif ($options['h'] == 'even') {
     $options['n'] = '0';
     $options['i'] = '2';
-}
-else if ($options['h'] == 'all') {
+} elseif ($options['h'] == 'all') {
     $where = ' ';
     $doing = 'all';
-}
-else if ($options['h']) {
+} elseif ($options['h']) {
     if (is_numeric($options['h'])) {
         $where = "AND `device_id` = '".$options['h']."'";
         $doing = $options['h'];
-    }
-    else {
+    } else {
         $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
         $doing = $options['h'];
     }
@@ -101,8 +97,7 @@ if (isset($options['d']) || isset($options['v'])) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', 1);
-}
-else {
+} else {
     $debug = false;
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -120,8 +115,7 @@ if (isset($options['f'])) {
 
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
-}
-else {
+} else {
     $influxdb = false;
 }
 

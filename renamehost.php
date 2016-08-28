@@ -28,16 +28,13 @@ if ($argv[1] && $argv[2]) {
         $toid   = getidbyname($tohost);
         if ($toid) {
             echo "NOT renamed. New hostname $tohost already exists.\n";
-        }
-        else {
+        } else {
             renamehost($id, $tohost, 'console');
             echo "Renamed $host\n";
         }
-    }
-    else {
+    } else {
         echo "Host doesn't exist!\n";
     }
-}
-else {
+} else {
     echo "Host Rename Tool\nUsage: ./renamehost.php <old hostname> <new hostname>\n";
 }
