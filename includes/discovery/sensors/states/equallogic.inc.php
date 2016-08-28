@@ -51,7 +51,7 @@ The LibreNMS generic states is derived from Nagios:
                  array($state_index_id,'warning',1,2,1) ,
                  array($state_index_id,'critical',1,3,2)
              );
-            foreach($states as $value){ 
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -108,7 +108,7 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
                  array($state_index_id1,'no-ac-power',1,2,1) ,
                  array($state_index_id1,'failed-or-no-data',1,3,2)
              );
-            foreach($states1 as $value){ 
+            foreach ($states1 as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -132,8 +132,8 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
                 $oid              = $base_oid.$num_index;
                 $extra            = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
                 d_echo($extra);
-                if(!empty($extra)) {
-                    list($foid,$pstatus) = explode(' = ',$extra,2);
+                if (!empty($extra)) {
+                    list($foid,$pstatus) = explode(' = ', $extra, 2);
                     $index        = (100 + $index);
                     $low_limit    = 0.5;
                     $high_limit   = 1.5;

@@ -9,8 +9,7 @@ $name = 'powerdns';
 $app_id = $app['app_id'];
 if ($agent_data['app'][$name]) {
     $powerdns = $agent_data['app'][$name];
-}
-else {
+} else {
     $powerdns = snmp_get($device, $oid, $options, $mib);
 }
 
@@ -75,4 +74,3 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-

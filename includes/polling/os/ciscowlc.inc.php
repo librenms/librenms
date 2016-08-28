@@ -76,14 +76,13 @@ $graphs['wifi_clients'] = true;
 $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', array($device['device_id']));
 
 foreach ($radios as $key => $value) {
- 
     $indexName = substr($key, 0, -2);
 
     $channel       = str_replace('ch', '', $value['bsnAPIfPhyChannelNumber']);
     $mac           = str_replace(' ', ':', $stats[$indexName]['bsnAPDot3MacAddress']);
     $name          = $stats[$indexName]['bsnAPName'];
     $numasoclients = $value['bsnApIfNoOfUsers'];
-    $radioArray    = explode('.',$key);
+    $radioArray    = explode('.', $key);
     $radionum      = array_pop($radioArray);
     $txpow         = $value['bsnAPIfPhyTxPowerLevel'];
     $type          = $value['bsnAPIfType'];
@@ -145,7 +144,7 @@ foreach ($radios as $key => $value) {
 
     if ($foundid == 0) {
         $ap_id = dbInsert(
-        array(
+            array(
             'device_id' => $device['device_id'],
             'name' => $name,
             'radio_number' => $radionum,
@@ -159,8 +158,9 @@ foreach ($radios as $key => $value) {
             'numactbssid' => $numactbssid,
             'nummonbssid' => $nummonbssid,
             'interference' => $interference
-         ),
-        'access_points');
+            ),
+            'access_points'
+        );
     } else {
         dbUpdate(
             array(
@@ -177,7 +177,9 @@ foreach ($radios as $key => $value) {
                 'interference' => $interference
                  ),
             'access_points',
-            '`accesspoint_id` = ?', array($foundid));
+            '`accesspoint_id` = ?',
+            array($foundid)
+        );
     }
 }//end foreach
 

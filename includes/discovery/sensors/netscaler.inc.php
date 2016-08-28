@@ -19,18 +19,15 @@ foreach ($ns_sensor_array as $descr => $data) {
         $divisor    = 0;
         $multiplier = 0;
         $type       = 'temperature';
-    }
-    else if (strpos($descr, 'Fan') !== false) {
+    } elseif (strpos($descr, 'Fan') !== false) {
         $divisor    = 0;
         $multiplier = 0;
         $type       = 'fanspeed';
-    }
-    else if (strpos($descr, 'Volt') !== false) {
+    } elseif (strpos($descr, 'Volt') !== false) {
         $divisor    = 1000;
         $multiplier = 0;
         $type       = 'voltage';
-    }
-    else if (strpos($descr, 'Vtt') !== false) {
+    } elseif (strpos($descr, 'Vtt') !== false) {
         $divisor    = 1000;
         $multiplier = 0;
         $type       = 'voltage';
@@ -40,9 +37,22 @@ foreach ($ns_sensor_array as $descr => $data) {
         $current = ($current / $divisor);
     };
 
-    discover_sensor($valid['sensor'], $type, $device,
-        $oid, $descr, 'netscaler-health',
-        $descr, $divisor, $multiplier, null, null, null, null, $current);
+    discover_sensor(
+        $valid['sensor'],
+        $type,
+        $device,
+        $oid,
+        $descr,
+        'netscaler-health',
+        $descr,
+        $divisor,
+        $multiplier,
+        null,
+        null,
+        null,
+        null,
+        $current
+    );
 }
 
 unset($ns_sensor_array);

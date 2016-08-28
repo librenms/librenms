@@ -5,4 +5,3 @@ if (!$os) {
         $os = "hytera";
     }
 }
-

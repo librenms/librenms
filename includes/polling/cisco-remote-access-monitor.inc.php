@@ -55,7 +55,7 @@ if ($device['os_group'] == 'cisco') {
         );
 
         $tags = compact('rrd_def');
-        data_update($device,'cras_sessions',$tags,$fields);
+        data_update($device, 'cras_sessions', $tags, $fields);
 
         $graphs['cras_sessions'] = true;
     }
