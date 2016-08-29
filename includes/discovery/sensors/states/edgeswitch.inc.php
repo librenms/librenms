@@ -19,7 +19,7 @@ if ($device['os'] == 'edgeswitch') {
     $state = snmp_get($device, $chassis_state_oid, '-Oqv');
     if (!empty($state)) {
         $state_index_id = create_state_index($state_name);
-        if ($state_index_id) {
+        if ($state_index_id !== null) {
             $states = array(
                 array($state_index_id, 'other', 0, 0, 3),
                 array($state_index_id, 'ok', 1, 1, 0),
