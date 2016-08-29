@@ -33,11 +33,11 @@ if (!$os) {
         $os = 'avaya-vsp';
     }
     if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.209')) {
-        // VSP-7254XSQ 
+        // VSP-7254XSQ
         $os = 'avaya-vsp';
     }
     if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.210')) {
-        // VSP-7254XTQ 
+        // VSP-7254XTQ
         $os = 'avaya-vsp';
     }
 }
