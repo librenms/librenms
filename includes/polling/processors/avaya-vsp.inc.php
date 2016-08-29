@@ -10,12 +10,12 @@
  * the source code distribution for details.
  */
 
-// Avaya mibs for cpu on VOSS
+// Avaya VSP cpu w/ VOSS
 // rcKhiSlotCpuCurrentUtil  1.3.6.1.4.1.2272.1.85.10.1.1.2.1
 // rcKhiSlotCpu5MinAve      1.3.6.1.4.1.2272.1.85.10.1.1.3.1
 
-if ($device['os'] == 'avaya-vsp') {
-    $oid = '.1.3.6.1.4.1.2272.1.85.10.1.1.3.1';
-    $usage = snmp_walk($device, $oid, '-Ovq');
-    discover_processor($valid['processor'], $device, $oid, 1, 'avaya-vsp', 'VSP Processor', '1', $usage);
+$proc = trim(snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.3.1", "-Ovq"), '"');
+
+if (is_numeric($usage)) {
+    $proc = ($usage * 100);
 }

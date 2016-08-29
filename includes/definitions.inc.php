@@ -1015,7 +1015,7 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'avaya';
 
 $os = 'avaya-vsp';
-$config['os'][$os]['text']             = 'Avaya VSP';
+$config['os'][$os]['text']             = 'Avaya VOSS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'avaya';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
