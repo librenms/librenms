@@ -7,10 +7,7 @@ if (!$os) {
     if (preg_match('/Dlink DES-/', $sysDescr)) {
         $os = 'dlink';
     }
-    if (preg_match('/^DES-/', $sysDescr)) {
-        $os = 'dlink';
-    }
-    if (preg_match('/^DGS-/', $sysDescr)) {
+    if (preg_match('/^D[CEG]S-/', $sysDescr)) {
         $os = 'dlink';
     }
 }
