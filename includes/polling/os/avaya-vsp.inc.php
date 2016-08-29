@@ -12,20 +12,19 @@
  */
 
 // rcSysVersion
-$version = snmp_get($device, '.1.3.6.1.4.1.2272.1.1.7.0', '-Oqvn');
+$version  = snmp_get($device, 'rcSysVersion', '-Osqv', 'RAPID-CITY');
 $version = explode(' ', $version);
 $version = $version[0];
 $version = str_replace('"', '', $version);
 
 // rcChasSerialNumber
-$serial = snmp_get($device, '.1.3.6.1.4.1.2272.1.4.2.0', '-Oqvn');
+$serial   = snmp_get($device, 'rcChasSerialNumber', '-Osqv', 'RAPID-CITY');
 $serial = str_replace('"', '', $serial);
 
 // rcChasHardwareRevision
 $sysDescr = $poll_device['sysDescr'];
 $sysDescr = explode(' ', $sysDescr);
 $sysDescr = $sysDescr[0];
-$hwrevision = snmp_get($device, '.1.3.6.1.4.1.2272.1.4.3.0', '-Oqvn');
+$hwrevision = snmp_get($device, 'rcChasHardwareRevision', '-Osqv', 'RAPID-CITY');
 $hardware = $sysDescr . " HW: $hwrevision";
 $hardware = str_replace('"', '', $hardware);
-
