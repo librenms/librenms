@@ -22,7 +22,7 @@ if ($device['os_group'] == 'printer') {
             $index           = $split_oid[(count($split_oid) - 1)];
             if (is_numeric($role)) {
                 //ricoh using private oids to expose toner levels
-                if ($os == 'ricoh') {
+                if ($os == 'ricoh' || $os == 'nrg') {
                     $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$index";
                     $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$index";
                 } else {
@@ -44,7 +44,7 @@ if ($device['os_group'] == 'printer') {
                     }
 
                     //fix for ricoh devices returning garbage and devices returning percentage
-                    if ($os == 'ricoh') {
+                    if ($os == 'ricoh' || $os == 'nrg') {
                         if ($current == '-3') {
                             $current = 50;
                         } elseif ($current == '-100') {
@@ -57,7 +57,7 @@ if ($device['os_group'] == 'printer') {
                         $current = ($current / $capacity * 100);
                     }
 
-                    $type     = 'jetdirect';
+                    $type = 'jetdirect';
                     if (isHexString($descr)) {
                         $descr = snmp_hexstring($descr);
                     }
