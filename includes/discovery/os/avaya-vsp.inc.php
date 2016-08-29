@@ -41,4 +41,3 @@ if (!$os) {
         $os = 'avaya-vsp';
     }
 }
-
