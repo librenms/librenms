@@ -12,31 +12,31 @@
  */
 
 if (!$os) {
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.202')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.202')) {
         // VSP-4850GTS
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.203')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.203')) {
         // VSP-4850GTS-PWR+
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.205')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.205')) {
         // VSP-8284XSQ
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.206')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.206')) {
         // VSP-4450GSX-PWR+
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.208')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.208')) {
         // VSP-8404
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.209')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.209')) {
         // VSP-7254XSQ 
         $os = 'avaya-vsp';
     }
-    if (strstr($sysObjectID, '.1.3.6.1.4.1.2272.210')) {
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.210')) {
         // VSP-7254XTQ 
         $os = 'avaya-vsp';
     }
