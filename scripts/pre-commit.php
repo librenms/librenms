@@ -71,6 +71,8 @@ exit($ret); //return the combined/single return value of tests
  */
 function check_lint($passthru = false, $command_only = false)
 {
+    $parallel_lint_bin = check_exec('parallel-lint');
+
     // matches a substring of the relative path, leading / is treated as absolute path
     $lint_excludes = array('vendor/');
     if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
@@ -78,7 +80,7 @@ function check_lint($passthru = false, $command_only = false)
     }
 
     $lint_exclude = build_excludes('--exclude ', $lint_excludes);
-    $lint_cmd = "./vendor/bin/parallel-lint $lint_exclude ./";
+    $lint_cmd = "$parallel_lint_bin $lint_exclude ./";
 
     if ($command_only) {
         echo $lint_cmd . PHP_EOL;
@@ -112,6 +114,8 @@ function check_lint($passthru = false, $command_only = false)
  */
 function check_style($passthru = false, $command_only = false)
 {
+    $phpcs_bin = check_exec('phpcs');
+
     // matches a substring of the full path
     $cs_excludes = array(
         '/vendor/',
@@ -120,7 +124,7 @@ function check_style($passthru = false, $command_only = false)
     );
 
     $cs_exclude = build_excludes('--ignore=', $cs_excludes);
-    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
+    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
 
     if ($command_only) {
         echo $cs_cmd . PHP_EOL;
@@ -155,7 +159,8 @@ function check_style($passthru = false, $command_only = false)
  */
 function check_unit($passthru = false, $command_only = false)
 {
-    $phpunit_cmd = './vendor/bin/phpunit --colors=always';
+    $phpunit_bin = check_exec('phpunit');
+    $phpunit_cmd = "$phpunit_bin --colors=always";
 
     if ($command_only) {
         echo $phpunit_cmd . PHP_EOL;
@@ -211,4 +216,58 @@ function build_excludes($exclude_string, $excludes)
     }
 
     return $result;
+}
+
+/**
+ * Find an executable
+ *
+ * @param string|array $execs executable names to find
+ * @return string the path to the executable, or '' if it is not found
+ * @throws Exception Could not find the Executable
+ */
+function find_exec($execs)
+{
+    foreach ((array)$execs as $exec) {
+        // check vendor bin first
+        $vendor_bin_dir = './vendor/bin/';
+        if (is_executable($vendor_bin_dir . $exec)) {
+            return $vendor_bin_dir . $exec;
+        }
+
+        // check path
+        $path_exec = shell_exec("which $exec 2> /dev/null");
+        if (!empty($path_exec)) {
+            return trim($path_exec);
+        }
+
+        // check the cwd
+        if (is_executable('./' . $exec)) {
+            return './' . $exec;
+        }
+    }
+    throw new Exception('Executable not found');
+}
+
+/**
+ * Check for an executable and return the path to it
+ * If it does not exist, run composer update.
+ * If composer isn't installed, print error and exit.
+ *
+ * @param string $exec the name of the executable to check
+ * @return string path to the executable
+ */
+function check_exec($exec)
+{
+    try {
+        return find_exec($exec);
+    } catch (Exception $e) {
+        try {
+            $composer_bin = find_exec(array('composer', 'composer.phar'));
+            shell_exec("$composer_bin update");
+            return find_exec($exec);
+        } catch (Exception $ce) {
+            echo "\nCould not find $exec. Please install composer.\nYou can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+            exit(1);
+        }
+    }
 }
