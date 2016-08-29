@@ -16,10 +16,8 @@
 // rcKhiSlotMemUtil 1.3.6.1.4.1.2272.1.85.10.1.1.8.1
 
 if ($device['os'] == 'avaya-vsp') {
-
     $memutil = trim(snmp_get($device, '.1.3.6.1.4.1.2272.1.85.10.1.1.8.1', '-OvQ'));
     if (is_numeric($memutil)) {
         discover_mempool($valid_mempool, $device, 0, 'avaya-vsp', 'VSP Memory', '1', null, null);
     }
-
 }
