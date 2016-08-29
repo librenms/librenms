@@ -802,7 +802,7 @@ function is_port_valid($port, $device) {
 
     global $config;
 
-    if (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") == false) {
+    if (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
         $valid = 0;
     }
     else {
