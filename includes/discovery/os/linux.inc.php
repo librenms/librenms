@@ -58,6 +58,8 @@ if (!$os) {
             $os = 'cumulus';
         } elseif (strstr($sysDescr, 'g56fa85e') || strstr($sysDescr, 'gc80f187') || strstr($sysDescr, 'g829be90') || strstr($sysDescr, 'g63c0044')) {
             $os = 'sophos';
+        } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
+            $os = 'ddnos';
         } else {
             // Check for Synology DSM
             $hrSystemInitialLoadParameters = trim(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'));
