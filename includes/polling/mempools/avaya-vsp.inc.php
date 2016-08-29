@@ -15,20 +15,13 @@
 // rcKhiSlotMemFree 1.3.6.1.4.1.2272.1.85.10.1.1.7.1
 // rcKhiSlotMemUtil 1.3.6.1.4.1.2272.1.85.10.1.1.8.1
 
-if ($device['os'] == 'avaya-vsp') {
-    $used = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.6.1", '-OvQ') * 1000);
-    $free = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.7.1", '-OvQ') * 1000);
-    $perc = snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.8.1", '-OvQ');
-    $total = ($used + $free);
-    d_echo "Avaya VSP Memory ";
-    d_echo "total=" .$total." ";
-    d_echo "free=" .$free." ";
-    d_echo "used=" .$used." ";
-    d_echo "prec=" .$perc."%\n";
-    if (is_numeric($used) && is_numeric($free) && is_numeric($perc)) {
-        $mempool['total'] = $total;
-        $mempool['free']  = $free;
-        $mempool['used']  = $used;
-        $mempool['perc']  = $perc;
-    }
+$used = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.6.1", '-OvQ') * 1000);
+$free = (snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.7.1", '-OvQ') * 1000);
+$perc = snmp_get($device, "1.3.6.1.4.1.2272.1.85.10.1.1.8.1", '-OvQ');
+$total = ($used + $free);
+if (is_numeric($used) && is_numeric($free) && is_numeric($perc)) {
+    $mempool['total'] = $total;
+    $mempool['free']  = $free;
+    $mempool['used']  = $used;
+    $mempool['perc']  = $perc;
 }
