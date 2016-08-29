@@ -83,6 +83,12 @@ $graphs['dhcp-stats'] = array(
      'stats',
 );
 
+$graphs['freeswitch'] = array(
+    'peak',
+    'callsIn',
+    'callsOut',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
@@ -102,8 +108,7 @@ foreach ($app_list as $app) {
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
         // echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
-    }
-    else {
+    } else {
         // echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
     }
 
@@ -120,12 +125,10 @@ print_optionbar_end();
 if ($vars['app']) {
     if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
         include 'pages/apps/'.mres($vars['app']).'.inc.php';
-    }
-    else {
+    } else {
         include 'pages/apps/default.inc.php';
     }
-}
-else {
+} else {
     include 'pages/apps/overview.inc.php';
 }
 

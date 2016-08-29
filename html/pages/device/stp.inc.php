@@ -37,11 +37,11 @@ print_optionbar_end();
 
 if ($vars['view'] == 'basic') {
     include 'includes/print-stp.inc.php';
-}    
+}
 
 if ($vars['view'] == 'ports') {
     include 'includes/common/stp-ports.inc.php';
-    echo implode('',$common_output);
+    echo implode('', $common_output);
 }
 
 $pagetitle[] = 'STP';

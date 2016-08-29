@@ -1,3 +1,4 @@
+source: Support/Support-New-OS.md
 This document will explain how to add basic and full support for a new OS. **Some knowledge in PHP is needed for the full support.**
 
 
@@ -103,8 +104,6 @@ Polling
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
-
-
 
 #### FULL SUPPORT FOR A NEW OS
 

@@ -1,3 +1,4 @@
+source: index.md
 ### Welcome to the LibreNMS docs
 
 Some of these docs are work in progress or may be missing configuration examples for varying distros.
@@ -6,9 +7,8 @@ and submit a pull request.
 
 The docs should provide you with information on various elements to the software:
 
-  - Installation
-  - Support / FAQ
+  - [Installation](http://docs.librenms.org/Installation/Installing-LibreNMS/)
+  - [Support](http://docs.librenms.org/Support/FAQ/#faq3) / [FAQ](http://docs.librenms.org/Support/FAQ/)
+  - [Contributing to LibreNMS](http://docs.librenms.org/General/Contributing/)
   - Developing for LibreNMS
-  - Available extensions
-
-
+  - Available extensions (features)

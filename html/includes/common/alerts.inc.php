@@ -20,8 +20,8 @@ $alert_severities = array(
     'critical' => 3
 );
 
-//if( defined('show_settings') || empty($widget_settings) ) {
-if(defined('show_settings')) {
+//if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
     $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
@@ -117,8 +117,7 @@ if(defined('show_settings')) {
   </div>
 </form>
 ';
-}
-else {
+} else {
     $device_id    = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
     $state        = $widget_settings['state'];
@@ -132,16 +131,14 @@ else {
     if (is_numeric($state)) {
         $state_name = array_search($state, $alert_states);
         $title = "$title ($state_name)";
-    }
-    elseif ($state) {
+    } elseif ($state) {
         $title = "$title ($state)";
     }
 
     if (is_numeric($acknowledged)) {
         if ($acknowledged == '0') {
             $title = "Unacknowledged $title";
-        }
-        elseif ($acknowledged == '1') {
+        } elseif ($acknowledged == '1') {
             $title = "Acknowledged $title";
         }
     }
@@ -183,9 +180,12 @@ else {
                 <th data-column-id="severity" data-formatter="severity">Severity</th>
                 <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>';
     if (is_numeric($proc)) {
-        if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
+        if ($proc) {
+            $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>';
+        }
+    } else {
+        $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>';
     }
-    else { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
     $common_output[] = '
             </tr>
         </thead>
@@ -302,4 +302,3 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
 });
 </script>';
 }
-

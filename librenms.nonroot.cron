@@ -5,3 +5,7 @@
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 15   0    * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
 *    *    * * *   librenms    /opt/librenms/alerts.php >> /dev/null 2>&1
+*/5  *    * * *   librenms    /opt/librenms/poll-billing.php >> /dev/null 2>&1
+01   *    * * *   librenms    /opt/librenms/billing-calculate.php >> /dev/null 2>&1
+*/5  *    * * *   librenms    /opt/librenms/check-services.php >> /dev/null 2>&1
+

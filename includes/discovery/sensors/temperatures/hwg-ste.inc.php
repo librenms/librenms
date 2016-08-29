@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'hwg-ste') {
-
     $temp = snmpwalk_cache_multi_oid($device, 'sensTable', array(), 'STE-MIB');
     $cur_oid = '.1.3.6.1.4.1.21796.4.1.3.1.5.';
 

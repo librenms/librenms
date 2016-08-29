@@ -25,6 +25,10 @@
  * @subpackage Discovery
  */
 
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostUnreachablePingException;
+
 $ts = microtime(true);
 
 chdir(dirname($argv[0]));
@@ -32,16 +36,16 @@ chdir(dirname($argv[0]));
 require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
+require 'includes/functions.php';
+require 'includes/discovery/functions.inc.php';
 
 if ($config['autodiscovery']['snmpscan'] == false) {
     echo 'SNMP-Scan disabled.'.PHP_EOL;
     exit(2);
 }
 
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
-
-function perform_snmp_scan($net) {
+function perform_snmp_scan($net)
+{
     global $stats, $config, $debug, $vdebug;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
@@ -138,7 +142,7 @@ if (isset($opts['r'])) {
     if (!is_array($config['nets'])) {
         $config['nets'] = array( $config['nets'] );
     }
-    foreach( $config['nets'] as $subnet ) {
+    foreach ($config['nets'] as $subnet) {
         $net = Net_IPv4::parseAddress($subnet);
         perform_snmp_scan($net);
     }
@@ -148,4 +152,3 @@ if (isset($opts['r'])) {
     echo 'Please either add a range argument with \'-r <CIDR_RANGE>\' or define $config[\'nets\'] in your config.php'.PHP_EOL;
     exit(2);
 }
-

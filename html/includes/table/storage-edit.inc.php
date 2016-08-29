@@ -11,7 +11,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";
 
-$total = dbFetchCell($count_sql,$param);
+$total = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
 }
@@ -34,8 +34,7 @@ if ($rowCount != -1) {
 $sql = "SELECT * $sql";
 
 //$response[] = array('storage_descr' => $sql);
-foreach (dbFetchRows($sql,$param) as $drive) {
-
+foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc'], 0);
     $perc_warn = round($drive['storage_perc_warn'], 0);
     $response[] = array(
@@ -44,7 +43,6 @@ foreach (dbFetchRows($sql,$param) as $drive) {
         'storage_descr' => $drive['storage_descr'],
         'storage_perc' => $perc . "%",
         'storage_perc_warn' => $perc_warn);
-
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);

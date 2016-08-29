@@ -8,7 +8,7 @@ echo 'Comware OS...';
 
 $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:HH3C-PRODUCT-ID-MIB');
 
-$data =  str_replace(",","",$poll_device['sysDescr']);
+$data =  str_replace(",", "", $poll_device['sysDescr']);
 $explodeddata = explode(" ", $data);
 $version = $explodeddata['6'];
 $features = $explodeddata['8'];

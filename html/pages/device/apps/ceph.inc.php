@@ -38,8 +38,7 @@ foreach ($graphs as $key => $text) {
                 echo '</td></tr>';
             }
         }
-    }
-    elseif ($key == "ceph_osdperf") {
+    } elseif ($key == "ceph_osdperf") {
         foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'osd'), '-*.rrd')) as $rrd_filename) {
             $graph_array['to']     = $config['time']['now'];
             $graph_array['id']     = $app['app_id'];
@@ -54,8 +53,7 @@ foreach ($graphs as $key => $text) {
                 echo '</td></tr>';
             }
         }
-    }
-    elseif ($key == "ceph_df") {
+    } elseif ($key == "ceph_df") {
         foreach (glob(rrd_name($device['hostname'], array('app', 'ceph', $app['app_id'], 'df'), '-*.rrd')) as $rrd_filename) {
             if (preg_match("/.*-df-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $pool = $pools[1];
@@ -69,8 +67,7 @@ foreach ($graphs as $key => $text) {
                     echo "<tr bgcolor='$row_colour'><td colspan=5>";
                     include 'includes/print-graphrow.inc.php';
                     echo '</td></tr>';
-                }
-                else {
+                } else {
                     echo '<h3>'.$pool.' Usage</h3>';
                     $graph_array['to']     = $config['time']['now'];
                     $graph_array['id']     = $app['app_id'];
@@ -94,5 +91,4 @@ foreach ($graphs as $key => $text) {
             }
         }
     }
-
 }

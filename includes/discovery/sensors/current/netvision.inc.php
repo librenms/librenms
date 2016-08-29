@@ -12,9 +12,22 @@ if ($device['os'] == 'netvision') {
         $warnlimit   = null;
         $limit       = null;
 
-        discover_sensor($valid['sensor'], 'current', $device,
-            $current_oid, $index, $type,
-            $descr, '10', '1', $lowlimit, null, null, null, $current);
+        discover_sensor(
+            $valid['sensor'],
+            'current',
+            $device,
+            $current_oid,
+            $index,
+            $type,
+            $descr,
+            '10',
+            '1',
+            $lowlimit,
+            null,
+            null,
+            null,
+            $current
+        );
     }
 
     for ($i = 1; $i <= 3; $i++) {
@@ -28,8 +41,21 @@ if ($device['os'] == 'netvision') {
         $warnlimit   = null;
         $limit       = null;
 
-        discover_sensor($valid['sensor'], 'current', $device,
-            $current_oid, $index, $type,
-            $descr, '10', '1', $lowlimit, null, null, null, $current);
+        discover_sensor(
+            $valid['sensor'],
+            'current',
+            $device,
+            $current_oid,
+            $index,
+            $type,
+            $descr,
+            '10',
+            '1',
+            $lowlimit,
+            null,
+            null,
+            null,
+            $current
+        );
     }
 }

@@ -18,7 +18,7 @@ if (is_numeric($transmitPower)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-transmitPower', $tags, $fields);
-    $graphs['cambium_250_transmitPower'] = TRUE;
+    $graphs['cambium_250_transmitPower'] = true;
 }
 
 $receivePower = snmp_get($device, "receivePower.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
@@ -35,7 +35,7 @@ if (is_numeric($receivePower)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-receivePower', $tags, $fields);
-    $graphs['cambium_250_receivePower'] = TRUE;
+    $graphs['cambium_250_receivePower'] = true;
 }
 
 $txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.250.5.9.0", "-Ovqn", "");
@@ -52,7 +52,7 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-modulationMode', $tags, $fields);
-    $graphs['cambium_250_modulationMode'] = TRUE;
+    $graphs['cambium_250_modulationMode'] = true;
 }
 
 $receiveDataRate = snmp_get($device, "receiveDataRate.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
@@ -72,7 +72,7 @@ if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric(
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-dataRate', $tags, $fields);
-    $graphs['cambium_250_dataRate'] = TRUE;
+    $graphs['cambium_250_dataRate'] = true;
 }
 
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
@@ -84,5 +84,5 @@ if (is_numeric($ssr)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'cambium-250-ssr', $tags, $fields);
-    $graphs['cambium_250_ssr'] = TRUE;
+    $graphs['cambium_250_ssr'] = true;
 }

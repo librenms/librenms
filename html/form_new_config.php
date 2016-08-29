@@ -33,12 +33,10 @@ $new_conf_desc = $_POST['new_conf_desc'];
 if (empty($new_conf_name)) {
     echo "You haven't specified a config name";
     exit;
-}
-else if (empty($new_conf_desc)) {
+} elseif (empty($new_conf_desc)) {
     echo "You haven't specified a config description";
     exit;
-}
-else if (empty($_POST['new_conf_single_value']) && empty($_POST['new_conf_multi_value'])) {
+} elseif (empty($_POST['new_conf_single_value']) && empty($_POST['new_conf_multi_value'])) {
     echo "You haven't specified a config value";
     exit;
 }
@@ -49,20 +47,16 @@ if ($new_conf_type == 'Single') {
     $new_conf_type  = 'single';
     $new_conf_value = $_POST['new_conf_single_value'];
     $db_inserted    = add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc);
-}
-else if ($new_conf_type == 'Single Array') {
+} elseif ($new_conf_type == 'Single Array') {
     $new_conf_type  = 'single-array';
     $new_conf_value = $_POST['new_conf_single_value'];
     $db_inserted    = add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc);
-}
-else if ($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array') {
+} elseif ($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array') {
     if ($new_conf_type == 'Standard Array') {
         $new_conf_type = 'array';
-    }
-    else if ($new_conf_type == 'Multi Array') {
+    } elseif ($new_conf_type == 'Multi Array') {
         $new_conf_type = 'multi-array';
-    }
-    else {
+    } else {
         // $new_conf_type is invalid so clear values so we don't create any config
         $new_conf_value = '';
     }
@@ -73,8 +67,7 @@ else if ($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array') 
         $new_conf_value  = trim($item);
         $db_inserted = add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc);
     }
-}
-else {
+} else {
     echo 'Bad config type!';
     $db_inserted = 0;
     exit;
@@ -82,7 +75,6 @@ else {
 
 if ($db_inserted == 1) {
     echo 'Your new config item has been added';
-}
-else {
+} else {
     echo 'An error occurred adding your config item to the database';
 }

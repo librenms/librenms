@@ -39,15 +39,13 @@ foreach (dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_delet
     );
     if ($sensor['sensor_alert'] == 1) {
         $alert_status = 'checked';
-    }
-    else {
+    } else {
         $alert_status = '';
     }
 
     if ($sensor['sensor_custom'] == 'No') {
         $custom = 'disabled';
-    }
-    else {
+    } else {
         $custom = '';
     }
 

@@ -108,7 +108,7 @@ if ($data) {
         }
 
         $tags = compact('af', 'rrd_name', 'rrd_def');
-        data_update($device,'ipSystemStats',$tags,$fields);
+        data_update($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
         $graphs['ipsystemstats_'.$af]         = true;

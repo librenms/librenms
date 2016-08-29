@@ -25,11 +25,9 @@ if ($argv[1]) {
     $id   = getidbyname($host);
     if ($id) {
         echo delete_device($id)."\n";
-    }
-    else {
+    } else {
         echo "Host doesn't exist!\n";
     }
-}
-else {
+} else {
     echo "Host Removal Tool\nUsage: ./delhost.php <hostname>\n";
 }

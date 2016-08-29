@@ -9,8 +9,7 @@ preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtyp
 
 if (is_numeric($vars['device'])) {
     $device = device_by_id_cache($vars['device']);
-}
-else if (!empty($vars['device'])) {
+} elseif (!empty($vars['device'])) {
     $device = device_by_name($vars['device']);
 }
 
@@ -45,20 +44,18 @@ require $config['install_dir']."/html/includes/graphs/$type/auth.inc.php";
 
 if ($auth === true && is_custom_graph($type, $subtype, $device)) {
     include($config['install_dir'] . "/html/includes/graphs/custom.inc.php");
-}
-else if ($auth === true && is_mib_graph($type, $subtype)) {
+} elseif ($auth === true && is_mib_graph($type, $subtype)) {
     include $config['install_dir']."/html/includes/graphs/$type/mib.inc.php";
-}
-elseif ($auth === true && is_file($config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php")) {
+} elseif ($auth === true && is_file($config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php")) {
     include $config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php";
-}
-else {
+} else {
     graph_error("$type*$subtype ");
     // Graph Template Missing");
 }
 
 
-function graph_error($string) {
+function graph_error($string)
+{
     global $vars, $config, $debug, $graphfile;
 
     $vars['bg'] = 'FFBBBB';
@@ -82,8 +79,7 @@ function graph_error($string) {
             unlink($graphfile);
             exit();
         }
-    }
-    else {
+    } else {
         if (!$debug) {
             header('Content-type: image/png');
         }
@@ -95,34 +91,28 @@ function graph_error($string) {
         imagedestroy($im);
         exit();
     }
-
 }
 
 
 if ($error_msg) {
     // We have an error :(
     graph_error($graph_error);
-}
-else if ($auth === null) {
+} elseif ($auth === null) {
     // We are unauthenticated :(
     if ($width < 200) {
         graph_error('No Auth');
-    }
-    else {
+    } else {
         graph_error('No Authorisation');
     }
-}
-else {
+} else {
     // $rrd_options .= " HRULE:0#999999";
     if ($no_file) {
         if ($width < 200) {
             graph_error('No RRD');
-        }
-        else {
+        } else {
             graph_error('Missing RRD Datafile');
         }
-    }
-    else if ($command_only) {
+    } elseif ($command_only) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "rrdtool graph $graphfile $rrd_options";
@@ -132,8 +122,7 @@ else {
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>$return";
         unlink($graphfile);
         echo '</div>';
-    }
-    else {
+    } else {
         if ($rrd_options) {
             rrdtool_graph($graphfile, $rrd_options);
             d_echo($rrd_cmd);
@@ -164,33 +153,27 @@ else {
                         imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
                         imagepng($dst_im);
                         imagedestroy($dst_im);
-                    }
-                    else {
+                    } else {
                         $fd = fopen($graphfile, 'r');
                         fpassthru($fd);
                         fclose($fd);
                     }
-                }
-                else {
+                } else {
                     echo `ls -l $graphfile`;
                     echo '<img src="'.data_uri($graphfile, 'image/png').'" alt="graph" />';
                 }
                 unlink($graphfile);
-            }
-            else {
+            } else {
                 if ($width < 200) {
                     graph_error('Draw Error');
-                }
-                else {
+                } else {
                     graph_error('Error Drawing Graph');
                 }
             }
-        }
-        else {
+        } else {
             if ($width < 200) {
                 graph_error('Def Error');
-            }
-            else {
+            } else {
                 graph_error('Graph Definition Error');
             }
         }

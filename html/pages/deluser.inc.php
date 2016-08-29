@@ -4,8 +4,7 @@ echo '<div style="margin: 10px;">';
 
 if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
     include 'includes/error-no-perm.inc.php';
-}
-else {
+} else {
     echo '<h3>Delete User</h3>';
 
     $pagetitle[] = 'Delete user';
@@ -17,12 +16,10 @@ else {
             if ($vars['confirm'] == 'yes') {
                 if (deluser($delete_username)) {
                     print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
-                }
-                else {
+                } else {
                     print_error('Error deleting user "'.$delete_username.'"!');
                 }
-            }
-            else {
+            } else {
                 print_error('You have requested deletion of the user "'.$delete_username.'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$vars['id'].'/confirm=yes">Click to confirm</a>');
             }
         }
@@ -57,8 +54,7 @@ else {
             </div>
             </form>
             ';
-    }
-    else {
+    } else {
         print_error('Authentication module does not allow user management!');
     }//end if
 }//end if

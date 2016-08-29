@@ -1,3 +1,4 @@
+source: Support/Configuration.md
 The options shown below also contain the default values.
 
 If you would like to alter any of these then please add your config option to `config.php`.
@@ -141,6 +142,16 @@ $config['top_devices']      = 1; // This enables the top X devices box
 ```
 A number of home pages are provided within the install and can be found in html/pages/front/. You can change the default by
 setting `front_page`. The other options are used to alter the look of those pages that support it (default.php supports these options).
+
+```php
+// This option exists in the web UI, edit it under Global Settings -> webui
+$config['webui']['default_dashboard_id'] = 0;
+```
+Allows the specification of a global default dashboard page for any user who
+has not set one in their user preferences.  Should be set to dashboard_id of an
+existing dashboard that is shared or shared(read).  Otherwise, the system will
+automatically create each user an empty dashboard called `Default` on their
+first login.
 
 ```php
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
@@ -317,7 +328,6 @@ $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires
 $config['enable_vrfs']                  = 1; # Enable VRFs
-$config['enable_printers']              = 0; # Enable Printer support
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 ```
 

@@ -32,8 +32,7 @@ if (isset($_POST['device_id'])) {
     $wheresql = ' WHERE `device_id` = ?';
     $sortcolumns = 3;
     $count_sql = "SELECT COUNT(*) FROM `device_mibs`".$wheresql;
-}
-else {
+} else {
     // device_id not supplied - get details for a all devices
     // used by all device MIBs page
     $params = array();
@@ -81,8 +80,11 @@ foreach (dbFetchRows($sql, $params) as $mib) {
     }
     if (!isset($_POST['device_id'])) {
         $device = device_by_id_cache($mib['device_id']);
-        $mibrow['hostname'] = generate_device_link($device,
-            $mib['hostname'], array('tab' => 'mib'));
+        $mibrow['hostname'] = generate_device_link(
+            $device,
+            $mib['hostname'],
+            array('tab' => 'mib')
+        );
     }
     $response[] = $mibrow;
 }

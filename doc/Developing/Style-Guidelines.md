@@ -1,3 +1,4 @@
+source: Developing/Style-Guidelines.md
 # Style guidelines
 
 This document is here to help style standards for contributions towards LibreNMS. These aren't strict rules but it is in
@@ -59,4 +60,3 @@ $config['dateformat']['mysql']['compact']                 = "%Y-%m-%d %H:%i:%s";
 $config['dateformat']['mysql']['date']                 = "%Y-%m-%d";
 $config['dateformat']['mysql']['time']                 = "%H:%i:%s";
 ```
-

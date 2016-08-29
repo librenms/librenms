@@ -35,7 +35,7 @@ if (strstr($device['hardware'], 'Dell')) {
     }
 
     foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
+        $data = trim($data);
         if ($data) {
             list($oid,$status) = explode(' ', $data, 2);
             d_echo('status : '.$status."\n");

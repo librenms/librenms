@@ -13,8 +13,7 @@ echo '<tr><th>Local Port</th>
 foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.port_id = L.local_port_id', array($device['device_id'])) as $neighbour) {
     if ($bg_colour == $list_colour_b) {
         $bg_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $bg_colour = $list_colour_b;
     }
 
@@ -26,8 +25,7 @@ foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ?
         $remote_device = device_by_id_cache($remote_port['device_id']);
         echo '<td>'.generate_port_link($remote_port).'<br />'.$remote_port['ifAlias'].'</td>';
         echo '<td>'.generate_device_link($remote_device).'<br />'.$remote_device['hardware'].'</td>';
-    }
-    else {
+    } else {
         echo '<td>'.$neighbour['remote_port'].'</td>';
         echo '<td>'.$neighbour['remote_hostname'].'
           <br />'.$neighbour['remote_platform'].'</td>';

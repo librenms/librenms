@@ -1,3 +1,4 @@
+source: Extensions/Component.md
 Table of Content:
 
 - [About](#about)
@@ -70,24 +71,10 @@ Because of this all fields of the component table are reserved, they cannot be u
 
 # <a name="using">Using Components</a>
 
-To use components in you application, first you need to include the code.
-
-From a Discovery/Poller module:
+Create an instance of the component class:
 
 ```php
-require_once 'includes/component.php';
-```
-
-From the html tree:
-
-```php
-require_once "../includes/component.php";
-```
-
-Once the code is loaded, create an instance of the component class:
-
-```php
-$COMPONENT = new component();
+$COMPONENT = new LibreNMS\Component();
 ```
 
 ## <a name="get">Retrieving Components</a>
@@ -144,7 +131,7 @@ Options can be supplied to `getComponents` to influence which and how components
 You can filter on any of the [reserved](#reserved) fields. Filters are created in the following format:
 
 ```php
-$OPTIONS['filter'][FIELD] = array ('OPERATOR', 'CRITERIA');
+$options['filter']['FIELD'] = array ('OPERATOR', 'CRITERIA');
 ```
 
 Where:
@@ -319,4 +306,3 @@ To see an example of how the component module can used, please see the following
     - includes/polling/cisco-otv.inc.php
     - html/includes/graphs/device/cisco-otv-mac.inc.php
     - html/pages/routing/cisco-otv.inc.php
-

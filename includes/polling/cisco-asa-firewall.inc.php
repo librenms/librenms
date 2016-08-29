@@ -21,8 +21,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
         $asa_db             = dbFetchCell('SELECT `ciscoASA_id` FROM `ciscoASA` WHERE `device_id` = ? AND `oid` = ?', array($device['device_id'], $oid));
         if (!is_numeric($asa_db)) {
             $asa_db = dbInsert(array('device_id' => $device['device_id'], 'oid' => $oid, 'data' => $result['cfwConnectionStatValue']), 'ciscoASA');
-        }
-        else {
+        } else {
             $asa_db = dbUpdate(array('data' => $result['cfwConnectionStatValue']), 'ciscoASA', 'device_id=?', array($device['device_id']));
         }
 
@@ -36,7 +35,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
         );
 
         $tags = compact('rrd_def');
-        data_update($device,'asa_conns',$tags,$fields);
+        data_update($device, 'asa_conns', $tags, $fields);
 
         $graphs['asa_conns'] = true;
         echo ' ASA Connections';
