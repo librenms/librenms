@@ -121,6 +121,7 @@ function check_style($passthru = false, $command_only = false)
         '/vendor/',
         '/lib/',
         '/html/plugins/',
+        '/config.php',
     );
 
     $cs_exclude = build_excludes('--ignore=', $cs_excludes);
