@@ -22,9 +22,10 @@ if ($device['os_group'] == 'printer') {
             $index           = $split_oid[(count($split_oid) - 1)];
             if (is_numeric($role)) {
                 //ricoh using private oids to expose toner levels
-                if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
+                if ($os == 'ricoh' || $os == 'nrg') {
                     $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$index";
                     $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$index";
+                    $capacity_oid = '';
                 } else {
                     $toner_oid    = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
                     $descr_oid    = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
@@ -37,14 +38,14 @@ if ($device['os_group'] == 'printer') {
                     $current  = snmp_get($device, $toner_oid, '-Oqv');
 
                     //ricoh private mibs returns values as percent, no capacity is disclosed as it is not needed
-                    if ($os == 'ricoh' || $os == 'lanier') {
+                    if ($os == 'ricoh' || $os == 'nrg') {
                         $capacity = 100;
                     } else {
                         $capacity = snmp_get($device, $capacity_oid, '-Oqv');
                     }
 
                     //fix for ricoh devices returning garbage and devices returning percentage
-                    if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
+                    if ($os == 'ricoh' || $os == 'nrg') {
                         if ($current == '-3') {
                             $current = 50;
                         } elseif ($current == '-100') {

@@ -5,12 +5,9 @@ $toner_data = dbFetchRows('SELECT * FROM toner WHERE device_id = ?', array($devi
 foreach ($toner_data as $toner) {
     echo 'Checking toner '.$toner['toner_descr'].'... ';
 
-    if ($toner['toner_capacity_oid']) {
-        // FIXME this if can go on 1-Sep-2012
-        $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], '-OUqnv');
-    }
 
-    $tonerperc = round((snmp_get($device, $toner['toner_oid'], '-OUqnv') / $toner['toner_capacity'] * 100));
+    $capacity = $toner['toner_capacity'];
+    $tonerperc = round((snmp_get($device, $toner['toner_oid'], '-OUqnv') / $capacity * 100));
     echo $tonerperc." %\n";
 
     $tags = array(
@@ -27,5 +24,5 @@ foreach ($toner_data as $toner) {
         log_event('Toner '.$toner['toner_descr'].' was replaced (new level: '.$tonerperc.'%)', $device, 'toner', $toner['toner_id']);
     }
 
-    dbUpdate(array('toner_current' => $tonerperc, 'toner_capacity' => $toner['toner_capacity']), 'toner', '`toner_id` = ?', array($toner['toner_id']));
+    dbUpdate(array('toner_current' => $tonerperc, 'toner_capacity' => $capacity), 'toner', '`toner_id` = ?', array($toner['toner_id']));
 }//end foreach
