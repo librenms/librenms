@@ -1534,13 +1534,6 @@ $config['os'][$os]['icon']             = 'hp';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
-$os = 'richoh';
-$config['os'][$os]['group']            = 'printer';
-$config['os'][$os]['text']             = 'Ricoh Printer';
-$config['os'][$os]['type']             = 'printer';
-$config['os'][$os]['over'][0]['graph'] = 'device_toner';
-$config['os'][$os]['over'][0]['text']  = 'Toner';
-
 $os = 'okilan';
 $config['os'][$os]['group']       = 'printer';
 $config['os'][$os]['text']        = 'OKI Printer';
