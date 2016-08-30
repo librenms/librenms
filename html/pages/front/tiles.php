@@ -26,7 +26,7 @@ if ($tmp != 0) {
     $default_dash = $tmp;
 } elseif ((int)$config['webui']['default_dashboard_id']) {
     // if the user hasn't set their default page, and there is a global default set
-    $default_dash = (int)$config['webui']['default_dashboard_id'];
+    $default_dash = dbFetchCell('SELECT `dashboard_id` FROM `dashboards` WHERE `dashboard_id` = ?', array((int)$config['webui']['default_dashboard_id']));
 }
 if ($default_dash == 0 && dbFetchCell(
     'SELECT dashboard_id FROM dashboards WHERE user_id=?',
