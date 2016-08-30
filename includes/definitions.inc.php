@@ -2040,6 +2040,17 @@ $config['os'][$os]['text']             = 'Sonus SBC';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'sonus';
 
+// Fujitsu Primergy Switch
+$os = 'fujitsupyos';
+$config['os'][$os]['text']             = 'Fujitsu';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'fujitsu';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
