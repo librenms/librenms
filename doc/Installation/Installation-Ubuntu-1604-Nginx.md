@@ -130,7 +130,7 @@ service snmpd restart
 chown -R librenms:librenms /opt/librenms
 ```
 
-Now run validate your install and make sure everything is ok:
+Now run validate.php as root to validate your install and make sure everything is ok:
 
 ```bash
 cd /opt/librenms
