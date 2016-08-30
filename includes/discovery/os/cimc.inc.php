@@ -12,6 +12,6 @@
  
 if (!$os) {
     if (stristr($sysDescr, 'Cisco Integrated Management Controller')) {
-        $os = 'imc';
+        $os = 'cimc';
     }
 }

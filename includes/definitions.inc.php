@@ -655,7 +655,7 @@ $config['os'][$os]['text']      = 'TelePresence Conductor';
 $config['os'][$os]['type']      = 'collaboration';
 $config['os'][$os]['icon']      = 'cisco';
 
-$os = 'imc';
+$os = 'cimc';
 $config['os'][$os]['text']             = 'Cisco Integrated Management Controller';
 $config['os'][$os]['type']             = 'server';
 $config['os'][$os]['icon']             = 'cisco';
