@@ -9,7 +9,7 @@ We have some pre-built VirtualBox images you can use to get started:
 
 If you want to install yourself then we have some new documentation which should make it easy.
 
-> Please note the following docs are new and may not be 100% complate, please provide feedback on your experience.
+> Please note the following docs are new and may not be 100% complete, please provide feedback on your experience.
 
 [Ubuntu 16.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1604-Apache/)
 

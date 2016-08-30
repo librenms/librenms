@@ -123,7 +123,11 @@ LibreNMS contributors:
 - Bennett Blodinger <bennett.blodinger@gmail.com> (benwa)
 - Michael Hansen <nerdalertdk@gmail.com> (nerdalertdk)
 - Daniel Cox <danielcoxman@gmail.com> (ospfbgp) 
+<<<<<<< HEAD
 - Joseph Cunningham <joey.was@gmail.com> (joeywas)
+=======
+- Michael Van Delft <librenms@xo.tc> (HybridAU)
+>>>>>>> upstream/master
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
