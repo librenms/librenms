@@ -326,6 +326,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
         $('.place_widget').on('click',  function(event, state) {
             var widget_id = $(this).data('widget_id');
+            event.preventDefault();
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
