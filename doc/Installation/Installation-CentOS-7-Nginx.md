@@ -156,7 +156,7 @@ systemctl enable nginx
 systemctl enable mariadb
 ```
 
-Now run validate.php to validate your install and make sure everything is ok:
+Now run validate.php as root to validate your install and make sure everything is ok:
 
 ```bash
 cd /opt/librenms
