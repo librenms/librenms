@@ -27,6 +27,7 @@ function generate_priority_icon($priority)
         "notice"    => "application_edit",
         "info"      => "application",
         "debug"     => "bug",
+        ""          => "application",
     );
 
     return '<img src="images/16/' . $map[$priority] .'.png" title="' . $priority . '">';
