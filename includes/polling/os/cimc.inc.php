@@ -18,4 +18,5 @@ if (!empty($data[1]['cucsComputeBoardModel'])) {
 if (!empty($data[1]['cucsComputeBoardSerial'])) {
     $serial = $data[1]['cucsComputeBoardSerial'];
 }
-$firmware = explode(" ", $poll_device['sysDescr'])[11];
+$firmwaredata = explode(" ", $poll_device['sysDescr']);
+$firmware = $firmwaredata[11];
