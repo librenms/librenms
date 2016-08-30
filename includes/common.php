@@ -1390,6 +1390,24 @@ function str_contains($haystack, $needles)
 }
 
 /**
+ * Determine if a given string contains a given substring.
+ * Case Insensitive.
+ *
+ * @param  string  $haystack
+ * @param  string|array  $needles
+ * @return bool
+ */
+function str_icontains($haystack, $needles)
+{
+    foreach ((array) $needles as $needle) {
+        if ($needle != '' && stripos($haystack, $needle) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Determine if a given string ends with a given substring.
  *
  * @param  string  $haystack
@@ -1406,6 +1424,24 @@ function ends_with($haystack, $needles)
     return false;
 }
 
+/**
+ * Determine if a given string ends with a given substring.
+ * Case insensitive.
+ *
+ * @param  string  $haystack
+ * @param  string|array  $needles
+ * @return bool
+ */
+function iends_with($haystack, $needles)
+{
+    $lower_haystack = strtolower($haystack);
+    foreach ((array)$needles as $needle) {
+        if (strtolower($needle) === substr($lower_haystack, -strlen($needle))) {
+            return true;
+        }
+    }
+    return false;
+}
 
 /**
  * Determine if a given string starts with a given substring.
@@ -1418,6 +1454,24 @@ function starts_with($haystack, $needles)
 {
     foreach ((array)$needles as $needle) {
         if ($needle != '' && strpos($haystack, $needle) === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Determine if a given string starts with a given substring.
+ * Case insensitive.
+ *
+ * @param  string $haystack
+ * @param  string|array $needles
+ * @return bool
+ */
+function istarts_with($haystack, $needles)
+{
+    foreach ((array)$needles as $needle) {
+        if ($needle != '' && stripos($haystack, $needle) === 0) {
             return true;
         }
     }
