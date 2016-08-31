@@ -130,6 +130,18 @@ Placeholders:
 - Transport name: `%transport`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
 
+> NOTE: Placeholder names which are contained within another need to be ordered correctly. As an example:
+
+```text
+Limit: %value.sensor_limit / %value.sensor_limit_low
+```
+
+Should be done as:
+
+```text
+Limit: %value.sensor_limit_low / %value.sensor_limit
+```
+
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
 Templates can be matched against several rules.
 

@@ -17,7 +17,6 @@ if ($fd = @fopen($argv[1], 'r')) {
         // FIXME check query success?
         echo "$line \n";
     }
-}
-else {
+} else {
     echo "ERROR: Could not open file \"$argv[1]\".\n";
 }

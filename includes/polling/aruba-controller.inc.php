@@ -56,7 +56,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     );
 
     $tags = compact('rrd_name', 'rrd_def');
-    data_update($device,'aruba-controller',$tags,$fields);
+    data_update($device, 'aruba-controller', $tags, $fields);
 
     // also save the info about how many clients in the same place as the wireless module
     $rrd_name = 'wificlients-radio1';
@@ -71,7 +71,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         'rrd_name' => $rrd_name,
         'rrd_def' => $rrd_def
     );
-    data_update($device,'wificlients',$tags,$fields);
+    data_update($device, 'wificlients', $tags, $fields);
 
     $graphs['wifi_clients'] = true;
 
@@ -137,7 +137,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 'rrd_def' => $rrd_def
             );
 
-            data_update($device,'aruba',$tags,$fields);
+            data_update($device, 'aruba', $tags, $fields);
         }
 
         // generate the mac address
@@ -164,8 +164,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
 
         if ($foundid == 0) {
             $ap_id = dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'radio_number' => $radionum, 'type' => $type, 'mac_addr' => $mac, 'channel' => $channel, 'txpow' => $txpow, 'radioutil' => $radioutil, 'numasoclients' => $numasoclients, 'nummonclients' => $nummonclients, 'numactbssid' => $numactbssid, 'nummonbssid' => $nummonbssid, 'interference' => $interference), 'access_points');
-        }
-        else {
+        } else {
             dbUpdate(array('mac_addr' => $mac, 'deleted' => 0, 'channel' => $channel, 'txpow' => $txpow, 'radioutil' => $radioutil, 'numasoclients' => $numasoclients, 'nummonclients' => $nummonclients, 'numactbssid' => $numactbssid, 'nummonbssid' => $nummonbssid, 'interference' => $interference), 'access_points', '`accesspoint_id` = ?', array($foundid));
         }
     }//end foreach

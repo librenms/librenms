@@ -51,6 +51,5 @@ rrdtool_initialize();
 foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC') as $service) {
     // Run the polling function
     poll_service($service);
-
 } //end foreach
-rrdtool_terminate();
+rrdtool_close();

@@ -84,9 +84,7 @@ if ($poll_device['sysObjectID'] == 'enterprises.311.1.1.3.1.1') {
     if (strstr($poll_device['sysDescr'], 'Version 6.3 (Build 10')) {
         $version = '10 (NT 6.3)';
     }
-
-}
-else if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.2') {
+} elseif ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.2') {
     if (strstr($poll_device['sysDescr'], 'Build Number: 1057')) {
         $version = 'NT Server 3.51';
     }
@@ -126,9 +124,7 @@ else if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.2') {
     if (strstr($poll_device['sysDescr'], 'Build 9600')) {
         $version = 'Server 2012 R2 Datacenter (NT 6.3)';
     }
-
-}
-else if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.3') {
+} elseif ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.3') {
     if (strstr($poll_device['sysDescr'], 'Build Number: 1057')) {
         $version = 'NT Datacenter 3.51';
     }
@@ -168,7 +164,6 @@ else if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.3') {
     if (strstr($poll_device['sysDescr'], 'Build 9600')) {
         $version = 'Server 2012 R2 (NT 6.3)';
     }
-
 }//end if
 
 if (strstr($poll_device['sysDescr'], 'Uniprocessor')) {

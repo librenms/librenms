@@ -10,8 +10,7 @@ if ($_SESSION['userlevel'] >= 5) {
     $data['ignored'] = array('query' => "SELECT COUNT(*) FROM devices WHERE `ignore` = '1' AND `disabled` = '0'");
 
     $data['disabled'] = array('query' => "SELECT COUNT(*) FROM devices WHERE `disabled` = '1'");
-}
-else {
+} else {
     $data['count'] = array(
         'query'  => 'SELECT COUNT(*) FROM devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id`',
         'params' => array($_SESSION['user_id']),

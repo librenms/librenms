@@ -41,7 +41,5 @@ if ($device['os'] == 'junos' || $device['os_group'] == 'junos') {
             $entPhysicalIndex_measured = 'ports';
             discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
-
     }
-
 }

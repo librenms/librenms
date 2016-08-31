@@ -7,10 +7,8 @@ $raspberry = snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameter
 if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     $sensor_type = "rasbperry_volts";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
-    for ($volt = 2; $volt < 6; $volt++)
-    {
-        switch($volt)
-        {
+    for ($volt = 2; $volt < 6; $volt++) {
+        switch ($volt) {
             case "2":
                 $descr = "Core";
                 break;

@@ -7,20 +7,19 @@ if ($device['os'] == 'serveriron') {
 
     // Power Supplies
     for ($i=1; $i != 3; $i++) {
-      $power_oid    = 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus.'.$i;
-      $power_status = snmp_get($device, $power_oid, '-Oqv','FOUNDRY-SN-AGENT-MIB');
-      if(!empty($power_status)) {
-        discover_sensor($valid['sensor'], 'state', $device, $power_oid, 'powerstatus'.$i, 'snmp', 'Power Supply '.$i.' Status', '1', '1', '1', null, null, '3', $power_status);
-      }
+        $power_oid    = 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus.'.$i;
+        $power_status = snmp_get($device, $power_oid, '-Oqv', 'FOUNDRY-SN-AGENT-MIB');
+        if (!empty($power_status)) {
+            discover_sensor($valid['sensor'], 'state', $device, $power_oid, 'powerstatus'.$i, 'snmp', 'Power Supply '.$i.' Status', '1', '1', '1', null, null, '3', $power_status);
+        }
     }
 
     // Fan status
     for ($i=1; $i != 7; $i++) {
-      $fan_oid    = 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus.'.$i;
-      $fan_status = snmp_get($device, $fan_oid, '-Oqv','FOUNDRY-SN-AGENT-MIB');
-      if(!empty($fan_status)) {
-        discover_sensor($valid['sensor'], 'state', $device, $fan_oid, 'fanstatus'.$i, 'snmp', 'Fan '.$i.' Status', '1', '1', '1', null, null, '3', $fan_status);
-      }
+        $fan_oid    = 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus.'.$i;
+        $fan_status = snmp_get($device, $fan_oid, '-Oqv', 'FOUNDRY-SN-AGENT-MIB');
+        if (!empty($fan_status)) {
+            discover_sensor($valid['sensor'], 'state', $device, $fan_oid, 'fanstatus'.$i, 'snmp', 'Fan '.$i.' Status', '1', '1', '1', null, null, '3', $fan_status);
+        }
     }
-
 }//end if

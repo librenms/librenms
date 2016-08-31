@@ -10,8 +10,7 @@
 if (!is_array($mempool_cache['hpGlobal'])) {
     $mempool_cache['hpGlobal'] = snmpwalk_cache_oid($device, 'hpGlobal', null, 'NETSWITCH-MIB', $config['mibdir'].':'.$config['mibdir'].'/hp');
     d_echo($mempool_cache);
-}
-else {
+} else {
     d_echo('Cached!');
 }
 

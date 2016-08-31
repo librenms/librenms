@@ -15,7 +15,6 @@
 
 if ($device['os'] == 'binos') {
     if (strpos($device['sysObjectID'], 'enterprises.738.1.5.100') !== false) {
-
         echo("Telco Systems:");
 
         // CPU temperature
