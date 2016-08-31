@@ -22,8 +22,7 @@ if ($device['os'] != 'Snom') {
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
             $value = $data[0][$oid];
-        }
-        else {
+        } else {
             $value = 'U';
         }
         $fields[$oid] = $value;
@@ -31,7 +30,7 @@ if ($device['os'] != 'Snom') {
 
     if (isset($data[0]['ipCidrRouteNumber'])) {
         $tags = compact('rrd_def');
-        data_update($device,'netstats-ip_forward',$tags,$fields);
+        data_update($device, 'netstats-ip_forward', $tags, $fields);
 
         $graphs['netstat_ip_forward'] = true;
     }

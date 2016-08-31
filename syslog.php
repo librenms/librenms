@@ -23,7 +23,7 @@ require_once 'includes/functions.php';
 
 $i = "1";
 
-$s = fopen('php://stdin','r');
+$s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
     #logfile($line);
     list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));

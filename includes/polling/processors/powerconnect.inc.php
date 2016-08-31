@@ -6,7 +6,7 @@ if (strpos($device["sysObjectID"], "enterprises.674.10895.3031") !== false) {
 } elseif (strpos($device["sysObjectID"], "enterprises.674.10895.3024") !== false) {
     d_echo("Dell Powerconnect 8024F");
     $values = trim(snmp_get($device, $processor['processor_oid'], '-O Uqnv'), '""');
-    $values = ltrim($values,' ');
+    $values = ltrim($values, ' ');
     preg_match('/(\d*\.\d*)/', $values, $matches);
     $proc = $matches[0];
 } else {

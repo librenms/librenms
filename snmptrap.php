@@ -40,7 +40,6 @@ if (!$device['device_id']) {
 $file = $config['install_dir'].'/includes/snmptrap/'.$entry['1'].'.inc.php';
 if (is_file($file)) {
     include "$file";
-}
-else {
+} else {
     echo "unknown trap ($file)";
 }

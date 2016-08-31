@@ -20,7 +20,6 @@ while ($end == 0) {
     passthru('clear');
     $tbl = new Console_Table(CONSOLE_TABLE_ALIGN_RIGHT);
     foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {
-
         $devices['count']++;
 
         $cache['devices']['hostname'][$device['hostname']] = $device['device_id'];
@@ -51,8 +50,7 @@ while ($end == 0) {
         }
 
         echo $tbl->getTable();
-    }
-    else if ($options['l'] == 'syslog') {
+    } elseif ($options['l'] == 'syslog') {
         $tbl = new Console_Table();
         $tbl->setHeaders(array('Date time', 'Host', 'Program', 'Message', 'Level', 'Facility'));
         if (is_numeric($options['d'])) {
@@ -65,8 +63,7 @@ while ($end == 0) {
         }
 
         echo $tbl->getTable();
-    }
-    else if ($options['list'] == 'devices') {
+    } elseif ($options['list'] == 'devices') {
         $tbl = new Console_Table();
         $tbl->setHeaders(array('Device ID', 'Device Hostname'));
         $query = 'SELECT device_id,hostname FROM `devices` ORDER BY hostname';
@@ -76,8 +73,7 @@ while ($end == 0) {
 
         echo $tbl->getTable();
         exit;
-    }
-    else if (isset($options['device-stats'])) {
+    } elseif (isset($options['device-stats'])) {
         $tbl = new Console_Table();
         $tbl->setHeaders(array('Port name', 'Status', 'IPv4 Address', 'Speed In', 'Speed Out', 'Packets In', 'Packets Out', 'Speed', 'Duplex', 'Type', 'MAC Address', 'MTU'));
         foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($options['d'])) as $port) {
@@ -108,8 +104,7 @@ while ($end == 0) {
         }//end foreach
 
         echo $tbl->getTable();
-    }
-    else {
+    } else {
         echo $options['list'];
         echo "Usage of console-ui.php:
 

@@ -18,5 +18,4 @@ if ($device['os'] == 'netonix') {
     $mempool['total'] = $total;
     $mempool['free']  = $free;
     $mempool['used']  = $total - $free;
-
 }

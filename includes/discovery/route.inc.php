@@ -24,22 +24,19 @@ $ids = array();
 
 // For the moment only will be cisco and the version 3
 if ($device['os_group'] == "cisco") {
-
     //RFC1213-MIB
     $mib = "RFC1213-MIB";
     //IpRouteEntry
     $vrfs_lite_cisco = array();
 
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-
         //i will only get one context of vrf, read the begin of this file
         foreach ($device['vrf_lite_cisco'] as $vrf_lite) {
             if (!key_exists($vrf_lite['vrf_name'], $vrfs_lite_cisco)) {
                 $vrfs_lite_cisco[$vrf_lite['vrf_name']] = $vrf_lite;
             }
         }
-    } 
-    else {
+    } else {
         $vrfs_lite_cisco = array(array('context_name' => null));
     }
 
@@ -50,7 +47,7 @@ if ($device['os_group'] == "cisco") {
 
         ////////////////ipRouteDest//////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.1';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -61,7 +58,7 @@ if ($device['os_group'] == "cisco") {
 
         /////////////////ipRouteIfIndex//////////////
         $oid = '.1.3.6.1.2.1.4.21.1.2';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -72,7 +69,7 @@ if ($device['os_group'] == "cisco") {
 
         ///////////////ipRouteMetric1///////////////
         $oid = '.1.3.6.1.2.1.4.21.1.3';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -83,7 +80,7 @@ if ($device['os_group'] == "cisco") {
 
         ////////////ipRouteNextHop//////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.7';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
         foreach (explode("\n", $resultHelp) as $ipRouteNextHop) {
@@ -93,7 +90,7 @@ if ($device['os_group'] == "cisco") {
 
         ////////////ipRouteType/////////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.8';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -104,7 +101,7 @@ if ($device['os_group'] == "cisco") {
 
         ///////////ipRouteProto//////////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.9';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -127,7 +124,7 @@ if ($device['os_group'] == "cisco") {
 
         ///////////ipRouteMask//////////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.11';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn -Ln", $mib, NULL);
+        $resultHelp = snmp_walk($device, $oid, "-Osqn -Ln", $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 
@@ -159,7 +156,6 @@ if ($device['os_group'] == "cisco") {
                     dbUpdate($changeRoute, 'route', 'device_id = ? and ipRouteDest = ? and context_name = ?', array($device['device_id'], $ipRoute['ipRouteDest'], $device['context_name']));
                 }
             } else {
-
                 $toInsert = array_merge($ipRoute, array('device_id' => $device['device_id'], 'context_name' => $device['context_name'], 'discoveredAt' => time()));
                 dbInsert($toInsert, 'route');
             }

@@ -31,7 +31,6 @@
 // NS-ROOT-MIB::vsvrTotalClients."observium" = Counter64: 43023
 // NS-ROOT-MIB::vsvrClientConnOpenRate."observium" = STRING: "0"
 if ($device['os'] == 'netscaler') {
-
     $oids_gauge = array(
                    'vsvrCurClntConnections',
                    'vsvrCurSrvrConnections',
@@ -83,8 +82,7 @@ if ($device['os'] == 'netscaler') {
             foreach ($oids as $oid) {
                 if (is_numeric($vsvr[$oid])) {
                     $fields[$oid] = $vsvr[$oid];
-                }
-                else {
+                } else {
                     $fields[$oid] = 'U';
                 }
             }
@@ -94,7 +92,7 @@ if ($device['os'] == 'netscaler') {
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def
             );
-            data_update($device,'netscaler-vsvr',$tags,$fields);
+            data_update($device, 'netscaler-vsvr', $tags, $fields);
 
             echo str_pad($vsvr['vsvrName'], 25).' | '.str_pad($vsvr['vsvrType'], 5).' | '.str_pad($vsvr['vsvrState'], 6).' | '.str_pad($vsvr['vsvrIpAddress'], 16).' | '.str_pad($vsvr['vsvrPort'], 5);
             echo ' | '.str_pad($vsvr['vsvrRequestRate'], 8).' | '.str_pad($vsvr['vsvrRxBytesRate'].'B/s', 8).' | '.str_pad($vsvr['vsvrTxBytesRate'].'B/s', 8);
@@ -113,8 +111,7 @@ if ($device['os'] == 'netscaler') {
                 $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrName']), $db_update);
                 $vsvr_id   = dbInsert($db_insert, 'netscaler_vservers');
                 echo ' +';
-            }
-            else {
+            } else {
                 $updated = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
                 echo ' U';
             }

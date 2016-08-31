@@ -3,11 +3,9 @@
 if (!$os) {
     if (strstr($sysDescr, 'TG585v7')) {
         $os = 'speedtouch';
-    }
-    else if (strstr($sysDescr, 'SpeedTouch ')) {
+    } elseif (strstr($sysDescr, 'SpeedTouch ')) {
         $os = 'speedtouch';
-    }
-    else if (preg_match('/^ST\d/', $sysDescr)) {
+    } elseif (preg_match('/^ST\d/', $sysDescr)) {
         $os = 'speedtouch';
     }
 }

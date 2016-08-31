@@ -1,4 +1,90 @@
 source: General/Changelog.md
+### August 2016
+
+#### Bug fixes
+  - WebUI
+    - Fix Infoblox dhcp messages graph ([PR3898](https://github.com/librenms/librenms/pull/3898))
+    - Fix version_info output in Safari ([PR3914](https://github.com/librenms/librenms/pull/3914))
+    - Added missing apps to Application page ([PR3964](https://github.com/librenms/librenms/pull/3964))
+  - Discovery / Polling
+    - Clear our stale IPSEC sessions from the DB ([PR3904](https://github.com/librenms/librenms/pull/3904))
+    - Fixed some InfluxDB bugs in check-services and ports ([PR4031](https://github.com/librenms/librenms/pull/4031))
+    - Fixed Promox and Ceph rrd's ([PR4038](https://github.com/librenms/librenms/pull/4038), [PR4037](https://github.com/librenms/librenms/pull/4037), [PR4047](https://github.com/librenms/librenms/pull/4047), [PR4041](https://github.com/librenms/librenms/pull/4041))
+    - Fixed LLDP Remote port in discovery-protocols module ([PR4070](https://github.com/librenms/librenms/pull/4070))
+  - Billing
+    - Check if ifSpeed is returned for calculating billing ([PR3921](https://github.com/librenms/librenms/pull/3921))
+  - Applications
+    - NFS-V3 stats fixed ([PR3963](https://github.com/librenms/librenms/pull/3963))
+  - Misc
+    - Dell Equallogic storage fix ([PR3956](https://github.com/librenms/librenms/pull/3956))
+    - Fix syslog bug where entries would log to the wrong device ([PR3996](https://github.com/librenms/librenms/pull/3996))
+
+#### Improvements
+  - Added / improved detection for:
+    - Cisco WAAS / WAVE ([PR3899](https://github.com/librenms/librenms/pull/3899))
+    - Maipu MyPower ([PR3909](https://github.com/librenms/librenms/pull/3909))
+    - TPLink Switches ([PR3919](https://github.com/librenms/librenms/pull/3919))
+    - Dell N3024 ([PR3941](https://github.com/librenms/librenms/pull/3941))
+    - Cisco FXOS ([PR3943](https://github.com/librenms/librenms/pull/3943))
+    - Brocade FABOS ([PR3959](https://github.com/librenms/librenms/pull/3959), [PR3988](https://github.com/librenms/librenms/pull/3988))
+    - JunOS ([PR3976](https://github.com/librenms/librenms/pull/3976))
+    - Dell PowerConnect ([PR3998](https://github.com/librenms/librenms/pull/3998), [PR4007](https://github.com/librenms/librenms/pull/4007))
+    - Comware ([PR3967](https://github.com/librenms/librenms/pull/3967))
+    - Calix E5 ([PR3864](https://github.com/librenms/librenms/pull/3864))
+    - Raisecom ([PR3992](https://github.com/librenms/librenms/pull/3864))
+    - Cisco ISE ([PR4063](https://github.com/librenms/librenms/pull/4063))
+    - Acano ([PR4064](https://github.com/librenms/librenms/pull/4064))
+    - McAfee SIEM Nitro ([PR4066](https://github.com/librenms/librenms/pull/4064))
+    - HP Bladesystem C3000/C7000 OA ([PR4035](https://github.com/librenms/librenms/pull/4035))
+    - Cisco VCS (Expressway) ([PR4086](https://github.com/librenms/librenms/pull/4086))
+    - Cisco Telepresence Conductor ([PR4087](https://github.com/librenms/librenms/pull/4087))
+    - Avaya VSP ([PR4048](https://github.com/librenms/librenms/pull/4048))
+    - Cisco/Tandberg Video Conferencing ([PR4065](https://github.com/librenms/librenms/pull/4065))
+    - Cisco Prime Infrastructure ([PR4088](https://github.com/librenms/librenms/pull/4088))
+    - HWGroup STE2 ([PR4116](https://github.com/librenms/librenms/pull/4116))
+    - HP 2530 Procurve / Arube ([PR4119](https://github.com/librenms/librenms/pull/4119))
+    - Brother Printers ([PR4141](https://github.com/librenms/librenms/pull/4141))
+    - Hytera Repeater ([PR4163](https://github.com/librenms/librenms/pull/4163))
+    - Sonus ([PR4176](https://github.com/librenms/librenms/pull/4176))
+    - Freeswitch ([PR4203](https://github.com/librenms/librenms/pull/4203))
+  - WebUI
+    - Improved OSPF display ([PR3908](https://github.com/librenms/librenms/pull/3908))
+    - Improved Apps overview page ([PR3954](https://github.com/librenms/librenms/pull/3954))
+    - Improved Syslog page ([PR3955](https://github.com/librenms/librenms/pull/3955), [PR3971](https://github.com/librenms/librenms/pull/3971))
+    - Rewrite availability map ([PR4043](https://github.com/librenms/librenms/pull/4043))
+    - Add predicted usage to billing overview ([PR4049](https://github.com/librenms/librenms/pull/4049))
+  - API
+    - Added services calls to API ([PR4215](https://github.com/librenms/librenms/pull/4215))
+  - Discovery / Polling
+    - Added CPU detection for Dell PowerConnect 8024F ([PR3966](https://github.com/librenms/librenms/pull/3966))
+    - Cisco VSS state discovery ([PR3977](https://github.com/librenms/librenms/pull/3977))
+    - Refactor of BGP Discovery and Polling (mainly JunOS) ([PR3938](https://github.com/librenms/librenms/pull/3938))
+    - Added Sensors for Brocade NOS ([PR3969](https://github.com/librenms/librenms/pull/3969))
+    - Cisco ASA HA States ([PR4012](https://github.com/librenms/librenms/pull/4012))
+    - Improved IPSLA Support ([PR4006](https://github.com/librenms/librenms/pull/4006))
+    - Added support for CISCO-NTP-MIB ([PR4005](https://github.com/librenms/librenms/pull/4005))
+    - Improved toner support for Ricoh devices ([PR4180](https://github.com/librenms/librenms/pull/4180))
+  - Documentation
+    - New doc site live http://docs.librenms.org/
+    - Added rsyslog 5 example to syslog docs ([PR3912](https://github.com/librenms/librenms/pull/3912))
+    - Application doc updates ([PR3928](https://github.com/librenms/librenms/pull/3928))
+  - Applications
+    - App OS Updates support ([PR3935](https://github.com/librenms/librenms/pull/3935))
+    - PowerDNS Recursor improvements ([PR3932](https://github.com/librenms/librenms/pull/3932))
+    - Add DHCP Stats support ([PR3970](https://github.com/librenms/librenms/pull/3970))
+    - Added snmp support to Memcached ([PR3949](https://github.com/librenms/librenms/pull/3949))
+    - Added Unbound support ([PR4074](https://github.com/librenms/librenms/pull/4074))
+    - Added snmp support to Proxmox ([PR4052](https://github.com/librenms/librenms/pull/4052))
+    - Added Raspberry Pi Sensor support ([PR4057](https://github.com/librenms/librenms/pull/4057))
+    - Updated NTPD support ([PR4077](https://github.com/librenms/librenms/pull/4077))
+  - Misc
+    - Added cleanup of old RRD files to daily.sh ([PR3907](https://github.com/librenms/librenms/pull/3907))
+    - Refactored addHost event logs ([PR3929](https://github.com/librenms/librenms/pull/3929), [PR3997](https://github.com/librenms/librenms/pull/3997))
+    - Refactored RRD Functions ([PR3800](https://github.com/librenms/librenms/pull/3800), [PR4081](https://github.com/librenms/librenms/pull/4081))
+    - Added support for nets-exclude in snmp-scan ([PR4000](https://github.com/librenms/librenms/pull/4045))
+    - Refactored files in html (Libraries and PSR2 style ([PR4071](https://github.com/librenms/librenms/pull/4071), [PR4101](https://github.com/librenms/librenms/pull/4101), [PR4117](https://github.com/librenms/librenms/pull/4117))
+    - Various IRC updates and fixes ([PR4200](https://github.com/librenms/librenms/pull/4200), [PR4204](https://github.com/librenms/librenms/pull/4204), [PR4201](https://github.com/librenms/librenms/pull/4201))
+
 ### July 2016
 
 #### Bug fixes

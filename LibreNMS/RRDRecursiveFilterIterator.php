@@ -31,9 +31,11 @@ namespace LibreNMS;
  * @method boolean isDir()
  *
  **/
-class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
+class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
+{
 
-    public function accept() {
+    public function accept()
+    {
         $filename = $this->current()->getFilename();
         if ($filename[0] === '.') {
             // Ignore hidden files and directories

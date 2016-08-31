@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
- $hardware = snmp_get($device, 'slcSystemModel.0', '-Ovqs', 'LANTRONIX-SLC-MIB'); 
+ $hardware = snmp_get($device, 'slcSystemModel.0', '-Ovqs', 'LANTRONIX-SLC-MIB');
  $hardware = str_replace('"', '', $hardware);
- $version = snmp_get($device, 'slcSystemFWRev.0', '-Ovqs', 'LANTRONIX-SLC-MIB'); 
+ $version = snmp_get($device, 'slcSystemFWRev.0', '-Ovqs', 'LANTRONIX-SLC-MIB');
  $version = str_replace('"', '', $version);
  $serial = snmp_get($device, 'slcSystemSerialNo.0', '-Ovqs', 'LANTRONIX-SLC-MIB');
  $serial = str_replace('"', '', $serial);

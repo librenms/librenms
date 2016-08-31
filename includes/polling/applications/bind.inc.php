@@ -44,8 +44,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
         if (!empty($matches)) {
             if ($matches[1] == 'default') {
                 continue;
-            }
-            else {
+            } else {
                 $view = $matches[1];
             }
         }
@@ -63,8 +62,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
             $item = str_replace(' ', '_', strtolower($matches[2]));
             if (!empty($view)) {
                 $bind_parsed[$prefix][$view][$item] = $cnt;
-            }
-            else {
+            } else {
                 $bind_parsed[$prefix][$item] = $cnt;
             }
         }
@@ -99,5 +97,4 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
 
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
-
 }//end if

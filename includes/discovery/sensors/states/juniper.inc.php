@@ -11,14 +11,13 @@
  */
 
 if ($device['os'] == 'junos') {
-
     $tables = array(
         array('JUNIPER-MIB','jnxFruTable','.1.3.6.1.4.1.2636.3.1.15.1.8.','jnxFruState','jnxFruName') ,
         array('JUNIPER-ALARM-MIB','jnxYellowAlarms','.1.3.6.1.4.1.2636.3.4.2.2.1.0','jnxYellowAlarmState') ,
-        array('JUNIPER-ALARM-MIB','jnxRedAlarms','.1.3.6.1.4.1.2636.3.4.2.3.1.0','jnxRedAlarmState') 
+        array('JUNIPER-ALARM-MIB','jnxRedAlarms','.1.3.6.1.4.1.2636.3.4.2.3.1.0','jnxRedAlarmState')
     );
 
-    foreach($tables as $tablevalue){
+    foreach ($tables as $tablevalue) {
         $temp = snmpwalk_cache_multi_oid($device, $tablevalue[1], array(), $tablevalue[0], $config['install_dir'].'/mibs/junos');
         $cur_oid = $tablevalue[2];
 
@@ -42,15 +41,14 @@ if ($device['os'] == 'junos') {
                         array($state_index_id,'diagnostic',0,9,3) ,
                         array($state_index_id,'standby',0,10,3)
                     );
-                }
-                else {
+                } else {
                     $states = array(
                         array($state_index_id,'other',0,1,3) ,
                         array($state_index_id,'off',0,2,0) ,
                         array($state_index_id,'on',0,3,2)
                     );
                 }
-                foreach($states as $value){ 
+                foreach ($states as $value) {
                     $insert = array(
                         'state_index_id' => $value[0],
                         'state_descr' => $value[1],
@@ -72,10 +70,8 @@ if ($device['os'] == 'junos') {
                     if ($tablevalue[3] == 'jnxRedAlarmState') {
                         $descr = 'Red Alarm';
                     }
-
                 }
                 if (stripos($descr, 'Yellow Alarm') !== false || stripos($descr, 'Red Alarm') !== false || stripos($descr, 'cb') !== false || stripos($descr, 'pem') !== false || stripos($descr, 'fan') !== false || stripos($descr, 'power') !== false || preg_match('/Routing Engine [0|1]/', $descr)) {
-
                     //Discover Sensors
                     discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[3]], 'snmp', $index);
 

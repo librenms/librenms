@@ -19,5 +19,4 @@ if ($device['os'] == 'qnap') {
             discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $fan_number, 'snmp', $fan_information, '1', '1', null, null, null, null, $fan_speed);
         }
     }
-
 }//end if

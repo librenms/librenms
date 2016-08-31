@@ -105,8 +105,8 @@ Now head to: http://librenms.example.com/install.php and follow the on-screen in
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.example /etc/snmpd.conf
-vim /etc/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+vim /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
@@ -127,7 +127,7 @@ service snmpd restart
 chown -R librenms:librenms /opt/librenms
 ```
 
-Now run validate your install and make sure everything is ok:
+Run validate.php as root in the librenms directory:
 
 ```bash
 cd /opt/librenms

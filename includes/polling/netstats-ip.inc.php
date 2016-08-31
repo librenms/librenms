@@ -37,15 +37,13 @@ if ($device['os'] != 'Snom') {
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
             $value = $data[0][$oid];
-        }
-        else {
+        } else {
             $value = 'U';
         }
         $fields[$oid] = $value;
     }
 
     if (isset($data[0]['ipOutRequests']) && isset($data[0]['ipInReceives'])) {
-
         $tags = compact('rrd_def');
         data_update($device, 'netstats-ip', $tags, $fields);
 

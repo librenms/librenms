@@ -2,7 +2,7 @@ source: Install Validation.md
 Install validation
 ------------------
 
-With a lot of configuration possibilities and at present the only way to do this being by manually editing config.php then it's not
+With a lot of configuration possibilities, manually editing config.php means it's not
 uncommon that mistakes get made. It's also impossible to validate user input in config.php when you're just using a text editor :)
 
 So, to try and help with some of the general issues people come across we've put together a simple validation tool which at present will:
@@ -22,10 +22,12 @@ Optionally you can also pass -m and a module name for that to be tested. Current
  - dist-poller - This will test your distributed poller configuration.
  - rrdcheck - This will test your rrd files to see if they are unreadable or corrupted (source of broken graphs).
 
-Output, this is color coded to try and make things a little easier:
+You can run validate.php as `root` by executing `./validate.php` within your install directory.
 
-Green OK - This is a good thing, you can skip over these :)
+The output will provide you either a clean bill of health or a list of things you need to fix:
 
-Yellow WARN - You probably want to check this out.
+OK - This is a good thing, you can skip over these :)
 
-Red FAIL - This is going to need your attention!
+WARN - You probably want to check this out.
+
+FAIL - This is going to need your attention!

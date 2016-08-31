@@ -9,8 +9,7 @@ if ($device['os'] == 'aos') {
 
     if (is_numeric($usage)) {
         discover_processor($valid['processor'], $device, '1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.13.0', '0', 'aos-system', $descr, '1', $usage, null, null);
-    }
-    else {
+    } else {
         // AOS7 devices use a different OID for CPU load. Not all Switches have
         // healthModuleCpuLatest so we use healthModuleCpu1MinAvg which makes no
         // difference for a 5 min. polling interval.
