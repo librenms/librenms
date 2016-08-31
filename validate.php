@@ -49,7 +49,7 @@ if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
 
 // Check we are running this as the root user
 if (function_exists('posix_getpwuid')) {
-    $userinfo = posix_getpwuid( posix_geteuid() );
+    $userinfo = posix_getpwuid(posix_geteuid());
     $username = $userinfo['name'];
 } else {
     $username = getenv('USERNAME') ?: getenv('USER');//http://php.net/manual/en/function.get-current-user.php
