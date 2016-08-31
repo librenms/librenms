@@ -30,5 +30,6 @@ require_once $install_dir . '/includes/defaults.inc.php';
 
 $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 
+require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/syslog.php';
