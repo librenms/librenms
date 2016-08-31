@@ -1375,33 +1375,24 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
 /**
  * Determine if a given string contains a given substring.
  *
- * @param  string  $haystack
- * @param  string|array  $needles
+ * @param  string $haystack
+ * @param  string|array $needles
+ * @param  bool $case_insensitive
  * @return bool
  */
-function str_contains($haystack, $needles)
+function str_contains($haystack, $needles, $case_insensitive = false)
 {
-    foreach ((array) $needles as $needle) {
-        if ($needle != '' && strpos($haystack, $needle) !== false) {
-            return true;
+    if ($case_insensitive) {
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && stripos($haystack, $needle) !== false) {
+                return true;
+            }
         }
-    }
-    return false;
-}
-
-/**
- * Determine if a given string contains a given substring.
- * Case Insensitive.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
- */
-function str_icontains($haystack, $needles)
-{
-    foreach ((array) $needles as $needle) {
-        if ($needle != '' && stripos($haystack, $needle) !== false) {
-            return true;
+    } else {
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) !== false) {
+                return true;
+            }
         }
     }
     return false;
@@ -1410,34 +1401,25 @@ function str_icontains($haystack, $needles)
 /**
  * Determine if a given string ends with a given substring.
  *
- * @param  string  $haystack
- * @param  string|array  $needles
+ * @param  string $haystack
+ * @param  string|array $needles
+ * @param  bool $case_insensitive
  * @return bool
  */
-function ends_with($haystack, $needles)
+function ends_with($haystack, $needles, $case_insensitive = false)
 {
-    foreach ((array)$needles as $needle) {
-        if ((string)$needle === substr($haystack, -strlen($needle))) {
-            return true;
+    if ($case_insensitive) {
+        $lower_haystack = strtolower($haystack);
+        foreach ((array)$needles as $needle) {
+            if (strtolower($needle) === substr($lower_haystack, -strlen($needle))) {
+                return true;
+            }
         }
-    }
-    return false;
-}
-
-/**
- * Determine if a given string ends with a given substring.
- * Case insensitive.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
- */
-function iends_with($haystack, $needles)
-{
-    $lower_haystack = strtolower($haystack);
-    foreach ((array)$needles as $needle) {
-        if (strtolower($needle) === substr($lower_haystack, -strlen($needle))) {
-            return true;
+    } else {
+        foreach ((array)$needles as $needle) {
+            if ((string)$needle === substr($haystack, -strlen($needle))) {
+                return true;
+            }
         }
     }
     return false;
@@ -1448,31 +1430,22 @@ function iends_with($haystack, $needles)
  *
  * @param  string $haystack
  * @param  string|array $needles
+ * @param  bool $case_insensitive
  * @return bool
  */
-function starts_with($haystack, $needles)
+function starts_with($haystack, $needles, $case_insensitive = false)
 {
-    foreach ((array)$needles as $needle) {
-        if ($needle != '' && strpos($haystack, $needle) === 0) {
-            return true;
+    if ($case_insensitive) {
+        foreach ((array)$needles as $needle) {
+            if ($needle != '' && stripos($haystack, $needle) === 0) {
+                return true;
+            }
         }
-    }
-    return false;
-}
-
-/**
- * Determine if a given string starts with a given substring.
- * Case insensitive.
- *
- * @param  string $haystack
- * @param  string|array $needles
- * @return bool
- */
-function istarts_with($haystack, $needles)
-{
-    foreach ((array)$needles as $needle) {
-        if ($needle != '' && stripos($haystack, $needle) === 0) {
-            return true;
+    } else {
+        foreach ((array)$needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) === 0) {
+                return true;
+            }
         }
     }
     return false;
