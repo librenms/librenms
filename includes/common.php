@@ -33,6 +33,23 @@ function generate_priority_icon($priority)
     return '<img src="images/16/' . $map[$priority] .'.png" title="' . $priority . '">';
 }
 
+function generate_priority_status($priority)
+{
+    $map = array(
+        "emerg"     => 2,
+        "alert"     => 2,
+        "crit"      => 2,
+        "err"       => 2,
+        "warning"   => 1,
+        "notice"    => 0,
+        "info"      => 0,
+        "debug"     => 3,
+        ""          => 0,
+    );
+
+    return $map[$priority];
+}
+
 function format_number_short($number, $sf)
 {
     // This formats a number so that we only send back three digits plus an optional decimal point.
