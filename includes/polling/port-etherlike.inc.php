@@ -18,7 +18,7 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     }
 
     $tags = compact('ifName', 'rrd_name', 'rrd_def', 'rrd_oldname');
-    data_update($device,'dot3',$tags,$fields);
+    data_update($device, 'dot3', $tags, $fields);
 
     echo 'EtherLike ';
 }

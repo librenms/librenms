@@ -22,7 +22,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-errorCount', $tags, $fields);
-        $graphs['cambium_generic_errorCount'] = TRUE;
+        $graphs['cambium_generic_errorCount'] = true;
         unset($rrd_filename,$fecInErrorsCount,$fecOutErrorsCount);
     }
 
@@ -34,11 +34,11 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-crcErrors', $tags, $fields);
-        $graphs['cambium_generic_crcErrors'] = TRUE;
+        $graphs['cambium_generic_crcErrors'] = true;
     }
 
-    $vertical = str_replace('"',"",snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
-    $horizontal = str_replace('"',"",snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.118.0", "-Ovqn", ""));
+    $vertical = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));
+    $horizontal = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.118.0", "-Ovqn", ""));
     $combined = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.21.0", "-Ovqn", "");
     if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
         $rrd_def = array(
@@ -53,7 +53,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-signalHV', $tags, $fields);
-        $graphs['cambium_generic_signalHV'] = TRUE;
+        $graphs['cambium_generic_signalHV'] = true;
         unset($rrd_filename,$vertical,$horizontal,$combined);
     }
 
@@ -65,7 +65,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-rssi', $tags, $fields);
-        $graphs['cambium_generic_rssi'] = TRUE;
+        $graphs['cambium_generic_rssi'] = true;
         unset($rrd_filename,$rssi);
     }
 
@@ -77,12 +77,12 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-jitter', $tags, $fields);
-        $graphs['cambium_generic_jitter'] = TRUE;
+        $graphs['cambium_generic_jitter'] = true;
         unset($rrd_filename,$jitter);
     }
 
-    $horizontal = str_replace('"',"",snmp_get($device, "radioDbmHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-    $vertical = str_replace('"',"",snmp_get($device, "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+    $horizontal = str_replace('"', "", snmp_get($device, "radioDbmHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
+    $vertical = str_replace('"', "", snmp_get($device, "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
             'DS:horizontal:GAUGE:600:-100:100',
@@ -94,11 +94,11 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveHV', $tags, $fields);
-        $graphs['cambium_generic_450_slaveHV'] = TRUE;
+        $graphs['cambium_generic_450_slaveHV'] = true;
         unset($rrd_filename,$horizontal,$vertical);
     }
 
-    $ssr = str_replace('"',"",snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
+    $ssr = str_replace('"', "", snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($ssr)) {
         $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
         $fields = array(
@@ -106,12 +106,12 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveSSR', $tags, $fields);
-        $graphs['cambium_generic_450_slaveSSR'] = TRUE;
+        $graphs['cambium_generic_450_slaveSSR'] = true;
         unset($rrd_filename,$ssr);
     }
 
-    $horizontal = str_replace('"',"",snmp_get($device, "signalToNoiseRatioSMHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
-    $vertical = str_replace('"',"",snmp_get($device, "signalToNoiseRatioSMVertical.0", "-Ovqn", "WHISP-SM-MIB"));
+    $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioSMHorizontal.0", "-Ovqn", "WHISP-SM-MIB"));
+    $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioSMVertical.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
             'DS:horizontal:GAUGE:600:0:100',
@@ -123,7 +123,7 @@ if (strstr($hardware, 'CMM') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-slaveSNR', $tags, $fields);
-        $graphs['cambium_generic_450_slaveSNR'] = TRUE;
+        $graphs['cambium_generic_450_slaveSNR'] = true;
         unset($rrd_filename,$horizontal,$vertical);
     }
 }
@@ -132,11 +132,9 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     $gpsStatus = snmp_get($device, "whispGPSStats.0", "-Ovqn", "WHISP-APS-MIB");
     if ($gpsStatus == 'generatingSync') {
         $gpsStatus = 3;
-    }
-    else if ($gpsStatus == 'gpsLostSync') {
+    } elseif ($gpsStatus == 'gpsLostSync') {
         $gpsStatus = 2;
-    }
-    else if ($gpsStatus == 'gpsSynchronized') {
+    } elseif ($gpsStatus == 'gpsSynchronized') {
         $gpsStatus = 1;
     }
     if (is_numeric($gpsStatus)) {
@@ -146,12 +144,12 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-whispGPSStats', $tags, $fields);
-        $graphs['cambium_generic_whispGPSStats'] = TRUE;
+        $graphs['cambium_generic_whispGPSStats'] = true;
         unset($rrd_filename,$gpsStatus);
     }
 
-    $visible = str_replace('"',"",snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
-    $tracked = str_replace('"',"",snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
+    $visible = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
+    $tracked = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
     if (is_numeric($visible) && is_numeric($tracked)) {
         $rrd_def = array(
             'DS:visible:GAUGE:600:0:1000',
@@ -163,26 +161,26 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-gpsStats', $tags, $fields);
-        $graphs['cambium_generic_gpsStats'] = TRUE;
+        $graphs['cambium_generic_gpsStats'] = true;
         unset($rrd_filename,$visible,$tracked);
     }
 }
 //PTP Equipment
-    $lastLevel = str_replace('"',"",snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
-    if (is_numeric($lastLevel)) {
-        $rrd_def = 'DS:last:GAUGE:600:-100:0';
-        $fields = array(
-            'last' => $lastLevel,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'cambium-generic-450-powerlevel', $tags, $fields);
-        $graphs['cambium_generic_450_powerlevel'] = TRUE;
-        unset($lastLevel);
-    }
+    $lastLevel = str_replace('"', "", snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
+if (is_numeric($lastLevel)) {
+    $rrd_def = 'DS:last:GAUGE:600:-100:0';
+    $fields = array(
+    'last' => $lastLevel,
+    );
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-generic-450-powerlevel', $tags, $fields);
+    $graphs['cambium_generic_450_powerlevel'] = true;
+    unset($lastLevel);
+}
     
 if (strstr($version, 'AP') == false) {
-    $horizontal = str_replace('"',"",snmp_get($device, "linkRadioDbmHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
-    $vertical = str_replace('"',"",snmp_get($device, "linkRadioDbmVertical.2", "-Ovqn", "WHISP-APS-MIB"));
+    $horizontal = str_replace('"', "", snmp_get($device, "linkRadioDbmHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
+    $vertical = str_replace('"', "", snmp_get($device, "linkRadioDbmVertical.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
             'DS:horizontal:GAUGE:600:-100:0',
@@ -194,12 +192,12 @@ if (strstr($version, 'AP') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-linkRadioDbm', $tags, $fields);
-        $graphs['cambium_generic_450_linkRadioDbm'] = TRUE;
+        $graphs['cambium_generic_450_linkRadioDbm'] = true;
         unset($rrd_filename,$horizontal,$horizontal);
     }
 
-    $horizontal = str_replace('"',"",snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
-    $vertical = str_replace('"',"",snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
+    $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
+    $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
             'DS:horizontal:GAUGE:600:0:100',
@@ -211,27 +209,27 @@ if (strstr($version, 'AP') == false) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-ptpSNR', $tags, $fields);
-        $graphs['cambium_generic_450_ptpSNR'] = TRUE;
+        $graphs['cambium_generic_450_ptpSNR'] = true;
         unset($rrd_filename,$horizontal,$horizontal);
     }
 
-    $ssr = str_replace('"',"",snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
+    $ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($ssr)) {
-    $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
-    $fields = array(
+        $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
+        $fields = array(
         'ssr' => $ssr,
-    );
+        );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-450-masterSSR', $tags, $fields);
-    $graphs['cambium_generic_450_masterSSR'] = TRUE;
-    unset($rrd_filename,$ssr);
+        $graphs['cambium_generic_450_masterSSR'] = true;
+        unset($rrd_filename,$ssr);
     }
 
-    if (strstr($hardware, 'PTP 230')) { 
-        $dbmRadio = str_replace('"',"",snmp_get($device, "radioDbmInt.0", "-Ovqn", "WHISP-SM-MIB"));
-        $minRadio = str_replace('"',"",snmp_get($device, "minRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
-        $maxRadio = str_replace('"',"",snmp_get($device, "maxRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
-        $avgRadio = str_replace('"',"",snmp_get($device, "radioDbmAvg.0", "-Ovqn", "WHISP-SM-MIB"));
+    if (strstr($hardware, 'PTP 230')) {
+        $dbmRadio = str_replace('"', "", snmp_get($device, "radioDbmInt.0", "-Ovqn", "WHISP-SM-MIB"));
+        $minRadio = str_replace('"', "", snmp_get($device, "minRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
+        $maxRadio = str_replace('"', "", snmp_get($device, "maxRadioDbm.0", "-Ovqn", "WHISP-SM-MIB"));
+        $avgRadio = str_replace('"', "", snmp_get($device, "radioDbmAvg.0", "-Ovqn", "WHISP-SM-MIB"));
 
         if (is_numeric($dbmRadio) && is_numeric($minRadio) && is_numeric($maxRadio) && is_numeric($avgRadio)) {
             $rrd_def = array(
@@ -248,7 +246,7 @@ if (strstr($version, 'AP') == false) {
             );
             $tags = compact('rrd_def');
             data_update($device, 'cambium-generic-radioDbm', $tags, $fields);
-            $graphs['cambium_generic_radioDbm'] = TRUE;
+            $graphs['cambium_generic_radioDbm'] = true;
             unset($rrd_filename,$dbmRadio,$minRadio,$maxRadio,$avgRadio);
         }
     }
@@ -256,8 +254,8 @@ if (strstr($version, 'AP') == false) {
 
 //AP Equipment
 if (strstr($version, 'AP')) {
-    $registered = str_replace('"',"",snmp_get($device, "regCount.0", "-Ovqn", "WHISP-APS-MIB"));
-    $failed = str_replace('"',"",snmp_get($device, "regFailureCount.0", "-Ovqn", "WHISP-APS-MIB"));
+    $registered = str_replace('"', "", snmp_get($device, "regCount.0", "-Ovqn", "WHISP-APS-MIB"));
+    $failed = str_replace('"', "", snmp_get($device, "regFailureCount.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($registered) && is_numeric($failed)) {
         $rrd_def = array(
             'DS:regCount:GAUGE:600:0:15000',
@@ -269,17 +267,16 @@ if (strstr($version, 'AP')) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-regCount', $tags, $fields);
-        $graphs['cambium_generic_regCount'] = TRUE;
+        $graphs['cambium_generic_regCount'] = true;
         unset($rrd_filename,$registered,$failed);
     }
     
-    $freq = str_replace('"',"",snmp_get($device, "currentRadioFreqCarrier.0", "-Ovqn", "WHISP-APS-MIB"));
+    $freq = str_replace('"', "", snmp_get($device, "currentRadioFreqCarrier.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($freq)) {
         $rrd_def = 'DS:freq:GAUGE:600:0:100000';
         if ($freq > 99999) {
             $freq = $freq / 100000;
-        }
-        else {
+        } else {
             $freq = $freq / 10000;
         }
         $fields = array(
@@ -287,7 +284,7 @@ if (strstr($version, 'AP')) {
         );
         $tags = compact('rrd_def');
         data_update($device, 'cambium-generic-freq', $tags, $fields);
-        $graphs['cambium_generic_freq'] = TRUE;
+        $graphs['cambium_generic_freq'] = true;
         unset($rrd_filename,$freq);
     }
 }

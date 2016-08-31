@@ -12,4 +12,4 @@
 
 list($hardware,$version) = explode(',', $poll_device['sysDescr']);
 preg_match('/(v[0-9\-\.]+)/', $version, $tmp_version);
-$version = rtrim($tmp_version[0],'.');
+$version = rtrim($tmp_version[0], '.');

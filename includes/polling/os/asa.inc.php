@@ -17,15 +17,13 @@ $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 
 if (isset($data[1]['entPhysicalSoftwareRev']) && $data[1]['entPhysicalSoftwareRev'] != '') {
     $version = $data[1]['entPhysicalSoftwareRev'];
-}
-else if (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
+} elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
     $version = $data[4]['entPhysicalSoftwareRev'];
 }
 
 if (isset($data[1]['entPhysicalModelName']) && $data[1]['entPhysicalModelName'] != '') {
     $hardware = $data[1]['entPhysicalModelName'];
-}
-else if (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
+} elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
     $hardware = $data[4]['entPhysicalModelName'];
 }
 

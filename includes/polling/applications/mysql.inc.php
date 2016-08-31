@@ -5,8 +5,7 @@ $name = 'mysql';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
-}
-else {
+} else {
     // Polls MySQL  statistics from script via SNMP
     $mysql_cmd  = $config['snmpget'].' -m NET-SNMP-EXTEND-MIB -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
     $mysql_cmd .= ' nsExtendOutputFull.5.109.121.115.113.108';
@@ -228,4 +227,3 @@ foreach ($mapping_status as $desc => $id) {
 $status = true;
 $tags = compact('name', 'app_id', 'status', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-

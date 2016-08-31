@@ -53,8 +53,7 @@ foreach ($ipsec_array as $index => $tunnel) {
     if (!is_array($tunnels[$tunnel['cikeTunRemoteValue']]) && !empty($tunnel['cikeTunRemoteValue'])) {
         $tunnel_id = dbInsert(array('device_id' => $device['device_id'], 'peer_addr' => $tunnel['cikeTunRemoteValue'], 'local_addr' => $tunnel['cikeTunLocalValue'], 'tunnel_name' => $tunnel['cikeTunLocalName']), 'ipsec_tunnels');
         $valid_tunnels[] = $tunnel_id;
-    }
-    else {
+    } else {
         foreach ($db_oids as $db_oid => $db_value) {
             $db_update[$db_value] = $tunnel[$db_oid];
         }
@@ -86,8 +85,7 @@ foreach ($ipsec_array as $index => $tunnel) {
     foreach ($oids as $oid) {
         if (is_numeric($tunnel[$oid])) {
             $value = $tunnel[$oid];
-        }
-        else {
+        } else {
             $value = '0';
         }
         $fields[$oid] = $value;
@@ -95,7 +93,7 @@ foreach ($ipsec_array as $index => $tunnel) {
 
     if (isset($tunnel['cikeTunRemoteValue'])) {
         $tags = compact('address', 'rrd_name', 'rrd_def');
-        data_update($device,'ipsectunnel',$tags,$fields);
+        data_update($device, 'ipsectunnel', $tags, $fields);
 
         // $graphs['ipsec_tunnels'] = TRUE;
     }

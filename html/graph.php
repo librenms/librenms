@@ -32,9 +32,9 @@ if (isset($_GET['debug'])) {
 
 require_once '../includes/defaults.inc.php';
 require_once '../config.php';
+require_once '../includes/common.php';
 require_once '../includes/definitions.inc.php';
 
-require_once '../includes/common.php';
 require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
@@ -42,9 +42,12 @@ require_once '../includes/rrdtool.inc.php';
 if ($config['allow_unauth_graphs'] != true) {
     require_once 'includes/authenticate.inc.php';
 }
+
+rrdtool_initialize(false);
+
 require 'includes/graphs/graph.inc.php';
 
-$console_color = new Console_Color2();
+rrdtool_close();
 
 $end = microtime(true);
 $run = ($end - $start);

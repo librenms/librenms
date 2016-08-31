@@ -52,6 +52,10 @@ source: API/API-Docs.md
         - [`get_bill`](#api-route-23)
     - [`resources`](#api-resources)
         - [`list_arp`](#api-resources-list_arp)
+    - [`services`](#api-services)
+        - [`list_services`](#api-services-list_services)
+        - [`get_service_for_host`](#api-services-get_service_for_host)
+
 Describes the API structure.
 
 # <a name="api-structure">`Structure`</a> [`top`](#top)
@@ -786,56 +790,19 @@ Output:
 ```text
 [
      {
-         "status": "error",
-         "message": "Found 1 in group LinuxServers",
-         "count": 1,
+         "status": "ok",
+         "message": "Found 3 in group LinuxServers",
+         "count": 3,
          "devices": [
-             {
-                 "device_id": "1",
-                 "hostname": "localhost",
-                 "sysName": "hostname",
-                 "community": "librenms",
-                 "authlevel": null,
-                 "authname": null,
-                 "authpass": null,
-                 "authalgo": null,
-                 "cryptopass": null,
-                 "cryptoalgo": null,
-                 "snmpver": "v2c",
-                 "port": "161",
-                 "transport": "udp",
-                 "timeout": null,
-                 "retries": null,
-                 "bgpLocalAs": null,
-                 "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                 "sysDescr": "Linux li1045-133.members.linode.com 4.1.5-x86_64-linode61 #7 SMP Mon Aug 24 13:46:31 EDT 2015 x86_64",
-                 "sysContact": "",
-                 "version": "4.1.5-x86_64-linode61",
-                 "hardware": "Generic x86 64-bit",
-                 "features": "CentOS 7.1.1503",
-                 "location": "",
-                 "os": "linux",
-                 "status": "1",
-                 "status_reason": "",
-                 "ignore": "0",
-                 "disabled": "0",
-                 "uptime": "4615964",
-                 "agent_uptime": "0",
-                 "last_polled": "2015-12-12 13:20:04",
-                 "last_poll_attempted": null,
-                 "last_polled_timetaken": "1.90",
-                 "last_discovered_timetaken": "79.53",
-                 "last_discovered": "2015-12-12 12:34:21",
-                 "last_ping": "2015-12-12 13:20:04",
-                 "last_ping_timetaken": "0.08",
-                 "purpose": null,
-                 "type": "server",
-                 "serial": null,
-                 "icon": null,
-                 "poller_group": "0",
-                 "override_sysLocation": "0",
-                 "notes": "Nope"
-             }
+            {
+                "device_id": "15"
+            },
+            {
+                "device_id": "18"
+            },
+            {
+                "device_id": "20"
+            }
          ]
      }
 ]
@@ -1437,6 +1404,113 @@ Output:
             "ipv4_address": "1.1.1.1",
             "context_name": ""
         }
+    ]
+}
+```
+
+### <a name="api-services-list_services">Function: `list_services`</a> [`top`](#top)
+
+Retrieve all services
+
+Route: /api/v0/services
+
+Input:
+
+ - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+ - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=0&type=tcp
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "services": [
+        [
+            {
+                "service_id": "13",
+                "device_id": "1",
+                "service_ip": "demo1.yourdomian.net",
+                "service_type": "ntp_peer",
+                "service_desc": "NTP",
+                "service_param": "-H 192.168.1.10",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1470962470",
+                "service_message": "NTP OK: Offset -0.000717 secs",
+                "service_disabled": "0",
+                "service_ds": "{\"offset\":\"s\"}"
+            }
+        ],
+        [
+            {
+                "service_id": "2",
+                "device_id": "2",
+                "service_ip": "demo2.yourdomian.net",
+                "service_type": "esxi_hardware.py",
+                "service_desc": "vmware hardware",
+                "service_param": "-H 192.168.1.11 -U USER -P PASS -p",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1471702206",
+                "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
+                "service_disabled": "0",
+                "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
+            }
+        ]
+    ]
+}
+```
+### <a name="api-services-get_service_for_host">Function: `get_service_for_host`</a> [`top`](#top)
+
+Retrieve services for device
+
+Route: /api/v0/services/:hostname
+
+ - id or hostname is the specific device
+
+Input:
+
+ - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+ - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=0&type=tcp
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "services": [
+        [
+            {
+                "service_id": "2",
+                "device_id": "2",
+                "service_ip": "demo2.yourdomian.net",
+                "service_type": "esxi_hardware.py",
+                "service_desc": "vmware hardware",
+                "service_param": "-H 192.168.1.11 -U USER -P PASS -p",
+                "service_ignore": "0",
+                "service_status": "0",
+                "service_changed": "1471702206",
+                "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
+                "service_disabled": "0",
+                "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
+            }
+        ]
     ]
 }
 ```

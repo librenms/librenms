@@ -17,7 +17,7 @@ if (is_numeric($transmitPower)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-transmitPower', $tags, $fields);
-    $graphs['cambium_650_transmitPower'] = TRUE;
+    $graphs['cambium_650_transmitPower'] = true;
 }
 
 $rawReceivePower = snmp_get($device, "rawReceivePower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -28,7 +28,7 @@ if (is_numeric($rawReceivePower)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-rawReceivePower', $tags, $fields);
-    $graphs['cambium_650_rawReceivePower'] = TRUE;
+    $graphs['cambium_650_rawReceivePower'] = true;
 }
 
 
@@ -45,7 +45,7 @@ if (is_numeric($txModulation) && is_numeric($rxModulation)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-modulationMode', $tags, $fields);
-    $graphs['cambium_650_modulationMode'] = TRUE;
+    $graphs['cambium_650_modulationMode'] = true;
 }
 
 $receiveDataRate = snmp_get($device, "receiveDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -64,7 +64,7 @@ if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric(
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-dataRate', $tags, $fields);
-    $graphs['cambium_650_dataRate'] = TRUE;
+    $graphs['cambium_650_dataRate'] = true;
 }
 
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
@@ -75,46 +75,37 @@ if (is_numeric($ssr)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'cambium-650-ssr', $tags, $fields);
-    $graphs['cambium_650_ssr'] = TRUE;
+    $graphs['cambium_650_ssr'] = true;
 }
 
 $gps = snmp_get($device, "tDDSynchronizationStatus.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if ($gps == 'locked') {
         $gps = 0;
-    }
-    else if ($gps == 'holdover') {
+} elseif ($gps == 'holdover') {
         $gps = 1;
-    }
-    else if ($gps == 'holdoverNoGPSSyncIn') {
-        $gps = 2;
-    }
-    else if ($gps == 'notSynchronized') {
-        $gps = 3;
-    }
-    else if ($gps == 'notSynchronizedNoGPSSyncIn') {
-        $gps = 4;
-    }
-    else if ($gps == 'pTPSYNCNotConnected') {
-        $gps = 5;
-    }
-    else if ($gps == 'initialising') {
-        $gps = 6;
-    }
-    else if ($gps == 'clusterTimingMaster') {
-        $gps = 7;
-    }
-    else if ($gps == 'acquiringLock') {
-        $gps = 8;
-    }
-    else if ($gps == 'inactive') {
-        $gps = 9;
-    }
+} elseif ($gps == 'holdoverNoGPSSyncIn') {
+    $gps = 2;
+} elseif ($gps == 'notSynchronized') {
+    $gps = 3;
+} elseif ($gps == 'notSynchronizedNoGPSSyncIn') {
+    $gps = 4;
+} elseif ($gps == 'pTPSYNCNotConnected') {
+    $gps = 5;
+} elseif ($gps == 'initialising') {
+    $gps = 6;
+} elseif ($gps == 'clusterTimingMaster') {
+    $gps = 7;
+} elseif ($gps == 'acquiringLock') {
+    $gps = 8;
+} elseif ($gps == 'inactive') {
+    $gps = 9;
+}
 if (is_numeric($gps)) {
     $rrd_def = 'DS:gps:GAUGE:600:0:10';
     $fields = array(
-        'gps' => $gps,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-650-gps', $tags, $fields);
-    $graphs['cambium_650_gps'] = TRUE;
+    'gps' => $gps,
+        );
+        $tags = compact('rrd_def');
+        data_update($device, 'cambium-650-gps', $tags, $fields);
+            $graphs['cambium_650_gps'] = true;
 }

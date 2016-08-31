@@ -23,7 +23,8 @@
 //
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
-function set_debug($debug) {
+function set_debug($debug)
+{
     if (isset($debug)) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 0);
@@ -39,10 +40,10 @@ $config['install_dir'] = realpath(__DIR__ . '/..');
 // initialize the class loader and add custom mappings
 require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
 $classLoader = new LibreNMS\ClassLoader();
-$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/includes/console_colour.php');
-$classLoader->registerClass('Console_Table', $config['install_dir'] . '/includes/console_table.php');
-$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
-$classLoader->registerClass('SMTP', $config['install_dir'] . "/includes/phpmailer/class.smtp.php");
+$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/lib/console_colour.php');
+$classLoader->registerClass('Console_Table', $config['install_dir'] . '/lib/console_table.php');
+$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/lib/phpmailer/class.phpmailer.php");
+$classLoader->registerClass('SMTP', $config['install_dir'] . "/lib/phpmailer/class.smtp.php");
 $classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
 $classLoader->register();
 
@@ -107,8 +108,7 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
     if (strpos($_SERVER['SERVER_NAME'], ':')) {
         // Literal IPv6
         $config['base_url'] = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    }
-    else {
+    } else {
         $config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
     }
 }
@@ -172,7 +172,7 @@ $config['show_services'] = 0;
 $config['ports_page_default'] = 'details';
 // eg "details" or "basic"
 // Adding Host Settings
-$config['addhost_alwayscheckip']   = FALSE;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
+$config['addhost_alwayscheckip']   = false;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
 // SNMP Settings - Timeouts/Retries disabled as default
 // $config['snmp']['timeout'] = 1;            # timeout in seconds
 // $config['snmp']['retries'] = 5;            # how many times to retry the query
@@ -883,7 +883,7 @@ $config['update_channel']                               = 'master';
 $config['default_port_association_mode'] = 'ifIndex';
 // Ignore ports which can't be mapped using a devices port_association_mode
 // See include/polling/ports.inc.php for a lenghty explanation.
-$config['ignore_unmapable_port'] = False;
+$config['ignore_unmapable_port'] = false;
 
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
@@ -891,4 +891,3 @@ $config['influxdb']['verifySSL']    = false;
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
-

@@ -23,8 +23,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
 
     if ($storage['size']) {
         $percent = round(($storage['used'] / $storage['size'] * 100));
-    }
-    else {
+    } else {
         $percent = 0;
     }
 

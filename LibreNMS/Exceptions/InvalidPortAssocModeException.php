@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Exceptions;
 
-
 class InvalidPortAssocModeException extends \Exception
 {
 

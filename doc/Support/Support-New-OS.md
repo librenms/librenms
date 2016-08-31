@@ -105,8 +105,6 @@ Polling
 
 At this step we should see all the values retrieved in LibreNMS.
 
-
-
 #### FULL SUPPORT FOR A NEW OS
 
 ### MIB

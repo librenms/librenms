@@ -21,7 +21,6 @@ require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require 'includes/polling/functions.inc.php';
 require 'includes/alerts.inc.php';
-require 'includes/console_table.php';
 
 $options = getopt('l:u:r::');
 
@@ -34,8 +33,7 @@ if (isset($options['l'])) {
         }
 
         echo $tbl->getTable();
-    }
-    else if ($options['l'] == 'groups') {
+    } elseif ($options['l'] == 'groups') {
         $tbl = new Console_Table();
         $tbl->setHeaders(array('ID', 'Group Name', 'Description'));
         foreach (dbFetchRows('SELECT * FROM `poller_groups`') as $groups) {
@@ -44,25 +42,21 @@ if (isset($options['l'])) {
 
         echo $tbl->getTable();
     }
-}
-else if (isset($options['u']) && !empty($options['u'])) {
+} elseif (isset($options['u']) && !empty($options['u'])) {
     if (is_numeric($options['u'])) {
         $db_column = 'id';
-    }
-    else {
+    } else {
         $db_column = 'poller_name';
     }
 
     if (dbDelete('pollers', "`$db_column` = ?", array($options['u'])) >= 0) {
         echo 'Poller '.$options['u']." has been removed\n";
     }
-}
-else if (isset($options['r'])) {
+} elseif (isset($options['r'])) {
     if (dbInsert(array('poller_name' => $config['distributed_poller_name'], 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0), 'pollers') >= 0) {
         echo 'Poller '.$config['distributed_poller_name']." has been registered\n";
     }
-}
-else {
+} else {
     echo "-l pollers | groups List registered pollers or poller groups\n";
     echo "-u <id> | <poller name> Unregister a poller\n";
     echo "-r Register this install as a poller\n";

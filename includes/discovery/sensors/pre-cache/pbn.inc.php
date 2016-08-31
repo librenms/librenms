@@ -10,12 +10,10 @@
  */
 
 if ($device['os'] == 'pbn') {
-
     echo 'Pre-cache PBN: ';
 
     $pbn_oids = array();
     echo 'Caching OIDs:';
 
     $pbn_oids = snmpwalk_cache_multi_oid($device, 'ifSfpParameterTable', array(), 'NMS-IF-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/pbn');
-
 }

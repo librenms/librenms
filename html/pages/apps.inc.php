@@ -83,6 +83,12 @@ $graphs['dhcp-stats'] = array(
      'stats',
 );
 
+$graphs['freeswitch'] = array(
+    'peak',
+    'callsIn',
+    'callsOut',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

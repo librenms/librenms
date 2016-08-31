@@ -13,8 +13,7 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
 
     if ($mempool['total']) {
         $percent = round(($mempool['used'] / $mempool['total'] * 100), 2);
-    }
-    else {
+    } else {
         $percent = 0;
     }
 
@@ -32,7 +31,7 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     );
 
     $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def');
-    data_update($device,'mempool',$tags,$fields);
+    data_update($device, 'mempool', $tags, $fields);
 
     $mempool['state'] = array(
                          'mempool_used'  => $mempool['used'],

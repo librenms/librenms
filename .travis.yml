@@ -3,33 +3,24 @@ matrix:
   fast_finish: true
   include:
   - php: 7.0
-    env:
-      PHP_L=1
-      EXECUTE_BUILD_DOCS=false
   - php: 5.3
     env:
-      PHP_L_OLD=1
-      EXECUTE_BUILD_DOCS=false
+      SKIP_STYLE_CHECK=1
   - php: 5.4
     env:
-      PHP_L_OLD=1
-      EXECUTE_BUILD_DOCS=false
+      SKIP_STYLE_CHECK=1
   - php: 5.5
     env:
-      PHP_L=1
-      EXECUTE_BUILD_DOCS=false
+      SKIP_STYLE_CHECK=1
   - php: 5.6
     env:
-      PHP_L=1
-      PHP_CS=1
+      SKIP_STYLE_CHECK=1
       EXECUTE_BUILD_DOCS=true
   - php: hhvm
     env:
-      PHP_L_OLD=1
-      EXECUTE_BUILD_DOCS=false
+      SKIP_STYLE_CHECK=1
 
   allow_failures:
-  - php: 7.0
   - php: hhvm
 
 cache:
@@ -44,7 +35,6 @@ after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
 
 script:
-  - if [[ $PHP_L == 1 ]]; then find . -path './vendor' -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1; fi
-  - if [[ $PHP_L_OLD == 1 ]]; then find . -regextype posix-extended -regex "\./(lib/influxdb-php|vendor)" -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected' ; test $? -eq 1; fi
-  - if [[ $PHP_CS == 1 ]]; then vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 --ignore=html/lib/* html; fi
+  - php scripts/pre-commit.php -p -l
+  - php scripts/pre-commit.php -p -s
   - phpunit

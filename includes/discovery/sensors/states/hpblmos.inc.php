@@ -1,6 +1,5 @@
 <?php
-if($device['os'] == "hpblmos")
-{
+if ($device['os'] == "hpblmos") {
     $fan_state_name = 'hpblmos_fanstate';
     $fan_state_descr = 'Fan ';
     $fans_oid = '.1.3.6.1.4.1.232.22.2.3.1.3.1.8';
@@ -44,8 +43,6 @@ if($device['os'] == "hpblmos")
                 create_sensor_to_state_index($device, $fan_state_name, $current_id);
             }
         }
-
-
     }
 
     $psu_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.16';

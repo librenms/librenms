@@ -25,7 +25,8 @@
 
 namespace LibreNMS;
 
-class Component {
+class Component
+{
     /*
      * These fields are used in the component table. They are returned in the array
      * so that they can be modified but they can not be set as user attributes. We
@@ -40,12 +41,12 @@ class Component {
         'error'     => '',
     );
 
-    public function getComponentType($TYPE=null) {
+    public function getComponentType($TYPE = null)
+    {
         if (is_null($TYPE)) {
             $SQL = "SELECT DISTINCT `type` as `name` FROM `component` ORDER BY `name`";
             $row = dbFetchRow($SQL, array());
-        }
-        else {
+        } else {
             $SQL = "SELECT DISTINCT `type` as `name` FROM `component` WHERE `type` = ? ORDER BY `name`";
             $row = dbFetchRow($SQL, array($TYPE));
         }
@@ -53,14 +54,14 @@ class Component {
         if (!isset($row)) {
             // We didn't find any component types
             return false;
-        }
-        else {
+        } else {
             // We found some..
             return $row;
         }
     }
 
-    public function getComponents($device_id=null,$options=array()) {
+    public function getComponents($device_id = null, $options = array())
+    {
         // Define our results array, this will be set even if no rows are returned.
         $RESULT = array();
         $PARAM = array();
@@ -87,25 +88,24 @@ class Component {
             $SQL .= " ( ";
             foreach ($options['filter'] as $field => $array) {
                 // Only add valid fields to the query
-                if (in_array($field,$validFields)) {
+                if (in_array($field, $validFields)) {
                     if ($array[0] == 'LIKE') {
                         $SQL .= "`".$field."` LIKE ? AND ";
                         $array[1] = "%".$array[1]."%";
-                    }
-                    else {
+                    } else {
                         // Equals operator is the default
                         $SQL .= "`".$field."` = ? AND ";
                     }
-                    array_push($PARAM,$array[1]);
+                    array_push($PARAM, $array[1]);
                 }
             }
             // Strip the last " AND " before closing the bracket.
-            $SQL = substr($SQL,0,-5)." )";
+            $SQL = substr($SQL, 0, -5)." )";
         }
 
         if ($COUNT == 0) {
             // Strip the " WHERE " that we didn't use.
-            $SQL = substr($SQL,0,-7);
+            $SQL = substr($SQL, 0, -7);
         }
 
         // sort     column direction
@@ -149,7 +149,7 @@ class Component {
             foreach ($RESULT as $k => $v) {
                 // k1 = component id, v1 = component array
                 foreach ($v as $k1 => $v1) {
-                    if ( ($COUNT >= $options['limit'][0]) && ($COUNT < $options['limit'][0]+$options['limit'][1])) {
+                    if (($COUNT >= $options['limit'][0]) && ($COUNT < $options['limit'][0]+$options['limit'][1])) {
                         $TEMP[$k][$k1] = $v1;
                     }
                     // We are counting components.
@@ -162,7 +162,8 @@ class Component {
         return $RESULT;
     }
 
-    public function getComponentStatus($device=null) {
+    public function getComponentStatus($device = null)
+    {
         $sql_query = "SELECT status, count(status) as count FROM component WHERE";
         $sql_param = array();
         $add = 0;
@@ -191,12 +192,13 @@ class Component {
             $count[$v['status']] = $v['count'];
         }
 
-        d_echo("Component Count by Status: ".print_r($count,TRUE)."\n");
+        d_echo("Component Count by Status: ".print_r($count, true)."\n");
         return $count;
     }
 
-    public function getComponentStatusLog($component=null,$start=null,$end=null) {
-        if ( ($component == null) || ($start == null) || ($end == null) ) {
+    public function getComponentStatusLog($component = null, $start = null, $end = null)
+    {
+        if (($component == null) || ($start == null) || ($end == null)) {
             // Error...
             d_echo("Required arguments are missing. Component: ".$component.", Start: ".$start.", End: ".$end."\n");
             return false;
@@ -211,8 +213,7 @@ class Component {
         $result = dbFetchRow($sql_query, $sql_param);
         if ($result == false) {
             $return['initial'] = false;
-        }
-        else {
+        } else {
             $return['initial'] = $result['status'];
         }
 
@@ -221,11 +222,12 @@ class Component {
         $sql_param = array($component,$start,$end);
         $return['data'] = dbFetchRows($sql_query, $sql_param);
 
-        d_echo("Status Log Data: ".print_r($return,TRUE)."\n");
+        d_echo("Status Log Data: ".print_r($return, true)."\n");
         return $return;
     }
 
-    public function createComponent ($device_id,$TYPE) {
+    public function createComponent($device_id, $TYPE)
+    {
         // Prepare our default values to be inserted.
         $DATA = $this->reserved;
 
@@ -237,16 +239,17 @@ class Component {
         $id = dbInsert($DATA, 'component');
 
         // Add a default status log entry - we always start ok.
-        $this->createStatusLogEntry($id,0,'Component Created');
+        $this->createStatusLogEntry($id, 0, 'Component Created');
 
         // Create a default component array based on what was inserted.
         $ARRAY = array();
         $ARRAY[$id] = $DATA;
-        unset ($ARRAY[$id]['device_id']);     // This doesn't belong here.
+        unset($ARRAY[$id]['device_id']);     // This doesn't belong here.
         return $ARRAY;
     }
 
-    public function createStatusLogEntry($component,$status,$message) {
+    public function createStatusLogEntry($component, $status, $message)
+    {
         // Add an entry to the statuslog table for a particular component.
         $DATA = array(
             'component'     => $component,
@@ -257,18 +260,19 @@ class Component {
         return dbInsert($DATA, 'component_statuslog');
     }
 
-    public function deleteComponent ($id) {
+    public function deleteComponent($id)
+    {
         // Delete a component from the database.
-        return dbDelete('component', "`id` = ?",array($id));
+        return dbDelete('component', "`id` = ?", array($id));
     }
 
-    public function setComponentPrefs ($device_id,$ARRAY) {
+    public function setComponentPrefs($device_id, $ARRAY)
+    {
         // Compare the arrays. Update/Insert where necessary.
 
         $OLD = $this->getComponents($device_id);
         // Loop over each component.
         foreach ($ARRAY as $COMPONENT => $AVP) {
-
             // Make sure the component already exists.
             if (!isset($OLD[$device_id][$COMPONENT])) {
                 // Error. Component doesn't exist in the database.
@@ -281,7 +285,7 @@ class Component {
             // If the Status has changed we need to add a log entry
             if ($AVP['status'] != $OLD[$device_id][$COMPONENT]['status']) {
                 d_echo("Status Changed - Old: ".$OLD[$device_id][$COMPONENT]['status'].", New: ".$AVP['status']."\n");
-                $this->createStatusLogEntry($COMPONENT,$AVP['status'],$AVP['error']);
+                $this->createStatusLogEntry($COMPONENT, $AVP['status'], $AVP['error']);
             }
 
             // Process our reserved components first.
@@ -289,7 +293,6 @@ class Component {
             foreach ($this->reserved as $k => $v) {
                 // does the reserved field exist, if not skip.
                 if (isset($AVP[$k])) {
-
                     // Has the value changed?
                     if ($AVP[$k] != $OLD[$device_id][$COMPONENT][$k]) {
                         // The value has been modified, add it to our update array.
@@ -311,8 +314,8 @@ class Component {
                 foreach ($UPDATE as $k => $v) {
                     $MSG .= $k." => ".$v.",";
                 }
-                $MSG = substr($MSG,0,-1);
-                log_event($MSG,$device_id,'component',$COMPONENT);
+                $MSG = substr($MSG, 0, -1);
+                log_event($MSG, $device_id, 'component', $COMPONENT);
             }
 
             // Process our AVP Adds and Updates
@@ -325,32 +328,28 @@ class Component {
                     dbInsert($DATA, 'component_prefs');
 
                     // Log the addition to the Eventlog.
-                    log_event ("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', $COMPONENT);
-                }
-                elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', $COMPONENT);
+                } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);
                     dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
 
                     // Add the modification to the Eventlog.
-                    log_event("Component: ".$AVP[$COMPONENT]['type']."(".$COMPONENT."). Attribute: ".$ATTR.", was modified from: ".$OLD[$COMPONENT][$ATTR].", to: ".$VALUE,$device_id,'component',$COMPONENT);
+                    log_event("Component: ".$AVP[$COMPONENT]['type']."(".$COMPONENT."). Attribute: ".$ATTR.", was modified from: ".$OLD[$COMPONENT][$ATTR].", to: ".$VALUE, $device_id, 'component', $COMPONENT);
                 }
-
             } // End Foreach AVP
 
             // Process our Deletes.
             $DELETE = array_diff_key($OLD[$device_id][$COMPONENT], $AVP);
             foreach ($DELETE as $KEY => $VALUE) {
                 // As the Attribute has been removed from the array, we should remove it from the database.
-                dbDelete('component_prefs', "`component` = ? AND `attribute` = ?",array($COMPONENT,$KEY));
+                dbDelete('component_prefs', "`component` = ? AND `attribute` = ?", array($COMPONENT,$KEY));
 
                 // Log the addition to the Eventlog.
-                log_event ("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", $COMPONENT);
+                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", $COMPONENT);
             }
-
         }
 
         return true;
     }
-
 }

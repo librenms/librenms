@@ -121,6 +121,10 @@ LibreNMS contributors:
 - Phil Regnauld <regnauld@x0.dk> (reegnauld)
 - Russell Morris <github@rkmorris.us> (arrmo)
 - Bennett Blodinger <bennett.blodinger@gmail.com> (benwa)
+- Michael Hansen <nerdalertdk@gmail.com> (nerdalertdk)
+- Daniel Cox <danielcoxman@gmail.com> (ospfbgp) 
+- Joseph Cunningham <joey.was@gmail.com> (joeywas)
+- Michael Van Delft <librenms@xo.tc> (HybridAU)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
