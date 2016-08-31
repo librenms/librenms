@@ -239,7 +239,7 @@ if (defined('SHOW_SETTINGS')) {
         $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
         $dev_groups = dbFetchRows($sql);
 
-        if($_SESSION['group_view'] == 0) {
+        if ($_SESSION['group_view'] == 0) {
             $selected = 'selected';
         } else {
             $selected = '';
@@ -261,7 +261,6 @@ if (defined('SHOW_SETTINGS')) {
             }
             $temp_header[] = '</select>';
         }
-
     }
 
     if ($directpage == "yes") {
