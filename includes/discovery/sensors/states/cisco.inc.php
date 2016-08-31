@@ -26,6 +26,10 @@ if ($device['os_group'] == 'cisco') {
         $cur_oid = $tablevalue[1];
 
         if (is_array($temp)) {
+            if ($temp[0][$tablevalue[2]] == 'nonRedundant') {
+                break;
+            }
+
             //Create State Index
             $state_name = $tablevalue[2];
             $state_index_id = create_state_index($state_name);
