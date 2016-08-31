@@ -11,7 +11,7 @@
  */
  
 if (!$os) {
-    if (stristr($sysDescr, 'Nimble Storage')) {
+    if (str_contains($sysDescr, 'Nimble Storage')) {
         $os = 'nimbleos';
     }
 }
