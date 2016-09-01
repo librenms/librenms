@@ -236,16 +236,16 @@ if (defined('SHOW_SETTINGS')) {
         </div>
         <div class="page-availability-title-right">';
 
-        $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
-        $dev_groups = dbFetchRows($sql);
-
-        if ($_SESSION['group_view'] == 0) {
-            $selected = 'selected';
-        } else {
-            $selected = '';
-        }
-
         if (($config['webui']['availability_map_use_device_groups'] != 0) && ($mode == 0 || $mode == 2)) {
+            $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
+            $dev_groups = dbFetchRows($sql);
+
+            if ($_SESSION['group_view'] == 0) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+
             $temp_header[] = '
             <span class="page-availability-title">Device group</span>
             <select id="group" class="page-availability-report-select" name="group">
