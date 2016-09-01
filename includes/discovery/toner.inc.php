@@ -25,7 +25,6 @@ if ($device['os_group'] == 'printer') {
                 if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
                     $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$index";
                     $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$index";
-                    $capacity_oid = '';
                 } else {
                     $toner_oid    = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
                     $descr_oid    = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
