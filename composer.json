@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "squizlabs/php_codesniffer": "*",
+        "squizlabs/php_codesniffer": "2.6.*",
         "phpunit/phpunit": "4.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
