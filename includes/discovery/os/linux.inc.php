@@ -56,7 +56,7 @@ if (!$os) {
             register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
         } elseif (stristr($sysObjectId, 'cumulusMib') || str_contains($sysObjectId, '.1.3.6.1.4.1.40310')) {
             $os = 'cumulus';
-        } elseif (str_contains($sysDescr, 'g56fa85e') || str_contains($sysDescr, 'gc80f187') || str_contains($sysDescr, 'g829be90') || str_contains($sysDescr, 'g63c0044') || str_contaions($sysDescr, 'g56fa85e')) {
+        } elseif (str_contains($sysDescr, 'g56fa85e') || str_contains($sysDescr, 'gc80f187') || str_contains($sysDescr, 'g829be90') || str_contains($sysDescr, 'g63c0044') || str_contaions($sysDescr, 'gba768e5')) {
             $os = 'sophos';
         } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
             $os = 'ddnos';
