@@ -244,7 +244,10 @@ if ($_SESSION['userlevel'] >= '10') {
         <li class="dropdown">
           <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Ports</span></a>
           <ul class="dropdown-menu">
-            <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
+              if ($config['int_all_ports']) {
+                echo('<li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>');
+                $ifbreak=1;
+            }
 
 <?php
 $ports = new ObjectCache('ports');
