@@ -70,8 +70,8 @@ if (defined('SHOW_SETTINGS')) {
     $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
     $widget_mode = json_decode($sql['settings']);
 
-    if (isset($_SESSION["mapView"])) {
-        $mode = $_SESSION["mapView"];
+    if (isset($_SESSION["map_view"])) {
+        $mode = $_SESSION["map_view"];
     } else {
         $mode = $widget_mode->{'mode'};
     }
@@ -93,7 +93,16 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($mode == 0 || $mode == 2) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
+        $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
+        $param = array($_SESSION['group_view']);
+        $devices = dbFetchRows($device_group, $param);
+        foreach ($devices as $in_dev) {
+            $in_devices[] = $in_dev['device_id'];
+        }
+        $in_devices = implode(',', $in_devices);
+
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
+
         if (is_normal_user() === true) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
             $param = array(
@@ -102,7 +111,13 @@ if (defined('SHOW_SETTINGS')) {
         } else {
             $sql .= ' WHERE';
         }
-        $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `".$deviceOrderBy."`";
+
+        if ($config['webui']['availability_map_use_device_groups'] != 0) {
+            $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' AND `D`.`device_id` IN (".$in_devices.") ORDER BY `".$deviceOrderBy."`";
+        } else {
+            $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `".$deviceOrderBy."`";
+        }
+
         $temp_output = array();
 
         foreach (dbFetchRows($sql, $param) as $device) {
@@ -220,6 +235,32 @@ if (defined('SHOW_SETTINGS')) {
             '</select>
         </div>
         <div class="page-availability-title-right">';
+
+        if (($config['webui']['availability_map_use_device_groups'] != 0) && ($mode == 0 || $mode == 2)) {
+            $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
+            $dev_groups = dbFetchRows($sql);
+
+            if ($_SESSION['group_view'] == 0) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+
+            $temp_header[] = '
+            <span class="page-availability-title">Device group</span>
+            <select id="group" class="page-availability-report-select" name="group">
+                <option value="0" '.$selected.'>select device group</option>';
+
+            foreach ($dev_groups as $dev_group) {
+                if ($_SESSION['group_view'] == $dev_group['id']) {
+                    $selected = 'selected';
+                } else {
+                    $selected = '';
+                }
+                $temp_header[] = '<option value="'.$dev_group['id'].'" '.$selected.'>'.$dev_group['name'].'</option>';
+            }
+            $temp_header[] = '</select>';
+        }
     }
 
     if ($directpage == "yes") {
