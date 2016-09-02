@@ -480,18 +480,15 @@ a.list-device-disabled, a.list-device-disabled:visited {
   border-radius: 2pt 2pt 2pt 2pt;
 }
 
-.status-boxes {
-}
-
 .boxes {
-  vertical-align: center;
+  vertical-align: middle;
 }
 
 .box {
   width: 500px;
   height: 300px;
   padding: 0px;
-  vertical-align: center;
+  vertical-align: middle;
 }
 
 .top10 {
@@ -1084,10 +1081,10 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
   /* Gradient background */
   background:#EEF7F7;
-#  background: -moz-linear-gradient(top, #FFF, #DEEFEF);
-#  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DEEFEF));
-#  background: -ms-linear-gradient(top, #FBFBFB, #DEEFEF);
-#  background: -webkit-linear-gradient(top, #FBFBFB, #DEEFEF);
+/*  background: -moz-linear-gradient(top, #FFF, #DEEFEF);
+   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DEEFEF));
+   background: -ms-linear-gradient(top, #FBFBFB, #DEEFEF);
+   background: -webkit-linear-gradient(top, #FBFBFB, #DEEFEF); */
 
   /* Rounded Corners */
   -moz-border-radius: 0px 4px 4px 4px;
@@ -1417,7 +1414,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .tabBox .tabcontent {
-    margin-top -2px;
+    margin-top: -2px;
     min-height: 600px;
     clear: left;
     position: relative;
@@ -1682,7 +1679,7 @@ tr.search:nth-child(odd) {
 .gridster .gs-w {
     background: #ffffff;
     box-shadow: inset 0 0 2px #000;
-    color: 000000
+    color: #000000;
     cursor: pointer;
     -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
@@ -1836,7 +1833,7 @@ label {
 }
 
 .redCluster {
-    background-color: rgba(255,0,0);
+    background-color: rgba(255,0,0, 0);
     background-color: rgba(255,0,0,0.7);
     text-align: center;
     width: 25px !important;
@@ -1846,7 +1843,7 @@ label {
 }
 
 .greenCluster {
-    background-color: rgba(0,255,0);
+    background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
     text-align: center;
     width: 25px !important;
@@ -1875,7 +1872,7 @@ label {
 .device-availability, .service-availability {
   color:#000000;
   float:left;
-  width:166px;
+  width:125px;
   height:64px;
   margin:10px;
   padding:8px;
