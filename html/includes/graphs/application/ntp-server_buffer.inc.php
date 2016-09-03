@@ -2,15 +2,15 @@
 
 require 'includes/graphs/common.inc.php';
 
+$scale_min    = 0;
 $colours      = 'mixed';
 $nototal      = (($width < 224) ? 1 : 0);
-$unit_text    = 'Milliseconds';
-$rrd_filename = rrd_name($device['hostname'], array('app', 'ntpclient', $app['app_id']));
+$unit_text    = 'Buffer';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'ntp-server', $app['app_id']));
 $array        = array(
-                 'offset'    => array('descr' => 'Offset'),
-                 'jitter'    => array('descr' => 'Jitter'),
-                 'noise'     => array('descr' => 'Noise'),
-                 'stability' => array('descr' => 'Stability'),
+                 'buffer_recv' => array('descr' => 'Received'),
+                 'buffer_used' => array('descr' => 'Used'),
+                 'buffer_free' => array('descr' => 'Free'),
                 );
 
 $i = 0;

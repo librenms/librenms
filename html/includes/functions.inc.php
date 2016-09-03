@@ -76,7 +76,7 @@ function nicecase($item)
         case 'ntp-client':
             return 'NTP Client';
 
-        case 'ntpd':
+        case 'ntp-server':
             return 'NTP Server';
 
         case 'os-updates':
