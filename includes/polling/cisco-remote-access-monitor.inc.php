@@ -35,7 +35,7 @@ if ($device['os_group'] == 'cisco') {
     $data     = snmp_get_multi($device, $oid_list, '-OUQs', 'CISCO-REMOTE-ACCESS-MONITOR-MIB');
     $data     = $data[0];
 
-    if ($data['crasEmailNumSessions'] || $data['crasIPSecNumSessions'] || $data['crasL2LNumSessions'] || $data['crasLBNumSessions'] || $data['crasSVCNumSessions'] || $data['crasWebvpnSessions']) {
+    if (is_numeric($data['crasEmailNumSessions']) && is_numeric($data['crasIPSecNumSessions']) && is_numeric($data['crasL2LNumSessions']) && is_numeric($data['crasLBNumSessions']) && is_numeric($data['crasSVCNumSessions']) && is_numeric($data['crasWebvpnNumSessions'])) {
         $rrd_def = array(
             'DS:email:GAUGE:600:0:U',
             'DS:ipsec:GAUGE:600:0:U',

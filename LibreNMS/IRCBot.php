@@ -372,7 +372,7 @@ class IRCBot
             return die();
         }
 
-        $this->log('Trying to connect to '.$this->server.':'.$this->port.($this->ssl ? ' (SSL)' : ''));
+        $this->log('Trying to connect ('.($try + 1).') to '.$this->server.':'.$this->port.($this->ssl ? ' (SSL)' : ''));
         if ($this->socket['irc']) {
             fclose($this->socket['irc']);
         }
@@ -392,6 +392,13 @@ class IRCBot
         }
 
         if (!is_resource($this->socket['irc'])) {
+            if ($try < 5) {
+                sleep(5);
+            } elseif ($try < 10) {
+                sleep(60);
+            } else {
+                sleep(300);
+            }
             return $this->connect($try + 1);
         } else {
             stream_set_blocking($this->socket['irc'], false);

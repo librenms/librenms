@@ -26,5 +26,5 @@
  */
 
 if ($device['os_group'] == 'cisco') {
-    require_once 'includes/discovery/ntp/cisco.inc.php';
+    include 'includes/discovery/ntp/cisco.inc.php';
 }
