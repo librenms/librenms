@@ -30,7 +30,8 @@ function generate_priority_icon($priority)
         ""          => "application",
     );
 
-    return '<img src="images/16/' . $map[$priority] .'.png" title="' . $priority . '">';
+    $image = isset($map[$priority]) ? $map[$priority] : 'application';
+    return '<img src="images/16/' . $image .'.png" title="' . $priority . '">';
 }
 
 function generate_priority_status($priority)
@@ -47,7 +48,7 @@ function generate_priority_status($priority)
         ""          => 0,
     );
 
-    return $map[$priority];
+    return isset($map[$priority]) ? $map[$priority] : 0;
 }
 
 function format_number_short($number, $sf)
