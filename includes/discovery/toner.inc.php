@@ -37,7 +37,7 @@ if ($device['os_group'] == 'printer') {
                     $current  = snmp_get($device, $toner_oid, '-Oqv');
 
                     //ricoh private mibs returns values as percent, no capacity is disclosed as it is not needed
-                    if ($os == 'ricoh' || $os == 'lanier') {
+                    if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
                         $capacity = 100;
                     } else {
                         $capacity = snmp_get($device, $capacity_oid, '-Oqv');
