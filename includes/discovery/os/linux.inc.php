@@ -16,17 +16,17 @@ if (!$os) {
         // Check for QNAP Systems TurboNAS
         $entPhysicalMfgName = snmp_get($device, 'ENTITY-MIB::entPhysicalMfgName.1', '-Osqnv');
 
-        if (strstr($sysObjectId, '.1.3.6.1.4.1.5528.100.20.10.2014') || strstr($sysObjectId, '.1.3.6.1.4.1.5528.100.20.10.2016')) {
+        if (str_contains($sysObjectId, '.1.3.6.1.4.1.5528.100.20.10.2014') || str_contains($sysObjectId, '.1.3.6.1.4.1.5528.100.20.10.2016')) {
             $os = 'netbotz';
-        } elseif (strstr($sysDescr, 'endian')) {
+        } elseif (str_contains($sysDescr, 'endian')) {
             $os = 'endian';
         } elseif (preg_match('/Cisco Small Business/', $sysDescr)) {
             $os = 'ciscosmblinux';
         } elseif (strpos($entPhysicalMfgName, 'QNAP') !== false) {
             $os = 'qnap';
-        } elseif (stristr($sysObjectId, 'packetlogic') || strstr($sysObjectId, '.1.3.6.1.4.1.15397.2')) {
+        } elseif (stristr($sysObjectId, 'packetlogic') || str_contains($sysObjectId, '.1.3.6.1.4.1.15397.2')) {
             $os = 'procera';
-        } elseif (strstr($sysObjectId, '.1.3.6.1.4.1.10002.1') || strstr($sysObjectId, '.1.3.6.1.4.1.41112.1.4') || strpos(trim(snmp_get($device, 'dot11manufacturerName.5', '-Osqnv', 'IEEE802dot11-MIB')), 'Ubiquiti') !== false) {
+        } elseif (str_contains($sysObjectId, '.1.3.6.1.4.1.10002.1') || str_contains($sysObjectId, '.1.3.6.1.4.1.41112.1.4') || strpos(trim(snmp_get($device, 'dot11manufacturerName.5', '-Osqnv', 'IEEE802dot11-MIB')), 'Ubiquiti') !== false) {
             $os = 'airos';
             if (strpos(trim(snmp_get($device, 'dot11manufacturerProductName.5', '-Osqnv', 'IEEE802dot11-MIB')), 'UAP') !== false) {
                 $os = 'unifi';
@@ -54,9 +54,9 @@ if (!$os) {
                "KNIdropCounter"  => "GANDI-MIB",  // KNI DROP counter
             );
             register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
-        } elseif (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
+        } elseif (stristr($sysObjectId, 'cumulusMib') || str_contains($sysObjectId, '.1.3.6.1.4.1.40310')) {
             $os = 'cumulus';
-        } elseif (strstr($sysDescr, 'g56fa85e') || strstr($sysDescr, 'gc80f187') || strstr($sysDescr, 'g829be90') || strstr($sysDescr, 'g63c0044')) {
+        } elseif (str_contains($sysDescr, array('g56fa85e', 'gc80f187', 'g829be90', 'g63c0044', 'gba768e5'))) {
             $os = 'sophos';
         } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
             $os = 'ddnos';
