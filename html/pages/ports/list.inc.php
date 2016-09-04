@@ -1,73 +1,82 @@
-
-<table cellpadding="3" cellspacing="0" class="table table-striped table-condensed" width="100%">
-
 <?php
+$details_visible = var_export($vars['format'] == 'list_detail', 1);
+$errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
 
-echo '<tr class="tablehead">';
+if ($vars['errors']) {
+    $error_sort = ' data-order="desc"';
+    $sort = '';
+} else {
+    $error_sort = '';
+    $sort = ' data-order="asc"';
+}
+?>
+<div class="panel panel-default panel-condensed">
+    <div class="table-responsive">
+        <table id="ports" class="table table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th data-column-id="device">Device</th>
+                    <th data-column-id="port"<?php echo $sort ?>>Port</th>
+                    <th data-column-id="ifSpeed" data-formatter="human-bps">Speed</th>
+                    <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green" data-formatter="human-bps">Down</th>
+                    <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue" data-formatter="human-bps">Up</th>
+                    <th data-column-id="ifInUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="green" data-formatter="human-pps">Packets In</th>
+                    <th data-column-id="ifOutUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-formatter="human-pps">Packets Out</th>
+                    <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red"<?php echo $error_sort ?>>Errors In</th>
+                    <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red">Errors Out</th>
+                    <th data-column-id="ifType">Media</th>
+                    <th data-column-id="description">Description</th>
+                    <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script>
 
-$cols = array(
-    'device'      => 'Device',
-    'port'        => 'Port',
-    'speed'       => 'Speed',
-    'traffic_in'  => 'Down',
-    'traffic_out' => 'Up',
-    'media'       => 'Media',
-    'descr'       => 'Description',
-);
-
-foreach ($cols as $sort => $col) {
-    if (isset($vars['sort']) && $vars['sort'] == $sort) {
-        echo '<th>'.$col.' *</th>';
-    } else {
-        echo '<th><a href="'.generate_url($vars, array('sort' => $sort)).'">'.$col.'</a></th>';
-    }
+function formatUnits(units,decimals,display,base) {
+    if(!units) return '';
+    if(display === undefined) display = ['bps', 'Kbps', 'Mbps', 'Gbps', 'Tbps', 'Pbps', 'Ebps', 'Zbps', 'Ybps'];
+    if(units == 0) return units + display[0];
+    base = base || 1000; // or 1024 for binary
+    var dm = decimals || 2;
+    var i = Math.floor(Math.log(units) / Math.log(base));
+    return parseFloat((units / Math.pow(base, i)).toFixed(dm)) + display[i];
 }
 
-echo '      </tr>';
-
-$ports_disabled = 0;
-$ports_down     = 0;
-$ports_up       = 0;
-$ports_total    = 0;
-
-foreach ($ports as $port) {
-    if (port_permitted($port['port_id'], $port['device_id'])) {
-        if ($port['ifAdminStatus'] == 'down') {
-            $ports_disabled++;
-        } elseif ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'down') {
-            $ports_down++;
-        } elseif ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'up') {
-            $ports_up++;
+var grid = $("#ports").bootgrid({
+    ajax: true,
+    rowCount: [25, 50,100,250,-1],
+    formatters: {
+        'human-bps': function(column, row) {
+            return formatUnits(row[column.id]);
+        },
+        'human-pps': function(column, row) {
+            return formatUnits(row[column.id], 2, ['pps', 'Kpps', 'Mpps', 'Gpps', 'Tpps', 'Ppps', 'Epps', 'Zpps', 'Ypps']);
         }
+    },
+    templates: {
+        search: ""
+    },
+    post: function ()
+    {
+        return {
+            id: "ports",
+            device_id: '<?php echo mres($vars['device_id']); ?>',
+            hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
+            state: '<?php echo mres($vars['state']); ?>',
+            ifSpeed: '<?php echo mres($vars['ifSpeed']); ?>',
+            ifType: '<?php echo mres($vars['ifType']); ?>',
+            port_descr_type: '<?php echo mres($vars['port_descr_type']); ?>',
+            ifAlias: '<?php echo htmlspecialchars($vars['ifAlias']); ?>',
+            location: '<?php echo mres($vars['location']); ?>',
+            disabled: '<?php echo mres($vars['disabled']); ?>',
+            ignore: '<?php echo mres($vars['ignore']); ?>',
+            deleted: '<?php echo mres($vars['deleted']); ?>',
+            errors: '<?php echo mres($vars['errors']); ?>',
+        };
+    },
+    url: "ajax_table.php"
+});
 
-        $ports_total++;
-
-        $speed   = humanspeed($port['ifSpeed']);
-        $type    = humanmedia($port['ifType']);
-        $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-
-        if ((isset($port['in_errors']) && $port['in_errors'] > 0) || (isset($ports['out_errors']) && $port['out_errors'] > 0)) {
-            $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
-        } else {
-            $error_img = '';
-        }
-
-        $port['in_rate']  = formatRates(($port['ifInOctets_rate'] * 8));
-        $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
-
-        $port = ifLabel($port, $device);
-        echo "<tr class='ports'>
-            <td width=200 class=list-bold>".generate_device_link($port, shorthost($port['hostname'], '20'))."</td>
-            <td width=150 class=list-bold><a class='".$ifclass."'href='".generate_port_url($port)."'>".fixIfName($port['label'])." $error_img</td>
-            <td width=110 >$speed</td>
-            <td width=100 class=green>".$port['in_rate'].'</td>
-            <td width=100 class=blue>'.$port['out_rate']."</td>
-            <td width=150>$type</td>
-            <td>".$port['ifAlias']."</td>
-            </tr>\n";
-    }//end if
-}//end foreach
-
-echo '<tr><td colspan="7">';
-echo "<strong>Matched Ports: $ports_total ( <span class=green>Up $ports_up</span> | <span class=red>Down $ports_down</span> | Disabled $ports_disabled )</strong>";
-echo '</td></tr></table>';
+</script>
