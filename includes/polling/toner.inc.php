@@ -6,7 +6,6 @@ foreach ($toner_data as $toner) {
     echo 'Checking toner '.$toner['toner_descr'].'... ';
 
     if ($toner['toner_capacity_oid']) {
-        // FIXME this if can go on 1-Sep-2012
         $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], '-OUqnv');
     }
 
