@@ -1792,6 +1792,7 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['icon']             = 'enterasys';
+$config['os'][$os]['ifname']           = 1;
 
 // Multimatic UPS (Generex CS121 SNMP Adapter)
 $os = 'multimatic';
