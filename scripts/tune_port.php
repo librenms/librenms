@@ -5,7 +5,7 @@ require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
 require 'includes/functions.php';
-rrdtool_pipe_open($rrd_process, $rrd_pipes);
+rrdtool_initialize();
 
 $options = getopt('h:p:');
 
