@@ -21,7 +21,6 @@
  * @link       http://librenms.org
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  * @copyright  2016 Tony Murray
- * @author     Adam Armstrong <adama@memetic.org>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
