@@ -93,13 +93,15 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($mode == 0 || $mode == 2) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
-        $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-        $param = array($_SESSION['group_view']);
-        $devices = dbFetchRows($device_group, $param);
-        foreach ($devices as $in_dev) {
-            $in_devices[] = $in_dev['device_id'];
+        if ($config['webui']['availability_map_use_device_groups'] != 0) {
+            $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
+            $param = array($_SESSION['group_view']);
+            $devices = dbFetchRows($device_group, $param);
+            foreach ($devices as $in_dev) {
+                $in_devices[] = $in_dev['device_id'];
+            }
+            $in_devices = implode(',', $in_devices);
         }
-        $in_devices = implode(',', $in_devices);
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
 
@@ -112,7 +114,8 @@ if (defined('SHOW_SETTINGS')) {
             $sql .= ' WHERE';
         }
 
-        if ($config['webui']['availability_map_use_device_groups'] != 0) {
+
+        if ($config['webui']['availability_map_use_device_groups'] != 0 && isset($in_devices)) {
             $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' AND `D`.`device_id` IN (".$in_devices.") ORDER BY `".$deviceOrderBy."`";
         } else {
             $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `".$deviceOrderBy."`";
@@ -249,7 +252,7 @@ if (defined('SHOW_SETTINGS')) {
             $temp_header[] = '
             <span class="page-availability-title">Device group</span>
             <select id="group" class="page-availability-report-select" name="group">
-                <option value="0" '.$selected.'>select device group</option>';
+                <option value="0" '.$selected.'>show all devices</option>';
 
             foreach ($dev_groups as $dev_group) {
                 if ($_SESSION['group_view'] == $dev_group['id']) {
