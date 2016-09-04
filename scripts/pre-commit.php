@@ -2,52 +2,56 @@
 <?php
 
 $filename = basename(__FILE__);
-$install_dir = realpath(__DIR__.'/..');
+$install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-$short_opts = 'lsuph';
+$short_opts = 'lsuphc';
 $long_opts = array(
     'lint',
     'style',
     'unit',
     'passthru',
+    'commands',
     'help',
 );
-$parameters = array(
-    'p',
-    'passthru',
-);
-
 $options = getopt($short_opts, $long_opts);
 
 if (check_opt($options, 'h', 'help')) {
     echo "LibreNMS Code Tests Script
 Running $filename without options runs all checks.
-  -l, --lint  Run php lint checks to test for valid syntax.
-  -s, --style Run phpcs check to check for PSR-2 compliance.
-  -u, --unit  Run phpunit tests.
-  -h, --help  Show this help text.\n";
+  -l, --lint     Run php lint checks to test for valid syntax.
+  -s, --style    Run phpcs check to check for PSR-2 compliance.
+  -u, --unit     Run phpunit tests.
+  -p, --passthru Display output from checks as it comes
+  -c, --commands Print commands only, no checks
+  -h, --help     Show this help text.\n";
     exit();
 }
 
 // set up some variables
+$parameters = array(
+    'p'        => false,
+    'c'        => false,
+    'passthru' => false,
+    'commands' => false,
+);
 $passthru = check_opt($options, 'p', 'passthru');
-$commands = array_diff($options, $parameters);
+$command_only = check_opt($options, 'c', 'commands');
+$commands = array_diff_assoc($options, $parameters);
 $all = empty($commands);
 $ret = 0;
 
-
 // run tests
-if ($all || check_opt($commands, 'l', 'lint')) {
-    $ret += check_lint();
+if (($all || check_opt($commands, 'l', 'lint')) && !getenv('SKIP_LINT_CHECK')) {
+    $ret += check_lint($passthru, $command_only);
 }
 
-if ($all || check_opt($commands, 's', 'style')) {
-    $ret += check_style($passthru);
+if (($all || check_opt($commands, 's', 'style')) && !getenv('SKIP_STYLE_CHECK')) {
+    $ret += check_style($passthru, $command_only);
 }
 
-if ($all || check_opt($commands, 'u', 'unit')) {
-    $ret += check_unit($passthru);
+if (($all || check_opt($commands, 'u', 'unit')) && !getenv('SKIP_UNIT_CHECK')) {
+    $ret += check_unit($passthru, $command_only);
 }
 
 
@@ -57,6 +61,130 @@ if ($all && $ret === 0) {
 }
 exit($ret); //return the combined/single return value of tests
 
+
+/**
+ * Runs php -l and tests for any syntax errors
+ *
+ * @param bool $passthru display the output as comes in
+ * @param bool $command_only only display the intended command, no checks
+ * @return int the return value from running php -l (0 = success)
+ */
+function check_lint($passthru = false, $command_only = false)
+{
+    $parallel_lint_bin = check_exec('parallel-lint');
+
+    // matches a substring of the relative path, leading / is treated as absolute path
+    $lint_excludes = array('vendor/');
+    if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
+        $lint_excludes[] = 'lib/influxdb-php/';
+    }
+
+    $lint_exclude = build_excludes('--exclude ', $lint_excludes);
+    $lint_cmd = "$parallel_lint_bin $lint_exclude ./";
+
+    if ($command_only) {
+        echo $lint_cmd . PHP_EOL;
+        return 250;
+    }
+
+    echo 'Running lint check... ';
+
+    if ($passthru) {
+        echo PHP_EOL;
+        passthru($lint_cmd, $lint_ret);
+    } else {
+        exec($lint_cmd, $lint_output, $lint_ret);
+
+        if ($lint_ret > 0) {
+            print(implode(PHP_EOL, $lint_output) . PHP_EOL);
+        } else {
+            echo "success\n";
+        }
+    }
+
+    return $lint_ret;
+}
+
+/**
+ * Runs phpcs --standard=PSR2 against the code base
+ *
+ * @param bool $passthru display the output as comes in
+ * @param bool $command_only only display the intended command, no checks
+ * @return int the return value from phpcs (0 = success)
+ */
+function check_style($passthru = false, $command_only = false)
+{
+    $phpcs_bin = check_exec('phpcs');
+
+    // matches a substring of the full path
+    $cs_excludes = array(
+        '/vendor/',
+        '/lib/',
+        '/html/plugins/',
+        '/config.php',
+    );
+
+    $cs_exclude = build_excludes('--ignore=', $cs_excludes);
+    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
+
+    if ($command_only) {
+        echo $cs_cmd . PHP_EOL;
+        return 250;
+    }
+
+    echo 'Running style check... ';
+
+    if ($passthru) {
+        echo PHP_EOL;
+        passthru($cs_cmd, $cs_ret);
+    } else {
+        exec($cs_cmd, $cs_output, $cs_ret);
+
+        if ($cs_ret > 0) {
+            echo "failed\n";
+            print(implode(PHP_EOL, $cs_output) . PHP_EOL);
+        } else {
+            echo "success\n";
+        }
+    }
+
+    return $cs_ret;
+}
+
+/**
+ * Runs phpunit
+ *
+ * @param bool $passthru display the output as comes in
+ * @param bool $command_only only display the intended command, no checks
+ * @return int the return value from phpunit (0 = success)
+ */
+function check_unit($passthru = false, $command_only = false)
+{
+    $phpunit_bin = check_exec('phpunit');
+    $phpunit_cmd = "$phpunit_bin --colors=always";
+
+    if ($command_only) {
+        echo $phpunit_cmd . PHP_EOL;
+        return 250;
+    }
+
+    echo 'Running unit tests... ';
+    if ($passthru) {
+        echo PHP_EOL;
+        passthru($phpunit_cmd, $phpunit_ret);
+    } else {
+        exec($phpunit_cmd, $phpunit_output, $phpunit_ret);
+
+        if ($phpunit_ret > 0) {
+            echo "failed\n";
+            print(implode(PHP_EOL, $phpunit_output) . PHP_EOL);
+        } else {
+            echo "success\n";
+        }
+    }
+
+    return $phpunit_ret;
+}
 
 /**
  *  Check if the given options array contains any of the $opts specified
@@ -74,96 +202,73 @@ function check_opt($options)
     return !empty($intersect);
 }
 
-
 /**
- * Runs php -l and tests for any syntax errors
+ * Build a list of exclude arguments from an array
  *
- * @return int the return value from running php -l (0 = success)
+ * @param string $exclude_string such as "--exclude"
+ * @param array $excludes array of directories to exclude
+ * @return string resulting string
  */
-function check_lint()
+function build_excludes($exclude_string, $excludes)
 {
-    echo "Running lint check... \n";
-
-    if (version_compare(PHP_VERSION, '5.6') >= 0) {
-        $lint_exclude = 'vendor';
-    } else {
-        $lint_exclude = 'vendor|lib/influxdb-php';
-    }
-    $lint_cmd = 'find . -regextype posix-extended -regex "\./(';
-    $lint_cmd .= $lint_exclude;
-    $lint_cmd .= ')" -prune -o -name "*.php" -print0 | xargs -0 -n1 -P8 php -l ';
-    $lint_cmd .= '| grep -v "^No syntax errors detected"; test $? -eq 1';
-
-    exec($lint_cmd, $lint_output, $lint_ret);
-
-    if ($lint_ret > 0) {
-        print(implode(PHP_EOL, $lint_output) . PHP_EOL);
-    } else {
-        echo "success\n";
+    $result = '';
+    foreach ($excludes as $exclude) {
+        $result .= $exclude_string . $exclude . ' ';
     }
 
-    return $lint_ret;
+    return $result;
 }
 
 /**
- * Runs phpcs --standard=PSR2 against the code base
+ * Find an executable
  *
- * @param bool $passthru display the output as comes in
- * @return int the return value from phpcs (0 = success)
+ * @param string|array $execs executable names to find
+ * @return string the path to the executable, or '' if it is not found
+ * @throws Exception Could not find the Executable
  */
-function check_style($passthru = false)
+function find_exec($execs)
 {
-    echo 'Checking PSR-2 style...'.($passthru ? "\n" : ' ');
+    foreach ((array)$execs as $exec) {
+        // check vendor bin first
+        $vendor_bin_dir = './vendor/bin/';
+        if (is_executable($vendor_bin_dir . $exec)) {
+            return $vendor_bin_dir . $exec;
+        }
 
+        // check path
+        $path_exec = shell_exec("which $exec 2> /dev/null");
+        if (!empty($path_exec)) {
+            return trim($path_exec);
+        }
 
-    $cs_exclude = '--ignore=html/lib/* --ignore=html/plugins/';
-    $cs_cmd = "./vendor/bin/phpcs -n -p --colors --extensions=php --standard=PSR2 $cs_exclude html includes";
-
-    $cs_output = '';
-    if ($passthru) {
-        passthru($cs_cmd, $cs_ret);
-    } else {
-        exec($cs_cmd, $cs_output, $cs_ret);
-    }
-
-    if (!$passthru) {
-        if ($cs_ret > 0) {
-            echo "failed\n";
-            print(implode(PHP_EOL, $cs_output) . PHP_EOL);
-        } else {
-            echo "success\n";
+        // check the cwd
+        if (is_executable('./' . $exec)) {
+            return './' . $exec;
         }
     }
-
-    return $cs_ret;
+    throw new Exception('Executable not found');
 }
 
 /**
- * Runs phpunit
+ * Check for an executable and return the path to it
+ * If it does not exist, run composer update.
+ * If composer isn't installed, print error and exit.
  *
- * @param bool $passthru display the output as comes in
- * @return int the return value from phpunit (0 = success)
+ * @param string $exec the name of the executable to check
+ * @return string path to the executable
  */
-function check_unit($passthru = false)
+function check_exec($exec)
 {
-    echo 'Running unit tests...'.($passthru ? "\n" : ' ');
-    $phpunit_cmd = './vendor/bin/phpunit --colors=always';
-
-    $phpunit_output = '';
-    if ($passthru) {
-        passthru($phpunit_cmd, $phpunit_ret);
-    } else {
-        exec($phpunit_cmd, $phpunit_output, $phpunit_ret);
-    }
-
-    if (!$passthru) {
-        if ($phpunit_ret > 0) {
-            echo "failed\n";
-            print(implode(PHP_EOL, $phpunit_output) . PHP_EOL);
-        } else {
-            echo "success\n";
+    try {
+        return find_exec($exec);
+    } catch (Exception $e) {
+        try {
+            $composer_bin = find_exec(array('composer', 'composer.phar'));
+            shell_exec("$composer_bin update");
+            return find_exec($exec);
+        } catch (Exception $ce) {
+            echo "\nCould not find $exec. Please install composer.\nYou can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+            exit(1);
         }
     }
-
-    return $phpunit_ret;
 }

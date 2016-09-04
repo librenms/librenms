@@ -44,7 +44,8 @@ if ($config['autodiscovery']['snmpscan'] == false) {
     exit(2);
 }
 
-function perform_snmp_scan($net) {
+function perform_snmp_scan($net)
+{
     global $stats, $config, $debug, $vdebug;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
@@ -141,7 +142,7 @@ if (isset($opts['r'])) {
     if (!is_array($config['nets'])) {
         $config['nets'] = array( $config['nets'] );
     }
-    foreach( $config['nets'] as $subnet ) {
+    foreach ($config['nets'] as $subnet) {
         $net = Net_IPv4::parseAddress($subnet);
         perform_snmp_scan($net);
     }
@@ -151,4 +152,3 @@ if (isset($opts['r'])) {
     echo 'Please either add a range argument with \'-r <CIDR_RANGE>\' or define $config[\'nets\'] in your config.php'.PHP_EOL;
     exit(2);
 }
-
