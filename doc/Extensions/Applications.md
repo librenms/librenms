@@ -13,7 +13,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [MySQL](#mysql) - Agent
 1. [NGINX](#nginx) - Agent
 1. [NTP Client](#ntp-client) - SNMP extend
-1. [NTP Server](#ntp-server) - SNMP extend, Agent
+1. [NTP Server](#ntp-server) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
@@ -185,9 +185,6 @@ extend ntp-server /etc/snmp/ntp-server.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `NTP Server` under the Applications tab.
-
-##### Agent
-Support is built into the agent, and this app will be automatically enabled.
 
 
 
