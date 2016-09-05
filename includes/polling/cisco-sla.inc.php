@@ -38,7 +38,7 @@ if (count($slas > 0)) {
         $rtt = $rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.1'][$sla_nr];
         echo 'SLA '.$sla_nr.': '.$rtt_type.' '.$sla['owner'].' '.$sla['tag'].'... '.$rtt.'ms at '.$time.'\n';
 
-        $metrics = array(
+        $fields = array(
             'rtt' => $rtt,
         );
 
@@ -46,9 +46,9 @@ if (count($slas > 0)) {
         $rrd_name = array('sla', $sla_nr);
         $rrd_def = 'DS:rtt:GAUGE:600:0:300000';
         $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-        data_update($device, 'sla', $tags, $metrics);
+        data_update($device, 'sla', $tags, $fields);
 
-        // Let's gather some per-type metrics.
+        // Let's gather some per-type fields.
         switch ($rtt_type) {
             case 'jitter':
                 $jitter = array(
@@ -80,7 +80,7 @@ if (count($slas > 0)) {
                 );
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $jitter);
-                $metrics = array_merge($metrics, $jitter);
+                $fields = array_merge($fields, $jitter);
                 break;
             case 'icmpjitter':
                 $icmpjitter = array(
@@ -110,12 +110,12 @@ if (count($slas > 0)) {
                 );
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $icmpjitter);
-                $metrics = array_merge($metrics, $icmpjitter);
+                $fields = array_merge($fields, $icmpjitter);
                 break;
         }
 
-        d_echo("The following metrics were collected for #".$sla['sla_nr'].":\n");
-        d_echo($metrics);
+        d_echo("The following datasources were collected for #".$sla['sla_nr'].":\n");
+        d_echo($fields);
 
         // Update the DB if necessary
         if (count($update) > 0) {
