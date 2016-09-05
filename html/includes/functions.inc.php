@@ -73,14 +73,8 @@ function nicecase($item)
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
 
-        case 'ntp-client':
-            return 'NTP Client';
-
-        case 'ntp-server':
-            return 'NTP Server';
-
-        case 'os-updates':
-            return 'OS Updates';
+        case 'ntpd':
+            return 'NTPD (Server)';
 
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
