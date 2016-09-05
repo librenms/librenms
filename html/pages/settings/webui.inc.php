@@ -19,17 +19,25 @@ $graph_conf = array(
 );
 
 $availability_map_conf = array(
-    array('name'               => 'webui.old_availability_map',
+    array('name'               => 'webui.availability_map_old',
           'descr'              => 'Availability map old view',
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_sort_status',
-          'descr'              => 'Sort devices by status',
+          'descr'              => 'Device sort by status',
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_use_device_groups',
-          'descr'              => 'Use device groups filter',
+          'descr'              => 'Device groups filtering',
           'type'               => 'checkbox',
+    ),
+    array('name'               => 'webui.availability_map_direct_tile_size',
+          'descr'              => 'Direct page tile size',
+          'type'               => 'numeric',
+    ),
+    array('name'               => 'webui.availability_map_old_widget_tile_size',
+          'descr'              => 'Old view widget tile size',
+          'type'               => 'numeric',
     ),
 );
 
