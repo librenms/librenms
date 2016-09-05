@@ -1,4 +1,5 @@
 <?php
+$rrd_options .= ' --alt-y-grid';
 
 $class     = 'voltage';
 $unit      = 'V';
