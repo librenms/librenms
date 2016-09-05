@@ -76,6 +76,9 @@ function nicecase($item)
         case 'ntpd':
             return 'NTPD (Server)';
 
+        case 'os-updates':
+            return 'OS Updates';
+
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
