@@ -112,6 +112,74 @@ def db_open():
         print "ERROR: Could not connect to MySQL database!"
         sys.exit(2)
 
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
+if 'distributed_poller_group' in config:
+    discovery_group = str(config['distributed_poller_group'])
+else:
+    discovery_group = False
+
+
+def memc_alive():
+    try:
+        global memc
+        key = str(uuid.uuid4())
+        memc.set('discovery.ping.' + key, key, 60)
+        if memc.get('discovery.ping.' + key) == key:
+            memc.delete('discovery.ping.' + key)
+            return True
+        else:
+            return False
+    except:
+        return False
+
+
+def memc_touch(key, time):
+    try:
+        global memc
+        val = memc.get(key)
+        memc.set(key, val, time)
+    except:
+        pass
+
+if ('distributed_poller' in config and
+    'distributed_poller_memcached_host' in config and
+    'distributed_poller_memcached_port' in config and
+        config['distributed_poller']):
+    try:
+        import memcache
+        import uuid
+        memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
+            str(config['distributed_poller_memcached_port'])])
+        if str(memc.get("discovery.master")) == config['distributed_poller_name']:
+            print "This system is already joined as the discovery master."
+            sys.exit(2)
+        if memc_alive():
+            if memc.get("discovery.master") is None:
+                print "Registered as Master"
+                memc.set("discovery.master", config['distributed_poller_name'], 10)
+                memc.set("discovery.nodes", 0, 300)
+                IsNode = False
+            else:
+                print "Registered as Node joining Master %s" % memc.get("discovery.master")
+                IsNode = True
+                memc.incr("discovery.nodes")
+            distdisco = True
+        else:
+            print "Could not connect to memcached, disabling distributed discovery."
+            distdisco = False
+            IsNode = False
+    except SystemExit:
+        raise
+    except ImportError:
+        print "ERROR: missing memcache python module:"
+        print "On deb systems: apt-get install python-memcache"
+        print "On other systems: easy_install python-memcached"
+        print "Disabling distributed discovery."
+        distdisco = False
+else:
+    distdisco = False
+# EOC1
+
 s_time = time.time()
 real_duration = 0
 per_device_duration = {}
@@ -137,8 +205,13 @@ devices_list = []
     thus greatening our chances of completing _all_ the work in exactly the time it takes to
     discover the slowest device! cool stuff he
 """
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
+if discovery_group is not False:
+    query = "select device_id from devices where poller_group IN(" + discovery_group + ") and disabled = 0 order by last_polled_timetaken desc"
+else:
+    query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
+# EOC2
 
-query = "select device_id from devices where disabled = 0 order by last_discovered_timetaken desc"
 
 db = db_open()
 cursor = db.cursor()
@@ -146,6 +219,14 @@ cursor.execute(query)
 devices = cursor.fetchall()
 for row in devices:
     devices_list.append(int(row[0]))
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC3
+if distdisco and not IsNode:
+    query = "select max(device_id),min(device_id) from devices"
+    cursor.execute(query)
+    devices = cursor.fetchall()
+    maxlocks = devices[0][0]
+    minlocks = devices[0][1]
+# EOC3
 db.close()
 
 """
@@ -156,10 +237,38 @@ db.close()
         "I know, I'll use threads," and then they two they hav erpoblesms.
 """
 
+
 def printworker():
     nodeso = 0
     while True:
-        worker_id, device_id, elapsed_time = print_queue.get()
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC4
+        global IsNode
+        global distdisco
+        if distdisco:
+            if not IsNode:
+                memc_touch('discovery.master', 10)
+                nodes = memc.get('discovery.nodes')
+                if nodes is None and not memc_alive():
+                    print "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    distdisco = False
+                    nodes = nodeso
+                if nodes is not nodeso:
+                    print "INFO: %s Node(s) Total" % (nodes)
+                    nodeso = nodes
+            else:
+                memc_touch('discovery.nodes', 10)
+            try:
+                worker_id, device_id, elapsed_time = print_queue.get(False)
+            except:
+                pass
+                try:
+                    time.sleep(1)
+                except:
+                    pass
+                continue
+        else:
+            worker_id, device_id, elapsed_time = print_queue.get()
+# EOC4
         global real_duration
         global per_device_duration
         global discovered_devices
@@ -181,14 +290,29 @@ def printworker():
 def poll_worker():
     while True:
         device_id = poll_queue.get()
-        try:
-            start_time = time.time()
-            command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (discovery_path, device_id)
-            subprocess.check_call(command, shell=True)
-            elapsed_time = int(time.time() - start_time)
-            print_queue.put([threading.current_thread().name, device_id, elapsed_time])
-        except (KeyboardInterrupt, SystemExit):
-            pass
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
+        if not distdisco or memc.get('discovery.device.' + str(device_id)) is None:
+            if distdisco:
+                result = memc.add('discovery.device.' + str(device_id), config['distributed_poller_name'], 300)
+                if not result:
+                    print "This device (%s) appears to be being discovered by another discovery node" % (device_id)
+                    poll_queue.task_done()
+                    continue
+                if not memc_alive() and IsNode:
+                    print "Lost Memcached, Not discovering Device %s as Node. Master will discover it." % device_id
+                    poll_queue.task_done()
+                    continue
+# EOC5
+            try:
+                start_time = time.time()
+                command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (discovery_path, device_id)
+                subprocess.check_call(command, shell=True)
+                elapsed_time = int(time.time() - start_time)
+                print_queue.put([threading.current_thread().name, device_id, elapsed_time])
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except:
+                pass
         poll_queue.task_done()
 
 poll_queue = Queue.Queue()
@@ -218,6 +342,32 @@ except (KeyboardInterrupt, SystemExit):
 total_time = int(time.time() - s_time)
 
 print "INFO: discovery-wrapper polled %s devices in %s seconds with %s workers" % (discovered_devices, total_time, amount_of_workers)
+
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
+if distdisco or memc_alive():
+    master = memc.get("discovery.master")
+    if master == config['distributed_poller_name'] and not IsNode:
+        print "Wait for all discovery-nodes to finish"
+        nodes = memc.get("discovery.nodes")
+        while nodes > 0 and nodes is not None:
+            try:
+                time.sleep(1)
+                nodes = memc.get("discovery.nodes")
+            except:
+                pass
+        print "Clearing Locks"
+        x = minlocks
+        while x <= maxlocks:
+            memc.delete('discovery.device.' + str(x))
+            x = x + 1
+        print "%s Locks Cleared" % x
+        print "Clearing Nodes"
+        memc.delete("discovery.master")
+        memc.delete("discovery.nodes")
+    else:
+        memc.decr("discovery.nodes")
+    print "Finished %s." % time.time()
+# EOC6
 
 show_stopper = False
 
