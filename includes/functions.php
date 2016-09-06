@@ -106,20 +106,15 @@ function getHostOS($device)
 
     d_echo("| $sysDescr | $sysObjectId | ");
 
-    $path = $config['install_dir'] . "/includes/discovery/os";
-    $dir_handle = @opendir($path) or die("Unable to open $path");
-    while ($file = readdir($dir_handle)) {
-        if (preg_match("/.php$/", $file)) {
-            include($config['install_dir'] . "/includes/discovery/os/" . $file);
+    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    foreach (glob($pattern) as $file) {
+        include $file;
+        if (isset($os)) {
+            return $os;
         }
     }
-    closedir($dir_handle);
 
-    if ($os) {
-        return $os;
-    } else {
-        return "generic";
-    }
+    return "generic";
 }
 
 function percent_colour($perc)
