@@ -571,8 +571,7 @@ class IRCBot
     {
         $versions       = version_info(false);
         $schema_version = $versions['db_schema'];
-        $version        = `git rev-parse --short HEAD`;
-        $version        = preg_replace('/\s+/', ' ', $version);
+        $version        = substr($versions['local_sha'], 1, 7);
 
         $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: #'.$schema_version.', PHP: '.PHP_VERSION;
         return $this->respond($msg);
