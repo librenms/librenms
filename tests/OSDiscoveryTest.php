@@ -46,7 +46,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
      * @param string $expectedOS the OS to test for
      * @param string $sysDescr set the snmp sysDescr variable
      * @param string $sysObjectId set the snmp sysObjectId variable
-     * @param array $snmpMock set arbitrary snmp variables with an associative array
+     * @param array $mockSnmp set arbitrary snmp variables with an associative array
      * @param array $device device array to send
      */
     private function checkOS($expectedOS, $sysDescr = '', $sysObjectId = '', $mockSnmp = array(), $device = array())
