@@ -1,9 +1,0 @@
-docs
-downloads
-node_modules
-src/*.css
-src/*.map
-*~
-*.diff
-*.patch
-.DS_Store
