@@ -10,6 +10,7 @@ $common_output[] = '
                 <th data-column-id="device_id">Hostname</th>
                 <th data-column-id="program">Program</th>
                 <th data-column-id="msg">Message</th>
+                <th data-column-id="status">Message</th>
             </tr>
         </thead>
     </table>
@@ -29,7 +30,14 @@ var syslog_grid = $("#syslog").bootgrid({
             from: "'.mres($vars['from']).'",
         };
     },
-    url: "ajax_table.php"
+    url: "ajax_table.php",
+    statusMappings: {
+        // Nagios style
+        0: "text-muted",
+        1: "warning",
+        2: "danger",
+        3: "info"
+    }
 });
 
 </script>

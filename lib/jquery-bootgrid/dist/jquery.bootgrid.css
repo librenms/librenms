@@ -1,6 +1,6 @@
 /*! 
- * jQuery Bootgrid v1.1.4 - 11/23/2014
- * Copyright (c) 2014 Rafael Staib (http://www.jquery-bootgrid.com)
+ * jQuery Bootgrid v1.3.1 - 09/11/2015
+ * Copyright (c) 2014-2015 Rafael Staib (http://www.jquery-bootgrid.com)
  * Licensed under MIT http://www.opensource.org/licenses/MIT
  */
 .bootgrid-header,
@@ -21,6 +21,10 @@
 .bootgrid-header .search .glyphicon,
 .bootgrid-footer .search .glyphicon {
   top: 0;
+}
+.bootgrid-header .search .fa,
+.bootgrid-footer .search .fa {
+  display: table-cell;
 }
 .bootgrid-header .search.search-field::-ms-clear,
 .bootgrid-footer .search.search-field::-ms-clear,
