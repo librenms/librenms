@@ -4,7 +4,8 @@ theme_dir: 'librenms_theme'
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
-    - pymdownx.superfences
+    - pymdownx.tasklist
+    - mdx_del_ins
 extra_css:
     - librenms.css
 include_next_prev: false

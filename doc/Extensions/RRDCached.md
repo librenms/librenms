@@ -11,6 +11,23 @@ To enable this set the following config:
 $config['rrdtool_version'] = 1.5.5;
 ```
 
+### Support matrix
+
+Shared FS: Is a shared filesystem required?
+
+Features: Supported features in the version indicated.
+
+          G = Graphs.
+
+          C = Create RRD Files.
+
+| Version | Shared FS | Features |
+| ------- | :-------: | -------- |
+| 1.4.x   | Yes       | G        |
+| <1.5.5  | Yes       | G        |
+| >=1.5.5 | No        | G,C      |
+| >=1.6.x | No        | G,C      |
+
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
 In this example, we'll use the Repoforge repository.
