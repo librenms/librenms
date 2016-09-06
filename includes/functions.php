@@ -37,6 +37,17 @@ include_once($config['install_dir'] . "/includes/services.inc.php");
 
 $console_color = new Console_Color2();
 
+function set_debug($debug)
+{
+    if (isset($debug)) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 0);
+        ini_set('log_errors', 0);
+        ini_set('allow_url_fopen', 0);
+        ini_set('error_reporting', E_ALL);
+    }
+}//end set_debug()
+
 function array_sort($array, $on, $order = SORT_ASC)
 {
     $new_array = array();

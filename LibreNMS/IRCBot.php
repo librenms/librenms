@@ -523,6 +523,7 @@ class IRCBot
         if ($this->user['level'] == 10) {
             global $config;
             $config = array();
+            include 'includes/defaults.inc.php';
             include 'config.php';
             include 'includes/definitions.inc.php';
             $this->respond('Reloading configuration & defaults');

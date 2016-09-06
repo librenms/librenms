@@ -23,17 +23,6 @@
 //
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
-function set_debug($debug)
-{
-    if (isset($debug)) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 0);
-        ini_set('log_errors', 0);
-        ini_set('allow_url_fopen', 0);
-        ini_set('error_reporting', E_ALL);
-    }
-}//end set_debug()
-
 // set install_dir
 $config['install_dir'] = realpath(__DIR__ . '/..');
 
