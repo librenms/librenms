@@ -315,6 +315,7 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 .bluebg  { background-color: #aaaaff; }
 .greenbg { background-color: #aaffaa; }
 .greybg  { background-color: #DEEFEF; }
+.blackbg { background-color: #000000; }
 
 .selector {
   width:275px;
@@ -1924,6 +1925,14 @@ label {
 
 .device-availability.warn, .service-availability.warn {
   border:1px solid #FFB733;
+}
+
+.device-availability.ignored, .service-availability.ignored {
+  border:1px solid #36393D;
+}
+
+.device-availability.disabled, .service-availability.disabled {
+  border:1px solid #000000;
 }
 
 .availability-label {
