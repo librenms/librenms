@@ -35,10 +35,10 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
-            <div class="col-sm-2">
+            <div class="col-sm-4">
                 <label for="title" class="control-label availability-map-widget-header">Widget title: </label>
             </div>
-            <div class="col-sm-10">
+            <div class="col-sm-6">
                 <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($widget_settings['title']).'">
             </div>
         </div>';
@@ -46,17 +46,55 @@ if (defined('SHOW_SETTINGS')) {
     if ($config['webui']['availability_map_compact'] == 1) {
         $common_output[] = '
         <div class="form-group">
-            <div class="col-sm-2">
+            <div class="col-sm-4">
                 <label for="tile_width" class="control-label availability-map-widget-header">Tile width:</label>
             </div>      
-            <div class="col-sm-10">
+            <div class="col-sm-6">
                 <input type="text" class="form-control" name="tile_width" placeholder="Tile " value="'.$compact_tile.'">
             </div>
         </div>';
     }
 
+    if (isset($widget_settings['show_disabled_and_ignored'])) {
+        $showDisabledAndIgnored = 1;
+    } else {
+        $showDisabledAndIgnored = 0;
+    }
+
     $common_output[] = '
     <div class="form-group">
+        <label for="show_disabled_and_ignored" class="col-sm-4 control-label">Disabled and ignored</label>
+        <div class="col-sm-6">
+            <input type="checkbox" class="form-control" name="show_disabled_and_ignored" value="1" ' .($showDisabledAndIgnored == 1 ? 'checked' : ''). '>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="tile_width" class="col-sm-4 control-label">Tile width</label>
+        <div class="col-sm-6">
+            <input class="form-control" name="tile_width" placeholder="I.e 10" value="'.$current_width.'">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="show_services" class="col-sm-4 control-label">Show</label>
+        <div class="col-sm-6">
+            <select class="form-control" name="mode">';
+
+    if ($config['show_services'] == 0) {
+        $common_output[] = '<option value="0" selected="selected">only devices</option>';
+    } else {
+        foreach ($select_modes as $mode_select => $option) {
+            if ($mode_select == $mode) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+            $common_output[] = '<option value="'.$mode_select.'" '.$selected.'>'.$option.'</option>';
+        }
+    }
+    $common_output[] ='
+            </select>
             <div class="col-sm-2">
                 <button type="submit" class="btn btn-default">Set</button>
             </div>
@@ -64,12 +102,27 @@ if (defined('SHOW_SETTINGS')) {
     </form>';
 } else {
     require_once 'includes/object-cache.inc.php';
+
+    $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
+    $widget_mode = json_decode($sql['settings']);
+
+    if (isset($_SESSION["map_view"])) {
+        $mode = $_SESSION["map_view"];
+    } else {
+        $mode = $widget_mode->{'mode'};
+    }
+
+    $showDisabledAndIgnored = $widget_mode->{'show_disabled_and_ignored'};
     $host_up_count = 0;
     $host_warn_count = 0;
     $host_down_count = 0;
+    $host_ignored_count = 0;
+    $host_disabled_count = 0;
     $service_up_count = 0;
     $service_warn_count = 0;
     $service_down_count = 0;
+    $service_ignored_count = 0;
+    $service_disabled_count = 0;
 
     if ($config['webui']['availability_map_sort_status'] == 1) {
         $deviceOrderBy = 'status';
@@ -91,7 +144,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = implode(',', $in_devices);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (is_normal_user() === true) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
@@ -102,17 +155,30 @@ if (defined('SHOW_SETTINGS')) {
             $sql .= ' WHERE';
         }
 
+        if ($showDisabledAndIgnored != 1) {
+             $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' AND";
+        }
 
         if ($config['webui']['availability_map_use_device_groups'] != 0 && isset($in_devices)) {
-            $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' AND `D`.`device_id` IN (" . $in_devices . ") ORDER BY `" . $deviceOrderBy . "`";
+            $sql .= " `D`.`device_id` IN (".$in_devices.")";
         } else {
-            $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `" . $deviceOrderBy . "`";
+            $sql .= " TRUE";
         }
+
+        $sql .= " ORDER BY `".$deviceOrderBy."`";
 
         $temp_output = array();
 
         foreach (dbFetchRows($sql, $param) as $device) {
-            if ($device['status'] == '1') {
+            if ($device['disabled'] == '1') {
+                $deviceState = "disabled";
+                $deviceLabel = "blackbg";
+                $host_disabled_count++;
+            } else if ($device['ignore'] == '1') {
+                $deviceState = "ignored";
+                $deviceLabel = "label-default";
+                $host_ignored_count++;
+            } else if ($device['status'] == '1') {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                     $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
@@ -155,11 +221,19 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
-        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY ' . $serviceOrderBy . ';';
+        $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `S`.`service_ignore`, `S`.`service.disabled`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
         $services = dbFetchRows($service_query);
         if (count($services) > 0) {
             foreach ($services as $service) {
-                if ($service['service_status'] == '0') {
+                if ($service['service_disabled'] == '1') {
+                    $serviceState = "disabled";
+                    $serviceLabel = "blackbg";
+                    $serviceDisabledCount++;
+                } else if ($service['service_ignore'] == '1') {
+                    $serviceState = "ignored";
+                    $deviceLabel = "label-default";
+                    $serviceIgnoredCount++;
+                } else if ($service['service_status'] == '0') {
                     $serviceLabel = "label-success";
                     $serviceLabelOld = 'availability-map-oldview-box-up';
                     $serviceState = "up";
@@ -256,19 +330,32 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($directpage == "yes") {
         $deviceClass = 'page-availability-report-host';
-        $serviceClass = 'page-availability-report-host';
+        $serviceClass = 'page-availability-report-service';
     } else {
         $deviceClass = 'widget-availability-host';
         $serviceClass = 'widget-availability-service';
+    }
+
+    $disabledAndIgnoredDeviceHeaders = '';
+    $disabledAndIgnoredServiceHeaders = '';
+
+    if ($showDisabledAndIgnored == 1) {
+        $disabledAndIgnoredDeviceHeaders = '
+            <span class="label label-default label-font-border label-border">ignored: '.$host_ignored_count.'</span>
+            <span class="label blackbg label-font-border label-border">disabled: '.$host_disabled_count.'</span>';
+        $disabledAndIgnoredServiceHeaders = '
+            <span class="label label-default label-front-border lable-border">ignored: '.$service_ignored_count.'</span>
+            <span class="label blackbg label-front-border lable-border">disabled: '.$service_disabled_count.'</span>';
     }
 
     if ($mode == 0 || $mode == 2) {
         $temp_header[] = '
             <div class="' . $deviceClass . '">
                 <span>Total hosts</span>
-                <span class="label label-success label-font-border label-border">up: ' . $host_up_count . '</span>
-                <span class="label label-warning label-font-border label-border">warn: ' . $host_warn_count . '</span>
-                <span class="label label-danger label-font-border label-border">down: ' . $host_down_count . '</span>
+                <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
+                <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
+                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>
+                '.$disabledAndIgnoredDeviceHeaders.'
             </div>';
     }
 
@@ -276,9 +363,10 @@ if (defined('SHOW_SETTINGS')) {
         $temp_header[] = '
             <div class="' . $serviceClass . '">
                 <span>Total services</span>
-                <span class="label label-success label-font-border label-border">up: ' . $service_up_count . '</span>
-                <span class="label label-warning label-font-border label-border">warn: ' . $service_warn_count . '</span>
-                <span class="label label-danger label-font-border label-border">down: ' . $service_down_count . '</span>
+                <span class="label label-success label-font-border label-border">up: '.$service_up_count.'</span>
+                <span class="label label-warning label-font-border label-border">warn: '.$service_warn_count.'</span>
+                <span class="label label-danger label-font-border label-border">down: '.$service_down_count.'</span>
+                '.$disabledAndIgnoredServiceHeader.'
             </div>';
     }
 
