@@ -126,6 +126,7 @@ LibreNMS contributors:
 - Joseph Cunningham <joey.was@gmail.com> (joeywas)
 - Michael Van Delft <librenms@xo.tc> (HybridAU)
 - Piotr Jurga <deutor1361@gmail.com> (deutor)
+- Jonathon Koyle <jonathon.koyle@gmail.com> (jonathon-k)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
