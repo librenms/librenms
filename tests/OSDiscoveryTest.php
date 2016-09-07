@@ -177,5 +177,4 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'Eaton 5P 2200');
         $this->checkOS('eatonups', 'Eaton 5PX 2000');
     }
-
 }
