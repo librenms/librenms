@@ -13,12 +13,13 @@
  */
 
 require_once '../includes/defaults.inc.php';
-set_debug($_REQUEST['debug']);
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/functions.php';
 require_once 'includes/authenticate.inc.php';
+
+set_debug($_REQUEST['debug']);
 
 $current = $_POST['current'];
 settype($current, 'integer');
