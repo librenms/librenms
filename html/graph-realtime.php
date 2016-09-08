@@ -3,7 +3,7 @@
 /**
  * LibreNMS
  *
- *   This file is included with Observium. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
+ *   This file is included with LibreNMS. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
  *
  * @package    librenms
  * @subpackage graphing
