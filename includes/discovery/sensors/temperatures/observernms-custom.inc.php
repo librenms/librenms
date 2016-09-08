@@ -19,7 +19,7 @@ if ($device['os_group'] == 'unix') {
             $descr_query = $config['snmpget'].' -M '.$config['mibdir'].' -m SNMPv2-SMI -Osqn '.snmp_gen_auth($device).' '.$device['transport'].':'.$device['hostname'].':'.$device['port']." .1.3.6.1.4.1.2021.7891.$oid.2.1 | sed s/.1.3.6.1.4.1.2021.7891.$oid.2.1\ //";
             $descr       = trim(str_replace('"', '', shell_exec($descr_query)));
             $fulloid     = ".1.3.6.1.4.1.2021.7891.$oid.101.1";
-            discover_sensor($valid['sensor'], 'temperature', $device, $fulloid, $oid, 'observium', $descr, '1', '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'temperature', $device, $fulloid, $oid, 'librenms', $descr, '1', '1', null, null, null, null, $current);
         }
     }
 }//end if

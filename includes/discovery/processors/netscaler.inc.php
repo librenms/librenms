@@ -1,6 +1,6 @@
 <?php
 
-// root@alpha:/home/observium/dev# snmpwalk -v2c -c // -M mibs -m +NS-ROOT-MIB netscaler.test nsCPUTable
+// root@alpha:/home/dev# snmpwalk -v2c -c // -M mibs -m +NS-ROOT-MIB netscaler.test nsCPUTable
 // NS-ROOT-MIB::nsCPUname."cpu0" = STRING: "cpu0"
 // NS-ROOT-MIB::nsCPUusage."cpu0" = Gauge32: 0
 if ($device['os'] == 'netscaler') {

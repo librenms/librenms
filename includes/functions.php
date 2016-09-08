@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage functions
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
