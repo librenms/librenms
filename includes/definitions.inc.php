@@ -452,6 +452,7 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'cisco';
 $config['os'][$os]['bad_ifXEntry'][]   = 'cisco1941';
+$config['os'][$os]['bad_ifXEntry'][]   = 'cisco886Va';
 
 $os = 'acsw';
 // $config['os'][$os]['group']            = "cisco";
