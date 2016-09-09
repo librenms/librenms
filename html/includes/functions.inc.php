@@ -88,6 +88,9 @@ function nicecase($item)
         case 'dhcp-stats':
             return 'DHCP Stats';
 
+        case 'ups-nut':
+            return 'UPS nut';
+
         default:
             return ucfirst($item);
     }
@@ -1214,6 +1217,11 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
             } elseif ($item['type'] == 'text') {
                 $output .= '
                 <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
+            } elseif ($item['type'] == 'numeric') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 ';
             } elseif ($item['type'] == 'select') {
