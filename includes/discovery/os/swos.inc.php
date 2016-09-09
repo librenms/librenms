@@ -1,7 +1,9 @@
 <?php
 
 if (!$os) {
-    if (is_numeric(snmp_get($device, 'SNMPv2-SMI::enterprises.14988.2', '-Oqv', ''))) {
-        $os = 'swos';
+    if (strstr(snmp_get($device, 'SNMPv2-MIB::sysName.0', '-Oqv', ''), 'MikroTik')) {
+        if (strstr(snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Oqv', ''), 'RB260GS')) {
+            $os = 'swos';
+        }
     }
 }
