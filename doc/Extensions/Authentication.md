@@ -166,7 +166,7 @@ Replace `<ad-admingroup>` with your Active Directory admin-user group and `<ad-u
 You can set two Active Directory servers by editing the `$config['auth_ad_url']` like this example:
 
 ```
-$config['auth_ad_url']                      = "ldaps://dc1.example.com ldaps://dc2.example.com";
+$config['auth_ad_url'] = "ldaps://dc1.example.com ldaps://dc2.example.com";
 ```
 
 #### Radius Authentication
