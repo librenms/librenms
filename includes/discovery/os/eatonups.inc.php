@@ -1,7 +1,7 @@
 <?php
 if (!$os) {
     // Eaton UPS
-    if (strstr($sysDescr, 'Eaton 5PX')) {
+    if (str_contains($sysDescr, 'Eaton 5P')) {
         $os = 'eatonups';
     }
 }
