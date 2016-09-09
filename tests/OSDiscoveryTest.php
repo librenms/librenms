@@ -101,6 +101,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dsm', 'Linux', '', $mockSnmp);
     }
 
+    public function testEatonups()
+    {
+        $this->checkOS('eatonups', 'Eaton 5P 2200');
+        $this->checkOS('eatonups', 'Eaton 5PX 2000');
+    }
+
     public function testEndian()
     {
         $this->checkOS('endian', 'Linux endian');
@@ -170,11 +176,5 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
             'dot11manufacturerProductName.0' => 'UAP-AC2',
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
-    }
-
-    public function testEatonups()
-    {
-        $this->checkOS('eatonups', 'Eaton 5P 2200');
-        $this->checkOS('eatonups', 'Eaton 5PX 2000');
     }
 }
