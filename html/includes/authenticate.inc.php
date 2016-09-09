@@ -102,7 +102,12 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             exit;
         }
     } elseif (isset($_SESSION['username'])) {
-        $auth_message = 'Authentication Failed';
+        global $auth_error;
+        if (isset($auth_error)) {
+            $auth_message = $auth_error;
+        } else {
+            $auth_message = 'Authentication Failed';
+        }
         unset($_SESSION['authenticated']);
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
     }
