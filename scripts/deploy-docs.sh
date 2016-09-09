@@ -5,6 +5,7 @@ THEME_REPO="https://github.com/librenms-docs/librenms_theme.git"
 
 pip install --user mkdocs
 pip install --user pymdown-extensions
+pip install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
 
