@@ -34,6 +34,13 @@ To enable a particular authentication module you need to set this up in config.p
 $config['auth_mechanism'] = "mysql";
 ```
 
+#### Note for SELinux users
+When using SELinux on the LibreNMS server, you need to allow Apache (httpd) to connect LDAP/Active Directory server, this is disabled by default. You can use SELinux Booleans to allow network access to LDAP resources with this command:
+
+```shell
+setsebool -P httpd_can_connect_ldap=1
+```
+
 #### MySQL Authentication
 
 Config option: `mysql`
@@ -154,6 +161,14 @@ $config['auth_ad_groups']['<ad-usergroup>']['level']  = 7;
 ```
 
 Replace `<ad-admingroup>` with your Active Directory admin-user group and `<ad-usergroup>` with your standard user group.
+
+##### Active Directory redundancy
+
+You can set two Active Directory servers by editing the `$config['auth_ad_url']` like this example:
+
+```
+$config['auth_ad_url'] = "ldaps://dc1.example.com ldaps://dc2.example.com";
+```
 
 #### Radius Authentication
 
