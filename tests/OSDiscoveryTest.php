@@ -182,4 +182,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
     }
+
+    public function testZxr10()
+    {
+        $this->checkOS('zxr10', 'ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23');
+    }
 }
