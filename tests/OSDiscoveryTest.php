@@ -101,6 +101,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dsm', 'Linux', '', $mockSnmp);
     }
 
+    public function testEatonups()
+    {
+        $this->checkOS('eatonups', 'Eaton 5P 2200');
+        $this->checkOS('eatonups', 'Eaton 5PX 2000');
+    }
+
     public function testEndian()
     {
         $this->checkOS('endian', 'Linux endian');
