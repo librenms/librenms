@@ -4,9 +4,13 @@
 
 // disable certificate checking before connect if required
 if (isset($config['auth_ad_check_certificates']) &&
-          $config['auth_ad_check_certificates'] == 0) {
+          !$config['auth_ad_check_certificates']) {
     putenv('LDAPTLS_REQCERT=never');
 };
+
+if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+    ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
+}
 
 $ldap_connection = @ldap_connect($config['auth_ad_url']);
 
@@ -17,14 +21,14 @@ ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 function authenticate($username, $password)
 {
-    global $config, $ldap_connection;
+    global $config, $ldap_connection, $auth_error;
 
     if ($ldap_connection) {
         // bind with sAMAccountName instead of full LDAP DN
         if ($username && ldap_bind($ldap_connection, "{$username}@{$config['auth_ad_domain']}", $password)) {
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
-                $config['auth_ad_require_groupmembership'] > 0) {
+                $config['auth_ad_require_groupmembership']) {
                 $search = ldap_search(
                     $ldap_connection,
                     $config['auth_ad_base_dn'],
@@ -33,28 +37,39 @@ function authenticate($username, $password)
                 );
                 $entries = ldap_get_entries($ldap_connection, $search);
 
-                $user_authenticated = 0;
-                
                 foreach ($entries[0]['memberof'] as $entry) {
                     $group_cn = get_cn($entry);
                     if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
                         // user is in one of the defined groups
-                        $user_authenticated = 1;
                         adduser($username);
+                        return 1;
                     }
                 }
 
-                return $user_authenticated;
+                if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+                    if ($entries['count'] == 0) {
+                        $auth_error = 'No groups found for user, check base dn';
+                    } else {
+                        $auth_error = 'User is not in one of the required groups';
+                    }
+                } else {
+                    $auth_error = 'Invalid credentials';
+                }
+
+                return 0;
             } else {
                 // group membership is not required and user is valid
                 adduser($username);
                 return 1;
             }
-        } else {
-            return 0;
         }
+    }
+
+    if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+        ldap_get_option($ldap_connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
+        $auth_error = ldap_error($ldap_connection).'<br />'.$extended_error;
     } else {
-        echo ldap_error($ldap_connection);
+        $auth_error = ldap_error($ldap_connection);
     }
 
     return 0;

@@ -142,14 +142,15 @@ If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authentica
 ##### Sample configuration
 
 ```
-$config['auth_ad_url']                      = "ldaps://your-domain.controll.er";
-$config['auth_ad_check_certificates']       = 1; // or 0
-$config['auth_ad_domain']                   = "your-domain.com";
-$config['auth_ad_base_dn']                  = "dc=your-domain,dc=com";
+$config['auth_ad_url']                     = "ldaps://<your-domain.controll.er>";
+$config['auth_ad_domain']                  = "<your-domain.com>";
+$config['auth_ad_base_dn']                 = "<dc=your-domain,dc=com>";
+$config['auth_ad_check_certificates']      = true;  // require a valid ssl certificate
+$config['auth_ad_debug']                   = false; // enable for verbose debug messages
+$config['active_directory']['users_purge'] = 30;    // purge users who haven't logged in for 30 days.
+$config['auth_ad_require_groupmembership'] = false; // require users to be members of a group listed below
 $config['auth_ad_groups']['<ad-admingroup>']['level'] = 10;
-$config['auth_ad_groups']['<ad-usergroup>']['level']   = 7;
-$config['auth_ad_require_groupmembership']  = 0;
-$config['active_directory']['users_purge']  = 14;//Purge users who haven't logged in for 14 days.
+$config['auth_ad_groups']['<ad-usergroup>']['level']  = 7;
 ```
 
 Replace `<ad-admingroup>` with your Active Directory admin-user group and `<ad-usergroup>` with your standard user group.
