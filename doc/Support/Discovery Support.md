@@ -35,6 +35,21 @@ new will poll only those devices that have recently been added or have been sele
 
 `-m` This enables you to specify the module you want to run for discovery.
 
+#### Discovery wrapper
+
+We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job).
+You can enable support for this within cron by replacing:
+
+`33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
+
+With:
+
+`33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.php 1 >> /dev/null 2>&1`
+
+The default is for discovery wrapper to only use 1 thread so that it mimics the current behaviour. However if your 
+system is powerful enough and the devices can cope then you can increase the thread count from 1 to a value of your
+choosing.
+
 #### Discovery config
 
 These are the default discovery config items. You can globally disable a module by setting it to 0. If you just want to
