@@ -117,6 +117,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2016');
     }
 
+    public function testNios()
+    {
+        $this->checkOS('nios', 'Linux ns01.hepl.ch 3.14.25 #1 SMP Thu Jun 16 18:19:37 EDT 2016 x86_64', '.1.3.6.1.4.1.7779.1');
+    }
+
     public function testPcoweb()
     {
         $mockSnmp = array(
