@@ -23,6 +23,8 @@ Features: Supported features in the version indicated.
 
           U = Update RRD files.
 
+          T = Tune RRD files.
+
 | Version | Shared FS | Features |
 | ------- | :-------: | -------- |
 | 1.4.x   | Yes       | G,U      |
