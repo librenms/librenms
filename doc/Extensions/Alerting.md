@@ -130,6 +130,8 @@ Placeholders:
 - Transport name: `%transport`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
 
+Placeholders can be used within the subjects for templates as well although %faults is most likely going to be worthless.
+
 > NOTE: Placeholder names which are contained within another need to be ordered correctly. As an example:
 
 ```text
@@ -188,18 +190,17 @@ By default the Contacts will be only gathered when the alert triggers and will i
 The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.
 At the moment LibreNMS only supports Port or Device permissions.
 You can exclude the `SysContact` by setting:
-~~
+
 ```php
 $config['alert']['syscontact'] = false;
 ```
-~
+
 To include users that have `Global-Read` or `Administrator` permissions it is required to add these additions to the `config.php` respectively:
-~
+
 ```php
 $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
 $config['alert']['admins']  = true; //Include Administrators into alert-contacts
 ```
-~~
 
 ## <a name="transports-email">E-Mail</a>
 
