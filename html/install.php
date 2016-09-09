@@ -205,7 +205,7 @@ foreach ($modules as $extension) {
             <td>$extension</td>
             <td>$ext_loaded</td>");
     if ($ext_loaded == 'no') {
-        echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
+        echo("<td></td>");
     } else {
         echo("<td></td>");
     }
