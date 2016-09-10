@@ -108,6 +108,7 @@ $graphs['ups-nut'] = array(
     'remaining',
     'load',
     'voltage_battery',
+    'charge',
     'voltage_input',
 );
 
