@@ -3,13 +3,13 @@
 global $config;
 
 $graphs = array(
-    'ntpdserver_stats'   => 'NTPD Server - Statistics',
-    'ntpdserver_freq'    => 'NTPD Server - Frequency',
-    'ntpdserver_stratum' => 'NTPD Server - Stratum',
-    'ntpdserver_buffer'  => 'NTPD Server - Buffer',
-    'ntpdserver_bits'    => 'NTPD Server - Packets Sent/Received',
-    'ntpdserver_packets' => 'NTPD Server - Packets Dropped/Ignored',
-    'ntpdserver_uptime'  => 'NTPD Server - Uptime',
+    'ntp-server_stats'   => 'NTPD Server - Statistics',
+    'ntp-server_freq'    => 'NTPD Server - Frequency',
+    'ntp-server_stratum' => 'NTPD Server - Stratum',
+    'ntp-server_buffer'  => 'NTPD Server - Buffer',
+    'ntp-server_bits'    => 'NTPD Server - Packets Sent/Received',
+    'ntp-server_packets' => 'NTPD Server - Packets Dropped/Ignored',
+    'ntp-server_uptime'  => 'NTPD Server - Uptime',
 );
 
 foreach ($graphs as $key => $text) {
