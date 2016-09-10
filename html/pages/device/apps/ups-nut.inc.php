@@ -30,6 +30,7 @@ $graphs = array(
     'ups-nut_remaining' => 'Remaining time: '.$ups_details,
     'ups-nut_load' => 'Load: '.$ups_details,
     'ups-nut_voltage_battery' => 'Battery voltage: '.$ups_details,
+    'ups-nut_charge' => 'Charge: '.$ups_details,
     'ups-nut_voltage_input' => 'Input voltage: '.$ups_details,
 );
 
@@ -52,3 +53,4 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
     echo '</div>';
 }
+
