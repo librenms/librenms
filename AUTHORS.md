@@ -127,6 +127,7 @@ LibreNMS contributors:
 - Michael Van Delft <librenms@xo.tc> (HybridAU)
 - Piotr Jurga <deutor1361@gmail.com> (deutor)
 - Jonathon Koyle <jonathon.koyle@gmail.com> (jonathon-k)
+- Tamas Szabo <jobs@szatam.com> (szatam)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
