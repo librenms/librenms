@@ -3,8 +3,8 @@
 global $config;
 
 $graphs = array(
-    'ntpclient_stats' => 'NTP Client - Statistics',
-    'ntpclient_freq'  => 'NTP Client - Frequency',
+    'ntp-client_stats' => 'NTP Client - Statistics',
+    'ntp-client_freq'  => 'NTP Client - Frequency',
 );
 
 foreach ($graphs as $key => $text) {
