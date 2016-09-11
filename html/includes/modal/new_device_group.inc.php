@@ -22,7 +22,7 @@ if (is_admin() !== false) {
           <h5 class="modal-title" id="Create">Device Groups</h5>
         </div>
         <div class="modal-body">
-            <form method="post" role="form" id="group" class="form-horizontal group-form">
+            <form method="post" role="form" id="devices-group" class="form-horizontal group-form">
         <div class="form-group">
             <div class="col-sm-12">
                 <span id="ajax_response"></span>
@@ -116,21 +116,23 @@ $('#create-group').on('show.bs.modal', function (event) {
            strategy: 'array',
            tagFieldName: 'patterns[]'
     });
-    $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "parse-device-group", group_id: group_id },
-        dataType: "json",
-        success: function(output) {
-            var arr = [];
-            $.each ( output['pattern'], function( key, value ) {
-                arr.push(value);
-            });
-            $('#response').data('tagmanager').populate(arr);
-            $('#name').val(output['name']);
-            $('#desc').val(output['desc']);
-        }
-    });
+    if (group_id > 0) {
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: {type: "parse-device-group", group_id: group_id},
+            dataType: "json",
+            success: function (output) {
+                var arr = [];
+                $.each(output['pattern'], function (key, value) {
+                    arr.push(value);
+                });
+                $('#response').data('tagmanager').populate(arr);
+                $('#name').val(output['name']);
+                $('#desc').val(output['desc']);
+            }
+        });
+    }
 });
 var cache = {};
 var suggestions = new Bloodhound({

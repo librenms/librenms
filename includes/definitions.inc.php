@@ -452,6 +452,7 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'cisco';
 $config['os'][$os]['bad_ifXEntry'][]   = 'cisco1941';
+$config['os'][$os]['bad_ifXEntry'][]   = 'cisco886Va';
 
 $os = 'acsw';
 // $config['os'][$os]['group']            = "cisco";
@@ -1792,6 +1793,7 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['icon']             = 'enterasys';
+$config['os'][$os]['ifname']           = 1;
 
 // Multimatic UPS (Generex CS121 SNMP Adapter)
 $os = 'multimatic';
@@ -1888,6 +1890,10 @@ $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'hp';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // HP MSM 
 $os = 'hpmsm';
@@ -2069,6 +2075,18 @@ $os = 'planetos';
 $config['os'][$os]['text']             = 'PLANET';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'planet';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Foundry Networking 
+$os = 'foundryos';
+$config['os'][$os]['text']             = 'Foundry Networking';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'foundry';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';

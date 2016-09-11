@@ -21,7 +21,6 @@
  * @link       http://librenms.org
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  * @copyright  2016 Tony Murray
- * @author     Adam Armstrong <adama@memetic.org>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -78,6 +77,8 @@ function rrdtool_running(&$process)
 function rrdtool_close()
 {
     global $rrd_sync_process, $rrd_async_process;
+    /** @var Proc $rrd_sync_process */
+    /** @var Proc $rrd_async_process */
 
     if (rrdtool_running($rrd_sync_process)) {
         $rrd_sync_process->close('quit');
@@ -98,6 +99,7 @@ function rrdtool_close()
 function rrdtool_graph($graph_file, $options)
 {
     global $debug, $rrd_sync_process;
+    /** @var Proc $rrd_sync_process */
 
     if (rrdtool_initialize(false)) {
         $cmd = rrdtool_build_command('graph', $graph_file, $options);
@@ -130,6 +132,8 @@ function rrdtool_graph($graph_file, $options)
 function rrdtool($command, $filename, $options)
 {
     global $config, $debug, $vdebug, $rrd_async_process, $rrd_sync_process;
+    /** @var Proc $rrd_sync_process */
+    /** @var Proc $rrd_async_process */
 
     try {
         $cmd = rrdtool_build_command($command, $filename, $options);

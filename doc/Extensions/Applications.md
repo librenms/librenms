@@ -12,7 +12,8 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Memcached](#memcached) - SNMP extend
 1. [MySQL](#mysql) - Agent
 1. [NGINX](#nginx) - Agent
-1. [NTPD](#ntpd-server) - SNMP extend, Agent
+1. [NTP Client](#ntp-client) - SNMP extend
+1. [NTP Server](#ntp-server) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
@@ -151,25 +152,39 @@ location /nginx-status {
 ```
 
 
-
-### NTPD Server
-Supports NTPD Server (not client, that is separate)
+### NTP Client
+A shell script that gets stats from ntp client.
 
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntpd-server.php -O /etc/snmp/ntpd-server.php
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client.sh -O /opt/ntp-client.sh
 ```
-2. Make the script executable (chmod +x /etc/snmp/ntdp-server.php)
+2. Make the script executable (chmod +x /opt/ntp-client.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ntpdserver /etc/snmp/ntpd-server.php
+extend ntp-client /etc/snmp/ntp-client.sh
 ```
 4. Restart snmpd on your host
-5. On the device page in Librenms, edit your host and check the `Ntpd-server` under the Applications tab.
+5. On the device page in Librenms, edit your host and check the `NTP Client` under the Applications tab.
 
-##### Agent
-Support is built into the agent, and this app will be automatically enabled.
+
+
+### NTP Server (NTPD)
+A shell script that gets stats from ntp server (ntpd).
+
+##### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-server.sh -O /opt/ntp-server.sh
+```
+2. Make the script executable (chmod +x /opt/ntp-server.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend ntp-server /etc/snmp/ntp-server.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `NTP Server` under the Applications tab.
 
 
 

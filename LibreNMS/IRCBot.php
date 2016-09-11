@@ -569,7 +569,12 @@ class IRCBot
 
     private function _version($params)
     {
-        return $this->respond($this->config['project_name_version'].', PHP: '.PHP_VERSION);
+        $versions       = version_info(false);
+        $schema_version = $versions['db_schema'];
+        $version        = substr($versions['local_sha'], 0, 7);
+
+        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: #'.$schema_version.', PHP: '.PHP_VERSION;
+        return $this->respond($msg);
     }//end _version()
 
 

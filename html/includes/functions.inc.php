@@ -73,8 +73,11 @@ function nicecase($item)
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
 
-        case 'ntpd':
-            return 'NTPD (Server)';
+        case 'ntp-client':
+            return 'NTP Client';
+
+        case 'ntp-server':
+            return 'NTP Server';
 
         case 'os-updates':
             return 'OS Updates';
@@ -574,7 +577,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array = array();
     $port        = ifNameDescr($port);
     if (!$text) {
-        $text = fixIfName($port['label']);
+        $text = fixifName($port['label']);
     }
 
     if ($type) {

@@ -1,4 +1,4 @@
-Developing/Merging-Pull-Requests.md
+source: Developing/Merging-Pull-Requests.md
 # Merging Pull Requests
 
 ### GitHub

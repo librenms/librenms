@@ -4,7 +4,7 @@
 // 1 UNKNOWN
 
 /*
- * Observium Network Management and Monitoring System
+ * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
  * This program is free software: you can redistribute it and/or modify

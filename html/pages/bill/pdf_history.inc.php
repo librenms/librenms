@@ -123,7 +123,7 @@ function genGraphs($bill_id, $imgtype, $from, $to, $bittype = 'Quota')
     $res .= '&x=1190&y=250';
     $res .= '&from='.$from.'&to='.$to;
     if (!bill_permitted($bill_id)) {
-        $res = 'images/observium-logo.png';
+        $res = 'images/librenms_logo.png';
     }
 
     return $res;

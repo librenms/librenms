@@ -7,12 +7,10 @@
  *
  * @package    librenms
  * @subpackage ajax
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
 require_once '../includes/defaults.inc.php';
-set_debug($_REQUEST['debug']);
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
 require_once 'includes/functions.inc.php';
@@ -21,6 +19,8 @@ require_once '../includes/common.php';
 
 require_once '../includes/rewrites.php';
 require_once 'includes/authenticate.inc.php';
+
+set_debug($_REQUEST['debug']);
 
 if (!$_SESSION['authenticated']) {
     echo 'unauthenticated';

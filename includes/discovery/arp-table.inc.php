@@ -11,15 +11,14 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
 
-    $ipNetToMedia_data = snmp_walk($device, 'ipNetToMediaPhysAddress', '-Oq', 'IP-MIB');
-    $ipNetToMedia_data = str_replace('ipNetToMediaPhysAddress.', '', trim($ipNetToMedia_data));
-    $ipNetToMedia_data = str_replace('IP-MIB::', '', trim($ipNetToMedia_data));
-
-    foreach (explode("\n", $ipNetToMedia_data) as $data) {
+    $ipNetToPhysical_data = snmp_walk($device, 'ipNetToPhysicalPhysAddress', '-Oq', 'IP-MIB');
+    $ipNetToPhysical_data = str_replace('IP-MIB::ipNetToPhysicalPhysAddress.', '', trim($ipNetToPhysical_data));
+    $ipNetToPhysical_data = str_replace('"', '', trim($ipNetToPhysical_data));
+    foreach (explode("\n", $ipNetToPhysical_data) as $data) {
         list($oid, $mac) = explode(' ', $data);
-        list($if, $first, $second, $third, $fourth) = explode('.', $oid);
+        list($if, $ipv, $first, $second, $third, $fourth) = explode('.', $oid);
         $ip = $first.'.'.$second.'.'.$third.'.'.$fourth;
-        if ($ip != '...') {
+        if ($ip != '...' && $ipv === 'ipv4' && $mac != '0:0:0:0:0:0') {
             $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $if));
 
             list($m_a, $m_b, $m_c, $m_d, $m_e, $m_f) = explode(':', $mac);

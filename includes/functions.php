@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage functions
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
@@ -36,6 +35,17 @@ include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
 
 $console_color = new Console_Color2();
+
+function set_debug($debug)
+{
+    if (isset($debug)) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 0);
+        ini_set('log_errors', 0);
+        ini_set('allow_url_fopen', 0);
+        ini_set('error_reporting', E_ALL);
+    }
+}//end set_debug()
 
 function array_sort($array, $on, $order = SORT_ASC)
 {
@@ -106,20 +116,15 @@ function getHostOS($device)
 
     d_echo("| $sysDescr | $sysObjectId | ");
 
-    $path = $config['install_dir'] . "/includes/discovery/os";
-    $dir_handle = @opendir($path) or die("Unable to open $path");
-    while ($file = readdir($dir_handle)) {
-        if (preg_match("/.php$/", $file)) {
-            include($config['install_dir'] . "/includes/discovery/os/" . $file);
+    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    foreach (glob($pattern) as $file) {
+        include $file;
+        if (isset($os)) {
+            return $os;
         }
     }
-    closedir($dir_handle);
 
-    if ($os) {
-        return $os;
-    } else {
-        return "generic";
-    }
+    return "generic";
 }
 
 function percent_colour($perc)

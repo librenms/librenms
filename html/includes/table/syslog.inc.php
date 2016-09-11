@@ -73,6 +73,7 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
         'msg'       => htmlspecialchars($syslog['msg']),
+        'status'    => generate_priority_status($syslog['priority']),
     );
 }
 

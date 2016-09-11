@@ -2,8 +2,6 @@
 
 $css = <<<EOF
 
-<!-- Observium PDF Billing Report Stylesheet //-->
-
 <style>
 
     .right {

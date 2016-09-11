@@ -63,7 +63,7 @@ Memcache is required for the distributed pollers to be able to register to a cen
 Pollers can be installed and run from anywhere, the only requirements are:
 
 They can access the Memcache instance
-They can create RRD files via some method such as a shared filesystem
+They can create RRD files via some method such as a shared filesystem or RRDTool >=1.5.5
 They can access the MySQL server
 
 You can either assign pollers into groups and set a poller group against certain devices, this will mean that those devices will only be processed by certain pollers (default poller group is 0) or you can assign all pollers to the default poller group for them to process any and all devices.

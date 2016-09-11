@@ -5,7 +5,7 @@ $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-$short_opts = 'lsuphc';
+$short_opts = 'lsupch';
 $long_opts = array(
     'lint',
     'style',
@@ -29,31 +29,31 @@ Running $filename without options runs all checks.
 }
 
 // set up some variables
-$parameters = array(
-    'p'        => false,
-    'c'        => false,
-    'passthru' => false,
-    'commands' => false,
-);
 $passthru = check_opt($options, 'p', 'passthru');
 $command_only = check_opt($options, 'c', 'commands');
-$commands = array_diff_assoc($options, $parameters);
-$all = empty($commands);
 $ret = 0;
+$completed_tests = array(
+    'lint' => false,
+    'style' => false,
+    'unit' => false,
+);
 
-// run tests
-if (($all || check_opt($commands, 'l', 'lint')) && !getenv('SKIP_LINT_CHECK')) {
-    $ret += check_lint($passthru, $command_only);
+$all = !check_opt($options, 'l', 'lint', 's', 'style', 'u', 'unit');
+if ($all) {
+    // no test specified, run all tests in this order
+    $options += array('u' => false, 's' => false, 'l' => false);
 }
 
-if (($all || check_opt($commands, 's', 'style')) && !getenv('SKIP_STYLE_CHECK')) {
-    $ret += check_style($passthru, $command_only);
+// run tests in the order they were specified
+foreach (array_keys($options) as $opt) {
+    if ($opt == 'l' || $opt == 'lint') {
+        $ret += run_check('lint', $passthru, $command_only);
+    } elseif ($opt == 's' || $opt == 'style') {
+        $ret += run_check('style', $passthru, $command_only);
+    } elseif ($opt == 'u' || $opt == 'unit') {
+        $ret += run_check('unit', $passthru, $command_only);
+    }
 }
-
-if (($all || check_opt($commands, 'u', 'unit')) && !getenv('SKIP_UNIT_CHECK')) {
-    $ret += check_unit($passthru, $command_only);
-}
-
 
 // output Tests ok, if no arguments passed
 if ($all && $ret === 0) {
@@ -61,6 +61,31 @@ if ($all && $ret === 0) {
 }
 exit($ret); //return the combined/single return value of tests
 
+
+/**
+ * Run the specified check and return the return value.
+ * Make sure it isn't skipped by SKIP_TYPE_CHECK env variable and hasn't been run already
+ *
+ * @param string $type type of check lint, style, or unit
+ * @param bool $passthru display the output as comes in
+ * @param bool $command_only only display the intended command, no checks
+ * @return int the return value from the check (0 = success)
+ */
+function run_check($type, $passthru, $command_only)
+{
+    global $completed_tests;
+    if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $completed_tests[$type]) {
+        return 0;
+    }
+
+    $function = 'check_' . $type;
+    if (function_exists($function)) {
+        $completed_tests[$type] = true;
+        return $function($passthru, $command_only);
+    }
+
+    return 1;
+}
 
 /**
  * Runs php -l and tests for any syntax errors

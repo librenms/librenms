@@ -93,7 +93,7 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
         if (isset($_tmp_password)) {
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => $session_time), 'session');
         } else {
-            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time, 'session', 'session_auth=?'), array($_COOKIE['auth']));
+            dbUpdate(array('session_value' => $sess_id, 'session_expiry' => $session_time), 'session', 'session_auth=?', array($_COOKIE['auth']));
         }
 
         $permissions = permissions_cache($_SESSION['user_id']);
@@ -102,8 +102,12 @@ if ((isset($_SESSION['username'], $_tmp_password)) || (isset($_COOKIE['sess_id']
             exit;
         }
     } elseif (isset($_SESSION['username'])) {
-        $auth_message = 'Authentication Failed';
-        destroy_cookies();
+        global $auth_error;
+        if (isset($auth_error)) {
+            $auth_message = $auth_error;
+        } else {
+            $auth_message = 'Authentication Failed';
+        }
         unset($_SESSION['authenticated']);
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
     }
