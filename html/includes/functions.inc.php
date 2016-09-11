@@ -577,7 +577,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array = array();
     $port        = ifNameDescr($port);
     if (!$text) {
-        $text = fixIfName($port['label']);
+        $text = fixifName($port['label']);
     }
 
     if ($type) {

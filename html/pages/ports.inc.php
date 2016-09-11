@@ -114,7 +114,7 @@ foreach ($results as $data) {
 
 ?>
       </select>
-      <input type="hostname" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {
+      <input type="text" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {
             echo('value="'.$vars['hostname'].'"');
 } ?> placeholder="Hostname" />
     </div>
@@ -203,7 +203,7 @@ foreach ($ports as $data) {
       <input title="Port Description" type="text" name="ifAlias" id="ifAlias" class="form-control input-sm" <?php if (strlen($vars['ifAlias'])) {
             echo('value="'.$vars['ifAlias'].'"');
 } ?> placeholder="Port Description"/>
-        <select name="location" id="location" class="form-control input-sm">
+        <select title="Location" name="location" id="location" class="form-control input-sm">
           <option value="">All Locations</option>
 <?php
 
@@ -222,46 +222,17 @@ foreach (getlocations() as $location) {
       </div>
       <div class="form-group">
         <label for="ignore">Ignored</label>
-        <input type=checkbox id="ignore" name="ignore" value="1" class="" <?php if ($vars['ignore']) {
+        <input type=checkbox id="ignore" name="ignore" value="1" <?php if ($vars['ignore']) {
             echo("checked");
-} ?> ></input>
+} ?> >
         <label for="disabled">Disabled</label>
-        <input type=checkbox id="disabled" name="disabled" value=1 class="" <?php if ($vars['disabled']) {
+        <input type=checkbox id="disabled" name="disabled" value=1 <?php if ($vars['disabled']) {
             echo("checked");
-} ?> ></input>
-        </label>
+} ?> >
         <label for="deleted">Deleted</label>
-        <input type=checkbox id="deleted" name="deleted" value=1 class="" <?php if ($vars['deleted']) {
+        <input type=checkbox id="deleted" name="deleted" value=1 <?php if ($vars['deleted']) {
             echo("checked");
-} ?> ></input>
-        </label>
-      </div>
-      <div class="form-group">
-        <select name="sort" id="sort" class="form-control input-sm">
-<?php
-    $sorts = array('device' => 'Device',
-        'port' => 'Port',
-        'speed' => 'Speed',
-        'traffic' => 'Traffic',
-        'traffic_in' => 'Traffic In',
-        'traffic_out' => 'Traffic Out',
-        'packets' => 'Packets',
-        'packets_in' => 'Packets In',
-        'packets_out' => 'Packets Out',
-        'errors' => 'Errors',
-        'media' => 'Media',
-        'descr' => 'Description');
-
-    foreach ($sorts as $sort => $sort_text) {
-        echo('<option value="'.$sort.'" ');
-        if ($vars['sort'] == $sort) {
-            echo("selected");
-        }
-        echo('>'.$sort_text.'</option>');
-    }
-?>
-
-        </select>
+} ?> >
       </div>
       <button type="submit" class="btn btn-default btn-sm">Search</button>
       <a class="btn btn-default btn-sm" href="<?php echo(generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
