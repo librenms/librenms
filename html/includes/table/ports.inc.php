@@ -24,7 +24,7 @@
  */
 
 list($sort_column, $sort_order) = explode(' ', trim($sort));
-$where = 1;
+$where = "`D`.`hostname` != '' ";
 $param = array();
 $sql = 'FROM `ports`';
 
@@ -37,8 +37,8 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
+$sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 if (!empty($_POST['hostname']) || !empty($_POST['location']) || $sort_column == 'device') {
-    $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
     if (!empty($_POST['hostname'])) {
         $where  .= ' AND `D`.`hostname` LIKE ?';
@@ -135,7 +135,6 @@ foreach (dbFetchRows($sql, $param) as $port) {
 
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
-
     $actions .= '<div class="col-xs-1"><a href="';
     $actions .= generate_device_url($device, array('tab' => 'alerts'));
     $actions .= '"><img src="images/16/bell.png" border="0" align="absmiddle" alt="View alerts" title="View alerts" /></a></div>';
