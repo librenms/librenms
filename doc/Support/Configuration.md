@@ -39,7 +39,8 @@ $config['db']['extension'] = 'mysqli';
 
 #### Programs
 
-A lot of these are self explanatory so no further information may be provided.
+A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
+documentation page will be linked to rather than having the config provided.
 
 ```php
 $config['rrdtool'] = "/usr/bin/rrdtool";
@@ -94,20 +95,11 @@ $config['sfdp']             = "/usr/bin/sfdp";
 
 #### Memcached
 
-```php
-$config['memcached']['enable']  = FALSE;
-$config['memcached']['host']    = "localhost";
-$config['memcached']['port']    = 11211;
-```
-Settings to enable memcached - currently it's not recommended to run memcached until support is improved.
+[Memcached](Extensions/Memcached.md]
 
 #### RRDCached
 
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached.sock"; // or a tcp connection 127.0.0.1:42217
-```
-To enable rrdcached you need to set at least the `rrdcached` option. Make sure rrdcached is started with the `-b` option set to the correct directoy, 
-as configured in `$config['rrd_dir`]`.
+[RRDCached](Extensions/RRDCached.md]
 
 #### WebUI Settings
 
@@ -182,9 +174,9 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 Enable / disable certain menus from being shown in the WebUI.
 
 ```php
-$config['web_mouseover']      = TRUE;
+$config['web_mouseover']      = true;
 ```
-You can disable the mouseover popover for mini graphs by setting this to FALSE.
+You can disable the mouseover popover for mini graphs by setting this to false.
 
 ```php
 $config['enable_lazy_load'] = true;
@@ -192,12 +184,12 @@ $config['enable_lazy_load'] = true;
 You can disable image lazy loading by setting this to false.
 
 ```php
-$config['show_overview_tab'] = TRUE;
+$config['show_overview_tab'] = true;
 ```
 Enable or disable the overview tab for a device.
 
 ```php
-$config['overview_show_sysDescr'] = TRUE;
+$config['overview_show_sysDescr'] = true;
 ```
 Enable or disable the sysDescr output for a device.
 
@@ -230,8 +222,8 @@ $config['gui']['network-map']['style'] = 'old';
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
 ```php
-$config['addhost_alwayscheckip']   = FALSE; #TRUE - check for duplicate ips even when adding host by name.
-                                            #FALSE- only check when adding host by ip.
+$config['addhost_alwayscheckip']   = false; #true - check for duplicate ips even when adding host by name.
+                                            #false- only check when adding host by ip.
 ```
 
 By default we allow hosts to be added with duplicate sysName's, you can disable this with the following config:
@@ -268,29 +260,7 @@ The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`,
 
 #### Auto discovery settings
 
-```php
-$config['autodiscovery']['xdp']            = TRUE;
-$config['autodiscovery']['ospf']           = TRUE;
-$config['autodiscovery']['bgp']            = TRUE;
-$config['autodiscovery']['snmpscan']       = TRUE;
-$config['discover_services']               = FALSE;
-```
-Auto discovery options, xdp covers LLDP, CDP and FDP. `discover_services` will discover services from SNMP.
-
-```php
-$config['autodiscovery']['nets-exclude'][] = "0.0.0.0/8";
-$config['autodiscovery']['nets-exclude'][] = "127.0.0.0/8";
-$config['autodiscovery']['nets-exclude'][] = "169.254.0.0/16";
-$config['autodiscovery']['nets-exclude'][] = "224.0.0.0/4";
-$config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
-```
-Arrays of subnets to exclude in auto discovery mode.
-
-```php
-$config['discovery_by_ip'] = true;
-```
-Enable auto discovery by IP. By default we only discover based on hostnames but manually adding by IP is allowed.
-Please note this could lead to duplicate devices being added based on IP, Hostname or sysName.
+[Auto-Discovery](Extensions/Auto-Discovery.md)
 
 #### Email configuration
 
@@ -305,7 +275,7 @@ $config['email_smtp_host']            = 'localhost';
 $config['email_smtp_port']            = 25;
 $config['email_smtp_timeout']         = 10;
 $config['email_smtp_secure']          = NULL;
-$config['email_smtp_auth']            = FALSE;
+$config['email_smtp_auth']            = false;
 $config['email_smtp_username']        = NULL;
 $config['email_smtp_password']        = NULL;
 ```
@@ -314,11 +284,11 @@ The varying options after that are to support the different transports.
 
 #### Alerting
 
-Please see [Alerting](http://docs.librenms.org/Extensions/Alerting/) section of the docs for configuration options.
+[Alerting](Extensions/Alerting.md)
 
 #### Billing
 
-Please see [Billing](http://docs.librenms.org/Extensions/Billing-Module/) section of the docs for setup and configuration options.
+[Billing](Extensions/Billing-Module.md)
 
 #### Global module support
 
@@ -333,10 +303,7 @@ $config['enable_sla']                   = 0; # Enable Cisco SLA collection and d
 
 #### Port extensions
 
-```php
-$config['port_descr_parser']            = "includes/port-descr-parser.inc.php";
-```
-You can extend the included port description parser with your own script here.
+[Port-Description-Parser](Extensions/Port-Description-Parser.md)
 
 ```php
 $config['enable_ports_etherlike']       = 0;
@@ -346,7 +313,7 @@ $config['enable_ports_poe']             = 0;
 ```
 Enable / disable additional port statistics.
 
-#### External integration
+### External integration
 
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
@@ -355,14 +322,11 @@ $config['rancid_ignorecomments']        = 0;
 Rancid configuration, `rancid_configs` is an array containing all of the locations of your rancid files.
 Setting `rancid_ignorecomments` will disable showing lines that start with #
 
-```php
-$config['oxidized']['enabled']         = FALSE;
-$config['oxidized']['url']             = 'http://127.0.0.1:8888';
-```
-To enable Oxidized support set enabled to `TRUE`. URL needs to be configured to point to the REST API for Oxidized. This
-is then used to retrieve the config for devices.
+#### Oxidized
 
+[Oxidized](Extensions/Oxidized.md)
 
+#### CollectD
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
@@ -373,28 +337,13 @@ $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
 ```
 Specify the location of the collectd unix socket. Using a socket allows the collectd graphs to be flushed to disk before being drawn. Be sure that your web server has permissions to write to this socket.
 
-```php
-$config['smokeping']['dir']             = "/var/lib/smokeping/";
-```
-Set the smokeping directory location.
+#### Smokeping
 
-```php
-$config['smokeping']['pings']           = 20;
-```
-Should be equal to "pings" in your smokeping config.  On Debian/Ubuntu, this is set in `/etc/smokeping/config.d/Database`.
+[Smokeping](Extensions/Smokeping.md)
 
-You can also set it to less than the value of "pings" in your smokeping config if you don't want LibreNMS to graph all of the ping data.
+#### NFSen
 
-```php
-$config['nfsen_enable'] = 0;
-$config['nfsen_split_char']   = "_";
-$config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
-$config['nfsen_suffix']   = "_yourdomain_com";
-```
-NFSen integration support.
-`nfsen_split_char` Is the character to replace with full stops to match the device hostname.
-`nfsen_rrds` Is the location of the rrd files.
-`nfsen_suffix` The domain to remove from the nfsen files.
+[NFSen](Extensions/NFSen.md)
 
 #### Location mapping
 
@@ -476,28 +425,11 @@ Mounted storage / mount points to ignore in discovery and polling.
 
 #### IRC Bot
 
-Please see [IRC Bot](http://docs.librenms.org/Extensions/IRC-Bot/) section of the docs for configuration options.
+[IRC Bot](Extensions/IRC-Bot.md)
 
 #### Authentication
 
-```php
-$config['auth_mechanism']           = "mysql";
-```
-This is the authentication type to use for the WebUI. MySQL is the default and configured when following the installation
-instructions. ldap and http-auth are also valid options. For instructions on the different authentication modules please
-see [Authentication](http://docs.librenms.org/Extensions/Authentication/).
-
-```php
-$config['auth_remember']            = '30';
-```
-If the user selects to be remembered on the login page, how long in days do we remember that use for.
-
-```php
-$config['allow_unauth_graphs']      = 0;
-$config['allow_unauth_graphs_cidr'] = array();
-```
-This option will enable unauthenticated access to the graphs from `allow_unauth_graphs_cidr` ranges that you allow. Use
- of this option is highly discouraged in favour of the [API](http://docs.librenms.org/API/API-Docs/) that is now available.
+[Authentication](Extensions/Authentication.md)
 
 #### Cleanup options
 
@@ -519,10 +451,7 @@ the rrd directory automatically - only enable this if you are comfortable with t
 
 #### Syslog options
 
-```php
-$config['syslog_filter'][] = "last message repeated";
-```
-This array can be used to filter out syslog messages that you don't want to be stored or seen within LibreNMS
+[Syslog](Extensions/Syslog.md)
 
 #### Virtualization
 
@@ -555,10 +484,7 @@ You can use this array to rewrite the description of ASes that you have discover
 
 #### Auto updates
 
-```php
-$config['update'] = 1;
-```
-By default, LibreNMS will auto update itself every 24 hours. You can stop this from happening by setting `update` to 0.
+[Updating](General/Updating.md)
 
 #### IPMI
 Setup the types of IPMI protocols to test a host for and it what order.
@@ -573,4 +499,4 @@ $config['ipmi']['type'][] = "open";
 
 #### Distributed poller settings
 
-Please see [Distributed Poller](http://docs.librenms.org/Extensions/Distributed-Poller/) section of the docs for setup and configuration options.
+[Distributed Poller](Extensions/Distributed-Poller.md)
