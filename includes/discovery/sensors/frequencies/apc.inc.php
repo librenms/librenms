@@ -74,12 +74,12 @@ if ($device['os'] == 'apc') {
         discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
     
-    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.3.0', '-OsqnU', '');
+    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.3.0', '-OsqnUT', '');
     d_echo($oids."\n");
     if ($oids) {
         echo ' APC Runtime ';
         list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
+        $divisor            = 6000;
         $type               = 'apc';
         $index              = '2.2.3.0';
         $descr              = 'Runtime';
