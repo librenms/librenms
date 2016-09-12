@@ -739,11 +739,15 @@ function get_graph_subtypes($type, $device = null)
         closedir($handle);
     }
 
-    // find the MIB subtypes
-    foreach ($config['graph_types'] as $type => $unused1) {
-        foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-            if (is_mib_graph($type, $subtype)  &&  $device != null  &&  is_device_graph($device, $subtype)) {
-                $types[] = $subtype;
+    if ($device != null) {
+        // find the MIB subtypes
+        $graphs = get_device_graphs($device);
+
+        foreach ($config['graph_types'] as $type => $unused1) {
+            foreach ($config['graph_types'][$type] as $subtype => $unused2) {
+                if (is_mib_graph($type, $subtype) && in_array($graphs, $subtype)) {
+                    $types[] = $subtype;
+                }
             }
         }
     }
@@ -752,13 +756,11 @@ function get_graph_subtypes($type, $device = null)
     return $types;
 } // get_graph_subtypes
 
-
-function is_device_graph($device, $subtype)
+function get_device_graphs($device)
 {
-    $query = 'SELECT COUNT(*) FROM `device_graphs` WHERE `device_id` = ? AND `graph` = ?';
-    return dbFetchCell($query, array($device['device_id'], $subtype)) > 0;
-} // is_device_graph
-
+    $query = 'SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?';
+    return dbFetchColumn($query, array($device['device_id']));
+}
 
 function get_smokeping_files($device)
 {
