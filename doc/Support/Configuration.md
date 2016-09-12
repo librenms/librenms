@@ -425,7 +425,7 @@ Mounted storage / mount points to ignore in discovery and polling.
 
 #### IRC Bot
 
-IRC Bot](Extensions/IRC-Bot.md)
+[IRC Bot](Extensions/IRC-Bot.md)
 
 #### Authentication
 
@@ -499,4 +499,4 @@ $config['ipmi']['type'][] = "open";
 
 #### Distributed poller settings
 
-[Distributed Poller](Extensions/Distributed-Poller.md
+[Distributed Poller](Extensions/Distributed-Poller.md)
