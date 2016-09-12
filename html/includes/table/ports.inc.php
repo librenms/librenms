@@ -39,16 +39,14 @@ if (is_admin() === false && is_read() === false) {
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
-if (!empty($_POST['hostname']) || !empty($_POST['location'])) {
-    if (!empty($_POST['hostname'])) {
-        $where  .= ' AND `D`.`hostname` LIKE ?';
-        $param[] = '%' . $_POST['hostname'] . '%';
-    }
+if (!empty($_POST['hostname'])) {
+    $where  .= ' AND `D`.`hostname` LIKE ?';
+    $param[] = '%' . $_POST['hostname'] . '%';
+}
 
-    if (!empty($_POST['location'])) {
-        $where  .= " AND `D`.`location` = ?";
-        $param[] = $_POST['location'];
-    }
+if (!empty($_POST['location'])) {
+    $where  .= " AND `D`.`location` = ?";
+    $param[] = $_POST['location'];
 }
 
 $sql .= " WHERE $where ";
