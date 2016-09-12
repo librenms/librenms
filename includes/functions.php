@@ -1491,19 +1491,6 @@ function report_this($message)
     return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
 }//end report_this()
 
-function reauthenticate($sess_id, $token)
-{
-    list($uname,$hash) = explode('|', $token);
-    $session           = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'", array(), true);
-    $hasher            = new PasswordHash(8, false);
-    if ($hasher->CheckPassword($uname.$session['session_token'], $hash)) {
-        $_SESSION['username'] = $uname;
-        return 1;
-    } else {
-        return 0;
-    }
-}//end reauthenticate()
-
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(" ", "", $number)) == 4) {
