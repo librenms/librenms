@@ -26,6 +26,7 @@ $supported_sensors = array(
     'load'        => '%',
     'state'       => '#',
     'signal'      => 'dBm',
+    'runtime'      => 'Min',
 );
 
 foreach ($supported_sensors as $sensor_type => $sensor_unit) {
