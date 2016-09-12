@@ -499,16 +499,16 @@ if ($bgp_alerts) {
               <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
-              <?php
-              if ($_SESSION['userlevel'] >= '10') {
-                  ?>
+                <?php
+                if ($_SESSION['userlevel'] >= '10') {
+                    ?>
                   <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
                   <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
                   <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
                   <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
-                  <?php
-              }
-              ?>
+                    <?php
+                }
+                ?>
           </ul>
       </li>
 
