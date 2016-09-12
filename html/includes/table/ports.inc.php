@@ -39,7 +39,7 @@ if (is_admin() === false && is_read() === false) {
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
-if (!empty($_POST['hostname']) || !empty($_POST['location']) || $sort_column == 'device') {
+if (!empty($_POST['hostname']) || !empty($_POST['location'])) {
     if (!empty($_POST['hostname'])) {
         $where  .= ' AND `D`.`hostname` LIKE ?';
         $param[] = '%' . $_POST['hostname'] . '%';
@@ -163,18 +163,11 @@ foreach (dbFetchRows($sql, $param) as $port) {
     );
 }
 
-// debug
-//$vals = $param;
-//$query = preg_replace_callback('/\?/', function ($match) use (&$vals) {
-//    return array_shift($vals); // wrap in quotes and sanitize
-//}, $sql);
-
 $output = array(
     'current'  => $current,
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $total,
-//    'sql'      => $query,
 );
 
 echo _json_encode($output);
