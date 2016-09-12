@@ -77,6 +77,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testAxiscam()
     {
+        $this->checkOS('axiscam', ' ; AXIS 221; Network Camera; 4.30; Nov 29 2005 11:18; 141; 1;');
         $this->checkOS('axiscam', ' ; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;');
     }
 
