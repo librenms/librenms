@@ -29,17 +29,6 @@ include 'tests/mocks/mock.snmp.inc.php';
 
 class DiscoveryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAiros()
-    {
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
-
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-        );
-        $this->checkOS('airos', 'Linux', '', $mockSnmp);
-    }
-
     /**
      * Set up variables and include os discovery
      *
@@ -67,12 +56,29 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedOS, $os);
     }
 
+    public function testAiros()
+    {
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
+
+        $mockSnmp = array(
+            'dot11manufacturerName.5' => 'Ubiquiti',
+        );
+        $this->checkOS('airos', 'Linux', '', $mockSnmp);
+    }
+
     public function testAirosAf()
     {
         $mockSnmp = array(
             'fwVersion.1' => '1.0',
         );
         $this->checkOS('airos-af', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+    }
+
+    public function testAxiscam()
+    {
+        $this->checkOS('axiscam', ' ; AXIS 221; Network Camera; 4.30; Nov 29 2005 11:18; 141; 1;');
+        $this->checkOS('axiscam', ' ; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;');
     }
 
     public function testCiscosmblinux()
