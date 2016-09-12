@@ -58,6 +58,7 @@ class Plugins
         include $file;
         $pluginFullName = 'LibreNMS\\Plugins\\' . $pluginName;
         if (class_exists($pluginFullName)) {
+            $pluginName = $pluginFullName;
             $plugin = new $pluginFullName;
         } elseif (class_exists($pluginName)) {
             $plugin = new $pluginName;
