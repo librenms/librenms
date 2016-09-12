@@ -25,6 +25,7 @@ require_once 'config.php';
 require_once 'includes/definitions.inc.php';
 require_once 'includes/functions.php';
 require_once 'includes/discovery/functions.inc.php';
+require_once 'html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
 error_reporting(E_ERROR);
 
 $irc = new LibreNMS\IRCBot();
