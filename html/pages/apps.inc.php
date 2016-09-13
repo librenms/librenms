@@ -104,6 +104,14 @@ $graphs['freeswitch'] = array(
     'callsOut',
 );
 
+$graphs['ups-nut'] = array(
+    'remaining',
+    'load',
+    'voltage_battery',
+    'charge',
+    'voltage_input',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

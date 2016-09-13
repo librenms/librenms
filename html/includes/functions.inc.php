@@ -88,6 +88,9 @@ function nicecase($item)
         case 'dhcp-stats':
             return 'DHCP Stats';
 
+        case 'ups-nut':
+            return 'UPS nut';
+
         default:
             return ucfirst($item);
     }
