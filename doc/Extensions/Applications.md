@@ -21,6 +21,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
+1. [UPS-nut](#ups-nut) - SNMP extend
 1. [Agent Setup](#agent-setup)
 
 
@@ -304,6 +305,21 @@ server:
 ```
 
 Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+
+
+
+### UPS-nut
+A small shell script that exports nut ups status.
+
+##### SNMP Extend
+1. Copy the [ups nut](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-nut.sh) to `/opt/` (or any other suitable location) on your PI host.
+2. Make the script executable (chmod +x /opt/ups-nut.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend ups-nut /opt/ups-nut.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `UPS nut` under the Applications tab.
 
 
 
