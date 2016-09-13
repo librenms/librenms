@@ -23,6 +23,13 @@ function authenticate($username, $password)
     return 0;
 }
 
+
+function reauthenticate($sess_id = '', $token = '')
+{
+    return 0;
+}
+
+
 function passwordscanchange($username = '')
 {
     return 0;
