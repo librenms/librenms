@@ -76,10 +76,10 @@ A small shell script that reports current DHCP leases stats.
 
 ##### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
-2. Make the script executable (chmod +x /opt/dhcp-status.sh)
+2. Make the script executable (chmod +x /etc/snmp/dhcp-status.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend dhcpstats /opt/dhcp-status.sh
+extend dhcpstats /etc/snmp/dhcp-status.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
@@ -104,11 +104,11 @@ extend mailscanner /etc/snmp/mailscanner.php
 
 ### Memcached
 ##### SNMP Extend
-1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/usr/local/bin` (or any other suitable location) on your remote server.
-2. Make the script executable: `chmod +x /usr/local/memcached`
+1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/etc/snmp/` on your remote server.
+2. Make the script executable: `chmod +x /etc/snmp/memcached`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 ```
-extend memcached /usr/local/bin/memcached
+extend memcached /etc/snmp/memcached
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Memcached` under the Applications tab.
@@ -159,9 +159,9 @@ A shell script that gets stats from ntp client.
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client.sh -O /opt/ntp-client.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client.sh -O /etc/snmp/ntp-client.sh
 ```
-2. Make the script executable (chmod +x /opt/ntp-client.sh)
+2. Make the script executable (chmod +x /etc/snmp/ntp-client.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend ntp-client /etc/snmp/ntp-client.sh
@@ -177,9 +177,9 @@ A shell script that gets stats from ntp server (ntpd).
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-server.sh -O /opt/ntp-server.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-server.sh -O /etc/snmp/ntp-server.sh
 ```
-2. Make the script executable (chmod +x /opt/ntp-server.sh)
+2. Make the script executable (chmod +x /etc/snmp/ntp-server.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend ntp-server /etc/snmp/ntp-server.sh
@@ -196,10 +196,10 @@ For pacman users automatically refreshing the database, it is recommended you us
 
 ##### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
-2. Make the script executable (chmod +x /opt/os-updates.sh)
+2. Make the script executable (chmod +x /etc/snmp/os-updates.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend osupdate /opt/os-updates.sh
+extend osupdate /etc/snmp/os-updates.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `OS Updates` under the Applications tab.
@@ -252,15 +252,15 @@ This script uses `rec_control get-all` to collect stats.
 SNMP extend script to get your PI data into your host.
 
 ##### SNMP Extend
-1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/opt/` (or any other suitable location) on your PI host.
-2. Make the script executable: `chmod +x /opt/raspberry.sh`
+1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/etc/snmp/` (or any other suitable location) on your PI host.
+2. Make the script executable: `chmod +x /etc/snmp/raspberry.sh`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 ```
-extend raspberry /opt/raspberry.sh
+extend raspberry /etc/snmp/raspberry.sh
 ```
 4. Edit your sudo users (usually `visudo`) and add at the bottom:
 ```
-snmp ALL=(ALL) NOPASSWD: /opt/raspberry.sh, /usr/bin/vcgencmd*
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 ```
 5. Restart snmpd on PI host
 
@@ -312,11 +312,11 @@ Restart your unbound after changing the configuration,v erify it is working by r
 A small shell script that exports nut ups status.
 
 ##### SNMP Extend
-1. Copy the [ups nut](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-nut.sh) to `/opt/` (or any other suitable location) on your PI host.
-2. Make the script executable (chmod +x /opt/ups-nut.sh)
+1. Copy the [ups nut](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-nut.sh) to `/etc/snmp/` on your host.
+2. Make the script executable (chmod +x /etc/snmp/ups-nut.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ups-nut /opt/ups-nut.sh
+extend ups-nut /etc/snmp/ups-nut.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `UPS nut` under the Applications tab.
