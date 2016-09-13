@@ -81,14 +81,6 @@ function authenticate($username, $password)
     return 0;
 }
 
-
-function reauthenticate($sess_id = '', $token = '')
-{
-    // Not supported
-    return 0;
-}
-
-
 function passwordscanchange($username = '')
 {
     // Not supported
