@@ -43,7 +43,7 @@ $config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
-$config['db']['extension']       = 'mysql';//mysql and mysqli available
+$config['db']['extension']       = 'mysqli';//mysql and mysqli available
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
