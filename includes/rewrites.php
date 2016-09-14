@@ -77,8 +77,6 @@ function ifLabel($interface, $device = null)
 
         if ($interface['ifName'] == '') {
             $interface['label'] = $interface['ifDescr'];
-        } else {
-            $interface['label'] = $interface['ifName'];
         }
     } elseif (isset($config['os'][$os]['ifalias'])) {
         $interface['label'] = $interface['ifAlias'];
