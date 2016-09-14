@@ -14,7 +14,7 @@
  */
 
 // assume this script is in the installation directory
-$install_dir = __DIR__;
+$install_dir = realpath(__DIR__);
 chdir($install_dir);
 
 $options = getopt('m:h::');
