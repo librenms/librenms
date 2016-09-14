@@ -17,7 +17,6 @@ if (is_admin() !== false) {
     if (file_exists($dir) && is_dir($dir)) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;
-        d_print_r($files);
         foreach ($files as $file) {
             if (is_executable($dir.$file) && is_file($dir.$file) && strstr($file, 'check_')) {
                 list(,$check_name) = explode('_', $file, 2);

@@ -18,7 +18,6 @@ function get_service_status($device = null)
         $sql_query = substr($sql_query, 0, strlen($sql_query)-6);
     }
     $sql_query .= " GROUP BY service_status";
-    d_echo("SQL Query: ".$sql_query);
 
     // $service is not null, get only what we want.
     $result = dbFetchRows($sql_query, $sql_param);
@@ -30,7 +29,6 @@ function get_service_status($device = null)
         $service_count[$v['service_status']] = $v['count'];
     }
 
-    d_echo("Service Count by Status: ".print_r($service_count, true)."\n");
     return $service_count;
 }
 

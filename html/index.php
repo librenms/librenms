@@ -35,13 +35,15 @@ function catchFatal()
 }
 
 if (strpos($_SERVER['PATH_INFO'], "debug")) {
-    $debug = "1";
+    $debug = true;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
     set_error_handler('logErrors');
     register_shutdown_function('catchFatal');
+    $sql_debug = array();
+    $php_debug = array();
 } else {
     $debug = false;
     ini_set('display_errors', 0);
