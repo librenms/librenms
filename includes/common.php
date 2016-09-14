@@ -651,12 +651,12 @@ function is_valid_hostname($hostname)
  */
 function d_echo($text, $no_debug_text = null)
 {
-    global $debug;
+    global $debug, $php_debug;
     if ($debug) {
-        if (is_array($text)) {
-            print_r($text);
+        if (isset($php_debug)) {
+            $php_debug[] = $text;
         } else {
-            echo "$text";
+            print_r($text);
         }
     } elseif ($no_debug_text) {
         echo "$no_debug_text";
@@ -683,19 +683,6 @@ function c_echo($string, $enabled = true)
         echo preg_replace('/%((%)|.)/', '', $string);
     }
 }
-
-/*
- * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
- */
-function d_print_r($var, $no_debug_text = null)
-{
-    global $debug;
-    if ($debug) {
-        print_r($var);
-    } elseif ($no_debug_text) {
-        echo "$no_debug_text";
-    }
-} // d_print_r
 
 
 /*
