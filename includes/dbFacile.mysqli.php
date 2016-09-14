@@ -340,7 +340,6 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
     } else {
         return null;
     }
-
 }//end dbFetchRow()
 
 
@@ -504,10 +503,11 @@ function dbPrepareData($data)
     return $values;
 }//end dbPrepareData()
 
-function dbInitStats() {
+function dbInitStats()
+{
     global $db_stats;
 
-    if(!isset($db_stats)) {
+    if (!isset($db_stats)) {
         $db_stats = array(
             'insert' => 0,
             'insert_sec' => 0.0,
