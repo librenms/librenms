@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 /*
@@ -13,9 +13,7 @@
  * the source code distribution for details.
  */
 
-// assume this script is in the installation directory
-$install_dir = __DIR__;
-chdir($install_dir);
+chdir(__DIR__); // cwd to the directory containing this script
 
 $options = getopt('m:h::');
 

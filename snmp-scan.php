@@ -29,6 +29,8 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 
+chdir(__DIR__); // cwd to the directory containing this script
+
 $ts = microtime(true);
 
 chdir(dirname($argv[0]));
