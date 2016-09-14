@@ -42,7 +42,15 @@ if (!empty($filter_hostname)) {
     }
 }
 
-$graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . '/search/universal/relative?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
+if (isset($config['graylog']['base_uri'])) {
+    $graylog_base = $config['graylog']['base_uri'];
+} elseif (version_compare($config['graylog']['version'], '2.1', '>=')) {
+    $graylog_base = '/api/search/universal/relative';
+} else {
+    $graylog_base = '/search/universal/relative';
+}
+
+$graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . $graylog_base . '?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
 
 $context = stream_context_create(array(
     'http' => array(
