@@ -56,7 +56,7 @@ if (!empty($filter_device)) {
 
     foreach ($results as $data) {
         $tmp_output .= '"<option value=\"'.$data['hostname'].'\""+';
-        if ($data['hostname'] == $vars['hostname']) {
+        if (isset($vars['hostname']) && $data['hostname'] == $vars['hostname']) {
             $tmp_output .= '"selected"+';
         }
         $tmp_output .= '">'.$data['hostname'].'</option>"+';
@@ -67,7 +67,7 @@ if (!empty($filter_device)) {
 ';
 }
 
-if (empty($filter_device)) {
+if (empty($filter_device) && isset($_POST['hostname'])) {
     $filter_device = mres($_POST['hostname']);
 }
 
@@ -96,7 +96,7 @@ $tmp_output .= '
         rowCount: ['. $results_limit .', 25,50,100,250,-1],
 ';
 
-if ($no_form !== true) {
+if (isset($no_form) && $no_form !== true) {
     $tmp_output .= '
         templates: {
             header: searchbar
@@ -109,8 +109,8 @@ $tmp_output .= '
         {
             return {
                 id: "graylog",
-                hostname: "' . $filter_device . '",
-                range: "' . mres($_POST['range'])  . '"
+                hostname: "' . (isset($filter_device) ? $filter_device : '') . '",
+                range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
             };
         },
         url: "ajax_table.php",

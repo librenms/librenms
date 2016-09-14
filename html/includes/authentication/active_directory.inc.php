@@ -36,6 +36,7 @@ function authenticate($username, $password)
                     array('memberOf')
                 );
                 $entries = ldap_get_entries($ldap_connection, $search);
+                unset($entries[0]['memberof']['count']); //remove the annoying count
 
                 foreach ($entries[0]['memberof'] as $entry) {
                     $group_cn = get_cn($entry);
@@ -162,11 +163,13 @@ function get_userlevel($username)
         array('memberOf')
     );
     $entries = ldap_get_entries($ldap_connection, $search);
-    
+    unset($entries[0]['memberof']['count']);
+
     // Loop the list and find the highest level
     foreach ($entries[0]['memberof'] as $entry) {
         $group_cn = get_cn($entry);
-        if ($config['auth_ad_groups'][$group_cn]['level'] > $userlevel) {
+        if (isset($config['auth_ad_groups'][$group_cn]['level']) &&
+             $config['auth_ad_groups'][$group_cn]['level'] > $userlevel) {
             $userlevel = $config['auth_ad_groups'][$group_cn]['level'];
         }
     }
@@ -353,13 +356,13 @@ function get_cn($dn)
 {
     $dn = str_replace('\\,', '~C0mmA~', $dn);
     preg_match('/[^,]*/', $dn, $matches, PREG_OFFSET_CAPTURE, 3);
-    $matches[0][0] = str_replace('~C0mmA~', ',', $matches[0][0]);
-    return $matches[0][0];
+    return str_replace('~C0mmA~', ',', $matches[0][0]);
 }
 
 function sid_from_ldap($sid)
 {
-        $sidHex = unpack('H*hex', $sid);
+        $sidUnpacked = unpack('H*hex', $sid);
+        $sidHex = array_shift($sidUnpacked);
         $subAuths = unpack('H2/H2/n/N/V*', $sid);
         $revLevel = hexdec(substr($sidHex, 0, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));
