@@ -291,7 +291,8 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             success: function(msg){
                 $("#message").html(\'<div class="alert alert-info">\'+msg+\'</div>\');
                 if(msg.indexOf("ERROR:") <= -1) {
-                    location.reload();
+                    var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
+                    alerts_grid.bootgrid("sort", $sortDictionary); 
                 }
             },
             error: function(){
