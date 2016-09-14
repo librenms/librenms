@@ -4,3 +4,4 @@ UPDATE `config` SET `config_name` = 'webui.availability_map_old', `config_hidden
 UPDATE `config` SET `config_hidden` = '0' WHERE `config_name` = 'webui.availability_map_sort_status';
 UPDATE `config` SET `config_descr` = 'Enable usage of device groups filter' WHERE `config_name` = 'webui.availability_map_use_device_groups';
 UPDATE `config` SET `config_descr` = 'Sort devices and services by status' WHERE `config_name` = 'webui.availability_map_sort_status';
+UPDATE `config` SET `config_name` = 'webui.availability_map_compact' WHERE `config_name` = 'webui.availability_map_old';
