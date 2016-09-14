@@ -226,19 +226,18 @@ if ($config['distributed_poller'] === true) {
               </select>
           </div>
       </div>
+    ';
+}//endif
+?>
       <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
               <div class="checkbox">
                   <label>
-                      <input type="checkbox" name="force_add" id="force_add"> Force add
+                      <input type="checkbox" name="force_add" id="force_add"> Force add - No ICMP or SNMP checks performed
                   </label>
               </div>
           </div>
       </div>
-    ';
-}//end if
-
-?>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>
