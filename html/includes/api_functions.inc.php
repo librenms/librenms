@@ -764,7 +764,7 @@ function list_alerts()
         array_push($param, $alert_id);
     }
 
-    $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.* FROM `alerts` AS `A`, `devices` AS `D` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`state` IN (?) $sql", $param);
+    $alerts       = dbFetchRows("SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN (?) $sql", $param);
     $total_alerts = count($alerts);
     $output       = array(
         'status'  => 'ok',
