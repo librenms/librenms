@@ -34,7 +34,7 @@ function catchFatal()
     }
 }
 
-if (strpos($_SERVER['PATH_INFO'], "debug")) {
+if (strpos($_SERVER['REQUEST_URI'], "debug")) {
     $debug = true;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 1);
