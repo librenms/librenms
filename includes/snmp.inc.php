@@ -991,7 +991,7 @@ function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
         $mibs[$obj['object_type']] = $obj;
         $mibs[$obj['object_type']]['included_by'] = $included_by;
     }
-    d_print_r($mibs);
+    d_echo($mibs);
     // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
     $columns = array('module', 'mib', 'object_type', 'oid', 'syntax', 'description', 'max_access', 'status', 'included_by');
     update_db_table('mibdefs', $columns, 3, $mibs);
@@ -1202,7 +1202,7 @@ function load_mibdefs($module, $name)
         }
     }
 
-    d_print_r($result);
+    d_echo($result);
     return $result;
 } // load_mibdefs
 
@@ -1236,7 +1236,7 @@ function poll_mibs($device, &$graphs)
         echo "$name ";
         d_echo("\n");
         $oids = snmpwalk_cache_oid($device, $name, array(), $module, null, "-OQUsb");
-        d_print_r($oids);
+        d_echo($oids);
         save_mibs($device, $name, $oids, load_mibdefs($module, $name), $graphs);
     }
     echo "\n";
