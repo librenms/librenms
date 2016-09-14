@@ -13,6 +13,10 @@
  * the source code distribution for details.
  */
 
+// assume this script is in the installation directory
+$install_dir = realpath(__DIR__);
+chdir($install_dir);
+
 $options = getopt('m:h::');
 
 if (isset($options['h'])) {
@@ -52,7 +56,7 @@ if (function_exists('posix_getpwuid')) {
     $userinfo = posix_getpwuid(posix_geteuid());
     $username = $userinfo['name'];
 } else {
-    $username = getenv('USERNAME') ?: getenv('USER');//http://php.net/manual/en/function.get-current-user.php
+    $username = getenv('USERNAME') ?: getenv('USER'); //http://php.net/manual/en/function.get-current-user.php
 }
 if ($username !== 'root') {
     print_fail("You need to run this script as root");
