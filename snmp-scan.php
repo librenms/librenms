@@ -33,8 +33,6 @@ chdir(__DIR__); // cwd to the directory containing this script
 
 $ts = microtime(true);
 
-chdir(dirname($argv[0]));
-
 require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
