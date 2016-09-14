@@ -2,7 +2,7 @@
 /**
  * ports.inc.php
  *
- * -Description-
+ * Exports the ports table to json
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-list($sort_column, $sort_order) = explode(' ', trim($sort));
 $where = "`D`.`hostname` != '' ";
 $param = array();
 $sql = 'FROM `ports`';
@@ -85,29 +84,20 @@ if (!empty($_POST['ifAlias'])) {
     $param[] = '%'.$_POST['ifAlias'].'%';
 }
 
-if (!empty($_POST['disabled'])) {
-    $sql    .= ' AND `ports`.`disabled`=?';
-    $param[] = $_POST['disabled'];
-}
+$sql    .= ' AND `ports`.`disabled`=?';
+$param[] = (int)(isset($_POST['disabled']) && $_POST['disabled']);
 
-if (!empty($_POST['ignore'])) {
-    $sql    .= ' AND `ports`.`ignore`=?';
-    $param[] = $_POST['ignore'];
-}
+$sql    .= ' AND `ports`.`ignore`=?';
+$param[] = (int)(isset($_POST['ignore']) && $_POST['ignore']);
 
-if (!empty($_POST['deleted'])) {
-    $sql    .= ' AND `ports`.`deleted`=?';
-    $param[] = $_POST['deleted'];
-}
-
+$sql    .= ' AND `ports`.`deleted`=?';
+$param[] = (int)(isset($_POST['deleted']) && $_POST['deleted']);
 
 $count_sql = "SELECT COUNT(`ports`.`port_id`) $sql";
-$total = dbFetchCell($count_sql, $param);
-if (empty($total)) {
-    $total = 0;
-}
+$total = (int)dbFetchCell($count_sql, $param);
 
 if (isset($sort) && !empty($sort)) {
+    list($sort_column, $sort_order) = explode(' ', trim($sort));
     if ($sort_column == 'device') {
         $sql .= " ORDER BY `D`.`hostname` $sort_order";
     } elseif ($sort_column == 'port') {
