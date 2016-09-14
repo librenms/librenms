@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 /*
@@ -12,6 +12,8 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+chdir(__DIR__); // cwd to the directory containing this script
 
 $options = getopt('m:h::');
 
@@ -52,7 +54,7 @@ if (function_exists('posix_getpwuid')) {
     $userinfo = posix_getpwuid(posix_geteuid());
     $username = $userinfo['name'];
 } else {
-    $username = getenv('USERNAME') ?: getenv('USER');//http://php.net/manual/en/function.get-current-user.php
+    $username = getenv('USERNAME') ?: getenv('USER'); //http://php.net/manual/en/function.get-current-user.php
 }
 if ($username !== 'root') {
     print_fail("You need to run this script as root");
