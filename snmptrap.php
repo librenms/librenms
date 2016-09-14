@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+chdir(__DIR__); // cwd to the directory containing this script
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
