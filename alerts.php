@@ -25,6 +25,8 @@
  * @subpackage Alerts
  */
 
+chdir(__DIR__); // cwd to the directory containing this script
+
 require_once 'includes/defaults.inc.php';
 require_once 'config.php';
 

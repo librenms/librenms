@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
+
 require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
@@ -26,3 +28,5 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `hostna
         rrdtool_tune('port', $rrdfile, $port['ifSpeed']);
     }
 }
+
+rrdtool_close();
