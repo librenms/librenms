@@ -8,4 +8,3 @@ if ($_SESSION['userlevel'] >= 5) {
         'params' => array($_SESSION['user_id']),
     );
 }
-
