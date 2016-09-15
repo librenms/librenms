@@ -273,10 +273,12 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             data: { type: "open-proc", alert_id: alert_id },
             success: function(msg){
 	        if (msg != "ERROR") { window.open(msg); }
-                else { $("#message").html(\'<div class="alert alert-info">Procedure link does not seem to be valid, please check the rule.</div>\'); }
+                else {
+                    toastr.error("Procedure link does not seem to be valid, please check the rule");
+                }
             },
             error: function(){
-                 $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure link was configured  ?</div>\');
+                 toastr.error("An error occurred opening procedure for this alert. Was the procedure link configured?");
             }
         });
     });
@@ -289,13 +291,14 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             url: "ajax_form.php",
             data: { type: "ack-alert", alert_id: alert_id, state: state },
             success: function(msg){
-                $("#message").html(\'<div class="alert alert-info">\'+msg+\'</div>\');
+                toastr.success(msg);
                 if(msg.indexOf("ERROR:") <= -1) {
-                    location.reload();
+                    var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
+                    alerts_grid.bootgrid("sort", $sortDictionary); 
                 }
             },
             error: function(){
-                 $("#message").html(\'<div class="alert alert-info">An error occurred acking this alert.</div>\');
+                 toastr.error("An error occurred acking this alert");
             }
         });
     });
