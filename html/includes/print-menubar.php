@@ -491,10 +491,19 @@ if ($bgp_alerts) {
 
 <?php
 }
+
+$alerts = new ObjectCache('alerts');
+
+if ($alerts['active_count'] > 0) {
+    $alert_colour = "danger";
+} else {
+    $alert_colour = "success";
+}
+
 ?>
 
       <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-exclamation-circle  fa-fw fa-lg fa-nav-icons hidden-md"> </i> Alerts</a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-exclamation-circle fa-col-<?php echo $alert_colour;?> fa-fw fa-lg fa-nav-icons hidden-md"> </i> Alerts</a>
           <ul class="dropdown-menu">
               <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
