@@ -75,6 +75,14 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('airos-af', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
     }
 
+    public function testApc()
+    {
+        $this->checkOS('apc', 'APC Web/SNMP Management Card (MB:v3.9.2 PF:v3.5.9 PN:apc_hw03_aos_359.bin AF1:v3.5.6 AN1:apc_hw03_nb200_356.bin MN:NBRK0200 HR:05 SN: FFFFFFFFFFFF MD:07/07/2012)', '.1.3.6.1.4.1.318.1.3.8.4');
+        $this->checkOS('apc', 'APC Switched Rack PDU');
+        $this->checkOS('apc', 'APC MasterSwitch PDU');
+        $this->checkOS('apc', 'APC Metered Rack PDU');
+    }
+
     public function testAxiscam()
     {
         $this->checkOS('axiscam', ' ; AXIS 221; Network Camera; 4.30; Nov 29 2005 11:18; 141; 1;');
