@@ -1,4 +1,4 @@
-[![Build Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Build Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
 
 Introduction
 ------------
@@ -32,6 +32,7 @@ Participating
 
 You can participate in the project by:
 - Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
+- Joining the [LibreNMS Community](https://community.librenms.org)
 - Joining the [librenms-project][1] mailing list.
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
@@ -44,28 +45,8 @@ VM image
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
-Enter the following command:
-
-    ./daily.sh
-
-You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
-create a DNS entry for `librenms.example.com` to point to that IP.  You can
-also edit your `/etc/hosts` file with the following line:
-
-    $ip librenms.example.com
-
-where `$ip` is the IP of your VM.
-
-Add a new user by entering:
-
-    ./adduser.php <username> <password> 10 <email>
-
-replace <username>, <password> and <email> with a username, password and your email address.
-
-From there, just point your web browser
-to `http://librenms.example.com/` and login with your new username and password.
-
+Download one of the [VirtualBox images][11] we have available, documentation is provided which details 
+login credentials and setup details.
 
 License
 -------
