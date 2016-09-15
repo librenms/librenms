@@ -185,6 +185,8 @@ This file will usually set the variables for $version and $hardware gained from 
 **html/images/os/$os.png**
 This is a 32x32 png format image of the OS you are adding support for.
 
+You will also need to supply a test unit within `tests/OSDiscoveryTest.php`. Please see [Support-New-OS](Support-New-OS.md) for further information.
+
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
 Please provide the following output as seperate non-expiring pastebin.com links.
