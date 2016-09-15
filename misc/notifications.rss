@@ -30,5 +30,11 @@
    set $config['alert_log_purge'] to a custom value (set in days).</description>
    <pubDate>Mon, 02 May 2016 20:00:00 +0000</pubDate>
  </item>
+ <item>
+   <title>The Alerts Menu has moved</title>
+   <description>The Alerts menu has been relocated to a top level menu on the far right.  To make room for this, Plugins have been moved
+   to the overview menu.</description>
+   <pubDate>Mon, 12 Sep 2016 20:00:00 +0000</pubDate>
+ </item>
 </channel>
 </rss>
