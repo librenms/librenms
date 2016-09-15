@@ -19,6 +19,8 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 
 if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config['site_style'] == 'mono')) {
     $navbar = 'navbar-inverse';
+} else {
+    $navbar = '';
 }
 
 ?>
@@ -142,6 +144,7 @@ if (is_module_enabled('poller', 'mib')) {
               <ul class="dropdown-menu scrollable-menu">
 <?php
 
+$param = array();
 if (is_admin() === true || is_read() === true) {
     $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
 } else {

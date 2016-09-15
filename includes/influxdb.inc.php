@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if ($config['influxdb']['enable'] === true) {
+if (isset($config['influxdb']['enable']) && $config['influxdb']['enable'] === true) {
     include $config['install_dir'].'/lib/influxdb-php/vendor/autoload.php';
 }//end if
 
