@@ -129,6 +129,7 @@ LibreNMS contributors:
 - Jonathon Koyle <jonathon.koyle@gmail.com> (jonathon-k)
 - Tamas Szabo <jobs@szatam.com> (szatam)
 - Dennis Væversted <dv@zitcom.dk> (dvaeversted)
+- Morgan Henreaux <morgan@henreaux.com> (mhenreaux)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
