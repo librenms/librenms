@@ -12,7 +12,7 @@ If we have the MIB, we can copy the file into the default directory:
 /opt/librenms/mibs
 ```
 
-### New OS definition
+#### New OS definition
 Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
 
 ```bash
@@ -35,7 +35,7 @@ $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 //The icon described before is the image we have to create and put in the directory html/images/os
 ```
 
-### Discovery OS
+#### Discovery OS
 
 We create a new file named as our OS definition and in this directory:
 
@@ -49,7 +49,7 @@ Look at other files to get help in the code structure.
 <?php
 
 if (!$os) {
-    if (strstr($sysDescr, 'Pulse Connect Secure')) {
+    if (str_contains($sysDescr, 'Pulse Connect Secure')) {
         $os = 'pulse';
     }
 }
@@ -105,9 +105,9 @@ Polling
 
 At this step we should see all the values retrieved in LibreNMS.
 
-#### FULL SUPPORT FOR A NEW OS
+### Full support for a new OS
 
-### MIB
+#### MIB
 
 At first we copy the MIB file into the default directory:
 
@@ -128,7 +128,7 @@ snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 
 iveCpuUtil.0 = Gauge32: 28
 ```
 
-### New OS definition
+#### New OS definition
 Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
 
 ```bash
@@ -161,7 +161,7 @@ $config['graph_types']['device']['pulse_sessions']['order']        = '0';
 $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
 ```
 
-### Discovery OS
+#### Discovery OS
 
 We create a new file named as our OS definition and in this directory:
 
@@ -416,3 +416,39 @@ Polling
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
+
+### OS Test units
+We have a testing unit for new OS', please ensure you add a test for any new OS' or updates to existing OS discovery.
+
+The OS test unit file is located `tests/OSDiscoveryTest.php`. An example of this is as follows:
+
+```php
+    public function testZxr10()
+    {
+        $this->checkOS('zxr10', 'ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23');
+    }
+```
+
+This test looks for the sysDescr of `ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23` and if it matches 
+the `zxr10` OS discovery file then the check will pass.
+
+A slightly more complicated test would be:
+
+```php
+    public function testAiros()
+    {
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
+
+        $mockSnmp = array(
+            'dot11manufacturerName.5' => 'Ubiquiti',
+        );
+        $this->checkOS('airos', 'Linux', '', $mockSnmp);
+    }
+```
+
+The first two `$this->checkOS` calls pass on both a `sysDescr` value (`Linux`) and a `sysObjectID`.
+
+The third call uses another snmp response (although fake) which the specific OS discovery for `airos` relies on.
+
+You can run `scripts/pre-commit.php -u` to run the unit tests to check your code.
