@@ -13,10 +13,14 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
+* @version    1.1
 * @package    LibreNMS
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
+* v1 - initial release
+* v1.1 - removed the battery_low graph
 */
 
 require 'includes/graphs/common.inc.php';
@@ -33,7 +37,6 @@ $addarea       = 1;
 $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 $array    = array(
-    'battery_low' => array('descr' => 'Low','colour' => '630606',),
     'battery_voltage' => array('descr' => 'Current','colour' => '50C150',),
 );
 
@@ -48,7 +51,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $i++;
     }
 } else {
-    echo "file missing: $rrd_filename";
+    echo "file missing: ".$rrd_filename;
 }
 
 require 'includes/graphs/generic_v3_multiline_float.inc.php';
