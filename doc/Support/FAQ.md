@@ -19,6 +19,7 @@ source: Support/FAQ.md
  - [My device doesn't finish polling within 300 seconds](#faq19)
  - [Things aren't working correctly?](#faq18)
  - [What do the values mean in my graphs?](#faq21)
+ - [Why does a device show as a warning?](#faq22)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -143,7 +144,7 @@ Re-run `./validate.php` once you've resolved any issues raised.
 
 You have an odd issue - we'd suggest you join our irc channel to discuss.
 
-#### <a name="faq22"> What do the values mean in my graphs?</a>
+#### <a name="faq21"> What do the values mean in my graphs?</a>
 
 The values you see are reported as metric values. Thanks to a post on [Reddit](https://www.reddit.com/r/networking/comments/4xzpfj/rrd_graph_interface_error_label_what_is_the_m/) 
 here are those values:
@@ -162,6 +163,11 @@ here are those values:
 10^12   T - tera
 10^15   P - peta
 ```
+
+#### <a name="faq22"> Why does a device show as a warning?</a>
+
+This is indicating that the device has rebooted within the last 24 hours (by default). If you want to adjust this 
+threshold then you can do so by setting `$config['uptime_warning']` in config.php. The value must be in seconds.
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
