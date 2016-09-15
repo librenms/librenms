@@ -13,10 +13,16 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
+* @version    1.1
 * @package    LibreNMS
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
+* v1 - initial release
+* v1.1 - removed battery_low value
+*      - corrected line nominal and input values
+*      - convert seconds to minutes on remaining uptime
 */
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-nut"
@@ -27,12 +33,11 @@ $ups_nut = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
-list ($charge, $bat_low, $remaining, $bat_volt, $model, $serial, $input_vol, $line_vol, $load) = explode("\n", $ups_nut);
+list ($charge, $remaining, $bat_volt, $model, $serial, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
     'DS:charge:GAUGE:600:0:100',
-    'DS:battery_low:GAUGE:600:0:100',
     'DS:time_remaining:GAUGE:600:0:U',
     'DS:battery_voltage:GAUGE:600:0:U',
     'DS:input_voltage:GAUGE:600:0:U',
@@ -42,11 +47,10 @@ $rrd_def = array(
 
 $fields = array(
     'charge' => $charge,
-    'battery_low' => $bat_low,
-    'time_remaining' => $remaining,
+    'time_remaining' => $remaining/60,
     'battery_voltage' => $bat_volt,
-    'input_voltage' => $input_vol,
-    'nominal_voltage' => $line_vol,
+    'input_voltage' => $line_volt,
+    'nominal_voltage' => $input_volt,
     'load' => $load,
 );
 

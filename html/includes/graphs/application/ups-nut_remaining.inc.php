@@ -13,10 +13,14 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
+* @version    1.1
 * @package    LibreNMS
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
+* v1 - initial release
+* v1.1 - changed description from seconds to minutes
 */
 
 require 'includes/graphs/common.inc.php';
@@ -27,7 +31,7 @@ $colour_area     = 'EEEEEE';
 $colour_line     = '36393D';
 $colour_area_max = 'FFEE99';
 $graph_max       = 0;
-$unit_text       = 'Seconds';
+$unit_text       = 'Minutes';
 $ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 if (rrdtool_check_rrd_exists($ups_nut)) {
     $rrd_filename = $ups_nut;

@@ -22,8 +22,8 @@
 global $config;
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutLine.\"ups-nut\"
-$ups_model = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.5', '-Oqv');
-$ups_serial = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.6', '-Oqv');
+$ups_model = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4', '-Oqv');
+$ups_serial = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.5', '-Oqv');
 $ups_details = $ups_model.' (SN:'.$ups_serial.')';
 
 $graphs = array(
