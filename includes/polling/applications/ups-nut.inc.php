@@ -19,10 +19,6 @@
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 *
-* v1 - initial release
-* v1.1 - removed battery_low value
-*      - corrected line nominal and input values
-*      - convert seconds to minutes on remaining uptime
 */
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-nut"
