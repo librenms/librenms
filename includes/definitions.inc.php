@@ -1538,7 +1538,7 @@ $config['os'][$os]['icon']             = 'ricoh';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
-$os = 'sharpprinter';
+$os = 'sharp';
 $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Sharp Printer';
 $config['os'][$os]['type']             = 'printer';
