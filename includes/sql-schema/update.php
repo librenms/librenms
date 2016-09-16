@@ -153,6 +153,9 @@ foreach ($filelist as $file) {
         $db_rev = $filename;
         if ($insert) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
+            if ($db_rev >= 6) {
+                $insert = 0;
+            }
         } else {
             dbUpdate(array('version' => $db_rev), 'dbSchema');
         }
