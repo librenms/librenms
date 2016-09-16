@@ -19,7 +19,6 @@ require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
 require 'includes/functions.php';
-$debug = true;
 
 $options = getopt('g:p:f::');
 
