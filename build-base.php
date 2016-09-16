@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-chdir(__DIR__); // cwd to the directory containing this script
-
 // MYSQL Check - FIXME
 // 1 UNKNOWN
 include 'config.php';
