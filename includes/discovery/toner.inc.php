@@ -59,7 +59,7 @@ if ($device['os_group'] == 'printer') {
 
                     $type = 'jetdirect';
                     if (isHexString($descr)) {
-                        $descr = snmp_hexstring($descr);
+                        $descr = str_replace(":", "", snmp_hexstring($descr));
                     }
 
                     discover_toner($valid_toner, $device, $toner_oid, $index, $type, $descr, $capacity_oid, $capacity, $current);
