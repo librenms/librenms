@@ -172,6 +172,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('qnap', 'Linux', '', $mockSnmp);
     }
 
+    public function testSharp()
+    {
+        $this->checkOS('sharp', 'SHARP MX-2614N');
+        $this->checkOS('sharp', 'SHARP MX-C301W');
+        $this->checkOS('sharp', 'SHARP MX-3140N');
+    }
+
     public function testSophos()
     {
         $this->checkOS('sophos', 'Linux g56fa85e');
