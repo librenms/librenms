@@ -692,7 +692,7 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
-$os = 'callmanager';
+$os = 'cucm';
 $config['os'][$os]['text']             = 'Cisco Unified Communications Manager';
 $config['os'][$os]['type']             = 'tele';
 $config['os'][$os]['icon']             = 'cisco';
