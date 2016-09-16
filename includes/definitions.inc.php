@@ -1538,6 +1538,14 @@ $config['os'][$os]['icon']             = 'ricoh';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
+$os = 'sharpprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Sharp Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'sharp';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
 // lanier is a rebadged ricoh
 $os = 'lanier';
 $config['os'][$os]['group']            = 'printer';
