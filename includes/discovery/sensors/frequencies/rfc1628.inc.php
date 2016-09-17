@@ -23,10 +23,10 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         }
         if ($device['os'] == 'poweralert') {
             $serial = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
-            if (version_compare($serial, '12.04.0055', '>=')) {
-                $divisor = 1;
-            } elseif (version_compare($serial, '12.06.0068', '>=')) {
+            if (version_compare($serial, '12.06.0068', '>=')) {
                 $divisor = 10;
+            } elseif (version_compare($serial, '12.04.0055', '>=')) {
+                $divisor = 1;
             }
         }
         $index = '3.2.0.'.$i;
@@ -43,10 +43,10 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
     if ($device['os'] == 'poweralert') {
         $serial = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
-        if (version_compare($serial, '12.04.0055', '>=')) {
-            $divisor = 1;
-        } elseif (version_compare($serial, '12.06.0068', '>=')) {
+        if (version_compare($serial, '12.06.0068', '>=')) {
             $divisor = 10;
+        } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            $divisor = 1;
         }
     }
     $index = '4.2.0';
@@ -62,10 +62,10 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
     if ($device['os'] == 'poweralert') {
         $serial = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
-        if (version_compare($serial, '12.04.0055', '>=')) {
-            $divisor = 1;
-        } elseif (version_compare($serial, '12.06.0068', '>=')) {
+        if (version_compare($serial, '12.06.0068', '>=')) {
             $divisor = 10;
+        } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            $divisor = 1;
         }
     }
     $index = '5.1.0';
