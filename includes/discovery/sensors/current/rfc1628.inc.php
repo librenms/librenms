@@ -5,6 +5,8 @@ if ($device['os'] == 'poweralert') {
     $serial = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
     if (version_compare($serial, '12.04.0055', '>=')) {
         $divisor = 1;
+    } elseif (version_compare($serial, '12.06.0068', '>=')) {
+        $divisor = 10;
     }
 }
 
