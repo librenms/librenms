@@ -39,11 +39,11 @@ if (empty($uptime)) {
         echo 'Using hrSystemUptime ('.$uptime."s)\n";
     } else {
         $uptime = floor($poll_device['sysUpTime'] / 100);
-        echo 'Using SNMP Agent Uptime ('.$uptime."s)\n";
+        echo 'Using SNMP Agent Uptime ('.$uptime."s)\n  ";
     }//end if
 }//end if
 
-if ($device["os"] != "edgeswitch" || $device["os"] != "edgeos") {
+if ($device["os"] != "edgeswitch") {
     if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
         $uptime = $snmp_uptime;
         d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
