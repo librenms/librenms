@@ -43,9 +43,11 @@ if (empty($uptime)) {
     }//end if
 }//end if
 
-if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
-    $uptime = $snmp_uptime;
-    d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
+if ($device["os"] != "edgeswitch" || $device["os"] != "edgeos") {
+    if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
+        $uptime = $snmp_uptime;
+        d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
+    }
 }
 
 if (is_numeric($uptime)) {
