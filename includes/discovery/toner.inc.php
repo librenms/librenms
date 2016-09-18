@@ -31,7 +31,7 @@ if ($device['os_group'] == 'printer') {
                     $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
                 }
 
-                $descr = trim(preg_replace('/[^A-Za-z0-9\-]/', '', snmp_get($device, $descr_oid, '-Oqv')));
+                $descr = trim(str_replace("\n", '', preg_replace('/[^A-Za-z0-9\-]/', '', snmp_get($device, $descr_oid, '-Oqv'))));
 
                 if ($descr != '') {
                     $current  = snmp_get($device, $toner_oid, '-Oqv');
