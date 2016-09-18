@@ -326,9 +326,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                if ($force_add || isSNMPable($device)) {
-                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
+                if ($force_add === true || isSNMPable($device)) {
+                    if ($force_add !== true) {
+                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    }
+                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost, $force_add);
                     if ($result !== false) {
                         return $result;
                     }
@@ -341,9 +343,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['community'] as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
-                if ($force_add || isSNMPable($device)) {
-                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
+                if ($force_add === true || isSNMPable($device)) {
+                    if ($force_add !== true) {
+                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    }
+                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost, $force_add);
                     if ($result !== false) {
                         return $result;
                     }
@@ -533,7 +537,7 @@ function getpollergroup($poller_group = '0')
     }
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '')
+function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '', $force_add = false)
 {
     global $config;
     $host = trim(strtolower($host));
@@ -560,7 +564,11 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
 
     $device = array_merge($device, $v3);
 
-    $device['os'] = getHostOS($device);
+    if ($force_add !== true) {
+        $device['os'] = getHostOS($device);
+    } else {
+        $device['os'] = 'generic';
+    }
 
     if ($device['os']) {
         if (host_exists($host, $snmphost) === false) {
@@ -647,7 +655,7 @@ function ipv62snmp($ipv6)
     }
     $ipv6_ip = implode('', $ipv6_ex);
     for ($i = 0; $i < 32;
-    $i+=2) {
+         $i+=2) {
         $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
     }
 
@@ -1246,20 +1254,20 @@ function function_check($function)
 
 function force_influx_data($data)
 {
-   /*
-    * It is not trivial to detect if something is a float or an integer, and
-    * therefore may cause breakages on inserts.
-    * Just setting every number to a float gets around this, but may introduce
-    * inefficiencies.
-    * I've left the detection statement in there for a possible change in future,
-    * but currently everything just gets set to a float.
-    */
+    /*
+     * It is not trivial to detect if something is a float or an integer, and
+     * therefore may cause breakages on inserts.
+     * Just setting every number to a float gets around this, but may introduce
+     * inefficiencies.
+     * I've left the detection statement in there for a possible change in future,
+     * but currently everything just gets set to a float.
+     */
 
     if (is_numeric($data)) {
         // If it is an Integer
         if (ctype_digit($data)) {
             return floatval($data);
-        // Else it is a float
+            // Else it is a float
         } else {
             return floatval($data);
         }
@@ -1302,7 +1310,7 @@ function snmpTransportToAddressFamily($transport)
  *
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
-**/
+ **/
 function host_exists($hostname, $snmphost = '')
 {
     global $config;
@@ -1326,7 +1334,7 @@ function host_exists($hostname, $snmphost = '')
  * Check the innodb buffer size
  *
  * @return array including the current set size and the currently used buffer
-**/
+ **/
 function innodb_buffer_check()
 {
     $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
@@ -1341,7 +1349,7 @@ function innodb_buffer_check()
  * @param array $innodb_buffer An array that contains the used and current size
  *
  * @return string $output
-**/
+ **/
 function warn_innodb_buffer($innodb_buffer)
 {
     $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
@@ -1378,7 +1386,7 @@ function oxidized_reload_nodes()
  *
  * @return string ip
  *
-**/
+ **/
 function dnslookup($device, $type = false, $return = false)
 {
     if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
@@ -1413,7 +1421,7 @@ function dnslookup($device, $type = false, $return = false)
  *
  * @return int exit code
  *
-**/
+ **/
 
 function rrdtest($path, &$stdOutput, &$stdError)
 {
