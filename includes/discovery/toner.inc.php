@@ -31,7 +31,7 @@ if ($device['os_group'] == 'printer') {
                     $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
                 }
 
-                $descr = trim(str_replace("\n", '', str_replace('"', '', snmp_get($device, $descr_oid, '-Oqv'))));
+                $descr = trim(preg_replace('/[^A-Za-z0-9\-]/', '', snmp_get($device, $descr_oid, '-Oqv')));
 
                 if ($descr != '') {
                     $current  = snmp_get($device, $toner_oid, '-Oqv');
@@ -59,7 +59,7 @@ if ($device['os_group'] == 'printer') {
 
                     $type = 'jetdirect';
                     if (isHexString($descr)) {
-                        $descr = str_replace(":", "", snmp_hexstring($descr));
+                        $descr = preg_replace('/[^A-Za-z0-9\-]/', '', snmp_hexstring($descr));
                     }
 
                     discover_toner($valid_toner, $device, $toner_oid, $index, $type, $descr, $capacity_oid, $capacity, $current);
