@@ -326,11 +326,9 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost, $force_add);
+                if ($force_add || isSNMPable($device)) {
+                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
                     if ($result !== false) {
                         return $result;
                     }
@@ -343,11 +341,9 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['community'] as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
-                if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost, $force_add);
+                if ($force_add || isSNMPable($device)) {
+                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
                     if ($result !== false) {
                         return $result;
                     }
@@ -537,7 +533,7 @@ function getpollergroup($poller_group = '0')
     }
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '', $force_add = false)
+function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '')
 {
     global $config;
     $host = trim(strtolower($host));
@@ -564,11 +560,7 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
 
     $device = array_merge($device, $v3);
 
-    if ($force_add !== true) {
-        $device['os'] = getHostOS($device);
-    } else {
-        $device['os'] = 'generic';
-    }
+    $device['os'] = getHostOS($device);
 
     if ($device['os']) {
         if (host_exists($host, $snmphost) === false) {
@@ -1566,4 +1558,17 @@ function hytera_h2f($number, $nd)
     }
 
     return number_format($floatfinal, $nd, '.', '');
+}
+
+function rrd_alert($name, $rrd_name, $device_id, $value)
+{
+    d_echo("\n------------------------------");
+    d_echo("\ndb insert for rrd based alerts");
+    d_echo("\n------------------------------");
+    $in_db = dbFetchCell("SELECT rrd_last_value FROM rrd_values WHERE `alert_name`= ? AND `rrd_name` = ? AND `device_id` = ?", array($name, $rrd_name, $device_id));
+    if ($in_db != "") {
+        echo dbUpdate(array('rrd_last_value' => $value, 'rrd_before_last_value' => $in_db), 'rrd_values', 'alert_name = ? AND rrd_name = ? AND device_id = ?', array($name, $rrd_name, $device_id));
+    } else {
+        dbInsert(array('alert_name' => $name, 'rrd_name' => $rrd_name, 'device_id' => $device_id, 'rrd_last_value' => $value, 'rrd_before_last_value' => 0), 'rrd_values');
+    }
 }
