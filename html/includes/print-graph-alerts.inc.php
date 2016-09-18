@@ -74,25 +74,19 @@ foreach ($groups as $group) {
     var dataset = new vis.DataSet(items);
     var options = {
         style:'bar',
-        barChart: {width:50, align:'right',handleOverlap:'sideBySide'}, // align: left, center, right
+        barChart: { width:50, align:'right', sideBySide:true}, // align: left, center, right
         drawPoints: false,
         legend: {left:{position:"bottom-left"}},
         dataAxis: {
             icons:true,
             showMajorLabels: true,
             showMinorLabels: true,
-            customRange: {
-               left: {
-                    min: 0, max: <?php
-                    echo $max_count; ?>
-                }
-            }
         },
         zoomMin: 86400, //24hrs
         zoomMax: <?php
         $first_date = reset($data);
         $last_date = end($data);
-        $milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
+        $milisec_diff = abs(strtotime($first_date["x"]) - strtotime($last_date["x"])) * 1000;
         echo $milisec_diff;
 ?>,
         orientation:'top'
