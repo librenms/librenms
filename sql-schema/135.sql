@@ -7,3 +7,4 @@ CREATE TABLE `rrd_values` (
   `rrd_filename` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+UPDATE `dbSchema` SET `version` = '135';
