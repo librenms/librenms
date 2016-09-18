@@ -2,6 +2,76 @@
 http://visjs.org
 
 
+## 2016-04-18, version 4.16.1
+
+### Timeline
+
+- Fixed #1786: Timeline having zero height on Internet Explorer, regression
+  introduced after fixing #1697.
+
+
+## 2016-04-07, version 4.16.0
+
+### Timeline
+
+- Implemented rtl support. Thanks @yotamberk.
+- Fixed #1697: Timeline not drawn when used within the Angular.js directive.
+- Fixed #1774: Wrong initial scale when Timeline contains a single item.
+
+### General
+
+- Created bundles for individual visualizations: `vis-graph3d.min.js`,
+  `vis-network.min.js`, and `vis-timeline-graph2d.min.js`.
+
+
+## 2016-03-08, version 4.15.1
+
+## General
+
+- Updated all dependencies.
+
+### Graph2d
+
+- Fixed #1455: allow vertical panning of the web page on touch devices.
+- Fixed #1692: Error when y-axis values are equal.
+
+### Timeline
+
+- Fixed #1455: allow vertical panning of the web page on touch devices.
+- Fixed #1695: Item line and dot not correctly reckoning with the line width
+  when using left or right align.
+- Fixed #1697: Timeline not drawn when used within the Angular.js directive.
+
+
+## 2016-02-23, version 4.15.0
+
+### Timeline
+
+- Implemented `currentTimeTick` event (see #1683).
+- Fixed #1630: method `getItemRange` missing in docs.
+
+### Graph2d
+
+- Fixed #1630: method `getDataRange` was wrongly called `getItemRange` in docs.
+- Fixed #1655: use parseFloat instead of Number.parseFloat, as the latter is
+  not supported in IE. Thanks @ttjoseph.
+
+### Graph3d
+
+- Changed the built-in tooltip to show the provided `xLabel`, `yLabel`, and
+  `zLabel` instead of `'x'`, `'y'`, and `'z'`. Thanks @jacklightbody.
+
+### Network
+
+- Implemented interpolation option for interpolation of images, default true.
+- Implemented parentCentralization option for hierarchical layout.
+- Fixed #1635: edges are now referring to the correct points.
+- Fixed #1644, #1631: overlapping nodes in hierarchical layout should no longer occur.
+- Fixed #1575: fixed selection events
+- Fixed #1677: updating groups through manipulation now works as it should.
+- Fixed #1672: Implemented stepped scaling for nice interpolation of images.
+
+
 ## 2016-02-04, version 4.14.0
 
 ### Timeline
