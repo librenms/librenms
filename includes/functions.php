@@ -654,8 +654,7 @@ function ipv62snmp($ipv6)
         $ipv6_ex[$i] = zeropad($ipv6_ex[$i], 4);
     }
     $ipv6_ip = implode('', $ipv6_ex);
-    for ($i = 0; $i < 32;
-         $i+=2) {
+    for ($i = 0; $i < 32; $i+=2) {
         $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
     }
 
@@ -1255,19 +1254,19 @@ function function_check($function)
 function force_influx_data($data)
 {
     /*
-     * It is not trivial to detect if something is a float or an integer, and
-     * therefore may cause breakages on inserts.
-     * Just setting every number to a float gets around this, but may introduce
-     * inefficiencies.
-     * I've left the detection statement in there for a possible change in future,
-     * but currently everything just gets set to a float.
-     */
+    * It is not trivial to detect if something is a float or an integer, and
+    * therefore may cause breakages on inserts.
+    * Just setting every number to a float gets around this, but may introduce
+    * inefficiencies.
+    * I've left the detection statement in there for a possible change in future,
+    * but currently everything just gets set to a float.
+    */
 
     if (is_numeric($data)) {
         // If it is an Integer
         if (ctype_digit($data)) {
             return floatval($data);
-            // Else it is a float
+        // Else it is a float
         } else {
             return floatval($data);
         }
