@@ -53,7 +53,8 @@ function rrd_array_filter($arr)
  * @param array $device
  * @param string $measurement Name of this measurement
  * @param array $tags tags for the data (or to control rrdtool)
- * @param array $fields
+ * @param array|mixed $fields The data to update in an associative array, the order must be consistent with rrd_def,
+ *                            single values are allowed and will be paired with $measurement
  */
 function data_update($device, $measurement, $tags, $fields)
 {
