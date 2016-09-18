@@ -94,6 +94,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosmblinux', 'Linux Cisco Small Business');
     }
 
+    public function testCucm()
+    {
+        $this->checkOS('cucm', 'Something that we do not have', '.1.3.6.1.4.1.9.1.1348');
+    }
+
     public function testCumulus()
     {
         $this->checkOS('cumulus', 'Linux', '.1.3.6.1.4.1.40310');
