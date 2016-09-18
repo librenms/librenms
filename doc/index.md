@@ -10,5 +10,5 @@ The docs should provide you with information on various elements to the software
   - [インストール](http://docs.librenms.org/Installation/Installing-LibreNMS/)
   - [サポート](http://docs.librenms.org/Support/FAQ/#faq3) / [FAQ](http://docs.librenms.org/Support/FAQ/)
   - [Contributing to LibreNMS](http://docs.librenms.org/General/Contributing/)
-  - Developing for LibreNMS
+  - 開発者 for LibreNMS
   - Available extensions (features)
