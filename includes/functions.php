@@ -1567,15 +1567,17 @@ function hytera_h2f($number, $nd)
     return number_format($floatfinal, $nd, '.', '');
 }
 
-function rrd_alert($name, $rrd_name, $device_id, $value)
+function rrd_alert($ds_data, $rrd_filename, $device_id)
 {
     d_echo("\n------------------------------");
     d_echo("\ndb insert for rrd based alerts");
     d_echo("\n------------------------------");
-    $in_db = dbFetchCell("SELECT rrd_last_value FROM rrd_values WHERE `alert_name`= ? AND `rrd_name` = ? AND `device_id` = ?", array($name, $rrd_name, $device_id));
-    if ($in_db != "") {
-        echo dbUpdate(array('rrd_last_value' => $value, 'rrd_before_last_value' => $in_db), 'rrd_values', 'alert_name = ? AND rrd_name = ? AND device_id = ?', array($name, $rrd_name, $device_id));
-    } else {
-        dbInsert(array('alert_name' => $name, 'rrd_name' => $rrd_name, 'device_id' => $device_id, 'rrd_last_value' => $value, 'rrd_before_last_value' => 0), 'rrd_values');
+    foreach ($ds_data as $ds_name => $ds_value) {
+        $in_db = dbFetchCell("SELECT ds_last_value FROM rrd_values WHERE `ds_name`= ? AND `rrd_filename` = ? AND `device_id` = ?", array($ds_name, $rrd_filename, $device_id));
+        if ($in_db != "") {
+            dbUpdate(array('ds_last_value' => $ds_value, 'ds_before_last_value' => $in_db), 'rrd_values', 'ds_name = ? AND rrd_filename = ? AND device_id = ?', array($ds_name, $rrd_filename, $device_id));
+        } else {
+            dbInsert(array('ds_name' => $ds_name, 'rrd_filename' => $rrd_filename, 'device_id' => $device_id, 'ds_last_value' => $ds_value), 'rrd_values');
+        }
     }
 }
