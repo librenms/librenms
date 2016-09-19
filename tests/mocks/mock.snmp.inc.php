@@ -23,16 +23,51 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-function setSnmpMock($mockSnmpArray)
+function setSnmpMock($oid, $value, $mib = null, $mibdir = null)
 {
     global $mockSnmp;
-    $mockSnmp = $mockSnmpArray;
+    if (!isset($mockSnmp)) {
+        $mockSnmp = array();
+    }
+    $num = snmp_translate_number($oid, $mib, $mibdir);
+    $mockSnmp[$num] = $value;
 }
 
-function snmp_get($device, $oid)
+function clearSnmpMock()
+{
+    global $mockSnmp;
+    unset($mockSnmp);
+}
+
+function snmp_translate_number($oid, $mib = null, $mibdir = null)
+{
+    global $config;
+
+    if (preg_match('/^[\.\d]*$/', $oid)) {
+        return $oid;
+    }
+
+    $cmd = "snmptranslate -IR -On $oid";
+    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mibdir']);
+    if (isset($mib) && $mib) {
+        $cmd .= " -m $mib";
+    }
+
+    $number = shell_exec($cmd);
+
+    if (empty($number)) {
+        throw new Exception('Could not translate oid: ' . $oid . PHP_EOL . 'Tried: ' . $cmd);
+    }
+
+    return trim($number);
+}
+
+function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
     global $mockSnmp;
     if (isset($mockSnmp) && !empty($mockSnmp)) {
+        $oid = snmp_translate_number($oid, $mib, $mibdir);
+
         if (isset($mockSnmp[$oid])) {
             return $mockSnmp[$oid];
         }
@@ -40,12 +75,18 @@ function snmp_get($device, $oid)
     return false;
 }
 
-function snmp_walk($device, $oid)
+function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
     global $mockSnmp;
+    if (!isset($mockSnmp)) {
+        return false;
+    }
+
     $output = '';
+    $num = snmp_translate_number($oid, $mib, $mibdir);
+
     foreach ($mockSnmp as $key => $value) {
-        if (starts_with($key, $oid)) {
+        if (starts_with($key, $num)) {
             $output .= $value . PHP_EOL;
         }
     }

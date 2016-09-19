@@ -27,6 +27,7 @@
 $install_dir = realpath(__DIR__ . '/..');
 
 require_once $install_dir . '/includes/defaults.inc.php';
+$config['mibdir'] = $config['install_dir'].'/mibs';
 
 $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 
