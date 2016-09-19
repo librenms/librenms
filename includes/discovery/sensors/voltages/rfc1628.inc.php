@@ -16,9 +16,15 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
             $volt_id          = $split_oid[(count($split_oid) - 1)];
             $volt_oid         = "1.3.6.1.2.1.33.1.2.5.$volt_id";
             $divisor          = 10;
-            if ($device['os'] == 'poweralert' || $device['os'] == 'poweralert') {
+
+            if ($device['os'] == 'netmanplus') {
                 $divisor = 1;
             }
+
+            if ($device['os'] == 'poweralert') {
+                $divisor = get_device_divisor($device, $_tmp_serial, $divisor);
+            }
+
             $volt  = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
             $descr = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
             $type  = 'rfc1628';
@@ -41,9 +47,15 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
 
         $type    = 'rfc1628';
         $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
+
+        if ($device['os'] == 'netmanplus') {
             $divisor = 1;
         }
+
+        if ($device['os'] == 'poweralert') {
+            $divisor = get_device_divisor($device, $_tmp_serial, $divisor);
+        }
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = $i;
 
@@ -63,9 +75,14 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
 
         $type    = 'rfc1628';
         $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
+        if ($device['os'] == 'netmanplus') {
             $divisor = 1;
         }
+
+        if ($device['os'] == 'poweralert') {
+            $divisor = get_device_divisor($device, $_tmp_serial, $divisor);
+        }
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = (100 + $i);
 
@@ -85,9 +102,15 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
 
         $type    = 'rfc1628';
         $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
+
+        if ($device['os'] == 'netmanplus') {
             $divisor = 1;
         }
+
+        if ($device['os'] == 'poweralert') {
+            $divisor = get_device_divisor($device, $_tmp_serial, $divisor);
+        }
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = (200 + $i);
 

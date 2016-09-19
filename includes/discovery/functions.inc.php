@@ -873,3 +873,21 @@ function avtech_add_sensor($device, $sensor)
 
     return true;
 }
+
+/**
+ * @param $device
+ * @param $serial
+ * @param $divisor
+ * @return int
+ */
+function get_device_divisor($device, $serial, $divisor)
+{
+    if ($device['os'] == 'poweralert') {
+        if (version_compare($serial, '12.06.0068', '>=')) {
+            $divisor = 10;
+        } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            $divisor = 1;
+        }
+    }
+    return $divisor;
+}
