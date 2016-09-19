@@ -1335,3 +1335,15 @@ function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
         return $sensorIpmi;
     }
 }
+
+function get_auth_ad_user_filter($username)
+{
+    $user_filter = str_replace('%user%', $username, $config['auth_ad_user_filter']);
+    return $user_filter;
+}
+
+function get_auth_ad_group_filter($groupname)
+{
+    $group_filter = str_replace('%group%', $groupname, $config['auth_ad_group_filter']);
+    return $group_filter;
+}

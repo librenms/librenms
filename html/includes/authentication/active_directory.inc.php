@@ -32,7 +32,7 @@ function authenticate($username, $password)
                 $search = ldap_search(
                     $ldap_connection,
                     $config['auth_ad_base_dn'],
-                    "(samaccountname={$username})",
+                    get_auth_ad_user_filter($username),
                     array('memberOf')
                 );
                 $entries = ldap_get_entries($ldap_connection, $search);
@@ -135,7 +135,7 @@ function user_exists($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         array('samaccountname')
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -159,7 +159,7 @@ function get_userlevel($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         array('memberOf')
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -186,7 +186,7 @@ function get_userid($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -292,7 +292,7 @@ function get_fullname($username)
     $result = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $result);
@@ -341,7 +341,7 @@ function get_dn($samaccountname)
     $result = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$samaccountname})",
+        get_auth_ad_group_filter($samaccountname),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $result);
