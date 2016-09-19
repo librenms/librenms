@@ -158,18 +158,14 @@ You need to add your desired MIBs to `/opt/librenms/mibs` folder. Afterwards you
 
 ```
 <?php
-if (!$os || $os === 'linux') {
-    $f5_sys_parent = '1.3.6.1.4.1.3375.2.1';
-    if (strpos($sysObjectId, $f5_sys_parent)) {
-        $os = 'f5';
-   }
-
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.3375.2.1')) {
+    $os = 'f5';
 }
 
 ### MIB definition as an array 
 $f5_mibs = array(
-                "ltmVirtualServStatEntry" => "F5-BIGIP-LOCAL-MIB",
-        );
+    'ltmVirtualServStatEntry' => 'F5-BIGIP-LOCAL-MIB',
+);
 
 ### Actual registering of the MIB
 register_mibs($device, $f5_mibs, "includes/discovery/os/f5.inc.php");
