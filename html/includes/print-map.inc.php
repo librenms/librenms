@@ -40,14 +40,10 @@ $devices = array();
 
 $where = "";
 if (is_numeric($vars['group'])) {
-    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$vars['group']);
-    $group_pattern = rtrim($group_pattern, '&&');
-    $group_pattern = rtrim($group_pattern, '||');
-
-    $device_id_sql = GenGroupSQL($group_pattern);
-    if ($device_id_sql) {
-        $where .= " AND D1.device_id IN ($device_id_sql) OR D2.device_id IN ($device_id_sql)";
-    }
+    $where .= " AND D1.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $sql_array[] = $vars['group'];
+    $where .= " OR D2.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $sql_array[] = $vars['group'];
 }
 
 if (in_array('mac', $config['network_map_items'])) {
