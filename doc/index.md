@@ -1,5 +1,5 @@
 source: index.md
-### Welcome to the LibreNMS docs
+### LibreNMS日本語ドキュメントへようこそ
 
 Some of these docs are work in progress or may be missing configuration examples for varying distros.
 If you find this is the case then please feel free to edit them on [GitHub](https://github.com/librenms/librenms/tree/master/doc)
