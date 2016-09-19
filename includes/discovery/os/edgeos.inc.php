@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^EdgeOS/', $sysDescr)) {
-        $os = 'edgeos';
-    }
+if (starts_with($sysDescr, 'EdgeOS')) {
+    $os = 'edgeos';
 }
