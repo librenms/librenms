@@ -19,7 +19,3 @@ if ($device['os'] == 'apc') {
     }
 }//end if
 
-    Contact GitHub API Training Shop Blog About 
-
-    © 2016 GitHub, Inc. Terms Privacy Security Status Help 
-
