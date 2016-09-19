@@ -15,10 +15,9 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
             $split_oid        = explode('.', $oid);
             $volt_id          = $split_oid[(count($split_oid) - 1)];
             $volt_oid         = "1.3.6.1.2.1.33.1.2.5.$volt_id";
-            $divisor          = 10;
-            if ($device['os'] == 'poweralert' || $device['os'] == 'poweralert') {
-                $divisor = 1;
-            }
+
+            $divisor = get_device_divisor($device, $_tmp_serial, $divisor, 'voltages');
+
             $volt  = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
             $descr = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
             $type  = 'rfc1628';
@@ -40,10 +39,9 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         }
 
         $type    = 'rfc1628';
-        $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
-            $divisor = 1;
-        }
+
+        $divisor = get_device_divisor($device, $_tmp_serial, $divisor, 'voltages');
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = $i;
 
@@ -62,10 +60,9 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         }
 
         $type    = 'rfc1628';
-        $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
-            $divisor = 1;
-        }
+
+        $divisor = get_device_divisor($device, $_tmp_serial, $divisor, 'voltages');
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = (100 + $i);
 
@@ -84,10 +81,9 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         }
 
         $type    = 'rfc1628';
-        $divisor = 10;
-        if ($device['os'] == 'netmanplus' || $device['os'] == 'poweralert') {
-            $divisor = 1;
-        }
+
+        $divisor = get_device_divisor($device, $_tmp_serial, $divisor, 'voltages');
+
         $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
         $index   = (200 + $i);
 
