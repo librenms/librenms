@@ -1,0 +1,2393 @@
+STEELHEAD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32,
+                 TimeTicks, IpAddress, Counter32, Counter64 FROM SNMPv2-SMI
+    DateAndTime FROM SNMPv2-TC
+    products FROM RBT-MIB;
+
+steelhead MODULE-IDENTITY
+          LAST-UPDATED        "201202030000Z"
+          ORGANIZATION        "Riverbed Technology, Inc."
+          CONTACT-INFO
+          "  Riverbed Technical Support
+             support@riverbed.com"
+          DESCRIPTION         "Steelhead MIB"
+          REVISION            "201202030000Z"
+          DESCRIPTION         "Updated for 7.0.1"
+          ::= { products 1 }
+
+system OBJECT IDENTIFIER
+    ::= { steelhead 1 }
+
+status OBJECT IDENTIFIER
+    ::= { steelhead 2 }
+
+config OBJECT IDENTIFIER
+    ::= { steelhead 3 }
+
+alarms OBJECT IDENTIFIER
+    ::= { steelhead 4 }
+
+statistics OBJECT IDENTIFIER
+    ::= { steelhead 5 }
+
+--
+--
+-- SYSTEM
+--
+--
+
+model OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Appliance model"
+    ::= { system 1 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Appliance serial number"
+    ::= { system 2 }
+
+systemVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System software version string"
+    ::= { system 3 }
+
+
+
+--
+--
+-- STATUS
+--
+--
+
+systemClock OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System clock time"
+    ::= { status 1 }
+
+health OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current health of the system. The value is one amongst
+             Healthy, Admission Control, Degraded, Critical"
+    ::= { status 2 }
+
+serviceStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current status of the optimization service"
+    ::= { status 3 }
+
+serviceUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Uptime of the optimization service"
+    ::= { status 4 }
+
+procTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table containing information about the various
+             managed processes"
+    ::= { status 5 }
+
+procEntry OBJECT-TYPE
+    SYNTAX      ProcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one process"
+    INDEX   { procIndex }
+    ::= { procTable 1 }
+
+ProcEntry ::=
+    SEQUENCE {
+        procIndex             Unsigned32,
+        procName              OCTET STRING,
+        procStatus            OCTET STRING,
+        procNumFailures       Unsigned32
+    }
+
+procIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "Synthetic numeric unique ID of process"
+    ::= { procEntry 1 }
+
+procName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Unique name of process"
+    ::= { procEntry 2 }
+
+procStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current state of process"
+    ::= { procEntry 3 }
+
+procNumFailures OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of times process has crashed or exited unexpectedly"
+    ::= { procEntry 4 }
+
+peerStatus OBJECT IDENTIFIER
+    ::= { status 6 }
+
+peerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing information about the various peer
+             appliances"
+    ::= { peerStatus 1 }
+
+peerEntry OBJECT-TYPE
+    SYNTAX      PeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one peer"
+    INDEX   { peerIndex }
+    ::= { peerTable 1 }
+
+PeerEntry ::=
+    SEQUENCE {
+        peerIndex             Unsigned32,
+        peerHostname          OCTET STRING,
+        peerVersion           OCTET STRING,
+    	peerAddress           IpAddress,
+        peerModel             OCTET STRING
+    }
+
+peerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "Index of peer"
+    ::= { peerEntry 1 }
+
+peerHostname OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Hostname of peer"
+    ::= { peerEntry 2 }
+
+peerVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System software version of peer"
+    ::= { peerEntry 3 }
+
+peerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IP address of peer"
+    ::= { peerEntry 4 }
+
+peerModel OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Model of peer"
+    ::= { peerEntry 5 }
+
+systemHealth OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    healthy (10000),
+                    degraded (30000),
+                    admissionControl (31000),
+                    critical (50000)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current health of the system. This variable is identical to
+             health except that it is of integer datatype"
+    ::= { status 7 }
+
+optServiceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (0),
+                    unmanaged (1),
+                    running (2),
+                    sentCom1 (3),
+                    sentTerm1 (4),
+                    sentTerm2 (5),
+                    sentTerm3 (6),
+                    pending (7),
+                    stopped (8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Status of the optimization service. This variable is identical to
+             serviceStatus except that it is of integer datatype"
+    ::= { status 8 }
+
+systemTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+            "The temperature of the system (C)"
+    ::= { status 9 }
+
+healthNotes OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Some notes regarding the health of the system"
+    ::= { status 10 }
+
+neighborStatus OBJECT IDENTIFIER
+    ::= { status 12 }
+
+neighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "List of neighbors and their status"
+    ::= { neighborStatus 1 }
+
+neighborEntry OBJECT-TYPE
+    SYNTAX      NeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one neighbor"
+    INDEX   { neighborIndex }
+    ::= { neighborTable 1 }
+
+NeighborEntry ::=
+    SEQUENCE {
+        neighborIndex       Unsigned32,
+    	neighborAddress     IpAddress,
+        neighborState       Unsigned32,
+        neighborNatReqSent  Counter32,
+        neighborNatDelSent  Counter32,
+        neighborNatAckRcvd  Counter32,
+        neighborNatReqRcvd  Counter32,
+        neighborNatDelRcvd  Counter32,
+        neighborNatAckSent  Counter32,
+        neighborDynReqSent  Counter32,
+        neighborDynDelSent  Counter32,
+        neighborDynAckRcvd  Counter32,
+        neighborDynReqRcvd  Counter32,
+        neighborDynDelRcvd  Counter32,
+        neighborDynAckSent  Counter32,
+        neighborRedirReqSent  Counter32,
+        neighborRedirDelSent  Counter32,
+        neighborRedirAckRcvd  Counter32,
+        neighborRedirReqRcvd  Counter32,
+        neighborRedirDelRcvd  Counter32,
+        neighborRedirAckSent  Counter32,
+        neighborConnFailures  Counter32,
+        neighborKeepaliveTimeouts Counter32,
+        neighborRequestTimeouts   Counter32,
+        neighborMaxLatency        Unsigned32
+    }
+
+neighborIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "Index of neighbor"
+    ::= { neighborEntry 1 }
+
+neighborAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IP address of neighbor"
+    ::= { neighborEntry 2 }
+
+neighborState OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "State of this neighbor"
+    ::= { neighborEntry 3 }
+
+neighborNatReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT request messages sent to this neighbor"
+    ::= { neighborEntry 4 }
+
+neighborNatDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT DEL messages sent to this neighbor"
+    ::= { neighborEntry 5 }
+
+neighborNatAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT ACK messages received from this neighbor"
+    ::= { neighborEntry 6 }
+
+neighborNatReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT request messages received from this neighbor"
+    ::= { neighborEntry 7 }
+
+neighborNatDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT DEL messages received from this neighbor"
+    ::= { neighborEntry 8 }
+
+neighborNatAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT ACK messages sent to this neighbor"
+    ::= { neighborEntry 9 }
+
+neighborDynReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN request messages sent to this neighbor"
+    ::= { neighborEntry 10 }
+
+neighborDynDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN DEL messages sent to this neighbor"
+    ::= { neighborEntry 11 }
+
+neighborDynAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN ACK messages received from this neighbor"
+    ::= { neighborEntry 12 }
+
+neighborDynReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN request messages received from this neighbor"
+    ::= { neighborEntry 13 }
+
+neighborDynDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN DEL messages received from this neighbor"
+    ::= { neighborEntry 14 }
+
+neighborDynAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN ACK messages sent to this neighbor"
+    ::= { neighborEntry 15 }
+
+neighborRedirReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR request messages sent to this neighbor"
+    ::= { neighborEntry 16 }
+
+neighborRedirDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR DEL messages sent to this neighbor"
+    ::= { neighborEntry 17 }
+
+neighborRedirAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR ACK messages received from this neighbor"
+    ::= { neighborEntry 18 }
+
+neighborRedirReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR request messages received from this neighbor"
+    ::= { neighborEntry 19 }
+
+neighborRedirDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR DEL messages received from this neighbor"
+    ::= { neighborEntry 20 }
+
+neighborRedirAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR ACK messages sent to this neighbor"
+    ::= { neighborEntry 21 }
+
+neighborConnFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of connection failures with this neighbor"
+    ::= { neighborEntry 22 }
+
+neighborKeepaliveTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of keepalives that have timed out with this neighbor"
+    ::= { neighborEntry 23 }
+
+neighborRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of requests that have timed out with this neighbor"
+    ::= { neighborEntry 24 }
+
+neighborMaxLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum latency that has been seen with this neighbor"
+    ::= { neighborEntry 25 }
+
+neighborAggregates OBJECT IDENTIFIER
+    ::= { neighborStatus 2 }
+
+nghAggrConfigured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of neighbors configured"
+    ::= { neighborAggregates 1 }
+
+nghAggrConnected OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of neighbors connected"
+    ::= { neighborAggregates 2 }
+
+nghAggrConnFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of connection failures"
+    ::= { neighborAggregates 3 }
+
+nghAggrKeepaliveTimouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of keepalives that have timed out"
+    ::= { neighborAggregates 4 }
+
+nghAggrRequestTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of requests that have timed out"
+    ::= { neighborAggregates 5 }
+
+nghAggrMaxLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum latency that had been seen"
+    ::= { neighborAggregates 6 }
+
+nghAggrNatReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT request messages sent"
+    ::= { neighborAggregates 7 }
+
+nghAggrNatDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT DEL messages sent"
+    ::= { neighborAggregates 8 }
+
+nghAggrNatAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT ACK messages received"
+    ::= { neighborAggregates 9 }
+
+nghAggrNatReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT request messages received"
+    ::= { neighborAggregates 10 }
+
+nghAggrNatDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT DEL messages received"
+    ::= { neighborAggregates 11 }
+
+nghAggrNatAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT ACK messages sent"
+    ::= { neighborAggregates 12 }
+
+nghAggrDynReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN request messages sent"
+    ::= { neighborAggregates 13 }
+
+nghAggrDynDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN DEL messages sent"
+    ::= { neighborAggregates 14 }
+
+nghAggrDynAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN ACK messages received"
+    ::= { neighborAggregates 15 }
+
+nghAggrDynReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN request messages received"
+    ::= { neighborAggregates 16 }
+
+nghAggrDynDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN DEL messages received"
+    ::= { neighborAggregates 17 }
+
+nghAggrDynAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DYN ACK messages sent"
+    ::= { neighborAggregates 18 }
+
+nghAggrRedirReqSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR request messages sent"
+    ::= { neighborAggregates 19 }
+
+nghAggrRedirDelSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR DEL messages"
+    ::= { neighborAggregates 20 }
+
+nghAggrRedirAckRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR ACK messages received"
+    ::= { neighborAggregates 21 }
+
+nghAggrRedirReqRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR request messages received"
+    ::= { neighborAggregates 22 }
+
+nghAggrRedirDelRcvd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR DEL messages received"
+    ::= { neighborAggregates 23 }
+
+nghAggrRedirAckSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of REDIR ACK messages sent"
+    ::= { neighborAggregates 24 }
+
+
+crlStatus OBJECT IDENTIFIER
+    ::= { status 11 }
+
+crlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing information about crl polling of various SSL
+            modules"
+    ::= { crlStatus 1 }
+
+crlEntry OBJECT-TYPE
+    SYNTAX      CrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for crl polling of one SSL module"
+    INDEX   { crlIndex }
+    ::= { crlTable 1 }
+
+CrlEntry ::=
+    SEQUENCE {
+        crlIndex             Unsigned32,
+        crlFeatureName       OCTET STRING,
+        crlNumCdpErr         Unsigned32,
+        crlErrMsg            OCTET STRING
+    }
+
+crlIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Index of one SSL module"
+    ::= { crlEntry 1 }
+
+crlFeatureName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Name of SSL module"
+    ::= { crlEntry 2 }
+
+crlNumCdpErr OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of cdp(s) from which crl polling fails"
+    ::= { crlEntry 3 }
+
+crlErrMsg OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A group of error messages showing failure of cdp(s) polling"
+    ::= { crlEntry 4 }
+
+capabilityStatus OBJECT IDENTIFIER
+    ::= { status 13 }
+
+shMaxConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum possible connections through this appliance"
+    ::= { capabilityStatus 1 } 
+
+shMaxBandwidth OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum possible bandwidth for this appliance"
+    ::= { capabilityStatus 2 }
+
+asymRouteCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+            "Number of Asymmetric Routes"
+    ::= { status 14 }
+
+
+
+--
+--
+-- CONFIG
+--
+--
+
+activeConfig OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Name of the currently active configuration"
+    ::= { config 1 }
+
+inpath OBJECT IDENTIFIER
+    ::= { config 2 }
+
+inpathSupport OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "In-path support"
+    ::= { inpath 1 }
+
+outofpath OBJECT IDENTIFIER
+    ::= { config 3 }
+
+outofpathSupport OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Out-of-path support"
+    ::= { outofpath 1 }
+
+datastoreSync OBJECT IDENTIFIER
+    ::= { config 4 }
+
+datastoreSyncPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Datastore Sync Port"
+    ::= { datastoreSync 1 }
+
+datastoreSyncAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Datastore Sync Address"
+    ::= { datastoreSync 2 }
+
+
+
+--
+--
+-- ALARMS
+--
+--
+
+alarmsPrefix OBJECT IDENTIFIER
+    ::= { alarms 0 }
+
+procCrash NOTIFICATION-TYPE
+    OBJECTS { procName }
+    STATUS  current
+    DESCRIPTION
+            "A procCrash trap signifies that a process managed by PM
+            has crashed and left a core file.  The variable sent with
+            the notification indicates which process crashed."
+    ::= { alarmsPrefix 1 }
+
+procExit NOTIFICATION-TYPE
+    OBJECTS { procName }
+    STATUS  current
+    DESCRIPTION
+            "A procExit trap signifies that a process managed by PM
+            has exited unexpectedly, but not left a core file.
+
+            The variable sent with the notification indicates 
+            which process exited."
+    ::= { alarmsPrefix 2 }
+
+cpuUtil NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The average CPU utilization in the past minute has gone
+            above the acceptable threshold"
+    ::= { alarmsPrefix 3 }
+
+pagingActivity NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The system has been paging excessively (thrashing)"
+    ::= { alarmsPrefix 4 }
+
+smartError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "SMART has sent an event about a possible disk error"
+    ::= { alarmsPrefix 5 }
+
+peerVersionMismatch NOTIFICATION-TYPE
+    OBJECTS { systemVersion }
+    STATUS  current
+    DESCRIPTION
+            "Detected a peer with a mismatched software version"
+    ::= { alarmsPrefix 6 }
+
+bypassMode NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Traffic is being passed through"
+    ::= { alarmsPrefix 7 }
+
+raidError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An error has been generated by the RAID array"
+    ::= { alarmsPrefix 8 }
+
+storeCorruption NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The data store is corrupted"
+    ::= { alarmsPrefix 9 }
+
+admissionMemError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Memory pressure is high. No additional connections will be
+             optimized"
+    ::= { alarmsPrefix 10 }
+
+admissionConnError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Connection limit reached. No additional connections will be
+             optimized"
+    ::= { alarmsPrefix 11 }
+
+haltError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The service is halted due to a software error"
+    ::= { alarmsPrefix 12 }
+
+serviceError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "There has been a non-fatal optimization service error. 
+             Please consult the log file"
+    ::= { alarmsPrefix 13 }
+
+scheduledJobError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A scheduled job has failed during execution"
+    ::= { alarmsPrefix 14 }
+
+confModeEnter NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A user has entered configuration mode"
+    ::= { alarmsPrefix 15 }
+
+confModeExit NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A user has exited configuration mode"
+    ::= { alarmsPrefix 16 }
+
+linkError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance has lost its link"
+    ::= { alarmsPrefix 17 }
+
+nfsV2V4 NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "NFS v2/v4 alarm notification"
+    ::= { alarmsPrefix 18 }
+
+powerSupplyError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A power supply on the appliance has failed" -- Not supported on all models
+    ::= { alarmsPrefix 19 }
+
+asymRouteError NOTIFICATION-TYPE
+    OBJECTS { asymRouteCount }
+    STATUS current
+    DESCRIPTION
+            "Asymmetric routes have been detected,certain connections might
+             not have been optimized because of this."
+    ::= { alarmsPrefix 20 }
+
+fanError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A fan has failed on this appliance" --  Not supported on all models
+    ::= { alarmsPrefix 21 }
+
+memoryError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A memory error has been detected on the appliance" -- Not supported on all models
+    ::= { alarmsPrefix 22 }
+
+ipmi NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "An IPMI event has been detected on the appliance. Please check
+             the details in the alarm report on the web UI"  -- Not supported on all models
+    ::= { alarmsPrefix 23 }
+
+configChange NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A change has been made to the system's configuration"
+    ::= { alarmsPrefix 24 }
+
+datastoreWrapped NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The datastore has wrapped around"
+    ::= { alarmsPrefix 25 }
+
+temperatureWarning NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The system temperature has exceeded the threshold" 
+    ::= { alarmsPrefix 26 }
+
+temperatureCritical NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The system temperature has reached a critical stage" 
+    ::= { alarmsPrefix 27 }
+
+cfConnFailure NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Unable to establish connection with the specified neighbor" 
+     ::= { alarmsPrefix 28 }
+
+cfConnLostEos NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection lost since end of stream was received from the 
+             specified neighbor"  
+     ::= { alarmsPrefix 29 }
+
+cfConnLostErr NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection lost due to an error communicating with the 
+             specified neighbor"  
+::= { alarmsPrefix 30 }
+
+cfKeepaliveTimeout NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection lost due to lack of keepalives from the specified 
+             neighbor" 
+     ::= { alarmsPrefix 31 }
+
+cfAckTimeout NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection lost due to lack of acks from the specified 
+             neighbor" 
+     ::= { alarmsPrefix 32 }
+
+cfReadInfoTimeout NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Timeout reading info from the specified neighbor" 
+     ::= { alarmsPrefix 33 }
+
+cfLatencyExceeded NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection forwarding latency with the specified neighbor
+              has exceeded the threshold" 
+     ::= { alarmsPrefix 34 }
+
+sslPeeringSCEPAutoReenrollError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "There is an error in the automatic re-enrollment of the SSL peering certificate"
+    ::= { alarmsPrefix 35 }
+
+crlError NOTIFICATION-TYPE
+	OBJECTS { crlFeatureName, crlErrMsg }
+    STATUS current
+    DESCRIPTION
+            "crl polling fails"
+    ::= { alarmsPrefix 36 }
+
+datastoreSyncFailure NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Data store sync has failed"
+    ::= { alarmsPrefix 37 }
+
+secureVaultNeedsUnlock NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "SSL acceleration and the secure data store cannot be used until
+             the secure vault has been unlocked."
+    ::= { alarmsPrefix 38 }
+
+secureVaultNeedsRekey NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "If you wish to use a non-default password for the secure
+             vault, the password must be rekeyed. Please see
+             Knowledge Base article 5592 for more details."
+    ::= { alarmsPrefix 39 }
+
+secureVaultInitError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An error was detected while initializing
+             the secure vault. Please contact customer support."
+    ::= { alarmsPrefix 40 }
+
+configSave NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The current appliance configuration has been saved"
+    ::= { alarmsPrefix 41 }
+
+tcpDumpStarted NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A TCP Dump has been started"
+    ::= { alarmsPrefix 42 }
+
+tcpDumpScheduled NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A TCP Dump has been scheduled"
+    ::= { alarmsPrefix 43 }
+
+newUserCreated NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A new user has been created"
+    ::= { alarmsPrefix 44 }
+
+diskError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Disk error has been detected"
+    ::= { alarmsPrefix 45 }
+
+wearWarning NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Accumulated SSD write cycles passed predefined level"
+    ::= { alarmsPrefix 46 }
+
+cliUserLogin NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A user has just logged-in via CLI" 
+    ::= { alarmsPrefix 47 }
+
+cliUserLogout NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A CLI user has just logged-out" 
+    ::= { alarmsPrefix 48 }
+
+webUserLogin NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A user has just logged-in via the Web UI" 
+    ::= { alarmsPrefix 49 }
+
+webUserLogout NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A user has just logged-out via the Web UI" 
+    ::= { alarmsPrefix 50 }
+
+trapTest NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Trap test" 
+    ::= { alarmsPrefix 51 }
+
+admissionCpuError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Optimization service is experiencing high CPU utilization, no additional
+             connections will be optimized"
+    ::= { alarmsPrefix 52 }
+
+admissionTcpError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Optimization service is experiencing high TCP memory pressure, no additional
+             connections will be optimized"
+    ::= { alarmsPrefix 53 }
+
+systemDiskFullError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "One or more system partitions is full or almost full"
+    ::= { alarmsPrefix 54 }
+
+domainJoinError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An attempt to join a domain failed"
+    ::= { alarmsPrefix 55 }
+
+certsExpiringError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Some x509 certificates may be expiring"
+    ::= { alarmsPrefix 56 }
+
+licenseError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The main Appliance license has expired, been removed, or become invalid"
+    ::= { alarmsPrefix 57 }
+
+hardwareError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Hardware Error detected"
+    ::= { alarmsPrefix 58 }
+
+sysdetailError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Error is found in System Detail Report"
+    ::= { alarmsPrefix 59 }
+
+admissionMapiError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "New MAPI connections will be passed through due to high connection count"
+    ::= { alarmsPrefix 60 }
+
+neighborIncompatibility NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Serial cascade misconfiguration has been detected"
+    ::= { alarmsPrefix 61 }
+
+flashError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Flash hardware error detected."
+    ::= { alarmsPrefix 62 }
+
+lanWanLoopError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "LAN-WAN loop detected. System will not optimize new connections un
+till this error is cleared"
+    ::= { alarmsPrefix 63 }
+
+optimizationServiceStatusError NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Optimization service currently not optimizing any connecntions."
+    ::= { alarmsPrefix 64 }
+
+upgradeFailure NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Upgrade failed and the system is running the previous image"
+    ::= { alarmsPrefix 65 }
+
+licenseExpiring NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "One or more licensed features will expire within the next two week
+s"
+    ::= { alarmsPrefix 66 }
+
+licenseExpired NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "One or more licensed features have expired"
+    ::= { alarmsPrefix 67 }
+
+clusterDisconnectedSHAlertError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A cluster Steelhead has been reported as disconnected"
+    ::= { alarmsPrefix 68 }
+
+smbAlert NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Domain authentication alert"
+    ::= { alarmsPrefix 69 }
+
+linkDuplex NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance is in half-duplex mode"
+    ::= { alarmsPrefix 70 }
+
+linkIoErrors NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance is suffering I/O errors"
+    ::= { alarmsPrefix 71 }
+
+storageProfSwitchFailed NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Storage profile switch failed"
+    ::= { alarmsPrefix 73 }
+
+cpuUtilClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The average CPU utilization has fallen back 
+             within the acceptable threshold"
+    ::= { alarmsPrefix 1003 }
+
+pagingActivityClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The system has stopped paging excessively (thrashing)"
+    ::= { alarmsPrefix 1004 }
+
+peerVersionMismatchClear NOTIFICATION-TYPE
+    OBJECTS { systemVersion }
+    STATUS  current
+    DESCRIPTION
+            "All peers are compatible"
+    ::= { alarmsPrefix 1006 }
+
+bypassModeClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Traffic is now being optimized"
+    ::= { alarmsPrefix 1007 }
+
+raidErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A RAID error has been cleared"
+    ::= { alarmsPrefix 1008 }
+
+storeCorruptionClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The data store is normal"
+    ::= { alarmsPrefix 1009 }
+
+admissionMemErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Admission control memory alarm has been cleared,
+             and the optimization service is running normally"
+    ::= { alarmsPrefix 1010 }
+
+admissionConnErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Admission control connections alarm has been cleared,
+             and the service is running normally"
+    ::= { alarmsPrefix 1011 }
+
+haltErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The service is now running normally"
+    ::= { alarmsPrefix 1012 }
+
+serviceErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The service is now running normally"
+    ::= { alarmsPrefix 1013 }
+
+linkErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance has regained its link"
+    ::= { alarmsPrefix 1017 }
+
+nfsV2V4Clear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "NFS v2/v4 alarm has been cleared"
+    ::= { alarmsPrefix 1018 }
+
+powerSupplyErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "All power supplies are now functioning normally" -- Not supported on all models
+    ::= { alarmsPrefix 1019 }
+
+asymRouteErrorClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "All asymmetric routes have expired or have been cleared"
+    ::= { alarmsPrefix 1020 }
+
+fanErrorClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "All system fans are now functioning normally" -- Not supported on all models
+    ::= { alarmsPrefix 1021 }
+
+memoryErrorClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "A memory error has been rectified on the appliance" -- Not supported on all models
+    ::= { alarmsPrefix 1022 }
+
+ipmiClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "An IPMI event has been rectified on the appliance" -- Not supported on all models
+    ::= { alarmsPrefix 1023 }
+
+temperatureNormal NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The system temperature is back within the threshold" 
+    ::= { alarmsPrefix 1026 }
+
+temperatureNonCritical NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "The system temperature is no longer in a critical stage" 
+    ::= { alarmsPrefix 1027 }
+
+cfConnRestored NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection reestablished with the specified neighbor" 
+     ::= { alarmsPrefix 1028 }
+
+cfConnLostEosClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection restablished after a prior termination due to
+              receiving end of strem from the specified neighbor" 
+     ::= { alarmsPrefix 1029 }
+
+cfConnLostErrClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection restablished after a prior termination due to
+              an error communicating with the specified neighbor" 
+    ::= { alarmsPrefix 1030 }
+
+cfKeepaliveTimeoutClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+        "Keepalive restored after a prior timeout with the specified neighbor" 
+     ::= { alarmsPrefix 1031 }
+
+cfAckTimeoutClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+        "Ack restored after a prior timeout with the specified neighbor" 
+     ::= { alarmsPrefix 1032 }
+
+cfReadInfoTimeoutClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+        "Successfully read info from the specified neighbor after a prior
+         timeout"
+     ::= { alarmsPrefix 1033 }
+
+cfLatencyExceededClear NOTIFICATION-TYPE
+     OBJECTS { neighborAddress }
+     STATUS current
+     DESCRIPTION
+             "Connection forwarding latency with the specified neighbor
+              is back within the threshold" 
+     ::= { alarmsPrefix 1034 }
+
+sslPeeringSCEPAutoReenrollClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Automatic re-enrollment of SSL peering certificate is OK or is disabled"
+    ::= { alarmsPrefix 1035 }
+
+crlClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "crl polling is running normally"
+    ::= { alarmsPrefix 1036 }
+
+datastoreSyncFailureClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Data store sync restored"
+    ::= { alarmsPrefix 1037 }
+
+secureVaultClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Secure vault has been unlocked and is healthy"
+    ::= { alarmsPrefix 1040 }
+
+diskErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "All disks are back online"
+    ::= { alarmsPrefix 1045 }
+
+admissionCpuErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Admission control CPU alarm has been cleared,
+             and the service is running normally"
+    ::= { alarmsPrefix 1052 }
+
+admissionTcpErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Admission control TCP alarm has been cleared,
+             and the service is running normally"
+    ::= { alarmsPrefix 1053 }
+
+systemDiskFullErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The system partitions are below usage thresholds"
+    ::= { alarmsPrefix 1054 }
+
+domainJoinErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "A domain error on the appliance has been cleared"
+    ::= { alarmsPrefix 1055 }
+
+certsExpiringErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "There are no expiring certificates"
+    ::= { alarmsPrefix 1056 }
+
+licenseErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "The main appliance license error has been cleared"
+    ::= { alarmsPrefix 1057 }
+
+hardwareErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Hardware Error has been cleared"
+    ::= { alarmsPrefix 1058 }
+
+sysdetailErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Overall status of System Detail Report is back to OK"
+    ::= { alarmsPrefix 1059 }
+
+admissionMapiErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "System will resume to optimize new MAPI connections since connection count has fallen below the threshold"
+    ::= { alarmsPrefix 1060 }
+
+neighborIncompatibilityClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Serial cascade misconfiguration issue is now resolved."
+    ::= { alarmsPrefix 1061 }
+
+flashErrorClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Flash is back to OK."
+    ::= { alarmsPrefix 1062 }
+
+lanWanLoopClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "LAN-WAN loop error cleared. System will resume to optimize connect
+ions."
+    ::= { alarmsPrefix 1063 }
+ 
+optimizationServiceStatusClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Optimization Service error cleared. System will resume to optimize
+ connections."
+    ::= { alarmsPrefix 1064 }
+ 
+upgradeFailureClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+            "Upgrade failure cleared and the system is still running
+             the previous image"
+    ::= { alarmsPrefix 1065 }
+
+clusterDisconnectedSHAlertClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "All cluster Steelheads are currently connected"
+    ::= { alarmsPrefix 1068 }
+
+smbAlertClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Domain authentication alert has been cleared"
+    ::= { alarmsPrefix 1069 }
+
+linkDuplexClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance has cleared the half-duplex error"
+    ::= { alarmsPrefix 1070 }
+
+linkIoErrorsClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An interface on the appliance has cleared the I/O errors state"
+    ::= { alarmsPrefix 1071  }
+
+
+
+
+rspGeneralError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "RSP general alarm is triggered."
+    ::= { alarmsPrefix 20001 }
+
+rspServiceError NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "RSP service alarm is triggered."
+    ::= { alarmsPrefix 20002 }
+
+rspGeneralClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "RSP general alarm cleared."
+    ::= { alarmsPrefix 21001 }
+
+rspServiceClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "RSP service alarm cleared."
+    ::= { alarmsPrefix 21002 }
+
+
+--
+--
+-- STATISTICS
+--
+--
+
+cpuLoad OBJECT IDENTIFIER
+    ::= { statistics 1 }
+
+cpuLoad1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "One-minute CPU load in hundreths"
+    ::= { cpuLoad 1 }
+
+cpuLoad5 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Five-minute CPU load in hundreths"
+    ::= { cpuLoad 2 }
+
+cpuLoad15 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fifteen-minute CPU load in hundreths"
+    ::= { cpuLoad 3 }
+
+cpuUtil1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage CPU utilization, aggregated across all CPUs, rolling
+         average over the past minute"
+    ::= { cpuLoad 4 }
+
+cpuIndivUtilTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CPUIndivUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Details about the individual CPU utilization"
+    ::= { cpuLoad 5 }
+
+cpuIndivUtilEntry OBJECT-TYPE
+    SYNTAX      CPUIndivUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one cpu"
+    INDEX   { cpuIndivIndex }
+    ::= {cpuIndivUtilTable 1 }
+
+CPUIndivUtilEntry ::=
+    SEQUENCE {
+        cpuIndivIndex       Unsigned32,
+        cpuIndivId          Unsigned32,
+        cpuIndivIdleTime    Unsigned32,
+        cpuIndivSystemTime  Unsigned32,
+        cpuIndivUserTime    Unsigned32
+}
+
+cpuIndivIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A synthetic number numbering the cpus"
+    ::= { cpuIndivUtilEntry 1 }
+
+cpuIndivId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Name of the cpu, also serves as the Index for the table"
+    ::= { cpuIndivUtilEntry 2 }
+
+cpuIndivIdleTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Idle time for this CPU"
+    ::= { cpuIndivUtilEntry 3 }
+
+cpuIndivSystemTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System time for this CPU"
+    ::= { cpuIndivUtilEntry 4 }
+
+cpuIndivUserTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "User time for this CPU"
+    ::= { cpuIndivUtilEntry 5 }
+
+connectionCounts OBJECT IDENTIFIER
+    ::= { statistics 2 }
+
+optimizedConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current total number of optimized connections"
+    ::= { connectionCounts 1 }
+
+passthroughConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current total number of pass-through connections"
+    ::= { connectionCounts 2 }
+
+halfOpenedConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current total number of half-opened (optimized) connections"
+    ::= { connectionCounts 3 }
+
+halfClosedConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current total number of half-closed (optimized) connections"
+    ::= { connectionCounts 4 }
+
+establishedConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current number of established (optimized) connections"
+    ::= { connectionCounts 5 }
+
+activeConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current number of active (optimized) connections"
+    ::= { connectionCounts 6 }
+
+totalConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of connections"
+    ::= { connectionCounts 7 }
+
+bandwidth OBJECT IDENTIFIER
+    ::= { statistics 3 }
+
+bandwidthAggregate OBJECT IDENTIFIER
+    ::= { bandwidth 1 }
+
+bwAggInLan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             WAN to LAN direction since the last restart of service, 
+             as measured on the LAN side"
+    ::= { bandwidthAggregate 1 }
+
+bwAggInWan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             WAN to LAN direction since the last restart of service, 
+             as measured on the WAN side"
+    ::= { bandwidthAggregate 2 }
+
+bwAggOutLan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             LAN to WAN direction since the last restart of service, 
+             as measured on the LAN side"
+    ::= { bandwidthAggregate 3 }
+
+bwAggOutWan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             LAN to WAN direction since the last restart of service, 
+             as measured on the WAN side"
+    ::= { bandwidthAggregate 4 }
+
+bandwidthPerPort OBJECT IDENTIFIER
+    ::= { bandwidth 2 }
+
+bwPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BWPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing statistics for optimized traffic on
+             a per application port basis"
+    ::= { bandwidthPerPort 1 }
+
+bwPortEntry OBJECT-TYPE
+    SYNTAX      BWPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one port"
+    INDEX   { bwPortNumber }
+    ::= { bwPortTable 1 }
+
+BWPortEntry ::=
+    SEQUENCE {
+        bwPortNumber          Unsigned32,
+        bwPortInLan           Counter32,
+        bwPortInWan           Counter32,
+        bwPortOutLan          Counter32,
+        bwPortOutWan          Counter32
+    }
+
+bwPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port Number on which the traffic is observed"
+    ::= { bwPortEntry 1 }
+
+bwPortInLan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the WAN to LAN direction since last restart of 
+             service, as measured on the LAN side"
+    ::= { bwPortEntry 2 }
+
+bwPortInWan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the WAN to LAN direction since last restart of 
+             service, as measured on the WAN side"
+    ::= { bwPortEntry 3 }
+
+bwPortOutLan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the LAN to WAN direction since last restart of 
+             service, as measured on the LAN side"
+    ::= { bwPortEntry 4 }
+
+bwPortOutWan OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optimized bytes in the LAN to WAN direction since last restart of 
+         service, as measured on the WAN side"
+    ::= { bwPortEntry 5 }
+
+bandwidthPassThrough OBJECT IDENTIFIER
+    ::= { bandwidth 3 }
+
+bwPassThroughIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Passthrough bytes in WAN to LAN direction"
+    ::= { bandwidthPassThrough 1 }
+
+bwPassThroughOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Passthrough bytes in LAN to WAN direction"
+    ::= { bandwidthPassThrough 2 }
+
+bwPassThroughTotal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total passthrough bytes"
+    ::= { bandwidthPassThrough 3 }
+
+datastore OBJECT IDENTIFIER
+    ::= { statistics 4 }
+
+dsHitsTotal OBJECT-TYPE
+    SYNTAX      Counter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of datastore hits since last restart of service"
+    ::= { datastore 1 }
+
+dsMissTotal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of datastore misses since last restart of service"
+    ::= { datastore 2 }
+
+dsCostPerSegment OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+            "Cost per segment expressed in microseconds"
+    ::= { datastore 3 }
+
+dsAveDiskUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average disk utilization, a more accurate measurement of
+             the underlying disk activities, and correlates directly
+             to disk pressure"
+    ::= { datastore 4 }
+
+topTalkers OBJECT IDENTIFIER
+    ::= { statistics 5 }
+
+ttTalkersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TalkersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the top talkers"
+    ::= { topTalkers 1 }
+
+ttTalkersEntry OBJECT-TYPE
+    SYNTAX      TalkersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one talker"
+    INDEX   { ttTalkerId }
+    ::= { ttTalkersTable 1 }
+
+TalkersEntry ::=
+    SEQUENCE {
+        ttTalkerId           Unsigned32,
+        ttTalkerIp1           IpAddress,
+        ttTalkerPort1        Unsigned32,
+        ttTalkerIp2           IpAddress,
+        ttTalkerPort2        Unsigned32,
+        ttTalkerByteCount     Counter64
+}
+
+ttTalkerId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A synthetic index for the table"
+    ::= { ttTalkersEntry 1 }
+
+ttTalkerIp1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ip address of end point #1 of this conversaition"
+    ::= { ttTalkersEntry 2 }
+
+ttTalkerPort1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Application port for end point #1 of this conversation"
+    ::= { ttTalkersEntry 3 }
+
+ttTalkerIp2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ip address of end point #2 of this conversaition"
+    ::= { ttTalkersEntry 4 }
+
+ttTalkerPort2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Application port for end point #2 of this conversation"
+    ::= { ttTalkersEntry 5 }
+
+ttTalkerByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bidirectional bytecount for this conversation"
+    ::= { ttTalkersEntry 6 }
+
+ttSrcHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SrcHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the hosts generating the most traffic"
+    ::= { topTalkers 2 }
+
+ttSrcHostEntry OBJECT-TYPE
+    SYNTAX      SrcHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one source host"
+    INDEX   { ttSrcHostId }
+    ::= { ttSrcHostTable 1 }
+
+SrcHostEntry ::=
+    SEQUENCE {
+        ttSrcHostId           Unsigned32,
+        ttSrcHostIp           IpAddress,
+        ttSrcHostByteCount    Counter64
+}
+
+ttSrcHostId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A synthetic index for the table"
+    ::= { ttSrcHostEntry 1 }
+
+ttSrcHostIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ip address of the host generating the traffic"
+    ::= { ttSrcHostEntry 2 }
+
+ttSrcHostByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bytecount of traffic generated by this host "
+    ::= { ttSrcHostEntry 3 }
+
+ttDestHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DestHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the hosts receiving the most traffic"
+    ::= { topTalkers 3 }
+
+ttDestHostEntry OBJECT-TYPE
+    SYNTAX      DestHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one destination host"
+    INDEX   { ttDestHostId }
+    ::= { ttDestHostTable 1 }
+
+DestHostEntry ::=
+    SEQUENCE {
+        ttDestHostId           Unsigned32,
+        ttDestHostIp           IpAddress,
+        ttDestHostByteCount    Counter64
+}
+
+ttDestHostId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A synthetic index for the table"
+    ::= { ttDestHostEntry 1 }
+
+ttDestHostIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ip address of the host receiving the traffic"
+    ::= { ttDestHostEntry 2 }
+
+ttDestHostByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bytecount of traffic received by this host "
+    ::= { ttDestHostEntry 3 }
+
+ttAppPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the application ports generating
+             the most traffic"
+    ::= { topTalkers 4 }
+
+ttAppPortEntry OBJECT-TYPE
+    SYNTAX      AppPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one application port"
+    INDEX   { ttAppPortId }
+    ::= { ttAppPortTable 1 }
+
+AppPortEntry ::=
+    SEQUENCE {
+        ttAppPortId           Unsigned32,
+        ttAppPort             Unsigned32,
+        ttAppPortByteCount    Counter64
+}
+
+ttAppPortId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A synthetic index for the table"
+    ::= { ttAppPortEntry 1 }
+
+ttAppPort   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Port number in the source port field of the traffic"
+    ::= { ttAppPortEntry 2 }
+
+ttAppPortByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bytecount of traffic generated with this port
+             number in the source port field"
+    ::= { ttAppPortEntry 3 }
+
+bandwidthHC OBJECT IDENTIFIER
+    ::= { statistics 6 }
+
+bandwidthHCAggregate OBJECT IDENTIFIER
+    ::= { bandwidthHC 1 }
+
+bwHCAggInLan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             WAN to LAN direction since the last restart of service, 
+             as measured on the LAN side"
+    ::= { bandwidthHCAggregate 1 }
+
+bwHCAggInWan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             WAN to LAN direction since the last restart of service, 
+             as measured on the WAN side"
+    ::= { bandwidthHCAggregate 2 }
+
+bwHCAggOutLan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             LAN to WAN direction since the last restart of service, 
+             as measured on the LAN side"
+    ::= { bandwidthHCAggregate 3 }
+
+bwAggHCOutWan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total optimized bytes across all application ports, in the 
+             LAN to WAN direction since the last restart of service, 
+             as measured on the WAN side"
+    ::= { bandwidthHCAggregate 4 }
+
+bandwidthHCPerPort OBJECT IDENTIFIER
+    ::= { bandwidthHC 2 }
+
+bwHCPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BWHCPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing statistics for optimized traffic on
+             a per application port basis"
+    ::= { bandwidthHCPerPort 1 }
+
+bwHCPortEntry OBJECT-TYPE
+    SYNTAX      BWHCPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one port"
+    INDEX   { bwHCPortNumber }
+    ::= { bwHCPortTable 1 }
+
+BWHCPortEntry ::=
+    SEQUENCE {
+        bwHCPortNumber          Unsigned32,
+        bwHCPortInLan           Counter64,
+        bwHCPortInWan           Counter64,
+        bwHCPortOutLan          Counter64,
+        bwHCPortOutWan          Counter64
+    }
+
+bwHCPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port Number on which the traffic is observed"
+    ::= { bwHCPortEntry 1 }
+
+bwHCPortInLan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the WAN to LAN direction since last restart of 
+             service, as measured on the LAN side"
+    ::= { bwHCPortEntry 2 }
+
+bwHCPortInWan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the WAN to LAN direction since last restart of 
+             service, as measured on the WAN side"
+    ::= { bwHCPortEntry 3 }
+
+bwHCPortOutLan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Optimized bytes in the LAN to WAN direction since last restart of 
+             service, as measured on the LAN side"
+    ::= { bwHCPortEntry 4 }
+
+bwHCPortOutWan OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optimized bytes in the LAN to WAN direction since last restart of 
+         service, as measured on the WAN side"
+    ::= { bwHCPortEntry 5 }
+
+
+
+END
+
