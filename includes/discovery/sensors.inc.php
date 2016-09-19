@@ -21,6 +21,7 @@ require 'includes/discovery/sensors/temperatures.inc.php';
 require 'includes/discovery/sensors/humidity.inc.php';
 require 'includes/discovery/sensors/voltages.inc.php';
 require 'includes/discovery/sensors/frequencies.inc.php';
+require 'includes/discovery/sensors/runtime.inc.php';
 require 'includes/discovery/sensors/current.inc.php';
 require 'includes/discovery/sensors/power.inc.php';
 require 'includes/discovery/sensors/fanspeeds.inc.php';
