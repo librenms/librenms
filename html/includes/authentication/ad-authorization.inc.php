@@ -217,7 +217,6 @@ function get_userlist()
     $ldap_groups = get_group_list();
 
     foreach ($ldap_groups as $ldap_group) {
-        $group_cn = get_cn($ldap_group);
         $search_filter = "(memberOf=$ldap_group)";
         if ($config['auth_ad_user_filter']) {
             $search_filter = "(&{$config['auth_ad_user_filter']}$search_filter)";
