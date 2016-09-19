@@ -126,6 +126,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('endian', 'Linux endian');
     }
 
+    public function testF5()
+    {
+        $this->checkOS('f5', 'Linux', '.1.3.6.1.4.1.3375.2.1.3.4.1000');
+    }
+
     public function testLinux()
     {
         $this->checkOS('linux', 'Linux');
