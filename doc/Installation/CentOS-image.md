@@ -1,12 +1,12 @@
 source: Installation/CentOS-image.md
-> NOTE: We highly advice that you change all passwords on this image when you deploy it!!
+> NOTE: このイメージをデプロイした後、全てのパスワードを変更して頂くことを強く勧める!!
 
-> NOTE: Read the above note again!
+> NOTE: 上記の注意事項を繰り返し読んで下さい!
 
-We have available for download a pre-built image based on CentOS 7. Details of the image are below:
+CentOS 7上にlibrenmsの環境を構築したイメージをダウンロードできるように準備した。イメージの詳細は以下の通り:
 
-The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
-These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
+イメージはVirtualBoxを用いて構築した。a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
+これらはVMWare Fusion、Workstation、PlayerおよびVirtualBoxでの動作を確認しています。
 
 Any issues with these images should be reported via [Github](https://github.com/librenms/librenms/issues) or our IRC channel ##librenms on the Freenode network.
 
