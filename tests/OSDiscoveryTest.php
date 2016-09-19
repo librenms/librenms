@@ -41,7 +41,10 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     private function checkOS($expectedOS, $sysDescr = '', $sysObjectId = '', $mockSnmp = array(), $device = array())
     {
         global $config;
-        setSnmpMock($mockSnmp);
+        clearSnmpMock();
+        foreach ($mockSnmp as $oid => $val) {
+            setSnmpMock($oid, $val);
+        }
         $os = null;
 
         // cannot use getHostOS() because of functions.php includes
@@ -62,7 +65,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
 
         $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
+            'IEEE802dot11-MIB::dot11manufacturerName.5' => 'Ubiquiti',
         );
         $this->checkOS('airos', 'Linux', '', $mockSnmp);
     }
@@ -70,7 +73,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAirosAf()
     {
         $mockSnmp = array(
-            'fwVersion.1' => '1.0',
+            'UBNT-AirFIBER-MIB::fwVersion.1' => '1.0',
         );
         $this->checkOS('airos-af', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
     }
@@ -146,7 +149,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPcoweb()
     {
         $mockSnmp = array(
-            'roomTemp.0' => 1,
+            'CAREL-ug40cdz-MIB::roomTemp.0' => 1,
         );
         $this->checkOS('pcoweb', 'Linux', '', $mockSnmp);
     }
@@ -190,17 +193,17 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testUnifi()
     {
         $mockSnmp = array(
-            'dot11manufacturerProductName.6' => 'UAP',
+            'IEEE802dot11-MIB::dot11manufacturerProductName.6' => 'UAP',
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
 
         $mockSnmp = array(
-            'dot11manufacturerProductName.4' => 'UAP-PRO',
+            'IEEE802dot11-MIB::dot11manufacturerProductName.4' => 'UAP-PRO',
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
 
         $mockSnmp = array(
-            'dot11manufacturerProductName.0' => 'UAP-AC2',
+            'IEEE802dot11-MIB::dot11manufacturerProductName.1' => 'UAP-AC2',
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
     }
