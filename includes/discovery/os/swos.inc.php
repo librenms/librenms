@@ -5,5 +5,11 @@ if (!$os) {
         if (strstr(snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Oqv', ''), 'RB260GS')) {
             $os = 'swos';
         }
+        if (strstr(snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Oqv', ''), 'RB250GS')) {
+            $os = 'swos';
+        }
+        if (strstr(snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Oqv', ''), 'RB260GSP')) {
+            $os = 'swos';
+        }
     }
 }
