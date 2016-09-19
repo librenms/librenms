@@ -50,14 +50,8 @@ if (isset($_POST['min_severity'])) {
 }
 
 if (is_numeric($_POST['group'])) {
-    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$_POST['group']);
-    $group_pattern = rtrim($group_pattern, '&&');
-    $group_pattern = rtrim($group_pattern, '||');
-
-    $device_id_sql = GenGroupSQL($group_pattern);
-    if ($device_id_sql) {
-        $where .= " AND devices.device_id IN ($device_id_sql)";
-    }
+    $where .= " AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $param[] = $_POST['group'];
 }
 
 if (!$show_recovered) {

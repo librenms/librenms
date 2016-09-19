@@ -74,7 +74,7 @@ function EditDeviceGroup($group_id, $name = null, $desc = null, $pattern = null)
  * Generate SQL from Group-Pattern
  * @param string $pattern Pattern to generate SQL for
  * @param string $search  What to searchid for
- * @return string
+ * @return string sql to perform the search
  */
 function GenGroupSQL($pattern, $search = '', $extra = 0)
 {
