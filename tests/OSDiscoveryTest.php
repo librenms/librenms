@@ -121,6 +121,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'Eaton 5PX 2000');
     }
 
+    public function testEdgeos()
+    {
+        $this->checkOS('edgeos', 'EdgeOS');
+    }
+
     public function testEndian()
     {
         $this->checkOS('endian', 'Linux endian');
@@ -203,6 +208,18 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
             'dot11manufacturerProductName.0' => 'UAP-AC2',
         );
         $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+    }
+
+    public function testVyatta()
+    {
+        $this->checkOS('vyatta', 'Vyatta');
+    }
+
+    public function testVyos()
+    {
+        $this->checkOS('vyos', 'Vyatta VyOS');
+        $this->checkOS('vyos', 'VyOS');
+        $this->checkOS('vyos', 'vyos');
     }
 
     public function testZxr10()
