@@ -16,6 +16,7 @@
 $supported_sensors = array(
     'current'     => 'A',
     'frequency'   => 'Hz',
+    'runtime'     => 'Min',
     'humidity'    => '%',
     'fanspeed'    => 'rpm',
     'power'       => 'W',
