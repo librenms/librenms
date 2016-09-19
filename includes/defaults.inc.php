@@ -591,8 +591,8 @@ $config['auth_ldap_cache_ttl'] = 300;
 // How long in seconds should ldap* module cache user information in $_SESSION
 
 // Active Directory Authentication
-$config['auth_ad_user_filter'] = "(sAMAccountName=%user%)";
-$config['auth_ad_group_filter'] = "(sAMAccountName=%group%)";
+$config['auth_ad_user_filter'] = "(objectclass=user)";
+$config['auth_ad_group_filter'] = "(objectclass=group)";
 
 // Sensors
 $config['allow_entity_sensor']['amperes']     = 1;
