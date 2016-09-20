@@ -1,0 +1,18 @@
+RBT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+
+rbt MODULE-IDENTITY
+    LAST-UPDATED        "200604100000Z"
+    ORGANIZATION        "Riverbed Technology, Inc."
+    CONTACT-INFO
+       "   John Cho
+           jcho@riverbed.com"
+    DESCRIPTION         "Riverbed Technology MIB"
+    ::= { enterprises 17163 }
+
+products OBJECT IDENTIFIER
+    ::= { rbt 1 }
+
+END
