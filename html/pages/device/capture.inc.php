@@ -38,14 +38,6 @@ if (!is_admin()) {
         <li role="presentation"><a data-toggle="tab" href="#snmp">SNMP</a></li>
     </ul>
     <div class="tab-content">
-    <style type="text/css">
-        /* stop buttons from looking like they get stuck clicked */
-        .btn-default:focus {
-            background-color: #fff;
-            border-color: #ccc;
-            outline: none;
-        }
-    </style>
     <?php
     $tabs = array(
         'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname='.$device['hostname'],
@@ -58,13 +50,12 @@ if (!is_admin()) {
         <div id="<?php echo $tab ?>" class="tab-pane fade <?php echo ($tab == 'discovery' ? ' in active' : '') ?>">
         <div class="row"><div class="col-md-12">
         <div class="btn-toolbar" role="toolbar" style="margin:5px 0 5px 0">
-        <button type="button" class="btn btn-default" id="run-<?php echo $tab ?>">Run</button>
-        <button type="button" class="btn btn-default" id="copy-<?php echo $tab ?>">Copy</button>
-        <a class="btn btn-default" href="<?php echo str_replace('text', 'download', $url) ?>">Download</a>
+        <button type="button" class="btn btn-success" id="run-<?php echo $tab ?>"><i class="fa fa-play fa-lg"></i> Run</button>
+        <button type="button" class="btn btn-primary" id="copy-<?php echo $tab ?>"><i class="fa fa-clipboard fa-lg"></i> Copy</button>
+        <a class="btn btn-warning" href="<?php echo str_replace('text', 'download', $url) ?>"><i class="fa fa-download fa-lg"></i> Download</a>
         </div></div></div>
         <div class="row"><div class="col-md-12">
-        <label for="output-<?php echo $tab ?>">Output</label>
-        <textarea readonly id="output-<?php echo $tab ?>" style="width:100%; height:400px; resize:vertical;"></textarea>
+        <textarea readonly id="output-<?php echo $tab ?>" class="form-control" rows="30" placeholder="Output"></textarea>
         </div></div>
         </div>
         <script type="text/javascript">
