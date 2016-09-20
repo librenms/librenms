@@ -22,17 +22,12 @@
 
 global $config;
 
-//NET-SNMP-EXTEND-MIB::nsExtendOutLine.\"ups-nut\"
-$ups_model = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4', '-Oqv');
-$ups_serial = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.5', '-Oqv');
-$ups_details = $ups_model.' (SN:'.$ups_serial.')';
-
 $graphs = array(
-    'ups-nut_remaining' => 'Remaining time: '.$ups_details,
-    'ups-nut_load' => 'Load: '.$ups_details,
-    'ups-nut_voltage_battery' => 'Battery voltage: '.$ups_details,
-    'ups-nut_charge' => 'Charge: '.$ups_details,
-    'ups-nut_voltage_input' => 'Input voltage: '.$ups_details,
+    'ups-nut_remaining' => 'Remaining time: ',
+    'ups-nut_load' => 'Load: ',
+    'ups-nut_voltage_battery' => 'Battery voltage: ',
+    'ups-nut_charge' => 'Charge: ',
+    'ups-nut_voltage_input' => 'Input voltage: ',
 );
 
 foreach ($graphs as $key => $text) {

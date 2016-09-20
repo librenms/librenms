@@ -48,7 +48,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $i++;
     }
 } else {
-    echo "file missing: ".$rrd_filename;
+    echo "file missing: $rrd_filename";
 }
 
 require 'includes/graphs/generic_v3_multiline_float.inc.php';
