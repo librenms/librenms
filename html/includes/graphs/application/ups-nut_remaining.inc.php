@@ -32,5 +32,8 @@ $unit_text       = 'Minutes';
 $ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 if (rrdtool_check_rrd_exists($ups_nut)) {
     $rrd_filename = $ups_nut;
+} else {
+    echo "file missing: $rrd_filename";
 }
+
 require 'includes/graphs/generic_simplex.inc.php';
