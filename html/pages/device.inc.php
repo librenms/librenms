@@ -417,6 +417,10 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                  Edit
                 </a>
                 </li>';
+
+            echo '<li><a href="'.generate_device_url($device, array('tab' => 'capture')).'">
+                <img src="images/16/brick_error.png" align="absmiddle" border="0" /> Capture
+                </a></li>';
         }
               echo '</ul>
             </div>';
