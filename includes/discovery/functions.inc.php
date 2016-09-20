@@ -877,7 +877,6 @@ function avtech_add_sensor($device, $sensor)
 /**
  * @param $device
  * @param $serial
- * @param $divisor
  * @param $sensor
  * @return int
  */
