@@ -130,6 +130,7 @@ LibreNMS contributors:
 - Tamas Szabo <jobs@szatam.com> (szatam)
 - Dennis Væversted <dv@zitcom.dk> (dvaeversted)
 - Morgan Henreaux <morgan@henreaux.com> (mhenreaux)
+- Yves Boudreau <yves.boudreau@bgp.ca> (boudreau)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
