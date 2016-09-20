@@ -740,6 +740,15 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-24';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-24P';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-48';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF302-08';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-10';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-10SFP';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-20';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-28';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-28MP';
 
 // Huawei
 $os = 'vrp';
