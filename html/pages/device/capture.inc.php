@@ -55,7 +55,7 @@ if (!is_admin()) {
         <a class="btn btn-warning" href="<?php echo str_replace('text', 'download', $url) ?>"><i class="fa fa-download fa-lg"></i> Download</a>
         </div></div></div>
         <div class="row"><div class="col-md-12">
-        <textarea readonly id="output-<?php echo $tab ?>" class="form-control" rows="30" placeholder="Output"></textarea>
+        <textarea readonly id="output-<?php echo $tab ?>" class="form-control" rows="30" placeholder="Output" style="resize:vertical;"></textarea>
         </div></div>
         </div>
         <script type="text/javascript">
