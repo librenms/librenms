@@ -41,7 +41,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $clean_mac = $m_a.$m_b.$m_c.$m_d.$m_e.$m_f;
             $mac_table[$if][$mac]['cleanmac'] = $clean_mac;
             $port_id = $interface['port_id'];
-            $mac_table[$port_id][$clean_mac] = 1;
+            $mac_table[$port_id][$clean_mac][$ip] = 1;
 
             if (dbFetchCell('SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ?', array($interface['port_id'], $ip))) {
                 // Commented below, no longer needed but leaving for reference.
@@ -74,8 +74,9 @@ foreach ($vrfs_lite_cisco as $vrf) {
     foreach (dbFetchRows($sql) as $entry) {
         $entry_mac = $entry['mac_address'];
         $entry_if  = $entry['port_id'];
-        if (!$mac_table[$entry_if][$entry_mac]) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if, $entry_mac));
+        $entry_ip  = $entry['ipv4_address'];
+        if (!$mac_table[$entry_if][$entry_mac][$entry_ip]) {
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ? AND `ipv4_address` = ? ', array($entry_if, $entry_mac, $entry_ip));
             d_echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
 
             echo '-';

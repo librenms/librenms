@@ -189,14 +189,16 @@ You will also need to supply a test unit within `tests/OSDiscoveryTest.php`. Ple
 
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
-Please provide the following output as seperate non-expiring pastebin.com links.
+Under the device, click the gear and select Capture. 
+Please provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring pastebin.com links.
 
-Replace the relevant information in these commands such as HOSTNAME and COMMUNITY.
+You can also use the command line to obtain the information.  Especially, if snmpwalk results in a large amount of data.
+Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
 ```bash
 ./discovery.php -h HOSTNAME -d -m os
 ./poller.php -h HOSTNAME -r -f -d -m os
-snmpbulkwalk -On -v2c -c COMMUNITY HOSTNAME .
+snmpbulkwalk -Onet -v2c -c COMMUNITY HOSTNAME .
 ```
 
 If possible please also provide what the OS name should be if it doesn't exist already.

@@ -167,7 +167,7 @@ var newW;
 
 $(window).on('resize', function(){
     rtime = new Date();
-    if (timeout === false) {
+    if (timeout === false && !(typeof no_refresh === 'boolean' && no_refresh === true)) {
         timeout = true;
         setTimeout(resizeend, delta);
     }
