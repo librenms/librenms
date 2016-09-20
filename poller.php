@@ -46,10 +46,14 @@ if ($options['h'] == 'odd') {
     $doing = 'all';
 } elseif ($options['h']) {
     if (is_numeric($options['h'])) {
-        $where = "AND `device_id` = '".$options['h']."'";
+        $where = "AND `device_id` = ".$options['h'];
         $doing = $options['h'];
     } else {
-        $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+        if (preg_match('/\*/', $options['h'])) {
+            $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+        } else {
+            $where = "AND `hostname` = '".mres($options['h'])."'";
+        }
         $doing = $options['h'];
     }
 }
@@ -127,8 +131,8 @@ if (!isset($query)) {
 }
 
 foreach (dbFetch($query) as $device) {
-    $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
-    $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = '".$device['device_id']."'");
+    $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = " .$device['device_id']);
+    $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ".$device['device_id']);
     poll_device($device, $options);
     RunRules($device['device_id']);
     echo "\r\n";
