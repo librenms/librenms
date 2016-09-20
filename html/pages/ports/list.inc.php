@@ -1,6 +1,7 @@
 <?php
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
+$no_refresh = true;
 
 if ($vars['errors']) {
     $error_sort = ' data-order="desc"';
