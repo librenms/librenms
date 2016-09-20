@@ -124,21 +124,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testAkcp()
     {
-        $this->checkOS('minkelsrms', '8VD-X20');
         $this->checkOS('akcp', 'SensorProbe');
     }
 
-    public function testAlcatelLucent()
+    public function testAos()
     {
-        $this->checkOS('arubaos', 'AOS-W', '.1.3.6.1.4.1.6486.800');
         $this->checkOS('aos', 'AOS-W', '.1.3.6.1.4.1.6486.801');
         $this->checkOS('aos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6486.801');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.3');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.6.2.1.2.2.');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.6.1');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.6.1.1.2.');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.9.1');
-        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.15.');
     }
 
     public function testAllied()
@@ -512,7 +504,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testExtremeware()
     {
         $this->checkOS('extremeware', 'Something that we do not have', '.1.3.6.1.4.1.1916.2');
-        $this->checkOS('xos', 'XOS');
     }
 
     public function testF5()
@@ -563,9 +554,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testFreebsd()
     {
-        $this->checkOS('voswall', 'Voswall');
-        $this->checkOS('monowall', 'm0n0wall');
-        $this->checkOS('pfsense', 'pfSense');
         $this->checkOS('freebsd', 'FreeBSD');
     }
 
@@ -694,7 +682,15 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ios', 'IOS (tm)');
         $this->checkOS('ios', 'Cisco IOS Software, 3800 Software (C3825-ADVIPSERVICESK9-M), Version 12.4(22)T5, RELEASE SOFTWARE (fc3) Technical Support: http://www.cisco.com/techsupport Copyright (c) 1986-2010 by Cisco Systems, Inc. Compiled Wed 28-Apr-10 11:30 by prod_rel_team');
         $this->checkOS('ios', 'Global Site Selector');
+    }
+
+    public function testIosxe()
+    {
         $this->checkOS('iosxe', 'Cisco IOS Software, IOS-XE Software (PPC_LINUX_IOSD-ADVENTERPRISEK9-M), Version 15.1(3)S, RELEASE SOFTWARE (fc1) Technical Support: http://www.cisco.com/techsupport Copyright (c) 1986-2011 by Cisco Systems, Inc. Compiled Thu 21-Jul-11 21:59 by mcpre');
+    }
+
+    public function testIosxr()
+    {
         $this->checkOS('iosxr', 'IOS XR');
     }
 
@@ -784,54 +780,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testLinux()
     {
-        $mockSnmp = array(
-            'ENTITY-MIB::entPhysicalMfgName.1' => 'QNAP',
-        );
         $this->checkOS('linux', 'Linux');
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2014');
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2016');
-        $this->checkOS('endian', 'Linux endian');
-        $this->checkOS('ciscosmblinux', 'Linux Cisco Small Business');
-        $this->checkOS('qnap', 'Linux', '', $mockSnmp);
-        $this->checkOS('procera', 'Linux', '.1.3.6.1.4.1.15397.2');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-        );
-        $this->checkOS('airos', 'Linux', '', $mockSnmp);
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-            'dot11manufacturerProductName' => 'UAP',
-        );
-        $this->checkOS('unifi', 'Linux', '', $mockSnmp);
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-            'fwVersion.1' => 'Something that we do not have',
-        );
-        $this->checkOS('airos-af', 'Linux', '', $mockSnmp);
-        $mockSnmp = array(
-            'GANDI-MIB::rxCounter.0' => 'GANDI-MIB',
-        );
-        $this->checkOS('pktj', 'Linux', '', $mockSnmp);
-        $this->checkOS('cumulus', 'Linux', '.1.3.6.1.4.1.40310');
-        $this->checkOS('sophos', 'Linux g56fa85e');
-        $this->checkOS('sophos', 'Linux gc80f187');
-        $this->checkOS('sophos', 'Linux g829be90');
-        $this->checkOS('sophos', 'Linux g63c0044');
-        $this->checkOS('sophos', 'Linux gba768e5');
-        $mockSnmp = array(
-            'SFA-INFO::systemName.0' => 'Something that we do not have',
-        );
-        $this->checkOS('ddnos', 'Linux', '', $mockSnmp);
-        $mockSnmp = array(
-            'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0' => 'syno_hw_version',
-        );
-        $this->checkOS('dsm', 'Linux', '', $mockSnmp);
-        $mockSnmp = array(
-            'roomTemp.0' => 10,
-        );
-        $this->checkOS('pcoweb', 'Linux', '', $mockSnmp);
     }
 
     public function testMacosx()
@@ -880,6 +829,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMicrosemitime()
     {
         $this->checkOS('microsemitime', 'Something that we do not have', '.1.3.6.1.4.1.39165.1.6');
+    }
+
+    public function testMinkelsrms()
+    {
+        $this->checkOS('minkelsrms', '8VD-X20');
+    }
+
+    public function testMonowall()
+    {
+        $this->checkOS('monowall', 'm0n0wall');
     }
 
     public function testMrvld()
@@ -994,6 +953,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('okilan', 'OKI OkiLAN');
     }
 
+    public function testOpensolaris()
+    {
+        $this->checkOS('opensolaris', 'SunOS Something 5.11');
+    }
+
     public function testOnefs()
     {
         $this->checkOS('onefs', 'Something that we do not have', '.1.3.6.1.4.1.12124.1');
@@ -1047,6 +1011,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPerle()
     {
         $this->checkOS('perle', 'Perle MCR-MGT');
+    }
+
+    public function testPfsense()
+    {
+        $this->checkOS('pfsense', 'pfSense');
     }
 
     public function testPix()
@@ -1214,6 +1183,10 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         );
         $this->checkOS('sentry3', 'Sentry Switched ', '', $mockSnmp);
         $this->checkOS('sentry3', 'Sentry Smart ', '', $mockSnmp);
+    }
+
+    public function testSentry4()
+    {
         $mockSnmp = array(
             'Sentry3-MIB::serverTech.4.1.1.1.3.0' => '0 8',
         );
@@ -1249,7 +1222,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testSolaris()
     {
         $this->checkOS('solaris', 'SunOS Something 5.10');
-        $this->checkOS('opensolaris', 'SunOS Something 5.11');
         $this->checkOS('solaris', 'Something that we do not have', '.1.3.6.1.4.1.42.2.1.1');
     }
 
@@ -1311,6 +1283,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('symbol', 'Something that we do not have', '.1.3.6.1.4.1.388');
     }
 
+    public function testTimos()
+    {
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.3');
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.6.2.1.2.2.');
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.6.1');
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.6.1.1.2.');
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.9.1');
+        $this->checkOS('timos', 'Alcatel-Lucent OS6850-U24X 6.4.3.520.R01 GA, April 08, 2010', '.1.3.6.1.4.1.6527.1.15.');
+    }
+
     public function testTpconductor()
     {
         $this->checkOS('tpconductor', 'Something that we do not have', '.1.3.6.1.4.1.5596.180.6.4.1');
@@ -1363,6 +1345,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('vmware', 'VMware ESX');
         $this->checkOS('vmware', 'VMware-vCenter-Server-Appliance');
+    }
+
+    public function testVoswall()
+    {
+        $this->checkOS('voswall', 'Voswall');
     }
 
     public function testVrp()
@@ -1423,6 +1410,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testXirrus()
     {
         $this->checkOS('xirrus_aos', 'Xirrus ArrayOS');
+    }
+
+    public function testXos()
+    {
+        $this->checkOS('xos', 'XOS');
     }
 
     public function testZxr10()
