@@ -1,9 +1,15 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Proc;
+
 $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
+
+require_once $install_dir . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->register();
 
 $short_opts = 'lsupch';
 $long_opts = array(
@@ -11,6 +17,7 @@ $long_opts = array(
     'style',
     'unit',
     'passthru',
+    'snmpsim',
     'commands',
     'help',
 );
@@ -19,10 +26,11 @@ $options = getopt($short_opts, $long_opts);
 if (check_opt($options, 'h', 'help')) {
     echo "LibreNMS Code Tests Script
 Running $filename without options runs all checks.
-  -l, --lint     Run php lint checks to test for valid syntax.
-  -s, --style    Run phpcs check to check for PSR-2 compliance.
-  -u, --unit     Run phpunit tests.
+  -l, --lint     Run php lint checks to test for valid syntax
+  -s, --style    Run phpcs check to check for PSR-2 compliance
+  -u, --unit     Run phpunit tests
   -p, --passthru Display output from checks as it comes
+      --snmpsim  Use snmpsim on 127.0.0.1:11161 for unit tests
   -c, --commands Print commands only, no checks
   -h, --help     Show this help text.\n";
     exit();
@@ -31,6 +39,7 @@ Running $filename without options runs all checks.
 // set up some variables
 $passthru = check_opt($options, 'p', 'passthru');
 $command_only = check_opt($options, 'c', 'commands');
+$snmpsim = check_opt($options, 'snmpsim');
 $ret = 0;
 $completed_tests = array(
     'lint' => false,
@@ -51,7 +60,7 @@ foreach (array_keys($options) as $opt) {
     } elseif ($opt == 's' || $opt == 'style') {
         $ret += run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
-        $ret += run_check('unit', $passthru, $command_only);
+        $ret += run_check('unit', $passthru, $command_only, $snmpsim);
     }
 }
 
@@ -69,19 +78,21 @@ exit($ret); //return the combined/single return value of tests
  * @param string $type type of check lint, style, or unit
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
+ * @param bool $snmpsim Use snmpsim
  * @return int the return value from the check (0 = success)
  */
-function run_check($type, $passthru, $command_only)
+function run_check($type, $passthru, $command_only, $snmpsim = false)
 {
     global $completed_tests;
     if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $completed_tests[$type]) {
+        echo ucfirst($type) . ' check skipped.';
         return 0;
     }
 
     $function = 'check_' . $type;
     if (function_exists($function)) {
         $completed_tests[$type] = true;
-        return $function($passthru, $command_only);
+        return $function($passthru, $command_only, $snmpsim);
     }
 
     return 1;
@@ -181,16 +192,34 @@ function check_style($passthru = false, $command_only = false)
  *
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
+ * @param bool $snmpsim send snmp requests to snmpsim listening on 127.0.0.1:11161
  * @return int the return value from phpunit (0 = success)
  */
-function check_unit($passthru = false, $command_only = false)
+function check_unit($passthru = false, $command_only = false, $snmpsim = false)
 {
     $phpunit_bin = check_exec('phpunit');
-    $phpunit_cmd = "$phpunit_bin --colors=always";
+
+    if ($snmpsim) {
+        $phpunit_cmd = "SNMPSIM=1 $phpunit_bin --colors=always";
+        $snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log";
+    } else {
+        $phpunit_cmd = "$phpunit_bin --colors=always";
+        $snmpsim_cmd = '';
+    }
+
 
     if ($command_only) {
         echo $phpunit_cmd . PHP_EOL;
+        if ($snmpsim) {
+            echo $snmpsim_cmd . PHP_EOL;
+        }
         return 250;
+    }
+
+    $proc_snmpsimd = null;
+    if ($snmpsim) {
+        echo 'Starting snmpsimd...' .  PHP_EOL;
+        $proc_snmpsimd = new Proc($snmpsim_cmd);
     }
 
     echo 'Running unit tests... ';
@@ -202,11 +231,13 @@ function check_unit($passthru = false, $command_only = false)
 
         if ($phpunit_ret > 0) {
             echo "failed\n";
-            print(implode(PHP_EOL, $phpunit_output) . PHP_EOL);
+            echo implode(PHP_EOL, $phpunit_output) . PHP_EOL;
+            echo 'snmpsimd: output at /tmp/snmpsimd.log';
         } else {
             echo "success\n";
         }
     }
+    $proc_snmpsimd->terminate();
 
     return $phpunit_ret;
 }

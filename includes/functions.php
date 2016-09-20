@@ -116,6 +116,7 @@ function getHostOS($device)
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
+    $os = null;
     $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
     foreach (glob($pattern) as $file) {
         include $file;
