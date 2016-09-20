@@ -1,9 +1,6 @@
 <?php
 
-$divisor = 10;
-if ($device['os'] == 'poweralert') {
-    $divisor = get_device_divisor($device, $_tmp_serial, $divisor);
-}
+$divisor = get_device_divisor($device, $_tmp_serial, $divisor, "current");
 
 // RFC1628 UPS
 if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
