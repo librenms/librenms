@@ -1,5 +1,10 @@
 <?php
 
-if (starts_with($sysDescr, 'EdgeOS')) {
+$items = array(
+    'EdgeOS',
+    'EdgeRouter Lite',
+);
+
+if (starts_with($sysDescr, $items)) {
     $os = 'edgeos';
 }
