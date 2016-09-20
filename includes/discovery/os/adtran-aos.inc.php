@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS ADTRAN AOS OS Discovery module
  *
@@ -12,11 +11,8 @@
  * the source code distribution for details.
  */
 
-
-if (!$os) {
-    if (preg_match('/NetVanta/', $sysDescr)) {
-        $os = 'adtran-aos';
-    } elseif (strstr($sysObjectId, '.1.3.6.1.4.1.664')) {
-        $os = 'adtran-aos';
-    }
+if (str_contains($sysDescr, 'NetVanta')) {
+    $os = 'adtran-aos';
+} elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.664')) {
+    $os = 'adtran-aos';
 }
