@@ -13,7 +13,6 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* @version    1.1
 * @package    LibreNMS
 * @link       http://librenms.org
 * @copyright  2016 crcro
@@ -29,7 +28,7 @@ $ups_nut = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
-list ($charge, $remaining, $bat_volt, $model, $serial, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
+list ($charge, $remaining, $bat_volt, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
