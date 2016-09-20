@@ -470,6 +470,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testEdgeos()
     {
         $this->checkOS('edgeos', 'EdgeOS');
+        $this->checkOS('edgeos', 'EdgeRouter Lite');
     }
 
     public function testEdgeswitch()
@@ -1250,11 +1251,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testSwos()
     {
-        //FIXME Not working
-        /*$mockSnmp = array(
-            'SNMPv2-MIB::sysName.0' => 'MikroTik',
+        $mockSnmp = array(
+            'SNMPv2-MIB::sysName.0' => 'MicroTik'
         );
-        $this->checkOS('swos', 'RB260GS', '', $mockSnmp);**/
+        $this->checkOS('swos', 'RB250GS', '', $mockSnmp);
+        $this->checkOS('swos', 'RB260GS', '', $mockSnmp);
+        $this->checkOS('swos', 'RB260GSP', '', $mockSnmp);
     }
 
     public function testSymbol()
