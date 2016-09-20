@@ -475,7 +475,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testEdgeswitch()
     {
-        // FIXME
+        $this->checkOS('edgeswitch', 'Something that we do not have', '.1.3.6.1.4.1.4413');
     }
 
     public function testEndian()
@@ -784,7 +784,54 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testLinux()
     {
+        $mockSnmp = array(
+            'ENTITY-MIB::entPhysicalMfgName.1' => 'QNAP',
+        );
         $this->checkOS('linux', 'Linux');
+        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2014');
+        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2016');
+        $this->checkOS('endian', 'Linux endian');
+        $this->checkOS('ciscosmblinux', 'Linux Cisco Small Business');
+        $this->checkOS('qnap', 'Linux', '', $mockSnmp);
+        $this->checkOS('procera', 'Linux', '.1.3.6.1.4.1.15397.2');
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
+        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
+        $mockSnmp = array(
+            'dot11manufacturerName.5' => 'Ubiquiti',
+        );
+        $this->checkOS('airos', 'Linux', '', $mockSnmp);
+        $mockSnmp = array(
+            'dot11manufacturerName.5' => 'Ubiquiti',
+            'dot11manufacturerProductName' => 'UAP',
+        );
+        $this->checkOS('unifi', 'Linux', '', $mockSnmp);
+        $mockSnmp = array(
+            'dot11manufacturerName.5' => 'Ubiquiti',
+            'fwVersion.1' => 'Something that we do not have',
+        );
+        $this->checkOS('airos-af', 'Linux', '', $mockSnmp);
+        $mockSnmp = array(
+            'GANDI-MIB::rxCounter.0' => 'GANDI-MIB',
+        );
+        $this->checkOS('pktj', 'Linux', '', $mockSnmp);
+        $this->checkOS('cumulus', 'Linux', '.1.3.6.1.4.1.40310');
+        $this->checkOS('sophos', 'Linux g56fa85e');
+        $this->checkOS('sophos', 'Linux gc80f187');
+        $this->checkOS('sophos', 'Linux g829be90');
+        $this->checkOS('sophos', 'Linux g63c0044');
+        $this->checkOS('sophos', 'Linux gba768e5');
+        $mockSnmp = array(
+            'SFA-INFO::systemName.0' => 'Something that we do not have',
+        );
+        $this->checkOS('ddnos', 'Linux', '', $mockSnmp);
+        $mockSnmp = array(
+            'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0' => 'syno_hw_version',
+        );
+        $this->checkOS('dsm', 'Linux', '', $mockSnmp);
+        $mockSnmp = array(
+            'roomTemp.0' => 10,
+        );
+        $this->checkOS('pcoweb', 'Linux', '', $mockSnmp);
     }
 
     public function testMacosx()
