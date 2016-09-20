@@ -654,8 +654,7 @@ function ipv62snmp($ipv6)
         $ipv6_ex[$i] = zeropad($ipv6_ex[$i], 4);
     }
     $ipv6_ip = implode('', $ipv6_ex);
-    for ($i = 0; $i < 32;
-    $i+=2) {
+    for ($i = 0; $i < 32; $i+=2) {
         $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
     }
 
@@ -1254,7 +1253,7 @@ function function_check($function)
 
 function force_influx_data($data)
 {
-   /*
+    /*
     * It is not trivial to detect if something is a float or an integer, and
     * therefore may cause breakages on inserts.
     * Just setting every number to a float gets around this, but may introduce
@@ -1310,7 +1309,7 @@ function snmpTransportToAddressFamily($transport)
  *
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
-**/
+ **/
 function host_exists($hostname, $snmphost = '')
 {
     global $config;
@@ -1334,7 +1333,7 @@ function host_exists($hostname, $snmphost = '')
  * Check the innodb buffer size
  *
  * @return array including the current set size and the currently used buffer
-**/
+ **/
 function innodb_buffer_check()
 {
     $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
@@ -1349,7 +1348,7 @@ function innodb_buffer_check()
  * @param array $innodb_buffer An array that contains the used and current size
  *
  * @return string $output
-**/
+ **/
 function warn_innodb_buffer($innodb_buffer)
 {
     $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
@@ -1386,7 +1385,7 @@ function oxidized_reload_nodes()
  *
  * @return string ip
  *
-**/
+ **/
 function dnslookup($device, $type = false, $return = false)
 {
     if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
@@ -1421,7 +1420,7 @@ function dnslookup($device, $type = false, $return = false)
  *
  * @return int exit code
  *
-**/
+ **/
 
 function rrdtest($path, &$stdOutput, &$stdError)
 {
@@ -1566,4 +1565,19 @@ function hytera_h2f($number, $nd)
     }
 
     return number_format($floatfinal, $nd, '.', '');
+}
+
+function rrd_alert($ds_data, $rrd_filename, $device_id)
+{
+    d_echo("\n------------------------------");
+    d_echo("\ndb insert for rrd based alerts");
+    d_echo("\n------------------------------");
+    foreach ($ds_data as $ds_name => $ds_value) {
+        $in_db = dbFetchCell("SELECT ds_last_value FROM rrd_values WHERE `ds_name`= ? AND `rrd_filename` = ? AND `device_id` = ?", array($ds_name, $rrd_filename, $device_id));
+        if ($in_db != "") {
+            dbUpdate(array('ds_last_value' => $ds_value, 'ds_before_last_value' => $in_db), 'rrd_values', 'ds_name = ? AND rrd_filename = ? AND device_id = ?', array($ds_name, $rrd_filename, $device_id));
+        } else {
+            dbInsert(array('ds_name' => $ds_name, 'rrd_filename' => $rrd_filename, 'device_id' => $device_id, 'ds_last_value' => $ds_value), 'rrd_values');
+        }
+    }
 }

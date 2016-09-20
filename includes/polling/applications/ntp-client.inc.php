@@ -28,3 +28,5 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+
+rrd_alert($fields, implode("-", $rrd_name), $device["device_id"]);
