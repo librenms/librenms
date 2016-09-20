@@ -117,8 +117,13 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     } elseif (strtolower($bill['bill_type']) == 'quota') {
         $type       = 'Quota';
         $allowed    = format_bytes_billing($bill['bill_allowed']);
-        $in         = format_bytes_billing($bill['traf_in']);
-        $out        = format_bytes_billing($bill['traf_out']);
+        if (!empty($prev)) {
+            $in  = format_bytes_billing($bill['traf_in']);
+            $out = format_bytes_billing($bill['traf_out']);
+        } else {
+            $in  = format_bytes_billing($bill['total_data_in']);
+            $out = format_bytes_billing($bill['total_data_out']);
+        }
         if (!$prev) {
             $percent    = round((($bill['total_data'] / ($bill['bill_allowed'])) * 100), 2);
             $overuse    = ($bill['total_data'] - $bill['bill_allowed']);
