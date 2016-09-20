@@ -330,7 +330,7 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($directpage == "yes") {
         $deviceClass = 'page-availability-report-host';
-        $serviceClass = 'page-availability-report-service';
+        $serviceClass = 'page-availability-report-host';
     } else {
         $deviceClass = 'widget-availability-host';
         $serviceClass = 'widget-availability-service';
