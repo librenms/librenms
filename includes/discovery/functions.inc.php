@@ -881,7 +881,7 @@ function avtech_add_sensor($device, $sensor)
  * @param $sensor
  * @return int
  */
-function get_device_divisor($device, $serial, $divisor, $sensor)
+function get_device_divisor($device, $serial, $sensor)
 {
     if (($device['os'] == 'poweralert') && ($sensor == 'current' || $sensor == 'frequencies' || $sensor == 'voltages')) {
         if (version_compare($serial, '12.06.0068', '>=')) {
