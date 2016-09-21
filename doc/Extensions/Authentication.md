@@ -181,7 +181,7 @@ $config['auth_ad_user_filter'] = "(objectclass=user)";
 $config['auth_ad_group_filter'] = "(objectclass=group)";
 ```
 
-This yields `(&(objectclass=user)(sAMAccountName=$username))` for the user filter and `s/user/group/g` for the group filter.
+This yields `(&(objectclass=user)(sAMAccountName=$username))` for the user filter and `(&(objectclass=group)(sAMAccountName=$group))` for the group filter.
 
 #### Radius Authentication
 
