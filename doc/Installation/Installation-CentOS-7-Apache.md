@@ -121,8 +121,8 @@ Once you have completed the web installer steps. Please add the following to `co
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.example /etc/snmpd/snmpd.conf
-vim /etc/snmpd/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+vim /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
