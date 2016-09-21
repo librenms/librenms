@@ -55,17 +55,13 @@ if (defined('SHOW_SETTINGS')) {
         </div>';
     }
 
-    if (isset($widget_settings['show_disabled_and_ignored'])) {
-        $showDisabledAndIgnored = 1;
-    } else {
-        $showDisabledAndIgnored = 0;
-    }
+    $showDisabledAndIgnored =  isset($widget_settings['show_disabled_and_ignored']) && $widget_settings['show_disabled_and_ignored'];
 
     $common_output[] = '
     <div class="form-group">
         <label for="show_disabled_and_ignored" class="col-sm-4 control-label">Disabled and ignored</label>
         <div class="col-sm-6">
-            <input type="checkbox" class="form-control" name="show_disabled_and_ignored" value="1" ' .($showDisabledAndIgnored == 1 ? 'checked' : ''). '>
+            <input type="checkbox" class="form-control" name="show_disabled_and_ignored" value="1" ' .($showDisabledAndIgnored ? 'checked' : ''). '>
         </div>
     </div>
 
