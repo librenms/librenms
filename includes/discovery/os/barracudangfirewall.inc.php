@@ -10,14 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (stristr($sysDescr, 'Barracuda Load Balancer') || stristr($sysDescr, 'Barracuda Load Balancer ADC')) {
-        $os = 'barracudaloadbalancer';
-    }
-    if (stristr($sysDescr, 'Barracuda Spam Firewall')) {
-        $os = 'barracudaspamfirewall';
-    }
-    if (stristr($sysDescr, 'Barracuda Firewall')) {
-        $os = 'barracudangfirewall';
-    }
+if (str_contains($sysDescr, 'Barracuda Firewall', true)) {
+    $os = 'barracudangfirewall';
 }

@@ -1,8 +1,8 @@
 <?php
 /*
- * LibreNMS
+ * LibreNMS Barracuda OS information module
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (str_contains($sysDescr, 'BUFFALO TeraStation')) {
-    $os = 'buffalo';
+if (str_contains($sysDescr, 'Barracuda Spam Firewall', true)) {
+    $os = 'barracudaspamfirewall';
 }
