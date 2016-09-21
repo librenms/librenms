@@ -1990,3 +1990,7 @@ label {
   float:left;
   background-color: #D9534F;
 }
+
+.availability-map-widget-header {
+  line-height:30px;
+}
