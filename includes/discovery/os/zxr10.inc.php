@@ -1,10 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^ZXR10/', $sysDescr)) {
-        $os = 'zxr10';
-    }
-    if (str_contains($sysDescr, "ZTE Ethernet Switch")) {
-        $os = 'zxr10';
-    }
+if (starts_with('ZXR10', $sysDescr) || str_contains('ZTE Ethernet Switch', $sysDescr)) {
+    $os = 'zxr10';
 }
