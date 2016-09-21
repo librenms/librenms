@@ -7,6 +7,7 @@ $data_oids = array(
     'ifAlias',
     'ifAdminStatus',
     'ifOperStatus',
+    'ifLastChange',
     'ifMtu',
     'ifSpeed',
     'ifHighSpeed',
@@ -112,6 +113,7 @@ $ifmib_oids = array(
     'ifDescr',
     'ifAdminStatus',
     'ifOperStatus',
+    'ifLastChange',
     'ifType',
     'ifPhysAddress',
     'ifMtu',
@@ -471,6 +473,9 @@ foreach ($ports as $port) {
                     echo $oid.' ';
                 }
             } elseif ($port[$oid] != $this_port[$oid]) {
+                // if the value is different, update it
+
+                // rrdtune if needed
                 $port_tune = $attribs['ifName_tune:'.$port['ifName']];
                 $device_tune = $attribs['override_rrdtool_tune'];
                 if ($port_tune == "true" ||
@@ -480,10 +485,15 @@ foreach ($ports as $port) {
                         $tune_port = true;
                     }
                 }
+
+                // set the update data
                 $port['update'][$oid] = $this_port[$oid];
+
+                // store the previous values for alerting
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
                     $port['update'][$oid.'_prev'] = $port[$oid];
                 }
+
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
