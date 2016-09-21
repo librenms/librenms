@@ -1,9 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Ethernet Routing Switch')) {
-        $os = 'avaya-ers';
-    } elseif (strstr($sysDescr, 'ERS-')) {
-        $os = 'avaya-ers';
-    }
+if (str_contains($sysDescr, array('Ethernet Routing Switch', 'ERS-'))) {
+    $os = 'avaya-ers';
 }
