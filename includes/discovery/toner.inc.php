@@ -34,7 +34,7 @@ if ($device['os_group'] == 'printer') {
                 $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqv'))));
 
                 if ($descr != '') {
-                    $current  = snmp_get($device, $toner_oid, '-Oqv');
+                    $current = snmp_get($device, $toner_oid, '-Oqv');
 
                     //ricoh private mibs returns values as percent, no capacity is disclosed as it is not needed
                     if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
@@ -51,6 +51,21 @@ if ($device['os_group'] == 'printer') {
                             $current = 0;
                         } else {
                             $current = ($current / $capacity * 100);
+                        }
+                    } elseif ($os == 'brother') {
+                        switch ($current) {
+                            case '0':
+                                $current = 100;
+                                break;
+                            case '1':
+                                $current = 5;
+                                break;
+                            case '2':
+                                $current = 0;
+                                break;
+                            case '3':
+                                $current = 1;
+                                break;
                         }
                     } else {
                         //normal devices returning toner values
