@@ -13,34 +13,43 @@ $rrd_options .= " DEF:lb=$rrd_filename:lb:AVERAGE";
 $rrd_options .= " DEF:svc=$rrd_filename:svc:AVERAGE";
 $rrd_options .= " DEF:webvpn=$rrd_filename:webvpn:AVERAGE";
 
-$rrd_options .= " COMMENT:'Sessions         Current    Average   Maximum\\n'";
+$rrd_options .= " COMMENT:'Sessions            Current    Average    Maximum\\n'";
 
-$rrd_options .= " AREA:svc#aa0000:'SSLVPN Tunnels'";
-$rrd_options .= " GPRINT:svc:LAST:'%6.2lf%s'";
-$rrd_options .= " GPRINT:svc:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:svc:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:svc#1985A1:'AnyConnect    ':STACK";
+$rrd_options .= " GPRINT:svc:LAST:'%8.2lf'";
+$rrd_options .= " GPRINT:svc:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:svc:MAX:' %8.2lf\\\\n'";
 
-$rrd_options .= " AREA:webvpn#999999:'Clientless VPN'";
-$rrd_options .= " GPRINT:webvpn:LAST:'%6.2lf%s'";
-$rrd_options .= " GPRINT:webvpn:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:webvpn:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:webvpn#4C5C68:'Clientless VPN':STACK";
+$rrd_options .= " GPRINT:webvpn:LAST:'%8.2lf'";
+$rrd_options .= " GPRINT:webvpn:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:webvpn:MAX:' %8.2lf\\\\n'";
 
-$rrd_options .= " AREA:ipsec#00aa00:'IPSEC         '";
-$rrd_options .= " GPRINT:ipsec:LAST:'%6.2lf%s'";
-$rrd_options .= " GPRINT:ipsec:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:ipsec:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:ipsec#46494C:'IPSEC         ':STACK";
+$rrd_options .= " GPRINT:ipsec:LAST:'%8.2lf'";
+$rrd_options .= " GPRINT:ipsec:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:ipsec:MAX:' %8.2lf\\\\n'";
 
-$rrd_options .= " AREA:l2l#aaaa00:'Lan-to-Lan    '";
-$rrd_options .= ' GPRINT:l2l:LAST:%6.2lf%s';
-$rrd_options .= " GPRINT:l2l:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:l2l:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:l2l#C5C3C6:'LAN-to-LAN    ':STACK";
+$rrd_options .= ' GPRINT:l2l:LAST:%8.2lf';
+$rrd_options .= " GPRINT:l2l:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:l2l:MAX:' %8.2lf\\\\n'";
 
-$rrd_options .= " AREA:email#0000aa:'Email         '";
-$rrd_options .= ' GPRINT:email:LAST:%6.2lf%s';
-$rrd_options .= " GPRINT:email:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:email:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:email#DCDCDD:'Email         ':STACK";
+$rrd_options .= ' GPRINT:email:LAST:%8.2lf';
+$rrd_options .= " GPRINT:email:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:email:MAX:' %8.2lf\\\\n'";
 
-$rrd_options .= " AREA:lb#aa00aa:'Load Balancer '";
-$rrd_options .= ' GPRINT:lb:LAST:%6.2lf%s';
-$rrd_options .= " GPRINT:lb:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:lb:MAX:' %6.2lf%s\\\\n'";
+$rrd_options .= " AREA:lb#FFFFFF:'Load Balancer ':STACK";
+$rrd_options .= ' GPRINT:lb:LAST:%8.2lf';
+$rrd_options .= " GPRINT:lb:AVERAGE:' %8.2lf'";
+$rrd_options .= " GPRINT:lb:MAX:' %8.2lf\\\\n'";
+
+//  Total
+$rrd_options .= " 'CDEF:TOTAL=email,ipsec,l2l,lb,svc,webvpn,+,+,+,+,+'";
+
+$rrd_options .= " 'LINE1:TOTAL#000000FF:Total         '";
+
+$rrd_options .= " 'GPRINT:TOTAL:LAST:%8.2lf'";
+$rrd_options .= " 'GPRINT:TOTAL:AVERAGE: %8.2lf'";
+$rrd_options .= " 'GPRINT:TOTAL:MAX: %8.2lf\\\\n'";
