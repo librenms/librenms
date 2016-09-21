@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Cisco wireless controller OS detection module
  *
@@ -11,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysDescr, 'Cisco Controller')) {
-        $os = 'ciscowlc';
-    }
+if (str_contains($sysDescr, 'Cisco Controller')) {
+    $os = 'ciscowlc';
 }
