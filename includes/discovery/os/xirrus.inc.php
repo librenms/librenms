@@ -1,9 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Xirrus')) {
-        if (strstr($sysDescr, 'ArrayOS')) {
-            $os = 'xirrus_aos';
-        }
-    }
+if (str_contains('Xirrus', $sysDescr) && str_contains('ArrayOS', $sysDescr)) {
+    $os = 'xirrus_aos';
 }
