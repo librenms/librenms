@@ -70,21 +70,26 @@ function format_number_short($number, $sf)
 function external_exec($command)
 {
     global $debug,$vdebug;
-    if ($debug && !$vdebug) {
-        $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):(.*):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
-        d_echo($debug_command);
-    } elseif ($vdebug) {
-        d_echo($command."\n");
+    if ($debug) {
+        if ($vdebug) {
+            c_echo('SNMP[%c'.$command."%n]\n");
+        } else {
+            $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
+            $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+            c_echo('SNMP[%c'.$debug_command."%n]\n");
+        }
     }
 
     $output = shell_exec($command);
 
-    if ($debug && !$vdebug) {
-        $debug_output = preg_replace('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/', '*', $output);
-        d_echo("$debug_output\n");
-    } elseif ($vdebug) {
-        d_echo($output."\n");
+    if ($debug) {
+        if ($vdebug) {
+            d_echo($output.PHP_EOL);
+        } else {
+            $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+            $debug_output = preg_replace($ip_regex, '*', $output);
+            d_echo($debug_output.PHP_EOL);
+        }
     }
 
     return $output;
