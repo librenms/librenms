@@ -131,6 +131,7 @@ LibreNMS contributors:
 - Dennis Væversted <dv@zitcom.dk> (dvaeversted)
 - Morgan Henreaux <morgan@henreaux.com> (mhenreaux)
 - Yves Boudreau <yves.boudreau@bgp.ca> (boudreau)
+- Konrad Bechler <konrad@bechler.pl> (kbechler)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
