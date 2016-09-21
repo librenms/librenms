@@ -1,10 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^VMware ESX/', $sysDescr)) {
-        $os = 'vmware';
-    }
-    if (preg_match('/^VMware-vCenter-Server-Appliance/', $sysDescr)) {
-        $os = 'vmware';
-    }
+if (starts_with($sysDescr, array('VMware ESX', 'VMware-vCenter-Server-Appliance'))) {
+    $os = 'vmware';
 }
