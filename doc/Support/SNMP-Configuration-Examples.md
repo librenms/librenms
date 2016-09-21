@@ -6,10 +6,7 @@ Table of Content:
 - [Devices](#devices)
     - [Cisco](#cisco)
         - [Adaptive Security Appliance (ASA)](#adaptive-security-appliance-asa)
-        - [IOS](#ios)
-        - [IOS](#ios)
-        - [IOS XE](#ios-xe)
-        - [NX-OS](#nx-os)
+        - [IOS / IOS XE / NX-OS](#ios--ios-xe--nx-os)
         - [Wireless LAN Controller (WLC)](#wireless-lan-controller-wlc)
     - [Infoblox](#infoblox)
         - [NIOS 7.x](#nios-7x)
@@ -19,6 +16,7 @@ Table of Content:
         - [PANOS 6.x/7.x](#panos-6x7x)
 - [Operating systems](#operating-systems)
     - [Linux (snmpd)](#linux-snmpd)
+    - [Windows Server 2008 R2](#windows-server-2008-r2)
     - [Windows Server 2012 R2](#windows-server-2012-r2)
 
 ## Devices
@@ -31,22 +29,8 @@ Table of Content:
 4. Add in the "SNMP Host Access List" section your LibreNMS server IP address
 5. Click Apply and Save
 
-#### IOS
+#### IOS / IOS XE / NX-OS
 
-``` 
-snmp-server community YOUR-COMMUNITY RO
-snmp-server contact YOUR-CONTACT
-snmp-server location YOUR-LOCATION
-```
-
-#### IOS XE
-``` 
-snmp-server community YOUR-COMMUNITY RO
-snmp-server contact YOUR-CONTACT
-snmp-server location YOUR-LOCATION
-```
-
-#### NX-OS
 ``` 
 snmp-server community YOUR-COMMUNITY RO
 snmp-server contact YOUR-CONTACT
@@ -136,6 +120,19 @@ systemctl restart snmpd
 ```
 service snmpd restart
 ```
+
+### Windows Server 2008 R2
+1. Log in to your Windows Server 2008 R2
+2. Start "Server Manager" under "Administrative Tools"
+3. Click "Features" and then click "Add Feature"
+5. Check (if not checked) "SNMP Service", click "Next" until "Install"
+6. Start "Services" under "Administrative Tools"
+7. Edit "SNMP Service" properties
+8. Go to the security tab
+9. In "Accepted community name" click "Add" to add your community string and permission
+10. In "Accept SNMP packets from these hosts" click "Add" and add your LibreNMS server IP address
+11. Validate change by clicking "Apply"
+
 ### Windows Server 2012 R2
 1. Log in to your Windows Server 2012 R2
 2. Start "Server Manager" under "Administrative Tools"
