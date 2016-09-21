@@ -31,6 +31,10 @@ $availability_map_conf = array(
           'descr'              => 'Use device groups filter',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'webui.availability_map_box_size',
+          'descr'              => 'Availability box width',
+          'type'               => 'numeric',
+    ),
 );
 
 $dashboard_conf = array(

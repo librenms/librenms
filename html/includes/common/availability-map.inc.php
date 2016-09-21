@@ -12,24 +12,51 @@
  * the source code distribution for details.
  */
 
+$sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
+$widget_mode = json_decode($sql['settings']);
+
+if (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
+    $mode = $_SESSION["map_view"];
+} else {
+    $mode = $widget_mode->{'mode'};
+}
+
 $select_modes = array(
     '0' => 'only devices',
     '1' => 'only services',
     '2' => 'devices and services',
 );
 
+if ($config['webui']['availability_map_compact'] == 1) {
+    $compact_tile = $widget_mode->{'tile_width'};
+}
+
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
             <div class="col-sm-2">
-                <label for="title" class="control-label">Title: </label>
+                <label for="title" class="control-label availability-map-widget-header">Widget title: </label>
             </div>
             <div class="col-sm-10">
                 <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($widget_settings['title']).'">
             </div>
-        </div>
+        </div>';
+
+    if ($config['webui']['availability_map_compact'] == 1) {
+        $common_output[] = '
         <div class="form-group">
+            <div class="col-sm-2">
+                <label for="tile_width" class="control-label availability-map-widget-header">Tile width:</label>
+            </div>      
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="tile_width" placeholder="Tile " value="'.$compact_tile.'">
+            </div>
+        </div>';
+    }
+
+    $common_output[] = '
+    <div class="form-group">
             <div class="col-sm-2">
                 <button type="submit" class="btn btn-default">Set</button>
             </div>
@@ -37,16 +64,6 @@ if (defined('SHOW_SETTINGS')) {
     </form>';
 } else {
     require_once 'includes/object-cache.inc.php';
-
-    $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
-    $widget_mode = json_decode($sql['settings']);
-
-    if (isset($_SESSION["map_view"])) {
-        $mode = $_SESSION["map_view"];
-    } else {
-        $mode = $widget_mode->{'mode'};
-    }
-
     $host_up_count = 0;
     $host_warn_count = 0;
     $host_down_count = 0;
@@ -114,7 +131,7 @@ if (defined('SHOW_SETTINGS')) {
                 $host_down_count++;
             }
 
-            if ($config['webui']['availability_map_old'] == 0) {
+            if ($config['webui']['availability_map_compact'] == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getImage($device);
                     $temp_output[] = '
@@ -132,7 +149,7 @@ if (defined('SHOW_SETTINGS')) {
                     </a>';
                 }
             } else {
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '"><div class="' . $deviceLabelOld . '" style="width:' . $config['webui']['availability_map_old_widget_tile_size'] . 'px;"></div></a>';
+                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '"><div class="' . $deviceLabelOld . '" style="width:' . $compact_tile . 'px;"></div></a>';
             }
         }
     }
@@ -159,7 +176,7 @@ if (defined('SHOW_SETTINGS')) {
                     $service_down_count++;
                 }
 
-                if ($config['webui']['availability_map_old'] == 0) {
+                if ($config['webui']['availability_map_compact'] == 0) {
                     if ($directpage == "yes") {
                         $deviceIcon = getImage($service);
                         $temp_output[] = '
@@ -176,9 +193,10 @@ if (defined('SHOW_SETTINGS')) {
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
                         </a>';
+
                     }
                 } else {
-                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="' . $serviceLabelOld . '" style="width:' . $config['webui']['availability_map_old_widget_tile_size'] . 'px;"></div></a>';
+                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="' . $serviceLabelOld . '" style="width:'.$compact_tile.'px;"></div></a>';
                 }
             }
         } else {
