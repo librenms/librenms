@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'SonicWALL')) {
-        $os = 'sonicwall';
-    }
+if (str_contains('SonicWALL', $sysDescr)) {
+    $os = 'sonicwall';
 }
