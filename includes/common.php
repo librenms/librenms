@@ -121,7 +121,7 @@ function print_error($text)
     if (isCli()) {
         c_echo("%r".$text."%n\n");
     } else {
-        echo('<div class="alert alert-danger"><img src="images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
@@ -130,7 +130,7 @@ function print_message($text)
     if (isCli()) {
         c_echo("%g".$text."%n\n");
     } else {
-        echo('<div class="alert alert-success"><img src="images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"> '.$text.'</div>');
     }
 }
 
