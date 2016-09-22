@@ -13,7 +13,7 @@
  */
 
 $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
-$widget_mode = json_decode($sql['settings']);
+$widget_mode = json_decode($sql['settings'], true);
 
 if (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
     $mode = $_SESSION["map_view"];
