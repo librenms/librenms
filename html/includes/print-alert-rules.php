@@ -220,8 +220,8 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 
     echo '</td>';
