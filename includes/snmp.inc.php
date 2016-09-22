@@ -554,10 +554,6 @@ function snmp_gen_auth(&$device)
         }
     }//end if
 
-    if ($vdebug) {
-        print "DEBUG: SNMP Auth options = $cmd\n";
-    }
-
     return $cmd;
 }//end snmp_gen_auth()
 

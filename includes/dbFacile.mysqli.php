@@ -32,7 +32,7 @@ function dbQuery($sql, $parameters = array())
             if (preg_match('/(INSERT INTO `alert_log`).*(details)/i', $fullSql)) {
                 echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
             } else {
-                c_echo("\nSQL[%y".$fullSql.'%n] ');
+                c_echo('SQL[%y'.$fullSql."%n] \n");
             }
         } else {
             $sql_debug[] = $fullSql;
