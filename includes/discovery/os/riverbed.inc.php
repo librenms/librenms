@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysObjectId, '1.3.6.1.4.1.17163.1.1')) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.17163.1.1')) {
     $os = 'riverbed';
 }
