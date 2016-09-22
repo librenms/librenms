@@ -232,7 +232,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     }//end if
 
     if (count($int_links) > 3) {
-        echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
+        echo '<div class="collapse-neighbors"><i class="neighbors-button fa fa-plus" aria-hidden="true"></i>
                <span class="neighbors-interface-list-firsts" style="display: inline;">';
     }
 

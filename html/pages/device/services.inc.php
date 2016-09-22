@@ -68,8 +68,8 @@ foreach ($services as $service) {
                 <div class="col-sm-6"><?php echo $service['service_desc']?></div>
                 <div class="col-sm-2"><?php echo $status?></div>
                 <div class="pull-right">
-                    <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
-                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
+                    <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
+                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
                 </div>
             </div>
             <div class="col-sm-12">
