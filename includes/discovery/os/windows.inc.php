@@ -1,11 +1,9 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysObjectId, '1.3.6.1.4.1.311.1.1.3')) {
-        $os = 'windows';
-    }
+if (starts_with('.1.3.6.1.4.1.311.1.1.3', $sysObjectId)) {
+    $os = 'windows';
+}
 
-    if (preg_match('/Windows/', $sysDescr)) {
-        $os = 'windows';
-    }
+if (str_contains($sysDescr, array('Windows'))) {
+    $os = 'windows';
 }
