@@ -1,6 +1,6 @@
 <?php
 
-if (str_contains('ServerIron', $sysDescr)) {
+if (str_contains($sysDescr, 'ServerIron')) {
     $os = 'serveriron';
     $serviron_mibs = array (
         "snL4slbTotalConnections"       => "FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB",  // Total connections in this device
