@@ -4,7 +4,7 @@ if (str_contains($sysDescr, 'router') && is_numeric(snmp_get($device, 'SNMPv2-SM
     $os = 'routeros';
 }
 
-if (str_contains($sysDescr, 'RouterOS')) {
+if (starts_with($sysDescr, 'RouterOS')) {
     $os = 'routeros';
 }
 
