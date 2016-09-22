@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'PacketShaper')) {
-        $os = 'packetshaper';
-    }
+if (str_contains($sysDescr, 'PacketShaper')) {
+    $os = 'packetshaper';
 }
