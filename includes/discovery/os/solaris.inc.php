@@ -4,7 +4,7 @@ if (starts_with($sysDescr, array('SunOS'))) {
     $os = 'solaris';
     list(,,$version) = explode(' ', $sysDescr);
 
-    if(version_compare($version, '5.10', '>')) {
+    if (version_compare($version, '5.10', '>')) {
         if (str_contains('oi_', $sysDescr)) {
             $os = 'openindiana';
         } else {
