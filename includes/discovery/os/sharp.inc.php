@@ -1,5 +1,5 @@
 <?php
 
-if (str_contains('SHARP MX-', $sysDescr)) {
+if (str_contains($sysDescr, array('SHARP MX-'))) {
     $os = 'sharp';
 }

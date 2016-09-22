@@ -1,6 +1,6 @@
 <?php
 
-if (starts_with('SunOS', $sysDescr)) {
+if (starts_with($sysDescr, array('SunOS'))) {
     $os = 'solaris';
     list(,,$version) = explode(' ', $sysDescr);
 
@@ -13,6 +13,6 @@ if (starts_with('SunOS', $sysDescr)) {
     }
 }
 
-if (str_contains('.1.3.6.1.4.1.42.2.1.1', $sysObjectId)) {
+if (starts_with('.1.3.6.1.4.1.42.2.1.1', $sysObjectId)) {
     $os = 'solaris';
 }
