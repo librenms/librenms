@@ -135,7 +135,7 @@ function print_message($text)
     if (isCli()) {
         c_echo("%g".$text."%n\n");
     } else {
-        echo('<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"> '.$text.'</div>');
+        echo('<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
