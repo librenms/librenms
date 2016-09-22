@@ -1,5 +1,5 @@
 <?php
 
-if (starts_with('Tranzeo', $sysDescr)) {
+if (starts_with($sysDescr, 'Tranzeo')) {
     $os = 'tranzeo';
 }
