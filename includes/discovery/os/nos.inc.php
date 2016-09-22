@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, "Brocade VDX")||strstr($sysDescr, "BR-VDX")||strstr($sysDescr, "VDX67")) {
-        $os = "nos";
-    }
+if (str_contains($sysDescr, array('Brocade VDX', 'BR-VDX', 'VDX67'))) {
+    $os = 'nos';
 }

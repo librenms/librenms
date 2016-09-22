@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'NRG Network Printer')) {
-        $os = 'nrg';
-    }
+if (str_contains($sysDescr, 'NRG Network Printer')) {
+    $os = 'nrg';
 }
