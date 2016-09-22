@@ -423,13 +423,12 @@ foreach ($ports as $port) {
             $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
         }
 
-        // update ifLastChange
-        if (isset($this_port['ifLastChange'])) {
-            d_echo('ifLastChange -> ' . $this_port['ifLastChange'] . PHP_EOL);
+        // update ifLastChange. only in the db, not rrd
+        if (isset($this_port['ifLastChange']) && is_numeric($this_port['ifLastChange'])) {
             $port['update']['ifLastChange'] = $this_port['ifLastChange'];
+        } else {
+            $port['update']['ifLastChange'] = 0;  // same as device uptime
         }
-
-
 
         // Set VLAN and Trunk from Cisco
         if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != 'notApplicable') {
