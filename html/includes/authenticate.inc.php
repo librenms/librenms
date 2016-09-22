@@ -59,36 +59,42 @@ if (file_exists('includes/authentication/'.$config['auth_mechanism'].'.inc.php')
 }
 
 if (!$_SESSION['authenticated']) {
-    $authenticated = false;
-    $pw_success = false;
-    $cookie_success = false;
+    /* keep track of actual authentication vs "remember me" cookie success */
+    $auth_mechanism_successful = false;
+    $remember_cookie_successful = false;
 
     if (isset($form_username)) {
         /* try password auth */
         $_SESSION['username'] = $form_username;
-        $pw_success = authenticate($form_username, $form_password);
+        $auth_mechanism_successful = authenticate($form_username, $form_password);
+        if ($_SESSION['username'] !== $form_username) {
+            /* Must be using one of the auth methods that trusts $_SERVER['REMOTE_USER'] */
+            $form_username = $_SESSION['username'];
+        }
     } elseif (isset($_COOKIE['sess_id'],$_COOKIE['token'])) {
         /* trying cookie auth */
-        $cookie_success = reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']);
+        $remember_cookie_successful = reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']);
     }
 
-    if ($pw_success || $cookie_success) {
+    if ($auth_mechanism_successful || $remember_cookie_successful) {
         if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
             include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
             twofactor_auth();
         }
 
         if (!$config['twofactor'] || $_SESSION['twofactor']) {
-            $authenticated = true;
+            /* FIXME: start new session here and copy values to avoid session
+             * fixation vulnerabilities
+             */
             $_SESSION['authenticated'] = true;
             dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
         }
     }
 
-    if ($authenticated) {
+    if ($_SESSION['authenticated']) {
         if (!$_SESSION['username']) {
             unset($_SESSION['authenticated']);
-            print_error("ERROR: auth_mechanism did not set session username: pw: $pw_success, cookie: $cookie_success");
+            print_error("ERROR: auth_mechanism did not set session username: pw: $auth_mechanism_successful, cookie: $remember_cookie_successful");
             exit();
         }
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
@@ -108,7 +114,7 @@ if (!$_SESSION['authenticated']) {
         }
 
         $permissions = permissions_cache($_SESSION['user_id']);
-        if ($pw_success) {
+        if ($auth_mechanism_successful) {
             header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }
