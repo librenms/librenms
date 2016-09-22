@@ -1,6 +1,6 @@
 <?php
 
-if (starts_with('Sentry', $sysDescr) && str_contains($sysDescr, array('Switched', 'Smart'))) {
+if (starts_with($sysDescr, array('Sentry')) && str_contains($sysDescr, array('Switched', 'Smart'))) {
     // ServerTech doesn't have a way to distinguish between sentry3 and sentry4 devices
     // Hopefully, we can use the version string to figure it out
     $version = trim(snmp_get($device, 'Sentry3-MIB::serverTech.4.1.1.1.3.0', '-Osqnv'));
