@@ -1,7 +1,5 @@
 <?php
 
-if (starts_with('ZXR10', $sysDescr)) {
-    $os = 'zxr10';
-} elseif (str_contains('ZTE Ethernet Switch', $sysDescr)) {
+if (str_contains($sysDescr, array('ZXR10', 'ZTE Ethernet Switch'))) {
     $os = 'zxr10';
 }
