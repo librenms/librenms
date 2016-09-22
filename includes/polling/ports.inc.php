@@ -426,8 +426,8 @@ foreach ($ports as $port) {
         // update ifLastChange. only in the db, not rrd
         if (isset($this_port['ifLastChange']) && is_numeric($this_port['ifLastChange'])) {
             $port['update']['ifLastChange'] = $this_port['ifLastChange'];
-        } else {
-            $port['update']['ifLastChange'] = 0;  // same as device uptime
+        } elseif ($port['ifLastChange'] != 0) {
+            $port['update']['ifLastChange'] = 0;  // no data, so use the same as device uptime
         }
 
         // Set VLAN and Trunk from Cisco
