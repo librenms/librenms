@@ -205,9 +205,9 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '<i>'.htmlentities($rule['rule']).'</i></td>';
     echo '<td>'.$rule['severity'].'</td>';
-    echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-3x fa-".$ico.' text-'.$col."'></span> ";
+    echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<i class='fa fa-fw fa-3x fa-volume-off text-primary' aria-hidden='true'></i></td>";
+        echo "<i class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></i></td>";
     }
 
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
