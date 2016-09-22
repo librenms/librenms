@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with('Cisco Wide Area Application Services', $sysDescr)) {
+if (starts_with($sysDescr, 'Cisco Wide Area Application Services')) {
     $os = 'waas';
 }

@@ -1,5 +1,5 @@
 <?php
 
-if (starts_with('NWA-', $sysDescr)) {
+if (starts_with($sysDescr, 'NWA-')) {
     $os = 'zyxelnwa';
 }
