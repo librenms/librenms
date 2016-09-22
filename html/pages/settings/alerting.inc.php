@@ -316,7 +316,9 @@ foreach ($api_urls as $api_url) {
                         <label for="api_url" class="col-sm-4 control-label">API URL ('.$api_method.') </label>
                         <div class="col-sm-4">
                             <input id="api_url" class="form-control" type="text" name="global-config-input" value="'.$api_url['config_value'].'" data-config_id="'.$api_url['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+                                <i class="fa" aria-hidden="true"></i>
+                            </span>
                         </div>
                         <div class="col-sm-2">
                             <button type="button" class="btn btn-danger del-api-config" name="del-api-call" data-config_id="'.$api_url['config_id'].'"><i class="fa fa-minus"></i></button>
@@ -328,7 +330,9 @@ foreach ($api_urls as $api_url) {
                         <label for="api_url" class="col-sm-4 control-label api-method">API URL </label>
                         <div class="col-sm-4">
                             <input id="api_url" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+                                <i class="fa" aria-hidden="true"></i>
+                            </span>
                         </div>
                         <div class="col-sm-2">
                             <button type="button" class="btn btn-danger del-api-config" name="del-api-call" data-config_id=""><i class="fa fa-minus"></i></button>
@@ -371,10 +375,12 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                 <div class="panel-body">
                     <div class="form-group has-feedback">
                         <label for="nagios" class="col-sm-4 control-label">Nagios compatible FIFO </label>
-                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.nagios']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.nagios']['config_descr'].'" class="toolTip fa fa-question-sign"></div>
                         <div class="col-sm-4">
                             <input id="nagios" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.nagios']['config_value'].'" data-config_id="'.$config_groups['alert.transports.nagios']['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+                                <i class="fa" aria-hidden="true"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -390,7 +396,7 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
                 <div class="panel-body">
                     <div class="form-group">
                         <label for="irc" class="col-sm-4 control-label">Enable irc transport </label>
-                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.irc']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.irc']['config_descr'].'" class="toolTip fa fa-question-circle"></div>
                         <div class="col-sm-4">
                             <input id="irc" type="checkbox" name="global-config-check" '.$config_groups['alert.transports.irc']['config_checked'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$config_groups['alert.transports.irc']['config_id'].'">
                         </div>
@@ -429,7 +435,9 @@ foreach ($slack_urls as $slack_url) {
                             <label for="slack_url" class="col-sm-4 control-label">Slack URL </label>
                             <div class="col-sm-4">
                                 <input id="slack_url" class="form-control" type="text" name="global-config-input" value="'.$slack_url['config_value'].'" data-config_id="'.$slack_url['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-slack-config" name="del-slack-call" data-config_id="'.$slack_url['config_id'].'"><i class="fa fa-minus"></i></button>
@@ -438,7 +446,9 @@ foreach ($slack_urls as $slack_url) {
                         <div class="form-group has-feedback">
                             <div class="col-sm-offset-4 col-sm-4">
                                 <textarea class="form-control" name="global-config-textarea" id="upd_slack_extra" placeholder="Enter the config options" data-config_id="'.$slack_url['config_id'].'" data-type="slack">'.$upd_slack_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
                             </div>
                         </div>
                     </div>';
@@ -449,7 +459,9 @@ foreach ($slack_urls as $slack_url) {
                             <label for="slack_url" class="col-sm-4 control-label api-method">Slack URL </label>
                             <div class="col-sm-4">
                                 <input id="slack_url" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-slack-config" name="del-slack-call" data-config_id=""><i class="fa fa-minus"></i></button>
@@ -497,7 +509,9 @@ foreach ($hipchat_urls as $hipchat_url) {
                             <label for="hipchat_url" class="col-sm-4 control-label">Hipchat URL </label>
                             <div class="col-sm-4">
                                 <input id="hipchat_url" class="form-control" type="text" name="global-config-input" value="'.$hipchat_url['config_value'].'" data-config_id="'.$hipchat_url['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-hipchat-config" name="del-hipchat-call" data-config_id="'.$hipchat_url['config_id'].'"><i class="fa fa-minus"></i></button>
@@ -507,20 +521,26 @@ foreach ($hipchat_urls as $hipchat_url) {
                             <label for="hipchat_room_id" class="col-sm-4 control-label">Room ID</label>
                             <div class="col-sm-4">
                                 <input id="hipchat_room_id" class="form-control" type="text" name="global-config-input" value="'.$hipchat_room_id['config_value'].'" data-config_id="'.$hipchat_room_id['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
                             <label for="hipchat_from" class="col-sm-4 control-label">From</label>
                             <div class="col-sm-4">
                                 <input id="hipchat_from" class="form-control" type="text" name="global-config-input" value="'.$hipchat_from['config_value'].'" data-config_id="'.$hipchat_from['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
                             <div class="col-sm-offset-4 col-sm-4">
                                 <textarea class="form-control" name="global-config-textarea" id="upd_hipchat_extra" placeholder="Enter the config options" data-config_id="'.$hipchat_url['config_id'].'" data-type="hipchat">'.$upd_hipchat_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                     </div>';
@@ -531,7 +551,9 @@ foreach ($hipchat_urls as $hipchat_url) {
                             <label for="hipchat_url" class="col-sm-4 control-label api-method">Hipchat URL </label>
                             <div class="col-sm-4">
                                 <input id="hipchat_url" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-hipchat-config" id="del-hipchat-call" name="del-hipchat-call" data-config_id=""><i class="fa fa-minus"></i></button>
@@ -541,14 +563,18 @@ foreach ($hipchat_urls as $hipchat_url) {
                             <label for="hipchat_room_id" class="col-sm-4 control-label">Room ID</label>
                             <div class="col-sm-4">
                                 <input id="global-config-room_id" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
                             <label for="hipchat_from" class="col-sm-4 control-label">From</label>
                             <div class="col-sm-4">
                                 <input id="global-config-from" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
@@ -592,7 +618,9 @@ foreach ($pushover_appkeys as $pushover_appkey) {
                             <label for="pushover_appkey" class="col-sm-4 control-label">Pushover Appkey </label>
                             <div class="col-sm-4">
                                 <input id="pushover_appkey" class="form-control" type="text" name="global-config-input" value="'.$pushover_appkey['config_value'].'" data-config_id="'.$pushover_appkey['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-pushover-config" name="del-pushover-call" data-config_id="'.$pushover_appkey['config_id'].'"><i class="fa fa-minus"></i></button>
@@ -602,13 +630,17 @@ foreach ($pushover_appkeys as $pushover_appkey) {
                             <label for="pushover_userkey" class="col-sm-4 control-label">Userkey</label>
                             <div class="col-sm-4">
                                 <input id="pushover_userkey" class="form-control" type="text" name="global-config-input" value="'.$pushover_userkey['config_value'].'" data-config_id="'.$pushover_userkey['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
                             <div class="col-sm-offset-4 col-sm-4">
                                 <textarea class="form-control" name="global-config-textarea" id="upd_pushover_extra" placeholder="Enter the config options" data-config_id="'.$pushover_appkey['config_id'].'" data-type="pushover">'.$upd_pushover_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                     </div>';
@@ -619,7 +651,9 @@ echo '<div id="pushover_appkey_template" class="hide">
                             <label for="pushover_appkey" class="col-sm-4 control-label api-method">Pushover Appkey </label>
                             <div class="col-sm-4">
                                 <input id="pushover_appkey" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-pushover-config" id="del-pushover-call" name="del-pushover-call" data-config_id=""><i class="fa fa-minus"></i></button>
@@ -629,7 +663,9 @@ echo '<div id="pushover_appkey_template" class="hide">
                             <label for="pushover_userkey" class="col-sm-4 control-label">Userkey</label>
                             <div class="col-sm-4">
                                 <input id="global-config-userkey" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
@@ -672,7 +708,9 @@ foreach ($boxcar_appkeys as $boxcar_appkey) {
                             <label for="boxcar_access_token" class="col-sm-4 control-label">Boxcar Access token </label>
                             <div class="col-sm-4">
                                 <input id="boxcar_access_token" class="form-control" type="text" name="global-config-input" value="'.$boxcar_appkey['config_value'].'" data-config_id="'.$boxcar_appkey['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-boxcar-config" name="del-boxcar-call" data-config_id="'.$boxcar_appkey['config_id'].'"><i class="fa fa-minus"></i></button>
@@ -681,7 +719,9 @@ foreach ($boxcar_appkeys as $boxcar_appkey) {
                         <div class="form-group has-feedback">
                             <div class="col-sm-offset-4 col-sm-4">
                                 <textarea class="form-control" name="global-config-textarea" id="upd_boxcar_extra" placeholder="Enter the config options" data-config_id="'.$boxcar_appkey['config_id'].'" data-type="boxcar">'.$upd_boxcar_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                         </div>
                     </div>';
@@ -692,7 +732,9 @@ echo '<div id="boxcar_appkey_template" class="hide">
                             <label for="boxcar_access_token" class="col-sm-4 control-label api-method">Boxcar Access token </label>
                             <div class="col-sm-4">
                                 <input id="boxcar_access_token" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-boxcar-config" id="del-boxcar-call" name="del-boxcar-call" data-config_id=""><i class="fa fa-minus"></i></button>
@@ -717,10 +759,12 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 <div class="panel-body">
                     <div class="form-group has-feedback">
                         <label for="pushbullet" class="col-sm-4 control-label">Pushbullet Access Token </label>
-                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.pushbullet']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.pushbullet']['config_descr'].'" class="toolTip fa fa-question-circle"></div>
                         <div class="col-sm-4">
                             <input id="pushbullet" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.pushbullet']['config_value'].'" data-config_id="'.$config_groups['alert.transports.pushbullet']['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                 </div>
@@ -736,10 +780,12 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 <div class="panel-body">
                     <div class="form-group has-feedback">
                         <label for="victorops" class="col-sm-4 control-label">Post URL </label>
-                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip fa fa-question-circle"></div>
                         <div class="col-sm-4">
                             <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                 </div>
@@ -767,14 +813,18 @@ echo '
                         <label for="clickatell_token" class="col-sm-4 control-label">Clickatell Token </label>
                         <div class="col-sm-4">
                             <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="'.$clickatell['config_value'].'" data-config_id="'.$clickatell['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="clickatell_to" class="col-sm-4 control-label">Mobile numbers</label>
                         <div class="col-sm-4">
                             <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$clickatell['config_id'].'" data-type="clickatell">'.$upd_mobiles.'</textarea>
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                 </div>
@@ -803,35 +853,45 @@ echo '
                         <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
                         <div class="col-sm-4">
                             <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="playsms_user" class="col-sm-4 control-label">User</label>
                         <div class="col-sm-4">
                             <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="'.$playsms_user['config_value'].'" data-config_id="'.$playsms_user['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="playsms_token" class="col-sm-4 control-label">Token</label>
                         <div class="col-sm-4">
                             <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="'.$playsms_token['config_value'].'" data-config_id="'.$playsms_token['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="playsms_from" class="col-sm-4 control-label">From</label>
                         <div class="col-sm-4">
                             <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="'.$playsms_from['config_value'].'" data-config_id="'.$playsms_from['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="clickatell_to" class="col-sm-4 control-label">Mobiles</label>
                         <div class="col-sm-4">
                             <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="'.$playsms_url['config_id'].'" data-type="playsms">'.$upd_mobiles.'</textarea>
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                 </div>
@@ -855,35 +915,45 @@ echo '
                         <label for="canopsis_host" class="col-sm-4 control-label">Canopsis Hostname </label>
                         <div class="col-sm-4">
                             <input id="canopsis_host" class="form-control" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="canopsis_port" class="col-sm-4 control-label">Canopsis Port number </label>
                         <div class="col-sm-4">
                             <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="canopsis_user" class="col-sm-4 control-label">User</label>
                         <div class="col-sm-4">
                             <input id="canopsis_user" class="form-control" type="text" name="global-config-input" value="'.$canopsis_user['config_value'].'" data-config_id="'.$canopsis_user['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="canopsis_passwd" class="col-sm-4 control-label">Password</label>
                         <div class="col-sm-4">
                             <input id="canopsis_passwd" class="form-control" type="password" name="global-config-input" value="'.$canopsis_passwd['config_value'].'" data-config_id="'.$canopsis_passwd['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label for="canopsis_vhost" class="col-sm-4 control-label">Vhost</label>
                         <div class="col-sm-4">
                             <input id="canopsis_vhost" class="form-control" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'">
-                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
                         </div>
                     </div>
                 </div>
@@ -1242,17 +1312,17 @@ echo '
             success: function (data) {
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
-                    $this.next().addClass('glyphicon-ok');
+                    $this.next().addClass('fa-check');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
-                        $this.next().removeClass('glyphicon-ok');
+                        $this.next().removeClass('fa-check');
                     }, 2000);
                 } else {
                     $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('glyphicon-remove');
+                    $this.next().addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('glyphicon-remove');
+                        $this.next().removeClass('fa-times');
                     }, 2000);
                 }
             },
@@ -1275,17 +1345,17 @@ echo '
             success: function (data) {
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
-                    $this.next().addClass('glyphicon-ok');
+                    $this.next().addClass('fa-check');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
-                        $this.next().removeClass('glyphicon-ok');
+                        $this.next().removeClass('fa-check');
                     }, 2000);
                 } else {
                     $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('glyphicon-remove');
+                    $this.next().addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('glyphicon-remove');
+                        $this.next().removeClass('fa-times');
                     }, 2000);
                 }
             },

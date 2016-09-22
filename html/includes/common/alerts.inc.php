@@ -227,7 +227,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";
         },
         "ack": function(column,row) {
-            return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><span class=\'glyphicon glyphicon-"+row.ack_ico+"\'aria-hidden=\'true\'></span></button>";
+            return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><i class=\'fa fa-"+row.ack_ico+"\'aria-hidden=\'true\'></i></button>";
         },
         "proc": function(column,row) {
             return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
@@ -248,7 +248,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     }).on("click", function(e) {
       var target = $(this).data("target");
       $(target).collapse(\'toggle\');
-      $(this).toggleClass(\'glyphicon-plus glyphicon-minus\');
+      $(this).toggleClass(\'fa-plus fa-minus\');
     });
     alerts_grid.find(".incident").each( function() {
       $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
@@ -258,8 +258,8 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         $(this).find(".incident-toggle").fadeOut(200);
       }).on("click", "td:not(.incident-toggle-td)", function() {
         var target = $(this).parent().find(".incident-toggle").data("target");
-        if( $(this).parent().find(".incident-toggle").hasClass(\'glyphicon-plus\') ) {
-          $(this).parent().find(".incident-toggle").toggleClass(\'glyphicon-plus glyphicon-minus\');
+        if( $(this).parent().find(".incident-toggle").hasClass(\'fa-plus\') ) {
+          $(this).parent().find(".incident-toggle").toggleClass(\'fa-plus fa-minus\');
           $(target).collapse(\'toggle\');
         }
       });

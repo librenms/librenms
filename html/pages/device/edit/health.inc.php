@@ -58,13 +58,17 @@ foreach (dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND sensor_delet
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit'].'">
-        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+        <span class="form-control-feedback">
+            <i class="fa" aria-hidden="true"></i>
+        </span>
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
-        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+        <span class="form-control-feedback">
+            <i class="fa" aria-hidden="true"></i>
+        </span>
         </div>
         </td>
         <td>
@@ -128,18 +132,18 @@ $( ".sensor" ).blur(function() {
             dataType: "html",
             success: function(data){
                 $this.closest('.form-group').addClass('has-success');
-                $this.next().addClass('glyphicon-ok');
+                $this.next().addClass('fa-check');
                 setTimeout(function(){
                     $this.closest('.form-group').removeClass('has-success');
-                    $this.next().removeClass('glyphicon-ok');
+                    $this.next().removeClass('fa-check');
                 }, 2000);
             },
                 error:function(){
                     $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('glyphicon-remove');
+                    $this.next().addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('glyphicon-remove');
+                        $this.next().removeClass('fa-times');
                     }, 2000);
                 }
     });
