@@ -1,5 +1,9 @@
 <?php
 
+if (str_contains($sysDescr, array('ProCurve', 'HP 1820'))) {
+    $os = 'procurve';
+}
+
 if (!$os) {
     if (stristr($sysDescr, 'ProCurve') || stristr($sysDescr, 'HP 1820')) {
         $os = 'procurve';

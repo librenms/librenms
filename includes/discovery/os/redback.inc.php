@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/Redback/', $sysDescr)) {
-        $os = 'redback';
-    }
+if (str_contains($sysDescr, 'Redback')) {
+    $os = 'redback';
 }
