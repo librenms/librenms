@@ -52,33 +52,33 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     $fault_detail = alert_details($alertlog['details']);
     $alert_state  = $alertlog['state'];
     if ($alert_state == '0') {
-        $glyph_icon  = 'ok';
-        $glyph_color = 'green';
-        $text        = 'Ok';
+        $fa_icon  = 'check';
+        $fa_color = 'success';
+        $text     = 'Ok';
     } elseif ($alert_state == '1') {
-        $glyph_icon  = 'remove';
-        $glyph_color = 'red';
-        $text        = 'Alert';
+        $fa_icon  = 'times';
+        $fa_color = 'danger';
+        $text     = 'Alert';
     } elseif ($alert_state == '2') {
-        $glyph_icon  = 'info-sign';
-        $glyph_color = 'lightgrey';
-        $text        = 'Ack';
+        $fa_icon  = 'info-circle';
+        $fa_color = 'muted';
+        $text     = 'Ack';
     } elseif ($alert_state == '3') {
-        $glyph_icon  = 'arrow-down';
-        $glyph_color = 'orange';
-        $text        = 'Worse';
+        $fa_icon  = 'arrow-down';
+        $fa_color = 'warning';
+        $text     = 'Worse';
     } elseif ($alert_state == '4') {
-        $glyph_icon  = 'arrow-up';
-        $glyph_color = 'khaki';
-        $text        = 'Better';
+        $fa_icon  = 'arrow-up';
+        $fa_color = 'info';
+        $text     = 'Better';
     }//end if
     $response[] = array(
         'id'          => $rulei++,
         'time_logged' => $alertlog['humandate'],
-        'details'     => '<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
+        'details'     => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
         'hostname'    => '<div class="incident">'.generate_device_link($dev, shorthost($dev['hostname'])).'<div id="incident'.($rulei).'" class="collapse">'.$fault_detail.'</div></div>',
         'alert'       => htmlspecialchars($alertlog['alert']),
-        'status'      => "<b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b>",
+        'status'      => "<b><i class='fa fa-".$glyph_icon." text-".$glyph_color."'></i> $text</b>",
     );
 }//end foreach
 
