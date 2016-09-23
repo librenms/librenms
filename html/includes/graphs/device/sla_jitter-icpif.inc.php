@@ -18,11 +18,12 @@ $rrd_options .= ' -l 0 -E ';
 $rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'jitter'));
 
 if (file_exists($rrd_filename)) {
-    $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
+    $rrd_options .= " COMMENT:'                           Cur  Min  Max  Avg\\n'";
 
     $rrd_options .= " DEF:ICPIF=" . $rrd_filename . ":ICPIF:AVERAGE ";
-    $rrd_options .= " LINE1.25:ICPIF#0000ee:'ICPIF                     ' ";
+    $rrd_options .= " LINE1.25:ICPIF#0000ee:'ICPIF                ' ";
     $rrd_options .= " GPRINT:ICPIF:LAST:%3.0lf ";
     $rrd_options .= " GPRINT:ICPIF:MIN:%3.0lf ";
-    $rrd_options .= " GPRINT:ICPIF:MAX:%3.0lf\\\l ";
+    $rrd_options .= " GPRINT:ICPIF:MAX:%3.0lf ";
+    $rrd_options .= " GPRINT:ICPIF:AVERAGE:'%3.0lf'\\\l ";
 }

@@ -62,6 +62,10 @@ git pull upstream master
 git push origin master
 ```
 
+At this stage it's worth pointing out that we have some standard checks that are performed when you submit a 
+pull request, you can run these checks [yourself](Validating-Code.md) to be sure no issues are present in your 
+pull request.
+
 Now, create a new branch to do you work on. It's important that you do this as you are then able to work on more than
 one feature at a time and submit them as pull requests individually. If you did all your work in the master branch then
 it gets a bit messy!

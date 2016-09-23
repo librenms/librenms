@@ -1,6 +1,7 @@
 <?php
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
+$no_refresh = true;
 
 if ($vars['errors']) {
     $error_sort = ' data-order="desc"';
@@ -17,11 +18,14 @@ if ($vars['errors']) {
                 <tr>
                     <th data-column-id="device">Device</th>
                     <th data-column-id="port"<?php echo $sort ?>>Port</th>
-                    <th data-column-id="ifSpeed" data-formatter="human-bps">Speed</th>
-                    <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green" data-formatter="human-bps">Down</th>
-                    <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue" data-formatter="human-bps">Up</th>
-                    <th data-column-id="ifInUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="green" data-formatter="human-pps">Packets In</th>
-                    <th data-column-id="ifOutUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-formatter="human-pps">Packets Out</th>
+                    <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
+                    <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
+                    <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
+                    <th data-column-id="ifMtu" data-visible="false">MTU</th>
+                    <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green" data-converter="human-bps">Down</th>
+                    <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue" data-converter="human-bps">Up</th>
+                    <th data-column-id="ifInUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">Packets In</th>
+                    <th data-column-id="ifOutUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">Packets Out</th>
                     <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red"<?php echo $error_sort ?>>Errors In</th>
                     <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red">Errors Out</th>
                     <th data-column-id="ifType">Media</th>
@@ -46,17 +50,22 @@ function formatUnits(units,decimals,display,base) {
 
 var grid = $("#ports").bootgrid({
     ajax: true,
-    rowCount: [25, 50,100,250,-1],
-    formatters: {
-        'human-bps': function(column, row) {
-            return formatUnits(row[column.id]);
+    rowCount: [25, 50, 100, 250, -1],
+    converters: {
+        'duration': {
+            to: function (value) { return moment.duration(value, 'seconds').humanize(); }
         },
-        'human-pps': function(column, row) {
-            return formatUnits(row[column.id], 2, ['pps', 'Kpps', 'Mpps', 'Gpps', 'Tpps', 'Ppps', 'Epps', 'Zpps', 'Ypps']);
+        'human-bps': {
+            to: function (value) { return formatUnits(value); }
+        },
+        'human-pps': {
+            to: function (value) {
+                return formatUnits(value, 2, ['pps', 'Kpps', 'Mpps', 'Gpps', 'Tpps', 'Ppps', 'Epps', 'Zpps', 'Ypps']);
+            }
         }
     },
     templates: {
-        search: ""
+        search: "" // hide the generic search
     },
     post: function ()
     {

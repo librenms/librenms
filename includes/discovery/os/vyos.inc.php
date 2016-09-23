@@ -1,7 +1,5 @@
 <?php
 
-if (!$os || $os == 'vyatta') {
-    if (preg_match('/^Vyatta VyOS/', $sysDescr) || preg_match('/^VyOS/i', $sysDescr)) {
-        $os = 'vyos';
-    }
+if (starts_with($sysDescr, 'Vyatta VyOS') || starts_with($sysDescr, 'VyOS', true)) {
+    $os = 'vyos';
 }

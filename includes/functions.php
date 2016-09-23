@@ -326,9 +326,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             // Try each set of parameters from config
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                if ($force_add || isSNMPable($device)) {
-                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost);
+                if ($force_add === true || isSNMPable($device)) {
+                    if ($force_add !== true) {
+                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    }
+                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost, $force_add);
                     if ($result !== false) {
                         return $result;
                     }
@@ -341,9 +343,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['community'] as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
-                if ($force_add || isSNMPable($device)) {
-                    $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost);
+                if ($force_add === true || isSNMPable($device)) {
+                    if ($force_add !== true) {
+                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+                    }
+                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost, $force_add);
                     if ($result !== false) {
                         return $result;
                     }
@@ -533,7 +537,7 @@ function getpollergroup($poller_group = '0')
     }
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '')
+function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '', $force_add = false)
 {
     global $config;
     $host = trim(strtolower($host));
@@ -560,7 +564,11 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
 
     $device = array_merge($device, $v3);
 
-    $device['os'] = getHostOS($device);
+    if ($force_add !== true) {
+        $device['os'] = getHostOS($device);
+    } else {
+        $device['os'] = 'generic';
+    }
 
     if ($device['os']) {
         if (host_exists($host, $snmphost) === false) {

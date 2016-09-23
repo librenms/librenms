@@ -11,9 +11,11 @@
 * the source code distribution for details.
 */
 
-include_once("../includes/defaults.inc.php");
-include_once("../config.php");
-include_once("../includes/definitions.inc.php");
+chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
+
+include_once("includes/defaults.inc.php");
+include_once("config.php");
+include_once("includes/definitions.inc.php");
 
 ?>
 

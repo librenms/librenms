@@ -19,6 +19,9 @@ if ($used_sensors['voltage']) {
 if ($used_sensors['frequency']) {
     $datas[] = 'frequency';
 }
+if ($used_sensors['runtime']) {
+    $datas[] = 'runtime';
+}
 if ($used_sensors['current']) {
     $datas[] = 'current';
 }
@@ -50,6 +53,7 @@ $type_text['processor'] = "Processor";
 $type_text['voltage'] = "Voltage";
 $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
+$type_text['runtime'] = "Runtime";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 $type_text['toner'] = "Toner";

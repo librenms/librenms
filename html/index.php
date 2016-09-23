@@ -385,6 +385,7 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
     </script>');
 } else {
     echo('<script type="text/javascript">
+    var no_refresh = ' . var_export((bool)$no_refresh, true) . ';
     $(document).ready(function() {
         $("#countdown_timer").html("Refresh disabled");
         $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i>");
