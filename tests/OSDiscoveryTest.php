@@ -447,6 +447,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('eatonups', 'eaton-5p');
         $this->checkOS('eatonups', 'eaton-5px');
+        $this->checkOS('eatonups', 'eaton-powerxpert');
     }
 
     public function testEdgeos()
