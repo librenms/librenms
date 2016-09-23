@@ -55,6 +55,7 @@ pages:
     - Extensions/MIB-based-polling.md
     - Extensions/Memcached.md
     - Extensions/Network-Map.md
+    - Extensions/NFSen.md
     - Extensions/Oxidized.md
     - Extensions/Plugin-System.md
     - Extensions/Poller-Service.md
