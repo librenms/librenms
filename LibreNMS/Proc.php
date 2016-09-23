@@ -65,7 +65,7 @@ class Proc
         $env = null,
         $blocking = false
     ) {
-        echo "Starting process: $cmd";
+        d_echo("Starting process: $cmd");
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
         if (!is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
