@@ -786,6 +786,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMacosx()
     {
         $this->checkOS('macosx', 'Darwin Kernel Version 15', '.1.3.6.1.4.1.9999999.3.2.16');
+        $this->checkOS('macosx', 'Darwin Kernel Version 16', '.1.3.6.1.4.1.8072.3.2.255');
     }
 
     public function testMaipu()
