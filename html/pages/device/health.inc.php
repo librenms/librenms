@@ -12,6 +12,7 @@ $fans         = dbFetchCell("select count(*) from sensors WHERE sensor_class='fa
 $volts        = dbFetchCell("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = ?", array($device['device_id']));
 $current      = dbFetchCell("select count(*) from sensors WHERE sensor_class='current' AND device_id = ?", array($device['device_id']));
 $freqs        = dbFetchCell("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = ?", array($device['device_id']));
+$runtime      = dbFetchCell("select count(*) from sensors WHERE sensor_class='runtime' AND device_id = ?", array($device['device_id']));
 $power        = dbFetchCell("select count(*) from sensors WHERE sensor_class='power' AND device_id = ?", array($device['device_id']));
 $dBm          = dbFetchCell("select count(*) from sensors WHERE sensor_class='dBm' AND device_id = ?", array($device['device_id']));
 $states       = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
@@ -60,6 +61,10 @@ if ($freqs) {
     $datas[] = 'frequency';
 }
 
+if ($runtime) {
+    $datas[] = 'runtime';
+}
+
 if ($current) {
     $datas[] = 'current';
 }
@@ -95,6 +100,7 @@ $type_text['processor']   = 'Processor';
 $type_text['voltage']     = 'Voltage';
 $type_text['fanspeed']    = 'Fanspeed';
 $type_text['frequency']   = 'Frequency';
+$type_text['runtime']     = 'Runtime';
 $type_text['current']     = 'Current';
 $type_text['power']       = 'Power';
 $type_text['dbm']         = 'dBm';

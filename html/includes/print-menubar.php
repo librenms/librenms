@@ -19,6 +19,8 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 
 if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config['site_style'] == 'mono')) {
     $navbar = 'navbar-inverse';
+} else {
+    $navbar = '';
 }
 
 ?>
@@ -48,46 +50,40 @@ if ($config['title_image']) {
         <li class="dropdown">
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Overview</span></a>
           <ul class="dropdown-menu multi-level" role="menu">
-             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
-             <li class="dropdown-submenu">
-                <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i> Alerts</a>
-                <ul class="dropdown-menu scrollable-menu">
-                    <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
-                    <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
-                    <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
-<?php
-if ($_SESSION['userlevel'] >= '10') {
-?>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
-<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
-<?php
-}
-?>
-            </ul>
-          </li>
-          <li class="dropdown-submenu">
-           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
-           <ul class="dropdown-menu">
-                <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
-               <li>
-                    <a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a>
-               </li>
+              <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
+           <li class="dropdown-submenu">
+            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
+            <ul class="dropdown-menu">
+              <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a></li>
                 <?php
-
                     require_once '../includes/device-groups.inc.php';
                     $devices_groups = GetDeviceGroups();
                 if (count($devices_groups) > 0) {
                     echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
                     foreach ($devices_groups as $group) {
-                        echo '<li><a href="'.generate_url(array('page'=>'map','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
+                        echo '<li><a href="'.generate_url(array('page'=>'map','group'=>$group['id'])).'" title="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
                     }
                     unset($group);
                     echo '</ul></li>';
                 }
                 ?>
-           </ul>
+            </ul>
+          </li>
+          <li class="dropdown-submenu">
+            <a><i class="fa fa-plug fa-fw fa-lg"></i> Plugins</a>
+            <ul class="dropdown-menu scrollable-menu">
+                <?php
+                \LibreNMS\Plugins::call('menu');
+
+                if ($_SESSION['userlevel'] >= '10') {
+                    if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
+                        echo('<li role="presentation" class="divider"></li>');
+                    }
+                    echo('<li><a href="plugin/view=admin"> <i class="fa fa-lock fa-fw fa-lg"></i>Plugin Admin</a></li>');
+                }
+                ?>
+            </ul>
           </li>
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg"></i> Tools</a>
@@ -142,6 +138,7 @@ if (is_module_enabled('poller', 'mib')) {
               <ul class="dropdown-menu scrollable-menu">
 <?php
 
+$param = array();
 if (is_admin() === true || is_read() === true) {
     $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
 } else {
@@ -161,7 +158,7 @@ foreach (dbFetchRows($sql, $param) as $devtype) {
 if (count($devices_groups) > 0) {
     echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
     foreach ($devices_groups as $group) {
-        echo '<li><a href="'.generate_url(array('page'=>'devices','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
+        echo '<li><a href="'.generate_url(array('page'=>'devices','group'=>$group['id'])).'" title="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
     }
     unset($group);
     echo '</ul></li>';
@@ -497,23 +494,35 @@ if ($bgp_alerts) {
 
 <?php
 }
-?>
 
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Plugins</span></a>
-          <ul class="dropdown-menu">
-<?php
-\LibreNMS\Plugins::call('menu');
+$alerts = new ObjectCache('alerts');
 
-if ($_SESSION['userlevel'] >= '10') {
-    if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
-        echo('<li role="presentation" class="divider"></li>');
-    }
-    echo('<li><a href="plugin/view=admin"> <i class="fa fa-lock fa-fw fa-lg"></i>Plugin Admin</a></li>');
+if ($alerts['active_count'] > 0) {
+    $alert_colour = "danger";
+} else {
+    $alert_colour = "success";
 }
+
 ?>
+
+      <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-exclamation-circle fa-col-<?php echo $alert_colour;?> fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Alerts</span></a>
+          <ul class="dropdown-menu">
+              <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
+                <?php
+                if ($_SESSION['userlevel'] >= '10') {
+                    ?>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg"></i> Rules</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg"></i> Maintenance Windows</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg"></i> Rule Mapping</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
+                    <?php
+                }
+                ?>
           </ul>
-        </li>
+      </li>
 
 <?php
 // Custom menubar entries.

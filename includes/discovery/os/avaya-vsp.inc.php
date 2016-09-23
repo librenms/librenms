@@ -11,33 +11,14 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.202')) {
-        // VSP-4850GTS
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.203')) {
-        // VSP-4850GTS-PWR+
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.205')) {
-        // VSP-8284XSQ
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.206')) {
-        // VSP-4450GSX-PWR+
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.208')) {
-        // VSP-8404
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.209')) {
-        // VSP-7254XSQ
-        $os = 'avaya-vsp';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2272.210')) {
-        // VSP-7254XTQ
-        $os = 'avaya-vsp';
-    }
+if (starts_with($sysObjectId, array(
+    '.1.3.6.1.4.1.2272.202',
+    '.1.3.6.1.4.1.2272.203',
+    '.1.3.6.1.4.1.2272.205',
+    '.1.3.6.1.4.1.2272.206',
+    '.1.3.6.1.4.1.2272.208',
+    '.1.3.6.1.4.1.2272.209',
+    '.1.3.6.1.4.1.2272.210',
+))) {
+    $os = 'avaya-vsp';
 }

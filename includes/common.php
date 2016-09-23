@@ -70,21 +70,23 @@ function format_number_short($number, $sf)
 function external_exec($command)
 {
     global $debug,$vdebug;
+
     if ($debug && !$vdebug) {
         $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):(.*):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
-        d_echo($debug_command);
+        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+        c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        d_echo($command."\n");
+        c_echo('SNMP[%c'.$command."%n]\n");
     }
 
     $output = shell_exec($command);
 
     if ($debug && !$vdebug) {
-        $debug_output = preg_replace('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/', '*', $output);
-        d_echo("$debug_output\n");
+        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+        $debug_output = preg_replace($ip_regex, '*', $output);
+        d_echo($debug_output . PHP_EOL);
     } elseif ($vdebug) {
-        d_echo($output."\n");
+        d_echo($output . PHP_EOL);
     }
 
     return $output;
@@ -121,7 +123,7 @@ function print_error($text)
     if (isCli()) {
         c_echo("%r".$text."%n\n");
     } else {
-        echo('<div class="alert alert-danger"><img src="images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
@@ -130,7 +132,7 @@ function print_message($text)
     if (isCli()) {
         c_echo("%g".$text."%n\n");
     } else {
-        echo('<div class="alert alert-success"><img src="images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
@@ -739,11 +741,15 @@ function get_graph_subtypes($type, $device = null)
         closedir($handle);
     }
 
-    // find the MIB subtypes
-    foreach ($config['graph_types'] as $type => $unused1) {
-        foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-            if (is_mib_graph($type, $subtype)  &&  $device != null  &&  is_device_graph($device, $subtype)) {
-                $types[] = $subtype;
+    if ($device != null) {
+        // find the MIB subtypes
+        $graphs = get_device_graphs($device);
+
+        foreach ($config['graph_types'] as $type => $unused1) {
+            foreach ($config['graph_types'][$type] as $subtype => $unused2) {
+                if (is_mib_graph($type, $subtype) && in_array($graphs, $subtype)) {
+                    $types[] = $subtype;
+                }
             }
         }
     }
@@ -752,13 +758,11 @@ function get_graph_subtypes($type, $device = null)
     return $types;
 } // get_graph_subtypes
 
-
-function is_device_graph($device, $subtype)
+function get_device_graphs($device)
 {
-    $query = 'SELECT COUNT(*) FROM `device_graphs` WHERE `device_id` = ? AND `graph` = ?';
-    return dbFetchCell($query, array($device['device_id'], $subtype)) > 0;
-} // is_device_graph
-
+    $query = 'SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?';
+    return dbFetchColumn($query, array($device['device_id']));
+}
 
 function get_smokeping_files($device)
 {

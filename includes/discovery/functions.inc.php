@@ -873,3 +873,27 @@ function avtech_add_sensor($device, $sensor)
 
     return true;
 }
+
+/**
+ * @param $device
+ * @param $serial
+ * @param $sensor
+ * @return int
+ */
+function get_device_divisor($device, $serial, $sensor)
+{
+    if (($device['os'] == 'poweralert') && ($sensor == 'current' || $sensor == 'frequencies' || $sensor == 'voltages')) {
+        if (version_compare($serial, '12.06.0068', '>=')) {
+            $divisor = 10;
+        } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            $divisor = 1;
+        }
+    } elseif (($device['os'] == 'huaweiups') && ($sensor == 'frequencies')) {
+        $divisor = 100;
+    } elseif (($device['os'] == 'netmanplus') && ($sensor == 'voltages')) {
+        $divisor = 1;
+    } else {
+        $divisor = 10;
+    }
+    return $divisor;
+}

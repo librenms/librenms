@@ -170,6 +170,19 @@ You can set two Active Directory servers by editing the `$config['auth_ad_url']`
 $config['auth_ad_url'] = "ldaps://dc1.example.com ldaps://dc2.example.com";
 ```
 
+##### Active Directory LDAP filters
+
+You can add an LDAP filter to be ANDed with the builtin user filter (`(sAMAccountName=$username)`).
+
+The defaults are:
+
+```
+$config['auth_ad_user_filter'] = "(objectclass=user)";
+$config['auth_ad_group_filter'] = "(objectclass=group)";
+```
+
+This yields `(&(objectclass=user)(sAMAccountName=$username))` for the user filter and `(&(objectclass=group)(sAMAccountName=$group))` for the group filter.
+
 #### Radius Authentication
 
 Please note that a mysql user is created for each user the logs in successfully. User level 1 is assigned to those accounts so you will then need to assign the relevant permissions unless you set `$config['radius']['userlevel']` to be something other than 1.

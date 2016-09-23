@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Acceidan MetroNID OS Discovery module
  *
@@ -12,9 +11,6 @@
  * the source code distribution for details.
  */
 
-
-if (!$os) {
-    if (preg_match('/AMN-/', $sysDescr)) {
-        $os = 'aen';
-    }
+if (str_contains($sysDescr, 'AMN-')) {
+    $os = 'aen';
 }

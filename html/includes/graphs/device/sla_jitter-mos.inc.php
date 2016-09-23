@@ -18,11 +18,12 @@ $rrd_options .= ' -l 0 -E ';
 $rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'jitter'));
 
 if (file_exists($rrd_filename)) {
-    $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
+    $rrd_options .= " COMMENT:'                           Cur   Min   Max   Avg\\n'";
 
     $rrd_options .= " DEF:MOS=" . $rrd_filename . ":MOS:AVERAGE ";
-    $rrd_options .= " LINE1.25:MOS#0000ee:'Mean Opinion Score              ' ";
-    $rrd_options .= " GPRINT:MOS:LAST:%3.0lf ";
-    $rrd_options .= " GPRINT:MOS:MIN:%3.0lf ";
-    $rrd_options .= " GPRINT:MOS:MAX:%3.0lf\\\l ";
+    $rrd_options .= " LINE1.25:MOS#0000ee:'Mean Opinion Score   ' ";
+    $rrd_options .= " GPRINT:MOS:LAST:%3.2lf ";
+    $rrd_options .= " GPRINT:MOS:MIN:%3.2lf ";
+    $rrd_options .= " GPRINT:MOS:MAX:%3.2lf ";
+    $rrd_options .= " GPRINT:MOS:AVERAGE:'%3.2lf'\\\l ";
 }

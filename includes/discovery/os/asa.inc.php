@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^Cisco\ Adaptive\ Security\ Appliance/', $sysDescr)) {
-        $os = 'asa';
-    }
+if (starts_with($sysDescr, 'Cisco Adaptive Security Appliance')) {
+    $os = 'asa';
 }
