@@ -1763,6 +1763,57 @@ label {
     font-weight: normal;
 }
 
+.badge-navbar-user {
+   border-radius: 40%;
+   font-size: 65%;
+   padding: 5px;
+   position: relative;
+   top: -10px;
+   left: -5px;
+}
+.badge-default {
+  background-color: #777;
+}
+.badge-default[href]:hover,
+.badge-default[href]:focus {
+  background-color: #5e5e5e;
+}
+.badge-primary {
+  background-color: #337ab7;
+}
+.badge-primary[href]:hover,
+.badge-primary[href]:focus {
+  background-color: #286090;
+}
+.badge-success {
+  background-color: #5cb85c;
+}
+.badge-success[href]:hover,
+.badge-success[href]:focus {
+  background-color: #449d44;
+}
+.badge-info {
+  background-color: #5bc0de;
+}
+.badge-info[href]:hover,
+.badge-info[href]:focus {
+  background-color: #31b0d5;
+}
+.badge-warning {
+  background-color: #f0ad4e;
+}
+.badge-warning[href]:hover,
+.badge-warning[href]:focus {
+  background-color: #ec971f;
+}
+.badge-danger {
+  background-color: #d9534f;
+}
+.badge-danger[href]:hover,
+.badge-danger[href]:focus {
+  background-color: #c9302c;
+}
+
 @media only screen and (max-width: 480px) {
     .thumbnail_graph_table b { font-size : 6px;}
     .thumbnail_graph_table img {
