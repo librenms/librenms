@@ -8,7 +8,7 @@ if (starts_with($sysDescr, 'Sentry') && str_contains($sysDescr, array('Switched'
     $version = intval($version[1]);
 
     // It appears that version 8 and up is good for sentry4
-    if ($version < 8) {
-        $os = 'sentry3';
+    if ($version >= 8) {
+        $os = 'sentry4';
     }
 }

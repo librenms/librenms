@@ -1271,7 +1271,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testSwos()
     {
         $mockSnmp = array(
-            'SNMPv2-MIB::sysName.0' => 'MicroTik'
+            'SNMPv2-MIB::sysName.0' => 'MikroTik'
         );
         $this->checkOS('swos', 'RB250GS', '', $mockSnmp);
         $this->checkOS('swos', 'RB260GS', '', $mockSnmp);
