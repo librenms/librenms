@@ -29,8 +29,6 @@ cache:
   - directories:
     - vendor
     - $HOME/.composer/cache
-    - $HOME/.snmpsim-cache
-
 
 before_install:
   - sudo apt-get -qq update
@@ -41,7 +39,7 @@ install:
   - pip install --user snmpsim
 
 before_script:
-  - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log  --cache-dir=$HOME/.snmpsim-cache --daemon --pid-file=/tmp/snmpsimd.pid
+  - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log --daemon --pid-file=/tmp/snmpsimd.pid
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
