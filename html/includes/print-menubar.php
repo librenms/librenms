@@ -549,7 +549,6 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
     $class = 'badge-danger';
 }
     echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
-}
 ?>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
