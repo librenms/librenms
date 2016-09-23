@@ -26,13 +26,27 @@
 // get the current LibreNMS install directory
 $install_dir = realpath(__DIR__ . '/..');
 
-require_once $install_dir . '/includes/defaults.inc.php';
+require $install_dir . '/includes/defaults.inc.php';
+
+// definitions, don't want to initialize mysql...
+$config['install_dir'] = $install_dir;
+$config['mibdir'] = $install_dir . '/mibs';
+$config['snmpget'] = 'snmpget';
+$runtime_stats = array('snmpget' => 0, 'snmpwalk' => 0);
 
 $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 
-require_once $install_dir . '/includes/common.php';
-require_once $install_dir . '/includes/rrdtool.inc.php';
-require_once $install_dir . '/includes/syslog.php';
+require $install_dir . '/includes/common.php';
+if (getenv('SNMPSIM')) {
+    require $install_dir . '/includes/functions.php';
+} else {
+    require $install_dir . '/includes/rrdtool.inc.php';
+    require $install_dir . '/includes/syslog.php';
+    require $install_dir . '/tests/mocks/mock.snmp.inc.php';
+}
 
 ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL);
+error_reporting(E_ALL & ~E_WARNING);
+//error_reporting(E_ALL);
+//$debug=true;
+//$vdebug=true;
