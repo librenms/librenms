@@ -95,11 +95,11 @@ $config['sfdp']             = "/usr/bin/sfdp";
 
 #### Memcached
 
-[Memcached](Extensions/Memcached.md]
+[Memcached](../Extensions/Memcached.md]
 
 #### RRDCached
 
-[RRDCached](Extensions/RRDCached.md]
+[RRDCached](../Extensions/RRDCached.md]
 
 #### WebUI Settings
 
@@ -260,7 +260,7 @@ The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`,
 
 #### Auto discovery settings
 
-[Auto-Discovery](Extensions/Auto-Discovery.md)
+[Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 #### Email configuration
 
@@ -284,11 +284,11 @@ The varying options after that are to support the different transports.
 
 #### Alerting
 
-[Alerting](Extensions/Alerting.md)
+[Alerting](../Extensions/Alerting.md)
 
 #### Billing
 
-[Billing](Extensions/Billing-Module.md)
+[Billing](../Extensions/Billing-Module.md)
 
 #### Global module support
 
@@ -303,7 +303,7 @@ $config['enable_sla']                   = 0; # Enable Cisco SLA collection and d
 
 #### Port extensions
 
-[Port-Description-Parser](Extensions/Port-Description-Parser.md)
+[Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
 ```php
 $config['enable_ports_etherlike']       = 0;
@@ -324,7 +324,7 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 
 #### Oxidized
 
-[Oxidized](Extensions/Oxidized.md)
+[Oxidized](../Extensions/Oxidized.md)
 
 #### CollectD
 ```php
@@ -339,11 +339,11 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 
 #### Smokeping
 
-[Smokeping](Extensions/Smokeping.md)
+[Smokeping](../Extensions/Smokeping.md)
 
 #### NFSen
 
-[NFSen](Extensions/NFSen.md)
+[NFSen](../Extensions/NFSen.md)
 
 #### Location mapping
 
@@ -425,11 +425,11 @@ Mounted storage / mount points to ignore in discovery and polling.
 
 #### IRC Bot
 
-[IRC Bot](Extensions/IRC-Bot.md)
+[IRC Bot](../Extensions/IRC-Bot.md)
 
 #### Authentication
 
-[Authentication](Extensions/Authentication.md)
+[Authentication](../Extensions/Authentication.md)
 
 #### Cleanup options
 
@@ -451,7 +451,7 @@ the rrd directory automatically - only enable this if you are comfortable with t
 
 #### Syslog options
 
-[Syslog](Extensions/Syslog.md)
+[Syslog](../Extensions/Syslog.md)
 
 #### Virtualization
 
@@ -484,7 +484,7 @@ You can use this array to rewrite the description of ASes that you have discover
 
 #### Auto updates
 
-[Updating](General/Updating.md)
+[Updating](../General/Updating.md)
 
 #### IPMI
 Setup the types of IPMI protocols to test a host for and it what order.
@@ -499,4 +499,4 @@ $config['ipmi']['type'][] = "open";
 
 #### Distributed poller settings
 
-[Distributed Poller](Extensions/Distributed-Poller.md)
+[Distributed Poller](../Extensions/Distributed-Poller.md)

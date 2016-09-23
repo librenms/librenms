@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Viprinet VPN Router')) {
-        $os = 'viprinux';
-    }
+if (str_contains($sysDescr, 'Viprinet VPN Router')) {
+    $os = 'viprinux';
 }
