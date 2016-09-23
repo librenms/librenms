@@ -1209,7 +1209,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
             $output .= '
             <div class="form-group has-feedback">
                 <label for="'.$item['name'].'"" class="col-sm-4 control-label">'.$item['descr'].' </label>
-                <div data-toggle="tooltip" title="'.$config_groups[$item['name']]['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                <div data-toggle="tooltip" title="'.$config_groups[$item['name']]['config_descr'].'" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
                 <div class="col-sm-4">
             ';
             if ($item['type'] == 'checkbox') {
@@ -1217,6 +1217,11 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
             } elseif ($item['type'] == 'text') {
                 $output .= '
                 <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
+                ';
+            } elseif ($item['type'] == 'numeric') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 ';
             } elseif ($item['type'] == 'select') {
@@ -1242,7 +1247,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 }
                 $output .='
                 </select>
-                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
             }
             $output .= '

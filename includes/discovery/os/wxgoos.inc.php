@@ -1,6 +1,6 @@
 <?php
 
-if (str_contains('NETOS 6.0', $sysDescr)) {
+if (str_contains($sysDescr, 'NETOS 6.0')) {
     $os = 'wxgoos';
 }
 

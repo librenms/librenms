@@ -1763,22 +1763,56 @@ label {
     font-weight: normal;
 }
 
-.nav>li>a.dropdown-toggle {
-    padding: 15px 6px;
-}
-
-.badge-navbar-user{
-   background:red;
+.badge-navbar-user {
    border-radius: 40%;
    font-size: 65%;
-   height: auto;
-   margin: 0;
-   padding:5px;
-   position:absolute;
-   right:-3px;
-   top:5px;
-   width: auto;
-  }
+   padding: 5px;
+   position: relative;
+   top: -10px;
+   left: -5px;
+}
+.badge-default {
+  background-color: #777;
+}
+.badge-default[href]:hover,
+.badge-default[href]:focus {
+  background-color: #5e5e5e;
+}
+.badge-primary {
+  background-color: #337ab7;
+}
+.badge-primary[href]:hover,
+.badge-primary[href]:focus {
+  background-color: #286090;
+}
+.badge-success {
+  background-color: #5cb85c;
+}
+.badge-success[href]:hover,
+.badge-success[href]:focus {
+  background-color: #449d44;
+}
+.badge-info {
+  background-color: #5bc0de;
+}
+.badge-info[href]:hover,
+.badge-info[href]:focus {
+  background-color: #31b0d5;
+}
+.badge-warning {
+  background-color: #f0ad4e;
+}
+.badge-warning[href]:hover,
+.badge-warning[href]:focus {
+  background-color: #ec971f;
+}
+.badge-danger {
+  background-color: #d9534f;
+}
+.badge-danger[href]:hover,
+.badge-danger[href]:focus {
+  background-color: #c9302c;
+}
 
 @media only screen and (max-width: 480px) {
     .thumbnail_graph_table b { font-size : 6px;}
@@ -1872,7 +1906,6 @@ label {
 .device-availability, .service-availability {
   color:#000000;
   float:left;
-  width:163px;
   height:64px;
   margin:10px;
   padding:8px;
@@ -1990,4 +2023,8 @@ label {
   width:12px;
   float:left;
   background-color: #D9534F;
+}
+
+.availability-map-widget-header {
+  line-height:30px;
 }

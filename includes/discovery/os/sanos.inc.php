@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'SAN-OS')) {
-        $os = 'sanos';
-    }
+if (str_contains($sysDescr, 'SAN-OS')) {
+    $os = 'sanos';
 }
