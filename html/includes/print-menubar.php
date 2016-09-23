@@ -544,9 +544,12 @@ if (is_file("includes/print-menubar-custom.inc.php")) {
     $notifications = new ObjectCache('notifications');
     $style = '';
 if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
-    $style = 'style="background-color:grey; color:white;"';
+    $class = 'badge-default';
+} else {
+    $class = 'badge-danger';
 }
-    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i> <span class="visible-xs-inline-block">User</span><span class="badge" '.$style.'>'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+}
 ?>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
