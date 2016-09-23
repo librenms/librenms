@@ -54,8 +54,18 @@ class Proc
      * @param bool $blocking set the output pipes to blocking (default: false)
      * @throws Exception the command was unable to execute
      */
-    public function __construct($cmd, $descriptorspec, $cwd = null, $env = null, $blocking = false)
-    {
+    public function __construct(
+        $cmd,
+        $descriptorspec = array(
+            0 => array("pipe", "r"),
+            1 => array("pipe", "w"),
+            2 => array("pipe", "w")
+        ),
+        $cwd = null,
+        $env = null,
+        $blocking = false
+    ) {
+        echo "Starting process: $cmd";
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
         if (!is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
@@ -102,10 +112,7 @@ class Proc
      */
     public function sendCommand($command)
     {
-        if (!ends_with($command, PHP_EOL)) {
-            $command .= PHP_EOL;
-        }
-        $this->sendInput($command);
+        $this->sendInput($this->checkAddEOL($command));
 
         return $this->getOutput();
     }
@@ -140,22 +147,35 @@ class Proc
     }
 
     /**
+     * Close all pipes for this process
+     */
+    private function closePipes()
+    {
+        foreach ($this->_pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+    }
+
+    /**
      * Attempt to gracefully close this process
      * optionally send one last piece of input
      * such as a quit command
      *
-     * @param string $cmd the final command to send
+     * ** Warning: this will block until the process closes.
+     * Some processes might not close on their own.
+     *
+     * @param string $command the final command to send (appends newline if one is ommited)
      * @return int the exit status of this process (-1 means error)
      */
-    public function close($cmd = null)
+    public function close($command = null)
     {
-        if (isset($cmd)) {
-            $this->sendInput($cmd);
+        if (isset($command)) {
+            $this->sendInput($this->checkAddEOL($command));
         }
 
-        fclose($this->_pipes[0]);
-        fclose($this->_pipes[1]);
-        fclose($this->_pipes[2]);
+        $this->closePipes();
 
         return proc_close($this->_process);
     }
@@ -172,8 +192,7 @@ class Proc
     {
         $status = $this->getStatus();
 
-        fclose($this->_pipes[1]);
-        fclose($this->_pipes[2]);
+        $this->closePipes();
 
         $closed = proc_terminate($this->_process, $signal);
 
@@ -233,5 +252,20 @@ class Proc
     public function setSynchronous($synchronous)
     {
         $this->_synchronous = $synchronous;
+    }
+
+    /**
+     * Add and end of line character to a string if
+     * it doesn't already end with one
+     *
+     * @param $string
+     * @return string
+     */
+    private function checkAddEOL($string)
+    {
+        if (!ends_with($string, PHP_EOL)) {
+            $string .= PHP_EOL;
+        }
+        return $string;
     }
 }
