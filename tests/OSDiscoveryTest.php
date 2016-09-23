@@ -1136,7 +1136,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testRiverbed()
     {
-        $this->checkOS('riverbed', 'Something that we do not have', '1.3.6.1.4.1.17163.1.1');
+        $this->checkOS('riverbed', 'Something that we do not have', '.1.3.6.1.4.1.17163.1.1');
     }
 
     public function testRouteros()
