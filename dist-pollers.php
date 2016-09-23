@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-chdir(dirname($argv[0]));
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';

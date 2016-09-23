@@ -112,6 +112,7 @@ $ifmib_oids = array(
     'ifDescr',
     'ifAdminStatus',
     'ifOperStatus',
+    'ifLastChange',
     'ifType',
     'ifPhysAddress',
     'ifMtu',
@@ -129,11 +130,11 @@ if (!in_array($device['hardware'], $config['os'][$device['os']]['bad_ifXEntry'])
 
 $hc_test = array_slice($port_stats, 0, 1);
 if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
-    $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
 } else {
     foreach ($ifmib_oids as $oid) {
         echo "$oid ";
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
     }
 }
 
@@ -422,6 +423,13 @@ foreach ($ports as $port) {
             $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
         }
 
+        // update ifLastChange. only in the db, not rrd
+        if (isset($this_port['ifLastChange']) && is_numeric($this_port['ifLastChange'])) {
+            $port['update']['ifLastChange'] = $this_port['ifLastChange'];
+        } elseif ($port['ifLastChange'] != 0) {
+            $port['update']['ifLastChange'] = 0;  // no data, so use the same as device uptime
+        }
+
         // Set VLAN and Trunk from Cisco
         if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != 'notApplicable') {
             $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
@@ -471,6 +479,9 @@ foreach ($ports as $port) {
                     echo $oid.' ';
                 }
             } elseif ($port[$oid] != $this_port[$oid]) {
+                // if the value is different, update it
+
+                // rrdtune if needed
                 $port_tune = $attribs['ifName_tune:'.$port['ifName']];
                 $device_tune = $attribs['override_rrdtool_tune'];
                 if ($port_tune == "true" ||
@@ -480,10 +491,15 @@ foreach ($ports as $port) {
                         $tune_port = true;
                     }
                 }
+
+                // set the update data
                 $port['update'][$oid] = $this_port[$oid];
+
+                // store the previous values for alerting
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
                     $port['update'][$oid.'_prev'] = $port[$oid];
                 }
+
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');

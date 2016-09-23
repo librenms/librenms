@@ -102,6 +102,8 @@ if (isset($sort) && !empty($sort)) {
         $sql .= " ORDER BY `D`.`hostname` $sort_order";
     } elseif ($sort_column == 'port') {
         $sql .= " ORDER BY `ifDescr` $sort_order";
+    } elseif ($sort_column == 'ifLastChange') {
+        $sql .= " ORDER BY `secondsIfLastChange` $sort_order";
     } else {
         $sql .= " ORDER BY `$sort_column` $sort_order";
     }
@@ -116,9 +118,12 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT DISTINCT(`ports`.`port_id`),`ports`.* $sql";
+$query = 'SELECT DISTINCT(`ports`.`port_id`),`ports`.*';
+// calculate ifLastChange as seconds ago
+$query .= ',`D`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange ';
+$query .= $sql;
 
-foreach (dbFetchRows($sql, $param) as $port) {
+foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
 
     // FIXME what actions should we have?
@@ -138,9 +143,12 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $response[] = array(
         'device' => generate_device_link($device),
         'port' => generate_port_link($port),
+        'ifLastChange' => ceil($port['secondsIfLastChange']),
+        'ifConnectorPresent' => ($port['ifConnectorPresent'] == 'true') ? 'yes' : 'no',
         'ifSpeed' => $port['ifSpeed'],
-        'ifInOctets_rate' => $port['ifInOctets_rate'],
-        'ifOutOctets_rate' => $port['ifOutOctets_rate'],
+        'ifMtu' => $port['ifMtu'],
+        'ifInOctets_rate' => $port['ifInOctets_rate'] * 8,
+        'ifOutOctets_rate' => $port['ifOutOctets_rate'] * 8,
         'ifInUcastPkts_rate' => $port['ifInUcastPkts_rate'],
         'ifOutUcastPkts_rate' => $port['ifOutUcastPkts_rate'],
         'ifInErrors' => $port['ifInErrors'],

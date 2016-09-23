@@ -1,9 +1,12 @@
+#!/usr/bin/env php
 <?php
 
 /*
  * Daily Task Checks
  * (c) 2013 LibreNMS Contributors
  */
+
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';

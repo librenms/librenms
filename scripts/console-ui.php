@@ -1,11 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require '../html/includes/functions.inc.php';
+chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
+
+require 'includes/defaults.inc.php';
+require 'config.php';
+require_once 'includes/definitions.inc.php';
+require 'includes/functions.php';
+require 'html/includes/functions.inc.php';
 
 $console_color = new Console_Color2();
 
@@ -88,7 +90,7 @@ while ($end == 0) {
                 $port_speed = humanspeed($port['ifSpeed']);
             }
 
-            if ($port[ifDuplex] != 'unknown') {
+            if ($port['ifDuplex'] != 'unknown') {
                 $port_duplex = $port['ifDuplex'];
             }
 
@@ -108,22 +110,18 @@ while ($end == 0) {
         echo $options['list'];
         echo "Usage of console-ui.php:
 
-            -l      What log type we want to see:
-            eventlog = Event log messages
-            syslog = Syslog messages
+ -l              What log type we want to see:
+                   eventlog = Event log messages
+                   syslog = Syslog messages
+ -d              Specify the device id to filter results
+ --list          What to list
+                   devices = list devices and device id's
+ --device-stats  Lists the port statistics for a given device
 
-            -d      Specify the device id to filter results
-
-            --list   What to list
-            devices = list devices and device id's
-
-            --device-stats      Lists the port statistics for a given device
-
-            Examples:
-            #1 php console-ui.php -l eventlog -d 1
-            #2 php console-ui.php --list=devices
-
-            ";
+ Examples:
+  #1 php console-ui.php -l eventlog -d 1
+  #2 php console-ui.php --list=devices
+";
         exit;
     }//end if
     echo print $console_color->convert('%rLast update at '.date('Y-m-d h:i:s')."%n\n\n");

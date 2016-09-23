@@ -128,6 +128,11 @@ LibreNMS contributors:
 - Piotr Jurga <deutor1361@gmail.com> (deutor)
 - Jonathon Koyle <jonathon.koyle@gmail.com> (jonathon-k)
 - Tamas Szabo <jobs@szatam.com> (szatam)
+- Dennis Væversted <dv@zitcom.dk> (dvaeversted)
+- Morgan Henreaux <morgan@henreaux.com> (mhenreaux)
+- Yves Boudreau <yves.boudreau@bgp.ca> (boudreau)
+- Konrad Bechler <konrad@bechler.pl> (kbechler)
+- Florent Bruchez <ftbz@me.com> (ftbz)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

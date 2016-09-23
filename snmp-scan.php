@@ -29,9 +29,9 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 
-$ts = microtime(true);
+chdir(__DIR__); // cwd to the directory containing this script
 
-chdir(dirname($argv[0]));
+$ts = microtime(true);
 
 require 'includes/defaults.inc.php';
 require 'config.php';

@@ -117,7 +117,7 @@ function user_exists($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname=${username})",
+        get_auth_ad_user_filter($username),
         array('samaccountname')
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -150,7 +150,7 @@ function get_userlevel($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         array('memberOf')
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -183,7 +183,7 @@ function get_userid($username)
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $search);
@@ -217,34 +217,27 @@ function get_userlist()
     $ldap_groups = get_group_list();
 
     foreach ($ldap_groups as $ldap_group) {
-        $group_cn = get_cn($ldap_group);
-        $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], "(cn={$group_cn})", array('member'));
-        $entries = ldap_get_entries($ldap_connection, $search);
+        $search_filter = "(memberOf=$ldap_group)";
+        if ($config['auth_ad_user_filter']) {
+            $search_filter = "(&{$config['auth_ad_user_filter']}$search_filter)";
+        }
+        $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, array('samaccountname','displayname','objectsid','mail'));
+        $results = ldap_get_entries($ldap_connection, $search);
 
-        foreach ($entries[0]['member'] as $member) {
-            $member_cn = get_cn($member);
-            $search = ldap_search(
-                $ldap_connection,
-                $config['auth_ad_base_dn'],
-                "(cn={$member_cn})",
-                array('sAMAccountname', 'displayName', 'objectSID', 'mail')
-            );
-            $results = ldap_get_entries($ldap_connection, $search);
-            foreach ($results as $result) {
-                if (isset($result['samaccountname'][0])) {
-                    $userid = preg_replace(
-                        '/.*-(\d+)$/',
-                        '$1',
-                        sid_from_ldap($result['objectsid'][0])
-                    );
+        foreach ($results as $result) {
+            if (isset($result['samaccountname'][0])) {
+                $userid = preg_replace(
+                    '/.*-(\d+)$/',
+                    '$1',
+                    sid_from_ldap($result['objectsid'][0])
+                );
 
-                    // don't make duplicates, user may be member of more than one group
-                    $userhash[$result['samaccountname'][0]] = array(
-                            'realname' => $result['displayName'][0],
-                            'user_id'  => $userid,
-                            'email'    => $result['mail'][0]
-                            );
-                }
+                // don't make duplicates, user may be member of more than one group
+                $userhash[$result['samaccountname'][0]] = array(
+                    'realname' => $result['displayName'][0],
+                    'user_id'  => $userid,
+                    'email'    => $result['mail'][0]
+                );
             }
         }
     }
@@ -290,7 +283,7 @@ function get_fullname($username)
     $result = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$username})",
+        get_auth_ad_user_filter($username),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $result);
@@ -339,7 +332,7 @@ function get_dn($samaccountname)
     $result = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
-        "(samaccountname={$samaccountname})",
+        get_auth_ad_group_filter($samaccountname),
         $attributes
     );
     $entries = ldap_get_entries($ldap_connection, $result);
