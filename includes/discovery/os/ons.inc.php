@@ -1,6 +1,5 @@
 <?php
-if (!$os) {
-    if (str_contains($sysDescr, 'Cisco ONS')) {
-        $os = 'ons';
-    }
+
+if (str_contains($sysDescr, 'Cisco ONS')) {
+    $os = 'ons';
 }
