@@ -91,6 +91,7 @@ pages:
     - Support/Performance.md
     - Support/Poller Support.md
     - Support/Support-New-OS.md
+    - Support/SNMP-Configuration-Examples.md
 - hidden:
     - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
     - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
