@@ -1872,7 +1872,6 @@ label {
 .device-availability, .service-availability {
   color:#000000;
   float:left;
-  width:163px;
   height:64px;
   margin:10px;
   padding:8px;
@@ -1990,4 +1989,8 @@ label {
   width:12px;
   float:left;
   background-color: #D9534F;
+}
+
+.availability-map-widget-header {
+  line-height:30px;
 }
