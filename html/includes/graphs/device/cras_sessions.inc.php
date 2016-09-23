@@ -15,7 +15,7 @@ $rrd_options .= " DEF:webvpn=$rrd_filename:webvpn:AVERAGE";
 
 $rrd_options .= " COMMENT:'Sessions            Current    Average    Maximum\\n'";
 
-$rrd_options .= " AREA:svc#1985A1:'AnyConnect    ':STACK";
+$rrd_options .= " AREA:svc#1985A1:'SSL VPN Client':STACK";
 $rrd_options .= " GPRINT:svc:LAST:'%8.2lf'";
 $rrd_options .= " GPRINT:svc:AVERAGE:' %8.2lf'";
 $rrd_options .= " GPRINT:svc:MAX:' %8.2lf\\\\n'";
