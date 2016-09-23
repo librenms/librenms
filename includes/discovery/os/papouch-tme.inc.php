@@ -1,9 +1,5 @@
 <?php
 
-if (!$os) {
-    if ($sysDescr == 'SNMP TME') {
-        $os = 'papouch-tme';
-    } elseif ($sysDescr == 'TME') {
-        $os = 'papouch-tme';
-    }
+if (str_contains($sysDescr, array('SNMP TME', 'TME'))) {
+    $os = 'papouch-tme';
 }
