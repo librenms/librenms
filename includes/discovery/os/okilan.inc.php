@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'OKI OkiLAN')) {
-        $os = 'okilan';
-    }
+if (str_contains($sysDescr, 'OKI OkiLAN')) {
+    $os = 'okilan';
 }
