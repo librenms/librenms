@@ -313,6 +313,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cimc', 'Cisco Integrated Management Controller');
     }
 
+    public function testCips()
+    {
+        $this->checkOS('cips', 'Cisco Intrusion Prevention System');
+    }
+
     public function testCiscosb()
     {
         $this->checkOS('ciscosb', 'Something that we do not have', '.1.3.6.1.4.1.9.6.1.80');
