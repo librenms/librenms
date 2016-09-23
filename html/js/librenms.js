@@ -213,11 +213,11 @@ $(document).on("click", '.collapse-neighbors', function(event)
     var list = caller.find('.neighbors-interface-list');
     var continued = caller.find('.neighbors-list-continued');
 
-    if(button.hasClass("glyphicon-plus")) {
-        button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
+    if(button.hasClass("fa-plus")) {
+        button.addClass('fa-minus').removeClass('fa-plus');
     }
     else {
-        button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        button.addClass('fa-plus').removeClass('fa-minus');
     }
    
     list.toggle();

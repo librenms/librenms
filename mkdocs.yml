@@ -55,6 +55,7 @@ pages:
     - Extensions/MIB-based-polling.md
     - Extensions/Memcached.md
     - Extensions/Network-Map.md
+    - Extensions/NFSen.md
     - Extensions/Oxidized.md
     - Extensions/Plugin-System.md
     - Extensions/Poller-Service.md
@@ -91,6 +92,7 @@ pages:
     - Support/Performance.md
     - Support/Poller Support.md
     - Support/Support-New-OS.md
+    - Support/SNMP-Configuration-Examples.md
 - hidden:
     - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
     - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md

@@ -1,6 +1,6 @@
 <?php
 
-if (starts_with('ZyWALL 2X', $sysDescr)) {
+if (starts_with($sysDescr, 'ZyWALL 2X')) {
     $os = 'zywall';
 }
 
