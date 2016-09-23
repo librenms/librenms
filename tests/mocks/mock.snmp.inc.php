@@ -65,7 +65,7 @@ function snmprec_get($community)
 {
     global $snmpMockCache;
     cache_snmprec($community);
-    var_dump($snmpMockCache);
+    d_echo($snmpMockCache);
 
     if (isset($snmpMockCache[$community])) {
         return $snmpMockCache[$community];

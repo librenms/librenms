@@ -237,7 +237,6 @@ function check_unit($passthru = false, $command_only = false, $snmpsim = false)
             echo "success\n";
         }
     }
-    $proc_snmpsimd->terminate();
 
     return $phpunit_ret;
 }
