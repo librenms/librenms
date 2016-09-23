@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.935.10') || str_contains($sysDescr, 'Network Management Card for UPS')) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.935.10') || starts_with($sysDescr, 'Network Management Card for UPS')) {
     $os = 'powerwalker';
 }
