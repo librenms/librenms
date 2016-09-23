@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (starts_with($sysObjectId, array('.1.3.6.1.4.1.2879.1.9.2','.1.3.6.1.4.1.177.15.1.1.1'))) {
-        $os = 'sonus-sbc';
-    }
+if (starts_with($sysObjectId, array('.1.3.6.1.4.1.2879.1.9.2', '.1.3.6.1.4.1.177.15.1.1.1'))) {
+    $os = 'sonus-sbc';
 }
