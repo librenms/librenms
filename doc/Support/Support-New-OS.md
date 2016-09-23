@@ -423,32 +423,54 @@ We have a testing unit for new OS', please ensure you add a test for any new OS'
 The OS test unit file is located `tests/OSDiscoveryTest.php`. An example of this is as follows:
 
 ```php
-    public function testZxr10()
+    public function testNios()
     {
-        $this->checkOS('zxr10', 'ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23');
+        $this->checkOS('nios');
+        $this->checkOS('nios', 'nios-ipam');
     }
 ```
 
-This test looks for the sysDescr of `ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23` and if it matches 
-the `zxr10` OS discovery file then the check will pass.
 
-A slightly more complicated test would be:
-
-```php
-    public function testAiros()
-    {
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
-
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-        );
-        $this->checkOS('airos', 'Linux', '', $mockSnmp);
-    }
+We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing for OS discovery. For this to work you need
+to supply an snmprec file. This is pretty simple and using nios as the example again this would look like:
+```
+1.3.6.1.2.1.1.1.0|4|Linux 3.14.25 #1 SMP Thu Jun 16 18:19:37 EDT 2016 x86_64
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.7779.1.1402
 ```
 
-The first two `$this->checkOS` calls pass on both a `sysDescr` value (`Linux`) and a `sysObjectID`.
+During testing LibreNMS will use any info in the snmprec file for snmp calls.  This one provides 
+sysDescr (`.1.3.6.1.2.1.1.1.0`, 4 = Octet String) and sysObjectID (`.1.3.6.1.2.1.1.2.0`, 6 = Object Identifier),
+ which is the minimum that should be provided for new snmprec files.
 
-The third call uses another snmp response (although fake) which the specific OS discovery for `airos` relies on.
+To look up the numeric OID and type of an string OID with snmptranslate:
+```bash
+snmptranslate -On -Td SNMPv2-MIB::sysDescr.0
+```
 
-You can run `scripts/pre-commit.php -u` to run the unit tests to check your code.
+Common OIDs used in discovery:
+
+| String OID                          | Numeric OID                 |
+| ----------------------------------- | --------------------------- |
+| SNMPv2-MIB::sysDescr.0              | 1.3.6.1.2.1.1.1.0           |
+| SNMPv2-MIB::sysObjectID.0           | 1.3.6.1.2.1.1.2.0           |
+| ENTITY-MIB::entPhysicalDescr.1      | 1.3.6.1.2.1.47.1.1.1.1.2.1  |
+| ENTITY-MIB::entPhysicalMfgName.1    | 1.3.6.1.2.1.47.1.1.1.1.12.1 |
+| SML-MIB::product-Name.0             | 1.3.6.1.4.1.2.6.182.3.3.1.0 |
+
+List of SNMP data types:
+
+| Type              | Value         |
+| ----------------- | ------------- |
+| OCTET STRING      | 4             |
+| Integer32         | 2             |
+| NULL              | 5             |
+| OBJECT IDENTIFIER | 6             |
+| IpAddress         | 64            |
+| Counter32         | 65            |
+| Gauge32           | 66            |
+| TimeTicks         | 67            |
+| Opaque            | 68            |
+| Counter64         | 70            |
+
+You can run `./scripts/pre-commit.php -u` to run the unit tests to check your code.
+If you would like to run tests locally against a full snmpsim instance, run `./scripts/pre-commit.php -u --snmpsim`.
