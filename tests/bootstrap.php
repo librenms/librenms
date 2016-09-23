@@ -45,8 +45,8 @@ if (getenv('SNMPSIM')) {
     require $install_dir . '/tests/mocks/mock.snmp.inc.php';
 }
 
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL & ~E_WARNING);
+ini_set('display_errors', 1);
+error_reporting(E_ALL & ~E_WARNING);
 //error_reporting(E_ALL);
 //$debug=true;
 //$vdebug=true;
