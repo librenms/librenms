@@ -9,6 +9,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
     $vtpdomain_id = '1';
     $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'IEEE8021-Q-BRIDGE-MIB');
+    $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'IEEE0821-Q-BRIDGE-MIB');
+    $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'IEEE0821-Q-BRIDGE-MIB');
 
     foreach ($vlans as $vlan_id => $vlan) {
         echo " $vlan_id";
