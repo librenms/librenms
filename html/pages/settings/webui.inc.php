@@ -19,8 +19,8 @@ $graph_conf = array(
 );
 
 $availability_map_conf = array(
-    array('name'               => 'webui.old_availability_map',
-          'descr'              => 'Availability map old view',
+    array('name'               => 'webui.availability_map_compact',
+          'descr'              => 'Availability map compact view',
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_sort_status',
@@ -30,6 +30,10 @@ $availability_map_conf = array(
     array('name'               => 'webui.availability_map_use_device_groups',
           'descr'              => 'Use device groups filter',
           'type'               => 'checkbox',
+    ),
+    array('name'               => 'webui.availability_map_box_size',
+          'descr'              => 'Availability box width',
+          'type'               => 'numeric',
     ),
 );
 

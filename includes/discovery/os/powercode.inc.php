@@ -12,9 +12,6 @@
  * the source code distribution for details.
  */
 
-// sysDescr.0 = STRING: Powercode BMU
-if (!$os) {
-    if (stristr($sysDescr, 'Powercode BMU')) {
-        $os = 'powercode';
-    }
+if (str_contains($sysDescr, 'Powercode BMU')) {
+    $os = 'powercode';
 }

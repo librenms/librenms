@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^NetBSD/', $sysDescr)) {
-        $os = 'netbsd';
-    }
+if (starts_with($sysDescr, 'NetBSD')) {
+    $os = 'netbsd';
 }

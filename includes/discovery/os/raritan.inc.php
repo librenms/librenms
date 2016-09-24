@@ -1,19 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Raritan')) {
-        $os = 'raritan';
-    }
-}
-
-if (!$os) {
-    if (strstr($sysDescr, 'PX2')) {
-        $os = 'raritan';
-    }
-}
-
-if (!$os) {
-    if (strstr($sysDescr, 'Raritan')) {
-        $os = 'raritan';
-    }
+if (str_contains($sysDescr, array('Raritan', 'PX2'))) {
+    $os = 'raritan';
 }

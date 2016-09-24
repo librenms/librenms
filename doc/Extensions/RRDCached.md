@@ -8,7 +8,7 @@ If you have rrdcached 1.5.5 or above, we can also tune over rrdcached.
 To enable this set the following config:
 
 ```php
-$config['rrdtool_version'] = 1.5.5;
+$config['rrdtool_version'] = '1.5.5';
 ```
 
 ### Support matrix
