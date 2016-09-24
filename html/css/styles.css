@@ -1958,13 +1958,13 @@ label {
 }
 
 .page-availability-title-left {
-  width:50%;
+  width:40%;
   float:left;
   height:40px;
 }
 
 .page-availability-title-right {
-  width:50%;
+  width:60%;
   float:left;
   text-align:right;
 }
