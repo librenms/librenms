@@ -1,28 +1,17 @@
 <?php
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.80')) {
-        $os = 'ciscosb';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.81')) {
-        $os = 'ciscosb';
-    }
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.82')) {
-        $os = 'ciscosb';
-    }
 
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.83')) {
-        $os = 'ciscosb';
-    }
+$ciscosb_id = array(
+    '.1.3.6.1.4.1.9.6.1.80',
+    '.1.3.6.1.4.1.9.6.1.81',
+    '.1.3.6.1.4.1.9.6.1.82',
+    '.1.3.6.1.4.1.9.6.1.83',
+    '.1.3.6.1.4.1.9.6.1.85',
+    '.1.3.6.1.4.1.9.6.1.88',
+    '.1.3.6.1.4.1.9.6.1.89',
+);
 
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.85')) {
+if (starts_with($sysObjectId, $ciscosb_id)) {
         $os = 'ciscosb';
-    }
-
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.88')) {
-        $os = 'ciscosb';
-    }
-
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.9.6.1.89')) {
-        $os = 'ciscosb';
-    }
 }
+
+unset($ciscosb_id);
