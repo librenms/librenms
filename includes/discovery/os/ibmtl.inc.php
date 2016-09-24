@@ -12,6 +12,6 @@
 
 $ibmtl_snmpget = snmp_get($device, 'SML-MIB::product-Name.0', '-Oqv', '');
 
-if (str_contains($ibmtl_snmpget, 'IBM System Storage TS3500 Tape Library')) {
+if (str_contains($ibmtl_snmpget, 'IBM System Storage TS3500 Tape Library', true)) {
     $os = 'ibmtl';
 }

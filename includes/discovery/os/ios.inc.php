@@ -4,14 +4,6 @@ if (str_contains($sysDescr, array('Cisco Internetwork Operating System Software'
     $os = 'ios';
 }
 
-if (str_contains($sysDescr, 'IOS-XE')) {
-    $os = 'iosxe';
-}
-
-if (str_contains($sysDescr, 'IOS XR')) {
-    $os = 'iosxr';
-}
-
 if (!empty($os)) {
     $extra_mibs = array(
         "ciscoAAASessionMIB" => "CISCO-AAA-SESSION-MIB",
