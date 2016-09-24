@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.8072.3.2.16') && str_contains($sysObjectId, array('Darwin Kernel Version 15', 'Darwin Kernel Version 16'))) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.8072.3.2.16') || str_contains($sysDescr, array('Darwin Kernel Version 15', 'Darwin Kernel Version 16'))) {
     $os = 'macosx';
 }
