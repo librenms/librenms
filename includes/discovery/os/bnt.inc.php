@@ -1,11 +1,7 @@
 <?php
 
-if (!$os) {
-    if (stristr($sysDescr, 'Blade Network Technologies')) {
-        $os = 'bnt';
-    }
-
-    if (preg_match('/^BNT /', $sysDescr)) {
-        $os = 'bnt';
-    }
+if (str_contains($sysDescr, 'Blade Network Technologies', true)) {
+    $os = 'bnt';
+} elseif (starts_with($sysDescr, 'BNT ')) {
+    $os = 'bnt';
 }
