@@ -17,6 +17,7 @@
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
 */
 
 require 'includes/graphs/common.inc.php';
@@ -33,7 +34,6 @@ $addarea       = 1;
 $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 $array    = array(
-    'battery_low' => array('descr' => 'Low','colour' => '630606',),
     'battery_voltage' => array('descr' => 'Current','colour' => '50C150',),
 );
 
