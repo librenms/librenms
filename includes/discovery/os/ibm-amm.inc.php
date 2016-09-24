@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (stristr($sysDescr, 'BladeCenter Advanced Management Module')) {
-        $os = 'ibm-amm';
-    }
+if (str_contains($sysDescr, 'BladeCenter Advanced Management Module')) {
+    $os = 'ibm-amm';
 }
