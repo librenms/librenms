@@ -1360,3 +1360,21 @@ function get_auth_ad_group_filter($groupname)
     }
     return $group_filter;
 }
+
+/**
+ * @param $filename
+ * @param $output
+ */
+function file_download($filename, $output)
+{
+    $length = strlen($output);
+    header('Content-Description: File Transfer');
+    header('Content-Type: text/plain');
+    header("Content-Disposition: attachment; filename=$filename");
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Length: ' . $length);
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Expires: 0');
+    header('Pragma: public');
+    echo $output;
+}
