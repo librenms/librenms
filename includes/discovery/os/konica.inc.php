@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'KONICA MINOLTA ')) {
-        $os = 'konica';
-    }
+if (str_contains($sysDescr, 'KONICA MINOLTA ')) {
+    $os = 'konica';
 }
