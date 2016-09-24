@@ -9,8 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (!$os) {
-    if (strpos($sysObjectId, '.1.3.6.1.4.1.5651.1.102.21') !== false) {
-        $os = 'mypoweros';
-    }
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.5651.1.102.21')) {
+    $os = 'mypoweros';
 }
