@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'MGE Switched PDU')) {
-        $os = 'mgepdu';
-    }
+if (str_contains($sysDescr, 'MGE Switched PDU')) {
+    $os = 'mgepdu';
 }
