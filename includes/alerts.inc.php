@@ -160,13 +160,14 @@ function RunRules($device)
         return false;
     }
     foreach (GetRules($device) as $rule) {
-        echo " #".$rule['id'].":";
+        c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
         $inv = json_decode($rule['extra'], true);
         if (isset($inv['invert'])) {
             $inv = (bool) $inv['invert'];
         } else {
             $inv = false;
         }
+        d_echo(PHP_EOL);
         $chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         $sql = GenSQL($rule['rule']);
         $qry = dbFetchRows($sql, array($device));
@@ -185,30 +186,31 @@ function RunRules($device)
         }
         if ($doalert) {
             if ($chk['state'] === "2") {
-                echo " SKIP  ";
+                c_echo('Status: %ySKIP');
             } elseif ($chk['state'] >= "1") {
-                echo " NOCHG ";
+                c_echo('Status: %bNOCHG');
             } else {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
                 if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
                     if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
                         dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                     }
-                    echo " ALERT ";
+                    c_echo(PHP_EOL . 'Status: %rALERT');
                 }
             }
         } else {
             if ($chk['state'] === "0") {
-                echo " NOCHG ";
+                c_echo('Status: %bNOCHG');
             } else {
                 if (dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id']), 'alert_log')) {
                     if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
                         dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
                     }
-                    echo " OK    ";
+                    c_echo(PHP_EOL . 'Status: %gOK');
                 }
             }
         }
+        c_echo('%n' . PHP_EOL);
     }
 }
 
