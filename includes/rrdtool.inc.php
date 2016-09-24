@@ -81,10 +81,10 @@ function rrdtool_close()
     /** @var Proc $rrd_async_process */
 
     if (rrdtool_running($rrd_sync_process)) {
-        $rrd_sync_process->close('quit');
+        $rrd_sync_process->sendCommand('quit');
     }
     if (rrdtool_running($rrd_async_process)) {
-        $rrd_async_process->close('quit');
+        $rrd_async_process->sendCommand('quit');
     }
 }
 
