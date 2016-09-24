@@ -150,12 +150,6 @@ if (defined('SHOW_SETTINGS')) {
             $sql .= ' WHERE';
         }
 
-        /*
-        if ($show_disabled_ignored != 1) {
-             $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' AND";
-        }
-        */
-
         if ($config['webui']['availability_map_use_device_groups'] != 0 && isset($in_devices)) {
             $sql .= " `D`.`device_id` IN (".$in_devices.")";
         } else {
