@@ -1363,11 +1363,11 @@ function get_auth_ad_group_filter($groupname)
 
 /**
  * @param $filename
- * @param $output
+ * @param $content
  */
-function file_download($filename, $output)
+function file_download($filename, $content)
 {
-    $length = strlen($output);
+    $length = strlen($content);
     header('Content-Description: File Transfer');
     header('Content-Type: text/plain');
     header("Content-Disposition: attachment; filename=$filename");
@@ -1376,5 +1376,5 @@ function file_download($filename, $output)
     header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
     header('Expires: 0');
     header('Pragma: public');
-    echo $output;
+    echo $content;
 }
