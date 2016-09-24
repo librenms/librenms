@@ -91,6 +91,9 @@ function nicecase($item)
         case 'ups-nut':
             return 'UPS nut';
 
+        case 'ups-apcups':
+            return 'UPS apcups';
+
         default:
             return ucfirst($item);
     }
