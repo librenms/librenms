@@ -2,9 +2,7 @@
 
 if (str_contains($sysDescr, 'EMC SOHO-NAS Storage.')) {
     $os = 'lenovoemc';
-}
 
-if (!empty($os)) {
     $lenovoemc_mibs = array(
         "fanValue"  => "IOMEGANAS-MIB",
         "tempValue"     => "IOMEGANAS-MIB",
