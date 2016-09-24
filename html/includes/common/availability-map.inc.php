@@ -266,18 +266,18 @@ if (defined('SHOW_SETTINGS')) {
             <span class="page-availability-title">Availability map for</span>
             <select id="mode" class="page-availability-report-select" name="mode">';
 
-            if ($config['show_services'] == 0) {
-                $temp_header[] = '<option value="0" selected>only devices</option>';
-            } else {
-                foreach ($select_modes as $mode_select => $option) {
-                    if ($mode_select == $mode) {
-                        $selected = 'selected';
-                    } else {
-                        $selected = '';
-                    }
-                    $temp_header[] = '<option value="' . $mode_select . '" ' . $selected . '>' . $option . '</option>';
+        if ($config['show_services'] == 0) {
+            $temp_header[] = '<option value="0" selected>only devices</option>';
+        } else {
+            foreach ($select_modes as $mode_select => $option) {
+                if ($mode_select == $mode) {
+                    $selected = 'selected';
+                } else {
+                    $selected = '';
                 }
+                $temp_header[] = '<option value="' . $mode_select . '" ' . $selected . '>' . $option . '</option>';
             }
+        }
 
         $temp_header[] =
             '</select>
