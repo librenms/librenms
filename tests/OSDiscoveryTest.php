@@ -663,6 +663,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIosxe()
     {
         $this->checkOS('iosxe');
+        $this->checkOS('iosxe', 'iosxe-asr1000');
     }
 
     public function testIosxr()
