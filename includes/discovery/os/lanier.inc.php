@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'LANIER')) {
-        $os = 'lanier';
-    }
+if (str_contains($sysDescr, 'LANIER')) {
+    $os = 'lanier';
 }
