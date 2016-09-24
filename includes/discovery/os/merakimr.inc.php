@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (preg_match('/^Meraki MR/', $sysDescr)) {
-        $os = 'merakimr';
-    }
+if (starts_with($sysDescr, 'Meraki MR')) {
+    $os = 'merakimr';
 }
