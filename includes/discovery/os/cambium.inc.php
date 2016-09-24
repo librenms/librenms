@@ -11,6 +11,6 @@
 
 if (starts_with($sysDescr, array('Cambium PTP 50650', 'PTP250', 'Cambium'))) {
     $os = 'cambium';
-} elseif (starts_with($sysObjectId, array('.1.3.6.1.4.1.17713.21', 'enterprises.17713.21'))) {
+} elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
     $os = 'cambium';
 }
