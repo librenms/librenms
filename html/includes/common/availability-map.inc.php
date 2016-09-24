@@ -38,7 +38,7 @@ if (defined('SHOW_SETTINGS')) {
     <form class="form" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="title" class="control-label availability-map-widget-header">Widget title:</label>
+                <label for="title" class="control-label availability-map-widget-header">Widget title</label>
             </div>
             <div class="col-sm-6">
                 <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($widget_settings['title']).'">
@@ -49,7 +49,7 @@ if (defined('SHOW_SETTINGS')) {
         $common_output[] = '
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="tile_width" class="control-label availability-map-widget-header">Tile width:</label>
+                <label for="tile_width" class="control-label availability-map-widget-header">Tile width</label>
             </div>      
             <div class="col-sm-6">
                 <input type="text" class="form-control" name="tile_width" value="'.$compact_tile.'">
@@ -68,7 +68,7 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <div class="form-group">
         <div class="col-sm-4">
-            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled and ignored</label>
+            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled/ignored</label>
         </div>
         <div class="col-sm-6">
             <select class="form-control" name="show_disabled_and_ignored">
