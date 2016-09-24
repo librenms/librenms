@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (preg_match('/^LigoPTP/', $sysDescr)) {
-        $os = 'ligoos';
-    }
+if (starts_with($sysDescr, 'LigoPTP')) {
+    $os = 'ligoos';
 }

@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'KYOCERA ')) {
-        $os = 'kyocera';
-    }
+if (str_contains($sysDescr, 'KYOCERA ')) {
+    $os = 'kyocera';
 }

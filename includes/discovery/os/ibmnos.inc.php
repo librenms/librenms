@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (stristr($sysDescr, 'IBM Networking Operating System') || stristr($sysDescr, 'IBM Flex System Fabric') || stristr($sysDescr, 'IBM Networking OS')) {
-        $os = 'ibmnos';
-    }
+if (str_contains($sysDescr, array('IBM Networking Operating System', 'IBM Flex System Fabric', 'IBM Networking OS'))) {
+    $os = 'ibmnos';
 }

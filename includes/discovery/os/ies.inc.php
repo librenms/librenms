@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'IES-') && !strstr($sysDescr, 'Cisco Systems')) {
-        $os = 'ies';
-    }
+if (str_contains($sysDescr, 'IES-') && !str_contains($sysDescr, 'Cisco Systems')) {
+    $os = 'ies';
 }
