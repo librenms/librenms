@@ -28,11 +28,12 @@ $ups_nut = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
-list ($charge, $remaining, $bat_volt, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
+list ($charge, $battery_low, $remaining, $bat_volt, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
     'DS:charge:GAUGE:600:0:100',
+    'DS:battery_low:GAUGE:600:0:100',
     'DS:time_remaining:GAUGE:600:0:U',
     'DS:battery_voltage:GAUGE:600:0:U',
     'DS:input_voltage:GAUGE:600:0:U',
@@ -42,6 +43,7 @@ $rrd_def = array(
 
 $fields = array(
     'charge' => $charge,
+    'battery_low' => $battery_low,
     'time_remaining' => $remaining/60,
     'battery_voltage' => $bat_volt,
     'input_voltage' => $line_volt,
