@@ -1562,13 +1562,12 @@ function hytera_h2f($number, $nd)
 
 /*
  * Cisco CIMC functions
- * ./includes/discovery/cisco-cimc.inc.php
  */
 // Create an entry in the entPhysical table if it doesnt already exist.
 function setCIMCentPhysical($location, $data, &$entphysical, &$index)
 {
     // Go get the location, this will create it if it doesnt exist.
-    getCIMCentPhysical($location, $entphysical, $index);
+    $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
 
     // See if we need to update
     $update = array();
@@ -1584,7 +1583,8 @@ function setCIMCentPhysical($location, $data, &$entphysical, &$index)
     if (count($update) > 0) {
         dbUpdate($update, 'entPhysical', '`entPhysical_id` = ?', array($entphysical[$location]['entPhysical_id']));
     }
-    return $entphysical[$location]['entPhysical_id'];
+    $entPhysicalId = $entphysical[$location]['entPhysical_id'];
+    return array($entPhysicalId, $entPhysicalIndex);
 }
 
 function getCIMCentPhysical($location, &$entphysical, &$index)
