@@ -9,10 +9,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (preg_match('/^CANOPY/', $sysDescr)) {
-        $os = 'canopy';
-    } elseif (preg_match('/^CMM/', $sysDescr)) {
-        $os = 'canopy';
-    }
+if (starts_with($sysDescr, array('CANOPY', 'CMM'))) {
+    $os = 'canopy';
 }
