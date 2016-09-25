@@ -13,5 +13,7 @@
 if (empty($os)) {
     if (strstr($sysDescr, 'Cisco FX-OS')) {
         $os = 'fxos';
+    } elseif (preg_match('/[0-9.]+sf.(virtual|cisco)-[0-9]+/', $sysDescr)) {
+        $os = 'fxos';
     }
 }

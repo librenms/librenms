@@ -558,6 +558,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFxos()
     {
         $this->checkOS('fxos');
+        $this->checkOS('fxos', 'fxos-firepower-1');
+        $this->checkOS('fxos', 'fxos-firepower-2');
     }
 
     public function testGaia()
