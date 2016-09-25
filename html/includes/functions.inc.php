@@ -1343,23 +1343,3 @@ function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
         return $sensorIpmi;
     }
 }
-
-function get_auth_ad_user_filter($username)
-{
-    global $config;
-    $user_filter = "(samaccountname=$username)";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
-    }
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
-}
