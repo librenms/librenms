@@ -112,6 +112,14 @@ $graphs['ups-nut'] = array(
     'voltage_input',
 );
 
+$graphs['ups-apcups'] = array(
+    'remaining',
+    'load',
+    'voltage_battery',
+    'charge',
+    'voltage_input',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
