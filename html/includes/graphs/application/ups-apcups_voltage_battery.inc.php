@@ -18,21 +18,32 @@
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
-
 require 'includes/graphs/common.inc.php';
-
-$scale_min = 0;
-$ds        = 'charge';
-$colour_area     = 'EEEEEE';
-$colour_line     = 'FF3300';
-$colour_area_max = 'FFEE99';
-$graph_max       = 0;
-$unit_text       = 'Percent';
-$ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
-if (rrdtool_check_rrd_exists($ups_nut)) {
-    $rrd_filename = $ups_nut;
+$scale_min     = 0;
+$colours       = 'mixed';
+$unit_text     = 'Volts';
+$unitlen       = 10;
+$bigdescrlen   = 15;
+$smalldescrlen = 15;
+$dostack       = 0;
+$printtotal    = 0;
+$addarea       = 1;
+$transparency  = 33;
+$rrd_filename = rrd_name($device['hostname'], array('app', 'ups-apcups', $app['app_id']));
+$array    = array(
+    'battery_nominal' => array('descr' => 'Nominal','colour' => '630606',),
+    'battery_voltage' => array('descr' => 'Current','colour' => '50C150',),
+);
+$i = 0;
+if (rrdtool_check_rrd_exists($rrd_filename)) {
+    foreach ($array as $ds => $vars) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr']    = $vars['descr'];
+        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['colour']   = $vars['colour'];
+        $i++;
+    }
 } else {
     echo "file missing: $rrd_filename";
 }
-
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/graphs/generic_v3_multiline_float.inc.php';

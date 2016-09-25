@@ -17,19 +17,16 @@
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
-*
 */
-
 global $config;
 
 $graphs = array(
-    'ups-nut_remaining' => 'Remaining time: ',
-    'ups-nut_load' => 'Load: ',
-    'ups-nut_voltage_battery' => 'Battery voltage: ',
-    'ups-nut_charge' => 'Charge: ',
-    'ups-nut_voltage_input' => 'Input voltage: ',
+    'ups-apcups_remaining' => 'Remaining time:',
+    'ups-apcups_load' => 'Load:',
+    'ups-apcups_voltage_battery' => 'Battery voltage:',
+    'ups-apcups_charge' => 'Charge:',
+    'ups-apcups_voltage_input' => 'Input voltage:',
 );
-
 foreach ($graphs as $key => $text) {
     $graph_type            = $key;
     $graph_array['height'] = '100';
@@ -37,7 +34,6 @@ foreach ($graphs as $key => $text) {
     $graph_array['to']     = $config['time']['now'];
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
-
     echo '<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">'.$text.'</h3>

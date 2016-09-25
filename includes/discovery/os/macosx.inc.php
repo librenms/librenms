@@ -9,10 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (!$os) {
-    if (strpos($sysObjectId, '1.3.6.1.4.1.8072.3.2.16') !== false ||
-        preg_match('/Darwin Kernel Version 15/', $sysDescr) ||
-        preg_match('/Darwin Kernel Version 16/', $sysDescr) ) {
-        $os = 'macosx';
-    }
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.8072.3.2.16') || str_contains($sysDescr, array('Darwin Kernel Version 15', 'Darwin Kernel Version 16'))) {
+    $os = 'macosx';
 }

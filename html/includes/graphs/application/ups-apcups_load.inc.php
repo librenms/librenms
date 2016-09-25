@@ -18,21 +18,16 @@
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
-
 require 'includes/graphs/common.inc.php';
-
 $scale_min = 0;
-$ds        = 'charge';
+$ds        = 'load';
 $colour_area     = 'EEEEEE';
 $colour_line     = 'FF3300';
 $colour_area_max = 'FFEE99';
 $graph_max       = 0;
 $unit_text       = 'Percent';
-$ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
-if (rrdtool_check_rrd_exists($ups_nut)) {
-    $rrd_filename = $ups_nut;
-} else {
-    echo "file missing: $rrd_filename";
+$ups_apcups  = rrd_name($device['hostname'], array('app', 'ups-apcups', $app['app_id']));
+if (rrdtool_check_rrd_exists($ups_apcups)) {
+    $rrd_filename = $ups_apcups;
 }
-
 require 'includes/graphs/generic_simplex.inc.php';
