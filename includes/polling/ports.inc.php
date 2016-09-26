@@ -541,6 +541,12 @@ foreach ($ports as $port) {
         // End parse ifAlias
         // Update IF-MIB metrics
         $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
+
+        // Do EtherLike-MIB
+        if ($config['enable_ports_etherlike']) {
+            include 'port-etherlike.inc.php';
+        }
+
         foreach ($_stat_oids as $oid) {
             $port_update = 'update';
             $extended_metric = !in_array($oid, $stat_oids_db, true);
@@ -677,11 +683,6 @@ foreach ($ports as $port) {
         }
 
         // End Update PAgP
-        // Do EtherLike-MIB
-        if ($config['enable_ports_etherlike']) {
-            include 'port-etherlike.inc.php';
-        }
-
         // Do ADSL MIB
         if ($config['enable_ports_adsl']) {
             include 'port-adsl.inc.php';

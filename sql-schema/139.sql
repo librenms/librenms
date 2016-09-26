@@ -1,0 +1,14 @@
+ALTER TABLE ports_statistics 
+ADD dot3StatsAlignmentErrors bigint, ADD dot3StatsAlignmentErrors_prev bigint, ADD dot3StatsAlignmentErrors_delta bigint, ADD dot3StatsAlignmentErrors_rate int,
+ADD dot3StatsFCSErrors bigint, ADD dot3StatsFCSErrors_prev bigint, ADD dot3StatsFCSErrors_delta bigint, ADD dot3StatsFCSErrors_rate int,
+ADD dot3StatsSingleCollisionFrames bigint, ADD dot3StatsSingleCollisionFrames_prev bigint, ADD dot3StatsSingleCollisionFrames_delta bigint, ADD dot3StatsSingleCollisionFrames_rate int,
+ADD dot3StatsMultipleCollisionFrames bigint, ADD dot3StatsMultipleCollisionFrames_prev bigint, ADD dot3StatsMultipleCollisionFrames_delta bigint, ADD dot3StatsMultipleCollisionFrames_rate int,
+ADD dot3StatsSQETestErrors bigint, ADD dot3StatsSQETestErrors_prev bigint, ADD dot3StatsSQETestErrors_delta bigint, ADD dot3StatsSQETestErrors_rate int,
+ADD dot3StatsDeferredTransmissions bigint, ADD dot3StatsDeferredTransmissions_prev bigint, ADD dot3StatsDeferredTransmissions_delta bigint, ADD dot3StatsDeferredTransmissions_rate int,
+ADD dot3StatsLateCollisions bigint, ADD dot3StatsLateCollisions_prev bigint, ADD dot3StatsLateCollisions_delta bigint, ADD dot3StatsLateCollisions_rate int,
+ADD dot3StatsExcessiveCollisions bigint, ADD dot3StatsExcessiveCollisions_prev bigint, ADD dot3StatsExcessiveCollisions_delta bigint, ADD dot3StatsExcessiveCollisions_rate int,
+ADD dot3StatsInternalMacTransmitErrors bigint, ADD dot3StatsInternalMacTransmitErrors_prev bigint, ADD dot3StatsInternalMacTransmitErrors_delta bigint, ADD dot3StatsInternalMacTransmitErrors_rate int,
+ADD dot3StatsCarrierSenseErrors bigint, ADD dot3StatsCarrierSenseErrors_prev bigint, ADD dot3StatsCarrierSenseErrors_delta bigint, ADD dot3StatsCarrierSenseErrors_rate int,
+ADD dot3StatsFrameTooLongs bigint, ADD dot3StatsFrameTooLongs_prev bigint, ADD dot3StatsFrameTooLongs_delta bigint, ADD dot3StatsFrameTooLongs_rate int,
+ADD dot3StatsInternalMacReceiveErrors bigint, ADD dot3StatsInternalMacReceiveErrors_prev bigint, ADD dot3StatsInternalMacReceiveErrors_delta bigint, ADD dot3StatsInternalMacReceiveErrors_rate int,
+ADD dot3StatsSymbolErrors bigint, ADD dot3StatsSymbolErrors_prev bigint, ADD dot3StatsSymbolErrors_delta bigint, ADD dot3StatsSymbolErrors_rate int;
