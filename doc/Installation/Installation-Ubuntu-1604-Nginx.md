@@ -119,6 +119,10 @@ deb http://http.us.debian.org/debian stable main contrib non-free
 aptitude install snmp-mibs-downloader
 download-mibs
 ```
+Edit the /etc/snmp/snmp.conf file and comment out the line:
+```bash
+#mib: 
+```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
