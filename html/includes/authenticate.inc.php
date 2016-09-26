@@ -1,5 +1,7 @@
 <?php
 
+require_once 'includes/authentication_functions.inc.php';
+
 @ini_set('session.use_only_cookies', 1);
 @ini_set('session.cookie_httponly', 1);
 @ini_set('session.use_strict_mode', 1); // php >= 5.5.2
