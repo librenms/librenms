@@ -1361,8 +1361,7 @@ function auth_end_session()
         auth_update_session_id();
 
         $_SESSION['last_activity'] = time();
-        $auth_unauthenticated_session_timeout = 60;
-        $_SESSION['expires'] = time() + $auth_unauthenticated_session_timeout*60;
+        $_SESSION['expires'] = time() + $config['auth_unauthenticated_session_timeout']*60;
 }
 
 function auth_check_session()
@@ -1383,7 +1382,8 @@ function auth_check_session()
         return;
     }
 
-    if ($_SESSION['last_activity'] < time() + 60 * $config['session_idle_timeout_minutes']) {
+    if ($config['auth_idle_session_timeout'] > 0
+        && $_SESSION['last_activity'] < time() + 60 * $config['auth_idle_session_timeout']) {
         if ($_SESSION['authenticated']) {
             dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Session idle timeout'), 'authlog');
         }
