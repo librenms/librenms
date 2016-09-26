@@ -802,6 +802,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
         $this->checkOS('mgeups', 'mgeups-proxy');
+        $this->checkOS('mgeups', 'mgeups-comet');
     }
 
     public function testMicrosemitime()
