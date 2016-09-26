@@ -21,8 +21,8 @@ $smart_oid = '.1.3.6.1.4.1.24681.1.2.11.1.7.';
 d_echo("QNAP HDD status\n");
 for ($i = 1; $i <= $total_disks; $i++) {
     $state = snmp_get($device, $status_oid . $i, '-Oqv');
-    $status_name = 'qnap_hdd_status_'.$i;
-    $status_descr = 'HDD '.$i.' status';
+    $status_name = 'qnap_hdd_status_' . $i;
+    $status_descr = 'HDD ' . $i . ' status';
     if (is_numeric($state)) {
         $state_index_id = create_state_index($status_name);
 
@@ -46,7 +46,7 @@ for ($i = 1; $i <= $total_disks; $i++) {
                 dbInsert($insert, 'state_translations');
             }
         }
-        discover_sensor($valid['sensor'], 'state', $device, $status_oid.$i, 1, $status_name, $status_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
+        discover_sensor($valid['sensor'], 'state', $device, $status_oid . $i, 1, $status_name, $status_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
         create_sensor_to_state_index($device, $status_name, 1);
     }
 }
@@ -54,10 +54,10 @@ for ($i = 1; $i <= $total_disks; $i++) {
 d_echo("QNAP HDD SMART\n");
 for ($i = 1; $i <= $total_disks; $i++) {
     $state = snmp_get($device, $smart_oid . $i, '-Oqv');
-    $smart_name = 'qnap_hdd_smart_'.$i;
-    $smart_descr = 'HDD '.$i.' SMART';
+    $smart_name = 'qnap_hdd_smart_' . $i;
+    $smart_descr = 'HDD ' . $i . ' SMART';
 
-    switch($state) {
+    switch ($state) {
         case '"Normal"':
             $state = 1;
             break;
@@ -90,7 +90,7 @@ for ($i = 1; $i <= $total_disks; $i++) {
                 dbInsert($insert, 'state_translations');
             }
         }
-        discover_sensor($valid['sensor'], 'state', $device, $smart_oid.$i, 1, $smart_name, $smart_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
+        discover_sensor($valid['sensor'], 'state', $device, $smart_oid . $i, 1, $smart_name, $smart_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
         create_sensor_to_state_index($device, $smart_name, 1);
     }
 }
