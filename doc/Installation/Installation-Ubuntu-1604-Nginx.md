@@ -112,6 +112,14 @@ cp /opt/librenms/snmpd.conf.example /etc/snmpd/snmpd.conf
 vim /etc/snmpd/snmpd.conf
 ```
 
+> NOTE: If you are installing on Debian make sure you enable debian non-free repo and install snmp-mibs:
+
+```bash
+deb http://http.us.debian.org/debian stable main contrib non-free
+aptitude install snmp-mibs-downloader
+download-mibs
+```
+
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
 ```bash
