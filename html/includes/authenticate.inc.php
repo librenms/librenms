@@ -86,7 +86,7 @@ if (!$_SESSION['authenticated']) {
             /* Congratulations, you are authenticated! */
 
             /* prevent session fixation vulnerabilities */
-            create_new_session();
+            auth_update_session_id();
 
             $_SESSION['authenticated'] = true;
             dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
