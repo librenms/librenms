@@ -14,7 +14,7 @@
 // Netonix Voltages
 if ($device['os'] == 'netonix') {
     echo 'Netonix: ';
-    $oids = snmpwalk_cache_multi_oid($device, 'voltageTable', array(), 'NETONIX-SWITCH-MIB', '+'.$config['mibdir'].'/netonix');
+    $oids = snmpwalk_cache_multi_oid($device, 'voltageTable', array(), 'NETONIX-SWITCH-MIB', 'netonix');
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             if (is_numeric($entry['voltage']) && is_numeric($index) && $entry['voltage'] > '0') {

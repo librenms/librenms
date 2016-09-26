@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', $config['install_dir'].'/mibs/equallogic');
+$eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
 if (is_array($eql_storage)) {
     echo 'EqliscsiVolumeEntry ';

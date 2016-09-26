@@ -3,11 +3,11 @@
 // JunOSe Temperatures
 if ($device['os'] == 'junose') {
     echo 'JunOSe: ';
-    $oids = snmpwalk_cache_multi_oid($device, 'juniSystemTempValue', array(), 'Juniper-System-MIB', $config['install_dir'].'/mibs/junose');
+    $oids = snmpwalk_cache_multi_oid($device, 'juniSystemTempValue', array(), 'Juniper-System-MIB', 'junose');
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             if (is_numeric($entry['juniSystemTempValue']) && is_numeric($index) && $entry['juniSystemTempValue'] > '0') {
-                $entPhysicalIndex = snmp_get($device, 'juniSystemTempPhysicalIndex.'.$index, '-Oqv', 'Juniper-System-MIB', '+'.$config['install_dir'].'/mibs/junose');
+                $entPhysicalIndex = snmp_get($device, 'juniSystemTempPhysicalIndex.'.$index, '-Oqv', 'Juniper-System-MIB', 'junose');
                 $descr            = snmp_get($device, 'entPhysicalDescr.'.$entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 $descr            = preg_replace('/^Juniper\ [0-9a-zA-Z\-]+/', '', $descr);
                 // Wipe out ugly Juniper crap. Why put vendor and model in here? Idiots!

@@ -10,7 +10,7 @@ if ($config['enable_inventory']) {
     } elseif ($device['os'] == 'timos') {
         $entity_array = array();
         echo 'tmnxHwObjs';
-        $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
+        $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', 'aos');
     } else {
         $entity_array = array();
         echo ' entPhysicalEntry';

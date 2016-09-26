@@ -14,7 +14,7 @@
 // Netonix Temperatures
 if ($device['os'] == 'netonix') {
     echo 'Netonix: ';
-    $oids = snmpwalk_cache_multi_oid($device, 'tempTable', array(), 'NETONIX-SWITCH-MIB', '+'.$config['mibdir'].'/netonix');
+    $oids = snmpwalk_cache_multi_oid($device, 'tempTable', array(), 'NETONIX-SWITCH-MIB', 'netonix');
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             if (is_numeric($entry['temp']) && is_numeric($index) && $entry['temp'] > '0') {
