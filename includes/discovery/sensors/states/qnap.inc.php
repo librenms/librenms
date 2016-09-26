@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS QNAP NAS HDD Smart/Status information module
+ * LibreNMS QNAP NAS HDD SMART/Status information module
  *
  * Copyright (c) 2016 Cercel Valentin <crc@nuamchefazi.ro>
  * This program is free software: you can redistribute it and/or modify it
