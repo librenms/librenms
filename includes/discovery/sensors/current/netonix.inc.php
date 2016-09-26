@@ -2,7 +2,7 @@
 /**
  * netonix.inc.php
  *
- * LibreNMS temperatures module for Netonix
+ * LibreNMS current module for Netonix
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-// Netonix Temperatures
+
 if ($device['os'] == 'netonix') {
     echo 'Netonix: ';
-    // NETONIX-SWITCH-MIB::tempTable .1.3.6.1.4.1.46242.3
-    $oids = snmpwalk_cache_multi_oid($device, 'tempTable', array(), 'NETONIX-SWITCH-MIB', $config['mibdir'] . ':' . $config['mibdir'].'/netonix');
-    if (is_array($oids)) {
-        foreach ($oids as $index => $entry) {
-            if (is_numeric($entry['temp']) && is_numeric($index) && $entry['temp'] > '0') {
-                $descr   = $entry['tempDescription'];
-                $oid     = '.1.3.6.1.4.1.46242.3.1.3.'.$index;
-                $current = $entry['temp'];
-                discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $device['os'], $descr, '1', '1', null, null, null, null, $current);
-            }
-        }
+
+    $dcinput_oid = '.1.3.6.1.4.1.46242.7.0'; // NETONIX-SWITCH-MIB::dcdcInputCurrent.0
+    $dcinput_value = snmp_get($device, $dcinput_oid, '-Oqv');
+    $descr = 'DC Power Input';
+    $divisor = 10;
+
+    if (is_numeric($dcinput_value) && $dcinput_value > 0) {
+        discover_sensor($valid['sensor'], 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
     }
 }
