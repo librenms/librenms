@@ -2,7 +2,7 @@
 /**
  * output.php
  *
- * runs the requested command and outputs as a file or json
+ * runs the requested query and outputs as a file or text
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2016 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
 if (!is_admin()) {
@@ -32,24 +32,24 @@ $hostname = escapeshellcmd($_REQUEST['hostname']);
 $type = $_REQUEST['type'];
 
 switch ($type) {
-    case 'poller':
-        $cmd = "php ${config['install_dir']}/poller.php -h $hostname -r -f -d";
-        $filename = "poller-$hostname.txt";
-        break;
-    case 'snmpwalk':
-        $device = device_by_name(mres($hostname));
-
-        $cmd = gen_snmpwalk_cmd($device, '.', ' -Onet');
-
-        if ($debug) {
-            $cmd .= ' 2>&1';
+    case 'alerts':
+        $filename = "alerts-$hostname.txt";
+        $device_id = getidbyname($hostname);
+        $device = device_by_id_cache($device_id);
+        $rules = GetRules($device_id);
+        $output = '';
+        foreach ($rules as $rule) {
+            $sql = GenSQL($rule['rule']);
+            $qry = dbFetchRow($sql, array($device_id));
+            if (is_array($qry)) {
+                $response = 'matches';
+            } else {
+                $response = 'no match';
+            }
+            $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
+            $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
+            $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
-
-        $filename = $device['os'] . '-' . $device['hostname'] . '.snmpwalk';
-        break;
-    case 'discovery':
-        $cmd = "php ${config['install_dir']}/discovery.php -h $hostname -d";
-        $filename = "discovery-$hostname.txt";
         break;
     default:
         echo 'You must specify a valid type';
@@ -62,21 +62,7 @@ if ($_GET['format'] == 'text') {
     header("Content-type: text/plain");
     header('X-Accel-Buffering: no');
 
-    if (($fp = popen($cmd, "r"))) {
-        while (!feof($fp)) {
-            $line = stream_get_line($fp, 1024, PHP_EOL);
-            echo preg_replace('/\033\[[\d;]+m/', '', $line) . PHP_EOL;
-            ob_flush();
-            flush(); // you have to flush buffer
-        }
-        fclose($fp);
-    }
+    echo $output;
 } elseif ($_GET['format'] == 'download') {
-    ob_start();
-    $output = shell_exec($cmd);
-    ob_end_clean();
-
-    $output = preg_replace('/\033\[[\d;]+m/', '', $output);
-
     file_download($filename, $output);
 }
