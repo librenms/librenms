@@ -24,6 +24,6 @@
  */
 
 //NETONIX-SWITCH-MIB::firmwareVersion.0
-$version = snmp_get($device, '.1.3.6.1.4.1.46242.1.0', '-OQv');
+$version = snmp_get($device, '.1.3.6.1.4.1.46242.1.0', '-OQva');
 $version = str_replace('.n.........', '', $version); // version display bug in 1.3.9
 $hardware = $poll_device['sysDescr'];
