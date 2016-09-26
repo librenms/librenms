@@ -53,18 +53,18 @@ for ($i = 1; $i <= $total_disks; $i++) {
 
 d_echo("QNAP HDD SMART\n");
 for ($i = 1; $i <= $total_disks; $i++) {
-    $state = snmp_get($device, $smart_oid . $i, '-Oqv');
+    $state = str_replace('"', '', snmp_get($device, $smart_oid . $i, '-Oqv'));
     $smart_name = 'qnap_hdd_smart_' . $i;
     $smart_descr = 'HDD ' . $i . ' SMART';
 
     switch ($state) {
-        case '"Normal"':
+        case 'Normal':
             $state = 1;
             break;
-        case '"--"':
+        case '--':
             $state = 0;
             break;
-        case '"Warning"':
+        case 'Warning':
             $state = 2;
             break;
     }
