@@ -50,3 +50,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     echo "\n";
 }
+
+check_valid_sensors($device, 'voltage', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'temperature', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'fanspeed', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'power', $valid['sensor'], 'ipmi');
