@@ -175,8 +175,6 @@ function discover_device($device, $options = null)
 
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
 {
-    global $config;
-
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n");
 
     if (is_null($low_warn_limit) && !is_null($warn_limit)) {
@@ -443,7 +441,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 
 function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
 {
-    global $config;
+    d_echo("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 
     if (dbFetchCell('SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?', array($port_id, $vp_id)) == '0') {
         $inserted = dbInsert(array('port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => $vp_descr), 'juniAtmVp');
@@ -462,9 +460,9 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
 
 function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id)
 {
-    global $config, $link_exists;
+    global $link_exists;
 
-    d_echo("$local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version");
+    d_echo("Discover link: $local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version\n");
 
     if (dbFetchCell(
         'SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?',
@@ -523,24 +521,22 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
 {
-    global $config;
-
-    d_echo("$device, $index, $type, $mib, $descr, $units, $used, $size\n");
+    d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
         if ($storage === false || !count($storage)) {
             $insert = dbInsert(
                 array(
-                'device_id' => $device['device_id'],
-                'storage_descr' => $descr,
-                'storage_index' => $index,
-                'storage_mib' => $mib,
-                'storage_type' => $type,
-                'storage_units' => $units,
-                'storage_size' => $size,
-                'storage_used' => $used,
-                    ),
+                    'device_id' => $device['device_id'],
+                    'storage_descr' => $descr,
+                    'storage_index' => $index,
+                    'storage_mib' => $mib,
+                    'storage_type' => $type,
+                    'storage_units' => $units,
+                    'storage_size' => $size,
+                    'storage_used' => $used,
+                ),
                 'storage'
             );
 
@@ -562,9 +558,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
 function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = '1', $current = null, $entPhysicalIndex = null, $hrDeviceIndex = null)
 {
-    global $config;
-
-    d_echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
+    d_echo("Discover Processor: $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
 
     if ($descr) {
         $descr = trim(str_replace('"', '', $descr));
@@ -607,9 +601,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
 function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null)
 {
-    global $config;
-
-    d_echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
+    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex\n");
 
     // FIXME implement the mempool_perc, mempool_used, etc.
     if ($descr) {
@@ -661,9 +653,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
 
 function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity_oid = null, $capacity = null, $current = null)
 {
-    global $config;
-
-    d_echo("$oid, $index, $type, $descr, $capacity, $capacity_oid\n");
+    d_echo("Discover Toner: $oid, $index, $type, $descr, $capacity_oid, $capacity, $current\n");
 
     if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_capacity_oid` =?', array($device['device_id'], $type, $index, $capacity_oid)) == '0') {
         $inserted = dbInsert(array('device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current), 'toner');
@@ -686,7 +676,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {
-    global $device, $config;
+    global $device;
 
     $ipv6_network = Net_IPv6::getNetmask("$ipv6_address/$ipv6_prefixlen") . '/' . $ipv6_prefixlen;
     $ipv6_compressed = Net_IPv6::compress($ipv6_address);
