@@ -20,5 +20,8 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     $tags = compact('ifName', 'rrd_name', 'rrd_def', 'rrd_oldname');
     data_update($device, 'dot3', $tags, $fields);
 
+    // Add this counters to the DB stats
+    $_stat_oids = array_merge($_stat_oids, $etherlike_oids);
+
     echo 'EtherLike ';
 }
