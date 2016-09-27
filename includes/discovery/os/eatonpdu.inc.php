@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.534.6.6.7')) {
-        $os = 'eatonpdu';
-    }
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.534.6.6.7')) {
+    $os = 'eatonpdu';
 }
