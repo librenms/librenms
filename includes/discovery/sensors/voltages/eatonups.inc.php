@@ -5,85 +5,69 @@ if ($device['os'] == 'eatonups') {
     echo 'XUPS-MIB ';
 
     // XUPS-MIB::xupsBatVoltage.0 = INTEGER: 51
-    $oids = snmp_walk($device, 'xupsBatVoltage', '-Osqn', 'XUPS-MIB');
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'xupsBatVoltage', array(), 'XUPS-MIB');
 
-    $oids = trim($oids);
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$descr) = explode(' ', $data, 2);
-            $split_oid        = explode('.', $oid);
-            $volt_id          = $split_oid[(count($split_oid) - 1)];
-            $volt_oid         = ".1.3.6.1.4.1.534.1.2.2.$volt_id";
-            $divisor          = 1;
-            $volt             = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
-            $descr            = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
-            $type             = 'xups';
-            $index            = '1.2.5.'.$volt_id;
+    foreach ($oids as $volt_id => $data) {
+        $volt_oid         = ".1.3.6.1.4.1.534.1.2.2.$volt_id";
+        $divisor          = 1;
+        $volt             = $data['xupsBatVoltage'] / $divisor;
+        $descr            = 'Battery'.(count($oids) == 1 ? '' : ' '.($volt_id + 1));
+        $type             = 'xups';
+        $index            = '1.2.5.'.$volt_id;
 
-            discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
-        }
+        discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
     }
 
-    // XUPS-MIB::xupsInputNumPhases.0 = INTEGER: 1
-    $oids = trim(snmp_walk($device, 'xupsInputNumPhases', '-OsqnU', 'XUPS-MIB'));
-    d_echo($oids."\n");
 
-    list($unused,$numPhase) = explode(' ', $oids);
-    for ($i = 1; $i <= $numPhase; $i++) {
-        // XUPS-MIB::xupsInputVoltage.1 = INTEGER: 228
-        $volt_oid = ".1.3.6.1.4.1.534.1.3.4.1.2.$i";
-        $descr    = 'Output';
-        if ($numPhase > 1) {
-            $descr .= " Phase $i";
+    // XUPS-MIB::xupsInputVoltage.1 = INTEGER: 228
+    $oids = snmpwalk_cache_oid($device, 'xupsInputVoltage', array(), 'XUPS-MIB');
+
+    foreach ($oids as $volt_id => $data) {
+        $volt_oid = ".1.3.6.1.4.1.534.1.3.4.1.2.$volt_id";
+        $descr    = 'Input';
+        if (count($oids) > 1) {
+            $descr .= " Phase $volt_id";
         }
-
         $type    = 'xups';
         $divisor = 1;
-        $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-        $index   = '3.4.1.2.'.$i;
+        $current = $data['xupsInputVoltage'] / $divisor;
+        $index   = '3.4.1.2.'.$volt_id;
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    // XUPS-MIB::xupsOutputNumPhases.0 = INTEGER: 1
-    $oids = trim(snmp_walk($device, 'xupsOutputNumPhases', '-OsqnU'));
-    d_echo($oids."\n");
+    // XUPS-MIB::xupsOutputVoltage.1 = INTEGER: 228
+    $oids = snmpwalk_cache_oid($device, 'xupsOutputVoltage', array(), 'XUPS-MIB');
 
-    list($unused,$numPhase) = explode(' ', $oids);
-    for ($i = 1; $i <= $numPhase; $i++) {
-        // XUPS-MIB::xupsOutputVoltage.1 = INTEGER: 228
-        $volt_oid = ".1.3.6.1.4.1.534.1.4.4.1.2.$i";
+    foreach ($oids as $volt_id => $data) {
+        $volt_oid = ".1.3.6.1.4.1.534.1.4.4.1.2.$volt_id";
         $descr    = 'Output';
-        if ($numPhase > 1) {
-            $descr .= " Phase $i";
+        if (count($oids) > 1) {
+            $descr .= " Phase $volt_id";
         }
 
         $type    = 'xups';
         $divisor = 1;
-        $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-        $index   = '4.4.1.2.'.$i;
+        $current = $data['xupsOutputVoltage'] / $divisor;
+        $index   = '4.4.1.2.'.$volt_id;
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 
     // XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
-    $oids = trim(snmp_walk($device, 'xupsBypassNumPhases', '-OsqnU'));
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'xupsBypassVoltage', array(), 'XUPS-MIB');
 
-    list($unused,$numPhase) = explode(' ', $oids);
-    for ($i = 1; $i <= $numPhase; $i++) {
-        $volt_oid = ".1.3.6.1.4.1.534.1.5.3.1.2.$i";
+    foreach ($oids as $volt_id => $data) {
+        $volt_oid = ".1.3.6.1.4.1.534.1.5.3.1.2.$volt_id";
         $descr = 'Bypass';
-        if ($numPhase > 1) {
-            $descr .= " Phase $i";
+        if (count($oids) > 1) {
+            $descr .= " Phase $volt_id";
         }
 
         $type    = 'xups';
         $divisor = 1;
-        $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-        $index   = '5.3.1.2.'.$i;
+        $current = $data['xupsBypassVoltage'] / $divisor;
+        $index   = '5.3.1.2.'.$volt_id;
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }

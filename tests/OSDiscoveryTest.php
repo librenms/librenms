@@ -147,6 +147,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-switched-rack');
         $this->checkOS('apc', 'apc-masterswitch');
         $this->checkOS('apc', 'apc-metered-rack');
+        $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
     public function testAreca()
@@ -312,6 +313,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cimc');
     }
 
+    public function testCips()
+    {
+        $this->checkOS('cips');
+    }
+
     public function testCiscosb()
     {
         $this->checkOS('ciscosb');
@@ -448,6 +454,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'eaton-5p');
         $this->checkOS('eatonups', 'eaton-5px');
         $this->checkOS('eatonups', 'eaton-powerxpert');
+    }
+
+    public function testEdgecore()
+    {
+        $this->checkOS('edge-core', 'edgecore-es3528m');
     }
 
     public function testEdgeos()

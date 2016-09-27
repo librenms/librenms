@@ -17,8 +17,7 @@ if (is_admin() === false) {
 }
 
 $rule     = implode(' ', $_POST['rules']);
-$rule     = rtrim($rule, '&&');
-$rule     = rtrim($rule, '||');
+$rule     = rtrim($rule, '&|');
 $alert_id = $_POST['alert_id'];
 $count    = mres($_POST['count']);
 $delay    = mres($_POST['delay']);
