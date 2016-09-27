@@ -5,6 +5,7 @@ $apc_desc = array(
     'APC Switched Rack PDU',
     'APC MasterSwitch PDU',
     'APC Metered Rack PDU',
+    'APC Embedded PowerNet',
 );
 
 if (str_contains($sysDescr, $apc_desc)) {
