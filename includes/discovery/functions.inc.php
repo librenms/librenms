@@ -892,6 +892,11 @@ function get_device_divisor($device, $serial, $sensor)
     return $divisor;
 }
 
+/**
+ * @param $device
+ * @param $capacity_oid
+ * @return int
+ */
 function get_toner_capacity($device, $capacity_oid)
 {
     if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
@@ -903,6 +908,12 @@ function get_toner_capacity($device, $capacity_oid)
     return $capacity;
 }
 
+/**
+ * @param $device
+ * @param $oid_value
+ * @param $oid_capacity
+ * @return float|int
+ */
 function get_toner_levels($device, $oid_value, $oid_capacity)
 {
     if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
@@ -931,7 +942,6 @@ function get_toner_levels($device, $oid_value, $oid_capacity)
     } else {
         $current = ($oid_value / $oid_capacity * 100);
     }
-
 
     return $current;
 }
