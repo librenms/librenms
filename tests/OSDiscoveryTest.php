@@ -312,6 +312,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cimc');
     }
 
+    public function testCips()
+    {
+        $this->checkOS('cips');
+    }
+
     public function testCiscosb()
     {
         $this->checkOS('ciscosb');
