@@ -1,4 +1,5 @@
 <?php
+require_once 'includes/discovery/vlans/vlan_functions.inc.php';
 
 echo 'IEEE8021-Q-BRIDGE-MIB VLANs : ';
 
@@ -8,9 +9,9 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     echo "VLAN $vlanversion ";
 
     $vtpdomain_id = '1';
-    $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'IEEE8021-Q-BRIDGE-MIB');
-    $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'IEEE0821-Q-BRIDGE-MIB');
-    $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'IEEE0821-Q-BRIDGE-MIB');
+    $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'Q-BRIDGE-MIB');
+    $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
+    $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
 
     foreach ($vlans as $vlan_id => $vlan) {
         echo " $vlan_id";
@@ -21,11 +22,11 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             echo '+';
         }
 
-        $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
+        $key = "0.$vlan_id";
 
-        $untagged_port_indices = q_bridge_bits2indices($tagoruntag[0][$vlan_id]);
-        $tagoruntag = q_bridge_bits2indices($untag[0][$vlan_id]);
-        $tagged_port_indices = $array_diff($tagoruntag_ports, $untagged_ports);
+        $untagged_port_indices = q_bridge_bits2indices($untag[$key]['dot1qVlanCurrentUntaggedPorts']);
+        $tagoruntag_indices = q_bridge_bits2indices($tagoruntag[$key]['dot1qVlanCurrentEgressPorts']);
+        $tagged_port_indices = array_diff($tagoruntag_indices, $untagged_port_indices);
 
         foreach ($tagged_port_indices as $port_ifindex) {
             $port = get_port_by_index_cache($device, $port_ifindex);

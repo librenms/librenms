@@ -3,7 +3,8 @@ function q_bridge_bits2indices($hex_data)
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
-     */
+    */
+    $hex_data = str_replace(" ", "", $hex_data);
     $value = hex2bin($hex_data);
     $length = strlen($value);
     $indices = array();

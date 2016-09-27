@@ -31,7 +31,7 @@ class VlanFunctionsTest extends \PHPUnit_Framework_TestCase
 {
     public function testQBridgeBits2Indices()
     {
-        $bits = "8040201008040201ff000000000000";
+        $bits = "8040 201008040201 ff000000   000000";
         $indices = array(1, 10, 19, 28, 37, 46, 55, 64, 65, 66, 67, 68, 69, 70, 71, 72);
 
         $this->assertTrue(q_bridge_bits2indices($bits) == $indices);
