@@ -39,8 +39,11 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 extend apache /etc/snmp/apache-stats.py
 ```
 4. Restart snmpd on your host
-5. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
-(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+5. Verify it is working by running /usr/lib/check_mk_agent/local/apache
+6. (In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+7. (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed, apt-get install libwww-perl)
+8. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
+
 
 
 ### BIND9 aka named

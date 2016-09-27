@@ -2,7 +2,7 @@
 /**
  * netonix.inc.php
  *
- * LibreNMS processors module for Netonix
+ * LibreNMS current module for Netonix
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+
 if ($device['os'] == 'netonix') {
-    echo 'NETONIX : ';
+    echo 'Netonix: ';
 
-    $idle   = snmp_get($device, 'UCD-SNMP-MIB::ssCpuIdle.0', '-OvQ');
+    $dcinput_oid = '.1.3.6.1.4.1.46242.7.0'; // NETONIX-SWITCH-MIB::dcdcInputCurrent.0
+    $dcinput_value = snmp_get($device, $dcinput_oid, '-Oqv');
+    $descr = 'DC Power Input';
+    $divisor = 10;
 
-    if (is_numeric($idle)) {
-        discover_processor($valid['processor'], $device, 0, 0, 'ucd-old', 'CPU', '1', (100 - $idle));
+    if (is_numeric($dcinput_value) && $dcinput_value > 0) {
+        discover_sensor($valid['sensor'], 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
     }
 }

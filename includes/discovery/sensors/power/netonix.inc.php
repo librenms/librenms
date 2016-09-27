@@ -2,7 +2,7 @@
 /**
  * netonix.inc.php
  *
- * LibreNMS processors module for Netonix
+ * LibreNMS power module for Netonix
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+
 if ($device['os'] == 'netonix') {
-    echo 'NETONIX : ';
+    echo 'Netonix: ';
 
-    $idle   = snmp_get($device, 'UCD-SNMP-MIB::ssCpuIdle.0', '-OvQ');
+    $power_oid = '.1.3.6.1.4.1.46242.6.0'; // NETONIX-SWITCH-MIB::totalPowerConsumption
+    $power_value = snmp_get($device, $power_oid, '-Oqv');
+    $descr = 'Total Consumption';
+    $divisor = 10;
 
-    if (is_numeric($idle)) {
-        discover_processor($valid['processor'], $device, 0, 0, 'ucd-old', 'CPU', '1', (100 - $idle));
+    if (is_numeric($power_value) && $power_value > 0) {
+        discover_sensor($valid['sensor'], 'power', $device, $power_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $power_value / $divisor);
     }
 }
