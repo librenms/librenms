@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Telco Systems OS discovery module
  *
@@ -12,9 +11,6 @@
  * the source code distribution for details.
  */
 
-
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.738.1.5.100')) {
-        $os = 'binos';
-    }
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.738.1.5.100')) {
+    $os = 'binos';
 }

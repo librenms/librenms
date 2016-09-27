@@ -162,13 +162,13 @@ $full_query = $full_query.$query." LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
-    $ico   = 'ok';
+    $ico   = 'check';
     $col   = 'success';
     $extra = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
         if ((int) $sub['state'] === 0) {
-            $ico = 'ok';
+            $ico = 'check';
             $col = 'success';
         } elseif ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $ico   = 'remove';
@@ -205,9 +205,9 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '<i>'.htmlentities($rule['rule']).'</i></td>';
     echo '<td>'.$rule['severity'].'</td>';
-    echo "<td><span id='alert-rule-".$rule['id']."' class='glyphicon glyphicon-".$ico.' glyphicon-large text-'.$col."'></span> ";
+    echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<span class='glyphicon glyphicon-volume-off glyphicon-large text-primary' aria-hidden='true'></span></td>";
+        echo "<i class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></i></td>";
     }
 
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
@@ -219,8 +219,9 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '</td>';
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
+        echo "<div class='btn-group btn-group-sm' role='group'>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 
     echo '</td>';
@@ -297,15 +298,15 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
             success: function(msg) {
                 if(msg.indexOf("ERROR:") <= -1) {
                     if(state) {
-                        $('#alert-rule-'+alert_id).removeClass('glyphicon-pause');
-                        $('#alert-rule-'+alert_id).addClass('glyphicon-'+orig_state);
+                        $('#alert-rule-'+alert_id).removeClass('fa-pause');
+                        $('#alert-rule-'+alert_id).addClass('fa-'+orig_state);
                         $('#alert-rule-'+alert_id).removeClass('text-default');
                         $('#alert-rule-'+alert_id).addClass('text-'+orig_colour);
                         $('#row_'+alert_id).removeClass('active');
                         $('#row_'+alert_id).addClass(orig_class);
                     } else {
-                        $('#alert-rule-'+alert_id).removeClass('glyphicon-'+orig_state);
-                        $('#alert-rule-'+alert_id).addClass('glyphicon-pause');
+                        $('#alert-rule-'+alert_id).removeClass('fa-'+orig_state);
+                        $('#alert-rule-'+alert_id).addClass('fa-pause');
                         $('#alert-rule-'+alert_id).removeClass('text-'+orig_colour);
                         $('#alert-rule-'+alert_id).addClass('text-default');
                         $('#row_'+alert_id).removeClass('warning');

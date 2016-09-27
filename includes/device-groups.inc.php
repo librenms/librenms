@@ -73,7 +73,8 @@ function EditDeviceGroup($group_id, $name = null, $desc = null, $pattern = null)
 /**
  * Generate SQL from Group-Pattern
  * @param string $pattern Pattern to generate SQL for
- * @param string $search  What to searchid for
+ * @param string $search What to searchid for
+ * @param int $extra
  * @return string sql to perform the search
  */
 function GenGroupSQL($pattern, $search = '', $extra = 0)
@@ -82,23 +83,29 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
     if ($pattern === false) {
         return false;
     }
-    $tmp    = explode(' ', $pattern);
-    $tables = array();
-    foreach ($tmp as $opt) {
-        if (strstr($opt, '%') && strstr($opt, '.')) {
-            $tmpp     = explode('.', $opt, 2);
-            $tmpp[0]  = str_replace('%', '', $tmpp[0]);
-            $tables[] = mres(str_replace('(', '', $tmpp[0]));
-            $pattern  = str_replace($opt, $tmpp[0].'.'.$tmpp[1], $pattern);
+
+    if (starts_with($pattern, '%')) {
+        // v1 pattern
+        $tables = array();
+        $words = explode(' ', $pattern);
+        foreach ($words as $word) {
+            if (starts_with($word, '%') && str_contains($word, '.')) {
+                list($table, $column) = explode('.', $word, 2);
+                $table = str_replace('%', '', $table);
+                $tables[] = mres(str_replace('(', '', $table));
+                $pattern = str_replace($word, $table . '.' . $column, $pattern);
+            }
         }
+        $tables = array_keys(array_flip($tables));
+    } else {
+        // v2 pattern
+        $tables = getTablesFromPattern($pattern);
     }
 
-    $pattern = rtrim($pattern, '&&');
-    $pattern = rtrim($pattern, '||');
+    $pattern = rtrim($pattern, '&|');
 
-    $tables = array_keys(array_flip($tables));
-    if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
-        //Our first table has no valid glue, append the 'devices' table to it!
+    if ($tables[0] != 'devices' && dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
+        //Our first table has no valid glue, prepend the 'devices' table to it!
         array_unshift($tables, 'devices');
     }
     $x = sizeof($tables)-1;
@@ -137,12 +144,27 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
         $search = str_replace("(", "", $tables[0]).'.'.$search. ' AND';
     }
     if (!empty($join)) {
-        $join = '('.rtrim($join, ' && ').') &&';
+        $join = '('.rtrim($join, '& ').') &&';
     }
     $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$join.' '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
 }//end GenGroupSQL()
 
+
+/**
+ * Extract an array of tables in a pattern
+ *
+ * @param string $pattern
+ * @return array
+ */
+function getTablesFromPattern($pattern)
+{
+    preg_match_all('/[A-Za-z_]+(?=\.[A-Za-z_]+ )/', $pattern, $tables);
+    if (is_null($tables)) {
+        return array();
+    }
+    return array_keys(array_flip($tables[0])); // unique tables only
+}
 
 /**
  * Run the group queries again to get fresh list of devices for this group
@@ -151,11 +173,12 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
  */
 function QueryDevicesFromGroup($group_id)
 {
-    $pattern = dbFetchCell('SELECT pattern FROM device_groups WHERE id = ?', array($group_id));
-    $pattern = rtrim($pattern, '&&');
-    $pattern = rtrim($pattern, '||');
+    $group = dbFetchRow('SELECT pattern,params FROM device_groups WHERE id = ?', array($group_id));
+    $pattern = rtrim($group['pattern'], '&|');
+    $params = (array)json_decode($group['params']);
     if (!empty($pattern)) {
-        return dbFetchColumn(GenGroupSQL($pattern));
+        $result = dbFetchColumn(GenGroupSQL($pattern), $params);
+        return $result;
     }
 
     return false;
@@ -196,7 +219,9 @@ function QueryGroupsFromDevice($device_id, $extra = 0)
 {
     $ret = array();
     foreach (GetDeviceGroups() as $group) {
-        if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?', $extra).' LIMIT 1', array($device_id)) == $device_id) {
+        $params = (array)json_decode($group['params']);
+        array_unshift($params, $device_id);
+        if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?', $extra).' LIMIT 1', $params) == $device_id) {
             if ($extra === 0) {
                 $ret[] = $group['id'];
             } else {
@@ -257,12 +282,16 @@ function RunGroupMacros($rule, $x = 1)
  */
 function UpdateGroupsForDevice($device_id)
 {
+    d_echo("### Start Device Groups ###\n");
     $queried_groups = QueryGroupsFromDevice($device_id);
     $db_groups = GetGroupsFromDevice($device_id);
 
     // compare the arrays to get the added and removed groups
     $added_groups = array_diff($queried_groups, $db_groups);
     $removed_groups = array_diff($db_groups, $queried_groups);
+
+    d_echo("Groups Added: ".implode(',', $added_groups).PHP_EOL);
+    d_echo("Groups Removed: ".implode(',', $removed_groups).PHP_EOL);
 
     // insert new groups
     $insert = array();
@@ -277,6 +306,7 @@ function UpdateGroupsForDevice($device_id)
     if (!empty($removed_groups)) {
         dbDelete('device_group_device', '`device_id`=? AND `device_group_id` IN (?)', array($device_id, array(implode(',', $removed_groups))));
     }
+    d_echo("### End Device Groups ###\n");
 }
 
 /**
@@ -305,4 +335,23 @@ function UpdateDeviceGroup($group_id)
     if (!empty($removed_devices)) {
         dbDelete('device_group_device', '`device_group_id`=? AND `device_id` IN (?)', array($group_id, array(implode(',', $removed_devices))));
     }
+}
+
+/**
+ * Fill in params into the pattern, replacing placeholders (?)
+ * If $params is empty or null, just returns $pattern
+ *
+ * @return string
+ */
+function formatDeviceGroupPattern($pattern, $params)
+{
+    // fill in parameters
+    foreach ((array)$params as $value) {
+        if (!is_numeric($value) && !starts_with($value, "'")) {
+            $value = "'".$value."'";
+        }
+        $pattern = preg_replace('/\?/', $value, $pattern, 1);
+    }
+
+    return $pattern;
 }

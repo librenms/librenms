@@ -9,8 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (!$os) {
-    if (strpos($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1.49') !== false) {
-        $os = 'gaia';
-    }
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1.49')) {
+    $os = 'gaia';
 }

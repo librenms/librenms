@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2879.1.1.2')) {
-        $os = 'sonus-gsx';
-    }
+if (strstr($sysObjectId, '.1.3.6.1.4.1.2879.1.1.2')) {
+    $os = 'sonus-gsx';
 }

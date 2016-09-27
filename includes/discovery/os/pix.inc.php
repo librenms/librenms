@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/Cisco\ PIX/', $sysDescr)) {
-        $os = 'pixos';
-    }
+if (str_contains($sysDescr, 'Cisco PIX')) {
+    $os = 'pixos';
 }

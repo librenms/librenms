@@ -36,13 +36,15 @@ if (!is_admin()) {
         <li role="presentation" class="active"><a data-toggle="tab" href="#discovery">Discovery</a></li>
         <li role="presentation"><a data-toggle="tab" href="#poller">Poller</a></li>
         <li role="presentation"><a data-toggle="tab" href="#snmp">SNMP</a></li>
+        <li role="presentation"><a data-toggle="tab" href="#alerts">Alerts</a></li>
     </ul>
     <div class="tab-content">
     <?php
     $tabs = array(
         'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname='.$device['hostname'],
-        'poller' => 'ajax_output.php?id=capture&format=text&type=poller&hostname='.$device['hostname'],
-        'snmp' => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname='.$device['hostname'],
+        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname='.$device['hostname'],
+        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname='.$device['hostname'],
+        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname='.$device['hostname'],
     );
 
     foreach ($tabs as $tab => $url) {

@@ -7,7 +7,6 @@ $data_oids = array(
     'ifAlias',
     'ifAdminStatus',
     'ifOperStatus',
-    'ifLastChange',
     'ifMtu',
     'ifSpeed',
     'ifHighSpeed',
@@ -131,11 +130,11 @@ if (!in_array($device['hardware'], $config['os'][$device['os']]['bad_ifXEntry'])
 
 $hc_test = array_slice($port_stats, 0, 1);
 if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
-    $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
 } else {
     foreach ($ifmib_oids as $oid) {
         echo "$oid ";
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
     }
 }
 
@@ -227,7 +226,7 @@ $ports = $ports_mapped['ports'];
 // Rename any old RRD files still named after the previous ifIndex based naming schema.
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
     foreach (array ('', '-adsl', '-dot3') as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix.rrd";
+        $old_rrd_name = "port-$ifIndex$suffix";
         $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
 
         rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
@@ -422,6 +421,13 @@ foreach ($ports as $port) {
         if (isset($this_port['dot3StatsDuplexStatus'])) {
             echo 'dot3Duplex ';
             $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
+        }
+
+        // update ifLastChange. only in the db, not rrd
+        if (isset($this_port['ifLastChange']) && is_numeric($this_port['ifLastChange'])) {
+            $port['update']['ifLastChange'] = $this_port['ifLastChange'];
+        } elseif ($port['ifLastChange'] != 0) {
+            $port['update']['ifLastChange'] = 0;  // no data, so use the same as device uptime
         }
 
         // Set VLAN and Trunk from Cisco
