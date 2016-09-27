@@ -456,6 +456,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'eaton-powerxpert');
     }
 
+    public function testEdgecore()
+    {
+        $this->checkOS('edge-core', 'edgecore-es3528m');
+    }
+
     public function testEdgeos()
     {
         $this->checkOS('edgeos');
