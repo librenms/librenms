@@ -219,7 +219,7 @@ function QueryGroupsFromDevice($device_id, $extra = 0)
 {
     $ret = array();
     foreach (GetDeviceGroups() as $group) {
-        $params = json_decode($group['params']);
+        $params = (array)json_decode($group['params']);
         array_unshift($params, $device_id);
         if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?', $extra).' LIMIT 1', $params) == $device_id) {
             if ($extra === 0) {
@@ -282,13 +282,16 @@ function RunGroupMacros($rule, $x = 1)
  */
 function UpdateGroupsForDevice($device_id)
 {
-    d_echo("Updating Device Groups.\n");
+    d_echo("### Start Device Groups ###\n");
     $queried_groups = QueryGroupsFromDevice($device_id);
     $db_groups = GetGroupsFromDevice($device_id);
 
     // compare the arrays to get the added and removed groups
     $added_groups = array_diff($queried_groups, $db_groups);
     $removed_groups = array_diff($db_groups, $queried_groups);
+
+    d_echo("Groups Added: ".implode(',', $added_groups).PHP_EOL);
+    d_echo("Groups Removed: ".implode(',', $removed_groups).PHP_EOL);
 
     // insert new groups
     $insert = array();
@@ -303,7 +306,7 @@ function UpdateGroupsForDevice($device_id)
     if (!empty($removed_groups)) {
         dbDelete('device_group_device', '`device_id`=? AND `device_group_id` IN (?)', array($device_id, array(implode(',', $removed_groups))));
     }
-    d_echo("Done updating Device Groups.\n");
+    d_echo("### End Device Groups ###\n");
 }
 
 /**
