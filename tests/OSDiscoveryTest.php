@@ -314,7 +314,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testCips()
     {
-        $this->checkOS('cips', 'Cisco Intrusion Prevention System');
+        $this->checkOS('cips');
     }
 
     public function testCiscosb()
