@@ -207,9 +207,32 @@ $('#map-stub').typeahead({
 
 $(function () {
     $("#start").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>'
+        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
     });
-    $("#end").datetimepicker();
+    $("#end").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#start").on("dp.change", function (e) {
         $("#end").data("DateTimePicker").minDate(e.date);
     });

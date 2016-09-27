@@ -17,6 +17,7 @@
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
 */
 
 require 'includes/graphs/common.inc.php';
@@ -27,9 +28,12 @@ $colour_area     = 'EEEEEE';
 $colour_line     = '36393D';
 $colour_area_max = 'FFEE99';
 $graph_max       = 0;
-$unit_text       = 'Seconds';
+$unit_text       = 'Minutes';
 $ups_nut  = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 if (rrdtool_check_rrd_exists($ups_nut)) {
     $rrd_filename = $ups_nut;
+} else {
+    echo "file missing: $rrd_filename";
 }
+
 require 'includes/graphs/generic_simplex.inc.php';

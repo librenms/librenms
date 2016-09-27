@@ -9,8 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (!$os) {
-    if (strpos($sysObjectId, '1.3.6.1.4.1.17163.1.1') !== false) {
-        $os = 'riverbed';
-    }
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.17163.1.1')) {
+    $os = 'riverbed';
 }

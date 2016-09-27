@@ -30,7 +30,7 @@ function prep_snmp_setting($device, $setting)
 {
     global $config;
 
-    if (is_numeric($device[$setting]) && $device[$setting] > 0) {
+    if (isset($device[$setting]) && is_numeric($device[$setting]) && $device[$setting] > 0) {
         return $device[$setting];
     } elseif (isset($config['snmp'][$setting])) {
         return $config['snmp'][$setting];
@@ -74,7 +74,7 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
     global $config;
-    if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk']) {
+    if ($device['snmpver'] == 'v1' || (isset($device['os']) && $config['os'][$device['os']]['nobulk'])) {
         $snmpcmd = $config['snmpwalk'];
     } else {
         $snmpcmd = $config['snmpbulkwalk'];
@@ -553,10 +553,6 @@ function snmp_gen_auth(&$device)
             print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n";
         }
     }//end if
-
-    if ($vdebug) {
-        print "DEBUG: SNMP Auth options = $cmd\n";
-    }
 
     return $cmd;
 }//end snmp_gen_auth()

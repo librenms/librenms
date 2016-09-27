@@ -87,11 +87,35 @@ print_optionbar_start();
 
 <script>
 $(function () {
-    $("#dtpickerfrom").datetimepicker();
+    $("#dtpickerfrom").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#dtpickerfrom").on("dp.change", function (e) {
         $("#dtpickerto").data("DateTimePicker").minDate(e.date);
     });
-    $("#dtpickerto").datetimepicker();
+    $("#dtpickerto").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#dtpickerto").on("dp.change", function (e) {
         $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
     });

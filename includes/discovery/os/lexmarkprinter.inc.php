@@ -1,6 +1,5 @@
 <?php
-if (!$os) {
-    if (strstr($sysDescr, 'Lexmark ')) {
-        $os = 'lexmarkprinter';
-    }
+
+if (str_contains($sysDescr, 'Lexmark ')) {
+    $os = 'lexmarkprinter';
 }

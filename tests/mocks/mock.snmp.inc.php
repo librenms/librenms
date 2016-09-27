@@ -23,37 +23,229 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-function setSnmpMock($mockSnmpArray)
-{
-    global $mockSnmp;
-    $mockSnmp = $mockSnmpArray;
-}
+$snmpMockCache = array();
 
-function snmp_get($device, $oid)
+/**
+ * Cache the data from an snmprec file
+ * in ./tests/snmpsim/
+ *
+ * @param string $file the snmprec file name (excluding .snmprec)
+ */
+function cache_snmprec($file)
 {
-    global $mockSnmp;
-    if (isset($mockSnmp) && !empty($mockSnmp)) {
-        if (isset($mockSnmp[$oid])) {
-            return $mockSnmp[$oid];
-        }
+    global $config, $snmpMockCache;
+    if (isset($snmpMockCache[$file])) {
+        return;
     }
-    return false;
+    $snmpMockCache[$file] = array();
+
+    $data = file_get_contents($config['install_dir'] . "/tests/snmpsim/$file.snmprec");
+    $line = strtok($data, "\r\n");
+    while ($line !== false) {
+        list($oid, $type, $data) = explode('|', $line, 3);
+        if ($type == 4) {
+            $data = trim($data);
+        } elseif ($type == 6) {
+            $data = trim($data, '.');
+        }
+
+        $snmpMockCache[$file][$oid] = array($type, $data);
+        $line = strtok("\r\n");
+    }
 }
 
-function snmp_walk($device, $oid)
+/**
+ * Get all data of the specified $community from the snmprec cache
+ *
+ * @param string $community snmp community to return
+ * @return array array of the data containing: [$oid][$type, $data]
+ * @throws Exception this $community is not cached
+ */
+function snmprec_get($community)
 {
-    global $mockSnmp;
+    global $snmpMockCache;
+    cache_snmprec($community);
+    d_echo($snmpMockCache);
+
+    if (isset($snmpMockCache[$community])) {
+        return $snmpMockCache[$community];
+    }
+
+    throw new Exception("SNMPREC: community $community not cached");
+}
+
+/**
+ * Get an $oid from the specified $community
+ *
+ * @param string $community the community to fetch data from
+ * @param string $oid numeric oid of data to fetch
+ * @return array array of the data containing: [$type, $data]
+ * @throws Exception this $oid is not cached
+ */
+function snmprec_get_oid($community, $oid)
+{
+    global $snmpMockCache;
+    cache_snmprec($community);
+
+    if (isset($snmpMockCache[$community]) && isset($snmpMockCache[$community][$oid])) {
+        return $snmpMockCache[$community][$oid];
+    }
+
+    throw new Exception("SNMPREC: oid $community:$oid not cached");
+}
+
+/**
+ * Get the numeric oid of an oid
+ * The leading dot is ommited by default to be compatible with snmpsim
+ *
+ * @param string $oid the oid to tranlslate
+ * @param string $mib mib to use
+ * @param string $mibdir mib dir to look for mib in
+ * @return string the oid in numeric format (.1.3.4.5)
+ * @throws Exception Could not translate the oid
+ */
+function snmp_translate_number($oid, $mib = null, $mibdir = null)
+{
+    global $config;
+
+    // optimizations (35s -> 1.6s on my laptop)
+    if ($oid == 'SNMPv2-MIB::sysDescr.0') {
+        return '1.3.6.1.2.1.1.1.0';
+    }
+    if ($oid == 'SNMPv2-MIB::sysObjectID.0') {
+        return '1.3.6.1.2.1.1.2.0';
+    }
+    if ($oid == 'ENTITY-MIB::entPhysicalDescr.1') {
+        return '1.3.6.1.2.1.47.1.1.1.1.2.1';
+    }
+    if ($oid == 'SML-MIB::product-Name.0') {
+        return '1.3.6.1.4.1.2.6.182.3.3.1.0';
+    }
+    if ($oid == 'ENTITY-MIB::entPhysicalMfgName.1') {
+        return '1.3.6.1.2.1.47.1.1.1.1.12.1';
+    }
+    if ($oid == 'GAMATRONIC-MIB::psUnitManufacture.0') {
+        return '1.3.6.1.4.1.6050.1.1.2.0';
+    }
+    // end optimizations
+
+    if (preg_match('/^[\.\d]*$/', $oid)) {
+        return ltrim($oid, '.');
+    }
+
+    $cmd = "snmptranslate -IR -On $oid";
+    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mibdir']);
+    if (isset($mib) && $mib) {
+        $cmd .= " -m $mib";
+    }
+
+    $number = shell_exec($cmd);
+
+    if (empty($number)) {
+        throw new Exception('Could not translate oid: ' . $oid . PHP_EOL . 'Tried: ' . $cmd);
+    }
+
+    return trim($number, ". \n\r");
+}
+
+function snmp_translate_type($oid, $mib = null, $mibdir = null)
+{
+    global $config;
+
+    $cmd = "snmptranslate -IR -Td $oid";
+    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mibdir']);
+    if (isset($mib) && $mib) {
+        $cmd .= " -m $mib";
+    }
+
+    $result = shell_exec($cmd);
+
+    if (empty($result)) {
+        throw new Exception('Could not translate oid: ' . $oid . PHP_EOL . 'Tried: ' . $cmd);
+    }
+
+    if (str_contains($result, 'OCTET STRING')) {
+        return 4;
+    }
+    if (str_contains($result, 'Integer32')) {
+        return 2;
+    }
+    if (str_contains($result, 'NULL')) {
+        return 5;
+    }
+    if (str_contains($result, 'OBJECT IDENTIFIER')) {
+        return 6;
+    }
+    if (str_contains($result, 'IpAddress')) {
+        return 64;
+    }
+    if (str_contains($result, 'Counter32')) {
+        return 65;
+    }
+    if (str_contains($result, 'Gauge32')) {
+        return 66;
+    }
+    if (str_contains($result, 'TimeTicks')) {
+        return 67;
+    }
+    if (str_contains($result, 'Opaque')) {
+        return 68;
+    }
+    if (str_contains($result, 'Counter64')) {
+        return 70;
+    }
+
+    throw new Exception('Unknown type');
+}
+
+// Mocked functions
+
+function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    $community = $device['community'];
+    $num_oid = snmp_translate_number($oid, $mib, $mibdir);
+
+    try {
+        $data = snmprec_get_oid($community, $num_oid);
+
+        $result = $data[1];
+        if ($data[0] == 6) {
+            $result = '.' . $data[1];
+        }
+
+        d_echo("[SNMP] snmpget $community $num_oid: $result\n");
+
+        return $result;
+    } catch (Exception $e) {
+        d_echo("[SNMP] snmpget $community $num_oid: no data\n");
+        return false;
+    }
+}
+
+function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    $community = $device['community'];
+    $dev = snmprec_get($community);
+    $num_oid = snmp_translate_number($oid, $mib, $mibdir);
+
     $output = '';
-    foreach ($mockSnmp as $key => $value) {
-        if (starts_with($key, $oid)) {
-            $output .= $value . PHP_EOL;
+    foreach ($dev as $key => $data) {
+        if (starts_with($key, $num_oid)) {
+            if ($data[0] == 6) {
+                $output .= '.' . $data[1] . PHP_EOL;
+            } else {
+                $output .= $data[1] . PHP_EOL;
+            }
         }
     }
 
+    d_echo("[SNMP] snmpwalk $community $num_oid: ");
     if (empty($output)) {
+        d_echo("no data\n");
         // does this match the behavior of the real snmp_walk()?
         return false;
     } else {
+        d_echo($output);
         return $output;
     }
 }
@@ -61,4 +253,25 @@ function snmp_walk($device, $oid)
 function register_mibs()
 {
     // stub
+}
+
+function getHostOS($device)
+{
+    global $config;
+
+    $sysDescr = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+
+    d_echo("| $sysDescr | $sysObjectId | \n");
+
+    $os = null;
+    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    foreach (glob($pattern) as $file) {
+        include $file;
+        if (isset($os)) {
+            return $os;
+        }
+    }
+
+    return "generic";
 }

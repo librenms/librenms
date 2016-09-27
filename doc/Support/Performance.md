@@ -15,7 +15,7 @@ We absolutely recommend running this, it will save on IO load. [RRDCached](http:
 It's advisable after 24 hours of running MySQL that you run (MySQL Tuner)[https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl]
 which will make suggestions on things you can change specific to your setup.
 
-One recommendation we can make is that you set the following in my.cnf:
+One recommendation we can make is that you set the following in my.cnf under a [mysqld] group: 
 
 ```bash
 innodb_flush_log_at_trx_commit = 0
