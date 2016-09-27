@@ -1,6 +1,6 @@
 <?php
 
-if (str_contains($sysDescr, array('ProCurve', 'HP 1820'))) {
+if (str_contains($sysDescr, array('ProCurve', 'HP 1820'), true)) {
     $os = 'procurve';
 } elseif (preg_match('/eCos-[0-9.]+/', $sysDescr)) {
     $os = 'procurve';
