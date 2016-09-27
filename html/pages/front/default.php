@@ -116,7 +116,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 }
 
 // Device rebooted boxes
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) {
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0 && $config['os'][$os]['bad_uptime'] !== true) {
     if (is_admin() === true || is_read() === true) {
         $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '".$config['uptime_warning']."' AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
     } else {
