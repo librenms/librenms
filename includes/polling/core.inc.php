@@ -50,7 +50,7 @@ if ($device["os"] != "edgeswitch") {
     }
 }
 
-if (is_numeric($uptime)) {
+if (is_numeric($uptime) && $config['os'][$os]['bad_uptime'] !== true) {
     if ($uptime < $device['uptime']) {
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }
