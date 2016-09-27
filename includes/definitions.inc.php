@@ -1892,7 +1892,7 @@ $config['os'][$os]['icon']             = 'meraki';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['bad_uptime']       = 1;
+$config['os'][$os]['bad_uptime']       = true;
 
 $os = 'merakims';
 $config['os'][$os]['text']             = 'Meraki Switch';
