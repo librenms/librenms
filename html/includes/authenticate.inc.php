@@ -68,7 +68,7 @@ if (!$_SESSION['authenticated']) {
         /* try password auth */
         $_SESSION['username'] = $form_username;
         $auth_mechanism_successful = authenticate($form_username, $form_password);
-        if ($auth_mechanism_successful != 1) {
+        if ($auth_mechanism_successful !== 1) {
             $auth_mechanism_successful = false;
         }
         if (isset($_SESSION['username']) && $_SESSION['username'] !== $form_username) {
@@ -77,7 +77,7 @@ if (!$_SESSION['authenticated']) {
         }
     }
 
-    if ($auth_mechanism_successful) {
+    if ($auth_mechanism_successful === 1) {
         if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
             include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
             twofactor_auth();
@@ -119,7 +119,7 @@ if (!$_SESSION['authenticated']) {
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
 
         $permissions = permissions_cache($_SESSION['user_id']);
-        if ($auth_mechanism_successful) {
+        if ($auth_mechanism_successful === 1) {
             header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }

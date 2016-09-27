@@ -3,26 +3,30 @@
 
 function auth_end_session()
 {
-        /* delete the important things just in case, then blow this session away */
-        unset($_SESSION['authenticated']);
-        unset($_SESSION['user_id']);
-        unset($_SESSION['username']);
-        unset($_SESSION['userlevel']);
+    global $config;
 
-        /* out with the old */
-        session_unset();
-        session_destroy();
+    /* delete the important things just in case, then blow this session away */
+    unset($_SESSION['authenticated']);
+    unset($_SESSION['user_id']);
+    unset($_SESSION['username']);
+    unset($_SESSION['userlevel']);
 
-        /* in with the new */
-        session_start();
-        auth_update_session_id();
+    /* out with the old */
+    session_unset();
+    session_destroy();
 
-        $_SESSION['last_activity'] = time();
-        $_SESSION['expires'] = time() + $config['auth_unauthenticated_session_timeout']*60;
+    /* in with the new */
+    session_start();
+    auth_update_session_id();
+
+    $_SESSION['last_activity'] = time();
+    $_SESSION['expires'] = time() + $config['auth_unauthenticated_session_timeout']*60;
 }
 
 function auth_check_session()
 {
+    global $config;
+
     session_start();
 
     if (!isset($_SESSION['expires']) || !isset($_SESSION['last_activity'])) {
