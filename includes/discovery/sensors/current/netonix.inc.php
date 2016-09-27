@@ -29,7 +29,7 @@ if ($device['os'] == 'netonix') {
 
     $dcinput_oid = '.1.3.6.1.4.1.46242.7.0'; // NETONIX-SWITCH-MIB::dcdcInputCurrent.0
     $dcinput_value = snmp_get($device, $dcinput_oid, '-Oqv');
-    $descr = 'DC Power Input';
+    $descr = 'DC Input Current';
     $divisor = 10;
 
     if (is_numeric($dcinput_value) && $dcinput_value > 0) {
