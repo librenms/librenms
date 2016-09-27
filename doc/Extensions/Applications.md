@@ -22,6 +22,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
+1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [Agent Setup](#agent-setup)
 
 
@@ -38,8 +39,11 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 extend apache /etc/snmp/apache-stats.py
 ```
 4. Restart snmpd on your host
-5. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
-(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+5. Verify it is working by running /usr/lib/check_mk_agent/local/apache
+6. (In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+7. (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed, apt-get install libwww-perl)
+8. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
+
 
 
 ### BIND9 aka named
@@ -320,6 +324,21 @@ extend ups-nut /etc/snmp/ups-nut.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `UPS nut` under the Applications tab.
+
+
+
+### UPS-apcups
+A small shell script that exports apcacess ups status.
+
+##### SNMP Extend
+1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups.sh) to `/etc/snmp/` on your host.
+2. Make the script executable (chmod +x /etc/snmp/ups-apcups.sh)
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend ups-apcups /etc/snmp/ups-apcups.sh
+```
+4. Restart snmpd on your host
+5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
 
 
 

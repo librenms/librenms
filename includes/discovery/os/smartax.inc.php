@@ -23,8 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (!$os) {
-    if (strpos($sysDescr, 'Huawei Integrated Access Software') !== false) {
-        $os = 'smartax';
-    }
+if (str_contains($sysDescr, 'Huawei Integrated Access Software')) {
+    $os = 'smartax';
 }
