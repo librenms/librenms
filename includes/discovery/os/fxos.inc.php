@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (empty($os)) {
-    if (strstr($sysDescr, 'Cisco FX-OS')) {
-        $os = 'fxos';
-    }
+if (str_contains($sysDescr, 'Cisco FX-OS')) {
+    $os = 'fxos';
 }

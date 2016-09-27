@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Force10 Operating System')) {
-        $os = 'ftos';
-    }
+if (str_contains($sysDescr, 'Force10 Operating System')) {
+    $os = 'ftos';
 }

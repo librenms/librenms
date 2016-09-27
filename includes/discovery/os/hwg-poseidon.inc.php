@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.21796.3.3')) {
-        $os = 'hwg-poseidon';
-    }
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.21796.3.3')) {
+    $os = 'hwg-poseidon';
 }
