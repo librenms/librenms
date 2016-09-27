@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^Tranzeo/', $sysDescr)) {
-        $os = 'tranzeo';
-    }
+if (starts_with($sysDescr, 'Tranzeo')) {
+    $os = 'tranzeo';
 }

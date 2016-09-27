@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Palo Alto Networks')) {
-        $os = 'panos';
-    }
+if (str_contains($sysDescr, 'Palo Alto Networks')) {
+    $os = 'panos';
 }

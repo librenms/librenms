@@ -55,6 +55,7 @@ pages:
     - Extensions/MIB-based-polling.md
     - Extensions/Memcached.md
     - Extensions/Network-Map.md
+    - Extensions/NFSen.md
     - Extensions/Oxidized.md
     - Extensions/Plugin-System.md
     - Extensions/Poller-Service.md
@@ -71,16 +72,19 @@ pages:
     - Extensions/Two-Factor-Auth.md
     - Extensions/Varnish.md
 - Developing:
+    - Developing/Using-Git.md
     - Developing/Code-Guidelines.md
+    - Developing/Style-Guidelines.md
+    - Developing/Validating-Code.md
     - Developing/Code-Structure.md
+
     - Developing/Creating-Documentation.md
-    - Developing/Merging-Pull-Requests.md
-    - Developing/Creating-Release.md
+    - Developing/Support-New-OS.md
     - Developing/Dynamic-Config.md
     - Developing/Sensor-State-Support.md
-    - Developing/Style-Guidelines.md
-    - Developing/Using-Git.md
-    - Developing/Validating-Code.md
+
+    - Developing/Merging-Pull-Requests.md
+    - Developing/Creating-Release.md
 - API: API/API-Docs.md
 - Support:
     - Support/Configuration.md
@@ -90,7 +94,7 @@ pages:
     - Support/Install Validation.md
     - Support/Performance.md
     - Support/Poller Support.md
-    - Support/Support-New-OS.md
+    - Support/SNMP-Configuration-Examples.md
 - hidden:
     - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
     - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
@@ -98,3 +102,4 @@ pages:
     - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
     - Installation/Installation-(Debian-Ubuntu).md
     - Installation/Installation-(RHEL-CentOS).md
+    - Support/Support-New-OS.md

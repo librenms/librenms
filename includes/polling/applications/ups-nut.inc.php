@@ -17,6 +17,7 @@
 * @link       http://librenms.org
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
+*
 */
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-nut"
@@ -27,7 +28,7 @@ $ups_nut = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
-list ($charge, $bat_low, $remaining, $bat_volt, $model, $serial, $input_vol, $line_vol, $load) = explode("\n", $ups_nut);
+list ($charge, $battery_low, $remaining, $bat_volt, $input_volt, $line_volt, $load) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
@@ -42,11 +43,11 @@ $rrd_def = array(
 
 $fields = array(
     'charge' => $charge,
-    'battery_low' => $bat_low,
-    'time_remaining' => $remaining,
+    'battery_low' => $battery_low,
+    'time_remaining' => $remaining/60,
     'battery_voltage' => $bat_volt,
-    'input_voltage' => $input_vol,
-    'nominal_voltage' => $line_vol,
+    'input_voltage' => $line_volt,
+    'nominal_voltage' => $input_volt,
     'load' => $load,
 );
 
