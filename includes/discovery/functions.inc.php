@@ -872,10 +872,14 @@ function avtech_add_sensor($device, $sensor)
  */
 function get_device_divisor($device, $serial, $sensor)
 {
-    if (($device['os'] == 'poweralert') && ($sensor == 'current' || $sensor == 'frequencies' || $sensor == 'voltages')) {
-        if (version_compare($serial, '12.06.0068', '>=')) {
-            $divisor = 10;
-        } elseif (version_compare($serial, '12.04.0055', '>=')) {
+    if ($device['os'] == 'poweralert') {
+        if ($sensor == 'current' || $sensor == 'frequencies') {
+            if (version_compare($serial, '12.06.0068', '>=')) {
+                $divisor = 10;
+            } elseif (version_compare($serial, '12.04.0055', '>=')) {
+                $divisor = 1;
+            }
+        } elseif ($sensor == 'voltages') {
             $divisor = 1;
         }
     } elseif (($device['os'] == 'huaweiups') && ($sensor == 'frequencies')) {
