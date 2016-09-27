@@ -134,7 +134,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = implode(',', $in_devices);
         }
 
-        if ($show_disabled_ignored != 1) {
+        if ($show_disabled_ignored == 1) {
             $disabled_ignored = ', `D`.`ignore`, `D`.`disabled`';
         }
 
