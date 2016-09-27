@@ -15,4 +15,10 @@ if (preg_match('/Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
 }
 
 $serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerialNum.10", "-Osqnv");
-$hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');
+if ($serial === 'notForwarding') {
+    unset($serial);
+}
+$hardware = $poll_device['sysObjectID'];
+if ($hardware === 'enterprises.8072.3.2.10') {
+    unset($hardware);
+}

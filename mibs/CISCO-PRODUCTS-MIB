@@ -18,7 +18,7 @@ IMPORTS
 		FROM CISCO-SMI;
 
 ciscoProductsMIB MODULE-IDENTITY
-	LAST-UPDATED	"201607080000Z"
+	LAST-UPDATED	"201609190000Z"
 	ORGANIZATION	"Cisco Systems, Inc."
 	CONTACT-INFO
 		"       Cisco Systems
@@ -1819,6 +1819,8 @@ ciscoN9KC93128TX                OBJECT IDENTIFIER ::= { ciscoProducts 1923 } -- 
 ciscoN9KC9396TX                 OBJECT IDENTIFIER ::= { ciscoProducts 1924 } -- 2RU TOR, 48x10GT+12x40G QSFP
 ciscoN9KC9396PX                 OBJECT IDENTIFIER ::= { ciscoProducts 1925 } -- 2RU TOR, 48x10GF+12x40G QSFP 
 ciscoUcsEN120S                  OBJECT IDENTIFIER ::= { ciscoProducts 1931 } -- UCS E-Series Network compute engine 2-Core Service module (UCS-EN120S-M2/K9)
+ciscoUcsEN140N                  OBJECT IDENTIFIER ::= { ciscoProducts 1932 } -- UCS E-Series Network compute engine 4-Core Network interface module (UCS-EN140N-M2/K9)
+ciscoUcsEN120E                  OBJECT IDENTIFIER ::= { ciscoProducts 1933 } -- UCS E-Series Network compute engine 2-Core Enhanced High-speed WAN interface card (UCS-EN120E-M2/K9)
 ciscoC68xxVirtualSwitch         OBJECT IDENTIFIER ::= { ciscoProducts 1934 } -- 68xx Virtual Switch 
 ciscoISR4431                    OBJECT IDENTIFIER ::= { ciscoProducts 1935 } -- Cisco ISR 4431 Router Chassis
 ciscoC6880x                     OBJECT IDENTIFIER ::= { ciscoProducts 1936 } -- Catalyst 6880 chassis 
@@ -1926,6 +1928,8 @@ ciscoASA5508K7                      OBJECT IDENTIFIER ::= { ciscoProducts 2126 }
 ciscoASA5508K7sc                    OBJECT IDENTIFIER ::= { ciscoProducts 2127 } -- ASA 5508 Adaptive Security Appliance Security Context with No Payload Encryption
 ciscoASA5508K7sy                    OBJECT IDENTIFIER ::= { ciscoProducts 2128 } -- ASA 5508 Adaptive Security Appliance System Context with No Payload Encryption
 ciscoAIRAP1702                      OBJECT IDENTIFIER ::= { ciscoProducts 2129 } --  Cisco Aironet 1700 Series (IEEE 802.11ac) Access Point
+catwsC3560CX8ptS                    OBJECT IDENTIFIER ::= { ciscoProducts 2130 } -- Smirnoff catalyst 3560CX 8x GE downlink ,PoE+, 2x 1G copper UPOE uplinks.
+catwsC3560CX8XpdS                   OBJECT IDENTIFIER ::= { ciscoProducts 2131 } -- Smirnoff catalyst 3560CX 2x mGig + 6x GE  downlink ,PoE+, 2x SFP+ uplinks.
 catwsC3560CX12pdS                   OBJECT IDENTIFIER ::= { ciscoProducts 2132 } -- Smirnoff catalyst 3560CX 12x GE downlink, PoE+, 2x CU + 2x 10G SFP+ uplinks
 catwsC3560CX12tcS                   OBJECT IDENTIFIER ::= { ciscoProducts 2133 } -- Smirnoff catalyst 3560CX 12x GE downlink, 2x Copper + 2x SFP uplinks
 catwsC3560CX12pcS                   OBJECT IDENTIFIER ::= { ciscoProducts 2134 } -- Smirnoff catalyst 3560CX 12x GE downlink, PoE+, 2x copper + 2x SFP uplink
@@ -2095,6 +2099,10 @@ ciscoNcs4201                        OBJECT IDENTIFIER ::= { ciscoProducts 2326 }
 ciscoNcs4202                        OBJECT IDENTIFIER ::= { ciscoProducts 2327 } -- NCS 4202 System (1RU,12GE,4-10GE and 1 SLOT)
 ciscoNcs4206                        OBJECT IDENTIFIER ::= { ciscoProducts 2328 } -- NCS 4206 System (3RU and 6 SLOT)
 ciscoNcs4216                        OBJECT IDENTIFIER ::= { ciscoProducts 2329 } -- NCS 4216 System (7RU and 16 SLOT)
+ciscoIE10004TLM                     OBJECT IDENTIFIER ::= { ciscoProducts 2330 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 5x 10/100 BaseT Copper ports
+ciscoIE10006TLM                     OBJECT IDENTIFIER ::= { ciscoProducts 2331 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 8x 10/100 BaseT Copper ports
+ciscoIE10004PTSLM                   OBJECT IDENTIFIER ::= { ciscoProducts 2332 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 4x 10/100 BaseT downlink ports and 2X GE SFP uplink ports
+ciscoIE10008PTSLM                   OBJECT IDENTIFIER ::= { ciscoProducts 2333 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 8x 10/100 BaseT downlink ports and 2X GE SFP uplink ports
 ciscoVFTD                           OBJECT IDENTIFIER ::= { ciscoProducts 2334 } -- Cisco Virtual Firepower Threat Defense
 ciscoRAIE1783IMS28GNAC              OBJECT IDENTIFIER ::= { ciscoProducts 2340 } -- Cisco IE5000 for Rockwell Automation ruggedized Ethernet switch supports Lanbase license and AC power supply with 12x10/100/1000 BaseT Copper downlinks with POE/POE+, 12x100/1000BaseX Fiber SFP downlinks, 4x1G Fiber SFP+ uplinks, Timing module
 ciscoRAIE1783IMS28GNDC              OBJECT IDENTIFIER ::= { ciscoProducts 2341 } -- Cisco IE5000 for Rockwell Automation ruggedized Ethernet switch supports Lanbase license and DC power supply with 12x10/100/1000 BaseT Copper downlinks with POE/POE+, 12x100/1000BaseX Fiber SFP downlinks, 4x1G Fiber SFP+ uplinks, Timing module
@@ -2105,12 +2113,17 @@ cisco897VAGWLTEGAEK9                OBJECT IDENTIFIER ::= { ciscoProducts 2345 }
 cisco886VAGLTEGAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2346 } -- C886VAG-LTE-GA-K9 router with 1 WAN VDSL2/ADSL2+ over ISDN, 1 4G LTE secure platform multi-mode Global (Europe) LTE/HSPA+, 4 Fast Ethernet LAN, 1 USB 2.0 port, 1 Console/Aux port, 256MB flash memory and 1GB DRAM
 ciscoNcs1002                        OBJECT IDENTIFIER ::= { ciscoProducts 2347 } -- NCS 1002 System (1RP, 3 FANs, 2 Powers)
 ciscoNCS5508                        OBJECT IDENTIFIER ::= { ciscoProducts 2349 } -- Network Convergence Services NCS5500 8 Slot Single Chassis
+ciscoNCS5501SE                      OBJECT IDENTIFIER ::= { ciscoProducts 2350 } -- Network Convergence Services NCS5501 Fixed 40x10G and 4x100G Scale chassis
+ciscoNCS5502SE                      OBJECT IDENTIFIER ::= { ciscoProducts 2351 } -- Network Convergence Services NCS5502 Fixed 48x100G Scale chassis
 ciscoUnifiedSipProxy                OBJECT IDENTIFIER ::= { ciscoProducts 2352 } -- SIP-based stateless call routing engine
 cisco898EAGLTELAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2355 } -- 4G LTE Latin America router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 EFM over G.SH DSL WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco897VAGLTELAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2356 } -- 4G LTE  Latin America router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 VDSL2/ADSL2+ Annex A Data Backup WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 ISDN BRI S/T interface, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco819GWLTELACK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2357 } -- C819GW-LTE-LA-CK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
 cisco819GWLTELAQK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2358 } -- C819GW-LTE-LA-QK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
 cisco819GWLTELANK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2359 } -- C819GW-LTE-LA-NK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
+cisco867VAEK9V2                     OBJECT IDENTIFIER ::= { ciscoProducts 2378 } -- Cisco 867VAE Secure router with VDSL2/ADSL2+ over POTS
+cisco866VAEK9V2                     OBJECT IDENTIFIER ::= { ciscoProducts 2379 } -- Cisco 866VAE Secure router with VDSL2/ADSL2+ over ISDN
+cisco867VAEV2                       OBJECT IDENTIFIER ::= { ciscoProducts 2380 } -- Cisco 867VAE router with VDSL2/ADSL2+ over POTS
 cisco899GLTELAK9                    OBJECT IDENTIFIER ::= { ciscoProducts 2381 } -- C899G-LTE-LA-K9 4G router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 EFM over G.SH DSL WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco819GLTELAK9                    OBJECT IDENTIFIER ::= { ciscoProducts 2382 } -- C819G-LTE-LA-K9 Router with 1 Gigabit Ethernet WAN, 4 Fast Ethernet LAN, 1 AT&T LTE modem, 1 Serial, 1 Console/Aux ports,256MB flash memory, 512MB DRAM
 ciscoStealthWatch2404               OBJECT IDENTIFIER ::= { ciscoProducts 2385 } -- Cisco StealthWatch Packet Analyzer 2404
@@ -2121,11 +2134,15 @@ cisco819HGLTEMNAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2392 }
 ciscoIR829GWLTEGASK9                OBJECT IDENTIFIER ::= { ciscoProducts 2393 } -- IR829 Hardened WAN GE 4G LTE secure platform multi-mode Global (Singapore) LTE/HSPA+ with 802.11n, PoE, Australia Compliant
 ciscoIR829GWLTEGACK9                OBJECT IDENTIFIER ::= { ciscoProducts 2394 } -- IR829 Hardened WAN GE 4G LTE secure platform multi-mode Global (Malaysia) LTE/HSPA+ with 802.11n, PoE, Australia Compliant
 ciscoCSP2100                        OBJECT IDENTIFIER ::= { ciscoProducts 2397 } -- Cloud Services Platform Model CSP-2100
+ciscoNCS5501                        OBJECT IDENTIFIER ::= { ciscoProducts 2400 } -- Network Convergence Services NCS5501 Fixed 48x10G and 6x100G chassis
+ciscoNCS5502                        OBJECT IDENTIFIER ::= { ciscoProducts 2401 } -- Network Convergence Services NCS5502 Fixed 48x100G chassis
 ciscoNCS4216F2BSA                   OBJECT IDENTIFIER ::= { ciscoProducts 2402 } -- NCS 4216 Front to Back Shelf Assembly (16 slots - 14 RU) - Includes Air Deflector Plenum and Brackets/Guides
 ciscoFpr2110td                      OBJECT IDENTIFIER ::= { ciscoProducts 2404 } -- Cisco FirePOWER 2110 Security Appliance, 1U with embedded security module 
 ciscoFpr2120td                      OBJECT IDENTIFIER ::= { ciscoProducts 2405 } -- Cisco FirePOWER 2120 Security Appliance, 1U with embedded security module  
 ciscoFpr2130td                      OBJECT IDENTIFIER ::= { ciscoProducts 2406 } -- Cisco FirePOWER 2130 Security Appliance, 1U with embedded security module
 ciscoFpr2140td                      OBJECT IDENTIFIER ::= { ciscoProducts 2407 } -- Cisco FirePOWER 2140 Security Appliance, 1U with embedded security module 
+ciscoFpr9000SM44                    OBJECT IDENTIFIER ::= { ciscoProducts 2409 } -- Cisco FirePOWER 9000 Security Module 44
+ciscoNCS5011                        OBJECT IDENTIFIER ::= { ciscoProducts 2411 } -- Cisco NCS 5011 Series Router
 END
 
 
