@@ -925,19 +925,30 @@ function get_toner_levels($device, $oid_value, $oid_capacity)
             $current = ($oid_value / $oid_capacity * 100);
         }
     } elseif ($device['os'] == 'brother') {
-        switch ($oid_value) {
-            case '0':
-                $current = 100;
-                break;
-            case '1':
-                $current = 5;
-                break;
-            case '2':
-                $current = 0;
-                break;
-            case '3':
-                $current = 1;
-                break;
+        if (str_contains($device['hardware'], 'NC-8600h')) {
+            switch ($oid_value) {
+                case '0':
+                    $current = 0;
+                    break;
+                case '-3':
+                    $current = 50;
+                    break;
+            }
+        } else {
+            switch ($oid_value) {
+                case '0':
+                    $current = 100;
+                    break;
+                case '1':
+                    $current = 5;
+                    break;
+                case '2':
+                    $current = 0;
+                    break;
+                case '3':
+                    $current = 1;
+                    break;
+            }
         }
     } else {
         $current = ($oid_value / $oid_capacity * 100);
