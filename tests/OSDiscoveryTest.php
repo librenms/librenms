@@ -1166,6 +1166,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('siklu');
     }
 
+    public function testSinetica()
+    {
+        $this->checkOS('sinetica');
+    }
+
     public function testSmartax()
     {
         $this->checkOS('smartax');
