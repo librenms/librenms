@@ -22,6 +22,38 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }
 
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
+
+        $untagged_port_indices = q_bridge_bits2indices($tagoruntag[0][$vlan_id]);
+        $tagoruntag = q_bridge_bits2indices($untag[0][$vlan_id]);
+        $tagged_port_indices = $array_diff($tagoruntag_ports, $untagged_ports);
+
+        foreach ($tagged_port_indices as $port_ifindex) {
+            $port = get_port_by_index_cache($device, $port_ifindex);
+            echo str_pad("q-bridge ", 10).str_pad($port_ifindex, 10).str_pad($port['ifDescr'], 25).str_pad("n/a", 10).str_pad("n/a", 15).str_pad("n/a", 10);
+
+            $db_w = array(
+                'device_id' => $device['device_id'],
+                'port_id'   => $port['port_id'],
+                'vlan'      => $vlan_id,
+            );
+
+            $db_a['baseport'] = $port_ifindex;
+            $db_a['priority'] = 0;
+            $db_a['state']    = 'unknown';
+            $db_a['cost']     = 0;
+
+            $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', array($device['device_id'], $port['port_id'], $vlan_id));
+
+            if ($from_db['port_vlan_id']) {
+                dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', array($from_db['port_vlan_id']));
+                echo 'Updated';
+            } else {
+                dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
+                echo 'Inserted';
+            }
+
+            echo "\n";
+        }//end foreach
     }
 }
 
