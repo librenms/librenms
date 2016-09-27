@@ -1,16 +1,7 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/D-Link DES-/', $sysDescr)) {
-        $os = 'dlink';
-    }
-    if (preg_match('/Dlink DES-/', $sysDescr)) {
-        $os = 'dlink';
-    }
-    if (preg_match('/^DES-/', $sysDescr)) {
-        $os = 'dlink';
-    }
-    if (preg_match('/^DGS-/', $sysDescr)) {
-        $os = 'dlink';
-    }
+if (str_contains($sysDescr, array('D-Link DES-', 'Dlink DES-'))) {
+    $os = 'dlink';
+} elseif (starts_with($sysDescr, array('DES-', 'DGS-'))) {
+    $os = 'dlink';
 }
