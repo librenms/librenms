@@ -9,7 +9,6 @@ require_once 'includes/authentication_functions.inc.php';
 
 /* make sure our PHP sessions can survive for the desired amount of time */
 @ini_set('session.gc_maxlifetime', $config['auth_remember'] * 60 * 60 * 24);
-@ini_set('session.cookie_lifetime', $config['auth_remember'] * 60 * 60 * 24);
 
 
 auth_check_session();
@@ -87,6 +86,21 @@ if (!$_SESSION['authenticated']) {
         if (!$config['twofactor'] || $_SESSION['twofactor']) {
             /* Congratulations, you are authenticated! */
 
+            /* do this before changing the session_id so the session cookie has
+             * the right lifetime; a long expiration time on an unauthenticated
+             * session should not be dangerous */
+            if (isset($_POST['remember'])) {
+                // keep session cookie for auth_remember days
+                session_set_cookie_params($config['auth_remember'] * 60 * 60 * 24);
+                $_SESSION['expires'] = time() + $config['auth_remember'] * 60 * 60 * 24;
+            } else {
+                // keep session cookie for the duration of the browser session
+                session_set_cookie_params(0);
+
+                // valid for auth_no_remember minutes, regardless of activity
+                $_SESSION['expires'] = time() + $config['auth_no_remember'] * 60;
+            }
+
             /* prevent session fixation vulnerabilities */
             auth_update_session_id();
 
@@ -103,13 +117,6 @@ if (!$_SESSION['authenticated']) {
         }
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
-
-        if (isset($_POST['remember'])) {
-            $_SESSION['expires'] = time() + $config['auth_remember'] * 60 * 60 * 24;
-        } else {
-            $auth_no_remember = 60; /* minutes */
-            $_SESSION['expires'] = time() + $auth_no_remember * 60;
-        }
 
         $permissions = permissions_cache($_SESSION['user_id']);
         if ($auth_mechanism_successful) {
