@@ -6,7 +6,7 @@ $divisor = get_device_divisor($device, $_tmp_serial, 'current');
 if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
     echo 'RFC1628 ';
 
-    $oids = snmp_walk($device, '1.3.6.1.2.1.33.1.2.6', '-Osqn', 'UPS-MIB');
+    $oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.2.6', '-Osqn', 'UPS-MIB');
     d_echo($oids."\n");
 
     $oids = trim($oids);
@@ -16,7 +16,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $current_id       = $split_oid[(count($split_oid) - 1)];
-            $current_oid      = "1.3.6.1.2.1.33.1.2.6.$current_id";
+            $current_oid      = ".1.3.6.1.2.1.33.1.2.6.$current_id";
             $precision        = 10;
             $current          = (snmp_get($device, $current_oid, '-O vq') / $precision);
             $descr            = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
