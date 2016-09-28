@@ -39,20 +39,35 @@ $selected_cpu = '';
 $selected_ram = '';
 
 switch ($top_query) {
-    case "0":
+    case "traffic":
+        $table_header = 'Traffic';
         $selected_traffic = 'selected';
+        $graph_type = 'device_bits';
+        $params = '';
         break;
-    case "1":
+    case "uptime":
+        $table_header = 'Uptime';
         $selected_uptime = 'selected';
+        $graph_type = 'device_uptime';
+        $params = array('tab' => 'graphs', 'group' => 'system');
         break;
-    case "2":
+    case "ping":
+        $table_header = 'Response time';
         $selected_ping = 'selected';
+        $graph_type = 'device_ping_perf';
+        $params = array('tab' => 'graphs', 'group' => 'poller');
         break;
-    case "3":
+    case "cpu":
+        $table_header = 'CPU Load';
         $selected_cpu = 'selected';
+        $graph_type = 'device_processor';
+        $params = array('tab' => 'health', 'metric' => 'processor');
         break;
-    case "4":
+    case "ram":
+        $table_header = 'Memory usage';
         $selected_ram = 'selected';
+        $graph_type = 'device_mempool';
+        $params = array('tab' => 'health', 'metric' => 'mempool');
         break;
 }
 
@@ -74,11 +89,11 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select class="form-control" name="top_query">
-                    <option value="0" ' . $selected_traffic . '>Traffic</option>
-                    <option value="1" ' . $selected_uptime . '>Uptime</option>
-                    <option value="2" ' . $selected_ping . '>Response time</option>
-                    <option value="3" ' . $selected_cpu . '>Processor load</option>
-                    <option value="4" ' . $selected_ram . '>Memory usage</option>
+                    <option value="traffic" ' . $selected_traffic . '>Traffic</option>
+                    <option value="uptime" ' . $selected_uptime . '>Uptime</option>
+                    <option value="ping" ' . $selected_ping . '>Response time</option>
+                    <option value="cpu" ' . $selected_cpu . '>Processor load</option>
+                    <option value="ram" ' . $selected_ram . '>Memory usage</option>
                 </select>
             </div>
         </div>
@@ -117,8 +132,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
     $params = array('user' => $_SESSION['user_id'], 'interval' => array($interval_seconds), 'count' => array($device_count));
 
-    if ($top_query == 0) {
-        $table_header = 'Traffic';
+    if ($top_query === 'traffic') {
         if (is_admin() || is_read()) {
             $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
@@ -145,8 +159,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             LIMIT :count
             ';
         }
-    } elseif ($top_query == 1) {
-        $table_header = 'Uptime';
+    } elseif ($top_query === 'uptime') {
         if (is_admin() || is_read()) {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
@@ -162,8 +175,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       ORDER BY `uptime` DESC 
                       LIMIT :count';
         }
-    } elseif ($top_query == 2) {
-        $table_header = 'Response time';
+    } elseif ($top_query === 'ping') {
         if (is_admin() || is_read()) {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
@@ -179,8 +191,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       ORDER BY `last_ping_timetaken` DESC 
                       LIMIT :count';
         }
-    } elseif ($top_query == 3) {
-        $table_header = 'CPU Load';
+    } elseif ($top_query === 'cpu') {
         if (is_admin() || is_read()) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload` 
                       FROM `processors` AS `procs`, `devices` AS `d` 
@@ -198,8 +209,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       ORDER BY `cpuload` DESC
                       LIMIT :count';
         }
-    } elseif ($top_query == 4) {
-        $table_header = 'Memory usage';
+    } elseif ($top_query === 'ram') {
         if (is_admin() || is_read()) {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc` 
                       FROM `mempools` as `mem`, `devices` as `d`
@@ -231,18 +241,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         <tbody>';
 
     foreach (dbFetchRows($query, $params) as $result) {
-        if ($top_query == 0) {
-            $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_bits', 'no', 150, 21), array(), 0, 0, 0);
-        } elseif ($top_query == 1) {
-            $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_uptime', 'no', 150, 21), array('tab' => 'graphs', 'group' => 'system'), 0, 0, 0);
-        } elseif ($top_query == 2) {
-            $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_ping_perf', 'no', 150, 21), array('tab' => 'graphs', 'group' => 'poller'), 0, 0, 0);
-        } elseif ($top_query == 3) {
-            $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_processor', 'no', 150, 21), array('tab' => 'health', 'metric' => 'processor'), 0, 0, 0);
-        } elseif ($top_query == 4) {
-            $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_mempool', 'no', 150, 21), array('tab' => 'health', 'metric' => 'mempool'), 0, 0, 0);
-        }
-
+        $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $params, 0, 0, 0);
         $common_output[] = '
         <tr>
             <td class="text-left">' . generate_device_link($result, shorthost($result['hostname'])) . '</td>
