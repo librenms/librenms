@@ -42,5 +42,6 @@ class VlanFunctionsTest extends \PHPUnit_Framework_TestCase
         $binstr = "This is only a test.\x00\xff";
 
         $this->assertTrue(hex2bin($hexstr) === $binstr);
+        $this->assertTrue(hex2bin_compat($hexstr) === $binstr);
     }
 }

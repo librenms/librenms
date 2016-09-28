@@ -1,12 +1,18 @@
 <?php
 /* idea from http://php.net/manual/en/function.hex2bin.php comments */
+function hex2bin_compat($str)
+{
+    if (strlen($str) % 2 !== 0) {
+        trigger_error(__FUNCTION__.'(): Hexadecimal input string must have an even length', E_USER_WARNING);
+    }
+    return pack("H*", $str);
+}
+
 if (!function_exists('hex2bin')) {
+    // This is only a hack
     function hex2bin($str)
     {
-        if (strlen($str) % 2 !== 0) {
-            trigger_error(__FUNCTION__.'(): Hexadecimal input string must have an even length', E_USER_WARNING);
-        }
-        return pack("H*", substr($str, $i, 2));
+        return hex2bin_compat($str);
     }
 }
 
