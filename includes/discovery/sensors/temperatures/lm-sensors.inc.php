@@ -15,7 +15,7 @@ if ($device['os'] == 'linux' || $device['os'] == 'pktj' || $device['os'] == 'cum
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $temperature_id   = $split_oid[(count($split_oid) - 1)];
-            $temperature_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temperature_id";
+            $temperature_oid  = ".1.3.6.1.4.1.2021.13.16.2.1.3.$temperature_id";
             $temperature      = (snmp_get($device, $temperature_oid, '-Ovq') / 1000);
             $descr            = str_ireplace('temperature-', '', $descr);
             $descr            = str_ireplace('temp-', '', $descr);

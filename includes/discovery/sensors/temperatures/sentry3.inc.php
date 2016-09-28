@@ -19,7 +19,7 @@ if ($device['os'] == 'sentry3') {
             $index            = $split_oid[(count($split_oid) - 1)];
 
             // tempHumidSensorTempValue
-            $temperature_oid = '1.3.6.1.4.1.1718.3.2.5.1.6.1.'.$index;
+            $temperature_oid = '.1.3.6.1.4.1.1718.3.2.5.1.6.1.'.$index;
             $descr           = 'Removable Sensor '.$index;
             $low_warn_limit  = null;
             $low_limit       = (snmp_get($device, "tempHumidSensorTempLowThresh.1.$index", '-Ovq', 'Sentry3-MIB') / $divisor);

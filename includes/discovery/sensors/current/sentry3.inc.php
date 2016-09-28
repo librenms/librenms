@@ -28,7 +28,7 @@ if ($device['os'] == 'sentry3') {
                 $infeed_index            = $split_oid[(count($split_oid) - 1)];
 
                 // infeedLoadValue
-                $infeed_oid = '1.3.6.1.4.1.1718.3.2.2.1.7.'.$towers.'.1';
+                $infeed_oid = '.1.3.6.1.4.1.1718.3.2.2.1.7.'.$towers.'.1';
 
                 $descr_string    = snmp_get($device, "infeedID.$towers.$infeed_index", '-Ovq', 'Sentry3-MIB');
                 $descr           = "Infeed $descr_string";
@@ -63,7 +63,7 @@ if ($device['os'] == 'sentry3') {
                         $outlet_insert_index = $towers.$outlet_index;
 
                         // outletLoadValue: "A non-negative value indicates the measured load in hundredths of Amps"
-                        $outlet_oid             = "1.3.6.1.4.1.1718.3.2.3.1.7.$outletsuffix";
+                        $outlet_oid             = ".1.3.6.1.4.1.1718.3.2.3.1.7.$outletsuffix";
                         $outlet_descr_string    = snmp_get($device, "outletID.$outletsuffix", '-Ovq', 'Sentry3-MIB');
                         $outlet_descr           = "Outlet $outlet_descr_string";
                         $outlet_low_warn_limit  = null;

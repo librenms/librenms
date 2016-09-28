@@ -12,8 +12,8 @@
 
 if ($device['os'] == 'riverbed') {
     $tables = array(
-        array('systemHealth.0','1.3.6.1.4.1.17163.1.1.2.7.0','systemHealth','System Health') ,
-        array('optServiceStatus.0','1.3.6.1.4.1.17163.1.1.2.8.0','optServiceStatus','Optimization Service Status')
+        array('systemHealth.0','.1.3.6.1.4.1.17163.1.1.2.7.0','systemHealth','System Health') ,
+        array('optServiceStatus.0','.1.3.6.1.4.1.17163.1.1.2.8.0','optServiceStatus','Optimization Service Status')
     );
 
     foreach ($tables as $tablevalue) {

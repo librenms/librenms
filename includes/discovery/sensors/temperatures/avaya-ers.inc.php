@@ -8,7 +8,7 @@ if ($device['os'] == 'avaya-ers') {
 
     // Temperature info only known to be present in firmware 6.1 or higher
     if ($fw_major_version >= 6.1) {
-        $temps = snmp_walk($device, '1.3.6.1.4.1.45.1.6.3.7.1.1.5.5', '-Osqn');
+        $temps = snmp_walk($device, '.1.3.6.1.4.1.45.1.6.3.7.1.1.5.5', '-Osqn');
 
         foreach (explode("\n", $temps) as $i => $t) {
             $t   = explode(' ', $t);

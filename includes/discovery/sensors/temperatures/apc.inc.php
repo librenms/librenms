@@ -1,7 +1,7 @@
 <?php
 
 if ($device['os'] == 'apc') {
-    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
     d_echo($oids."\n");
 
     if ($oids) {
@@ -71,9 +71,9 @@ if ($device['os'] == 'apc') {
     }
 
     // Portable Air Conditioner
-    $set_oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.4.0', '-OsqnU', '');
+    $set_oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.4.0', '-OsqnU', '');
 
-    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.10.0', '-OsqnU', '');
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.10.0', '-OsqnU', '');
     d_echo($oids."\n");
     d_echo($set_oids."\n");
 
@@ -96,7 +96,7 @@ if ($device['os'] == 'apc') {
     }
 
     unset($oids);
-    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.12.0', '-OsqnU', '');
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.12.0', '-OsqnU', '');
     d_echo($oids."\n");
 
     if ($oids !== false) {
@@ -118,7 +118,7 @@ if ($device['os'] == 'apc') {
     }
 
     unset($oids);
-    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.14.0', '-OsqnU', '');
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.14.0', '-OsqnU', '');
     d_echo($oids."\n");
     if ($oids !== false) {
         echo 'APC Portable Remote Temp ';

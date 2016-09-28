@@ -18,11 +18,11 @@ if ($device['os'] == 'canopy') {
             $oid = 'lastPowerLevel.2';
             $mib = 'WHISP-APS-MIB';
         } else {
-            $oid  = '1.3.6.1.4.1.161.19.3.2.2.21.0';
+            $oid  = '.1.3.6.1.4.1.161.19.3.2.2.21.0';
             $mib = 'WHISP-BOX-MIBV2-MIB';
         }
     } else {
-        $oid  = '1.3.6.1.4.1.161.19.3.2.2.21.0';
+        $oid  = '.1.3.6.1.4.1.161.19.3.2.2.21.0';
         $mib = 'WHISP-BOX-MIBV2-MIB';
     }
     

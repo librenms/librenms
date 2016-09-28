@@ -7,7 +7,7 @@ if ($device['os'] == 'eatonups') {
     $oids = snmpwalk_cache_oid($device, 'xupsBatCurrent', array(), 'XUPS-MIB');
 
     foreach ($oids as $current_id => $data) {
-        $current_oid      = "1.3.6.1.4.1.534.1.2.3.$current_id";
+        $current_oid      = ".1.3.6.1.4.1.534.1.2.3.$current_id";
         $divisor          = 1;
         $current          = $data['xupsBatCurrent'];
         $descr            = 'Battery'.(count($oids) == 1 ? '' : ' '.($current_id + 1));
@@ -20,7 +20,7 @@ if ($device['os'] == 'eatonups') {
     $oids = snmpwalk_cache_oid($device, 'xupsOutputCurrent', array(), 'XUPS-MIB');
 
     foreach ($oids as $current_id => $data) {
-        $current_oid = "1.3.6.1.4.1.534.1.4.4.1.3.$current_id";
+        $current_oid = ".1.3.6.1.4.1.534.1.4.4.1.3.$current_id";
         $descr   = 'Output';
         if (count($oids) > 1) {
             $descr .= " Phase $current_id";
@@ -36,7 +36,7 @@ if ($device['os'] == 'eatonups') {
     $oids = snmpwalk_cache_oid($device, 'xupsInputCurrent', array(), 'XUPS-MIB');
 
     foreach ($oids as $current_id => $data) {
-        $current_oid = "1.3.6.1.4.1.534.1.3.4.1.3.$current_id";
+        $current_oid = ".1.3.6.1.4.1.534.1.3.4.1.3.$current_id";
         $descr   = 'Input';
         if (count($oids) > 1) {
             $descr .= " Phase $current_id";

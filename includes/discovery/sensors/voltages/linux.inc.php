@@ -45,7 +45,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $index            = $split_oid[(count($split_oid) - 1)];
-            $oid              = '1.3.6.1.4.1.2021.13.16.4.1.3.'.$index;
+            $oid              = '.1.3.6.1.4.1.2021.13.16.4.1.3.'.$index;
             $current          = (snmp_get($device, $oid, '-Oqv', 'LM-SENSORS-MIB') / $divisor);
 
             discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
