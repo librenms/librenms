@@ -62,10 +62,6 @@ function poll_sensor($device, $class, $unit)
                     if (!empty($temp_response[0])) {
                         $sensor_value = $temp_response[0];
                     }
-                    if (is_numeric($sensor_value) && $sensor_value != 9999) {
-                        break;
-                        // TME sometimes sends 999.9 when it is right in the middle of an update;
-                    }// end if
                 }//end if
             } elseif ($class == "voltage" && $device['os'] == 'hytera') {
                 require_once "includes/polling/voltages/hytera.inc.php";
