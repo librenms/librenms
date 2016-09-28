@@ -236,11 +236,10 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         <tbody>';
 
     foreach (dbFetchRows($query, $params) as $result) {
-        $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0);
         $common_output[] = '
         <tr>
             <td class="text-left">' . generate_device_link($result, shorthost($result['hostname'])) . '</td>
-            <td class="text-left">' . $graphs . '</td>
+            <td class="text-left">' . generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0) . '</td>
         </tr>';
     }
     $common_output[] = '
