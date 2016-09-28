@@ -43,31 +43,31 @@ switch ($top_query) {
         $table_header = 'Traffic';
         $selected_traffic = 'selected';
         $graph_type = 'device_bits';
-        $params = '';
+        $graph_params = '';
         break;
     case "uptime":
         $table_header = 'Uptime';
         $selected_uptime = 'selected';
         $graph_type = 'device_uptime';
-        $params = array('tab' => 'graphs', 'group' => 'system');
+        $graph_params = array('tab' => 'graphs', 'group' => 'system');
         break;
     case "ping":
         $table_header = 'Response time';
         $selected_ping = 'selected';
         $graph_type = 'device_ping_perf';
-        $params = array('tab' => 'graphs', 'group' => 'poller');
+        $graph_params = array('tab' => 'graphs', 'group' => 'poller');
         break;
     case "cpu":
         $table_header = 'CPU Load';
         $selected_cpu = 'selected';
         $graph_type = 'device_processor';
-        $params = array('tab' => 'health', 'metric' => 'processor');
+        $graph_params = array('tab' => 'health', 'metric' => 'processor');
         break;
     case "ram":
         $table_header = 'Memory usage';
         $selected_ram = 'selected';
         $graph_type = 'device_mempool';
-        $params = array('tab' => 'health', 'metric' => 'mempool');
+        $graph_params = array('tab' => 'health', 'metric' => 'mempool');
         break;
 }
 
@@ -82,7 +82,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="' . htmlspecialchars($widget_settings['title']) . '">
             </div>
         </div>
-        
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="top_query" class="control-label availability-map-widget-header">Top query</label>
@@ -97,26 +96,22 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 </select>
             </div>
         </div>
-        
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="graph_type" class="control-label availability-map-widget-header">Number of Devices: </label>
+                <label for="graph_type" class="control-label availability-map-widget-header">Number of Devices</label>
             </div>
             <div class="col-sm-6">
                 <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" placeholder="ie. 5" value="' . $widget_settings['device_count'] . '">
             </div>
         </div>
-      
-      
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="graph_type" class="control-label availability-map-widget-header">Time interval (minutes): </label>
+                <label for="graph_type" class="control-label availability-map-widget-header">Time interval (minutes)</label>
             </div>
             <div class="col-sm-6">
                 <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" placeholder="ie. 15" value="' . $widget_settings['time_interval'] . '">
             </div>
         </div>
-        
         <div class="form-group">
             <div class="col-sm-10">
                 <button type="submit" class="btn btn-default">Set</button>
@@ -241,7 +236,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         <tbody>';
 
     foreach (dbFetchRows($query, $params) as $result) {
-        $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $params, 0, 0, 0);
+        $graphs = generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0);
         $common_output[] = '
         <tr>
             <td class="text-left">' . generate_device_link($result, shorthost($result['hostname'])) . '</td>
