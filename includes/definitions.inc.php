@@ -2480,6 +2480,11 @@ $config['graph_types']['device']['ib_dhcp_messages']['section']               = 
 $config['graph_types']['device']['ib_dhcp_messages']['order']                 = '0';
 $config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 'DHCP messages';
 
+// Cisco WAAS Optimized TCP Connections
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['section']      = 'graphs';
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['order']        = '0';
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['descr']        = 'Optimized TCP Connections';
+
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
 $config['graph_types']['device']['bits']['descr']                 = 'Total Traffic';
