@@ -43,7 +43,7 @@ switch ($top_query) {
         $table_header = 'Traffic';
         $selected_traffic = 'selected';
         $graph_type = 'device_bits';
-        $graph_params = '';
+        $graph_params = array();
         break;
     case "uptime":
         $table_header = 'Uptime';
