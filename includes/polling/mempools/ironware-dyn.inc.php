@@ -15,9 +15,9 @@ if (strpos($is_netiron, 'NI') === false && strpos($is_netiron, 'MLX') === false 
 else {
     d_echo('caching');
     $mempool_cache['ironware-dyn'] = array();
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryAvailable', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
-    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB', $config['install_dir'].'/mibs');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryAvailable', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
+    $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
     d_echo($mempool_cache);
 
     $entry = $mempool_cache['ironware-dyn'][$mempool[mempool_index]];

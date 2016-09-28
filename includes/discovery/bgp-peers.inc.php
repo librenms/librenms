@@ -8,7 +8,7 @@ if ($config['enable_bgp']) {
         $vrfs_lite_cisco = array(array('context_name'=>null));
     }
 
-    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB', $config['mibdir']));
+    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB'));
 
     foreach ($vrfs_lite_cisco as $vrf) {
             $device['context_name'] = $vrf['context_name'];
@@ -21,9 +21,9 @@ if ($config['enable_bgp']) {
 
             $peer2      = false;
             if ($device['os'] !== 'junos') {
-                $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB', $config['mibdir']);
+                $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
                 if (empty($peers_data)) {
-                    $peers_data = snmp_walk($device, 'BGP4-MIB::bgpPeerRemoteAs', '-Oq', 'BGP4-MIB', $config['mibdir']);
+                    $peers_data = snmp_walk($device, 'BGP4-MIB::bgpPeerRemoteAs', '-Oq', 'BGP4-MIB');
                 } else {
                     $peer2 = true;
                 }
@@ -59,7 +59,7 @@ if ($config['enable_bgp']) {
                 // Juniper BGP4-V2 MIB
                 // FIXME: needs a big cleanup! also see below.
                 // FIXME: is .0.ipv6 the only possible value here?
-                $result = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
+                $result = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
                 $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.', '', $result));
                 foreach (explode("\n", $peers) as $peer) {
                     list($peer_ip_snmp, $peer_as) = explode(' ', $peer);
@@ -115,9 +115,9 @@ if ($config['enable_bgp']) {
                         unset($af_list);
 
                         if ($peer2 === true) {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB', $config['mibdir']);
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB');
                         } else {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB', $config['mibdir']);
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB');
                         }
 
                         d_echo('afi data :: ');
@@ -151,7 +151,7 @@ if ($config['enable_bgp']) {
                         $safis[2] = 'multicast';
 
                         if (!isset($j_peerIndexes)) {
-                            $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
+                            $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             print_r($j_bgp);
                             foreach ($j_bgp as $index => $entry) {
                                 switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
@@ -179,7 +179,7 @@ if ($config['enable_bgp']) {
                         }
 
                         if (!isset($j_afisafi)) {
-                            $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
+                            $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             foreach (array_keys($j_prefixes) as $key) {
                                 list($index,$afisafi) = explode('.', $key, 2);
                                 $j_afisafi[$index][]  = $afisafi;
