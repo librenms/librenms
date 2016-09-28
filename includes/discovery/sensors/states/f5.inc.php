@@ -30,12 +30,11 @@ if ($device['os'] == 'f5') {
             }
         }
 
-      foreach (array_keys($temp) as $index) {
+      foreach($temp as $index => $data) {
           $descr           = "sysChassisPowerSupplyStatus.".$temp[$index]['sysChassisPowerSupplyIndex'];
-          $current         = $temp[$index]['sysChassisPowerSupplyStatus'];
+          $current         = $data['sysChassisPowerSupplyStatus'];
           $sensorType      = 'f5';
           $oid             = '1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.'.$index;
-          $oid_status	 = snmp_get($device, $oid, '-Oqv');
           discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current, 'snmp',$index);
 
           //Create Sensor To State Index
