@@ -36,4 +36,11 @@ class VlanFunctionsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(q_bridge_bits2indices($bits) == $indices);
     }
+    public function testHex2Bin()
+    {
+        $hexstr = "54686973206973206f6e6c79206120746573742e00ff";
+        $binstr = "This is only a test.\x00\xff";
+
+        $this->assertTrue(hex2bin($hexstr) === $binstr);
+    }
 }

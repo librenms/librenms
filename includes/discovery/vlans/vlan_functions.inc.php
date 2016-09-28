@@ -1,4 +1,15 @@
 <?php
+/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+if (!function_exists('hex2bin')) {
+    function hex2bin($str)
+    {
+        if (strlen($str) % 2 !== 0) {
+            trigger_error(__FUNCTION__.'(): Hexadecimal input string must have an even length', E_USER_WARNING);
+        }
+        return pack("H*", substr($str, $i, 2));
+    }
+}
+
 function q_bridge_bits2indices($hex_data)
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
