@@ -23,3 +23,17 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
         $serial = $data[1]['entPhysicalSerialNum'];
     }
 }
+
+$connections = snmp_get($device, 'CISCO-WAN-OPTIMIZATION-MIB::cwoTfoStatsActiveOptConn.0', '-OQv');
+
+if (is_numeric($connections)) {
+    $rrd_def = 'DS:connections:GAUGE:600:0:U';
+
+    $fields = array(
+        'connections' => $connections
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'waas_cwotfostatsactiveoptconn', $tags, $fields);
+    $graphs['waas_cwotfostatsactiveoptconn'] = true;
+}
