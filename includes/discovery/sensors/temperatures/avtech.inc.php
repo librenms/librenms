@@ -4,7 +4,7 @@
 if ($device['os'] == 'avtech') {
     echo 'AVTECH: ';
     if (strpos($device['sysObjectID'], '.20916.1.7') !== false) {
-    //  TemPageR 3E
+        //  TemPageR 3E
         $device_oid = '.1.3.6.1.4.1.20916.1.7.';
 
         $internal = array(
@@ -28,7 +28,7 @@ if ($device['os'] == 'avtech') {
         );
         avtech_add_sensor($device, $sen2);
     } elseif (strpos($device['sysObjectID'], '.20916.1.9') !== false) {
-    //  RoomAlert 3E
+        //  RoomAlert 3E
         $device_oid = '.1.3.6.1.4.1.20916.1.9.';
 
         $internal = array(
@@ -45,7 +45,7 @@ if ($device['os'] == 'avtech') {
         );
         avtech_add_sensor($device, $sen1);
     } elseif (strpos($device['sysObjectID'], '.20916.1.1') !== false) {
-    //  TemPageR 4E
+        //  TemPageR 4E
         $device_oid = '.1.3.6.1.4.1.20916.1.1.';
 
         $internal = array(
@@ -84,7 +84,7 @@ if ($device['os'] == 'avtech') {
         );
         avtech_add_sensor($device, $sen3);
     } elseif (strpos($device['sysObjectID'], '.20916.1.6') !== false) {
-    //  RoomAlert 4E
+        //  RoomAlert 4E
         $device_oid = '.1.3.6.1.4.1.20916.1.6.';
         $divisor = 1;
 
