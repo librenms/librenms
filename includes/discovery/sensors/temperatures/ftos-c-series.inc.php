@@ -7,7 +7,7 @@
 // F10-C-SERIES-CHASSIS-MIB::chSysCardTemp.2 = Gauge32: 26
 if ($device['os'] == 'ftos' || $device['os_group'] == 'ftos') {
     echo 'FTOS C-Series ';
-    $oids = snmpwalk_cache_oid($device, 'chSysCardTemp', array(), 'F10-C-SERIES-CHASSIS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/ftos');
+    $oids = snmpwalk_cache_oid($device, 'chSysCardTemp', array(), 'F10-C-SERIES-CHASSIS-MIB', 'ftos');
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             $entry['descr']   = 'Slot '.$index;

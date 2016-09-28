@@ -8,9 +8,9 @@ if (!is_array($mempool_cache['junos'])) {
     d_echo('caching');
 
     $mempool_cache['junos'] = array();
-    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingBuffer', $mempool_cache['junos'], 'JUNIPER-MIB', $config['install_dir'].'/mibs/junos');
-    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingDRAMSize', $mempool_cache['junos'], 'JUNIPER-MIB', $config['install_dir'].'/mibs/junos');
-    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingMemory', $mempool_cache['junos'], 'JUNIPER-MIB', $config['install_dir'].'/mibs/junos');
+    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingBuffer', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
+    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingDRAMSize', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
+    $mempool_cache['junos'] = snmpwalk_cache_multi_oid($device, 'jnxOperatingMemory', $mempool_cache['junos'], 'JUNIPER-MIB', 'junos');
     d_echo($mempool_cache);
 }
 

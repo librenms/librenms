@@ -30,7 +30,7 @@ require $install_dir . '/includes/defaults.inc.php';
 
 // definitions, don't want to initialize mysql...
 $config['install_dir'] = $install_dir;
-$config['mibdir'] = $install_dir . '/mibs';
+$config['mib_dir'] = $install_dir . '/mibs';
 $config['snmpget'] = 'snmpget';
 $runtime_stats = array('snmpget' => 0, 'snmpwalk' => 0);
 

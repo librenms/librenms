@@ -1,6 +1,6 @@
 <?php
 
-$diskio_array = snmpwalk_cache_oid($device, 'diskIOEntry', array(), 'UCD-DISKIO-MIB', '+'.$config['install_dir'].'/mibs/');
+$diskio_array = snmpwalk_cache_oid($device, 'diskIOEntry', array(), 'UCD-DISKIO-MIB');
 $valid_diskio = array();
 if (is_array($diskio_array)) {
     foreach ($diskio_array as $index => $entry) {
