@@ -34,3 +34,4 @@ if (is_numeric($activetunnels)) {
 
     $graphs['panos_activetunnels'] = true;
 }
+
