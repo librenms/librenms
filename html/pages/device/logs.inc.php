@@ -43,6 +43,9 @@ if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
 
 switch ($vars['section']) {
     case 'syslog':
+        print_optionbar_end();
+        include 'pages/syslog.inc.php';
+        break;
     case 'eventlog':
     case 'graylog':
         include 'pages/device/logs/'.$vars['section'].'.inc.php';
