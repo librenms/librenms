@@ -9,8 +9,7 @@ if ($device['os'] == 'pbn') {
         echo 'PBN : ';
 
         $descr = 'Processor';
-        $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
-        $usage = snmp_get($device, 'nmspmCPUTotal5min.1', '-OUvQ', 'NMS-PROCESS-MIB', $mibdir);
+        $usage = snmp_get($device, 'nmspmCPUTotal5min.1', '-OUvQ', 'NMS-PROCESS-MIB', 'pbn');
 
         if (is_numeric($usage)) {
             discover_processor($valid['processor'], $device, 'NMS-PROCESS-MIB::nmspmCPUTotal5min', '0', 'pbn-cpu', $descr, '100', $usage, null, null);

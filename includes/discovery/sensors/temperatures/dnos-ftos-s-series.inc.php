@@ -6,8 +6,8 @@
 if ($device['os'] == 'ftos' || $device['os_group'] == 'ftos' || $device['os'] == 'dnos') {
     echo 'FTOS C-Series ';
 
-    $oids = snmpwalk_cache_oid($device, 'chStackUnitTemp', array(), 'F10-S-SERIES-CHASSIS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/ftos');
-    $oids = snmpwalk_cache_oid($device, 'chStackUnitSysType', $oids, 'F10-S-SERIES-CHASSIS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/ftos');
+    $oids = snmpwalk_cache_oid($device, 'chStackUnitTemp', array(), 'F10-S-SERIES-CHASSIS-MIB', 'ftos');
+    $oids = snmpwalk_cache_oid($device, 'chStackUnitSysType', $oids, 'F10-S-SERIES-CHASSIS-MIB', 'ftos');
 
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {

@@ -18,7 +18,7 @@ if ($device['os'] == 'junos') {
     );
 
     foreach ($tables as $tablevalue) {
-        $temp = snmpwalk_cache_multi_oid($device, $tablevalue[1], array(), $tablevalue[0], $config['install_dir'].'/mibs/junos');
+        $temp = snmpwalk_cache_multi_oid($device, $tablevalue[1], array(), $tablevalue[0], 'junos');
         $cur_oid = $tablevalue[2];
 
         if (is_array($temp)) {

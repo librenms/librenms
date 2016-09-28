@@ -11,16 +11,14 @@ function poll_sensor($device, $class, $unit)
         $sensor_value = '';
 
         if ($sensor['poller_type'] == 'snmp') {
+            $mibdir = null;
             if ($device['os'] == 'pbn') {
-                $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
-            } else {
-                $mibdir = $config['mibdir'];
+                $mibdir = 'pbn';
             }
 
+            $mib = '';
             if ($device['os'] == 'siklu') {
                 $mib = ':RADIO-BRIDGE-MIB';
-            } else {
-                $mib = '';
             }
 
             if ($class == 'temperature') {
