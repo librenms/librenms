@@ -32,15 +32,15 @@ if ($device['os'] == 'f5') {
         echo "sysCpuSensorTemperature ";
   
         foreach (array_keys($f5cpu) as $index) {
-            $cpuname_oid     = "1.3.6.1.4.1.3375.2.1.3.6.2.1.4.$index";
-            $slot_oid        = "1.3.6.1.4.1.3375.2.1.3.6.2.1.5.$index";
+            $cpuname_oid     = ".1.3.6.1.4.1.3375.2.1.3.6.2.1.4.$index";
+            $slot_oid        = ".1.3.6.1.4.1.3375.2.1.3.6.2.1.5.$index";
             $slotnum         = snmp_get($device, $slot_oid, '-Oqv', 'F5-BIGIP-SYSTEM-MIB');
             $cpuname         = snmp_get($device, $cpuname_oid, '-Oqv', 'F5-BIGIP-SYSTEM-MIB');
 
             $descr           = "Cpu Temperature slot".$slotnum."/".$cpuname;
             $current         = $f5cpu[$index]['sysCpuSensorTemperature'];
             $sensorType      = 'f5';
-            $oid             = '1.3.6.1.4.1.3375.2.1.3.6.2.1.2.'.$index;
+            $oid             = '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.'.$index;
             $low_limit       =  null;
             $low_warn_limit  =  null;
             $high_warn_limit =  null;
