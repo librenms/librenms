@@ -134,25 +134,25 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = implode(',', $in_devices);
         }
 
-        if ($show_disabled_ignored == 1) {
-            $disabled_ignored = ', `D`.`ignore`, `D`.`disabled`';
-        }
-
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon` '.$disabled_ignored.' FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (is_normal_user() === true) {
-            $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
+            $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
             $param = array(
                 $_SESSION['user_id']
             );
         } else {
-            $sql .= ' WHERE';
+            $sql .= ' WHERE ';
+        }
+
+        if ($show_disabled_ignored != 1) {
+            $sql .= '`D`.`ignore` = 0 AND `D`.`disabled` = 0 ';
+        } else {
+            $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`ignore` = 1 OR `D`.`disabled` = 1)';
         }
 
         if ($config['webui']['availability_map_use_device_groups'] != 0 && isset($in_devices)) {
-            $sql .= " `D`.`device_id` IN (".$in_devices.")";
-        } else {
-            $sql .= " TRUE";
+            $sql .= " AND `D`.`device_id` IN ($in_devices)";
         }
 
         $sql .= " ORDER BY `".$deviceOrderBy."`";
