@@ -42,7 +42,6 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 extend apache /etc/snmp/apache-stats.py
 ```
 4. Restart snmpd on your host
-5. (In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
 
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
