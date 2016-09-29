@@ -228,16 +228,24 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
     }
 }
 
-// check poller last run
-$lines = `tail logs/librenms.log`;
-if (!str_contains($lines, 'poller.php')) {
-    print_fail('The poller has not run, check the cron job');
-} else {
-    preg_match_all('/(\d{4}-\d\d-\d\d [\d:]+) - [\d]+ devices polled in [.\d]+ secs/', $lines, $matches, PREG_SET_ORDER);
-    $last = end($matches);
-    if (time() - strtotime($last[1]) > 300) {
-        print_fail("The poller has not run in the last 5 minutes, check the cron job");
-    }
+// check discovery last run
+if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
+    print_fail('Discovery has never run, check the cron job');
+} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 hours) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+    print_fail("Discovery has not run in the last 24 hours, check the cron job");
+}
+
+// check poller
+if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
+    print_fail('The poller has never run, check the cron job');
+} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+    print_fail("The poller has not run in the last 5 minutes, check the cron job");
+} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE (`last_polled` <= DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+    print_warn("Some devices have not been polled in the last 5 minutes, check your poll log");
+}
+
+if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1') > 0) {
+    print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.\n        Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
 }
 
 if ($versions['local_branch'] != 'master') {
