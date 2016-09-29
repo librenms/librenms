@@ -805,9 +805,9 @@ $config['os'][$os]['icon']             = 'siklu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
-// Saf Wireless
+// SAF Tehnika
 $os = 'saf';
-$config['os'][$os]['text']             = 'SAF Wireless';
+$config['os'][$os]['text']             = 'SAF Tehnika';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'saf';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
@@ -2286,6 +2286,27 @@ $config['graph_types']['device']['siklu_rfinterfaceOctets']['descr'] = 'Traffic'
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'wireless';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
+
+// SAF support
+$config['graph_types']['device']['saf_radioRxLevel']['section'] = 'wireless';
+$config['graph_types']['device']['saf_radioRxLevel']['order'] = '0';
+$config['graph_types']['device']['saf_radioRxLevel']['descr'] = 'RX Power';
+
+$config['graph_types']['device']['saf_radioTxPower']['section'] = 'wireless';
+$config['graph_types']['device']['saf_radioTxPower']['order'] = '1';
+$config['graph_types']['device']['saf_radioTxPower']['descr'] = 'TX Power';
+
+$config['graph_types']['device']['saf_modemRadialMSE']['section'] = 'wireless';
+$config['graph_types']['device']['saf_modemRadialMSE']['order'] = '2';
+$config['graph_types']['device']['saf_modemRadialMSE']['descr'] = 'Radial MSE';
+
+$config['graph_types']['device']['saf_modemModulation']['section'] = 'wireless';
+$config['graph_types']['device']['saf_modemModulation']['order'] = '3';
+$config['graph_types']['device']['saf_modemModulation']['descr'] = 'Modulation';
+
+$config['graph_types']['device']['saf_modemTotalCapacity']['section'] = 'wireless';
+$config['graph_types']['device']['saf_modemTotalCapacity']['order'] = '4';
+$config['graph_types']['device']['saf_modemTotalCapacity']['descr'] = 'Capacity';
 
 // Sub10 support
 $config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';
