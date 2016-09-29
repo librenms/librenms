@@ -21,9 +21,9 @@ $mib_oids = array(
         'Radial MSE',
         'GAUGE',
     ),
-    'modemModulation' => array(
+    'modemACMtotalCapacity' => array(
         'local',
-        'modemModulation',
+        'modemACMtotalCapacity',
         'Modulation',
         'GAUGE',
     ),
@@ -39,7 +39,7 @@ $mib_graphs = array(
     'saf_radioRxLevel',
     'saf_radioTxPower',
     'saf_modemRadialMSE',
-    'saf_modemModulation',
+    'saf_modemACMtotalCapacity',
     'saf_modemTotalCapacity',
 );
 

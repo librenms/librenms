@@ -2300,9 +2300,9 @@ $config['graph_types']['device']['saf_modemRadialMSE']['section'] = 'wireless';
 $config['graph_types']['device']['saf_modemRadialMSE']['order'] = '2';
 $config['graph_types']['device']['saf_modemRadialMSE']['descr'] = 'Radial MSE';
 
-$config['graph_types']['device']['saf_modemModulation']['section'] = 'wireless';
-$config['graph_types']['device']['saf_modemModulation']['order'] = '3';
-$config['graph_types']['device']['saf_modemModulation']['descr'] = 'Modulation';
+$config['graph_types']['device']['saf_modemACMtotalCapacity']['section'] = 'wireless';
+$config['graph_types']['device']['saf_modemACMtotalCapacity']['order'] = '3';
+$config['graph_types']['device']['saf_modemACMtotalCapacity']['descr'] = 'ACM Capacity';
 
 $config['graph_types']['device']['saf_modemTotalCapacity']['section'] = 'wireless';
 $config['graph_types']['device']['saf_modemTotalCapacity']['order'] = '4';
