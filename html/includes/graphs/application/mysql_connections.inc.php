@@ -48,4 +48,4 @@ $colours   = 'mixed';
 $nototal   = 1;
 $unit_text = 'Connections';
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/graphs/generic_multi_line.inc.php';
