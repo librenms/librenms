@@ -35,7 +35,9 @@ Either use SNMP extend or use the agent.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
 ```
 2. Make the script executable (chmod +x /etc/snmp/apache-stats.py)
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+3. Verify it is working by running /etc/snmp/apache-stats.py  
+(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)  
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend apache /etc/snmp/apache-stats.py
 ```
@@ -46,7 +48,7 @@ extend apache /etc/snmp/apache-stats.py
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 
 1. Verify it is working by running /usr/lib/check_mk_agent/local/apache  
-2. (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)  
+(If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)  
 3. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
 
