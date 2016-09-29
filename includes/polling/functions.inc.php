@@ -23,6 +23,7 @@ function poll_sensor($device, $class, $unit)
 
     $sensors = array();
     $misc_sensors = array();
+    $all_sensors = array();
     foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             $misc_sensors[] = $sensor;
@@ -34,40 +35,27 @@ function poll_sensor($device, $class, $unit)
     }
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
+print_r($snmp_data);exit;
 
     foreach ($sensors as $sensor) {
-        echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ';
+        echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
         $sensor_value = '';
 
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
-            if ($device['os'] == 'pbn') {
-                $mibdir = 'pbn';
+
+            if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
+                require_once 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
             }
 
-            $mib = '';
-            if ($device['os'] == 'siklu') {
-                $mib = ':RADIO-BRIDGE-MIB';
-            }
+            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
 
             if ($class == 'temperature') {
-                if ($device['os'] == 'netapp') {
-                    include 'includes/polling/temperatures/netapp.inc.php';
-                } elseif ($device['os'] == 'canopy') {
-                    include 'includes/polling/temperatures/canopy.inc.php';
-                } elseif ($device['os'] == 'hytera') {
-                    require_once 'includes/polling/temperatures/hytera.inc.php';
-                } else {
-                    $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
-                    preg_match('/[\d\.]+/', $sensor_value, $temp_response);
-                    if (!empty($temp_response[0])) {
-                        $sensor_value = $temp_response[0];
-                    }
-                }//end if
-            } elseif ($class == "voltage" && $device['os'] == 'hytera') {
-                require_once "includes/polling/voltages/hytera.inc.php";
+                preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
+                if (!empty($temp_response[0])) {
+                    $sensor_value = $temp_response[0];
+                }
             } elseif ($class == 'state') {
-                $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
                 if (!is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
                         'SELECT `state_value` 
@@ -82,78 +70,20 @@ function poll_sensor($device, $class, $unit)
                         $sensor_value = $state_value;
                     }
                 }
-            } elseif ($class == 'signal') {
-                $currentOS = $device['os'];
-                include "includes/polling/signal/$currentOS.inc.php";
-                $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
-            } elseif ($class == 'dbm') {
-                $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
-                //iosxr does not expose dbm values through SNMP so we convert Watts to dbm to have a nice graph to show
-                if ($device['os'] == "iosxr") {
-                    $sensor_value = round(10 * log10($sensor_value / 1000), 3);
-                }
-            } else {
-                if ($sensor['sensor_type'] == 'apc') {
-                    $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
-                } else {
-                    $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
-                }
             }//end if
             unset($mib);
             unset($mibdir);
+            $sensor['new_value'] = $sensor_value;
+            $all_sensors = array_merge($all_sensors, $sensor);
         }
-        if ($sensor_value == -32768) {
-            echo 'Invalid (-32768) ';
-            $sensor_value = 0;
-        }
-
-        if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-            $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
-        }
-
-        if ($sensor['sensor_multiplier']) {
-            $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
-        }
-
-        $rrd_name = get_sensor_rrd_name($device, $sensor);
-        $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
-
-        echo "$sensor_value $unit\n";
-
-        $fields = array(
-            'sensor' => $sensor_value,
-        );
-
-        $tags = array(
-            'sensor_class' => $sensor['sensor_class'],
-            'sensor_type' => $sensor['sensor_type'],
-            'sensor_descr' => $sensor['sensor_descr'],
-            'sensor_index' => $sensor['sensor_index'],
-            'rrd_name' => $rrd_name,
-            'rrd_def' => $rrd_def
-        );
-        data_update($device, 'sensor', $tags, $fields);
-
-        // FIXME also warn when crossing WARN level!!
-        if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
-            echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' under threshold: '.$sensor_value." $unit (< ".$sensor['sensor_limit_low']." $unit)", $device, $class, $sensor['sensor_id']);
-        } elseif ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
-            echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
-        }
-
-        if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
-            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
-        }
-
-        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }
 
     foreach ($misc_sensors as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             if (isset($agent_sensors)) {
                 $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
+                $sensor['new_value'] = $sensor_value;
+                $all_sensors = array_merge($all_sensors, $sensor);
             } else {
                 echo "no agent data!\n";
                 continue;
@@ -166,7 +96,10 @@ function poll_sensor($device, $class, $unit)
             echo "unknown poller type!\n";
             continue;
         }//end if
+    }
 
+    foreach ($all_sensors as $sensor) {
+        $sensor_value = $sensor['new_value'];
         if ($sensor_value == -32768) {
             echo 'Invalid (-32768) ';
             $sensor_value = 0;
@@ -207,13 +140,12 @@ function poll_sensor($device, $class, $unit)
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
-
         if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
         }
-
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }
+
 }//end poll_sensor()
 
 
