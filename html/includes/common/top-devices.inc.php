@@ -1,6 +1,7 @@
 <?php
 /* Copyright (C) 2015 Sergiusz Paprzycki <serek@walcz.net>
- * 
+ * Copyright (C) 2016 Cercel Valentin <crc@nuamchefazi.ro>
+ *
  * This widget is based on legacy frontpage module created by Paul Gear.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,51 +18,118 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Top devices by traffic
+ * Top devices
  * @author Sergiusz Paprzycki
  * @copyright 2015 Sergiusz Paprzycki <serek@walcz.net>
+ * @copyright 2016 Cercel Valentin <crc@nuamchefazi.ro>
  * @license GPL
  * @package LibreNMS
  * @subpackage Widgets
  */
 
+$sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '11'));
+$widget_mode = json_decode($sql['settings'], true);
+
+$top_query = $widget_mode['top_query'];
+
+$selected_traffic = '';
+$selected_uptime = '';
+$selected_ping = '';
+$selected_cpu = '';
+$selected_ram = '';
+
+switch ($top_query) {
+    case "traffic":
+        $table_header = 'Traffic';
+        $selected_traffic = 'selected';
+        $graph_type = 'device_bits';
+        $graph_params = array();
+        break;
+    case "uptime":
+        $table_header = 'Uptime';
+        $selected_uptime = 'selected';
+        $graph_type = 'device_uptime';
+        $graph_params = array('tab' => 'graphs', 'group' => 'system');
+        break;
+    case "ping":
+        $table_header = 'Response time';
+        $selected_ping = 'selected';
+        $graph_type = 'device_ping_perf';
+        $graph_params = array('tab' => 'graphs', 'group' => 'poller');
+        break;
+    case "cpu":
+        $table_header = 'CPU Load';
+        $selected_cpu = 'selected';
+        $graph_type = 'device_processor';
+        $graph_params = array('tab' => 'health', 'metric' => 'processor');
+        break;
+    case "ram":
+        $table_header = 'Memory usage';
+        $selected_ram = 'selected';
+        $graph_type = 'device_mempool';
+        $graph_params = array('tab' => 'health', 'metric' => 'mempool');
+        break;
+}
+
 if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
-<form class="form" onsubmit="widget_settings(this); return false;">
-  <div class="form-group">
-    <div class="col-sm-6">
-      <label for="graph_type" class="control-label">Number of Devices: </label>
-    </div>
-    <div class="col-sm-4">
-      <input class="form-control" name="device_count" id="input_count_'.$unique_id.'" placeholder="ie. 5" value="'.$widget_settings['device_count'].'">
-    </div>
-  </div>
-  <div class="clearfix"></div>
-  <div class="form-group">
-    <div class="col-sm-6">
-      <label for="graph_type" class="control-label">Time interval (minutes): </label>
-    </div>
-    <div class="col-sm-4">
-      <input class="form-control" name="time_interval" id="input_time_'.$unique_id.'" placeholder="ie. 15" value="'.$widget_settings['time_interval'].'">
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-2">
-      <button type="submit" class="btn btn-default">Set</button>
-    </div>
-  </div>
-</form>
-    ';
+    <form class="form" onsubmit="widget_settings(this); return false;">
+        <div class="form-group">
+            <div class="col-sm-4">
+                <label for="title" class="control-label availability-map-widget-header">Widget title</label>
+            </div>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="' . htmlspecialchars($widget_settings['title']) . '">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-4">
+                <label for="top_query" class="control-label availability-map-widget-header">Top query</label>
+            </div>
+            <div class="col-sm-6">
+                <select class="form-control" name="top_query">
+                    <option value="traffic" ' . $selected_traffic . '>Traffic</option>
+                    <option value="uptime" ' . $selected_uptime . '>Uptime</option>
+                    <option value="ping" ' . $selected_ping . '>Response time</option>
+                    <option value="cpu" ' . $selected_cpu . '>Processor load</option>
+                    <option value="ram" ' . $selected_ram . '>Memory usage</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-4">
+                <label for="graph_type" class="control-label availability-map-widget-header">Number of Devices</label>
+            </div>
+            <div class="col-sm-6">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" placeholder="ie. 5" value="' . $widget_settings['device_count'] . '">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-4">
+                <label for="graph_type" class="control-label availability-map-widget-header">Time interval (minutes)</label>
+            </div>
+            <div class="col-sm-6">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" placeholder="ie. 15" value="' . $widget_settings['time_interval'] . '">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-default">Set</button>
+            </div>
+        </div>
+    </form>';
 } else {
     $interval = $widget_settings['time_interval'];
-    (integer) $interval_seconds = ($interval * 60);
-    (integer) $device_count = $widget_settings['device_count'];
-    $common_output[] = '
-<h4>Top '.$device_count.' devices (last '.$interval.' minutes)</h4>
-    ';
+    (integer)$interval_seconds = ($interval * 60);
+    (integer)$device_count = $widget_settings['device_count'];
+
+    $common_output[] = '<h4>Top ' . $device_count . ' devices (last ' . $interval . ' minutes)</h4>';
+
     $params = array('user' => $_SESSION['user_id'], 'interval' => array($interval_seconds), 'count' => array($device_count));
-    if (is_admin() || is_read()) {
-        $query = '
+
+    if ($top_query === 'traffic') {
+        if (is_admin() || is_read()) {
+            $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
@@ -72,8 +140,8 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             ORDER BY total desc
             LIMIT :count
             ';
-    } else {
-        $query = '
+        } else {
+            $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d, `devices_perms` AS `P`
             WHERE `P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id` AND
@@ -85,46 +153,97 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             ORDER BY total desc
             LIMIT :count
             ';
+        }
+    } elseif ($top_query === 'uptime') {
+        if (is_admin() || is_read()) {
+            $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id` 
+                      FROM `devices` 
+                      WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `uptime` DESC 
+                      LIMIT :count';
+        } else {
+            $query = 'SELECT `uptime`, `hostname`, `last_polled`, `d`.`device_id` 
+                      FROM `devices` as `d`, `devices_perms` AS `P`
+                      WHERE  `P`.`user_id` = :user
+                      AND `P`.`device_id` = `d`.`device_id`
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
+                      ORDER BY `uptime` DESC 
+                      LIMIT :count';
+        }
+    } elseif ($top_query === 'ping') {
+        if (is_admin() || is_read()) {
+            $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id` 
+                      FROM `devices` 
+                      WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `last_ping_timetaken` DESC 
+                      LIMIT :count';
+        } else {
+            $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
+                      FROM `devices` as `d`, `devices_perms` AS `P` 
+                      WHERE `P`.`user_id` = :user 
+                      AND `P`.`device_id` = `d`.`device_id` 
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `last_ping_timetaken` DESC 
+                      LIMIT :count';
+        }
+    } elseif ($top_query === 'cpu') {
+        if (is_admin() || is_read()) {
+            $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload` 
+                      FROM `processors` AS `procs`, `devices` AS `d` 
+                      WHERE `d`.`device_id` = `procs`.`device_id` 
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      GROUP BY `d`.`device_id` 
+                      ORDER BY `cpuload` DESC 
+                      LIMIT :count';
+        } else {
+            $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload` 
+                      FROM `processors` AS procs, `devices` AS `d`, `devices_perms` AS `P`
+					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` 
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
+                      GROUP BY `procs`.`device_id` 
+                      ORDER BY `cpuload` DESC
+                      LIMIT :count';
+        }
+    } elseif ($top_query === 'ram') {
+        if (is_admin() || is_read()) {
+            $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc` 
+                      FROM `mempools` as `mem`, `devices` as `d`
+                      WHERE `d`.`device_id` = `mem`.`device_id`
+                      AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `mempool_perc` DESC
+                      LIMIT :count';
+        } else {
+            $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc` 
+                      FROM `mempools` as `mem`, `devices` as `d`, `devices_perms` AS `P`
+                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id`
+                      AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `mempool_perc` DESC
+                      LIMIT :count';
+        }
     }
+
     $common_output[] = '
-<div class="table-responsive">
-<table class="table table-hover table-condensed table-striped bootgrid-table">
-  <thead>
-    <tr>
-      <th class="text-left">Device</th>
-      <th class="text-left">Total traffic</a></th>
-   </tr>
-  </thead>
-  <tbody>
-    ';
+    <div class="table-responsive">
+        <table class="table table-hover table-condensed table-striped bootgrid-table">
+        <thead>
+            <tr>
+                <th class="text-left">Device</th>
+                <th class="text-left">' . $table_header . '</a></th>
+            </tr>
+        </thead>
+        <tbody>';
 
     foreach (dbFetchRows($query, $params) as $result) {
         $common_output[] = '
-    <tr>
-      <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>
-      <td class="text-left">'.generate_device_link(
-            $result,
-            generate_minigraph_image(
-                $result,
-                $config['time']['day'],
-                $config['time']['now'],
-                'device_bits',
-                'no',
-                150,
-                21
-            ),
-            array(),
-            0,
-            0,
-            0
-        ).'
-      </td>
-    </tr>
-        ';
+        <tr>
+            <td class="text-left">' . generate_device_link($result, shorthost($result['hostname'])) . '</td>
+            <td class="text-left">' . generate_device_link($result, generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], $graph_type, 'no', 150, 21), $graph_params, 0, 0, 0) . '</td>
+        </tr>';
     }
     $common_output[] = '
-  </tbody>
-</table>
-</div>
-    ';
+        </tbody>
+    </table>
+    </div>';
 }
