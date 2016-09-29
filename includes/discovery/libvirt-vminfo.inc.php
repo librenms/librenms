@@ -66,10 +66,34 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     $vmwVmDisplayName = $xml->name;
                     $vmwVmGuestOS     = '';
                     // libvirt does not supply this
-                    $vmwVmMemSize = ($xml->currentMemory / 1024);
                     exec($config['virsh'].' -rc '.$uri.' domstate '.$dom_id, $vm_state);
                     $vmwVmState = ucfirst($vm_state[0]);
-                    $vmwVmCpus  = $xml->vcpu;
+
+                    $vmwVmCpus = null;
+                    $vmwVmMemSize = null;
+                    if ($xml->xpath("//sysinfo/system/entry[@name='manufacturer'][.='oVirt']")) {
+                        d_echo("Parsing information for $vmwVmDisplayName with oVirt quirx");
+                        // oVirt does not fully comply with the example above
+                        switch ($xml->memory['unit']) {
+                            case 'MiB':
+                                $vmwVmMemSize = $xml->memory;
+                                break;
+                            case 'GiB':
+                                $vmwVmMemSize = $xml->memory * 1024;
+                                break;
+                            default:
+                                // includes KiB
+                                $vmwVmMemSize = $xml->memory / 1024;
+                                break;
+                        }
+                        $vmwVmCpus  = $xml->vcpu['current'];
+                        if (!isset($vmwVmCpus)) {
+                            $vmwVmCpus  = $xml->vcpu;
+                        }
+                    } else {
+                        $vmwVmMemSize = ($xml->currentMemory / 1024);
+                        $vmwVmCpus  = $xml->vcpu;
+                    }
 
                     // Check whether the Virtual Machine is already known for this host.
                     $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'", array($device['device_id'], $dom_id));
