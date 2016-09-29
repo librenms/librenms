@@ -2290,7 +2290,7 @@ $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Oth
 // SAF support
 $config['graph_types']['device']['saf_radioRxLevel']['section'] = 'wireless';
 $config['graph_types']['device']['saf_radioRxLevel']['order'] = '0';
-$config['graph_types']['device']['saf_radioRxLevel']['descr'] = 'RX Power';
+$config['graph_types']['device']['saf_radioRxLevel']['descr'] = 'RX Level';
 
 $config['graph_types']['device']['saf_radioTxPower']['section'] = 'wireless';
 $config['graph_types']['device']['saf_radioTxPower']['order'] = '1';
@@ -2300,13 +2300,9 @@ $config['graph_types']['device']['saf_modemRadialMSE']['section'] = 'wireless';
 $config['graph_types']['device']['saf_modemRadialMSE']['order'] = '2';
 $config['graph_types']['device']['saf_modemRadialMSE']['descr'] = 'Radial MSE';
 
-$config['graph_types']['device']['saf_modemACMtotalCapacity']['section'] = 'wireless';
-$config['graph_types']['device']['saf_modemACMtotalCapacity']['order'] = '3';
-$config['graph_types']['device']['saf_modemACMtotalCapacity']['descr'] = 'ACM Capacity';
-
-$config['graph_types']['device']['saf_modemTotalCapacity']['section'] = 'wireless';
-$config['graph_types']['device']['saf_modemTotalCapacity']['order'] = '4';
-$config['graph_types']['device']['saf_modemTotalCapacity']['descr'] = 'Capacity';
+$config['graph_types']['device']['saf_modemCapacity']['section'] = 'wireless';
+$config['graph_types']['device']['saf_modemCapacity']['order'] = '3';
+$config['graph_types']['device']['saf_modemCapacity']['descr'] = 'Capacity';
 
 // Sub10 support
 $config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';

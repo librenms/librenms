@@ -23,8 +23,8 @@ $mib_oids = array(
     ),
     'modemACMtotalCapacity' => array(
         'local',
-        'modemACMtotalCapacity',
-        'Modulation',
+        'modemACMCapacity',
+        'ACM Capacity',
         'GAUGE',
     ),
     'modemTotalCapacity' => array(
@@ -39,8 +39,7 @@ $mib_graphs = array(
     'saf_radioRxLevel',
     'saf_radioTxPower',
     'saf_modemRadialMSE',
-    'saf_modemACMtotalCapacity',
-    'saf_modemTotalCapacity',
+    'saf_modemCapacity',
 );
 
 unset($graph, $oids, $oid);
