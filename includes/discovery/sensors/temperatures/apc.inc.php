@@ -56,17 +56,17 @@ if ($device['os'] == 'apc') {
     if ($oids) {
         echo 'APC InRow Chiller ';
         $temps = array();
-        $temps['airIRRCUnitStatusRackInletTempMetric']            = 'Rack Inlet';
-        $temps['airIRRCUnitStatusSupplyAirTempMetric']            = 'Supply Air';
-        $temps['airIRRCUnitStatusReturnAirTempMetric']            = 'Return Air';
-        $temps['airIRRCUnitStatusEnteringFluidTemperatureMetric'] = 'Entering Fluid';
-        $temps['airIRRCUnitStatusLeavingFluidTemperatureMetric']  = 'Leaving Fluid';
+        $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.7']            = 'Rack Inlet'; //airIRRCUnitStatusRackInletTempMetric
+        $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.9']            = 'Supply Air'; //airIRRCUnitStatusSupplyAirTempMetric
+        $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.11']            = 'Return Air'; //airIRRCUnitStatusReturnAirTempMetric
+        $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.24'] = 'Entering Fluid'; //airIRRCUnitStatusEnteringFluidTemperatureMetric
+        $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.26']  = 'Leaving Fluid'; //airIRRCUnitStatusLeavingFluidTemperatureMetric
         foreach ($temps as $obj => $descr) {
             $oids                   = snmp_get($device, $obj.'.0', '-OsqnU', 'PowerNet-MIB');
             list($oid,$current) = explode(' ', $oids);
             $divisor            = 10;
             $sensorType         = substr($descr, 0, 2);
-            echo discover_sensor($valid['sensor'], 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', null, null, null, null, $current);
         }
     }
 

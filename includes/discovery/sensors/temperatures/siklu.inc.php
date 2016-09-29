@@ -1,8 +1,8 @@
 <?php
 
 if ($device['os'] == 'siklu') {
-    $oid  = 'rbSysTemperature.0';
-    $oids = snmp_get($device, "$oid", '-OsqnU', 'RADIO-BRIDGE-MIB');
+    $oid  = '.1.3.6.1.4.1.31926.1.2.0';
+    $oids = snmp_get($device, "$oid", '-OsqnU');
     d_echo($oids."\n");
 
     if (!empty($oids)) {

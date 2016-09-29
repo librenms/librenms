@@ -7,22 +7,7 @@ if ($device['os'] == 'netvision') {
     $type     = 'netvision';
     $divisor  = 10;
     $index    = '3.2.0';
-    discover_sensor(
-        $valid['sensor'],
-        'frequency',
-        $device,
-        $freq_oid,
-        $index,
-        $type,
-        $descr,
-        $divisor,
-        '1',
-        null,
-        null,
-        null,
-        null,
-        $current
-    );
+    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 
     $freq_oid = '.1.3.6.1.4.1.4555.1.1.1.1.4.2.0';
     $descr    = 'Output';
@@ -30,20 +15,5 @@ if ($device['os'] == 'netvision') {
     $type     = 'netvision';
     $divisor  = 10;
     $index    = '4.2.0';
-    discover_sensor(
-        $valid['sensor'],
-        'frequency',
-        $device,
-        $freq_oid,
-        $index,
-        $type,
-        $descr,
-        $divisor,
-        '1',
-        null,
-        null,
-        null,
-        null,
-        $current
-    );
+    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

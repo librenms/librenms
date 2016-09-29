@@ -26,22 +26,7 @@ if ($device['os'] == 'ironware') {
 
                 $current = ($temperature / 2);
 
-                discover_sensor(
-                    $valid['sensor'],
-                    'temperature',
-                    $device,
-                    $temperature_oid,
-                    $oid,
-                    'ironware',
-                    $descr,
-                    '2',
-                    '1',
-                    null,
-                    null,
-                    null,
-                    null,
-                    $current
-                );
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'ironware', $descr, '2', '1', null, null, null, null, $current);
             }
         }
     }
