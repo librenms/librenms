@@ -114,7 +114,7 @@ if (str_contains($poll_device['sysDescr'], 'Multiprocessor')) {
 
 // Detect Dell hardware via OpenManage SNMP
 $hw = snmp_get($device, '.1.3.6.1.4.1.674.10892.1.300.10.1.9.1', '-Oqv', 'MIB-Dell-10892');
-$hw = trim(str_replace('"', '', $hw))
+$hw = trim(str_replace('"', '', $hw));
 if (!empty($hw)) {
     $hardware = 'Dell ' . $hw;
 
