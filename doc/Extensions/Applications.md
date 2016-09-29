@@ -28,6 +28,7 @@ Different applications support a variety of ways collect data: by direct connect
 
 
 ### Apache
+Either use SNMP extend or use the agent.
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
@@ -39,11 +40,14 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 extend apache /etc/snmp/apache-stats.py
 ```
 4. Restart snmpd on your host
-5. Verify it is working by running /usr/lib/check_mk_agent/local/apache
-6. (In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
-7. (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed, apt-get install libwww-perl)
-8. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
+5. (In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
 
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
+
+1. Verify it is working by running /usr/lib/check_mk_agent/local/apache  
+2. (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)  
+3. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
 
 ### BIND9 aka named
