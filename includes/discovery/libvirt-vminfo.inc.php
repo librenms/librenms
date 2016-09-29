@@ -31,7 +31,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
         if ($ssh_ok || !strstr($method, 'ssh')) {
             // Fetch virtual machine list
             unset($domlist);
-            exec($config['virsh'].' -c '.$uri.' list', $domlist);
+            exec($config['virsh'].' -rc '.$uri.' list', $domlist);
 
             foreach ($domlist as $dom) {
                 list($dom_id,) = explode(' ', trim($dom), 2);
@@ -39,7 +39,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                 if (is_numeric($dom_id)) {
                     // Fetch the Virtual Machine information.
                     unset($vm_info_array);
-                    exec($config['virsh'].' -c '.$uri.' dumpxml '.$dom_id, $vm_info_array);
+                    exec($config['virsh'].' -rc '.$uri.' dumpxml '.$dom_id, $vm_info_array);
 
                     // <domain type='kvm' id='3'>
                     // <name>moo.example.com</name>
@@ -67,7 +67,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     $vmwVmGuestOS     = '';
                     // libvirt does not supply this
                     $vmwVmMemSize = ($xml->currentMemory / 1024);
-                    exec($config['virsh'].' -c '.$uri.' domstate '.$dom_id, $vm_state);
+                    exec($config['virsh'].' -rc '.$uri.' domstate '.$dom_id, $vm_state);
                     $vmwVmState = ucfirst($vm_state[0]);
                     $vmwVmCpus  = $xml->vcpu;
 
