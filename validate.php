@@ -15,6 +15,9 @@
 
 chdir(__DIR__); // cwd to the directory containing this script
 
+require_once 'includes/defaults.inc.php';
+require_once 'includes/common.php';
+
 $options = getopt('m:h::');
 
 if (isset($options['h'])) {
@@ -35,19 +38,61 @@ if (isset($options['h'])) {
     exit;
 }
 
-if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
-    $first_line = `head -n1 config.php`;
-    $last_lines = explode(PHP_EOL, `tail -n2 config.php`);
-    if (substr($first_line, 0, 5) !== '<?php') {
-        print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
-    } elseif ($last_lines[0] == '?>' && $last_lines[1] == '') {
-        print_fail('config.php contains a new line at the end, please remove any whitespace at the end of the file and also remove ?>');
-    } elseif ($last_lines[1] == '?>') {
-        print_warn("It looks like you have ?> at the end of config.php, it is suggested you remove this");
-    }
-} else {
-    print_fail('Syntax error in config.php');
+$console_color = new Console_Color2();
+
+// critical config.php checks
+if (!file_exists('config.php')) {
+    print_fail('config.php does not exist, please copy config.php.default to config.php');
+    exit;
 }
+
+$config_failed = false;
+$syntax_check = `php -ln config.php`;
+if (!str_contains($syntax_check, 'No syntax errors detected')) {
+    print_fail('Syntax error in config.php');
+    echo $syntax_check;
+    $config_failed = true;
+}
+
+$first_line = rtrim(`head -n1 config.php`);
+if (!starts_with($first_line, '<?php')) {
+    print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
+    $config_failed = true;
+}
+if (str_contains(`tail config.php`, '?>')) {
+    print_fail("Remove the ?> at the end of config.php");
+    $config_failed = true;
+}
+
+if ($config_failed) {
+    exit;
+}
+
+// load config.php now
+require_once 'config.php';
+
+// make sure install_dir is set correctly, or the next includes will fail
+if (!file_exists($config['install_dir'].'/config.php')) {
+    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
+    exit;
+}
+
+// continue loading includes
+require_once 'includes/definitions.inc.php';
+require_once 'includes/functions.php';
+require_once 'includes/alerts.inc.php';
+
+$versions = version_info();
+$cur_sha = $versions['local_sha'];
+
+echo "==========================================================\n";
+echo "LibreNMS Version: $cur_sha\n";
+echo "DB Schema: ".$versions['db_schema']."\n";
+echo "PHP: ".$versions['php_ver']."\n";
+echo "MySQL: ".$versions['mysql_ver']."\n";
+echo "RRDTool: ".$versions['rrdtool_ver']."\n";
+echo "SNMP: ".$versions['netsnmp_ver']."\n";
+echo "==========================================================\n\n";
 
 // Check we are running this as the root user
 if (function_exists('posix_getpwuid')) {
@@ -60,53 +105,10 @@ if ($username !== 'root') {
     print_fail("You need to run this script as root");
 }
 
-// load config.php now
-require_once 'includes/defaults.inc.php';
-require_once 'config.php';
-
-// make sure install_dir is set correctly, or the next includes will fail
-if (!file_exists($config['install_dir'].'/config.php')) {
-    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
-    exit;
-}
-
-// continue loading includes
-require_once 'includes/definitions.inc.php';
-require_once 'includes/functions.php';
-require_once 'includes/common.php';
-require_once $config['install_dir'].'/includes/alerts.inc.php';
-
-$versions = version_info();
-echo "====================================\n";
-echo "Version info:\n";
-$cur_sha = $versions['local_sha'];
 if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
     $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-    print_warn("Your install is out of date: $cur_sha " . $commit_date->format('(r)'));
-} else {
-    echo "Commit SHA: $cur_sha\n";
+    print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
 }
-if ($versions['local_branch'] != 'master') {
-    print_warn("Your local git branch is not master, this will prevent automatic updates.");
-}
-
-// check for modified files
-$modifiedcmd = 'git diff --name-only --exit-code';
-if ($username === 'root') {
-    $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
-}
-exec($modifiedcmd, $cmdoutput, $code);
-if ($code !== 0 && !empty($cmdoutput)) {
-    print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-    echo('    ' . implode("\n    ", $cmdoutput) . "\n");
-}
-
-echo "DB Schema: ".$versions['db_schema']."\n";
-echo "PHP: ".$versions['php_ver']."\n";
-echo "MySQL: ".$versions['mysql_ver']."\n";
-echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-echo "SNMP: ".$versions['netsnmp_ver']."\n";
-echo "====================================\n";
 
 // Check php modules we use to make sure they are loaded
 $extensions = array('pcre','curl','session','snmp','mcrypt');
@@ -226,6 +228,33 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
     }
 }
 
+// check poller last run
+$lines = `tail logs/librenms.log`;
+if (!str_contains($lines, 'poller.php')) {
+    print_fail('The poller has not run, check the cron job');
+} else {
+    preg_match_all('/(\d{4}-\d\d-\d\d [\d:]+) - [\d]+ devices polled in [.\d]+ secs/', $lines, $matches, PREG_SET_ORDER);
+    $last = end($matches);
+    if (time() - strtotime($last[1]) > 300) {
+        print_fail("The poller has not run in the last 5 minutes, check the cron job");
+    }
+}
+
+if ($versions['local_branch'] != 'master') {
+    print_warn("Your local git branch is not master, this will prevent automatic updates.");
+}
+
+// check for modified files
+$modifiedcmd = 'git diff --name-only --exit-code';
+if ($username === 'root') {
+    $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+}
+exec($modifiedcmd, $cmdoutput, $code);
+if ($code !== 0 && !empty($cmdoutput)) {
+    print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
+    echo('    ' . implode("\n    ", $cmdoutput) . "\n");
+}
+
 // Modules test
 $modules = explode(',', $options['m']);
 foreach ($modules as $module) {
@@ -339,19 +368,19 @@ foreach ($modules as $module) {
 
 function print_ok($msg)
 {
-    echo "[OK]      $msg\n";
+    c_echo("[%gOK%n]    $msg\n");
 }//end print_ok()
 
 
 function print_fail($msg)
 {
-    echo "[FAIL]    $msg\n";
+    c_echo("[%RFAIL%n]  $msg\n");
 }//end print_fail()
 
 
 function print_warn($msg)
 {
-    echo "[WARN]    $msg\n";
+    c_echo("[%YWARN%n]  $msg\n");
 }//end print_warn()
 
 function check_rrdcached()

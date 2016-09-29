@@ -1118,7 +1118,7 @@ function version_info($remote = true)
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
     $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-    $output['netsnmp_ver'] = shell_exec($config['snmpget'].' --version 2>&1');
+    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec($config['snmpget'].' --version 2>&1')));
 
     return $output;
 }//end version_info()
