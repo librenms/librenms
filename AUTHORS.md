@@ -135,6 +135,7 @@ LibreNMS contributors:
 - Florent Bruchez <ftbz@me.com> (ftbz)
 - Bartosz Radwan <b.radwan@citypartner.pl> (bartoszradwan)
 - Kate Gerry <kate@fansubber.com> (kate66)
+- Brian Crockett <bcrockett@richmondsystemengineering.com> (TheCrockett)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
