@@ -172,15 +172,15 @@ echo "
 
     <h5>LibreNMS is a community-based project. Please feel free to join us and contribute code, documentation, and bug reports:</h5>
 
-    <p>
-      <a href="http://www.librenms.org/">Web site</a> |
-      <a href="https://github.com/librenms/">GitHub</a> |
-      <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
-      <a href="http://twitter.com/librenms">Twitter</a> |
-      <a href="http://www.librenms.org/changelog.html">Changelog</a> |
-      <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
-    </p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="http://www.librenms.org/">Web site</a></li>
+      <li class="list-inline-item"><a href="https://github.com/librenms/">GitHub</a></li>
+      <li class="list-inline-item"><a href="https://github.com/librenms/librenms/issues">Bug tracker</a></li>
+      <li class="list-inline-item"><a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a></li>
+      <li class="list-inline-item"><a href="http://twitter.com/librenms">Twitter</a></li>
+      <li class="list-inline-item"><a href="http://www.librenms.org/changelog.html">Changelog</a></li>
+      <li class="list-inline-item"><a href="#" data-toggle="modal" data-target="#git_log">Git log</a></li>
+    </ul>
 
   <div style="margin-top:10px;">
   </div>

@@ -2037,3 +2037,23 @@ label {
 .availability-map-widget-header {
   line-height:30px;
 }
+
+/* Inline list with divider
+-----------------------------------------------------------------------------*/
+
+.list-inline-item:not(:last-child) {
+  margin-right: 0;
+}
+.list-inline::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.list-inline-item {
+  float: left;
+}
+.list-inline-item + .list-inline-item::before {
+  padding-right: .5rem;
+  padding-left: .5rem;
+  content: "|";
+}
