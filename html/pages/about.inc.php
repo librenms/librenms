@@ -157,12 +157,12 @@ $version_date    = $versions['local_date'];
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed' border='0'>
-      <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
-      <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
-      <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
-      <tr><td><b>PHP</b></td><td>$php_version</td></tr>
-      <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>
-      <tr><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
+      <tr><td class='text-right'><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
+      <tr><td class='text-right'><b>DB Schema</b></td><td>#$schema_version</td></tr>
+      <tr><td class='text-right'><b>Apache</b></td><td>$apache_version</td></tr>
+      <tr><td class='text-right'><b>PHP</b></td><td>$php_version</td></tr>
+      <tr><td class='text-right'><b>MySQL</b></td><td>$mysql_version</td></tr>
+      <tr><td class='text-right'><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
     </table>
 </div>
 ";
