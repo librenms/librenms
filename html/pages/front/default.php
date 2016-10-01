@@ -116,7 +116,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 }
 
 // Device rebooted boxes
-if ((filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) && $config['os'][$os]['bad_uptime'] !== true) {
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) {
     if (is_admin() === true || is_read() === true) {
         $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '".$config['uptime_warning']."' AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
     } else {
@@ -124,13 +124,15 @@ if ((filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $
     }
 
     foreach (dbFetchRows($sql) as $device) {
-        generate_front_box(
-            'device-rebooted',
-            generate_device_link($device, shorthost($device['hostname'])).'<br />
-      <span class=device-rebooted>Device Rebooted</span><br />
-      <span class=body-date-1>'.formatUptime($device['uptime'], 'short').'</span>'
-        );
-        ++$count_boxes;
+        if($device["os"] != "merakimr") {
+            generate_front_box(
+                'device-rebooted',
+                generate_device_link($device, shorthost($device['hostname'])).'<br />
+                <span class=device-rebooted>Device Rebooted</span><br />
+                <span class=body-date-1>'.formatUptime($device['uptime'], 'short').'</span>'
+            );
+            ++$count_boxes;
+        }
     }
 }
 
