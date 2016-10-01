@@ -124,7 +124,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $c
     }
 
     foreach (dbFetchRows($sql) as $device) {
-        if($device["os"] != "merakimr") {
+        if ($device["os"] != "merakimr") {
             generate_front_box(
                 'device-rebooted',
                 generate_device_link($device, shorthost($device['hostname'])).'<br />
