@@ -255,7 +255,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
+                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -263,7 +263,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user 
                       AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
+                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
                       LIMIT :count';
         }
     }
