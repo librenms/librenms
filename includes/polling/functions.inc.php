@@ -4,6 +4,7 @@ require_once $config['install_dir'].'/includes/device-groups.inc.php';
 
 function bulk_sensor_snmpget($device, $sensors)
 {
+    $oid_per_pdu = get_device_oid_limit($device);
     $sensors = array_chunk($sensors, 10);
     $cache = array();
     foreach ($sensors as $chunk) {
@@ -35,7 +36,6 @@ function poll_sensor($device, $class, $unit)
     }
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
-print_r($snmp_data);exit;
 
     foreach ($sensors as $sensor) {
         echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
@@ -74,7 +74,7 @@ print_r($snmp_data);exit;
             unset($mib);
             unset($mibdir);
             $sensor['new_value'] = $sensor_value;
-            $all_sensors = array_merge($all_sensors, $sensor);
+            $all_sensors[] = $sensor;
         }
     }
 
@@ -83,7 +83,7 @@ print_r($snmp_data);exit;
             if (isset($agent_sensors)) {
                 $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
                 $sensor['new_value'] = $sensor_value;
-                $all_sensors = array_merge($all_sensors, $sensor);
+                $all_sensors[] = $sensor;
             } else {
                 echo "no agent data!\n";
                 continue;
@@ -512,3 +512,9 @@ function location_to_latlng($device)
         }
     }
 }// end location_to_latlng()
+
+function get_device_oid_limit($device)
+{
+    global $config, $attribs;
+
+}
