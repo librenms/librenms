@@ -214,7 +214,7 @@ if ($config['enable_bgp']) {
         }
 
             // Delete removed peers
-            $sql = "SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND context_name = '".$device['context_name']."'";
+            $sql = "SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND (context_name = '".$device['context_name']."' OR context_name IS NULL)";
 
         foreach (dbFetchRows($sql) as $entry) {
             unset($exists);
