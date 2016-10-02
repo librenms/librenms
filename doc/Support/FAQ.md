@@ -44,6 +44,8 @@ You have two options for adding a new device into LibreNMS.
 ./addhost.php [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
 
+> Please note that if the community contains special characters such as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
+
  2. Using the web interface, go to Devices and then Add Device. Enter the details required for the device that you want to add and then click 'Add Host'.
 
 #### <a name="faq3"> How do I get help?</a>
