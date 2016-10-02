@@ -8,7 +8,7 @@ if ($_POST['editing']) {
         $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
         $timeout      = mres($_POST['timeout']);
         $retries      = mres($_POST['retries']);
-        $poller_group = mres($_POST['poller_group']);
+        $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
         $port_assoc_mode = mres($_POST['port_assoc_mode']);
         $max_repeaters = mres($_POST['max_repeaters']);
         $v3           = array(
