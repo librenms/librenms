@@ -421,9 +421,8 @@ function snmp_cache_portName($device, $array)
 function snmp_output_to_array($data, $array = array(), $index_parts = 1)
 {
     foreach (explode(PHP_EOL, $data) as $entry) {
-        // split data and value
-        list($oid, $value) = explode('=', $entry, 2);
-        $oid = trim($oid);
+        // split oid and value
+        list($oid, $value) = explode(' = ', $entry, 2);
         $value = trim($value, " \t\n\r\0\x0B\""); //remove surrounding whitespace and double quotes
 
         if (!str_contains($value, 'at this OID')) {
