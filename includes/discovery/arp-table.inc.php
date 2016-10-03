@@ -9,7 +9,7 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
 }
 
 $arp_oid = 'ipNetToPhysicalPhysAddress';
-if( $os == 'iosxr' ) {
+if( $device['os'] == 'iosxr' ) {
     $arp_oid = 'ipNetToMediaPhysAddress';
 }
 
