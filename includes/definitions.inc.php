@@ -1917,6 +1917,7 @@ $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $os = 'aerohive';
 $config['os'][$os]['text']             = 'Aerohive HiveOS';
 $config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'aerohive';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
