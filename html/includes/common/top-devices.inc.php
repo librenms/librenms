@@ -31,12 +31,23 @@ $sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AN
 $widget_mode = json_decode($sql['settings'], true);
 
 $top_query = $widget_mode['top_query'];
+$sort_order = $widget_mode['sort_order'];
+
+$selected_sort_asc = '';
+$selected_sort_desc = '';
+
+if ($sort_order === 'asc') {
+    $selected_sort_asc = 'selected';
+} elseif ($sort_order === 'desc') {
+    $selected_sort_desc = 'selected';
+}
 
 $selected_traffic = '';
 $selected_uptime = '';
 $selected_ping = '';
 $selected_cpu = '';
 $selected_ram = '';
+$selected_poller = '';
 
 switch ($top_query) {
     case "traffic":
@@ -69,6 +80,11 @@ switch ($top_query) {
         $graph_type = 'device_mempool';
         $graph_params = array('tab' => 'health', 'metric' => 'mempool');
         break;
+    case "poller":
+        $table_header = 'Poller duration';
+        $selected_poller = 'selected';
+        $graph_type = 'device_poller_perf';
+        $graph_params = array('tab' => 'graphs', 'group' => 'poller');
 }
 
 if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
@@ -91,8 +107,20 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                     <option value="traffic" ' . $selected_traffic . '>Traffic</option>
                     <option value="uptime" ' . $selected_uptime . '>Uptime</option>
                     <option value="ping" ' . $selected_ping . '>Response time</option>
+                    <option value="poller" ' . $selected_poller . '>Poller duration</option>
                     <option value="cpu" ' . $selected_cpu . '>Processor load</option>
                     <option value="ram" ' . $selected_ram . '>Memory usage</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-4">
+                <label for="top_query" class="control-label availability-map-widget-header">Sort order</label>
+            </div>
+            <div class="col-sm-6">
+                <select class="form-control" name="sort_order">
+                    <option value="asc" ' . $selected_sort_asc . '>Ascending</option>
+                    <option value="desc" ' . $selected_sort_desc . '>Descending</option>
                 </select>
             </div>
         </div>
@@ -137,7 +165,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
-            ORDER BY total desc
+            ORDER BY total '.$sort_order.'
             LIMIT :count
             ';
         } else {
@@ -150,7 +178,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
-            ORDER BY total desc
+            ORDER BY total '.$sort_order.'
             LIMIT :count
             ';
         }
@@ -159,7 +187,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `uptime` DESC 
+                      ORDER BY `uptime` '.$sort_order.' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -167,7 +195,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE  `P`.`user_id` = :user
                       AND `P`.`device_id` = `d`.`device_id`
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
-                      ORDER BY `uptime` DESC 
+                      ORDER BY `uptime` '.$sort_order.' 
                       LIMIT :count';
         }
     } elseif ($top_query === 'ping') {
@@ -175,7 +203,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` DESC 
+                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -183,7 +211,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user 
                       AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` DESC 
+                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
                       LIMIT :count';
         }
     } elseif ($top_query === 'cpu') {
@@ -193,7 +221,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `d`.`device_id` = `procs`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       GROUP BY `d`.`device_id` 
-                      ORDER BY `cpuload` DESC 
+                      ORDER BY `cpuload` '.$sort_order.' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload` 
@@ -201,7 +229,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       GROUP BY `procs`.`device_id` 
-                      ORDER BY `cpuload` DESC
+                      ORDER BY `cpuload` '.$sort_order.'
                       LIMIT :count';
         }
     } elseif ($top_query === 'ram') {
@@ -211,7 +239,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `d`.`device_id` = `mem`.`device_id`
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `mempool_perc` DESC
+                      ORDER BY `mempool_perc` '.$sort_order.'
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc` 
@@ -219,10 +247,27 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id`
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `mempool_perc` DESC
+                      ORDER BY `mempool_perc` '.$sort_order.'
+                      LIMIT :count';
+        }
+    } elseif ($top_query === 'poller') {
+        if (is_admin() || is_read()) {
+            $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id` 
+                      FROM `devices` 
+                      WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
+                      LIMIT :count';
+        } else {
+            $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
+                      FROM `devices` as `d`, `devices_perms` AS `P` 
+                      WHERE `P`.`user_id` = :user 
+                      AND `P`.`device_id` = `d`.`device_id` 
+                      AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
+                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
                       LIMIT :count';
         }
     }
+
 
     $common_output[] = '
     <div class="table-responsive">
