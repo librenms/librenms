@@ -35,7 +35,6 @@ if ($device['os_group'] == 'printer') {
                 $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqv'))));
 
                 if ($descr != '') {
-
                     $oid_toner = snmp_get($device, $toner_oid, '-Oqv');
                     $oid_capacity = snmp_get($device, $capacity_oid, '-Oqv');
 
