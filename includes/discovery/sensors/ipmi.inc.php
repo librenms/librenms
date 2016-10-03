@@ -8,7 +8,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
 
     if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost') {
-        $remote = ' -H '.$ipmi['host'].' -U '.$ipmi['user'].' -P '.$ipmi['password'];
+        $remote = " -H ".$ipmi['host']." -U '".$ipmi['user']."' -P '".$ipmi['password']."' -L USER";
     }
 
     foreach ($config['ipmi']['type'] as $ipmi_type) {
