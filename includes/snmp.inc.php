@@ -560,7 +560,7 @@ function snmp_gen_auth(&$device)
         
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
-            $username = isset($device['authname']) ? $device['authname'] : 'root';
+            $username = !empty($device['authname']) ? $device['authname'] : 'root';
             $cmd .= " -u '".$username."'";
         } elseif ($device['authlevel'] === 'authNoPriv') {
             $cmd .= " -a '".$device['authalgo']."'";
