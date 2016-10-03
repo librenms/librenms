@@ -1,4 +1,151 @@
 source: General/Changelog.md
+## Release: 201609
+*September 2016*
+
+#### Features
+* Added alerts output to capture system ([#4574](https://github.com/librenms/librenms/issues/4574))
+* Add support for ups-apcups via snmp
+* Add snmpsim to Travis automated testing. Update to check new setting for true and isset
+* use snmpsim for testing fallback feature so we don't have to run snmpsim on devel computers, should be adequate for now ./scripts/pre-commit.php -u -snmpsim will start an snmpsimd.py process automatically
+* Improved readability for snmp debug output
+* Add last changed, connected, and mtu to all ports data
+* Add temp & state sensors to Riverbed
+* Added support for all OS tests
+* Added Runtime support for APC ups 
+* Capture device troubleshooting info (discovery, poller, snmpwalk)
+* Add temp & state sensors to Riverbed
+* Add more state sensors to Dell iDrac
+* Allow scripts to be run from any working directory ([#4437](https://github.com/librenms/librenms/issues/4437))
+* New app: ups-nut ([#4386](https://github.com/librenms/librenms/issues/4386))
+* Added new discovery-wrapper.py script to replicate poller-wrapper.py ([#4351](https://github.com/librenms/librenms/issues/4351))
+* Extended graphing for sla - icmp-jitter [#4341](https://github.com/librenms/librenms/issues/4341)
+* Added Cisco Stackwise Support [#4301](https://github.com/librenms/librenms/issues/4301)
+* Add Cisco WAAS Optimized TCP Connections Graph ([#4645](https://github.com/librenms/librenms/issues/4645))
+
+#### Bugfixes
+* Toner nrg os capacity ([#4177](https://github.com/librenms/librenms/issues/4177))
+* Fixed swos detection [#4533](https://github.com/librenms/librenms/issues/4533)
+* Updated edit snmp to set default poller_group ([#4694](https://github.com/librenms/librenms/issues/4694))
+* Fixed SQL query for bgpPeers check to remove stale sessions ([#4697](https://github.com/librenms/librenms/issues/4697))
+* Netonix version display ([#4672](https://github.com/librenms/librenms/issues/4672))
+* FreeBSD variants ([#4661](https://github.com/librenms/librenms/issues/4661))
+* unix-agent handling of reported time values from check_mk [#4652](https://github.com/librenms/librenms/issues/4652)
+* Add checks for devices with no uptime over snmp [#4587](https://github.com/librenms/librenms/issues/4587)
+* stop qnap discovery from running for every device
+* Fixed the old port rrd migration code to work with new rrdtool functions ([#4616](https://github.com/librenms/librenms/issues/4616))
+* Run cleanup for ipmi sensor discovery ([#4582](https://github.com/librenms/librenms/issues/4582))
+* Numerous availability-map bug fixes
+* AD auth stop alerts being generated
+* Possible additional fix for non-terminating rrdtool processes.
+* AD auth stop alerts being generated
+* APC runtime graph missing in device>health>overview
+* LibreNMS/Proc improvements Should fix sending rrdtool the quit command without a newline at the end. (not sure if this is an issue)
+* Port ifLastChange polling now usable ([#4541](https://github.com/librenms/librenms/issues/4541))
+* brother toner levels ([#4526](https://github.com/librenms/librenms/issues/4526))
+* poweralert ups divisor
+* Update Fortinet Logo
+* Change CiscoSB devices to use ifEntry
+* Disable refreshing on window resize when $no_refresh is set.
+* Fix quota bills showing 0/0 for in/out ([#4462](https://github.com/librenms/librenms/issues/4462))
+* This removes stale entries in the mac_ipv4 table ([#4444](https://github.com/librenms/librenms/issues/4444))
+* Swos os discovery fixes [#3593](https://github.com/librenms/librenms/issues/3593)
+* Vyos discovery fix [#4486](https://github.com/librenms/librenms/issues/4486)
+* Toner descr that contain invalid characters [#4464](https://github.com/librenms/librenms/issues/4464)
+* Alert statics not showing data
+* Ubnt bad edgeswitch uptime [#4470](https://github.com/librenms/librenms/issues/4470)
+* New installs would have multiple entries in dbSchema table ([#4460](https://github.com/librenms/librenms/issues/4460))
+* Force add now ignores all snmp queries
+* Clean up errors in the webui ([#4438](https://github.com/librenms/librenms/issues/4438))
+* Reduce mib graph queries ([#4439](https://github.com/librenms/librenms/issues/4439))
+* Ports page includes disabled, ignored, and deleted ports ([#4419](https://github.com/librenms/librenms/issues/4419))
+* RRDTool call was always being done to check for local files ([#4427](https://github.com/librenms/librenms/issues/4427))
+* MikroTik OS detection [#3593](https://github.com/librenms/librenms/issues/3593)
+* Added cisco886Va to bad_ifXEntry for cisco os ([#4374](https://github.com/librenms/librenms/issues/4374))
+* Stop irc bot crashing on .reload [#4353](https://github.com/librenms/librenms/issues/4353)
+* Quanta blade switches are now being correctly detected as Quanta switches ([#4358](https://github.com/librenms/librenms/issues/4358))
+* Added options to make temperature graphs display y-axis correctly [#4350](https://github.com/librenms/librenms/issues/4350)
+* Added options to make voltage graphs display y-axis correctly [#4326](https://github.com/librenms/librenms/issues/4326)
+* Calling rrdtool_pipe_open() instead of rrdtool_initialize(); ([#4343](https://github.com/librenms/librenms/issues/4343))
+* Enterasys use ifname for port names [#3263](https://github.com/librenms/librenms/issues/3263)
+* Ricoh/nrg toner levels [#4177](https://github.com/librenms/librenms/issues/4177)
+* Availability map device box reverted to original size, fixes for device groups ([#4334](https://github.com/librenms/librenms/issues/4334))
+* Remove Cisco remote access stats graph transparency ([#4331](https://github.com/librenms/librenms/issues/4331))
+* Cisco remote access stats bugfix [#4293](https://github.com/librenms/librenms/issues/4293) ([#4309](https://github.com/librenms/librenms/issues/4309))
+* Added ability to force devices to use ifEntry instead of ifXEntry ([#4100](https://github.com/librenms/librenms/issues/4100))
+* Don’t add Cisco VSS sensors if VSS is not running [#4111](https://github.com/librenms/librenms/issues/4111)
+* Always validate the default dashboard_id to make sure it still exists
+* NRG Toner detection [#4250](https://github.com/librenms/librenms/issues/4250)
+* Missing variable in services api call
+* Added influxdb options to check-services.php
+
+#### Documentation
+* Include PHP Install instructions for MySQL app
+* Added FAQ for why interfaces are missing from overall traffic graphs ([#4696](https://github.com/librenms/librenms/issues/4696))
+* Updated Applications to clarify apache setup
+* Update apache applications to detail testing and additional requirements.md
+* Updated release doc with more information on stable / dev branches
+* Corrected the rsyslog documentation to be compatible with logrotate
+* Fixed centos snmp path
+* Updated to include info on how to use git hook to validate code ([#4484](https://github.com/librenms/librenms/issues/4484))
+* Added info on how to perform unit testing
+* Added faq to explain why devices show as warning ([#4449](https://github.com/librenms/librenms/issues/4449))
+* Standardize snmp extend script location to /etc/snmp/ ([#4418](https://github.com/librenms/librenms/issues/4418))
+* Added NFSen docs + update general config docs ([#4412](https://github.com/librenms/librenms/issues/4412))
+* Clarify install docs to run validate as root [#4286](https://github.com/librenms/librenms/issues/4286) 
+* Added example to alerting doc for using variables of similar name [#4264](https://github.com/librenms/librenms/issues/4264)
+* Added docs + file changes to support creating new releases/changelog
+* Update snmpd setup in Installation-Ubuntu-1604 docs [#4243](https://github.com/librenms/librenms/issues/4243)
+
+#### Refactoring
+* Centralize MIB include directory specification ([#4603](https://github.com/librenms/librenms/issues/4603))
+* OS discovery files (a-z)
+* F5 device discovery cleanup + test unit
+* Remove external uses of GenGroupSQL()
+* consolidate snmpcmd generation
+* consolidate snmpcmd generation I needed to generate an snmpcmd for an upcoming PR, so I figured I'd save a little code duplication.
+* Refactored new helper functions for case sensitivity [#4283](https://github.com/librenms/librenms/issues/4283) 
+* Final PSR2 cleanup
+* Moved IRCBot class to LibreNMS namespace [#4246](https://github.com/librenms/librenms/issues/4246) 
+* Update code in /includes to be psr2 compliant [#4220](https://github.com/librenms/librenms/issues/4220)
+
+#### Devices
+* Samsung Printer Discovery [#4251](https://github.com/librenms/librenms/issues/4251) ([#4258](https://github.com/librenms/librenms/issues/4258))
+* HP 1820 Discovery [#3933](https://github.com/librenms/librenms/issues/3933) ([#4259](https://github.com/librenms/librenms/issues/4259))
+* Added support for Cisco Callmanager
+* Edge Core ES3528M - base support
+* Added support for Cisco IPS ([#4561](https://github.com/librenms/librenms/issues/4561))
+* Added MGE detection
+* Netonix switch data collection update
+* Eaton PowerXpert
+* Added Datacom Dbm Support
+* Updated Edgerouter lite detection
+* Added support for Cisco Callmanager
+* Procurve 5400R series [#4375](https://github.com/librenms/librenms/issues/4375)
+* hp online admin cpu and mem [#4327](https://github.com/librenms/librenms/issues/4327)
+* Added support for Foundry Networks [#4311](https://github.com/librenms/librenms/issues/4311)
+* Added Cisco Stackwise Support [#4301](https://github.com/librenms/librenms/issues/4301)
+* Added support for PLANET Networking & Communication switches ([#4308](https://github.com/librenms/librenms/issues/4308))
+* Added support for Fujitsu Primergy switches [#4277](https://github.com/librenms/librenms/issues/4277) ([#4280](https://github.com/librenms/librenms/issues/4280))
+* Added support for Lanier printers [#4267](https://github.com/librenms/librenms/issues/4267) 
+* Added Temp and State support for EdgeSwitch OS [#4265](https://github.com/librenms/librenms/issues/4265) 
+* Added support for DDN Storage [#2737](https://github.com/librenms/librenms/issues/2737) ([#4261](https://github.com/librenms/librenms/issues/4261))
+* Improved support for UBNT EdgeSwitch OS [#4249](https://github.com/librenms/librenms/issues/4249)
+* Improved support for Avaya VSP [#4237](https://github.com/librenms/librenms/issues/4237)
+* Added support for macOS Sierra ([#4557](https://github.com/librenms/librenms/issues/4557))
+* Improve BDCOM detection ([#4329](https://github.com/librenms/librenms/issues/4329))
+
+#### WebUI
+* top devices enhancement [#4447](https://github.com/librenms/librenms/issues/4447)
+* Individual devices now use bootgrid syslog ([#4584](https://github.com/librenms/librenms/issues/4584))
+* added amazon server icon
+* Update all glyphicon to font awesome
+* Relocate Alerts menu
+* Updated force add option for addhost.php to be present in all instances ([#4428](https://github.com/librenms/librenms/issues/4428))
+* Add check to display make bill on port page only if billing is enabled ([#4361](https://github.com/librenms/librenms/issues/4361))
+* Added Pagination and server side search via Ajax to NTP ([#4330](https://github.com/librenms/librenms/issues/4330))
+
+---
+
 ### August 2016
 
 #### Bug fixes

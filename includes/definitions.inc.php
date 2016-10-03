@@ -1917,6 +1917,7 @@ $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $os = 'aerohive';
 $config['os'][$os]['text']             = 'Aerohive HiveOS';
 $config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'aerohive';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
@@ -2153,6 +2154,18 @@ $config['os'][$os]['text']             = 'Edge-Core';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['icon']             = 'edge-core';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Mimosa 
+$os = 'mimosa';
+$config['os'][$os]['text']             = 'Mimosa';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'mimosa';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -2454,9 +2467,14 @@ $config['graph_types']['device']['fortigate_cpu']['descr']         = 'CPU';
 $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
+
+//PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']        = '0';
 $config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['panos_activetunnels']['section'] = 'firewall';
+$config['graph_types']['device']['panos_activetunnels']['order']   = '1';
+$config['graph_types']['device']['panos_activetunnels']['descr']   = 'Active GlobalProtect Tunnels';
 
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';

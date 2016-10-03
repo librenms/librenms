@@ -69,7 +69,7 @@ foreach ($controls as $control) {
                             </span><br /><br />
                             <span><strong>Placeholders:</strong><br />
 <?php
-    $placeholders = array('hostname', 'sysName', 'location', 'title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
+    $placeholders = array('hostname', 'sysName', 'location', 'uptime', 'description', 'notes', 'title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
 foreach ($placeholders as $placeholder) {
     echo '              <button type="button" class="btn btn-success btn-sm" data-target="#placeholder-add" id="placeholder-add" name="placeholder-add" data-type="placeholder" data-value="'.$placeholder.'">'.$placeholder.'</button>';
 }
