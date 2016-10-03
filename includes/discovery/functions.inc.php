@@ -891,3 +891,68 @@ function get_device_divisor($device, $serial, $sensor)
     }
     return $divisor;
 }
+
+/**
+ * @param $device
+ * @param $capacity_oid
+ * @return int
+ */
+function get_toner_capacity($device, $capacity_oid)
+{
+    if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
+        $capacity = 100;
+    } else {
+        $capacity = snmp_get($device, $capacity_oid, '-Oqv');
+    }
+
+    return $capacity;
+}
+
+/**
+ * @param $device
+ * @param $oid_value
+ * @param $oid_capacity
+ * @return float|int
+ */
+function get_toner_levels($device, $oid_value, $oid_capacity)
+{
+    if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
+        if ($oid_value == '-3') {
+            $current = 50;
+        } elseif ($oid_value == '-100') {
+            $current = 0;
+        } else {
+            $current = ($oid_value / $oid_capacity * 100);
+        }
+    } elseif ($device['os'] == 'brother') {
+        if (str_contains($device['hardware'], 'NC-8600h')) {
+            switch ($oid_value) {
+                case '0':
+                    $current = 0;
+                    break;
+                case '-3':
+                    $current = 50;
+                    break;
+            }
+        } else {
+            switch ($oid_value) {
+                case '0':
+                    $current = 100;
+                    break;
+                case '1':
+                    $current = 5;
+                    break;
+                case '2':
+                    $current = 0;
+                    break;
+                case '3':
+                    $current = 1;
+                    break;
+            }
+        }
+    } else {
+        $current = ($oid_value / $oid_capacity * 100);
+    }
+
+    return $current;
+}
