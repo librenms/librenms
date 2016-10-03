@@ -2454,9 +2454,14 @@ $config['graph_types']['device']['fortigate_cpu']['descr']         = 'CPU';
 $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
+
+//PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']        = '0';
 $config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['panos_activetunnels']['section'] = 'firewall';
+$config['graph_types']['device']['panos_activetunnels']['order']   = '1';
+$config['graph_types']['device']['panos_activetunnels']['descr']   = 'Active GlobalProtect Tunnels';
 
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';

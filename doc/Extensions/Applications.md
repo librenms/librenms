@@ -130,6 +130,16 @@ extend memcached /etc/snmp/memcached
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
 
+CentOS
+```
+yum install php-cli php-mysql
+```
+
+Debian
+```
+apt-get install php5-cli php5-mysql
+```
+
 Unlike most other scripts, the MySQL script requires a configuration file `/usr/lib/check_mk_agent/local/mysql.cnf` with following content:
 
 ```php

@@ -136,6 +136,7 @@ LibreNMS contributors:
 - Bartosz Radwan <b.radwan@citypartner.pl> (bartoszradwan)
 - Kate Gerry <kate@fansubber.com> (kate66)
 - Johan Zaxmy <johan@zaxmy.com> (Zaxmy)
+- Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
