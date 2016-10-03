@@ -117,6 +117,8 @@ Placeholders:
 - Hostname of the Device: `%hostname`
 - sysName of the Device: `%sysName`
 - location of the Device: `%location`
+- description (purpose db field) of the Device: `%description`
+- notes of the Device: `%notes`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
