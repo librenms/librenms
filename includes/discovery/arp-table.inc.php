@@ -8,15 +8,15 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
     $vrfs_lite_cisco = array(array('context_name'=>null));
 }
 
-$arp_oid = 'ipNetToPhysicalPhysAddress';
-if( $device['os'] == 'iosxr' ) {
-    $arp_oid = 'ipNetToMediaPhysAddress';
-}
-
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
 
+    $arp_oid = 'ipNetToPhysicalPhysAddress';
     $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
+    if(empty($ipNetToPhysical_data)) {
+        $arp_oid = 'ipNetToMediaPhysAddress';
+        $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
+    }
     $ipNetToPhysical_data = str_replace('IP-MIB::'.$arp_oid.'.', '', trim($ipNetToPhysical_data));
     $ipNetToPhysical_data = str_replace('"', '', trim($ipNetToPhysical_data));
     foreach (explode("\n", $ipNetToPhysical_data) as $data) {
