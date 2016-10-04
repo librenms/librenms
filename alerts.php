@@ -500,7 +500,15 @@ function DescribeAlert($alert)
         }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
-        $obj['faults']  = false;
+        foreach ($extra['rule'] as $incident) {
+            $i++;
+            $obj['faults'][$i] = $incident;
+            foreach ($incident as $k => $v) {
+                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                }
+            }
+        }
     } else {
         return 'Unknown State';
     }//end if
