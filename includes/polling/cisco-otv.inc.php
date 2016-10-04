@@ -67,7 +67,7 @@ if ($device['os_group'] == "cisco") {
     $components = $components[$device['device_id']];
 
     // Only collect SNMP data if we have enabled components
-    if (count($components > 0)) {
+    if (count($components) > 0) {
         // Let's gather the stats..
         $tblOverlayEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.2.1.1');
         $tblAdjacencyDatabaseEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.3.1.1', 0);
