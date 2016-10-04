@@ -157,12 +157,12 @@ $version_date    = $versions['local_date'];
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed' border='0'>
-      <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
-      <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
-      <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
-      <tr><td><b>PHP</b></td><td>$php_version</td></tr>
-      <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>
-      <tr><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
+      <tr><td class='text-right'><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
+      <tr><td class='text-right'><b>DB Schema</b></td><td>#$schema_version</td></tr>
+      <tr><td class='text-right'><b>Apache</b></td><td>$apache_version</td></tr>
+      <tr><td class='text-right'><b>PHP</b></td><td>$php_version</td></tr>
+      <tr><td class='text-right'><b>MySQL</b></td><td>$mysql_version</td></tr>
+      <tr><td class='text-right'><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
     </table>
 </div>
 ";
@@ -172,15 +172,15 @@ echo "
 
     <h5>LibreNMS is a community-based project. Please feel free to join us and contribute code, documentation, and bug reports:</h5>
 
-    <p>
-      <a href="http://www.librenms.org/">Web site</a> |
-      <a href="https://github.com/librenms/">GitHub</a> |
-      <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
-      <a href="http://twitter.com/librenms">Twitter</a> |
-      <a href="http://www.librenms.org/changelog.html">Changelog</a> |
-      <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
-    </p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="http://www.librenms.org/">Web site</a></li>
+      <li class="list-inline-item"><a href="https://github.com/librenms/">GitHub</a></li>
+      <li class="list-inline-item"><a href="https://github.com/librenms/librenms/issues">Bug tracker</a></li>
+      <li class="list-inline-item"><a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a></li>
+      <li class="list-inline-item"><a href="http://twitter.com/librenms">Twitter</a></li>
+      <li class="list-inline-item"><a href="http://www.librenms.org/changelog.html">Changelog</a></li>
+      <li class="list-inline-item"><a href="#" data-toggle="modal" data-target="#git_log">Git log</a></li>
+    </ul>
 
   <div style="margin-top:10px;">
   </div>
