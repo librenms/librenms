@@ -264,11 +264,11 @@ if ($_SESSION['userlevel'] != '10') {
 
             $users_details = get_user($vars['user_id']);
             if (!empty($users_details)) {
-                    if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
-                        dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($vars['user_id']));
-                        print_message("User default dashboard updated");
-                    }
-                    echo "<form class='form-horizontal' role='form' method='post' action=''>
+                if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
+                    dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($vars['user_id']));
+                    print_message("User default dashboard updated");
+                }
+                echo "<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='".$vars['user_id']."'>
   <input type='hidden' name='cur_username' value='" . $users_details['username'] . "'>
   <input type='hidden' name='edit' value='yes'>
