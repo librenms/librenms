@@ -13,7 +13,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
 
     $arp_oid = 'ipNetToPhysicalPhysAddress';
     $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
-    if(empty($ipNetToPhysical_data)) {
+    if (empty($ipNetToPhysical_data)) {
         $arp_oid = 'ipNetToMediaPhysAddress';
         $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
     }
