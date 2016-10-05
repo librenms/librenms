@@ -300,7 +300,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     } else {
         $ip = $host;
     }
-    if (ip_exists($ip)) {
+    if ($force_add !== true && ip_exists($ip)) {
         throw new HostIpExistsException("Already have host with this IP $host");
     }
 
