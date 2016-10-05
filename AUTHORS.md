@@ -137,6 +137,7 @@ LibreNMS contributors:
 - Kate Gerry <kate@fansubber.com> (kate66)
 - Johan Zaxmy <johan@zaxmy.com> (Zaxmy)
 - Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
+- Layne Breitkreutz <github@thelenon.com> (Gorian)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

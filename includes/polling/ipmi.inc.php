@@ -11,7 +11,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'Fetching IPMI sensor data...';
 
     if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost') {
-        $remote = ' -H '.$ipmi['host'].' -U '.$ipmi['user'].' -P '.$ipmi['password'];
+        $remote = " -H ".$ipmi['host']." -U '".$ipmi['user']."' -P '".$ipmi['password']."' -L USER";
     }
 
     $results = external_exec($config['ipmitool'].' -I '.$ipmi['type'].' -c '.$remote.' sdr 2>/dev/null');
