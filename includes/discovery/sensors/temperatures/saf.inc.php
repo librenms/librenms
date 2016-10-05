@@ -1,17 +1,17 @@
 <?php
 
 if ($device['os'] == 'saf') {
-    $oid  = 'SAF-IPRADIO::sysTemperature';
-    $oids = snmp_get($device, $oid, '-OsqnU', 'SAF-IPRADIO');
+    $mib  = 'SAF-IPRADIO::sysTemperature';
+    $oid = '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.5';
+    $oids = snmp_get($device, $mib, '-OsqnU', 'SAF-IPRADIO');
     d_echo($oids."\n");
 
     if (!empty($oids)) {
         echo 'SAF Temperature ';
-    }
 
-    $divisor = 1;
-    $type    = 'saf';
-    if (!empty($oids)) {
+        $divisor = 1;
+        $type    = 'saf';
+
         list(,$current) = explode(' ', $oids);
         $index          = $oid;
         $descr          = 'System Temp';

@@ -44,4 +44,4 @@ $mib_graphs = array(
 
 unset($graph, $oids, $oid);
 
-poll_mib_def($device, 'SAF-IPRADIO:saf', 'saf', $mib_oids, $mib_graphs, $graphs);
+poll_mib_def($device, 'SAF-IPRADIO:saf-modem-radio', 'saf', $mib_oids, $mib_graphs, $graphs);
