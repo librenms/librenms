@@ -10,8 +10,8 @@ if ($config['enable_inventory']) {
     }
 
     // Delete any entries that have not bee accounted for.
-    $sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '" . $device['device_id'] . "'";
-    foreach (dbFetchRows($sql) as $test) {
+    $sql = 'SELECT * FROM `entPhysical` WHERE `device_id` = ?';
+    foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
         $id = $test['entPhysicalIndex'];
         if (!$valid[$id]) {
             echo '-';

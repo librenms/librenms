@@ -30,7 +30,6 @@ $tblUCSObjects = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.719.1', 2);
  */
 if (is_null($tblUCSObjects)) {
     // We have to error here or we will end up deleting all our components.
-    echo "Error\n";
 } else {
     // No Error, lets process things.
     echo("CIMC Hardware Found: ");
