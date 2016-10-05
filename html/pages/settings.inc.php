@@ -80,12 +80,22 @@ if (is_admin() === true) {
 
         function a2t($a)
         {
+
+            $excluded = array(
+                'db_pass',
+                'email_smtp_password',
+                'password',
+                'auth_ad_bindpassword',
+            );
+
             $r = '<table class="table table-condensed table-hover"><tbody>';
             foreach ($a as $k => $v) {
                 if (!empty($v)) {
-                    $r .= '<tr><td class="col-md-2"><i><b>' . $k . '</b></i></td><td class="col-md-10">';
-                    $r .= is_array($v) ? a2t($v) : '<code>' . wordwrap($v, 75, '<br/>') . '</code>';
-                    $r .= '</td></tr>';
+                    if (!in_array($k, $excluded)) {
+                        $r .= '<tr><td class="col-md-2"><i><b>' . $k . '</b></i></td><td class="col-md-10">';
+                        $r .= is_array($v) ? a2t($v) : '<code>' . wordwrap($v, 75, '<br/>') . '</code>';
+                        $r .= '</td></tr>';
+                    }
                 }
             }
             $r .= '</tbody></table>';
