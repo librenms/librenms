@@ -39,7 +39,6 @@ function poll_sensor($device, $class, $unit)
 
     foreach ($sensors as $sensor) {
         echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
-        $sensor_value = '';
 
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
@@ -521,7 +520,7 @@ function get_device_oid_limit($device)
 {
     global $config;
 
-    $max_oid = $devive['snmp_max_oid'];
+    $max_oid = $device['snmp_max_oid'];
 
     if (isset($max_oid) && $max_oid > 0) {
         return $max_oid;
