@@ -1450,6 +1450,13 @@ $config['os'][$os]['icon']             = 'mge';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 
+$os = 'sinetica';
+$config['os'][$os]['text']             = 'Sinetica UPS';
+$config['os'][$os]['group']            = 'ups';
+$config['os'][$os]['type']             = 'power';
+$config['os'][$os]['over'][0]['graph'] = 'device_current';
+$config['os'][$os]['over'][0]['text']  = 'Current';
+
 $os = 'mgepdu';
 $config['os'][$os]['text'] = 'MGE PDU';
 $config['os'][$os]['type'] = 'power';
