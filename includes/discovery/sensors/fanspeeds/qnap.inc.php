@@ -1,10 +1,12 @@
 <?php
 
-// Turbo NAS Fanspeed
-$fan_speed_oid = '.1.3.6.1.4.1.24681.1.2.15.1.3.';
 
 if ($device['os'] == 'qnap') {
+    echo 'QNAP: ';
     $oids = snmpwalk_cache_multi_oid($device, 'SystemFanTable', array(), 'NAS-MIB');
+
+    // Turbo NAS Fanspeed
+    $fan_speed_oid = '.1.3.6.1.4.1.24681.1.2.15.1.3.';
 
     // Parse all fans in the device to get the speed
     if (is_array($oids)) {

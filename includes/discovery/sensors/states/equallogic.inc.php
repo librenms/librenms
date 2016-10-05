@@ -13,7 +13,7 @@
  */
  
 if ($device['os'] == 'equallogic') {
-    $oids = snmp_walk($device, 'eqlMemberHealthStatus', '-OQne', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+    $oids = snmp_walk($device, 'eqlMemberHealthStatus', '-OQne', 'EQLMEMBER-MIB', 'equallogic');
 
     d_echo('Health oids:');
     d_echo($oids."\n");
@@ -78,7 +78,7 @@ The LibreNMS generic states is derived from Nagios:
         }
     }
 
-    $oids1 = snmp_walk($device, 'eqlMemberHealthDetailsPowerSupplyName', '-OQn', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+    $oids1 = snmp_walk($device, 'eqlMemberHealthDetailsPowerSupplyName', '-OQn', 'EQLMEMBER-MIB', 'equallogic');
 
     d_echo('PowerSupplyName oids:');
     d_echo($oids1."\n");
@@ -130,7 +130,7 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
                 $member_id        = $split_oid[(count($split_oid) - 2)];
                 $num_index        = $member_id.'.'.$num_index;
                 $oid              = $base_oid.$num_index;
-                $extra            = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+                $extra            = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
                 d_echo($extra);
                 if (!empty($extra)) {
                     list($foid,$pstatus) = explode(' = ', $extra, 2);

@@ -11,8 +11,13 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
 
-    $ipNetToPhysical_data = snmp_walk($device, 'ipNetToPhysicalPhysAddress', '-Oq', 'IP-MIB');
-    $ipNetToPhysical_data = str_replace('IP-MIB::ipNetToPhysicalPhysAddress.', '', trim($ipNetToPhysical_data));
+    $arp_oid = 'ipNetToPhysicalPhysAddress';
+    $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
+    if (empty($ipNetToPhysical_data)) {
+        $arp_oid = 'ipNetToMediaPhysAddress';
+        $ipNetToPhysical_data = snmp_walk($device, $arp_oid, '-Oq', 'IP-MIB');
+    }
+    $ipNetToPhysical_data = str_replace('IP-MIB::'.$arp_oid.'.', '', trim($ipNetToPhysical_data));
     $ipNetToPhysical_data = str_replace('"', '', trim($ipNetToPhysical_data));
     foreach (explode("\n", $ipNetToPhysical_data) as $data) {
         list($oid, $mac) = explode(' ', $data);
@@ -41,7 +46,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $clean_mac = $m_a.$m_b.$m_c.$m_d.$m_e.$m_f;
             $mac_table[$if][$mac]['cleanmac'] = $clean_mac;
             $port_id = $interface['port_id'];
-            $mac_table[$port_id][$clean_mac] = 1;
+            $mac_table[$port_id][$clean_mac][$ip] = 1;
 
             if (dbFetchCell('SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ?', array($interface['port_id'], $ip))) {
                 // Commented below, no longer needed but leaving for reference.
@@ -74,8 +79,9 @@ foreach ($vrfs_lite_cisco as $vrf) {
     foreach (dbFetchRows($sql) as $entry) {
         $entry_mac = $entry['mac_address'];
         $entry_if  = $entry['port_id'];
-        if (!$mac_table[$entry_if][$entry_mac]) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if, $entry_mac));
+        $entry_ip  = $entry['ipv4_address'];
+        if (!$mac_table[$entry_if][$entry_mac][$entry_ip]) {
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ? AND `ipv4_address` = ? ', array($entry_if, $entry_mac, $entry_ip));
             d_echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
 
             echo '-';

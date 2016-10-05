@@ -693,6 +693,28 @@ $config['os'][$os]['over'][1]['text']  = 'Power Voltage';
 $config['os'][$os]['over'][2]['graph'] = 'device_current';
 $config['os'][$os]['over'][2]['text']  = 'Power Current';
 
+$os = 'cucm';
+$config['os'][$os]['text']             = 'Cisco Unified Communications Manager';
+$config['os'][$os]['type']             = 'tele';
+$config['os'][$os]['icon']             = 'cisco';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'cips';
+$config['os'][$os]['text']             = 'Cisco Intrusion Prevention System';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'cisco';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Brocade NOS
 $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
@@ -730,6 +752,15 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-24';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-24P';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF300-48';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SF302-08';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-10';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-10SFP';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-20';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-28';
+$config['os'][$os]['bad_ifXEntry'][]   = 'SG300-28MP';
 
 // Huawei
 $os = 'vrp';
@@ -1539,6 +1570,14 @@ $config['os'][$os]['icon']             = 'ricoh';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
+$os = 'sharp';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Sharp Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'sharp';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
 // lanier is a rebadged ricoh
 $os = 'lanier';
 $config['os'][$os]['group']            = 'printer';
@@ -1865,6 +1904,7 @@ $config['os'][$os]['icon']             = 'meraki';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['bad_uptime']       = true;
 
 $os = 'merakims';
 $config['os'][$os]['text']             = 'Meraki Switch';
@@ -1878,6 +1918,7 @@ $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $os = 'aerohive';
 $config['os'][$os]['text']             = 'Aerohive HiveOS';
 $config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'aerohive';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
@@ -1979,7 +2020,7 @@ $config['os'][$os]['over'][0]['text']  = 'Current';
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
 $config['os'][$os]['type']             = 'appliance';
-$config['os'][$os]['icon']             = 'fortios';
+$config['os'][$os]['icon']             = 'fortinet';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -2101,6 +2142,31 @@ $os = 'foundryos';
 $config['os'][$os]['text']             = 'Foundry Networking';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'foundry';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Edge-Core
+$os = 'edge-core';
+$config['os'][$os]['text']             = 'Edge-Core';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['icon']             = 'edge-core';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Mimosa 
+$os = 'mimosa';
+$config['os'][$os]['text']             = 'Mimosa';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'mimosa';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -2402,9 +2468,14 @@ $config['graph_types']['device']['fortigate_cpu']['descr']         = 'CPU';
 $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
+
+//PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']        = '0';
 $config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['panos_activetunnels']['section'] = 'firewall';
+$config['graph_types']['device']['panos_activetunnels']['order']   = '1';
+$config['graph_types']['device']['panos_activetunnels']['descr']   = 'Active GlobalProtect Tunnels';
 
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';
@@ -2427,6 +2498,11 @@ $config['graph_types']['device']['ib_dns_performance']['descr']               = 
 $config['graph_types']['device']['ib_dhcp_messages']['section']               = 'dhcp';
 $config['graph_types']['device']['ib_dhcp_messages']['order']                 = '0';
 $config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 'DHCP messages';
+
+// Cisco WAAS Optimized TCP Connections
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['section']      = 'graphs';
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['order']        = '0';
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['descr']        = 'Optimized TCP Connections';
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';

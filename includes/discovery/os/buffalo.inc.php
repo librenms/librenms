@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (strstr($sysDescr, 'BUFFALO TeraStation')) {
-        $os = 'buffalo';
-    }
+if (str_contains($sysDescr, 'BUFFALO TeraStation')) {
+    $os = 'buffalo';
 }

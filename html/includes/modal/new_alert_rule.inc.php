@@ -136,7 +136,7 @@ if (is_admin() !== false) {
         <div class='form-group'>
             <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
             <div class='col-sm-9'>
-                <input type='text' id='proc' name='proc' class='form-control' maxlength='30'>
+                <input type='text' id='proc' name='proc' class='form-control' maxlength='80'>
             </div>
         </div>
         <div class="form-group">

@@ -11,16 +11,14 @@ function poll_sensor($device, $class, $unit)
         $sensor_value = '';
 
         if ($sensor['poller_type'] == 'snmp') {
+            $mibdir = null;
             if ($device['os'] == 'pbn') {
-                $mibdir = $config['mibdir'].'/pbn'.':'.$config['mibdir'];
-            } else {
-                $mibdir = $config['mibdir'];
+                $mibdir = 'pbn';
             }
 
+            $mib = '';
             if ($device['os'] == 'siklu') {
                 $mib = ':RADIO-BRIDGE-MIB';
-            } else {
-                $mib = '';
             }
 
             if ($class == 'temperature') {
@@ -71,9 +69,9 @@ function poll_sensor($device, $class, $unit)
                 }
             } else {
                 if ($sensor['sensor_type'] == 'apc') {
-                    $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB:PowerNet-MIB$mib", $mibdir)));
+                    $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-OUqnvt', "SNMPv2-MIB:PowerNet-MIB$mib", $mibdir)));
                 } else {
-                    $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib", $mibdir)));
+                    $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnvt', "SNMPv2-MIB$mib", $mibdir)));
                 }
             }//end if
             unset($mib);

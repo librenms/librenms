@@ -25,181 +25,1368 @@
 
 namespace LibreNMS\Tests;
 
-include 'tests/mocks/mock.snmp.inc.php';
-
 class DiscoveryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Set up variables and include os discovery
+     * Set up and test an os
+     * If $filename is not set, it will use the snmprec file matching $expected_os
      *
-     * @param string $expectedOS the OS to test for
-     * @param string $sysDescr set the snmp sysDescr variable
-     * @param string $sysObjectId set the snmp sysObjectId variable
-     * @param array $mockSnmp set arbitrary snmp variables with an associative array
-     * @param array $device device array to send
+     * @param string $expected_os The os we should get back from getHostOS()
+     * @param string $filename the name of the snmprec file to use
      */
-    private function checkOS($expectedOS, $sysDescr = '', $sysObjectId = '', $mockSnmp = array(), $device = array())
+    private function checkOS($expected_os, $filename = null)
     {
-        global $config;
-        setSnmpMock($mockSnmp);
-        $os = null;
+        $community = $filename ?: $expected_os;
 
-        // cannot use getHostOS() because of functions.php includes
-        $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
-        foreach (glob($pattern) as $file) {
-            include $file;
-            if (isset($os)) {
-                break;
-            }
-        }
+        ob_start();
+        $os = getHostOS($this->genDevice($community));
+        $output = ob_get_contents();
+        ob_end_clean();
 
-        $this->assertEquals($expectedOS, $os);
+        $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
+    }
+
+    /**
+     * Generate a fake $device array
+     *
+     * @param string $community The snmp community to set
+     * @return array resulting device array
+     */
+    private function genDevice($community)
+    {
+        return array(
+            'device_id' => 1,
+            'hostname' => '127.0.0.1',
+            'snmpver' => 'v2c',
+            'port' => 11161,
+            'timeout' => 3,
+            'retries' => 0,
+            'snmp_max_repeaters' => 10,
+            'community' => $community,
+        );
+    }
+
+    public function test3com()
+    {
+        $this->checkOS('3com');
+        $this->checkOS('3com', '3com1');
+        $this->checkOS('3com', '3com2');
+    }
+
+    public function testAcano()
+    {
+        $this->checkOS('acano');
+    }
+
+    public function testAcs()
+    {
+        $this->checkOS('acs');
+    }
+
+    public function testAcsw()
+    {
+        $this->checkOS('acsw');
+        $this->checkOS('acsw', 'acsw1');
+        $this->checkOS('acsw', 'acsw2');
+    }
+
+    public function testAdtranAos()
+    {
+        $this->checkOS('adtran-aos');
+        $this->checkOS('adtran-aos', 'adtran-aos1');
+    }
+
+    public function testAen()
+    {
+        $this->checkOS('aen');
+    }
+
+    public function testAerohive()
+    {
+        $this->checkOS('aerohive');
+    }
+
+    public function testAirport()
+    {
+        $this->checkOS('airport');
+        $this->checkOS('airport', 'airport1');
+        $this->checkOS('airport', 'airport2');
     }
 
     public function testAiros()
     {
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.10002.1');
-        $this->checkOS('airos', 'Linux', '.1.3.6.1.4.1.41112.1.4');
-
-        $mockSnmp = array(
-            'dot11manufacturerName.5' => 'Ubiquiti',
-        );
-        $this->checkOS('airos', 'Linux', '', $mockSnmp);
+        $this->checkOS('airos');
+        $this->checkOS('airos', 'airos1');
+        $this->checkOS('airos', 'airos2');
     }
 
     public function testAirosAf()
     {
-        $mockSnmp = array(
-            'fwVersion.1' => '1.0',
-        );
-        $this->checkOS('airos-af', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+        $this->checkOS('airos-af');
+    }
+
+    public function testAkcp()
+    {
+        $this->checkOS('akcp');
+    }
+
+    public function testAos()
+    {
+        $this->checkOS('aos');
+        $this->checkOS('aos', 'aos1');
+    }
+
+    public function testAllied()
+    {
+        $this->checkOS('allied');
     }
 
     public function testApc()
     {
-        $this->checkOS('apc', 'APC Web/SNMP Management Card (MB:v3.9.2 PF:v3.5.9 PN:apc_hw03_aos_359.bin AF1:v3.5.6 AN1:apc_hw03_nb200_356.bin MN:NBRK0200 HR:05 SN: FFFFFFFFFFFF MD:07/07/2012)', '.1.3.6.1.4.1.318.1.3.8.4');
-        $this->checkOS('apc', 'APC Switched Rack PDU');
-        $this->checkOS('apc', 'APC MasterSwitch PDU');
-        $this->checkOS('apc', 'APC Metered Rack PDU');
+        $this->checkOS('apc');
+        $this->checkOS('apc', 'apc-switched-rack');
+        $this->checkOS('apc', 'apc-masterswitch');
+        $this->checkOS('apc', 'apc-metered-rack');
+        $this->checkOS('apc', 'apc-embedded-powernet');
+    }
+
+    public function testAreca()
+    {
+        $this->checkOS('areca');
+    }
+
+    public function testAristaEos()
+    {
+        $this->checkOS('arista_eos');
+    }
+
+    public function testArubaos()
+    {
+        $this->checkOS('arubaos');
+    }
+
+    public function testAsa()
+    {
+        $this->checkOS('asa');
+    }
+
+    public function testAvayaers()
+    {
+        $this->checkOS('avaya-ers');
+        $this->checkOS('avaya-ers', 'avaya-ers1');
+    }
+
+    public function testAvayaipo()
+    {
+        $this->checkOS('avaya-ipo');
+    }
+
+    public function testAvayavsp()
+    {
+        $this->checkOS('avaya-vsp', 'avaya-vsp-4850gts');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-4850gts-pwr');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-8284xsq');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-4450gsx-pwr');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-8404');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-7254xsq');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-7254xtq');
+    }
+
+    public function testAvocent()
+    {
+        $this->checkOS('avocent');
+        $this->checkOS('avocent', 'avocent-alterpath');
+    }
+
+    public function testAvtech()
+    {
+        $this->checkOS('avtech', 'avtech-tempager4e');
     }
 
     public function testAxiscam()
     {
-        $this->checkOS('axiscam', ' ; AXIS 221; Network Camera; 4.30; Nov 29 2005 11:18; 141; 1;');
-        $this->checkOS('axiscam', ' ; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;');
+        $this->checkOS('axiscam');
+        $this->checkOS('axiscam', 'axiscam-nve');
+    }
+
+    public function testAxisdocserver()
+    {
+        $this->checkOS('axisdocserver');
+    }
+
+    public function testBarracudaloadbalancer()
+    {
+        $this->checkOS('barracudaloadbalancer');
+        $this->checkOS('barracudaloadbalancer', 'barracudaloadbalancer-adc');
+    }
+
+    public function testBarracudaspamfirewall()
+    {
+        $this->checkOS('barracudaspamfirewall');
+    }
+
+    public function testBarracudangfirewall()
+    {
+        $this->checkOS('barracudangfirewall');
+    }
+
+    public function testBcm963()
+    {
+        $this->checkOS('bcm963');
+    }
+
+    public function testBdcom()
+    {
+        $this->checkOS('bdcom');
+    }
+
+    public function testBinos()
+    {
+        $this->checkOS('binos');
+    }
+
+    public function testBinox()
+    {
+        $this->checkOS('binox');
+    }
+
+    public function testBintecsmart()
+    {
+        $this->checkOS('bintec-smart');
+    }
+
+    public function testBnt()
+    {
+        $this->checkOS('bnt');
+        $this->checkOS('bnt', 'bnt1');
+    }
+
+    public function testBrother()
+    {
+        $this->checkOS('brother');
+    }
+
+    public function testBuffalo()
+    {
+        $this->checkOS('buffalo');
+    }
+
+    public function testCalix()
+    {
+        $this->checkOS('calix');
+        $this->checkOS('calix', 'calix1');
+        $this->checkOS('calix', 'calix-e7-2');
+    }
+
+    public function testCambium()
+    {
+        $this->checkOS('cambium');
+        $this->checkOS('cambium', 'cambium-ptp');
+        $this->checkOS('cambium', 'cambium-ptp250');
+        $this->checkOS('cambium', 'cambium-ptp50650');
+    }
+
+    public function testCanonprinter()
+    {
+        $this->checkOS('canonprinter', 'canonprinter-mf');
+        $this->checkOS('canonprinter', 'canonprinter-ir-adv');
+    }
+
+    public function testCanopy()
+    {
+        $this->checkOS('canopy');
+        $this->checkOS('canopy', 'canopy-cmm');
+    }
+
+    public function testCat1900()
+    {
+        $this->checkOS('cat1900');
+    }
+
+    public function testCatos()
+    {
+        $this->checkOS('catos');
+    }
+
+    public function testCimc()
+    {
+        $this->checkOS('cimc');
+    }
+
+    public function testCips()
+    {
+        $this->checkOS('cips');
+    }
+
+    public function testCiscosb()
+    {
+        $this->checkOS('ciscosb');
+        $this->checkOS('ciscosb', 'ciscosb1');
+        $this->checkOS('ciscosb', 'ciscosb2');
+        $this->checkOS('ciscosb', 'ciscosb3');
+        $this->checkOS('ciscosb', 'ciscosb4');
+        $this->checkOS('ciscosb', 'ciscosb5');
+        $this->checkOS('ciscosb', 'ciscosb6');
     }
 
     public function testCiscosmblinux()
     {
-        $this->checkOS('ciscosmblinux', 'Linux Cisco Small Business');
+        $this->checkOS('ciscosmblinux');
+    }
+
+    public function testCiscowap()
+    {
+        $this->checkOS('ciscowap');
+    }
+
+    public function testCiscowlc()
+    {
+        $this->checkOS('ciscowlc');
+    }
+
+    public function testCometsystemp85xx()
+    {
+        $this->checkOS('cometsystem-p85xx');
+    }
+
+    public function testComware()
+    {
+        $this->checkOS('comware');
+        $this->checkOS('comware', 'comware1');
+        $this->checkOS('comware', 'comware-hp-c1234');
+    }
+
+    public function testCucm()
+    {
+        $this->checkOS('cucm');
     }
 
     public function testCumulus()
     {
-        $this->checkOS('cumulus', 'Linux', '.1.3.6.1.4.1.40310');
+        $this->checkOS('cumulus');
+    }
+
+    public function testDatacom()
+    {
+        $this->checkOS('datacom');
+    }
+
+    public function testDatadomain()
+    {
+        $this->checkOS('datadomain');
     }
 
     public function testDdnos()
     {
-        $mockSnmp = array(
-            'SFA-INFO::systemName.0' => 1,
-        );
-        $this->checkOS('ddnos', 'Linux', '', $mockSnmp);
+        $this->checkOS('ddnos');
+    }
+
+    public function testDeliberant()
+    {
+        $this->checkOS('deliberant');
+    }
+
+    public function testDelllaser()
+    {
+        $this->checkOS('dell-laser');
+        $this->checkOS('dell-laser', 'dell-laser-color');
+        $this->checkOS('dell-laser', 'dell-laser-mfp');
+    }
+
+    public function testDeltaups()
+    {
+        $this->checkOS('deltaups');
+    }
+
+    public function testDevelopprinter()
+    {
+        $this->checkOS('developprinter');
+    }
+
+    public function testDlinkap()
+    {
+        $this->checkOS('dlinkap');
+        $this->checkOS('dlinkap', 'dlinkap1');
+        $this->checkOS('dlinkap', 'dlinkap2');
+    }
+
+    public function testDlink()
+    {
+        $this->checkOS('dlink', 'dlink-des');
+        $this->checkOS('dlink', 'dlink-des1');
+        $this->checkOS('dlink', 'dlink-des2');
+        $this->checkOS('dlink', 'dlink-dgs');
+    }
+
+    public function testDnos()
+    {
+        $this->checkOS('dnos');
+        $this->checkOS('dnos', 'dnos1');
+        $this->checkOS('dnos', 'dnos2');
+        $this->checkOS('dnos', 'dnos3');
+        $this->checkOS('dnos', 'dnos4');
+        $this->checkOS('dnos', 'dnos5');
+        $this->checkOS('dnos', 'dnos6');
+        $this->checkOS('dnos', 'dnos7');
+        $this->checkOS('dnos', 'dnos8');
+        $this->checkOS('dnos', 'dnos9');
+    }
+
+    public function testDrac()
+    {
+        $this->checkOS('drac');
+        $this->checkOS('drac', 'drac1');
+        $this->checkOS('drac', 'drac2');
     }
 
     public function testDsm()
     {
-        $mockSnmp = array(
-            'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0' => 'syno_hw_version',
-        );
-        $this->checkOS('dsm', 'Linux', '', $mockSnmp);
+        $this->checkOS('dsm');
+    }
+
+    public function testEatonpdu()
+    {
+        $this->checkOS('eatonpdu');
     }
 
     public function testEatonups()
     {
-        $this->checkOS('eatonups', 'Eaton 5P 2200');
-        $this->checkOS('eatonups', 'Eaton 5PX 2000');
+        $this->checkOS('eatonups', 'eaton-5p');
+        $this->checkOS('eatonups', 'eaton-5px');
+        $this->checkOS('eatonups', 'eaton-powerxpert');
+    }
+
+    public function testEdgecore()
+    {
+        $this->checkOS('edge-core', 'edgecore-es3528m');
+    }
+
+    public function testEdgeos()
+    {
+        $this->checkOS('edgeos');
+        $this->checkOS('edgeos', 'edgeos-erl');
+    }
+
+    public function testEdgeswitch()
+    {
+        $this->checkOS('edgeswitch');
     }
 
     public function testEndian()
     {
-        $this->checkOS('endian', 'Linux endian');
+        $this->checkOS('endian');
+    }
+
+    public function testEngenius()
+    {
+        $this->checkOS('engenius');
+        $this->checkOS('engenius', 'engenius1');
+        $this->checkOS('engenius', 'engenius2');
+    }
+
+    public function testEnterasys()
+    {
+        $this->checkOS('enterasys');
+        $this->checkOS('enterasys', 'enterasys1');
+    }
+
+    public function testEpson()
+    {
+        $this->checkOS('epson');
+    }
+
+    public function testEquallogic()
+    {
+        $this->checkOS('equallogic');
+    }
+
+    public function testExtremeware()
+    {
+        $this->checkOS('extremeware');
+    }
+
+    public function testF5()
+    {
+        $this->checkOS('f5');
+    }
+
+    public function testFabos()
+    {
+        $this->checkOS('fabos');
+        $this->checkOS('fabos', 'fabos1');
+        $this->checkOS('fabos', 'fabos2');
+    }
+
+    public function testFiberhome()
+    {
+
+        $this->checkOS('fiberhome', 'fiberhome-an5516-01');
+        $this->checkOS('fiberhome', 'fiberhome-an5516-06');
+    }
+
+    public function testFireware()
+    {
+        $this->checkOS('fireware', 'fireware-xtm');
+        $this->checkOS('fireware', 'fireware-fbx');
+    }
+
+    public function testFlareos()
+    {
+        $this->checkOS('flareos');
+    }
+
+    public function testFortigate()
+    {
+        $this->checkOS('fortigate');
+        $this->checkOS('fortigate', 'fortigate1');
+    }
+
+    public function testFortios()
+    {
+        $this->checkOS('fortios');
+    }
+
+    public function testFoundryos()
+    {
+        $this->checkOS('foundryos');
+    }
+
+    public function testFreebsd()
+    {
+        $this->checkOS('freebsd');
+    }
+
+    public function testFtos()
+    {
+        $this->checkOS('ftos');
+    }
+
+    public function testFujitsupyos()
+    {
+        $this->checkOS('fujitsupyos');
+    }
+
+    public function testFxos()
+    {
+        $this->checkOS('fxos');
+    }
+
+    public function testGaia()
+    {
+        $this->checkOS('gaia');
+    }
+
+    public function testGamatronicups()
+    {
+        $this->checkOS('gamatronicups');
+    }
+
+    public function testHikvision()
+    {
+        $this->checkOS('hikvision');
+    }
+
+    public function testHp3par()
+    {
+        $this->checkOS('informos');
+    }
+
+    public function testHpblmos()
+    {
+        $this->checkOS('hpblmos');
+    }
+
+    public function testHpmsm()
+    {
+        $this->checkOS('hpmsm');
+    }
+
+    public function testHpvc()
+    {
+        $this->checkOS('hpvc');
+    }
+
+    public function testHuaweiups()
+    {
+        $this->checkOS('huaweiups');
+    }
+
+    public function testHwgposeidon()
+    {
+        $this->checkOS('hwg-poseidon');
+    }
+
+    public function testHwgste2()
+    {
+        $this->checkOS('hwg-ste2');
+    }
+
+    public function testHwgste()
+    {
+        $this->checkOS('hwg-ste');
+    }
+
+    public function testHytera()
+    {
+        $this->checkOS('hytera');
+    }
+
+    public function testIbmamm()
+    {
+        $this->checkOS('ibm-amm');
+    }
+
+    public function testIbmimm()
+    {
+        $this->checkOS('ibm-imm');
+    }
+
+    public function testIbmnos()
+    {
+        $this->checkOS('ibmnos');
+        $this->checkOS('ibmnos', 'ibmnos1');
+        $this->checkOS('ibmnos', 'ibmnos-flex');
+    }
+
+    public function testIbmtl()
+    {
+        $this->checkOS('ibmtl');
+    }
+
+    public function testIes()
+    {
+        $this->checkOS('ies');
+    }
+
+    public function testInfinity()
+    {
+        $this->checkOS('infinity');
+    }
+
+    public function testIos()
+    {
+        $this->checkOS('ios');
+        $this->checkOS('ios', 'ios1');
+        $this->checkOS('ios', 'ios2');
+        $this->checkOS('ios', 'ios-c3825');
+    }
+
+    public function testIosxe()
+    {
+        $this->checkOS('iosxe');
+        $this->checkOS('iosxe', 'iosxe-asr1000');
+    }
+
+    public function testIosxr()
+    {
+        $this->checkOS('iosxr');
+    }
+
+    public function testIpoman()
+    {
+        $this->checkOS('ipoman');
+    }
+
+    public function testIronware()
+    {
+        $this->checkOS('ironware');
+    }
+
+    public function testIse()
+    {
+        $this->checkOS('ise');
+        $this->checkOS('ise', 'ise1');
+    }
+
+    public function testJetdirect()
+    {
+        $this->checkOS('jetdirect');
+        $this->checkOS('jetdirect', 'jetdirect1');
+        $this->checkOS('jetdirect', 'jetdirect2');
+    }
+
+    public function testJuniperex2500os()
+    {
+        $this->checkOS('juniperex2500os');
+    }
+
+    public function testJunose()
+    {
+        $this->checkOS('junose');
+    }
+
+    public function testJunos()
+    {
+        $this->checkOS('junos');
+        $this->checkOS('junos', 'junos1');
+    }
+
+    public function testJwos()
+    {
+        $this->checkOS('jwos');
+    }
+
+    public function testKonica()
+    {
+        $this->checkOS('konica');
+    }
+
+    public function testKyocera()
+    {
+        $this->checkOS('kyocera');
+    }
+
+    public function testLanier()
+    {
+        $this->checkOS('lanier');
+    }
+
+    public function testLantronixslc()
+    {
+        $this->checkOS('lantronix-slc');
+    }
+
+    public function testLenovoemc()
+    {
+        $this->checkOS('lenovoemc');
+    }
+
+    public function testLexmarkprinter()
+    {
+        $this->checkOS('lexmarkprinter');
+    }
+
+    public function testLiebert()
+    {
+        $this->checkOS('liebert');
+    }
+
+    public function testLigoos()
+    {
+        $this->checkOS('ligoos');
     }
 
     public function testLinux()
     {
-        $this->checkOS('linux', 'Linux');
+        $this->checkOS('linux');
+    }
+
+    public function testMacosx()
+    {
+        $this->checkOS('macosx');
+        $this->checkOS('macosx', 'macosx-sierra');
+    }
+
+    public function testMaipu()
+    {
+        $this->checkOS('mypoweros');
+    }
+
+    public function testMellanox()
+    {
+        $this->checkOS('mellanox');
+    }
+
+    public function testMerakimr()
+    {
+        $this->checkOS('merakimr');
+    }
+
+    public function testMerakims()
+    {
+        $this->checkOS('merakims');
+    }
+
+    public function testMerakimx()
+    {
+        $this->checkOS('merakimx');
+    }
+
+    public function testMgepdu()
+    {
+        $this->checkOS('mgepdu');
+    }
+
+    public function testMgeups()
+    {
+        $this->checkOS('mgeups', 'mgeups-pulsar');
+        $this->checkOS('mgeups', 'mgeups-galaxy');
+        $this->checkOS('mgeups', 'mgeups-evolution');
+        $this->checkOS('mgeups', 'mgeups-proxy');
+        $this->checkOS('mgeups', 'mgeups-comet');
+    }
+
+    public function testMicrosemitime()
+    {
+        $this->checkOS('microsemitime');
+    }
+
+    public function testMimosa()
+    {
+        $this->checkOS('mimosa');
+    }
+
+    public function testMinkelsrms()
+    {
+        $this->checkOS('minkelsrms');
+    }
+
+    public function testMonowall()
+    {
+        $this->checkOS('monowall');
+    }
+
+    public function testMrvld()
+    {
+        $this->checkOS('mrvld');
+    }
+
+    public function testMultimatic()
+    {
+        $this->checkOS('multimatic');
+        $this->checkOS('multimatic', 'multimatic1');
+    }
+
+    public function testNetapp()
+    {
+        $this->checkOS('netapp');
+    }
+
+    public function testNetbsd()
+    {
+        $this->checkOS('netbsd');
     }
 
     public function testNetbotz()
     {
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2014');
-        $this->checkOS('netbotz', 'Linux', '.1.3.6.1.4.1.5528.100.20.10.2016');
+        $this->checkOS('netbotz', 'netbotz-2014');
+        $this->checkOS('netbotz', 'netbotz-2016');
+    }
+
+    public function testNetgear()
+    {
+        $this->checkOS('netgear');
+        $this->checkOS('netgear', 'netgear1');
+    }
+
+    public function testNetmanplus()
+    {
+        $this->checkOS('netmanplus');
+        $this->checkOS('netmanplus', 'netmanplus1');
+    }
+
+    public function testNetonix()
+    {
+        $this->checkOS('netonix', 'netonix-wispswitch');
+    }
+
+    public function testNetopia()
+    {
+        $this->checkOS('netopia');
+    }
+
+    public function testNetscaler()
+    {
+        $this->checkOS('netscaler');
+    }
+
+    public function testNetvision()
+    {
+        $this->checkOS('netvision');
+    }
+
+    public function testNetware()
+    {
+        $this->checkOS('netware');
+    }
+
+    public function testNimbleos()
+    {
+        $this->checkOS('nimbleos');
     }
 
     public function testNios()
     {
-        $this->checkOS('nios', 'Linux 3.14.25 #1 SMP Thu Jun 16 18:19:37 EDT 2016 x86_64', '.1.3.6.1.4.1.7779.1.1402');
-        $this->checkOS('nios', 'IPAM', '.1.3.6.1.4.1.7779.1.1004');
+        $this->checkOS('nios');
+        $this->checkOS('nios', 'nios-ipam');
+    }
+
+    public function testNitro()
+    {
+        $this->checkOS('nitro');
+        $this->checkOS('nitro', 'nitro1');
+        $this->checkOS('nitro', 'nitro2');
+        $this->checkOS('nitro', 'nitro3');
+    }
+
+    public function testNos()
+    {
+        $this->checkOS('nos');
+        $this->checkOS('nos', 'nos1');
+        $this->checkOS('nos', 'nos2');
+    }
+
+    public function testNrg()
+    {
+        $this->checkOS('nrg');
+    }
+
+    public function testNxos()
+    {
+        $this->checkOS('nxos');
+    }
+
+    public function testOkilan()
+    {
+        $this->checkOS('okilan');
+    }
+
+    public function testOpensolaris()
+    {
+        $this->checkOS('opensolaris');
+    }
+
+    public function testOnefs()
+    {
+        $this->checkOS('onefs');
+    }
+
+    public function testOns()
+    {
+        $this->checkOS('ons');
+    }
+
+    public function testOpenbsd()
+    {
+        $this->checkOS('openbsd');
+        $this->checkOS('openbsd', 'openbsd1');
+    }
+
+    public function testOracleilom()
+    {
+        $this->checkOS('oracle-ilom');
+    }
+
+    public function testPacketshaper()
+    {
+        $this->checkOS('packetshaper');
+    }
+
+    public function testPanos()
+    {
+        $this->checkOS('panos');
+    }
+
+    public function testPapouchtme()
+    {
+        $this->checkOS('papouch-tme');
+        $this->checkOS('papouch-tme', 'papouch-tme1');
+    }
+
+    public function testPbn()
+    {
+        $this->checkOS('pbn');
     }
 
     public function testPcoweb()
     {
-        $mockSnmp = array(
-            'roomTemp.0' => 1,
-        );
-        $this->checkOS('pcoweb', 'Linux', '', $mockSnmp);
+        $this->checkOS('pcoweb');
+    }
+
+    public function testPerle()
+    {
+        $this->checkOS('perle');
+    }
+
+    public function testPfsense()
+    {
+        $this->checkOS('pfsense');
+    }
+
+    public function testPix()
+    {
+        $this->checkOS('pixos');
     }
 
     public function testPktj()
     {
-        $mockSnmp = array(
-            'GANDI-MIB::rxCounter.0' => 1,
-        );
-        $this->checkOS('pktj', 'Linux', '', $mockSnmp);
+        $this->checkOS('pktj');
+    }
+
+    public function testPlanetos()
+    {
+        $this->checkOS('planetos');
+    }
+
+    public function testPoweralert()
+    {
+        $this->checkOS('poweralert');
+    }
+
+    public function testPowervault()
+    {
+        $this->checkOS('powervault');
+    }
+
+    public function testPowerwalker()
+    {
+        $this->checkOS('powerwalker');
+    }
+
+    public function testPowerware()
+    {
+        $this->checkOS('powerware');
+    }
+
+    public function testPrestige()
+    {
+        $this->checkOS('prestige');
+    }
+
+    public function testPrimeinfrastructure()
+    {
+        $this->checkOS('primeinfrastructure');
     }
 
     public function testProcera()
     {
-        $this->checkOS('procera', 'Linux', '.1.3.6.1.4.1.15397.2');
+        $this->checkOS('procera');
+    }
+
+    public function testProcurve()
+    {
+        $this->checkOS('procurve');
+        $this->checkOS('procurve', 'procurve-1800-8g');
+        $this->checkOS('procurve', 'procurve-1820');
+        $this->checkOS('procurve', 'procurve-ecos-100');
+        $this->checkOS('procurve', 'procurve-2530');
+        $this->checkOS('procurve', 'procurve-5402r');
+    }
+
+    public function testProxim()
+    {
+        $this->checkOS('proxim');
+    }
+
+    public function testPulse()
+    {
+        $this->checkOS('pulse');
     }
 
     public function testQnap()
     {
-        $mockSnmp = array(
-            'ENTITY-MIB::entPhysicalMfgName.1' => 'QNAP',
-        );
-        $this->checkOS('qnap', 'Linux', '', $mockSnmp);
+        $this->checkOS('qnap');
+    }
+
+    public function testQuanta()
+    {
+        $this->checkOS('quanta');
+        $this->checkOS('quanta', 'quanta1');
+        $this->checkOS('quanta', 'quanta2');
+        $this->checkOS('quanta', 'quanta3');
+    }
+
+    public function testRadlan()
+    {
+        $this->checkOS('radlan');
+    }
+
+    public function testRaisecom()
+    {
+        $this->checkOS('raisecom');
+    }
+
+    public function testRaritan()
+    {
+        $this->checkOS('raritan');
+        $this->checkOS('raritan', 'raritan-px2');
+    }
+
+    public function testRedback()
+    {
+        $this->checkOS('redback');
+    }
+
+    public function testRicoh()
+    {
+        $this->checkOS('ricoh');
+        $this->checkOS('ricoh', 'ricoh-aficio');
+    }
+
+    public function testRiverbed()
+    {
+        $this->checkOS('riverbed');
+    }
+
+    public function testRouteros()
+    {
+        $this->checkOS('routeros');
+        $this->checkOS('routeros', 'routeros1');
+    }
+
+    public function testRuckuswireless()
+    {
+        $this->checkOS('ruckuswireless');
+    }
+
+    public function testSaf()
+    {
+        $this->checkOS('saf');
+    }
+
+    public function testSamsungprinter()
+    {
+        $this->checkOS('samsungprinter', 'samsungprinter-clx');
+        $this->checkOS('samsungprinter', 'samsungprinter-scx');
+        $this->checkOS('samsungprinter', 'samsungprinter-c');
+        $this->checkOS('samsungprinter', 'samsungprinter-s');
+    }
+
+    public function testSanos()
+    {
+        $this->checkOS('sanos');
+    }
+
+    public function testScreenos()
+    {
+        $this->checkOS('screenos');
+        $this->checkOS('screenos', 'screenos1');
+    }
+
+    public function testSentry3()
+    {
+        $this->checkOS('sentry3', 'sentry3-switched');
+        $this->checkOS('sentry3', 'sentry3-smart');
+    }
+
+    public function testSentry4()
+    {
+        $this->checkOS('sentry4', 'sentry4-switched');
+        $this->checkOS('sentry4', 'sentry4-smart');
+    }
+
+    public function testServeriron()
+    {
+        $this->checkOS('serveriron');
+    }
+
+    public function testSharp()
+    {
+        $this->checkOS('sharp', 'sharp-mx2614n');
+        $this->checkOS('sharp', 'sharp-mxc301w');
+        $this->checkOS('sharp', 'sharp-mx3140n');
+    }
+
+    public function testSiklu()
+    {
+        $this->checkOS('siklu');
+    }
+
+    public function testSmartax()
+    {
+        $this->checkOS('smartax');
+    }
+
+    public function testSolaris()
+    {
+        $this->checkOS('solaris');
+        $this->checkOS('solaris', 'solaris1');
+    }
+
+    public function testSonicwall()
+    {
+        $this->checkOS('sonicwall');
+    }
+
+    public function testSonusgsx()
+    {
+        $this->checkOS('sonus-gsx');
+    }
+
+    public function testSonussbc()
+    {
+        $this->checkOS('sonus-sbc');
+        $this->checkOS('sonus-sbc', 'sonus-sbc1');
     }
 
     public function testSophos()
     {
-        $this->checkOS('sophos', 'Linux g56fa85e');
-        $this->checkOS('sophos', 'Linux gc80f187');
-        $this->checkOS('sophos', 'Linux g829be90');
-        $this->checkOS('sophos', 'Linux g63c0044');
+        $this->checkOS('sophos');
+        $this->checkOS('sophos', 'sophos1');
+        $this->checkOS('sophos', 'sophos2');
+        $this->checkOS('sophos', 'sophos3');
+    }
+
+    public function testSpeedtouch()
+    {
+        $this->checkOS('speedtouch');
+        $this->checkOS('speedtouch', 'speedtouch-tg585');
+        $this->checkOS('speedtouch', 'speedtouch-st5000');
+    }
+
+    public function testSub10()
+    {
+        $this->checkOS('sub10');
+    }
+
+    public function testSupermicroswitch()
+    {
+        $this->checkOS('supermicro-switch');
+        $this->checkOS('supermicro-switch', 'supermicro-switch-sse');
+        $this->checkOS('supermicro-switch', 'supermicro-switch-sbm');
+    }
+
+    public function testSwos()
+    {
+        $this->checkOS('swos', 'swos-rb250gs');
+        $this->checkOS('swos', 'swos-rb260gs');
+        $this->checkOS('swos', 'swos-rb260gsp');
+    }
+
+    public function testSymbol()
+    {
+        $this->checkOS('symbol');
+    }
+
+    public function testTimos()
+    {
+        $this->checkOS('timos');
+        $this->checkOS('timos', 'timos1');
+        $this->checkOS('timos', 'timos2');
+        $this->checkOS('timos', 'timos3');
+        $this->checkOS('timos', 'timos4');
+        $this->checkOS('timos', 'timos5');
+    }
+
+    public function testTpconductor()
+    {
+        $this->checkOS('tpconductor');
+    }
+
+    public function testTplink()
+    {
+        $this->checkOS('tplink');
+    }
+
+    public function testTranzeo()
+    {
+        $this->checkOS('tranzeo');
     }
 
     public function testUnifi()
     {
-        $mockSnmp = array(
-            'dot11manufacturerProductName.6' => 'UAP',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+        $this->checkOS('unifi');
+    }
 
-        $mockSnmp = array(
-            'dot11manufacturerProductName.4' => 'UAP-PRO',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+    public function testVccodec()
+    {
+        $this->checkOS('vccodec');
+    }
 
-        $mockSnmp = array(
-            'dot11manufacturerProductName.0' => 'UAP-AC2',
-        );
-        $this->checkOS('unifi', 'Linux', '.1.3.6.1.4.1.10002.1', $mockSnmp);
+    public function testVcs()
+    {
+        $this->checkOS('vcs');
+    }
+
+    public function testViprinux()
+    {
+        $this->checkOS('viprinux');
+    }
+
+    public function testVmware()
+    {
+        $this->checkOS('vmware', 'vmware-esx');
+        $this->checkOS('vmware', 'vmware-vcsa');
+    }
+
+    public function testVoswall()
+    {
+        $this->checkOS('voswall');
+    }
+
+    public function testVrp()
+    {
+        $this->checkOS('vrp');
+        $this->checkOS('vrp', 'vrp1');
+        $this->checkOS('vrp', 'vrp2');
+        $this->checkOS('vrp', 'vrp3');
+    }
+
+    public function testVyatta()
+    {
+        $this->checkOS('vyatta');
+    }
+
+    public function testVyos()
+    {
+        $this->checkOS('vyos');
+        $this->checkOS('vyos', 'vyos1');
+        $this->checkOS('vyos', 'vyos-vyatta');
+    }
+
+    public function testWaas()
+    {
+        $this->checkOS('waas');
+    }
+
+    public function testWatchguard()
+    {
+        $this->checkOS('firebox');
+        $this->checkOS('firebox', 'firebox1');
+    }
+
+    public function testWebpower()
+    {
+        $this->checkOS('webpower');
+    }
+
+    public function testWindows()
+    {
+        $this->checkOS('windows');
+        $this->checkOS('windows', 'windows1');
+    }
+
+    public function testWxgoos()
+    {
+        $this->checkOS('wxgoos');
+        $this->checkOS('wxgoos', 'wxgoos1');
+    }
+
+    public function testXerox()
+    {
+        $this->checkOS('xerox', 'xerox-phaser');
+        $this->checkOS('xerox', 'xerox-workcentre');
+        $this->checkOS('xerox', 'xerox-docuprint');
+    }
+
+    public function testXirrus()
+    {
+        $this->checkOS('xirrus_aos');
+    }
+
+    public function testXos()
+    {
+        $this->checkOS('xos');
     }
 
     public function testZxr10()
     {
-        $this->checkOS('zxr10', 'ZTE Ethernet Switch  ZXR10 5250-52TM-H, Version: V2.05.11B23');
+        $this->checkOS('zxr10');
+    }
+
+    public function testZynos()
+    {
+        $this->checkOS('zynos', 'zynos-es');
+        $this->checkOS('zynos', 'zynos-gs');
+    }
+
+    public function testZywall()
+    {
+        $this->checkOS('zywall');
+    }
+
+    public function testZyxelnwa()
+    {
+        $this->checkOS('zyxelnwa');
     }
 }

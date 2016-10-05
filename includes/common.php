@@ -70,21 +70,23 @@ function format_number_short($number, $sf)
 function external_exec($command)
 {
     global $debug,$vdebug;
+
     if ($debug && !$vdebug) {
         $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):(.*):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
-        d_echo($debug_command);
+        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+        c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        d_echo($command."\n");
+        c_echo('SNMP[%c'.$command."%n]\n");
     }
 
     $output = shell_exec($command);
 
     if ($debug && !$vdebug) {
-        $debug_output = preg_replace('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/', '*', $output);
-        d_echo("$debug_output\n");
+        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+        $debug_output = preg_replace($ip_regex, '*', $output);
+        d_echo($debug_output . PHP_EOL);
     } elseif ($vdebug) {
-        d_echo($output."\n");
+        d_echo($output . PHP_EOL);
     }
 
     return $output;
@@ -121,7 +123,7 @@ function print_error($text)
     if (isCli()) {
         c_echo("%r".$text."%n\n");
     } else {
-        echo('<div class="alert alert-danger"><img src="images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
@@ -130,7 +132,7 @@ function print_message($text)
     if (isCli()) {
         c_echo("%g".$text."%n\n");
     } else {
-        echo('<div class="alert alert-success"><img src="images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> '.$text.'</div>');
     }
 }
 
@@ -1116,7 +1118,7 @@ function version_info($remote = true)
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
     $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-    $output['netsnmp_ver'] = shell_exec($config['snmpget'].' --version 2>&1');
+    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec($config['snmpget'].' --version 2>&1')));
 
     return $output;
 }//end version_info()
@@ -1457,4 +1459,24 @@ function starts_with($haystack, $needles, $case_insensitive = false)
         }
     }
     return false;
+}
+
+function get_auth_ad_user_filter($username)
+{
+    global $config;
+    $user_filter = "(samaccountname=$username)";
+    if ($config['auth_ad_user_filter']) {
+        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
+    }
+    return $user_filter;
+}
+
+function get_auth_ad_group_filter($groupname)
+{
+    global $config;
+    $group_filter = "(samaccountname=$groupname)";
+    if ($config['auth_ad_group_filter']) {
+        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
+    }
+    return $group_filter;
 }

@@ -1,6 +1,6 @@
 --
 -- DATACOM Telematica
--- Copyright 1999-2011 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
+-- Copyright 1999-2013 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
 -- This DATACOM SNMP MIB Specification is Datacom proprietary intellectual property.
 --
 -- This module will be extend, as required. The specification and other information
@@ -12,25 +12,24 @@ DATACOM-REG	DEFINITIONS ::= BEGIN
 
 IMPORTS
   datacomModules, datacomManagementCards, datacomModems,
-  datacomAccessDevices
+  datacomAccessDevices, datacomDevices
     FROM DATACOM-SMI;
 
 
 datacomRegistrationModule OBJECT IDENTIFIER ::={ datacomModules 2 }
 --  MODULE-IDENTITY
---	LAST-UPDATED	"1112200000Z"
 --	ORGANIZATION	"DATACOM"
 --	CONTACT-INFO
 --		        "DATACOM
 --
 --		         Postal: DATACOM
---			         Av. França, 735
---			         Navegantes, POA, RS
---			         CEP 90230-220
+--			         Rua America, 1000
+--			         Eldorado do Sul, RS
+--			         CEP 92990-000
 --     		                 BRAZIL
 --
---	 	         Tel:+55(051)3358-0100
---			     Fax:+55(051)3358-0101
+--	 	         Tel:+55(51)3933 3000
+--			     Fax:+55(51)3933 3003
 --
 --			     E-mail: datacom@datacom.ind.br "
 --	DESCRIPTION
@@ -47,7 +46,6 @@ datacomRegistrationModule OBJECT IDENTIFIER ::={ datacomModules 2 }
 -- endorsement of or other affiliation with this documentation. All such names
 -- have been used only with the purpose of to identify products from these industries.
 --
-
 
 
 -- Management cards
@@ -128,9 +126,9 @@ datacomDm881ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 20 }
 -- 	DESCRIPTION
 --		" DATACOM DM881 SNMP Management Card. "
 
-datacomDm814ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 21 }
+datacomDm820ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 21 }
 -- 	DESCRIPTION
---		" DATACOM DM814 SNMP Management Card. "
+--		" DATACOM DM820 SNMP Management Card. "
 
 datacomDm830ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 22 }
 -- 	DESCRIPTION
@@ -308,13 +306,9 @@ datacomDm4000Eth48GXHSeriesManagCard OBJECT IDENTIFIER ::={ datacomManagementCar
 --  DESCRIPTION
 --  	" DATACOM DM4000 ETH48GX HSERIES SNMP Management Card. "
 
-datacomDm4000Eth10GX32E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 66 }
+datacomDm4000Eth10GX32E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 67 }
 --  DESCRIPTION
 --  	" DATACOM DM4000 ETH10GX+32E1 SNMP Management Card. "
-
-datacomDm4000EthSceqManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 67 }
---  DESCRIPTION
---  	" DM4000 SCEQ - Ethernet commuter -  Service Card Enhanced Queuing SNMP Management Card. "
 
 datacomDm4000Eth24GXHSeriesManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 68 }
 -- 	DESCRIPTION
@@ -324,9 +318,9 @@ datacomDm705CPU34ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 69 }
 -- 	DESCRIPTION
 --		" DATACOM DM705-CPU34 MUX SNMP Management Card. "
 
-datacomDm4650ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 70 }
+datacomDm4600IpsanMpu10ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 70 }
 -- 	DESCRIPTION
---		" DATACOM IP - SAN SNMP Management Card. "
+--		" DATACOM DM4600 IPSAN MPU10 SNMP Management Card. "
 
 datacomPabxManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 71 }
 -- 	DESCRIPTION
@@ -356,9 +350,9 @@ datacomDm2106-4GX-ManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 77 }
 --  DESCRIPTION
 --  	" DATACOM DM2106 4GX SNMP Management Card."
 
-datacomDm2106-4GXx8E1-EddManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 78 }
+datacomDm2106-4GXxE1-EddManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 78 }
 --  DESCRIPTION
---  	" DATACOM DM2106 4GX+8E1 SNMP Management Card."
+--  	" DATACOM DM2106 4GX+E1 SNMP Management Card."
 
 datacomDmSwitch2104G2-EDDxE1-EddManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 79 }
 --  DESCRIPTION
@@ -381,7 +375,7 @@ datacomDm4000Mpu512ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 84 }
 
 datacomDmSwitch2104G2S3Wri-EddManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 85 }
 --  DESCRIPTION
---  	" DATACOM EDDs3 modelo DM2104G2 – EDD WRI SNMP Management Card. "
+--  	" DATACOM EDDs3 modelo DM2104G2 ï¿½ EDD WRI SNMP Management Card. "
 
 ---
 datacomDm4100Eth24GXx4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 86 }
@@ -428,9 +422,9 @@ datacomDmSwitchEddE1S2ManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 9
 --  DESCRIPTION
 --      " DATACOM DmSwitch 2104G2 - EDD E1 (SERIES II) SNMP Management Card."
 
-datacomDm4100Eth44GPx4GCManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 97 }
+datacomDm4100Eth44GTx4GCManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 97 }
 --  DESCRIPTION
---      " DATACOM DmSwitch DM4100 ETH44GP+4GC SNMP Management Card."
+--      " DATACOM DmSwitch DM4100 ETH44GT+4GC SNMP Management Card."
 
 datacomDm4100Eth44GTx4GCx2XXManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 98 }
 --  DESCRIPTION
@@ -459,6 +453,183 @@ datacomDm4100Eth44GTx4GCx2XSxSManagCard  OBJECT IDENTIFIER ::={ datacomManagemen
 datacomDm4100Eth44GTx4GCx4XSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 104 }
 --  DESCRIPTION
 --      " DATACOM DmSwitch DM4100 ETH44GT+4GC+4XS SNMP Management Card."
+
+datacomDm4000Eth24GTHSeriesManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 106 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH24GT HSERIES SNMP Management Card. "
+
+datacomDm4000Eth48GTHSeriesManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 107 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH48GT HSERIES SNMP Management Card. "
+
+datacomDm4000Eth10GX4STM1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 108 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH10GX+4STM1 SNMP Management Card. "
+
+datacomDm4100Eth20GTx4GCx2XSxSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 109 }
+--  DESCRIPTION
+--      " DATACOM DM4100 20GT+4GC+2XS+S SNMP Management Card."
+
+datacomDm2290ShdslEfm1ftSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 110 }
+--  DESCRIPTION
+--      " DATACOM DM2290 SHDSL EFM 1FT SNMP Management Card."
+
+datacomDm2290ShdslEfm4ftSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 111 }
+--  DESCRIPTION
+--      " DATACOM DM2290 SHDSL EFM 4FT SNMP Management Card."
+
+datacomDm2290ShdslEfm1ftSeriesIISManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 112 }
+--  DESCRIPTION
+--      " DATACOM DM2290 SHDSL EFM 1FT Series II SNMP Management Card."
+
+datacomDm2295ShdslEfm4ftSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 113 }
+--  DESCRIPTION
+--      " DATACOM DM2295 SHDSL EFM 4FT SNMP Management Card."
+
+datacomDm2295ShdslEfm4ftE1SManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 114 }
+--  DESCRIPTION
+--      " DATACOM DM2295 SHDSL EFM 4FT + E1 SNMP Management Card."
+
+datacomDm4000Eth20GX32E1HSeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 115 }
+--  DESCRIPTION
+--      " DATACOM DM4000 PWE3 ETH20GX+32E1 H SERIES Management Card."
+
+datacomDm4000Eth20GX2x10GX32E1HSeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 116 }
+--  DESCRIPTION
+--      " DATACOM DM4000 PWE3 ETH20GX+2x10GX+32E1 H SERIES Management Card."
+
+datacomDm4000Eth16GX2x10GX4xSTM1HSeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 117 }
+--  DESCRIPTION
+--      " DATACOM DM4000 PWE3 ETH16GX+2x10GX+4STM1 H SERIES Management Card."
+
+datacomDm4000Eth16GX4xSTM1HSeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 118 }
+--  DESCRIPTION
+--      " DATACOM DM4000 PWE3 ETH16GX+4STM1 H SERIES Management Card."
+
+datacomDm4000Eth24gx2x10gxESeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 119 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH24GX 2x10GX E SERIES Management Card."
+
+datacomDm4000Eth24gxESeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 120 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH24GX E SERIES Management Card."
+
+datacomDm4000Eth4x10gxESeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 121 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH4x10GX E SERIES Management Card."
+
+datacomDm4000Eth48gtESeriesManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 122 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH48GT E SERIES Management Card."
+
+datacomDm4000Mpu960ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 123 }
+--  DESCRIPTION
+--      " DATACOM DM4000 MPU960 SNMP Management Card. "
+
+datacomDm4000Eth44GT4GCSMPLSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 124 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH44GT 4GC S MPLS DC Management Card."
+
+datacomDm4000Eth44GT4GC2XXSMPLSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 125 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH44GT 4GC 2XX S MPLS DC Management Card."
+
+datacomDm4000Eth44GT4GC4XXSMPLSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 126 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH44GT 4GC 4XX MPLS DC Management Card."
+
+datacomDm4000Eth24GX2X10GXHSeriesIIManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 127 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH24GX+2x10GX H Series II Management Card."
+
+datacomDm4100Eth20GT4GC4XSManagCard  OBJECT IDENTIFIER ::={ datacomManagementCards 128 }
+--  DESCRIPTION
+--      " DATACOM DM4100 ETH20GT 4GC 4XS Management Card."
+
+datacomDm2301-4GT4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 129 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+4GX Management Card."
+
+datacomDm4000EthETH24GXHSeriesIIManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 130 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH24GX H Series II Management Card."
+
+datacomDm4000EthETH2x10GXHSeriesIIManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 131 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH2x10GX H Series II Management Card."
+
+datacomDm4000EthETH48GXHSeriesIIManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 132 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH48GX H Series II Management Card."
+
+datacomDm4000EthETH4x10GXHSeriesIIManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 133 }
+--  DESCRIPTION
+--      " DATACOM DM4000 ETH4x10GX H Series II Management Card."
+
+datacomDm4600IpsanMpu20ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 134 }
+-- 	DESCRIPTION
+--		" DATACOM DM4600 IPSAN MPU20 Management Card. "
+
+datacomDm2301-4GT2GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 135 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+2GX Management Card."
+
+datacomDm4100Eth24GX4XSManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 136 }
+--  DESCRIPTION
+--      " DATACOM DM4100 ETH24GX 4XS Management Card."
+
+datacomDmOSManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 137 }
+--  DESCRIPTION
+--      " DATACOM DmOS Management Card."
+
+datacomDm2301-4GT2GX8E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 138 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+2GX+8E1 Management Card."
+
+datacomDm2301-4GT4GX8E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 139 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+4GX+8E1 Management Card."
+
+datacomDm2302-4GT4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 140 }
+--  DESCRIPTION
+--      " DATACOM DM2302 4GT+4GX Management Card."
+
+datacomDm2302-4GT4GX8E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 141 }
+--  DESCRIPTION
+--      " DATACOM DM2302 4GT+4GX+8E1 Management Card."
+
+datacomDm2303-4GT2GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 142 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+2GX Management Card."
+
+datacomDm2303-4GT4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 143 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+4GX Management Card."
+
+datacomDm2303-4GT4GX8E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 144 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+4GX+8E1 Management Card."
+
+datacomDm2351-4GT4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 145 }
+--  DESCRIPTION
+--      " DATACOM DM2351 4GT+4GX Management Card."
+
+datacomDm2351-4GT4GX8E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 146 }
+--  DESCRIPTION
+--      " DATACOM DM2351 4GT+4GX+8E1 Management Card."
+
+datacomDm2352-4GT4GX16E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 147 }
+--  DESCRIPTION
+--      " DATACOM DM2352 4GT+4GX+16E1 Management Card."
+
+datacomDm2353-4GT4GXManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 148 }
+--  DESCRIPTION
+--      " DATACOM DM2353 4GT+4GX Management Card."
+
+datacomDm2353-4GT4GX16E1ManagCard OBJECT IDENTIFIER ::={ datacomManagementCards 149 }
+--  DESCRIPTION
+--      " DATACOM DM2353 4GT+4GX+16E1 Management Card."
+
 -- Modems
 --
 -- datacomModems 1
@@ -1189,9 +1360,9 @@ dmAdMuxDatacomMuxDM881 	OBJECT IDENTIFIER ::={ dmAdMuxDatacom 116 }
 --	DESCRIPTION
 --		"DATACOM Mux DM881."
 
-dmAdMuxDatacomMuxDM814 	OBJECT IDENTIFIER ::={ dmAdMuxDatacom 117 }
+dmAdMuxDatacomMuxDM820 	OBJECT IDENTIFIER ::={ dmAdMuxDatacom 117 }
 --	DESCRIPTION
---		"DATACOM Mux DM814."
+--		"DATACOM Mux DM820."
 
 dmAdMuxDatacomMuxDM830 	OBJECT IDENTIFIER ::={ dmAdMuxDatacom 118 }
 --	DESCRIPTION
@@ -1205,5 +1376,63 @@ dmAdMuxDatacomMuxDM810 	OBJECT IDENTIFIER ::={ dmAdMuxDatacom 120 }
 --	DESCRIPTION
 --		"DATACOM Mux DM810."
 
+
+-- Devices
+
+datacomDm2301-4GT4GXDevice OBJECT IDENTIFIER ::={ datacomDevices 1 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+4GX Device."
+
+datacomDm2301-4GT2GXDevice OBJECT IDENTIFIER ::={ datacomDevices 2 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+2GX Device."
+
+datacomDm2301-4GT2GX8E1Device OBJECT IDENTIFIER ::={ datacomDevices 3 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+2GX+8E1 Device."
+
+datacomDm2301-4GT4GX8E1Device OBJECT IDENTIFIER ::={ datacomDevices 4 }
+--  DESCRIPTION
+--      " DATACOM DM2301 4GT+4GX+8E1 Device."
+
+datacomDm2302-4GT4GXDevice OBJECT IDENTIFIER ::={ datacomDevices 5 }
+--  DESCRIPTION
+--      " DATACOM DM2302 4GT+4GX Device."
+
+datacomDm2302-4GT4GX8E1Device OBJECT IDENTIFIER ::={ datacomDevices 6 }
+--  DESCRIPTION
+--      " DATACOM DM2302 4GT+4GX+8E1 Device."
+
+datacomDm2303-4GT2GXDevice OBJECT IDENTIFIER ::={ datacomDevices 7 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+2GX Device."
+
+datacomDm2303-4GT4GXDevice OBJECT IDENTIFIER ::={ datacomDevices 8 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+4GX Device."
+
+datacomDm2303-4GT4GX8E1Device OBJECT IDENTIFIER ::={ datacomDevices 9 }
+--  DESCRIPTION
+--      " DATACOM DM2303 4GT+4GX+8E1 Device."
+
+datacomDm2351-4GT4GXDevice OBJECT IDENTIFIER ::={ datacomDevices 10 }
+--  DESCRIPTION
+--      " DATACOM DM2351 4GT+4GX Device."
+
+datacomDm2351-4GT4GX8E1Device OBJECT IDENTIFIER ::={ datacomDevices 11 }
+--  DESCRIPTION
+--      " DATACOM DM2351 4GT+4GX+8E1 Device."
+
+datacomDm2352-4GT4GX16E1Device OBJECT IDENTIFIER ::={ datacomDevices 12 }
+--  DESCRIPTION
+--      " DATACOM DM2352 4GT+4GX+16E1 Device."
+
+datacomDm2353-4GT4GXDevice OBJECT IDENTIFIER ::={ datacomDevices 13 }
+--  DESCRIPTION
+--      " DATACOM DM2353 4GT+4GX Device."
+
+datacomDm2353-4GT4GX16E1Device OBJECT IDENTIFIER ::={ datacomDevices 14 }
+--  DESCRIPTION
+--      " DATACOM DM2353 4GT+4GX+16E1 Device."
 
 END

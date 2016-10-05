@@ -1,7 +1,10 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^EdgeOS/', $sysDescr)) {
-        $os = 'edgeos';
-    }
+$items = array(
+    'EdgeOS',
+    'EdgeRouter Lite',
+);
+
+if (starts_with($sysDescr, $items)) {
+    $os = 'edgeos';
 }

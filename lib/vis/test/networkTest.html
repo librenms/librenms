@@ -7,7 +7,7 @@
     <link href="../dist/vis.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
         #network{
-            width: 1900px;
+            width: 1200px;
             height: 800px;
             border: 1px solid lightgray;
         }
@@ -16,53 +16,48 @@
 <body>
 <h1>Network Test</h1>
 <div id="network"></div>
-<script>
-    var network = null;
 
-    var idmap = {};
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].label = i;
-        idmap[nodes[i].id] = i;
-        nodes[i].id = i;
-    }
+<script type="text/javascript">
+    // create a network
+    var container = document.getElementById('network');
+    var nodes = new vis.DataSet([]);
+    var edges = new vis.DataSet([]);
 
-    for (var i = 0; i < edges.length; i++) {
-        edges[i].from = idmap[edges[i].from];
-        edges[i].to = idmap[edges[i].to];
-        edges[i].id = 'e'+i;
-    }
-
-    console.log(JSON.stringify(nodes), JSON.stringify(edges));
-
-
-    // randomly create some nodes and edges
-        var data = {
-            nodes: nodes,
-            edges: edges
-        }
-        // create a network
-        var status = document.getElementById('status');
-        var container = document.getElementById('network');
-        var options = {
-            layout: {
-                hierarchical: {
-                    direction: "UD",
-                    sortMethod: "directed"
-                }
-            },
-            physics: {
-                enabled: false,
-                stabilization:false
+    // create a network
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+//    data.nodes.update({id: 0, label: 'node 1'});
+    var fontFace = 'roboto,"helvetica neue","segoe ui",arial,helvetica,sans-serif';
+    var options = {
+        autoResize: true,
+        interaction: {
+            hover: true
+        },
+        width: '100%',
+        height: '400px',
+        nodes: {
+            shape: 'dot',
+            font: {
+                size: 13,
+                face: fontFace,
+                strokeColor: '#fff',
+                strokeWidth: 5
             }
-        };
-        network = new vis.Network(container, data, options);
-        network.on("stabilizationProgress", function(params) {
-            var prog = params.iterations/params.total;
-            status.innerText = Math.round(prog*100)+'%';
-        });
-        network.on("stabilizationIterationsDone", function() {
-            status.innerText = "stabilized";
-        });
+        }
+    };
+    var network = new vis.Network(container, data, options);
+
+    function info(s) {
+        document.getElementById('num').innerText += s + '\n';
+    }
+
+
+
+
+
+
 </script>
 </body>
 </html>

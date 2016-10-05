@@ -9,9 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
-if (!$os) {
-    if (stristr($sysDescr, 'Fujitsu PY CB Eth Switch')) {
-        $os = 'fujitsupyos';
-    }
+
+if (str_contains($sysDescr, 'Fujitsu PY CB Eth Switch', true)) {
+    $os = 'fujitsupyos';
 }

@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^Net Vision/', $sysDescr)) {
-        $os = 'netvision';
-    }
+if (starts_with($sysDescr, 'Net Vision')) {
+    $os = 'netvision';
 }

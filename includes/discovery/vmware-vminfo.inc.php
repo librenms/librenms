@@ -20,7 +20,7 @@ if (($device['os'] == 'vmware') || ($device['os'] == 'linux')) {
      * Fetch information about Virtual Machines.
      */
 
-    $oids = snmpwalk_cache_multi_oid($device, 'vmwVmTable', $oids, '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['mib_dir'].'/vmware:'.$config['mib_dir']);
+    $oids = snmpwalk_cache_multi_oid($device, 'vmwVmTable', $oids, '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', 'vmware');
 
     foreach ($oids as $index => $entry) {
         $vmwVmDisplayName = $entry['vmwVmDisplayName'];
