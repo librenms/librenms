@@ -27,6 +27,7 @@ $data = array("type" => "note", "title" => $obj['title'], "body" => $obj['msg'])
 $data = json_encode($data);
 
 $curl = curl_init('https://api.pushbullet.com/v2/pushes');
+set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
 curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
