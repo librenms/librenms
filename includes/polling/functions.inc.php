@@ -5,7 +5,7 @@ require_once $config['install_dir'].'/includes/device-groups.inc.php';
 function bulk_sensor_snmpget($device, $sensors)
 {
     $oid_per_pdu = get_device_oid_limit($device);
-    $sensors = array_chunk($sensors, 10);
+    $sensors = array_chunk($sensors, $oid_per_pdu);
     $cache = array();
     foreach ($sensors as $chunk) {
         $oids = array_map(function ($data) {
@@ -145,7 +145,6 @@ function poll_sensor($device, $class, $unit)
         }
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }
-
 }//end poll_sensor()
 
 
@@ -155,6 +154,7 @@ function poll_device($device, $options)
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
+    $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
     $status = 0;
     unset($array);
@@ -513,8 +513,21 @@ function location_to_latlng($device)
     }
 }// end location_to_latlng()
 
+/**
+ * @param $device
+ * @return int|null
+ */
 function get_device_oid_limit($device)
 {
-    global $config, $attribs;
+    global $config;
 
+    $max_oid = $devive['snmp_max_oid'];
+
+    if (isset($max_oid) && $max_oid > 0) {
+        return $max_oid;
+    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
+        return $config['snmp']['max_oid'];
+    } else {
+        return 10;
+    }
 }
