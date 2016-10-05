@@ -35,7 +35,7 @@ if ($device['os_group'] == "cisco") {
         );
 
         $tags = compact('rrd_def');
-        dat_update($device, 'cisco-iosxcode', $tags, $fields);
+        data_update($device, 'cisco-iosxcode', $tags, $fields);
 
         $graphs['cisco-iosxcode'] = true;
         echo (" Cisco IOS Transcoder ");
