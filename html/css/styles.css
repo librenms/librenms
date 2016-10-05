@@ -2037,3 +2037,17 @@ label {
 .availability-map-widget-header {
   line-height:30px;
 }
+
+@media only screen and (max-width: 1240px) and (min-width: 1200px) {
+    .nav > li > a {
+        padding: 4px 4px !important;
+        padding-top: 15px !important;
+    }
+}
+
+@media only screen and (min-width: 1241px) {
+    .nav > li > a {
+        padding: 5px 5px !important;
+        padding-top: 15px !important;
+    }
+}
