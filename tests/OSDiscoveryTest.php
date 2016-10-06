@@ -836,6 +836,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('monowall');
     }
 
+    public function testMoxaNport()
+    {
+        $this->checkOS('moxa-nport');
+    }
+
     public function testMrvld()
     {
         $this->checkOS('mrvld');
