@@ -1,0 +1,35 @@
+SAF-ENTERPRISE DEFINITIONS ::= BEGIN
+
+-- Definitions for include by other SAF Tehnika mib modules
+
+IMPORTS
+         enterprises,
+         MODULE-IDENTITY,
+         OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+	
+-- saf   	            OBJECT IDENTIFIER ::=   { enterprises 7571 }
+saf    MODULE-IDENTITY
+       LAST-UPDATED "200704030000Z"    --  Apr, 04. 2007
+       ORGANIZATION "SAF Tehnika"
+       CONTACT-INFO
+               "SAF Tehnika technical support
+                <techsupport@saftehnika.com>"
+       DESCRIPTION
+               "SAF Tehnika enterprise spec."
+       ::= { enterprises 7571 }
+
+	tehnika	OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION
+		"Subtree to register SAF tehnika modules"
+        ::=   { saf 100 }
+
+-- smiv1
+
+microwaveRadio		OBJECT IDENTIFIER ::=   { tehnika  1}
+pointToPoint		OBJECT IDENTIFIER ::=   { microwaveRadio 1 }
+-- end smiv1
+
+--
+END
