@@ -20,14 +20,14 @@ if ($device['os_group'] == "cisco") {
     if (is_array($output)) {
         foreach ($output as $key => $value) {
             // 81 is the ifType for DS0's
-            if ($value[''] == "81") {
+            if ($value == "81") {
                 $total++;
             }
         }
 
         // Active
         $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
-        $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'][''];
+        $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'];
 
         if (isset($active) && $active > 0) {
             $rrd_def = array(

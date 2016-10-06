@@ -66,8 +66,8 @@ __Conditions__ can be any of:
 
 - Equals `=`
 - Not Equals `!=`
-- Matches `~`
-- Not Matches `!~`
+- Like `~`
+- Not Like `!~`
 - Greater `>`
 - Greater or Equal `>=`
 - Smaller `<`
@@ -76,7 +76,7 @@ __Conditions__ can be any of:
 __Values__ can be Entities or any single-quoted data.
 __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
-__Note__: The difference between `Equals` and `Matches` (and its negation) is that `Equals` does a strict comparison and `Matches` allows the usage of RegExp.
+__Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of RegExp.
 Arithmetics are allowed as well.
 
 ## <a name="rules-examples">Examples</a>

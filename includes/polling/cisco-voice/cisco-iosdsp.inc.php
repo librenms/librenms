@@ -17,7 +17,7 @@ if ($device['os_group'] == "cisco") {
     $output = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", null);
     if (is_array($output)) {
         foreach ($output as $key => $value) {
-            $total += $value[''];
+            $total += $value;
         }
 
         if (isset($total) && $total > 0) {
