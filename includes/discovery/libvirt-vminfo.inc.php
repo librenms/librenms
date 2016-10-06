@@ -41,6 +41,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     unset($vm_info_array);
                     exec($config['virsh'].' -rc '.$uri.' dumpxml '.$dom_id, $vm_info_array);
 
+                    // Example xml:
                     // <domain type='kvm' id='3'>
                     // <name>moo.example.com</name>
                     // <uuid>48cf6378-6fd5-4610-0611-63dd4b31cfd6</uuid>
@@ -54,6 +55,8 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     // <features>
                     // <acpi/>
                     // (...)
+                    // See spec at https://libvirt.org/formatdomain.html
+
                     // Convert array to string
                     unset($vm_info_xml);
                     foreach ($vm_info_array as $line) {
@@ -69,30 +72,45 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     exec($config['virsh'].' -rc '.$uri.' domstate '.$dom_id, $vm_state);
                     $vmwVmState = ucfirst($vm_state[0]);
 
-                    $vmwVmCpus = null;
-                    $vmwVmMemSize = null;
-                    if ($xml->xpath("//sysinfo/system/entry[@name='manufacturer'][.='oVirt']")) {
-                        d_echo("Parsing information for $vmwVmDisplayName with oVirt quirx");
-                        // oVirt does not fully comply with the example above
-                        switch ($xml->memory['unit']) {
-                            case 'MiB':
-                                $vmwVmMemSize = $xml->memory;
-                                break;
-                            case 'GiB':
-                                $vmwVmMemSize = $xml->memory * 1024;
-                                break;
-                            default:
-                                // includes KiB
-                                $vmwVmMemSize = $xml->memory / 1024;
-                                break;
-                        }
-                        $vmwVmCpus  = $xml->vcpu['current'];
-                        if (!isset($vmwVmCpus)) {
-                            $vmwVmCpus  = $xml->vcpu;
-                        }
-                    } else {
-                        $vmwVmMemSize = ($xml->currentMemory / 1024);
+                    $vmwVmCpus  = $xml->vcpu['current'];
+                    if (!isset($vmwVmCpus)) {
                         $vmwVmCpus  = $xml->vcpu;
+                    }
+                    $vmwVmMemSize = $xml->memory;
+                    // Convert memory size to MiB
+                    switch ($vmwVmMemSize['unit']) {
+                        case 'T':
+                        case 'TiB':
+                            $vmwVmMemSize = $vmwVmMemSize * 1048576;
+                            break;
+                        case 'TB':
+                            $vmwVmMemSize = $vmwVmMemSize * 1000000;
+                            break;
+                        case 'G':
+                        case 'GiB':
+                            $vmwVmMemSize = $vmwVmMemSize * 1024;
+                            break;
+                        case 'GB':
+                            $vmwVmMemSize = $vmwVmMemSize * 1000;
+                            break;
+                        case 'M':
+                        case 'MiB':
+                            $vmwVmMemSize = $vmwVmMemSize;
+                            break;
+                        case 'MB':
+                            $vmwVmMemSize = $vmwVmMemSize * 1000000 / 1048576;
+                            break;
+                        case 'KB':
+                            $vmwVmMemSize = $vmwVmMemSize / 1000;
+                            break;
+                        case 'b':
+                        case 'bytes':
+                            $vmwVmMemSize = $vmwVmMemSize / 1048576;
+                            break;
+                        default:
+                            // KiB or k or no value
+                            $vmwVmMemSize = $vmwVmMemSize / 1024;
+                            break;
                     }
 
                     // Check whether the Virtual Machine is already known for this host.
