@@ -2174,8 +2174,8 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
-// Moxa
-$os = 'moxa';
+// Moxa-nport
+$os = 'moxa-nport';
 $config['os'][$os]['text']             = 'Moxa';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'moxa';

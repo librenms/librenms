@@ -10,5 +10,5 @@
  * the source code distribution for details.
  */
 if (str_contains($sysObjectId, '.1.3.6.1.4.1.8691.2.7')) {
-    $os = 'moxa';
+    $os = 'moxa-nport';
 }
