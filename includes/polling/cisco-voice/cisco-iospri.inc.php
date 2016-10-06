@@ -20,7 +20,7 @@ if ($device['os_group'] == "cisco") {
     if (is_array($output)) {
         foreach ($output as $key => $value) {
             // 81 is the ifType for DS0's
-            if ($value == "81") {
+            if ($value[''] == "81") {
                 $total++;
             }
         }
