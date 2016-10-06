@@ -143,6 +143,15 @@ function poll_service($service)
         // Yes, We have perf data.
         $rrd_name = array('services', $service_id);
 
+        // limit DS name to 19 characters
+        foreach ($perf as $k => $v) {
+            if ( strlen($k) >= 19 ) {
+                d_echo( "k: " . $k . " exceeds 19 characters. changing to " . substr($k,0,19) . "\n");
+                $perf[substr($k,0,19)] = $v;
+                unset($perf[$k]);
+            }
+        }
+
         // Set the DS in the DB if it is blank.
         $DS = array();
         foreach ($perf as $k => $v) {
