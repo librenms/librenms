@@ -83,7 +83,9 @@ if (isset($_POST['create-default'])) {
         'disabled'  => 0,
         'name'      => 'Service up/down',
     );
+    require_once '../includes/alerts.inc.php';
     foreach ($default_rules as $add_rule) {
+        $add_rule['query'] = GenSQL($add_rule['rule']);
         dbInsert($add_rule, 'alert_rules');
     }
 }//end if

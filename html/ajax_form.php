@@ -21,6 +21,7 @@ require_once 'includes/functions.inc.php';
 require_once '../includes/functions.php';
 require_once 'includes/authenticate.inc.php';
 require_once 'includes/vars.inc.php';
+require_once '../includes/alerts.inc.php';
 
 set_debug($_REQUEST['debug']);
 
