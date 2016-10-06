@@ -1,1 +1,1 @@
-ALTER TABLE `packages` MODIFY `version` varchar(70) NOT NULL;
+ALTER TABLE `packages` MODIFY `version` varchar(255) NOT NULL;
