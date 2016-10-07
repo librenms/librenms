@@ -27,6 +27,7 @@
 $install_dir = realpath(__DIR__ . '/..');
 
 require $install_dir . '/includes/defaults.inc.php';
+require $install_dir . '/includes/definitions.inc.php';
 
 // definitions, don't want to initialize mysql...
 $config['install_dir'] = $install_dir;
