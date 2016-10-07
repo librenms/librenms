@@ -34,8 +34,8 @@ if (!$_SESSION['authenticated']) {
 
 $output = '';
 if ($_GET['query'] && $_GET['cmd']) {
-    $host = $_GET['query'];
-    if (Net_IPv6::checkIPv6($host) || Net_IPv4::validateip($host) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
+    $host = clean($_GET['query']);
+    if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
         switch ($_GET['cmd']) {
             case 'whois':
                 $cmd = $config['whois']." $host | grep -v \%";
