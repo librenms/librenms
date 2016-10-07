@@ -411,7 +411,7 @@ if ($format == "graph") {
         var grid = $("#devices").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            columnSelection: false,
+            columnSelection: true,
             formatters: {
                 "status": function (column, row) {
                     return "<span class=\"label label-" + row.extra + " devices-status-box-" + row.list_type + "\">" + row.msg + "</span>";
