@@ -741,6 +741,14 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'brocade';
 
+// Ceragon
+$os = 'ceragon';
+$config['os'][$os]['text']             = 'Ceragon';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ceragon';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Cisco Small Business
 $os = 'ciscosb';
 $config['os'][$os]['group']            = 'cisco';
