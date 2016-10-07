@@ -58,7 +58,7 @@ if (file_exists('includes/authentication/'.$config['auth_mechanism'].'.inc.php')
 $auth_success = 0;
 
 if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {
-    if (reauthenticate(clean($_COOKIE['sess_id']), clean($_COOKIE['token'])) || authenticate($_SESSION['username'], $_SESSION['password'])) {
+    if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_SESSION['password'])) {
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
         if (!$_SESSION['authenticated']) {
