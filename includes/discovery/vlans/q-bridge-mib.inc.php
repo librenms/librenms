@@ -32,8 +32,9 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
 
-        $untagged_indexes = q_bridge_bits2indices($untag[$vlan_id]['dot1qVlanCurrentUntaggedPorts.0']);
-        $egress_indexes = q_bridge_bits2indices($tagoruntag[$vlan_id]['dot1qVlanCurrentEgressPorts.0']);
+        $id = "0.$vlan_id";
+        $untagged_indexes = q_bridge_bits2indices($untag[$id]['dot1qVlanCurrentUntaggedPorts']);
+        $egress_indexes = q_bridge_bits2indices($tagoruntag[$id]['dot1qVlanCurrentEgressPorts']);
 
         foreach ($egress_indexes as $port_index) {
             $qbridge_data[$vlan_id][$port_index] = $base_indexes[$port_index];
