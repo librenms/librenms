@@ -39,7 +39,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $community = $filename ?: $expected_os;
 
         ob_start();
-        $os = getHostOS($this->genDevice($community));
+        $os = getHostOS($this->genDevice($community, $expected_os));
         $output = ob_get_contents();
         ob_end_clean();
 
@@ -52,7 +52,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
      * @param string $community The snmp community to set
      * @return array resulting device array
      */
-    private function genDevice($community)
+    private function genDevice($community, $os)
     {
         return array(
             'device_id' => 1,
@@ -63,6 +63,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
+            'os' => $os,
+            'os_group' => '',
         );
     }
 
