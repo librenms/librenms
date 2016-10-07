@@ -42,7 +42,7 @@ if (defined('SHOW_SETTINGS')) {
             </div>
         </div>';
 
-    if ($config['webui']['availability_map_compact'] == false) {
+    if ($config['webui']['availability_map_compact'] === false) {
         $common_output[] = '
     <div class="form-group">
         <div class="col-sm-4">
