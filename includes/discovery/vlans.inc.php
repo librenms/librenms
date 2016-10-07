@@ -27,6 +27,8 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
                 $vlan_device = array_merge($device, array('community' => $device['community'].'@'.$vlan_id));
                 $vlan_data   = snmpwalk_cache_oid($vlan_device, 'dot1dStpPortEntry', array(), 'BRIDGE-MIB:Q-BRIDGE-MIB');
                 $vlan_data   = snmpwalk_cache_oid($vlan_device, 'dot1dBasePortEntry', $vlan_data, 'BRIDGE-MIB:Q-BRIDGE-MIB');
+            } elseif (isset($qbridge_data)) {
+                $vlan_data = $qbridge_data[$vlan_id];
             }
 
             echo "VLAN $vlan_id \n";
@@ -49,6 +51,7 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
                 $db_a['priority'] = isset($vlan_port['dot1dStpPortPriority']) ? $vlan_port['dot1dStpPortPriority'] : 0;
                 $db_a['state']    = isset($vlan_port['dot1dStpPortState']) ? $vlan_port['dot1dStpPortState'] : 'unknown';
                 $db_a['cost']     = isset($vlan_port['dot1dStpPortPathCost']) ? $vlan_port['dot1dStpPortPathCost'] : 0;
+                $db_a['untagged'] = isset($vlan_port['untagged']) ? $vlan_port['untagged'] : 0;
 
                 $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', array($device['device_id'], $port['port_id'], $vlan_id));
 

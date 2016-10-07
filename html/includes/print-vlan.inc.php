@@ -18,9 +18,11 @@ foreach ($otherports as $otherport) {
     $vlan_ports[$otherport[ifIndex]] = $otherport;
 }
 
-  $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan_vlan']));
-foreach ($otherports as $otherport) {
-    $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+if (empty($otherports)) {
+    $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan_vlan']));
+    foreach ($otherports as $otherport) {
+        $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+    }
 }
 
   ksort($vlan_ports);
