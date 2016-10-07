@@ -7,7 +7,7 @@ foreach ($_GET as $key => $get_var) {
             $value = 'yes';
         }
 
-        $vars[$name] = $value;
+        $vars[$name] = clean($value);
     }
 }
 
@@ -34,9 +34,9 @@ foreach ($segments as $pos => $segment) {
 }
 
 foreach ($_GET as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = clean($value);
 }
 
 foreach ($_POST as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = clean($value);
 }
