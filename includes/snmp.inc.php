@@ -37,20 +37,14 @@ function prep_snmp_setting($device, $setting)
     }
 }//end prep_snmp_setting()
 
-
 /**
- * Generate the mib search directory argument for snmpcmd
- * If null return the default mib dir
- * If $mibdir is empty '', return an empty string
- *
- * @param string $mibdir should be the name of the directory within $config['mib_dir']
- * @param string $device
- * @return string The option string starting with -M
+ * @param $device
+ * @return array $extra will contain a list of mib dirs
  */
-function mibdir($mibdir = null, $device = array())
+function get_mib_dir($device)
 {
     global $config;
-    // FIXME: prepend + to allow system mibs?
+    $extra = array();
 
     if (file_exists($config['mib_dir'] . '/' . $device['os'])) {
         $extra[] = $config['mib_dir'] . '/' . $device['os'];
@@ -72,7 +66,27 @@ function mibdir($mibdir = null, $device = array())
         }
     }
 
-    $extra_dir = implode(':', $extra) . ':';
+    return $extra;
+}
+
+/**
+ * Generate the mib search directory argument for snmpcmd
+ * If null return the default mib dir
+ * If $mibdir is empty '', return an empty string
+ *
+ * @param string $mibdir should be the name of the directory within $config['mib_dir']
+ * @param string $device
+ * @return string The option string starting with -M
+ */
+function mibdir($mibdir = null, $device = array())
+{
+    global $config;
+    // FIXME: prepend + to allow system mibs?
+
+    $extra_dir = implode(':', get_mib_dir($device));
+    if (!empty($extra_dir)) {
+        $extra_dir .= ':';
+    }
 
     if (is_null($mibdir)) {
         return " -M $extra_dir${config['mib_dir']}";
