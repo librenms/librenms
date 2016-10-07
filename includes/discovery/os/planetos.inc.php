@@ -9,9 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
-if (!$os) {
-    if (str_contains($sysObjectId, '1.3.6.1.4.1.10456.1.1516')) {
-        $os = 'planetos';
-    }
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.10456.1.1516')) {
+    $os = 'planetos';
 }

@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^Netopia /', $sysDescr)) {
-        $os = 'netopia';
-    }
+if (starts_with($sysDescr, 'Netopia')) {
+    $os = 'netopia';
 }

@@ -13,12 +13,12 @@
  */
 
 if (!is_array($storage_cache1['eql-storage'])) {
-    $storage_cache1['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', $config['install_dir'].'/mibs/equallogic');
+    $storage_cache1['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
     d_echo($storage_cache1);
 }
 
 if (!is_array($storage_cache2['eql-storage'])) {
-    $storage_cache2['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeStatusEntry', null, 'EQLVOLUME-MIB', $config['install_dir'].'/mibs/equallogic');
+    $storage_cache2['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeStatusEntry', null, 'EQLVOLUME-MIB', 'equallogic');
     d_echo($storage_cache2);
 }
 

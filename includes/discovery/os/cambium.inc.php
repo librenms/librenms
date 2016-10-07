@@ -9,16 +9,8 @@
  * the source code distribution for details.
  */
 
-if (!$os) {
-    if (preg_match('/^Cambium PTP 50650/', $sysDescr)) {
-        $os = 'cambium';
-    } elseif (preg_match('/^PTP250/', $sysDescr)) {
-        $os = 'cambium';
-    } elseif (preg_match('/^Cambium/', $sysDescr)) {
-        $os = 'cambium';
-    } elseif (strstr($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
-        $os = 'cambium';
-    } elseif (strstr($sysObjectId, 'enterprises.17713.21')) {
-        $os = 'cambium';
-    }
+if (starts_with($sysDescr, array('Cambium PTP 50650', 'PTP250', 'Cambium'))) {
+    $os = 'cambium';
+} elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
+    $os = 'cambium';
 }

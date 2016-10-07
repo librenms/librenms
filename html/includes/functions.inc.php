@@ -91,6 +91,9 @@ function nicecase($item)
         case 'ups-nut':
             return 'UPS nut';
 
+        case 'ups-apcups':
+            return 'UPS apcups';
+
         default:
             return ucfirst($item);
     }
@@ -1219,6 +1222,11 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
+            } elseif ($item['type'] == 'numeric') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
             } elseif ($item['type'] == 'select') {
                 $output .= '
                 <select id="'.$config_groups[$item['name']]['name'].'" class="form-control" name="global-config-select" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
@@ -1336,22 +1344,20 @@ function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
     }
 }
 
-function get_auth_ad_user_filter($username)
+/**
+ * @param $filename
+ * @param $content
+ */
+function file_download($filename, $content)
 {
-    global $config;
-    $user_filter = "(samaccountname=$username)";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
-    }
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
+    $length = strlen($content);
+    header('Content-Description: File Transfer');
+    header('Content-Type: text/plain');
+    header("Content-Disposition: attachment; filename=$filename");
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Length: ' . $length);
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Expires: 0');
+    header('Pragma: public');
+    echo $content;
 }

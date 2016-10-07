@@ -22,22 +22,29 @@ print_optionbar_start();
             <div class="pull-left">
                 <form method="post" action="" class="form-inline" role="form" id="result_form">
                     <div class="form-group">
+                        <?php
+                        if (!is_numeric($vars['device'])) {
+                        ?>
                         <select name="device" id="device" class="form-control input-sm">
                             <option value="">All Devices</option>
-                                <?php
-                                foreach (get_all_devices() as $hostname) {
-                                    $device_id = getidbyname($hostname);
-                                    if (device_permitted($device_id)) {
-                                        echo '"<option value="'.$device_id.'"';
-                                        if ($device_id == $vars['device']) {
-                                            echo ' selected';
-                                        }
-
-                                        echo '>'.$hostname.'</option>';
+                            <?php
+                            foreach (get_all_devices() as $hostname) {
+                                $device_id = getidbyname($hostname);
+                                if (device_permitted($device_id)) {
+                                    echo '"<option value="' . $device_id . '"';
+                                    if ($device_id == $vars['device']) {
+                                        echo ' selected';
                                     }
+                                    echo '>' . $hostname . '</option>';
                                 }
-                                ?>
+                            }
+                            ?>
                         </select>
+                        <?php
+                        } else {
+                            echo '<input type="hidden" name="device" id="device" value="' . $vars['device'] . '">';
+                        }
+                        ?>
                     </div>
                     <div class="form-group">
                         <select name="program" id="program" class="form-control input-sm">

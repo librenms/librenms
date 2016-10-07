@@ -9,8 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (!$os) {
-    if (stristr($sysDescr, 'Perle MCR-MGT')) {
-        $os = 'perle';
-    }
+
+if (str_contains($sysDescr, 'Perle MCR-MGT')) {
+    $os = 'perle';
 }

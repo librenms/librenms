@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^LambdaDriver/', $sysDescr)) {
-        $os = 'mrvld';
-    }
+if (starts_with($sysDescr, 'LambdaDriver')) {
+    $os = 'mrvld';
 }

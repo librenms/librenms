@@ -1,7 +1,7 @@
 <?php
 
 if ($device['os'] == 'equallogic') {
-    $oids = snmp_walk($device, 'eqlMemberHealthDetailsFanName', '-OQn', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+    $oids = snmp_walk($device, 'eqlMemberHealthDetailsFanName', '-OQn', 'EQLMEMBER-MIB', 'equallogic');
 
     /*
         .1.3.6.1.4.1.12740.2.1.7.1.2.1.329840783.1 = Power Cooling Module 0 Fan 0
@@ -24,7 +24,7 @@ if ($device['os'] == 'equallogic') {
                 $num_index        = $part_oid.'.'.$num_index;
                 $base_oid         = '.1.3.6.1.4.1.12740.2.1.7.1.3.1.';
                 $oid              = $base_oid.$num_index;
-                $extra            = snmp_get_multi($device, "eqlMemberHealthDetailsFanValue.1.$num_index eqlMemberHealthDetailsFanCurrentState.1.$num_index eqlMemberHealthDetailsFanHighCriticalThreshold.1.$num_index eqlMemberHealthDetailsFanHighWarningThreshold.1.$num_index eqlMemberHealthDetailsFanLowCriticalThreshold.1.$num_index eqlMemberHealthDetailsFanLowWarningThreshold.1.$num_index", '-OQUs', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+                $extra            = snmp_get_multi($device, "eqlMemberHealthDetailsFanValue.1.$num_index eqlMemberHealthDetailsFanCurrentState.1.$num_index eqlMemberHealthDetailsFanHighCriticalThreshold.1.$num_index eqlMemberHealthDetailsFanHighWarningThreshold.1.$num_index eqlMemberHealthDetailsFanLowCriticalThreshold.1.$num_index eqlMemberHealthDetailsFanLowWarningThreshold.1.$num_index", '-OQUs', 'EQLMEMBER-MIB', 'equallogic');
                 $keys             = array_keys($extra);
                 $temperature      = $extra[$keys[0]]['eqlMemberHealthDetailsFanValue'];
                 $low_limit        = $extra[$keys[0]]['eqlMemberHealthDetailsFanLowCriticalThreshold'];
