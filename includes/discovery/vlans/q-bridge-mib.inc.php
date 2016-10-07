@@ -22,10 +22,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             echo '+';
         }
 
-        $key = "0.$vlan_id";
-
-        $untagged_port_indices = q_bridge_bits2indices($untag[$key]['dot1qVlanCurrentUntaggedPorts']);
-        $tagoruntag_indices = q_bridge_bits2indices($tagoruntag[$key]['dot1qVlanCurrentEgressPorts']);
+        $untagged_port_indices = q_bridge_bits2indices($untag[$vlan_id]['dot1qVlanCurrentUntaggedPorts.0']);
+        $tagoruntag_indices = q_bridge_bits2indices($tagoruntag[$vlan_id]['dot1qVlanCurrentEgressPorts.0']);
         $tagged_port_indices = array_diff($tagoruntag_indices, $untagged_port_indices);
 
         foreach ($tagged_port_indices as $port_ifindex) {
