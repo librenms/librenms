@@ -44,6 +44,7 @@ foreach( $opts as $tmp_api ) {
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json')
     );
+    set_curl_proxy($curl);
     curl_setopt($curl, CURLOPT_URL, $host);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST,true);
