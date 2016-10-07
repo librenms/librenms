@@ -75,17 +75,8 @@ switch ($top_query) {
         $graph_params = array('tab' => 'graphs', 'group' => 'poller');
 }
 
-if ($widget_settings['device_count'] > 0) {
-    $no_devices = $widget_settings['device_count'];
-} else {
-    $no_devices = 5;
-}
-
-if ($widget_settings['time_interval'] > 0) {
-    $time_interval = $widget_settings['time_interval'];
-} else {
-    $time_interval = 15;
-}
+$widget_settings['device_count']  = $widget_settings['device_count'] > 0 ? $widget_settings['device_count'] : 5;
+$widget_settings['time_interval'] = $widget_settings['time_interval'] > 0 ? $widget_settings['time_interval'] : 15;
 
 if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
@@ -129,7 +120,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <label for="graph_type" class="control-label availability-map-widget-header">Number of Devices</label>
             </div>
             <div class="col-sm-6">
-                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" value="' . $no_devices . '">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="device_count" id="input_count_' . $unique_id . '" value="' . $widget_settings['device_count'] . '">
             </div>
         </div>
         <div class="form-group">
@@ -137,7 +128,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                 <label for="graph_type" class="control-label availability-map-widget-header">Time interval (minutes)</label>
             </div>
             <div class="col-sm-6">
-                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" value="' . $time_interval . '">
+                <input class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="time_interval" id="input_time_' . $unique_id . '" value="' . $widget_settings['time_interval'] . '">
             </div>
         </div>
         <div class="form-group">
