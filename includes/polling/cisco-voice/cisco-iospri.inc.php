@@ -18,15 +18,14 @@ if ($device['os_group'] == "cisco") {
     $total = 0;
     foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.2.1.2.2.1.3", null) as $key => $value) {
         // 81 is the ifType for DS0's
-        if ($value == "81") {
+        if ($value[''] == "81") {
             $total++;
         }
     }
 
     // Active
     $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
-    $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'];
-    // FIXME why isn't this using snmpget?
+    $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'][''];
 
     if (isset($active) && ($active != "") && ($total != 0)) {
         $rrd_def = array(
