@@ -8,6 +8,7 @@ foreach ($vlans_db_raw as $vlan_db) {
 
 // Create an empty array to record what VLANs we discover this session.
 $device['vlans'] = array();
+$valid_vlan_port_ids = array();
 
 require 'includes/discovery/vlans/q-bridge-mib.inc.php';
 require 'includes/discovery/vlans/cisco-vtp.inc.php';
@@ -15,9 +16,6 @@ require 'includes/discovery/vlans/cisco-vtp.inc.php';
 // Fetch switchport <> VLAN relationships. This is DIRTY.
 foreach ($device['vlans'] as $domain_id => $vlans) {
     foreach ($vlans as $vlan_id => $vlan) {
-        // Pull Tables for this VLAN
-        // /usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/librenms/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
-        // /usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/librenms/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
         // FIXME - do this only when vlan type == ethernet?
         if (is_numeric($vlan_id) && ($vlan_id < 1002 || $vlan_id > 1105)) {
             // Ignore reserved VLAN IDs
@@ -56,14 +54,16 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
                 $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', array($device['device_id'], $port['port_id'], $vlan_id));
 
                 if ($from_db['port_vlan_id']) {
-                    dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', array($from_db['port_vlan_id']));
+                    $db_id = $from_db['port_vlan_id'];
+                    dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', array($db_id));
                     echo 'Updated';
                 } else {
-                    dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
+                    $db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
                     echo 'Inserted';
                 }
+                $valid_vlan_port_ids[] = $db_id;
 
-                echo "\n";
+                echo PHP_EOL;
             }//end foreach
         }//end if
     }//end foreach
@@ -76,5 +76,9 @@ foreach ($vlans_db as $domain_id => $vlans) {
         }
     }
 }
+
+// remove non-existent port-vlan mappings
+$num = dbDelete('ports_vlans', '`device_id`=? AND `port_vlan_id` NOT IN ('.join(',', $valid_vlan_port).')', array($device['device_id']));
+d_echo("Deleted $num vlan mappings\n");
 
 unset($device['vlans']);

@@ -1,6 +1,4 @@
 <?php
-require_once 'includes/discovery/vlans/vlan_functions.inc.php';
-
 echo 'IEEE8021-Q-BRIDGE-MIB VLANs: ';
 
 $vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'IEEE8021-Q-BRIDGE-MIB');
@@ -42,4 +40,4 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }
     }
 }
-echo "\n";
+echo PHP_EOL;
