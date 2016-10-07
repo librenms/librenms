@@ -1461,30 +1461,6 @@ function starts_with($haystack, $needles, $case_insensitive = false)
     return false;
 }
 
-/**
- * Search backwards for the $needle, returning $count found occurrence
- *
- * @param string $haystack
- * @param string $needle
- * @param int $count
- * @return bool|int
- */
-function strrpos_count($haystack, $needle, $count = 1)
-{
-    if ($count <= 0) {
-        return false;
-    }
-
-    $len = strlen($haystack);
-    $pos = $len;
-
-    for ($i = 0; $i < $count && $pos; $i++) {
-        $pos = strrpos($haystack, $needle, $pos - $len - 1);
-    }
-
-    return $pos;
-}
-
 function get_auth_ad_user_filter($username)
 {
     global $config;
