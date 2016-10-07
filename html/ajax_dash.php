@@ -36,7 +36,7 @@ if ($type == 'placeholder') {
     $results_limit     = 10;
     $typeahead_limit   = $config['webui']['global_search_result_limit'];
     $no_form           = true;
-    $title             = ucfirst($type);
+    $title             = ucfirst(display($type));
     $unique_id         = str_replace(array("-","."), "_", uniqid($type, true));
     $widget_id         = mres($_POST['id']);
     $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?', array($widget_id)), true);
@@ -47,7 +47,7 @@ if ($type == 'placeholder') {
     include 'includes/common/'.$type.'.inc.php';
     $output = implode('', $common_output);
     $status = 'ok';
-    $title  = $widget_settings['title'] ?: $title;
+    $title  = display($widget_settings['title']) ?: $title;
 }
 
 $response = array(

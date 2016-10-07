@@ -66,6 +66,8 @@ function ifLabel($interface, $device = null)
 {
     global $config;
 
+    $interface['ifAlias'] = display($interface['ifAlias']);
+
     if (!$device) {
         $device = device_by_id_cache($interface['device_id']);
     }
