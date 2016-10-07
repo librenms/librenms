@@ -36,6 +36,11 @@ require 'includes/dev-overview-data.inc.php';
 LibreNMS\Plugins::call('device_overview_container', array($device));
 
 require 'overview/ports.inc.php';
+
+if ($device['os'] == 'cimc') {
+    require 'overview/cimc.inc.php';
+}
+
 echo('
     </div>
     <div class="col-md-6">

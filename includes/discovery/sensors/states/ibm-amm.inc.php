@@ -126,8 +126,7 @@ if ($device['os'] == 'ibm-amm') {
      *   notAvailable(3),
      *   critical(4)
      */
-    foreach ($data as $oid => $array) {
-        $state = current($array);  // get the first (and only) item from the array
+    foreach ($data as $oid => $state) {
         $descr = $state_descr . $index;
 
         if (is_numeric($state) && $state != 3) {

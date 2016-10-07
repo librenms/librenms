@@ -1568,3 +1568,82 @@ function hytera_h2f($number, $nd)
 
     return number_format($floatfinal, $nd, '.', '');
 }
+
+/*
+ * Cisco CIMC functions
+ */
+// Create an entry in the entPhysical table if it doesnt already exist.
+function setCIMCentPhysical($location, $data, &$entphysical, &$index)
+{
+    // Go get the location, this will create it if it doesnt exist.
+    $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
+
+    // See if we need to update
+    $update = array();
+    foreach ($data as $key => $value) {
+        // Is the Array(DB) value different to the supplied data
+        if ($entphysical[$location][$key] != $value) {
+            $update[$key] = $value;
+            $entphysical[$location][$key] = $value;
+        } // End if
+    } // end foreach
+
+    // Do we need to update
+    if (count($update) > 0) {
+        dbUpdate($update, 'entPhysical', '`entPhysical_id` = ?', array($entphysical[$location]['entPhysical_id']));
+    }
+    $entPhysicalId = $entphysical[$location]['entPhysical_id'];
+    return array($entPhysicalId, $entPhysicalIndex);
+}
+
+function getCIMCentPhysical($location, &$entphysical, &$index)
+{
+    global $device;
+
+    // Level 1 - Does the location exist
+    if (isset($entphysical[$location])) {
+        // Yes, return the entPhysicalIndex.
+        return $entphysical[$location]['entPhysicalIndex'];
+    } else {
+        /*
+         * No, the entry doesnt exist.
+         * Find its parent so we can create it.
+         */
+
+        // Pull apart the location
+        $parts = explode('/', $location);
+
+        // Level 2 - Are we at the root
+        if (count($parts) == 1) {
+            // Level 2 - Yes. We are the root, there is no parent
+            d_echo("ROOT - ".$location."\n");
+            $shortlocation = $location;
+            $parent = 0;
+        } else {
+            // Level 2 - No. Need to go deeper.
+            d_echo("NON-ROOT - ".$location."\n");
+            $shortlocation = array_pop($parts);
+            $parentlocation = implode('/', $parts);
+            d_echo("Decend - parent location: ".$parentlocation."\n");
+            $parent = getCIMCentPhysical($parentlocation, $entphysical, $index);
+        } // end if - Level 2
+        d_echo("Parent: ".$parent."\n");
+
+        // Now we have an ID, create the entry.
+        $index++;
+        $insert = array(
+            'device_id'                 => $device['device_id'],
+            'entPhysicalIndex'          => $index,
+            'entPhysicalClass'          => 'container',
+            'entPhysicalVendorType'     => $location,
+            'entPhysicalName'           => $shortlocation,
+            'entPhysicalContainedIn'    => $parent,
+            'entPhysicalParentRelPos'   => '-1',
+        );
+
+        // Add to the DB and Array.
+        $id = dbInsert($insert, 'entPhysical');
+        $entphysical[$location] = dbFetchRow('SELECT * FROM entPhysical WHERE entPhysical_id=?', array($id));
+        return $index;
+    } // end if - Level 1
+} // end function

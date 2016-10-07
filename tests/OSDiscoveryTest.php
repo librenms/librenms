@@ -821,6 +821,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('microsemitime');
     }
 
+    public function testMimosa()
+    {
+        $this->checkOS('mimosa');
+    }
+
     public function testMinkelsrms()
     {
         $this->checkOS('minkelsrms');
@@ -829,6 +834,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMonowall()
     {
         $this->checkOS('monowall');
+    }
+
+    public function testMoxaNport()
+    {
+        $this->checkOS('moxa-nport');
     }
 
     public function testMrvld()

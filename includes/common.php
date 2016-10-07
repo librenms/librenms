@@ -1118,7 +1118,7 @@ function version_info($remote = true)
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
     $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-    $output['netsnmp_ver'] = shell_exec($config['snmpget'].' --version 2>&1');
+    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec($config['snmpget'].' --version 2>&1')));
 
     return $output;
 }//end version_info()
@@ -1459,6 +1459,30 @@ function starts_with($haystack, $needles, $case_insensitive = false)
         }
     }
     return false;
+}
+
+/**
+ * Search backwards for the $needle, returning $count found occurrence
+ *
+ * @param string $haystack
+ * @param string $needle
+ * @param int $count
+ * @return bool|int
+ */
+function strrpos_count($haystack, $needle, $count = 1)
+{
+    if ($count <= 0) {
+        return false;
+    }
+
+    $len = strlen($haystack);
+    $pos = $len;
+
+    for ($i = 0; $i < $count && $pos; $i++) {
+        $pos = strrpos($haystack, $needle, $pos - $len - 1);
+    }
+
+    return $pos;
 }
 
 function get_auth_ad_user_filter($username)
