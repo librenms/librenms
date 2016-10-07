@@ -420,6 +420,9 @@ function snmp_cache_portName($device, $array)
  */
 function snmp_output_to_array($data, $array = array(), $index_parts = 1)
 {
+    if (empty($data)) {
+        return null;
+    }
     foreach (explode(PHP_EOL, $data) as $entry) {
         // split oid and value
         list($oid, $value) = explode(' = ', $entry, 2);
