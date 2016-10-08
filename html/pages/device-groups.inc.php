@@ -17,7 +17,7 @@ if (!empty($group_count_check)) {
         echo '<td>'.formatDeviceGroupPattern($group['pattern'], json_decode($group['params'])).'</td>';
         echo '<td>';
         echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-group' data-group_id='".$group['id']."' name='edit-device-group'";
-        if (is_null($group['params'])) {
+        if (!is_null($group['params'])) {
             echo " disabled title='LibreNMS V2 device groups cannot be edited in LibreNMS V1'";
         }
         echo "><i class='fa fa-pencil' aria-hidden='true'></i></button> ";
