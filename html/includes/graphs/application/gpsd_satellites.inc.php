@@ -34,7 +34,7 @@ $addarea       = 1;
 $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 $array        = array(
-  'satellites' => array('descr' => 'Visible'),
+  'satellites' => array('descr' => 'Visible', 'area' => TRUE),
   'satellites_used' => array('descr' => 'Used'),
 );
 
@@ -46,6 +46,9 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[$i]['descr']  = $vars['descr'];
     $rrd_list[$i]['ds']     = $ds;
     $rrd_list[$i]['colour'] = $config['graph_colours'][$colours][$i];
+    if (!empty($vars['area'])) {
+      $rrd_list[$i]['area'] = $vars['area'];
+    }
     $i++;
   }
 } else {
