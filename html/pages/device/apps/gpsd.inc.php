@@ -15,8 +15,8 @@
 *
 * @package    LibreNMS
 * @link       http://librenms.org
-* @copyright  2016 crcro
-* @author     Cercel Valentin <crc@nuamchefazi.ro>
+* @copyright  2016 Karl Shea, LibreNMS
+* @author     Karl Shea <karl@karlshea.com>
 *
 */
 
