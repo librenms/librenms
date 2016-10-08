@@ -142,20 +142,23 @@ function poll_service($service)
     if (count($perf) > 0) {
         // Yes, We have perf data.
         $rrd_name = array('services', $service_id);
-        // limit DS name to 19 characters
+
+        // rrdtool requires A ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
         foreach ($perf as $k => $v) {
+            // normalize ds_name
             $ds_name = preg_replace('/[^a-zA-Z0-9_]/', '', $k);
-            if ( strlen($ds_name) >= 19 ) {
-                $ds_name = substr($ds_name,0,19);
-                d_echo( $k . " exceeds 19 characters, renaming to " . $ds_name . "\n");
+            // if ds_name is longer than 19 characters, only use the first 19
+            if (strlen($ds_name) >= 19) {
+                $ds_name = substr($ds_name, 0, 19);
+                d_echo($k . " exceeds 19 characters, renaming to " . $ds_name . "\n");
             }
             if ($ds_name != $k) {
                 // ds_name has changed. check if ds_name is already in the array
                 if (isset($perf[$ds_name])) {
-                    d_echo( $ds_name . " collides with an existing index\n");
+                    d_echo($ds_name . " collides with an existing index\n");
                     $perf_unique = 0;
                     //try to generate a unique name
-                    for( $i = 0; $i<10; $i++ ) {
+                    for($i = 0; $i<10; $i++) {
                         $tmp_ds_name = substr($ds_name,0,18) . $i;
                             if (!isset($perf[$tmp_ds_name])) {
                                 $ds_name = $tmp_ds_name;
@@ -163,12 +166,11 @@ function poll_service($service)
                                 break 1;
                             }
                         }
-                    //g
                     if ($perf_unique == 0) {
-                        //try to generate a unique name
-                        for( $i = 0; $i<10; $i++ ) {    
-                            for($j = 0; $j<10; $j++ ) {
-                                $tmp_ds_name = substr($ds_name,0,17) . $j . $i;
+                        //try harder to generate a unique name
+                        for($i = 0; $i<10; $i++) {
+                            for($j = 0; $j<10; $j++) {
+                                $tmp_ds_name = substr($ds_name, 0, 17) . $j . $i;
                                     if (!isset($perf[$tmp_ds_name])) {
                                         $ds_name = $tmp_ds_name;
                                         $perf_unique = 1;
@@ -177,7 +179,7 @@ function poll_service($service)
                                 }
                             }
                         }
-                    if ($perf_unique == 0){
+                    if ($perf_unique == 0) {
                         d_echo("could not generate a unique ds-name for " . $k . "\n");
                     }
                 }
@@ -185,9 +187,6 @@ function poll_service($service)
                 unset($perf[$k]);
             }
         }
-
-        // Set the DS in the DB if it is blank.
-        $DS = array();
         foreach ($perf as $k => $v) {
             $DS[$k] = $v['uom'];
         }
