@@ -29,8 +29,8 @@ $nototal = 1;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 $array = array(
-    'satellites' => array('descr' => 'Visible', 'area' => TRUE),
-    'satellites_used' => array('descr' => 'Used', 'area' => TRUE),
+    'satellites' => array('descr' => 'Visible', 'area' => true),
+    'satellites_used' => array('descr' => 'Used', 'area' => true),
 );
 
 $i = 0;
