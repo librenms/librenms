@@ -1,0 +1,5216 @@
+--MWRM-PM-MIB VERSION 1.8.3.1
+--MWRM (MicroWave-Radio-MIB)
+MWRM-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+--    Ipv6Address          FROM IPV6-TC
+--	Counter, enterprises, Gauge, IpAddress 	FROM RFC1155-SMI
+	Counter32, enterprises, Gauge32, IpAddress 	FROM SNMPv2-SMI
+	DisplayString, ifIndex  		FROM RFC1213-MIB
+	RowStatus						FROM SNMPv2-TC
+	MacAddress						FROM SNMPv2-TC
+	OBJECT-TYPE          			FROM SNMPv2-SMI
+	TRAP-TYPE            			FROM RFC-1215
+
+	EnableDisable			FROM MWRM-UNIT-MIB
+	EnableDisableSMI2  		FROM MWRM-UNIT-MIB
+	OffOn					FROM MWRM-UNIT-MIB
+	MetricImperial			FROM MWRM-UNIT-MIB
+	AllowedNotAllowed 		FROM MWRM-UNIT-MIB
+	ProgressStatus 			FROM MWRM-UNIT-MIB
+	Severity 				FROM MWRM-UNIT-MIB
+	NoYes					FROM MWRM-UNIT-MIB
+	DownUp					FROM MWRM-UNIT-MIB
+	TrailIfType 			FROM MWRM-UNIT-MIB
+	PmTableType 			FROM MWRM-UNIT-MIB
+	RateMbps				FROM MWRM-UNIT-MIB
+	HalfFull				FROM MWRM-UNIT-MIB
+	BerLevel				FROM MWRM-UNIT-MIB
+	SignalLevel				FROM MWRM-UNIT-MIB
+	LoopbackType			FROM MWRM-UNIT-MIB
+	QueueName				FROM MWRM-UNIT-MIB
+	RadioId					FROM MWRM-UNIT-MIB
+	RfuId					FROM MWRM-UNIT-MIB
+	SwCommand 				FROM MWRM-UNIT-MIB
+	TrailProtectedType		FROM MWRM-UNIT-MIB
+	ClockSrc 				FROM MWRM-UNIT-MIB
+	SlotId 					FROM MWRM-UNIT-MIB
+	Integrity				FROM MWRM-UNIT-MIB
+	GreenYellow 			FROM MWRM-UNIT-MIB
+	InputSeverity 			FROM MWRM-UNIT-MIB
+	SwCommandTimer 			FROM MWRM-UNIT-MIB
+
+	genEquipRadioCfgRadioId FROM MWRM-RADIO-MIB;
+
+microwave-radio OBJECT IDENTIFIER ::= { enterprises 2281 }
+genEquip OBJECT IDENTIFIER ::= { microwave-radio 10}
+genEquipUnit OBJECT IDENTIFIER ::= { genEquip 1}
+
+-- Performance Monitoring Tables
+
+genEquipPM	OBJECT IDENTIFIER ::= {genEquip 6}
+
+genEquipPmRfu	OBJECT IDENTIFIER ::= {genEquipPM 1}
+
+genEquipPmRfuCommon	OBJECT IDENTIFIER ::= {genEquipPmRfu 1}
+
+genEquipPmRfuCommonSL15minTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRfuCommonSL15minEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Signal Level PM data."
+        ::= { genEquipPmRfuCommon 1 }
+
+genEquipPmRfuCommonSL15minEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRfuCommonSL15minEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU SL PM."
+        INDEX { genEquipPmRfuCommonSL15minId }
+        ::= { genEquipPmRfuCommonSL15minTable 1 }
+
+GenEquipPmRfuCommonSL15minEntry ::=
+            SEQUENCE {
+		genEquipPmRfuCommonSL15minId			INTEGER,
+		genEquipPmRfuCommonSL15minIfIndex		INTEGER,
+        genEquipPmRfuCommonSL15minTimeAndDate	DisplayString,
+        genEquipPmRfuCommonSL15minMinRsl		INTEGER,
+        genEquipPmRfuCommonSL15minMaxRsl		INTEGER,
+        genEquipPmRfuCommonSL15minRslExceed1	INTEGER,
+        genEquipPmRfuCommonSL15minRslExceed2	INTEGER,
+        genEquipPmRfuCommonSL15minMinTsl		INTEGER,
+        genEquipPmRfuCommonSL15minMaxTsl		INTEGER,
+        genEquipPmRfuCommonSL15minTslExceed		INTEGER,
+        genEquipPmRfuCommonSL15minIDF			Integrity
+	}
+
+genEquipPmRfuCommonSL15minId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmRfuCommonSL15minEntry 1 }
+
+genEquipPmRfuCommonSL15minIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmRfuCommonSL15minEntry 2 }
+
+genEquipPmRfuCommonSL15minTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the Time and date for the specific PM."
+		::= { genEquipPmRfuCommonSL15minEntry 3 }
+
+genEquipPmRfuCommonSL15minMinRsl	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the minimum RSL value."
+		::= { genEquipPmRfuCommonSL15minEntry 4 }
+
+genEquipPmRfuCommonSL15minMaxRsl		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the maximum RSL value."
+		::= { genEquipPmRfuCommonSL15minEntry 5 }
+
+genEquipPmRfuCommonSL15minRslExceed1		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 1."
+		::= { genEquipPmRfuCommonSL15minEntry 6 }
+
+genEquipPmRfuCommonSL15minRslExceed2  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 2."
+        ::= { genEquipPmRfuCommonSL15minEntry 7 }
+
+genEquipPmRfuCommonSL15minMinTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Min TSL value."
+        ::= { genEquipPmRfuCommonSL15minEntry 8 }
+
+genEquipPmRfuCommonSL15minMaxTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Max TSL value."
+        ::= { genEquipPmRfuCommonSL15minEntry 9 }
+
+genEquipPmRfuCommonSL15minTslExceed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds TSL exceeded the threshold"
+        ::= { genEquipPmRfuCommonSL15minEntry 10 }
+
+genEquipPmRfuCommonSL15minIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmRfuCommonSL15minEntry 11 }
+
+
+-- SL 15 min CURRENT table --
+
+genEquipPmRfuCommonSL15minCurrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRfuCommonSL15minCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the RFU Signal Level PM data for the current 15 min. interval."
+        ::= { genEquipPmRfuCommon 2 }
+
+genEquipPmRfuCommonSL15minCurrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRfuCommonSL15minCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the Rfu SL PM."
+        INDEX { genEquipPmRfuCommonSL15minCurrId }
+        ::= { genEquipPmRfuCommonSL15minCurrTable 1 }
+
+GenEquipPmRfuCommonSL15minCurrEntry ::=
+            SEQUENCE {
+		genEquipPmRfuCommonSL15minCurrId			INTEGER,
+		genEquipPmRfuCommonSL15minCurrIfIndex		INTEGER,
+        genEquipPmRfuCommonSL15minCurrTimeAndDate	DisplayString,
+        genEquipPmRfuCommonSL15minCurrMinRsl		INTEGER,
+        genEquipPmRfuCommonSL15minCurrMaxRsl		INTEGER,
+        genEquipPmRfuCommonSL15minCurrRslExceed1	INTEGER,
+        genEquipPmRfuCommonSL15minCurrRslExceed2	INTEGER,
+        genEquipPmRfuCommonSL15minCurrMinTsl		INTEGER,
+        genEquipPmRfuCommonSL15minCurrMaxTsl		INTEGER,
+        genEquipPmRfuCommonSL15minCurrTslExceed		INTEGER,
+        genEquipPmRfuCommonSL15minCurrIDF			Integrity
+	}
+
+genEquipPmRfuCommonSL15minCurrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 1 }
+
+genEquipPmRfuCommonSL15minCurrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmRfuCommonSL15minCurrEntry 2 }
+
+genEquipPmRfuCommonSL15minCurrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the Time and date for the specific PM."
+		::= { genEquipPmRfuCommonSL15minCurrEntry 3 }
+
+genEquipPmRfuCommonSL15minCurrMinRsl	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the minimum RSL value."
+		::= { genEquipPmRfuCommonSL15minCurrEntry 4 }
+
+genEquipPmRfuCommonSL15minCurrMaxRsl		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the maximum RSL value."
+		::= { genEquipPmRfuCommonSL15minCurrEntry 5 }
+
+genEquipPmRfuCommonSL15minCurrRslExceed1		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 1."
+		::= { genEquipPmRfuCommonSL15minCurrEntry 6 }
+
+genEquipPmRfuCommonSL15minCurrRslExceed2  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 2."
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 7 }
+
+genEquipPmRfuCommonSL15minCurrMinTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Min TSL value."
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 8 }
+
+genEquipPmRfuCommonSL15minCurrMaxTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Max TSL value."
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 9 }
+
+genEquipPmRfuCommonSL15minCurrTslExceed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds TSL exceeded the threshold"
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 10 }
+
+genEquipPmRfuCommonSL15minCurrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the current interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmRfuCommonSL15minCurrEntry 11 }
+
+-- PM Tables for SL 24 hour intervals
+
+genEquipPmRfuCommonSL24hrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRfuCommonSL24hrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Signal Level 24 hr PM data."
+        ::= { genEquipPmRfuCommon 3 }
+
+genEquipPmRfuCommonSL24hrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRfuCommonSL24hrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU SL PM."
+        INDEX { genEquipPmRfuCommonSL24hrId }
+        ::= { genEquipPmRfuCommonSL24hrTable 1 }
+
+GenEquipPmRfuCommonSL24hrEntry ::=
+            SEQUENCE {
+		genEquipPmRfuCommonSL24hrId				INTEGER,
+		genEquipPmRfuCommonSL24hrIfIndex		INTEGER,
+        genEquipPmRfuCommonSL24hrTimeAndDate	DisplayString,
+        genEquipPmRfuCommonSL24hrMinRsl			INTEGER,
+        genEquipPmRfuCommonSL24hrMaxRsl			INTEGER,
+        genEquipPmRfuCommonSL24hrRslExceed1		INTEGER,
+        genEquipPmRfuCommonSL24hrRslExceed2		INTEGER,
+        genEquipPmRfuCommonSL24hrMinTsl			INTEGER,
+        genEquipPmRfuCommonSL24hrMaxTsl			INTEGER,
+        genEquipPmRfuCommonSL24hrTslExceed		INTEGER,
+        genEquipPmRfuCommonSL24hrIDF			Integrity
+	}
+
+genEquipPmRfuCommonSL24hrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmRfuCommonSL24hrEntry 1 }
+
+genEquipPmRfuCommonSL24hrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmRfuCommonSL24hrEntry 2 }
+
+genEquipPmRfuCommonSL24hrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmRfuCommonSL24hrEntry 3 }
+
+genEquipPmRfuCommonSL24hrMinRsl	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the min RSL value."
+		::= { genEquipPmRfuCommonSL24hrEntry 4 }
+
+genEquipPmRfuCommonSL24hrMaxRsl		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the max RSL value."
+		::= { genEquipPmRfuCommonSL24hrEntry 5 }
+
+genEquipPmRfuCommonSL24hrRslExceed1		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 1."
+		::= { genEquipPmRfuCommonSL24hrEntry 6 }
+
+genEquipPmRfuCommonSL24hrRslExceed2  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 2."
+        ::= { genEquipPmRfuCommonSL24hrEntry 7 }
+
+genEquipPmRfuCommonSL24hrMinTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Min TSL value."
+        ::= { genEquipPmRfuCommonSL24hrEntry 8 }
+
+genEquipPmRfuCommonSL24hrMaxTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Max TSL value."
+        ::= { genEquipPmRfuCommonSL24hrEntry 9 }
+
+genEquipPmRfuCommonSL24hrTslExceed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded the threshold"
+        ::= { genEquipPmRfuCommonSL24hrEntry 10 }
+
+genEquipPmRfuCommonSL24hrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmRfuCommonSL24hrEntry 11 }
+
+
+-- SL 24 HR CURRENT table --
+
+genEquipPmRfuCommonSL24hrCurrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRfuCommonSL24hrCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the RFU Signal Level PM data for the current 24 hour interval."
+        ::= { genEquipPmRfuCommon 4 }
+
+genEquipPmRfuCommonSL24hrCurrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRfuCommonSL24hrCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU SL PM."
+        INDEX { genEquipPmRfuCommonSL24hrCurrId }
+        ::= { genEquipPmRfuCommonSL24hrCurrTable 1 }
+
+GenEquipPmRfuCommonSL24hrCurrEntry ::=
+            SEQUENCE {
+		genEquipPmRfuCommonSL24hrCurrId				INTEGER,
+		genEquipPmRfuCommonSL24hrCurrIfIndex		INTEGER,
+        genEquipPmRfuCommonSL24hrCurrTimeAndDate	DisplayString,
+        genEquipPmRfuCommonSL24hrCurrMinRsl			INTEGER,
+        genEquipPmRfuCommonSL24hrCurrMaxRsl			INTEGER,
+        genEquipPmRfuCommonSL24hrCurrRslExceed1		INTEGER,
+        genEquipPmRfuCommonSL24hrCurrRslExceed2		INTEGER,
+        genEquipPmRfuCommonSL24hrCurrMinTsl			INTEGER,
+        genEquipPmRfuCommonSL24hrCurrMaxTsl			INTEGER,
+        genEquipPmRfuCommonSL24hrCurrTslExceed		INTEGER,
+        genEquipPmRfuCommonSL24hrCurrIDF			Integrity
+	}
+
+genEquipPmRfuCommonSL24hrCurrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 1 }
+
+genEquipPmRfuCommonSL24hrCurrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmRfuCommonSL24hrCurrEntry 2 }
+
+genEquipPmRfuCommonSL24hrCurrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmRfuCommonSL24hrCurrEntry 3 }
+
+genEquipPmRfuCommonSL24hrCurrMinRsl	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the min RSL value."
+		::= { genEquipPmRfuCommonSL24hrCurrEntry 4 }
+
+genEquipPmRfuCommonSL24hrCurrMaxRsl		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the Max RSL value."
+		::= { genEquipPmRfuCommonSL24hrCurrEntry 5 }
+
+genEquipPmRfuCommonSL24hrCurrRslExceed1		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 1."
+		::= { genEquipPmRfuCommonSL24hrCurrEntry 6 }
+
+genEquipPmRfuCommonSL24hrCurrRslExceed2  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 2."
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 7 }
+
+genEquipPmRfuCommonSL24hrCurrMinTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Min TSL value."
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 8 }
+
+genEquipPmRfuCommonSL24hrCurrMaxTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Max TSL value."
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 9 }
+
+genEquipPmRfuCommonSL24hrCurrTslExceed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds TSL exceeded the threshold"
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 10 }
+
+genEquipPmRfuCommonSL24hrCurrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmRfuCommonSL24hrCurrEntry 11 }
+
+
+
+--	PM for Radio Aggregate - 15 min intervals
+
+genEquipPmTraffic	OBJECT IDENTIFIER ::= {genEquipPM 2}
+
+genEquipPmTrafficRadioAgg15minTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficRadioAgg15minEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        ::= { genEquipPmTraffic 1 }
+
+genEquipPmTrafficRadioAgg15minEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficRadioAgg15minEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        INDEX { genEquipPmTrafficRadioAgg15minId }
+        ::= { genEquipPmTrafficRadioAgg15minTable 1 }
+
+GenEquipPmTrafficRadioAgg15minEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficRadioAgg15minId				INTEGER,
+		genEquipPmTrafficRadioAgg15minIfIndex		INTEGER,
+        genEquipPmTrafficRadioAgg15minTimeAndDate	DisplayString,
+        genEquipPmTrafficRadioAgg15minES				INTEGER,
+        genEquipPmTrafficRadioAgg15minSES			INTEGER,
+        genEquipPmTrafficRadioAgg15minUAS			INTEGER,
+        genEquipPmTrafficRadioAgg15minBBE			INTEGER,
+        genEquipPmTrafficRadioAgg15minIDF			Integrity
+	}
+
+genEquipPmTrafficRadioAgg15minId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmTrafficRadioAgg15minEntry 1 }
+
+genEquipPmTrafficRadioAgg15minIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmTrafficRadioAgg15minEntry 2 }
+
+genEquipPmTrafficRadioAgg15minTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmTrafficRadioAgg15minEntry 3 }
+
+genEquipPmTrafficRadioAgg15minES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the ES value."
+		::= { genEquipPmTrafficRadioAgg15minEntry 4 }
+
+genEquipPmTrafficRadioAgg15minSES		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the SES value."
+		::= { genEquipPmTrafficRadioAgg15minEntry 5 }
+
+genEquipPmTrafficRadioAgg15minUAS		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the UAS value."
+		::= { genEquipPmTrafficRadioAgg15minEntry 6 }
+
+genEquipPmTrafficRadioAgg15minBBE  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the BBE value."
+        ::= { genEquipPmTrafficRadioAgg15minEntry 7 }
+
+
+genEquipPmTrafficRadioAgg15minIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmTrafficRadioAgg15minEntry 8 }
+
+-- PM for Radio Agg. - 15min - Current interval
+
+genEquipPmTrafficRadioAgg15minCurrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficRadioAgg15minCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        ::= { genEquipPmTraffic 2 }
+
+genEquipPmTrafficRadioAgg15minCurrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficRadioAgg15minCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        INDEX { genEquipPmTrafficRadioAgg15minCurrId }
+        ::= { genEquipPmTrafficRadioAgg15minCurrTable 1 }
+
+GenEquipPmTrafficRadioAgg15minCurrEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficRadioAgg15minCurrId				INTEGER,
+		genEquipPmTrafficRadioAgg15minCurrIfIndex		INTEGER,
+        genEquipPmTrafficRadioAgg15minCurrTimeAndDate	DisplayString,
+        genEquipPmTrafficRadioAgg15minCurrES				INTEGER,
+        genEquipPmTrafficRadioAgg15minCurrSES			INTEGER,
+        genEquipPmTrafficRadioAgg15minCurrUAS			INTEGER,
+        genEquipPmTrafficRadioAgg15minCurrBBE			INTEGER,
+        genEquipPmTrafficRadioAgg15minCurrIDF			Integrity
+	}
+
+genEquipPmTrafficRadioAgg15minCurrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmTrafficRadioAgg15minCurrEntry 1 }
+
+genEquipPmTrafficRadioAgg15minCurrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmTrafficRadioAgg15minCurrEntry 2 }
+
+genEquipPmTrafficRadioAgg15minCurrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmTrafficRadioAgg15minCurrEntry 3 }
+
+genEquipPmTrafficRadioAgg15minCurrES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the ES value."
+		::= { genEquipPmTrafficRadioAgg15minCurrEntry 4 }
+
+genEquipPmTrafficRadioAgg15minCurrSES		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the SES value."
+		::= { genEquipPmTrafficRadioAgg15minCurrEntry 5 }
+
+genEquipPmTrafficRadioAgg15minCurrUAS		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the UAS value."
+		::= { genEquipPmTrafficRadioAgg15minCurrEntry 6 }
+
+genEquipPmTrafficRadioAgg15minCurrBBE  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the BBE value."
+        ::= { genEquipPmTrafficRadioAgg15minCurrEntry 7 }
+
+
+genEquipPmTrafficRadioAgg15minCurrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmTrafficRadioAgg15minCurrEntry 8 }
+
+-- PM for Radio Aggregate - 24 hours intervals
+
+genEquipPmTrafficRadioAgg24hrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficRadioAgg24hrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        ::= { genEquipPmTraffic 3 }
+
+genEquipPmTrafficRadioAgg24hrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficRadioAgg24hrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        INDEX { genEquipPmTrafficRadioAgg24hrId }
+        ::= { genEquipPmTrafficRadioAgg24hrTable 1 }
+
+GenEquipPmTrafficRadioAgg24hrEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficRadioAgg24hrId			INTEGER,
+		genEquipPmTrafficRadioAgg24hrIfIndex		INTEGER,
+        genEquipPmTrafficRadioAgg24hrTimeAndDate	DisplayString,
+        genEquipPmTrafficRadioAgg24hrES			INTEGER,
+        genEquipPmTrafficRadioAgg24hrSES			INTEGER,
+        genEquipPmTrafficRadioAgg24hrUAS			INTEGER,
+        genEquipPmTrafficRadioAgg24hrBBE			INTEGER,
+        genEquipPmTrafficRadioAgg24hrIDF			Integrity
+	}
+
+genEquipPmTrafficRadioAgg24hrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmTrafficRadioAgg24hrEntry 1 }
+
+genEquipPmTrafficRadioAgg24hrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmTrafficRadioAgg24hrEntry 2 }
+
+genEquipPmTrafficRadioAgg24hrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmTrafficRadioAgg24hrEntry 3 }
+
+genEquipPmTrafficRadioAgg24hrES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the ES value."
+		::= { genEquipPmTrafficRadioAgg24hrEntry 4 }
+
+genEquipPmTrafficRadioAgg24hrSES		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the SES value."
+		::= { genEquipPmTrafficRadioAgg24hrEntry 5 }
+
+genEquipPmTrafficRadioAgg24hrUAS		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the UAS value."
+		::= { genEquipPmTrafficRadioAgg24hrEntry 6 }
+
+genEquipPmTrafficRadioAgg24hrBBE  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the BBE value."
+        ::= { genEquipPmTrafficRadioAgg24hrEntry 7 }
+
+
+genEquipPmTrafficRadioAgg24hrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmTrafficRadioAgg24hrEntry 8 }
+
+-- PM for Radio Agg. - 24hr - Current interval
+
+genEquipPmTrafficRadioAgg24hrCurrTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficRadioAgg24hrCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        ::= { genEquipPmTraffic 4 }
+
+genEquipPmTrafficRadioAgg24hrCurrEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficRadioAgg24hrCurrEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the Radio Aggregate PM data for all 15 min intervals."
+        INDEX { genEquipPmTrafficRadioAgg24hrCurrId }
+        ::= { genEquipPmTrafficRadioAgg24hrCurrTable 1 }
+
+GenEquipPmTrafficRadioAgg24hrCurrEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficRadioAgg24hrCurrId			INTEGER,
+		genEquipPmTrafficRadioAgg24hrCurrIfIndex		INTEGER,
+        genEquipPmTrafficRadioAgg24hrCurrTimeAndDate	DisplayString,
+        genEquipPmTrafficRadioAgg24hrCurrES			INTEGER,
+        genEquipPmTrafficRadioAgg24hrCurrSES			INTEGER,
+        genEquipPmTrafficRadioAgg24hrCurrUAS			INTEGER,
+        genEquipPmTrafficRadioAgg24hrCurrBBE			INTEGER,
+        genEquipPmTrafficRadioAgg24hrCurrIDF			Integrity
+	}
+
+genEquipPmTrafficRadioAgg24hrCurrId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmTrafficRadioAgg24hrCurrEntry 1 }
+
+genEquipPmTrafficRadioAgg24hrCurrIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU (as appears in the ifTable)"
+		::= { genEquipPmTrafficRadioAgg24hrCurrEntry 2 }
+
+genEquipPmTrafficRadioAgg24hrCurrTimeAndDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time and date for the specific PM."
+		::= { genEquipPmTrafficRadioAgg24hrCurrEntry 3 }
+
+genEquipPmTrafficRadioAgg24hrCurrES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the ES value."
+		::= { genEquipPmTrafficRadioAgg24hrCurrEntry 4 }
+
+genEquipPmTrafficRadioAgg24hrCurrSES		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the SES value."
+		::= { genEquipPmTrafficRadioAgg24hrCurrEntry 5 }
+
+genEquipPmTrafficRadioAgg24hrCurrUAS		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the UAS value."
+		::= { genEquipPmTrafficRadioAgg24hrCurrEntry 6 }
+
+genEquipPmTrafficRadioAgg24hrCurrBBE  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the BBE value."
+        ::= { genEquipPmTrafficRadioAgg24hrCurrEntry 7 }
+
+
+genEquipPmTrafficRadioAgg24hrCurrIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the IDF (Invalid Data Flag) of the current interval.
+		 integrity(0), nointegrity(1)."
+        ::= { genEquipPmTrafficRadioAgg24hrCurrEntry 8 }
+
+
+
+
+-- 	New PM tables - Add PM Table Type to the tables as index.
+genEquipPmAll	OBJECT IDENTIFIER ::= {genEquipPM 3}
+
+genEquipPmClear  OBJECT-TYPE
+		SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Clear All values for PM tables."
+        ::= { genEquipPmAll 1 }
+
+
+-- 	Signal Level PM Group
+genEquipPmTrafficSL	OBJECT IDENTIFIER ::= {genEquipPmAll 2}
+
+genEquipPmTrafficSLTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficSLEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the RFU Signal Level PM data."
+        ::= { genEquipPmTrafficSL 1 }
+
+genEquipPmTrafficSLEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficSLEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Entry containing the data of the RFU signal level PM."
+        INDEX { genEquipPmTrafficSLPmType, genEquipPmTrafficSLId, genEquipPmTrafficSLInterval }
+        ::= { genEquipPmTrafficSLTable 1 }
+
+GenEquipPmTrafficSLEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficSLPmType		PmTableType,
+		genEquipPmTrafficSLId			RfuId,
+		genEquipPmTrafficSLInterval		INTEGER,
+        genEquipPmTrafficSLMinRsl		INTEGER,
+        genEquipPmTrafficSLMaxRsl		INTEGER,
+        genEquipPmTrafficSLRslExceed1	INTEGER,
+        genEquipPmTrafficSLRslExceed2	INTEGER,
+        genEquipPmTrafficSLMinTsl		INTEGER,
+        genEquipPmTrafficSLMaxTsl		INTEGER,
+        genEquipPmTrafficSLTslExceed	INTEGER,
+        genEquipPmTrafficSLIDF			Integrity
+	}
+
+genEquipPmTrafficSLPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmTrafficSLEntry 1 }
+
+genEquipPmTrafficSLId OBJECT-TYPE
+        SYNTAX  RfuId
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmTrafficSLEntry 2 }
+
+genEquipPmTrafficSLInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific PM Interval"
+        ::= { genEquipPmTrafficSLEntry 3 }
+
+genEquipPmTrafficSLMinRsl	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the min RSL value."
+		::= { genEquipPmTrafficSLEntry 4 }
+
+genEquipPmTrafficSLMaxRsl		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the max RSL value."
+		::= { genEquipPmTrafficSLEntry 5 }
+
+genEquipPmTrafficSLRslExceed1		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 1."
+		::= { genEquipPmTrafficSLEntry 6 }
+
+genEquipPmTrafficSLRslExceed2  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds RSL exceeded threshold number 2."
+        ::= { genEquipPmTrafficSLEntry 7 }
+
+genEquipPmTrafficSLMinTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Minimum TSL value."
+        ::= { genEquipPmTrafficSLEntry 8 }
+
+genEquipPmTrafficSLMaxTsl  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the Maximum TSL value."
+        ::= { genEquipPmTrafficSLEntry 9 }
+
+genEquipPmTrafficSLTslExceed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the number of seconds TSL exceeded the threshold"
+        ::= { genEquipPmTrafficSLEntry 10 }
+
+genEquipPmTrafficSLIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmTrafficSLEntry 11 }
+
+-- 	Aggregate PM Group
+genEquipPmTrafficAggregate	OBJECT IDENTIFIER ::= {genEquipPmAll 3}
+
+genEquipPmTrafficAggTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrafficAggEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table indicates the Radio Aggregate PM data."
+        ::= { genEquipPmTrafficAggregate 1 }
+
+genEquipPmTrafficAggEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrafficAggEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table indicates the Radio Aggregate PM data."
+        INDEX { genEquipPmTrafficAggPmType, ifIndex, genEquipPmTrafficAggInterval }
+        ::= { genEquipPmTrafficAggTable 1 }
+
+GenEquipPmTrafficAggEntry ::=
+            SEQUENCE {
+		genEquipPmTrafficAggPmType			PmTableType,
+		genEquipPmTrafficAggInterval		INTEGER,
+        genEquipPmTrafficAggES				INTEGER,
+        genEquipPmTrafficAggSES				INTEGER,
+        genEquipPmTrafficAggUAS				INTEGER,
+        genEquipPmTrafficAggBBE				INTEGER,
+        genEquipPmTrafficAggIDF				Integrity
+	}
+
+genEquipPmTrafficAggPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmTrafficAggEntry 1 }
+
+genEquipPmTrafficAggInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific PM Interval"
+        ::= { genEquipPmTrafficAggEntry 2 }
+
+genEquipPmTrafficAggES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the ES value (Errored seconds)."
+		::= { genEquipPmTrafficAggEntry 3 }
+
+genEquipPmTrafficAggSES		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the SES value (Severe Errored seconds)."
+		::= { genEquipPmTrafficAggEntry 4 }
+
+genEquipPmTrafficAggUAS		OBJECT-TYPE
+		SYNTAX 		INTEGER
+		ACCESS		read-only
+        STATUS		mandatory
+        DESCRIPTION
+		"This value indicates the UAS value. (Unavailable Seconds)"
+		::= { genEquipPmTrafficAggEntry 5 }
+
+genEquipPmTrafficAggBBE  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the BBE value. (Background Block Error)"
+        ::= { genEquipPmTrafficAggEntry 6 }
+
+
+genEquipPmTrafficAggIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmTrafficAggEntry 7 }
+
+
+
+-- 	Radio PM Group
+genEquipPmRadio	OBJECT IDENTIFIER ::= {genEquipPmAll 4}
+
+-- 	Radio MRMC PM Group
+genEquipPmRadioMRMC	OBJECT IDENTIFIER ::= {genEquipPmRadio 1}
+
+-- Radio MRMC PM Table
+genEquipPmRadioMRMCTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioMRMCEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The MRMC PM table"
+        ::= { genEquipPmRadioMRMC 1 }
+
+genEquipPmRadioMRMCEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioMRMCEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The MRMC PM table"
+        INDEX { genEquipPmRadioMRMCPmType, genEquipPmRadioMRMCId, genEquipPmRadioMRMCInterval }
+        ::= { genEquipPmRadioMRMCTable 1 }
+
+GenEquipPmRadioMRMCEntry ::=
+            SEQUENCE {
+		genEquipPmRadioMRMCPmType			PmTableType,
+		genEquipPmRadioMRMCId				RadioId,
+		genEquipPmRadioMRMCInterval			INTEGER,
+		genEquipPmRadioMRMCIfIndex			INTEGER,
+        genEquipPmRadioMRMCMinProfile		INTEGER,
+        genEquipPmRadioMRMCMaxProfile		INTEGER,
+        genEquipPmRadioMRMCMinBitrate		INTEGER,
+        genEquipPmRadioMRMCMaxBitrate		INTEGER,
+        genEquipPmRadioMRMCMinTDMIf			INTEGER,
+        genEquipPmRadioMRMCMaxTDMIf			INTEGER,
+        genEquipPmRadioMRMCIDF				Integrity
+	}
+
+genEquipPmRadioMRMCPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmRadioMRMCEntry 1 }
+
+genEquipPmRadioMRMCId OBJECT-TYPE
+        SYNTAX  RadioId
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific RFU"
+        ::= { genEquipPmRadioMRMCEntry 2 }
+
+genEquipPmRadioMRMCInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates an index of a specific PM Interval"
+        ::= { genEquipPmRadioMRMCEntry 3 }
+
+genEquipPmRadioMRMCIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS 	mandatory
+		DESCRIPTION
+		"This value indicates the interface index of a specific RFU interface (as appears in the ifTable)"
+		::= { genEquipPmRadioMRMCEntry 4 }
+
+genEquipPmRadioMRMCMinProfile	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Minimum MRMC profile."
+		::= { genEquipPmRadioMRMCEntry 5 }
+
+genEquipPmRadioMRMCMaxProfile	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"The maximum profile (Kbps) that was measured during the interva"
+		::= { genEquipPmRadioMRMCEntry 6 }
+
+genEquipPmRadioMRMCMinBitrate	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Minimum MRMC nominal bitrate (Units are Kbps)"
+		::= { genEquipPmRadioMRMCEntry 7 }
+
+genEquipPmRadioMRMCMaxBitrate	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Maximum MRMC nominal bitrate (Units are Kbps)"
+		::= { genEquipPmRadioMRMCEntry 8 }
+
+genEquipPmRadioMRMCMinTDMIf	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Minimum number of allocated TDM channels"
+		::= { genEquipPmRadioMRMCEntry 9 }
+
+genEquipPmRadioMRMCMaxTDMIf	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Maximum number of allocated TDM channels"
+		::= { genEquipPmRadioMRMCEntry 10 }
+
+genEquipPmRadioMRMCIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmRadioMRMCEntry 11 }
+
+
+
+-- 	Radio E1/T1 PM Group
+genEquipPmRadioTDM	OBJECT IDENTIFIER ::= {genEquipPmRadio 2}
+
+-- Radio E1/T1 TDM PM Table
+genEquipPmRadioTDMTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioTDMEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The PM table of logical TDM channels within the Radio link"
+        ::= { genEquipPmRadioTDM 1 }
+
+genEquipPmRadioTDMEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioTDMEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The PM table of logical TDM channels within the Radio link"
+        INDEX { genEquipPmRadioTDMPmType, ifIndex, genEquipPmRadioTDMInterval }
+        ::= { genEquipPmRadioTDMTable 1 }
+
+GenEquipPmRadioTDMEntry ::=
+            SEQUENCE {
+		genEquipPmRadioTDMPmType				PmTableType,
+		genEquipPmRadioTDMInterval				INTEGER,
+        genEquipPmRadioTDMRadioUAS				INTEGER,
+        genEquipPmRadioTDMIDF					Integrity
+	}
+
+genEquipPmRadioTDMPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmRadioTDMEntry 1 }
+
+genEquipPmRadioTDMInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmRadioTDMEntry 2 }
+
+genEquipPmRadioTDMRadioUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"TDM channel UAS (unavailable seconds)"
+		::= { genEquipPmRadioTDMEntry 3 }
+
+genEquipPmRadioTDMIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmRadioTDMEntry 4 }
+
+
+-- 	Radio Ethernet PM Group
+genEquipPmRadioEthernet	OBJECT IDENTIFIER ::= {genEquipPmRadio 3}
+
+-- Radio E1/T1 TDM PM Table
+genEquipPmRadioEthernetTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioEthernetEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The Ethernet PMs on the radio link"
+        ::= { genEquipPmRadioEthernet 1 }
+
+genEquipPmRadioEthernetEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioEthernetEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The Ethernet PMs on the radio link"
+        INDEX { genEquipPmRadioEthernetPmType, ifIndex, genEquipPmRadioEthernetInterval }
+        ::= { genEquipPmRadioEthernetTable 1 }
+
+GenEquipPmRadioEthernetEntry ::=
+            SEQUENCE {
+		genEquipPmRadioEthernetPmType				PmTableType,
+		genEquipPmRadioEthernetInterval				INTEGER,
+		genEquipPmRadioEthernetFrameErrorRate		INTEGER,
+		genEquipPmRadioEthernetPeakThroughput		INTEGER,
+		genEquipPmRadioEthernetAverageThroughput	INTEGER,
+		genEquipPmRadioEthernetExceedThroughput		INTEGER,
+		genEquipPmRadioEthernetPeakCapacity			INTEGER,
+		genEquipPmRadioEthernetAverageCapacity		INTEGER,
+		genEquipPmRadioEthernetExceedCapacity		INTEGER,
+		genEquipPmRadioEthernetPeakUtilization		INTEGER,
+		genEquipPmRadioEthernetAverageUtilization	INTEGER,
+		genEquipPmRadioEthernetExceedUtilization	INTEGER,
+        genEquipPmRadioEthernetIDF					Integrity
+	}
+
+genEquipPmRadioEthernetPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmRadioEthernetEntry 1 }
+
+
+genEquipPmRadioEthernetInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmRadioEthernetEntry 2 }
+
+genEquipPmRadioEthernetFrameErrorRate	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Frame Error Rate PM"
+		::= { genEquipPmRadioEthernetEntry 3 }
+
+genEquipPmRadioEthernetPeakThroughput	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Peak throughput PM (Units are bits per second)"
+		::= { genEquipPmRadioEthernetEntry 4 }
+
+genEquipPmRadioEthernetAverageThroughput	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Average throughput PM (Units are bits per second)"
+		::= { genEquipPmRadioEthernetEntry 5 }
+
+genEquipPmRadioEthernetExceedThroughput	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Exceed throughput PM"
+		::= { genEquipPmRadioEthernetEntry 6 }
+
+genEquipPmRadioEthernetPeakCapacity	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Peak capacity PM (in bps)"
+		::= { genEquipPmRadioEthernetEntry 7 }
+
+genEquipPmRadioEthernetAverageCapacity	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Average capacity PM (in bps)"
+		::= { genEquipPmRadioEthernetEntry 8 }
+
+genEquipPmRadioEthernetExceedCapacity	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Exceed capacity PM"
+		::= { genEquipPmRadioEthernetEntry 9 }
+
+genEquipPmRadioEthernetPeakUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Peak utilization PM (%)"
+		::= { genEquipPmRadioEthernetEntry 10 }
+
+genEquipPmRadioEthernetAverageUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Average utilization PM (%)"
+		::= { genEquipPmRadioEthernetEntry 11 }
+
+genEquipPmRadioEthernetExceedUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Ethernet Exceed utilization PM"
+		::= { genEquipPmRadioEthernetEntry 12 }
+
+genEquipPmRadioEthernetIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+		ACCESS  read-only
+		STATUS mandatory
+		DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+		::= { genEquipPmRadioEthernetEntry 13 }
+
+-- 	Radio Thresholds
+
+genEquipPmRadioEthernetThresholdTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioEthernetThresholdEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The Ethernet PMs on the radio link"
+        ::= { genEquipPmRadioEthernet 2 }
+
+genEquipPmRadioEthernetThresholdEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioEthernetThresholdEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The Ethernet PMs on the radio link"
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipPmRadioEthernetThresholdTable 1 }
+
+GenEquipPmRadioEthernetThresholdEntry ::=
+	SEQUENCE {
+		genEquipPmRadioEthernetThresholdThroughput		INTEGER,
+		genEquipPmRadioEthernetThresholdCapacity		INTEGER,
+		genEquipPmRadioEthernetThresholdUtilization		INTEGER
+	}
+
+genEquipPmRadioEthernetThresholdThroughput  OBJECT-TYPE
+		SYNTAX  INTEGER (0..1000)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Ethernet Throughput threshold (in Mbps)"
+        ::= { genEquipPmRadioEthernetThresholdEntry 1 }
+
+genEquipPmRadioEthernetThresholdCapacity  OBJECT-TYPE
+		SYNTAX  INTEGER (0..1000)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Ethernet capacity threshold (in Mbps)"
+        ::= { genEquipPmRadioEthernetThresholdEntry 2 }
+
+genEquipPmRadioEthernetThresholdUtilization  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			 above-0(0),
+			 above-20(1),
+			 above-40(2),
+			 above-60(3),
+			 above-80(4),
+			 no-threshold(5)}
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Ethernet utilization threshold (in percentage)."
+        ::= { genEquipPmRadioEthernetThresholdEntry 3 }
+
+-- 	The Ethernet ETM PMs on the radio link
+genEquipPmRadioEthernetEtmTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioEthernetEtmEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The Ethernet PMs on the radio link"
+        ::= { genEquipPmRadioEthernet 3 }
+
+genEquipPmRadioEthernetEtmEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioEthernetEtmEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The entry of Ethernet ETM PMs on the radio link"
+        INDEX { genEquipPmRadioEthernetEtmPmType, genEquipPmRadioEthernetEtmPmQueueIndex, genEquipPmRadioEthernetEtmInterval }
+        ::= { genEquipPmRadioEthernetEtmTable 1 }
+
+GenEquipPmRadioEthernetEtmEntry ::=
+	SEQUENCE {
+		genEquipPmRadioEthernetEtmPmType
+			PmTableType,
+		genEquipPmRadioEthernetEtmPmQueueIndex
+			INTEGER,
+		genEquipPmRadioEthernetEtmInterval
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxGreenBytesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgGreenBytesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxGreenFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgGreenFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxYellowBytesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgYellowBytesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxYellowFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgYellowFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxRedFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgRedFramesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmIDF
+			Integrity,
+		--genEquipPmRadioEthernetEtmPmMaxGreenBytesDropped
+		--	INTEGER,
+		--genEquipPmRadioEthernetEtmPmAvgGreenBytesDropped
+		--	INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxGreenFramesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgGreenFramesPassed
+			INTEGER,
+		--genEquipPmRadioEthernetEtmPmMaxYellowBytesDropped
+		--	INTEGER,
+		--genEquipPmRadioEthernetEtmPmAvgYellowBytesDropped
+		--	INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxYellowFramesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgYellowFramesPassed
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmMaxRedBytesDropped
+			INTEGER,
+		genEquipPmRadioEthernetEtmPmAvgRedBytesDropped
+			INTEGER
+	}
+
+genEquipPmRadioEthernetEtmPmType  OBJECT-TYPE
+		SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmRadioEthernetEtmEntry 1 }
+
+genEquipPmRadioEthernetEtmPmQueueIndex  OBJECT-TYPE
+		SYNTAX  INTEGER (1..8)
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Queue index"
+        ::= { genEquipPmRadioEthernetEtmEntry 2 }
+
+genEquipPmRadioEthernetEtmInterval  OBJECT-TYPE
+		SYNTAX  INTEGER (0..96)
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"The interval of the PM."
+        ::= { genEquipPmRadioEthernetEtmEntry 3 }
+
+genEquipPmRadioEthernetEtmPmMaxGreenBytesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Green Traffic Passed Bytes."
+        ::= { genEquipPmRadioEthernetEtmEntry 4 }
+
+genEquipPmRadioEthernetEtmPmAvgGreenBytesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Green Traffic Passed Bytes."
+        ::= { genEquipPmRadioEthernetEtmEntry 5 }
+
+genEquipPmRadioEthernetEtmPmMaxGreenFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Green Traffic Frames Droped by WRED."
+        ::= { genEquipPmRadioEthernetEtmEntry 6 }
+
+genEquipPmRadioEthernetEtmPmAvgGreenFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Green Traffic Frames Droped by WRED."
+        ::= { genEquipPmRadioEthernetEtmEntry 7 }
+
+genEquipPmRadioEthernetEtmPmMaxYellowBytesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Yellow Traffic Passed Bytes."
+        ::= { genEquipPmRadioEthernetEtmEntry 8 }
+
+genEquipPmRadioEthernetEtmPmAvgYellowBytesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Yellow Traffic Passed Bytes."
+        ::= { genEquipPmRadioEthernetEtmEntry 9 }
+
+genEquipPmRadioEthernetEtmPmMaxYellowFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Yellow Traffic Frames Droped by WRED."
+        ::= { genEquipPmRadioEthernetEtmEntry 10 }
+
+genEquipPmRadioEthernetEtmPmAvgYellowFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Yellow Traffic Frames Droped by WRED."
+        ::= { genEquipPmRadioEthernetEtmEntry 11 }
+
+genEquipPmRadioEthernetEtmPmMaxRedFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Red Traffic Frames Dropped."
+        ::= { genEquipPmRadioEthernetEtmEntry 12 }
+
+genEquipPmRadioEthernetEtmPmAvgRedFramesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Red Traffic Frames Dropped."
+        ::= { genEquipPmRadioEthernetEtmEntry 13 }
+
+genEquipPmRadioEthernetEtmPmIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmRadioEthernetEtmEntry 14 }
+
+--genEquipPmRadioEthernetEtmPmMaxGreenBytesDropped  OBJECT-TYPE
+--		SYNTAX  INTEGER
+--        ACCESS  read-only
+--        STATUS mandatory
+--        DESCRIPTION
+--		"Maximum Green Traffic Dropped Bytes."
+--        ::= { genEquipPmRadioEthernetEtmEntry 15}
+
+--genEquipPmRadioEthernetEtmPmAvgGreenBytesDropped  OBJECT-TYPE
+--		SYNTAX  INTEGER
+--        ACCESS  read-only
+--        STATUS mandatory
+--        DESCRIPTION
+--		"Average Green Traffic Dropped Bytes."
+--        ::= { genEquipPmRadioEthernetEtmEntry 16}
+
+genEquipPmRadioEthernetEtmPmMaxGreenFramesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Green Traffic Frames Passed."
+        ::= { genEquipPmRadioEthernetEtmEntry 17}
+
+genEquipPmRadioEthernetEtmPmAvgGreenFramesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Green Traffic Frames Passed."
+        ::= { genEquipPmRadioEthernetEtmEntry 18}
+
+--genEquipPmRadioEthernetEtmPmMaxYellowBytesDropped  OBJECT-TYPE
+--		SYNTAX  INTEGER
+--        ACCESS  read-only
+--        STATUS mandatory
+--        DESCRIPTION
+--		"Maximum Yellow Traffic Dropped Bytes."
+--        ::= { genEquipPmRadioEthernetEtmEntry 19}
+
+--genEquipPmRadioEthernetEtmPmAvgYellowBytesDropped  OBJECT-TYPE
+--		SYNTAX  INTEGER
+--        ACCESS  read-only
+--        STATUS mandatory
+--        DESCRIPTION
+--		"Average Yellow Traffic Dropped Bytes."
+--        ::= { genEquipPmRadioEthernetEtmEntry 20}
+
+genEquipPmRadioEthernetEtmPmMaxYellowFramesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Yellow Traffic Frames Passed."
+        ::= { genEquipPmRadioEthernetEtmEntry 21}
+
+genEquipPmRadioEthernetEtmPmAvgYellowFramesPassed  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Yellow Traffic Frames Passed."
+        ::= { genEquipPmRadioEthernetEtmEntry 22}
+
+genEquipPmRadioEthernetEtmPmMaxRedBytesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Maximum Red Traffic Bytes Dropped."
+        ::= { genEquipPmRadioEthernetEtmEntry 23}
+
+genEquipPmRadioEthernetEtmPmAvgRedBytesDropped  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Average Red Traffic Bytes Dropped."
+        ::= { genEquipPmRadioEthernetEtmEntry 24}
+
+
+--
+genEquipPmRadioMSETable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioMSEEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "Radio MSE PM"
+        ::= { genEquipPmRadio 4 }
+
+genEquipPmRadioMSEEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioMSEEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio MSE PM"
+        INDEX { genEquipPmRadioMSEPmType, ifIndex, genEquipPmRadioMSEInterval }
+        ::= { genEquipPmRadioMSETable 1 }
+
+GenEquipPmRadioMSEEntry ::=
+            SEQUENCE {
+		genEquipPmRadioMSEPmType		PmTableType,
+		genEquipPmRadioMSEInterval		INTEGER,
+        genEquipPmRadioMSEMinMse		INTEGER,
+        genEquipPmRadioMSEMaxMse		INTEGER,
+        genEquipPmRadioMSEexceeded		INTEGER,
+        genEquipPmRadioMSEIDF		Integrity
+	}
+
+genEquipPmRadioMSEPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmRadioMSEEntry 1 }
+
+genEquipPmRadioMSEInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmRadioMSEEntry 2 }
+
+genEquipPmRadioMSEMinMse OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the minimum MSE value detected in  the interval."
+        ::= { genEquipPmRadioMSEEntry 3 }
+
+genEquipPmRadioMSEMaxMse OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the maximum MSE value detected in  the interval."
+        ::= { genEquipPmRadioMSEEntry 4 }
+
+genEquipPmRadioMSEexceeded OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the number of seconds that the MSE exceeded the configured threshold."
+        ::= { genEquipPmRadioMSEEntry 5 }
+
+genEquipPmRadioMSEIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmRadioMSEEntry 6 }
+
+
+--  Radio Thresold
+
+genEquipPmRadioThresholdTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioThresholdEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "Radio MSE PM"
+        ::= { genEquipPmRadio 5 }
+
+genEquipPmRadioThresholdEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioThresholdEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio MSE PM"
+        INDEX { genEquipRadioCfgRadioId }
+        ::= { genEquipPmRadioThresholdTable 1 }
+
+GenEquipPmRadioThresholdEntry ::=
+            SEQUENCE {
+		genEquipPmRadioThresholdMSE		INTEGER,
+		genEquipPmRadioThresholdRSL1	INTEGER,
+        genEquipPmRadioThresholdRSL2 	INTEGER,
+        genEquipPmRadioThresholdTSL		INTEGER,
+        genEquipPmRadioThresholdXPI		INTEGER
+	}
+
+genEquipPmRadioThresholdMSE OBJECT-TYPE
+        SYNTAX  INTEGER (-99..-1)
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "The threshold above which MSE (Mean Square Error) exceeded seconds will be counted"
+        ::= { genEquipPmRadioThresholdEntry 1 }
+
+genEquipPmRadioThresholdRSL1 OBJECT-TYPE
+        SYNTAX  INTEGER (-75..-15)
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "The threshold below which RSL 1 exceeded seconds will be counted"
+        ::= { genEquipPmRadioThresholdEntry 2 }
+
+genEquipPmRadioThresholdRSL2 OBJECT-TYPE
+        SYNTAX  INTEGER (-75..-15)
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "The threshold below which RSL 2 exceeded seconds will be counted"
+        ::= { genEquipPmRadioThresholdEntry 3 }
+
+genEquipPmRadioThresholdTSL OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "The threshold above which TSL exceeded seconds will be counted"
+        ::= { genEquipPmRadioThresholdEntry 4 }
+
+genEquipPmRadioThresholdXPI OBJECT-TYPE
+        SYNTAX  INTEGER (0..99)
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "The threshold above which XPI (Cross Polar Interference) exceeded seconds will be counted"
+        ::= { genEquipPmRadioThresholdEntry 5 }
+
+
+--  Radio XPIC
+
+genEquipPmRadioXPITable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmRadioXPIEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "Radio XPIC PM"
+        ::= { genEquipPmRadio 6 }
+
+genEquipPmRadioXPIEntry OBJECT-TYPE
+        SYNTAX GenEquipPmRadioXPIEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Radio XPIC PM"
+        INDEX { genEquipPmRadioXPIPmType, ifIndex, genEquipPmRadioXPIPmInterval }
+        ::= { genEquipPmRadioXPITable 1 }
+
+GenEquipPmRadioXPIEntry ::=
+            SEQUENCE {
+		genEquipPmRadioXPIPmType			PmTableType,
+		genEquipPmRadioXPIPmInterval		INTEGER,
+        genEquipPmRadioXPIPmMinXPI 			INTEGER,
+        genEquipPmRadioXPIPmMaxXPI			INTEGER,
+		genEquipPmRadioXPIBelowThreshold	INTEGER,
+        genEquipPmRadioXPIIDF		Integrity
+	}
+
+genEquipPmRadioXPIPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmRadioXPIEntry 1 }
+
+genEquipPmRadioXPIPmInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The number of the interval: 1-30 in case the interval is 24 hours or 1-900 in case the interval is 15 minutes"
+        ::= { genEquipPmRadioXPIEntry 2 }
+
+genEquipPmRadioXPIPmMinXPI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the minimum XPI value detected in the interval"
+        ::= { genEquipPmRadioXPIEntry 3 }
+
+genEquipPmRadioXPIPmMaxXPI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the maximum XPI value detected in the interval"
+        ::= { genEquipPmRadioXPIEntry 4 }
+
+genEquipPmRadioXPIBelowThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This parameter holds the number of seconds in the interval that the XPI value was below the configured threshold."
+        ::= { genEquipPmRadioXPIEntry 5 }
+
+genEquipPmRadioXPIIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmRadioXPIEntry 6 }
+
+
+--  Clear RAdio PM
+
+genEquipPmRadioClear  OBJECT-TYPE
+		SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Clear all radio PMs (Performance Monitoring)."
+        ::= { genEquipPmRadio 7 }
+
+
+-- 	TDM (E1/T1) PM Group
+genEquipPmTDM	OBJECT IDENTIFIER ::= {genEquipPmAll 5}
+
+-- 	TDM (E1/T1) PM Table
+genEquipPmTdmTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTdmEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The line TDM PM table"
+        ::= { genEquipPmTDM 1 }
+
+genEquipPmTdmEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTdmEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The line TDM PM table"
+        INDEX { genEquipPmTdmPmType, ifIndex, genEquipPmTdmInterval }
+        ::= { genEquipPmTdmTable 1 }
+
+GenEquipPmTdmEntry ::=
+            SEQUENCE {
+		genEquipPmTdmPmType				PmTableType,
+		genEquipPmTdmInterval			INTEGER,
+        genEquipPmTdmES					INTEGER,
+        genEquipPmTdmSES				INTEGER,
+        genEquipPmTdmUAS				INTEGER,
+        genEquipPmTdmBBE				INTEGER,
+        genEquipPmTdmIDF				Integrity
+	}
+
+genEquipPmTdmPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmTdmEntry 1 }
+
+genEquipPmTdmInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmTdmEntry 2 }
+
+genEquipPmTdmES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"ES PM (Errored second)"
+		::= { genEquipPmTdmEntry 3 }
+
+genEquipPmTdmSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"SES PM (Severe Errored Seconds)"
+		::= { genEquipPmTdmEntry 4 }
+
+genEquipPmTdmUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"UAS PM (Unavailable Seconds)."
+		::= { genEquipPmTdmEntry 5 }
+
+genEquipPmTdmBBE	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"BBE PM (Background Block Errors)"
+		::= { genEquipPmTdmEntry 6 }
+
+genEquipPmTdmIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmTdmEntry 7 }
+
+-- 	SDH/Sonet PM Group
+genEquipPmSDH	OBJECT IDENTIFIER ::= {genEquipPmAll 6}
+
+genEquipPmSdhTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmSdhEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The line SDH PM table."
+        ::= { genEquipPmSDH 1 }
+
+genEquipPmSdhEntry OBJECT-TYPE
+        SYNTAX GenEquipPmSdhEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The line SDH PM table."
+        INDEX { genEquipPmSdhPmType, ifIndex, genEquipPmSdhInterval }
+        ::= { genEquipPmSdhTable 1 }
+
+GenEquipPmSdhEntry ::=
+            SEQUENCE {
+		genEquipPmSdhPmType				PmTableType,
+		genEquipPmSdhInterval			INTEGER,
+        genEquipPmSdhES					INTEGER,
+        genEquipPmSdhSES				INTEGER,
+        genEquipPmSdhEB					INTEGER,
+        genEquipPmSdhBBE				INTEGER,
+        genEquipPmSdhIDF				Integrity,
+		genEquipPmSdhIfIndex			INTEGER,
+		genEquipPmSdhTimeStamp			INTEGER,
+		genEquipPmSdhUAS				INTEGER
+	}
+
+genEquipPmSdhPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmSdhEntry 1 }
+
+genEquipPmSdhInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmSdhEntry 2 }
+
+genEquipPmSdhES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"ES STM-1/OC-3 PM."
+		::= { genEquipPmSdhEntry 3 }
+
+genEquipPmSdhSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"SES STM-1/OC-3 PM."
+		::= { genEquipPmSdhEntry 4 }
+
+genEquipPmSdhEB	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"EB STM-1/OC-3 PM (Errored block)."
+		::= { genEquipPmSdhEntry 5 }
+
+genEquipPmSdhBBE	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"BBE PM (background errored block STM-1/OC-3 PM or CVL PM (code violation line) when using OC-3."
+		::= { genEquipPmSdhEntry 6 }
+
+genEquipPmSdhIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmSdhEntry 7 }
+
+genEquipPmSdhIfIndex  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Port Number."
+        ::= { genEquipPmSdhEntry 8 }
+
+genEquipPmSdhTimeStamp  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates the time stamp of the interval."
+        ::= { genEquipPmSdhEntry 9 }
+
+genEquipPmSdhUAS  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Un-Available Seconds STM-1/OC-3 PM."
+        ::= { genEquipPmSdhEntry 10 }
+
+-- SONET/STM-1 interface-level PMs for line to radio direction - rst-stm1oc3-pm-status-ltor-table
+--
+
+genEquipPmSdhRstLRTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmSdhRstLREntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "SONET/STM-1 interface-level PMs for line to radio direction."
+        ::= { genEquipPmSDH 2 }
+
+genEquipPmSdhRstLREntry OBJECT-TYPE
+        SYNTAX GenEquipPmSdhRstLREntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "SONET/STM-1 interface-level PMs for line to radio direction entry."
+        INDEX { genEquipPmSdhRstLRPmType,
+				genEquipPmSdhRstLRIfIndex,
+				genEquipPmSdhRstLRInterval }
+        ::= { genEquipPmSdhRstLRTable 1 }
+
+GenEquipPmSdhRstLREntry ::=
+            SEQUENCE {
+		genEquipPmSdhRstLRPmType				PmTableType,
+		genEquipPmSdhRstLRIfIndex				INTEGER,
+		genEquipPmSdhRstLRInterval				INTEGER,
+        genEquipPmSdhRstLRTimeStamp				INTEGER,
+        genEquipPmSdhRstLRES					INTEGER,
+        genEquipPmSdhRstLRSES					INTEGER,
+        genEquipPmSdhRstLRUAS					INTEGER,
+        genEquipPmSdhRstLREB					INTEGER,
+		genEquipPmSdhRstLRCV					INTEGER,
+		genEquipPmSdhRstLRBBE					INTEGER,
+		genEquipPmSdhRstLRIDF					Integrity
+	}
+
+genEquipPmSdhRstLRPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmSdhRstLREntry 1 }
+
+genEquipPmSdhRstLRIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Port number."
+        ::= { genEquipPmSdhRstLREntry 2 }
+
+genEquipPmSdhRstLRInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmSdhRstLREntry 3 }
+
+genEquipPmSdhRstLRTimeStamp	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time stamp of the interval."
+		::= { genEquipPmSdhRstLREntry 4 }
+
+genEquipPmSdhRstLRES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Errored Seconds PM for STM-1/OC-3 on line to radio direction."
+		::= { genEquipPmSdhRstLREntry 5 }
+
+genEquipPmSdhRstLRSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Severely Errored Seconds PM for STM-1/OC-3 on line to radio direction."
+		::= { genEquipPmSdhRstLREntry 6 }
+
+genEquipPmSdhRstLRUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Unavailable Seconds PM for STM-1/OC-3."
+		::= { genEquipPmSdhRstLREntry 7 }
+
+genEquipPmSdhRstLREB  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Errored Blocks PM for STM-1/OC-3 on line to radio direction."
+        ::= { genEquipPmSdhRstLREntry 8 }
+
+genEquipPmSdhRstLRCV  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Code Viloations PM for STM-1/OC-3 on line to radio direction."
+        ::= { genEquipPmSdhRstLREntry 9 }
+
+genEquipPmSdhRstLRBBE  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Background Block Error PM for STM-1/OC-3 on line to radio direction."
+        ::= { genEquipPmSdhRstLREntry 10 }
+
+genEquipPmSdhRstLRIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmSdhRstLREntry 11 }
+
+
+-- SONET/STM-1 interface-level PMs for radio to line direction - rst-stm1oc3-pm-status-crl-type
+--
+
+genEquipPmSdhRstRLTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmSdhRstRLEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "SONET/STM-1 interface-level PMs for radio to line direction."
+        ::= { genEquipPmSDH 3 }
+
+genEquipPmSdhRstRLEntry OBJECT-TYPE
+        SYNTAX GenEquipPmSdhRstRLEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "SONET/STM-1 interface-level PMs for radio to line direction entry."
+        INDEX { genEquipPmSdhRstRLPmType,
+				genEquipPmSdhRstRLIfIndex,
+				genEquipPmSdhRstRLInterval }
+        ::= { genEquipPmSdhRstRLTable 1 }
+
+GenEquipPmSdhRstRLEntry ::=
+            SEQUENCE {
+		genEquipPmSdhRstRLPmType				PmTableType,
+		genEquipPmSdhRstRLIfIndex				INTEGER,
+		genEquipPmSdhRstRLInterval				INTEGER,
+        genEquipPmSdhRstRLTimeStamp				INTEGER,
+        genEquipPmSdhRstRLES					INTEGER,
+        genEquipPmSdhRstRLSES					INTEGER,
+        genEquipPmSdhRstRLUAS					INTEGER,
+        genEquipPmSdhRstRLEB					INTEGER,
+		genEquipPmSdhRstRLCV					INTEGER,
+		genEquipPmSdhRstRLBBE					INTEGER,
+		genEquipPmSdhRstRLIDF					Integrity
+	}
+
+genEquipPmSdhRstRLPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmSdhRstRLEntry 1 }
+
+genEquipPmSdhRstRLIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Port number."
+        ::= { genEquipPmSdhRstRLEntry 2 }
+
+genEquipPmSdhRstRLInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmSdhRstRLEntry 3 }
+
+genEquipPmSdhRstRLTimeStamp	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"This value indicates the time stamp of the interval."
+		::= { genEquipPmSdhRstRLEntry 4 }
+
+genEquipPmSdhRstRLES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Errored Seconds PM for STM-1/OC-3 on radio to line direction."
+		::= { genEquipPmSdhRstRLEntry 5 }
+
+genEquipPmSdhRstRLSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Severely Errored Seconds PM for STM-1/OC-3 on radio to line direction."
+		::= { genEquipPmSdhRstRLEntry 6 }
+
+genEquipPmSdhRstRLUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Unavailable Seconds PM for STM-1/OC-3."
+		::= { genEquipPmSdhRstRLEntry 7 }
+
+genEquipPmSdhRstRLEB  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Errored Blocks PM for STM-1/OC-3 on radio to line direction."
+        ::= { genEquipPmSdhRstRLEntry 8 }
+
+genEquipPmSdhRstRLCV  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Code Viloations PM for STM-1/OC-3 on radio to line direction."
+        ::= { genEquipPmSdhRstRLEntry 9 }
+
+genEquipPmSdhRstRLBBE  OBJECT-TYPE
+		SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"Background Block Error PM for STM-1/OC-3 on radio to line direction."
+        ::= { genEquipPmSdhRstRLEntry 10 }
+
+genEquipPmSdhRstRLIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmSdhRstRLEntry 11 }
+
+
+-- 	Trails PM Group
+genEquipPmTrails	OBJECT IDENTIFIER ::= {genEquipPmAll 7}
+
+-- 	TDM (E1/T1) PM Table
+genEquipPmTrailsEndPointTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmTrailsEndPointEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "PM table of the E1/T1 trails."
+        ::= { genEquipPmTrails 1 }
+
+genEquipPmTrailsEndPointEntry OBJECT-TYPE
+        SYNTAX GenEquipPmTrailsEndPointEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "PM table of the E1/T1 trails."
+        INDEX { genEquipPmTrailsEndPointPmType, genEquipPmTrailsEndPointId, genEquipPmTrailsEndPointEPId, genEquipPmTrailsEndPointInterval }
+        ::= { genEquipPmTrailsEndPointTable 1 }
+
+GenEquipPmTrailsEndPointEntry ::=
+            SEQUENCE {
+		genEquipPmTrailsEndPointPmType					PmTableType,
+		genEquipPmTrailsEndPointId						DisplayString,
+		genEquipPmTrailsEndPointEPId					INTEGER,
+		genEquipPmTrailsEndPointInterval				INTEGER,
+        genEquipPmTrailsEndPointES						INTEGER,
+        genEquipPmTrailsEndPointSES						INTEGER,
+        genEquipPmTrailsEndPointUAS						INTEGER,
+        genEquipPmTrailsEndPointBBE						INTEGER,
+        genEquipPmTrailsEndPointNoOfSwitches			INTEGER,
+        genEquipPmTrailsEndPointActivePathCounts		INTEGER,
+        genEquipPmTrailsEndPointIDF						Integrity
+	}
+
+genEquipPmTrailsEndPointPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmTrailsEndPointEntry 1 }
+
+genEquipPmTrailsEndPointId OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the trail id."
+        ::= { genEquipPmTrailsEndPointEntry 2 }
+
+genEquipPmTrailsEndPointEPId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the end point number for this trail.
+        If the trail is protected, there will be two end points for the trail (primary path and the secondary path)."
+        ::= { genEquipPmTrailsEndPointEntry 3 }
+
+genEquipPmTrailsEndPointInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmTrailsEndPointEntry 4 }
+
+genEquipPmTrailsEndPointES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"ES PM (Errored Seconds)."
+		::= { genEquipPmTrailsEndPointEntry 5 }
+
+genEquipPmTrailsEndPointSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"SES PM (Severe Errored Seconds)."
+		::= { genEquipPmTrailsEndPointEntry 6 }
+
+genEquipPmTrailsEndPointUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"UAS PM (Unavailable Seconds)."
+		::= { genEquipPmTrailsEndPointEntry 7 }
+
+genEquipPmTrailsEndPointBBE	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"BBE PM (Background Block Errors)."
+		::= { genEquipPmTrailsEndPointEntry 8 }
+
+genEquipPmTrailsEndPointNoOfSwitches	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"A counter of the number of SNCP switches (between primary and secondary paths) that trail had in the relevant interval."
+		::= { genEquipPmTrailsEndPointEntry 9 }
+
+genEquipPmTrailsEndPointActivePathCounts	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Active path seconds. "
+		::= { genEquipPmTrailsEndPointEntry 10 }
+
+genEquipPmTrailsEndPointIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmTrailsEndPointEntry 11 }
+
+-- 	PW PM Group
+genEquipPmPW	OBJECT IDENTIFIER ::= {genEquipPmAll 8}
+
+-- 	TDM (E1/T1) PM Table
+genEquipPmPWTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmPWEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table shows standard pseudowire-level PM measurements. Notice that PMs at the TDM port level are maintained separately."
+        ::= { genEquipPmPW 1 }
+
+genEquipPmPWEntry OBJECT-TYPE
+        SYNTAX GenEquipPmPWEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table shows standard pseudowire-level PM measurements. Notice that PMs at the TDM port level are maintained separately."
+        INDEX { genEquipPmPWPmType, genEquipPmPWId, genEquipPmPWInterval }
+        ::= { genEquipPmPWTable 1 }
+
+GenEquipPmPWEntry ::=
+            SEQUENCE {
+		genEquipPmPWPmType
+			PmTableType,
+		genEquipPmPWId
+			INTEGER,
+		genEquipPmPWInterval
+			INTEGER,
+        genEquipPmPWMissingPkts
+			INTEGER,
+        genEquipPmPWPktsReOrder
+			INTEGER,
+        genEquipPmPWtrBfrUnderruns
+			INTEGER,
+        genEquipPmPWMisOrderDropped
+			INTEGER,
+        genEquipPmPWMalformedPkt
+			INTEGER,
+		genEquipPmPWES
+			INTEGER,
+        genEquipPmPWSES
+			INTEGER,
+        genEquipPmPWUAS
+			INTEGER,
+        genEquipPmPWFC
+			INTEGER,
+        genEquipPmPWIDF
+			Integrity
+	}
+
+genEquipPmPWPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmPWEntry 1 }
+
+genEquipPmPWId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the trail id."
+        ::= { genEquipPmPWEntry 2 }
+
+
+genEquipPmPWInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmPWEntry 3 }
+
+genEquipPmPWMissingPkts	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of missing packets (as detected via control word sequence number gaps)."
+		::= { genEquipPmPWEntry 4 }
+
+genEquipPmPWPktsReOrder	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected out of sequence (via control word sequence number) but successfully re-ordered."
+		::= { genEquipPmPWEntry 5 }
+
+genEquipPmPWtrBfrUnderruns	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of times a packet needed to be played out and the jitter buffer was empty."
+		::= { genEquipPmPWEntry 6 }
+
+genEquipPmPWMisOrderDropped	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected out of order (via control word sequence numbers) that could not be re-ordered or could
+		not fit in the jitter buffer."
+		::= { genEquipPmPWEntry 7 }
+
+genEquipPmPWMalformedPkt	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected with unexpected size, or bad headers' stack."
+		::= { genEquipPmPWEntry 8 }
+
+genEquipPmPWES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"ES PM (Errored Seconds)."
+		::= { genEquipPmPWEntry 9 }
+
+genEquipPmPWSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"SES PM (Severe Errored Seconds)."
+		::= { genEquipPmPWEntry 10 }
+
+genEquipPmPWUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"UAS PM (Unavailable Seconds)."
+		::= { genEquipPmPWEntry 11 }
+
+genEquipPmPWFC	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"FC (Failure Counts) PM. A failure is a LOPS event."
+		::= { genEquipPmPWEntry 12 }
+
+genEquipPmPWIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmPWEntry 13 }
+
+--
+-- 	PW service PMs table - pw-service-pm-status-table
+--
+
+genEquipPmNGPWTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmNGPWEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "This table contains PW Performance Monitoring counters."
+        ::= { genEquipPmPW 2 }
+
+genEquipPmNGPWEntry OBJECT-TYPE
+        SYNTAX GenEquipPmNGPWEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "This table entry contains PW Performance Monitoring counters."
+        INDEX { genEquipPmNGPWPmType, genEquipPmNGPWIfIndex, genEquipPmNGPWInterval }
+        ::= { genEquipPmNGPWTable 1 }
+
+GenEquipPmNGPWEntry ::=
+            SEQUENCE {
+		genEquipPmNGPWPmType
+			PmTableType,
+		genEquipPmNGPWIfIndex
+			INTEGER,
+		genEquipPmNGPWInterval
+			INTEGER,
+        genEquipPmNGPWES
+			INTEGER,
+        genEquipPmNGPWSES
+			INTEGER,
+        genEquipPmNGPWUAS
+			INTEGER,
+        genEquipPmNGPWFC
+			INTEGER,
+        genEquipPmNGPWFER
+			INTEGER,
+		genEquipPmNGPWMissingPkts
+			INTEGER,
+        genEquipPmNGPWPktsReOrder
+			INTEGER,
+        genEquipPmNGPWMisOrderDropped
+			INTEGER,
+        genEquipPmNGPWMalformedPkt
+			INTEGER,
+        genEquipPmNGPWIdf
+			Integrity
+	}
+
+genEquipPmNGPWPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours."
+        ::= { genEquipPmNGPWEntry 1 }
+
+genEquipPmNGPWIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the interface Index."
+        ::= { genEquipPmNGPWEntry 2 }
+
+
+genEquipPmNGPWInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM."
+        ::= { genEquipPmNGPWEntry 3 }
+
+genEquipPmNGPWES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"ES (Errored Seconds) PM."
+		::= { genEquipPmNGPWEntry 4 }
+
+genEquipPmNGPWSES	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"SES (Severe Errored Seconds) PM."
+		::= { genEquipPmNGPWEntry 5 }
+
+genEquipPmNGPWUAS	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"UAS (Unavailable Seconds) PM."
+		::= { genEquipPmNGPWEntry 6 }
+
+genEquipPmNGPWFC	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"FC (Failure Counts) PM. A failure is a LOPS event."
+		::= { genEquipPmNGPWEntry 7 }
+
+genEquipPmNGPWFER	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Frame Error Ratio."
+		::= { genEquipPmNGPWEntry 8 }
+
+genEquipPmNGPWMissingPkts	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of missing packets (as detected via control word sequence number gaps)."
+		::= { genEquipPmNGPWEntry 9 }
+
+genEquipPmNGPWPktsReOrder	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected out of sequence (via control word sequence number) but successfully re-ordered."
+		::= { genEquipPmNGPWEntry 10 }
+
+genEquipPmNGPWMisOrderDropped	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected out of order (via control word sequence numbers) that could not be re-ordered or could not fit in the jitter buffer."
+		::= { genEquipPmNGPWEntry 11 }
+
+genEquipPmNGPWMalformedPkt	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of packets detected with unexpected size, or bad headers' stack."
+		::= { genEquipPmNGPWEntry 12 }
+
+genEquipPmNGPWIdf  OBJECT-TYPE
+		SYNTAX  Integrity
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+        ::= { genEquipPmNGPWEntry 13 }
+
+
+-- PM Utilization
+genEquipPmEthUtilization	OBJECT IDENTIFIER ::= {genEquipPmAll 9}
+
+genEquipPmEthUtilizationAdmin  OBJECT-TYPE
+		SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Ethernet port utilization PM admin"
+        ::= { genEquipPmEthUtilization 1 }
+
+genEquipPmEthUtilizationThreshold  OBJECT-TYPE
+		SYNTAX  INTEGER (0..100)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"User defined threshold for Ethernet port utilization PM."
+        ::= { genEquipPmEthUtilization 2 }
+
+genEquipPmEthUtilizationTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthUtilizationEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The Ethernet ports Utilization PMs"
+        ::= { genEquipPmEthUtilization 3 }
+
+genEquipPmEthUtilizationEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthUtilizationEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The Ethernet ports Utilization PMs"
+        INDEX { genEquipPmEthUtilizationPmType, ifIndex, genEquipPmEthUtilizationInterval }
+        ::= { genEquipPmEthUtilizationTable 1 }
+
+GenEquipPmEthUtilizationEntry ::=
+            SEQUENCE {
+		genEquipPmEthUtilizationPmType				PmTableType,
+		genEquipPmEthUtilizationInterval			INTEGER,
+		genEquipPmEthUtilizationPeakUtilization		INTEGER,
+		genEquipPmEthUtilizationAverageUtilization	INTEGER,
+		genEquipPmEthUtilizationExceedUtilization	INTEGER,
+        genEquipPmEthUtilizationIDF					Integrity
+	}
+
+genEquipPmEthUtilizationPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmEthUtilizationEntry 1 }
+
+genEquipPmEthUtilizationInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmEthUtilizationEntry 2 }
+
+genEquipPmEthUtilizationPeakUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Peak Ethernet port utilization of the current interval."
+		::= { genEquipPmEthUtilizationEntry 3 }
+
+genEquipPmEthUtilizationAverageUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Average Ethernet port utilization of the current interval."
+		::= { genEquipPmEthUtilizationEntry 4 }
+
+genEquipPmEthUtilizationExceedUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of seconds in current interval when Ethernet port utilization exceeded the user defined threshold."
+		::= { genEquipPmEthUtilizationEntry 5 }
+
+genEquipPmEthUtilizationIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+		ACCESS  read-only
+		STATUS mandatory
+		DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+		::= { genEquipPmEthUtilizationEntry 6 }
+
+
+-- PM Utilization
+genEquipPmEthernetIngressPolicer	OBJECT IDENTIFIER ::= {genEquipPmAll 10}
+
+--
+-- Logical Port unicast policer statistics - sw-ap-l2-if-logical-ingress-policer1-unicast-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerUnicastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "logical Interface unicast policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 1 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerUnicastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "logical Interface unicast policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerUnicastStatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerUnicastStatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerUnicastStatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerUnicastStatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerUnicastStatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerUnicastStatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerUnicastStatisticsEntry 8 }
+
+--
+-- Logical Port unicast policer statistics - sw-ap-l2-if-logical-ingress-policer2-multicast-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerMulticastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Logical Port multicast policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 2 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerMulticastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Logical Port multicast policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerMulticastStatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerMulticastStatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerMulticastStatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerMulticastStatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerMulticastStatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerMulticastStatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerMulticastStatisticsEntry 8 }
+
+--
+-- Logical Port broadcast policer statistics - sw-ap-l2-if-logical-ingress-policer3-broadcast-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerBroadcastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port broadcast policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 3 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerBroadcastStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port broadcast policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerBroadcastStatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerBroadcastStatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerBroadcastStatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerBroadcastStatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerBroadcastStatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerBroadcastStatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerBroadcastStatisticsEntry 8 }
+
+--
+-- Logical Port ether Type 1 policer statistics - sw-ap-l2-if-logical-ingress-policer4-eth-type1-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerEtherType1StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 1 policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 4 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerEtherType1StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 1 policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerEtherType1StatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerEtherType1StatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerEtherType1StatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerEtherType1StatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType1StatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerEtherType1StatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType1StatisticsEntry 8 }
+
+--
+-- Logical Port ether Type 2 policer statistics - sw-ap-l2-if-logical-ingress-policer5-eth-type2-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerEtherType2StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 2 policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 5 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerEtherType2StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 2 policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerEtherType2StatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerEtherType2StatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerEtherType2StatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerEtherType2StatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType2StatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerEtherType2StatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType2StatisticsEntry 8 }
+
+--
+-- Logical Port ether Type 3 policer statistics - sw-ap-l2-if-logical-ingress-policer6-eth-type3-statistics-table
+--
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetIngressPolicerEtherType3StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 3 policer statistics."
+        ::= { genEquipPmEthernetIngressPolicer 6 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetIngressPolicerEtherType3StatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface Logical Port ether Type 3 policer statistics."
+        INDEX { genEquipPmEthernetIngressPolicerEtherType3StatisticsIfIndex }
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsTable 1 }
+
+GenEquipPmEthernetIngressPolicerEtherType3StatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetIngressPolicerEtherType3StatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetIngressPolicerEtherType3StatisticsClearOnRead
+			NoYes,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsGreenPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsGreenBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsYellowPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsYellowBytes
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsRedPacket
+			Counter64,
+	    genEquipPmEthernetIngressPolicerEtherType3StatisticsRedBytes
+			Counter64
+	}
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Logical port if-index table key"
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 1 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsClearOnRead  OBJECT-TYPE
+        SYNTAX 	NoYes
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Clear counter statistics after reading."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 2 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsGreenPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 3 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsGreenBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as green."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 4 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsYellowPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 5 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsYellowBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as yellow."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 6 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsRedPacket  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of packets that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 7 }
+
+genEquipPmEthernetIngressPolicerEtherType3StatisticsRedBytes  OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS mandatory
+        DESCRIPTION
+        "The number of bytes that were counted as red."
+        ::= { genEquipPmEthernetIngressPolicerEtherType3StatisticsEntry 8 }
+
+
+
+--
+-- Interface physical Port RMON statistics - sw-ap-l2-if-phy-rmon-statistics-table
+--
+
+genEquipPmEthernetRmonStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetRmonStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface physical Port RMON statistics."
+        ::= { genEquipPmAll 11 }
+
+genEquipPmEthernetRmonStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetRmonStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Interface physical Port RMON statistics."
+        INDEX { genEquipPmEthernetRmonStatisticsIfIndex }
+        ::= { genEquipPmEthernetRmonStatisticsTable 1 }
+
+GenEquipPmEthernetRmonStatisticsEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetRmonStatisticsIfIndex
+			INTEGER,
+		genEquipPmEthernetRmonStatisticsClearOnRead
+			NoYes,
+		genEquipPmEthernetRmonStatisticsTxByteCount
+			Counter64,
+		genEquipPmEthernetRmonStatisticsTxFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxMulticastFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxBroadcastFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxControlFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxPauseFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxFcsErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxLengthErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxOversizeFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxUndersizeFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxFragmentFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTxJabberFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx64FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx65-127FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx128-255FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx256-511FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx512-1023FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx1024-1518FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsTx1519-1522FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxByteCount
+			Counter64,
+		genEquipPmEthernetRmonStatisticsRxFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxMulticastFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxBroadcastFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxControlFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxPauseFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxFcsErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxLengthErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxcode-ErrorCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxoversizeFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxundersize-ErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxFragmentFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx64FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx65-127FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx128-255FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx256-511FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx512-1023FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx1024-1518FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRx1519-1522FrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxExceedmaxFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxExceedMaxWithErrorFrameCount
+			Counter,
+		genEquipPmEthernetRmonStatisticsRxJabberFrameCount
+			Counter
+	}
+
+genEquipPmEthernetRmonStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Ethernet Physical port if-index table key"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 1 }
+
+genEquipPmEthernetRmonStatisticsClearOnRead OBJECT-TYPE
+        SYNTAX  NoYes
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "Clear on read"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 2 }
+
+genEquipPmEthernetRmonStatisticsTxByteCount OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX byte count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 3 }
+
+genEquipPmEthernetRmonStatisticsTxFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 4 }
+
+genEquipPmEthernetRmonStatisticsTxMulticastFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX multicast frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 5 }
+
+genEquipPmEthernetRmonStatisticsTxBroadcastFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX broadcast frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 6 }
+
+genEquipPmEthernetRmonStatisticsTxControlFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX control frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 7 }
+
+genEquipPmEthernetRmonStatisticsTxPauseFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX pause frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 8 }
+
+genEquipPmEthernetRmonStatisticsTxFcsErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX fcs error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 9 }
+
+genEquipPmEthernetRmonStatisticsTxLengthErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX length error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 10 }
+
+genEquipPmEthernetRmonStatisticsTxOversizeFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX oversize frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 11 }
+
+genEquipPmEthernetRmonStatisticsTxUndersizeFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX undersize frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 12 }
+
+genEquipPmEthernetRmonStatisticsTxFragmentFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX fragment frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 13 }
+
+genEquipPmEthernetRmonStatisticsTxJabberFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX jabber frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 14 }
+
+genEquipPmEthernetRmonStatisticsTx64FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 64 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 15 }
+
+genEquipPmEthernetRmonStatisticsTx65-127FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 65-127 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 16 }
+
+genEquipPmEthernetRmonStatisticsTx128-255FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 128-255 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 17 }
+
+genEquipPmEthernetRmonStatisticsTx256-511FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 256-511 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 18 }
+
+genEquipPmEthernetRmonStatisticsTx512-1023FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 512-1023 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 19 }
+
+genEquipPmEthernetRmonStatisticsTx1024-1518FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 1024-1518 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 20 }
+
+genEquipPmEthernetRmonStatisticsTx1519-1522FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "TX 1519-1522 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 21 }
+
+genEquipPmEthernetRmonStatisticsRxByteCount OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX byte count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 22 }
+
+genEquipPmEthernetRmonStatisticsRxFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 23 }
+
+genEquipPmEthernetRmonStatisticsRxMulticastFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX multicast frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 24 }
+
+genEquipPmEthernetRmonStatisticsRxBroadcastFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX broadcast frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 25 }
+
+genEquipPmEthernetRmonStatisticsRxControlFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX control frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 26 }
+
+genEquipPmEthernetRmonStatisticsRxPauseFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX pause frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 27 }
+
+genEquipPmEthernetRmonStatisticsRxFcsErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX fcs error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 28 }
+
+genEquipPmEthernetRmonStatisticsRxLengthErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX length error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 29 }
+
+genEquipPmEthernetRmonStatisticsRxcode-ErrorCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX code error count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 30 }
+
+genEquipPmEthernetRmonStatisticsRxoversizeFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX oversize frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 31 }
+
+genEquipPmEthernetRmonStatisticsRxundersize-ErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX undersize error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 32 }
+
+genEquipPmEthernetRmonStatisticsRxFragmentFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX fragment frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 33 }
+
+genEquipPmEthernetRmonStatisticsRx64FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 64 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 35 }
+
+genEquipPmEthernetRmonStatisticsRx65-127FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 65-127 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 36 }
+
+genEquipPmEthernetRmonStatisticsRx128-255FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 128-255 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 37 }
+
+genEquipPmEthernetRmonStatisticsRx256-511FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 256-511 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 38 }
+
+genEquipPmEthernetRmonStatisticsRx512-1023FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 512-1023 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 39 }
+
+genEquipPmEthernetRmonStatisticsRx1024-1518FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 1024-1518 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 40 }
+
+genEquipPmEthernetRmonStatisticsRx1519-1522FrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX 1519-1522 frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 41 }
+
+genEquipPmEthernetRmonStatisticsRxExceedmaxFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX exceed max frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 42 }
+
+genEquipPmEthernetRmonStatisticsRxExceedMaxWithErrorFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX exceed max with error frame count"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 43 }
+
+genEquipPmEthernetRmonStatisticsRxJabberFrameCount OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "RX jabber frame count - frames with length &gt; 1518 bytes (1522 bytes for VLAN tagged frames) with errors"
+        ::= { genEquipPmEthernetRmonStatisticsEntry 44 }
+
+--
+-- Service queues aggragation statistics - sw-ap-l3-srv-egress-queues-aggragate-statistics-table
+--
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service queues aggragation statistics."
+        ::= { genEquipPmAll 12 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service queues aggragation statistics."
+        INDEX { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsIfIndex,
+				genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsServiceIndex}
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTable 1 }
+
+GenEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry ::=
+	SEQUENCE {
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsIfIndex
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsServiceIndex
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsClearOnRead
+			NoYes,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenBitsPerSecond
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedGreenPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedGreenBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowBitsPerSecond
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedYellowPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedYellowBytes
+			Counter64
+	}
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "ifIndex"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 1 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsServiceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Egress service bundle ID"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 2 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsClearOnRead OBJECT-TYPE
+        SYNTAX  NoYes
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "clear on read"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 3 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+		ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted green packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 4 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted green bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 5 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedGreenBitsPerSecond OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted green bits per second"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 6 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped green packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 7 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped green bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 8 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted yellow packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 9 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted yellow bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 10 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsTransmittedYellowBitsPerSecond OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted yellow bits per second"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 11 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Tdropped yellow packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 12 }
+
+genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsDroppedYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped yellow bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueuesAggragateStatisticsEntry 13 }
+
+--
+-- Cos Service Point ingress Policer statistics - sw-ap-l4-srv-sp-cos-ingress-policer-statistics-table
+--
+
+genEquipServicesCetSpPmCosIngressPolicerStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipServicesCetSpPmCosIngressPolicerStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Cos Service Point ingress Policer statistics."
+        ::= { genEquipPmAll 13 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipServicesCetSpPmCosIngressPolicerStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Cos Service Point ingress Policer statistics."
+        INDEX { genEquipServicesCetSpPmCosIngressPolicerStatiServiceIndex,
+				genEquipServicesCetSpPmCosIngressPolicerStatiSpIndex,
+				genEquipServicesCetSpPmCosIngressPolicerStatiCos }
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsTable 1 }
+
+GenEquipServicesCetSpPmCosIngressPolicerStatisticsEntry ::=
+	SEQUENCE {
+		genEquipServicesCetSpPmCosIngressPolicerStatiServiceIndex
+			INTEGER,
+		genEquipServicesCetSpPmCosIngressPolicerStatiSpIndex
+			INTEGER,
+		genEquipServicesCetSpPmCosIngressPolicerStatiCos
+			INTEGER,
+		genEquipServicesCetSpPmCosIngressPolicerStatiClearOnRead
+			NoYes,
+		genEquipServicesCetSpPmCosIngressPolicerStatiGreenPacket
+			Counter64,
+		genEquipServicesCetSpPmCosIngressPolicerStatiGreenBytes
+			Counter64,
+		genEquipServicesCetSpPmCosIngressPolicerStatiYellowPacket
+			Counter64,
+		genEquipServicesCetSpPmCosIngressPolicerStatiYellowBytes
+			Counter64,
+		genEquipServicesCetSpPmCosIngressPolicerStatiRedPacket
+			Counter64,
+		genEquipServicesCetSpPmCosIngressPolicerStatiRedBytes
+			Counter64
+	}
+
+genEquipServicesCetSpPmCosIngressPolicerStatiServiceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "service-index"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 1 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiSpIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "sp-index"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 2 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiCos OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "cos index"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 3 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiClearOnRead OBJECT-TYPE
+        SYNTAX  NoYes
+		ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "Clear on read"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 4 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "green-packet"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 5 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "green-bytes"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 6 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "yellow-packet"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 7 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "yellow-bytes"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 8 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiRedPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "red-packet"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 9 }
+
+genEquipServicesCetSpPmCosIngressPolicerStatiRedBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "red-bytes"
+        ::= { genEquipServicesCetSpPmCosIngressPolicerStatisticsEntry 10 }
+
+--
+-- Service Point ingress Policer statistics - sw-ap-l4-srv-sp-ingress-policer-statistics-table
+--
+
+genEquipServicesCetSpPmIngressPolicerStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipServicesCetSpPmIngressPolicerStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service Point ingress Policer statistics."
+        ::= { genEquipPmAll 14 }
+
+genEquipServicesCetSpPmIngressPolicerStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipServicesCetSpPmIngressPolicerStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service Point ingress Policer statistics."
+        INDEX { genEquipServicesCetSpPmIngressPolicerStatiServiceIndex,
+				genEquipServicesCetSpPmIngressPolicerStatiSpIndex }
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsTable 1 }
+
+GenEquipServicesCetSpPmIngressPolicerStatisticsEntry ::=
+	SEQUENCE {
+		genEquipServicesCetSpPmIngressPolicerStatiServiceIndex
+			INTEGER,
+		genEquipServicesCetSpPmIngressPolicerStatiSpIndex
+			INTEGER,
+		genEquipServicesCetSpPmIngressPolicerStatiClearOnRead
+			NoYes,
+		genEquipServicesCetSpPmIngressPolicerStatiGreenPacket
+			Counter64,
+		genEquipServicesCetSpPmIngressPolicerStatiGreenBytes
+			Counter64,
+		genEquipServicesCetSpPmIngressPolicerStatiYellowPacket
+			Counter64,
+		genEquipServicesCetSpPmIngressPolicerStatiYellowBytes
+			Counter64,
+		genEquipServicesCetSpPmIngressPolicerStatiRedPacket
+			Counter64,
+		genEquipServicesCetSpPmIngressPolicerStatiRedBytes
+			Counter64
+	}
+
+genEquipServicesCetSpPmIngressPolicerStatiServiceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "service-index"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 1 }
+
+genEquipServicesCetSpPmIngressPolicerStatiSpIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "sp-index"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 2 }
+
+genEquipServicesCetSpPmIngressPolicerStatiClearOnRead OBJECT-TYPE
+        SYNTAX  NoYes
+		ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "Clear on read"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 3 }
+
+genEquipServicesCetSpPmIngressPolicerStatiGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "green-packet"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 4 }
+
+genEquipServicesCetSpPmIngressPolicerStatiGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "green-bytes"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 5 }
+
+genEquipServicesCetSpPmIngressPolicerStatiYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "yellow-packet"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 6 }
+
+genEquipServicesCetSpPmIngressPolicerStatiYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "yellow-bytes"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 7 }
+
+genEquipServicesCetSpPmIngressPolicerStatiRedPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "red-packet"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 8 }
+
+genEquipServicesCetSpPmIngressPolicerStatiRedBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "red-bytes"
+        ::= { genEquipServicesCetSpPmIngressPolicerStatisticsEntry 9 }
+
+--
+-- Service Point egress queue statistics - sw-ap-l4-srv-sp-egress-queue-statistics-table
+--
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipServicesCETTmPmSpEgressQueueStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service Point egress queue statistics."
+        ::= { genEquipPmAll 15 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsEntry OBJECT-TYPE
+        SYNTAX GenEquipServicesCETTmPmSpEgressQueueStatisticsEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Service Point egress queue statistics."
+        INDEX { genEquipServicesCETTmPmSpEgressQueueStatisticsIfIndex,
+				genEquipServicesCETTmPmSpEgressQueueStatisticsServiceIndex,
+				genEquipServicesCETTmPmSpEgressQueueStatisticsCosQueueIndex	}
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsTable 1 }
+
+GenEquipServicesCETTmPmSpEgressQueueStatisticsEntry ::=
+	SEQUENCE {
+		genEquipServicesCETTmPmSpEgressQueueStatisticsIfIndex
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsServiceIndex
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsCosQueueIndex
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsClearOnRead
+			NoYes,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenBitsPerSecond
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedGreenPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedGreenBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowBytes
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowBitsPerSecond
+			INTEGER,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedYellowPacket
+			Counter64,
+		genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedYellowBytes
+			Counter64
+	}
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "ifindex"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 1 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsServiceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Servic class ID"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 2 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsCosQueueIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "cos-queue-index"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 3 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsClearOnRead OBJECT-TYPE
+        SYNTAX  NoYes
+		ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+        "Clear on read"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 4 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-green-packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 5 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-green-bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 6 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedGreenBitsPerSecond OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-green-bits-per-second"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 7 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedGreenPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped-green-packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 8 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedGreenBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped-green-bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 9 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-yellow-packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 10 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-yellow-bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 11 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsTransmittedYellowBitsPerSecond OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "transmitted-yellow-bits-per-second"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 12 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedYellowPacket OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped-yellow-packet"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 13 }
+
+genEquipServicesCETTmPmSpEgressQueueStatisticsDroppedYellowBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "dropped-yellow-bytes"
+        ::= { genEquipServicesCETTmPmSpEgressQueueStatisticsEntry 14 }
+
+
+-- PM Utilization
+genEquipPmUtilization	OBJECT IDENTIFIER ::= {genEquipPmAll 16}
+
+-- PM CPU Utilization
+genEquipPmUtilizationCPU	OBJECT IDENTIFIER ::= {genEquipPmUtilization 1}
+
+genEquipPmUtilizationCPUAdmin  OBJECT-TYPE
+		SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"CPU utilization PM admin"
+        ::= { genEquipPmUtilizationCPU 1 }
+
+genEquipPmUtilizationCPUThreshold  OBJECT-TYPE
+		SYNTAX  INTEGER (0..100)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"User defined threshold for CPU utilization PM."
+        ::= { genEquipPmUtilizationCPU 2 }
+
+genEquipPmUtilizationCPUTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmUtilizationCPUEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The CPU Utilization PMs"
+        ::= { genEquipPmUtilizationCPU 3 }
+
+genEquipPmUtilizationCPUEntry OBJECT-TYPE
+        SYNTAX GenEquipPmUtilizationCPUEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The CPU Utilization PMs"
+        INDEX { genEquipPmUtilizationCPUPmType, genEquipPmUtilizationCPUInterval }
+        ::= { genEquipPmUtilizationCPUTable 1 }
+
+GenEquipPmUtilizationCPUEntry ::=
+            SEQUENCE {
+		genEquipPmUtilizationCPUPmType				PmTableType,
+		genEquipPmUtilizationCPUInterval			INTEGER,
+		genEquipPmUtilizationCPUPeakUtilization		INTEGER,
+		genEquipPmUtilizationCPUAverageUtilization	INTEGER,
+		genEquipPmUtilizationCPUMinimumUtilization	INTEGER,
+		genEquipPmUtilizationCPUExceedUtilization	INTEGER,
+        genEquipPmUtilizationCPUIDF					Integrity
+	}
+
+genEquipPmUtilizationCPUPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmUtilizationCPUEntry 1 }
+
+genEquipPmUtilizationCPUInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmUtilizationCPUEntry 2 }
+
+genEquipPmUtilizationCPUPeakUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Peak CPU utilization of the current interval."
+		::= { genEquipPmUtilizationCPUEntry 3 }
+
+genEquipPmUtilizationCPUAverageUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Average CPU utilization of the current interval."
+		::= { genEquipPmUtilizationCPUEntry 4 }
+
+genEquipPmUtilizationCPUMinimumUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Minimal CPU utilization of the current interval."
+		::= { genEquipPmUtilizationCPUEntry 5 }
+
+genEquipPmUtilizationCPUExceedUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of seconds in the current interval when CPU utilization exceeded user defined threshold."
+		::= { genEquipPmUtilizationCPUEntry 6 }
+
+genEquipPmUtilizationCPUIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+		ACCESS  read-only
+		STATUS mandatory
+		DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+		::= { genEquipPmUtilizationCPUEntry 7 }
+
+
+
+-- PM Memory Utilization
+genEquipPmUtilizationMem	OBJECT IDENTIFIER ::= {genEquipPmUtilization 2}
+
+genEquipPmUtilizationMemAdmin  OBJECT-TYPE
+		SYNTAX  EnableDisable
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Memory utilization PM admin"
+        ::= { genEquipPmUtilizationMem 1 }
+
+genEquipPmUtilizationMemThreshold  OBJECT-TYPE
+		SYNTAX  INTEGER (0..100)
+        ACCESS  read-write
+        STATUS mandatory
+        DESCRIPTION
+		"Memory threshold for Ethernet port utilization PM."
+        ::= { genEquipPmUtilizationMem 2 }
+
+genEquipPmUtilizationMemTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmUtilizationMemEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+       DESCRIPTION
+        "The Memory Utilization PMs"
+        ::= { genEquipPmUtilizationMem 3 }
+
+genEquipPmUtilizationMemEntry OBJECT-TYPE
+        SYNTAX GenEquipPmUtilizationMemEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "The Memory Utilization PMs"
+        INDEX { genEquipPmUtilizationMemPmType, genEquipPmUtilizationMemInterval }
+        ::= { genEquipPmUtilizationMemTable 1 }
+
+GenEquipPmUtilizationMemEntry ::=
+            SEQUENCE {
+		genEquipPmUtilizationMemPmType				PmTableType,
+		genEquipPmUtilizationMemInterval			INTEGER,
+		genEquipPmUtilizationMemPeakUtilization		INTEGER,
+		genEquipPmUtilizationMemAverageUtilization	INTEGER,
+		genEquipPmUtilizationMemMinimumUtilization	INTEGER,
+		genEquipPmUtilizationMemExceedUtilization	INTEGER,
+        genEquipPmUtilizationMemIDF					Integrity
+	}
+
+genEquipPmUtilizationMemPmType OBJECT-TYPE
+        SYNTAX  PmTableType
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access, 15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmUtilizationMemEntry 1 }
+
+genEquipPmUtilizationMemInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The interval of the PM"
+        ::= { genEquipPmUtilizationMemEntry 2 }
+
+genEquipPmUtilizationMemPeakUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Peak Memory utilization of the current interval."
+		::= { genEquipPmUtilizationMemEntry 3 }
+
+genEquipPmUtilizationMemAverageUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Average Memory utilization of the current interval."
+		::= { genEquipPmUtilizationMemEntry 4 }
+
+genEquipPmUtilizationMemMinimumUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of seconds in current interval when Memory utilization exceeded the user defined threshold."
+		::= { genEquipPmUtilizationMemEntry 5 }
+
+genEquipPmUtilizationMemExceedUtilization	OBJECT-TYPE
+        SYNTAX		INTEGER
+        ACCESS  	read-only
+        STATUS 		mandatory
+        DESCRIPTION
+		"Number of seconds in current interval when Memory utilization exceeded the user defined threshold."
+		::= { genEquipPmUtilizationMemEntry 6 }
+
+genEquipPmUtilizationMemIDF  OBJECT-TYPE
+		SYNTAX  Integrity
+		ACCESS  read-only
+		STATUS mandatory
+		DESCRIPTION
+		"This value indicates if the IDF (Invalid Data Flag), was set."
+		::= { genEquipPmUtilizationMemEntry 7 }
+
+-- PM Ethernet Port
+genEquipPmEthernet	OBJECT IDENTIFIER ::= {genEquipPmAll 17}
+
+
+--
+-- PM on Ethernet port counters - sw-ap-l2-if-phy-pm-table
+--
+
+genEquipPmEthernetPortTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GenEquipPmEthernetPortEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "PM on Ethernet port counters."
+        ::= { genEquipPmEthernet 1 }
+
+genEquipPmEthernetPortEntry OBJECT-TYPE
+        SYNTAX GenEquipPmEthernetPortEntry
+        ACCESS  not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "PM on Ethernet port counters entry."
+        INDEX { genEquipPmEthernetPortPmType,
+				ifIndex,
+				genEquipPmEthernetPortPmInterval}
+        ::= { genEquipPmEthernetPortTable 1 }
+
+GenEquipPmEthernetPortEntry ::=
+	SEQUENCE {
+		genEquipPmEthernetPortPmType
+			INTEGER,
+		genEquipPmEthernetPortPmInterval
+			INTEGER,
+	    genEquipPmEthernetPortRxAvgBcastPackets
+			INTEGER,
+	    genEquipPmEthernetPortRxPeakBcastPackets
+			INTEGER,
+	    genEquipPmEthernetPortRxBytesLayer1ExcedThSecCnt
+			INTEGER,
+	    genEquipPmEthernetPortRxAvgBytesLayer1
+			INTEGER,
+	    genEquipPmEthernetPortRxPeakBytesLayer1
+			INTEGER,
+	    genEquipPmEthernetPortRxAvgBytesLayer2
+			INTEGER,
+		genEquipPmEthernetPortRxPeakBytesLayer2
+			INTEGER,
+		genEquipPmEthernetPortRxAvgMcastPackets
+			INTEGER,
+		genEquipPmEthernetPortRxPeakMcastPackets
+			INTEGER,
+		genEquipPmEthernetPortRxAvgPackets
+			INTEGER,
+		genEquipPmEthernetPortRxPeakPackets
+			INTEGER,
+		genEquipPmEthernetPortTxAvgBcastPackets
+			INTEGER,
+		genEquipPmEthernetPortTxPeakBcastPackets
+			INTEGER,
+		genEquipPmEthernetPortTxBytesLayer1ExcedThSecCnt
+			INTEGER,
+		genEquipPmEthernetPortTxAvgBytesLayer1
+			INTEGER,
+		genEquipPmEthernetPortTxPeakBytesLayer1
+			INTEGER,
+		genEquipPmEthernetPortTxAvgBytesLayer2
+			INTEGER,
+		genEquipPmEthernetPortTxPeakBytesLayer2
+			INTEGER,
+		genEquipPmEthernetPortTxAvgMcastPackets
+			INTEGER,
+		genEquipPmEthernetPortTxPeakMcastPackets
+			INTEGER,
+		genEquipPmEthernetPortTxAvgPackets
+			INTEGER,
+		genEquipPmEthernetPortTxPeakPackets
+			INTEGER,
+		genEquipPmEthernetPortPmIDF
+			INTEGER
+	}
+
+genEquipPmEthernetPortPmType OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "This value indicates the PM Type table to access,
+		15 min, current 15 min, 24 hours or current 24 hours"
+        ::= { genEquipPmEthernetPortEntry 1 }
+
+genEquipPmEthernetPortPmInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "The number of the interval: 1-30 in case the interval is 24 hours
+		or 1-96 in case the interval is 15 minutes"
+        ::= { genEquipPmEthernetPortEntry 2 }
+
+genEquipPmEthernetPortRxAvgBcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average received broadcast packets"
+        ::= { genEquipPmEthernetPortEntry 3 }
+
+genEquipPmEthernetPortRxPeakBcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak received broadcast packets"
+        ::= { genEquipPmEthernetPortEntry 4 }
+
+genEquipPmEthernetPortRxBytesLayer1ExcedThSecCnt OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Counter of seconds in interval when received bytes in Layer1 exceeded threshold"
+        ::= { genEquipPmEthernetPortEntry 5 }
+
+genEquipPmEthernetPortRxAvgBytesLayer1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average received bytes in Layer1"
+        ::= { genEquipPmEthernetPortEntry 6 }
+
+genEquipPmEthernetPortRxPeakBytesLayer1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak received bytes in Layer1"
+        ::= { genEquipPmEthernetPortEntry 7 }
+
+genEquipPmEthernetPortRxAvgBytesLayer2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average received bytes in Layer2"
+        ::= { genEquipPmEthernetPortEntry 8 }
+
+genEquipPmEthernetPortRxPeakBytesLayer2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak received bytes in Layer2"
+        ::= { genEquipPmEthernetPortEntry 9 }
+
+genEquipPmEthernetPortRxAvgMcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average received multicast packets"
+        ::= { genEquipPmEthernetPortEntry 10 }
+
+genEquipPmEthernetPortRxPeakMcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak received multicast packets"
+        ::= { genEquipPmEthernetPortEntry 11 }
+
+genEquipPmEthernetPortRxAvgPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average received packets"
+        ::= { genEquipPmEthernetPortEntry 12 }
+
+genEquipPmEthernetPortRxPeakPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak received packets"
+        ::= { genEquipPmEthernetPortEntry 13 }
+
+genEquipPmEthernetPortTxAvgBcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average transmitted broadcast packets"
+        ::= { genEquipPmEthernetPortEntry 14 }
+
+genEquipPmEthernetPortTxPeakBcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak transmitted broadcast packets"
+        ::= { genEquipPmEthernetPortEntry 15 }
+
+genEquipPmEthernetPortTxBytesLayer1ExcedThSecCnt OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Counter of seconds in interval when transmitted bytes in Layer1 exceeded threshold"
+        ::= { genEquipPmEthernetPortEntry 16 }
+
+genEquipPmEthernetPortTxAvgBytesLayer1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average transmitted bytes in Layer1"
+        ::= { genEquipPmEthernetPortEntry 17 }
+
+genEquipPmEthernetPortTxPeakBytesLayer1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak transmitted bytes in Layer1"
+        ::= { genEquipPmEthernetPortEntry 18 }
+
+genEquipPmEthernetPortTxAvgBytesLayer2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average transmitted bytes in Layer2"
+        ::= { genEquipPmEthernetPortEntry 19 }
+
+genEquipPmEthernetPortTxPeakBytesLayer2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak transmitted bytes in Layer2"
+        ::= { genEquipPmEthernetPortEntry 20 }
+
+genEquipPmEthernetPortTxAvgMcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average transmitted multicast packets"
+        ::= { genEquipPmEthernetPortEntry 21 }
+
+genEquipPmEthernetPortTxPeakMcastPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak transmitted multicast packets"
+        ::= { genEquipPmEthernetPortEntry 22 }
+
+genEquipPmEthernetPortTxAvgPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Average transmitted packets"
+        ::= { genEquipPmEthernetPortEntry 23 }
+
+genEquipPmEthernetPortTxPeakPackets OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Peak transmitted packets"
+        ::= { genEquipPmEthernetPortEntry 24 }
+
+genEquipPmEthernetPortPmIDF OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS 	mandatory
+        DESCRIPTION
+        "Indicates if the performance values of the interval can be trusted"
+        ::= { genEquipPmEthernetPortEntry 25 }
+
+-- PM Scalars
+genEquipPMStatistics	OBJECT IDENTIFIER ::= {genEquipPM 4}
+
+genEquipRMONResetCounters  OBJECT-TYPE
+		SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+		"Clear all Ethernet RMON counters."
+        ::= { genEquipPMStatistics 1 }
+
+genEquipPMStatisticsResetAllL2PortPm OBJECT-TYPE
+		SYNTAX  OffOn
+        ACCESS  read-write
+        STATUS 	mandatory
+        DESCRIPTION
+		"Clear all L2 port PMs."
+        ::= { genEquipPMStatistics 2 }
+
+
+END
