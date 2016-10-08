@@ -23,9 +23,9 @@
 global $config;
 
 $graphs = array(
-    'gpsd_satellites' => 'Satellites: ',
-    'gpsd_hdop' => 'Horizontal dilution of precision: ',
-    'gpsd_mode' => 'Fix type: ',
+    'gpsd_satellites' => 'Satellites',
+    'gpsd_hdop' => 'Horizontal Dilution of Precision',
+    'gpsd_mode' => 'Fix type',
 );
 
 foreach ($graphs as $key => $text) {

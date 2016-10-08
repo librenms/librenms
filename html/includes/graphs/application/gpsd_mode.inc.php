@@ -24,9 +24,9 @@ require 'includes/graphs/common.inc.php';
 
 $scale_min = 0;
 $ds        = 'mode';
-$colour_area     = 'EEEEEE';
-$colour_line     = '36393D';
-$colour_area_max = 'FFEE99';
+$colour_area     = 'FFCECE';
+$colour_line     = '880000';
+$colour_area_max = 'FFCCCC';
 $graph_max       = 0;
 $unit_text       = 'Mode';
 $gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
