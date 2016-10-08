@@ -23,7 +23,7 @@
 require 'includes/graphs/common.inc.php';
 
 $scale_min = 0;
-$colours = 'blues';
+$colours = 'mixed';
 $unit_text = 'DOP';
 $nototal = 1;
 $rrd_filename  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
