@@ -23,17 +23,27 @@
 require 'includes/graphs/common.inc.php';
 
 $scale_min = 0;
-$ds        = 'hdop';
-$colour_area     = 'EEEEEE';
-$colour_line     = '36393D';
-$colour_area_max = 'FFEE99';
-$graph_max       = 0;
-$unit_text       = 'HDOP';
-$gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
-if (rrdtool_check_rrd_exists($gpsd)) {
-  $rrd_filename = $gpsd;
+$colours = 'blues';
+$unit_text = 'DOP';
+$nototal = 1;
+$rrd_filename  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
+$array = array(
+  'hdop' => array('descr' => 'Horiontal'),
+  'vdop' => array('descr' => 'Vertical'),
+);
+
+$i = 0;
+
+if (rrdtool_check_rrd_exists($rrd_filename)) {
+  foreach ($array as $ds => $vars) {
+    $rrd_list[$i]['filename']   = $rrd_filename;
+    $rrd_list[$i]['descr']  = $vars['descr'];
+    $rrd_list[$i]['ds']     = $ds;
+    $rrd_list[$i]['colour'] = $config['graph_colours'][$colours][$i+2];
+    $i++;
+  }
 } else {
-  echo "file missing: $rrd_filename";
+  echo "file missing: $file";
 }
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/graphs/generic_multi_line.inc.php';
