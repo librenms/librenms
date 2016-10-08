@@ -23,17 +23,18 @@
 require 'includes/graphs/common.inc.php';
 
 $scale_min = 0;
-$ds        = 'mode';
-$colour_area     = 'FFCECE';
-$colour_line     = '880000';
+$ds = 'mode';
+$colour_area = 'FFCECE';
+$colour_line = '880000';
 $colour_area_max = 'FFCCCC';
-$graph_max       = 0;
-$unit_text       = 'Mode';
+$graph_max = 0;
+$unit_text = 'Mode';
+
 $gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 if (rrdtool_check_rrd_exists($gpsd)) {
-  $rrd_filename = $gpsd;
+    $rrd_filename = $gpsd;
 } else {
-  echo "file missing: $rrd_filename";
+    echo "file missing: $rrd_filename";
 }
 
 require 'includes/graphs/generic_simplex.inc.php';

@@ -26,24 +26,25 @@ $scale_min = 0;
 $colours = 'mixed';
 $unit_text = 'DOP';
 $nototal = 1;
-$rrd_filename  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
+
+$rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 $array = array(
-  'hdop' => array('descr' => 'Horiontal'),
-  'vdop' => array('descr' => 'Vertical'),
+    'hdop' => array('descr' => 'Horiontal'),
+    'vdop' => array('descr' => 'Vertical'),
 );
 
 $i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-  foreach ($array as $ds => $vars) {
-    $rrd_list[$i]['filename']   = $rrd_filename;
-    $rrd_list[$i]['descr']  = $vars['descr'];
-    $rrd_list[$i]['ds']     = $ds;
-    $rrd_list[$i]['colour'] = $config['graph_colours'][$colours][$i+2];
-    $i++;
-  }
+    foreach ($array as $ds => $vars) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $vars['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $config['graph_colours'][$colours][$i+2];
+        $i++;
+    }
 } else {
-  echo "file missing: $file";
+    echo "file missing: $file";
 }
 
 require 'includes/graphs/generic_multi_line.inc.php';
