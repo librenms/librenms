@@ -14,32 +14,32 @@
 
 unset($poll_device);
 
-$snmpdata    = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+$snmpdata = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 $poll_device = $snmpdata[0];
-$poll_device['sysName']     = strtolower($poll_device['sysName']);
+$poll_device['sysName'] = strtolower($poll_device['sysName']);
 
-$poll_device['sysDescr']   = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+$poll_device['sysDescr'] = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
 if (!empty($agent_data['uptime'])) {
     list($uptime) = explode(' ', $agent_data['uptime']);
-    $uptime       = round($uptime);
+    $uptime = round($uptime);
     echo "Using UNIX Agent Uptime ($uptime)\n";
 }
 
 if (empty($uptime)) {
     $snmp_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
     $uptime_data = $snmp_data[0];
-    $snmp_uptime = (integer) $uptime_data['snmpEngineTime'];
+    $snmp_uptime = (integer)$uptime_data['snmpEngineTime'];
     $hrSystemUptime = $uptime_data['hrSystemUptime'];
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
         // Move uptime into agent_uptime
         $agent_uptime = $uptime;
 
         $uptime = floor($hrSystemUptime / 100);
-        echo 'Using hrSystemUptime ('.$uptime."s)\n";
+        echo 'Using hrSystemUptime (' . $uptime . "s)\n";
     } else {
         $uptime = floor($poll_device['sysUpTime'] / 100);
-        echo 'Using SNMP Agent Uptime ('.$uptime."s)\n  ";
+        echo 'Using SNMP Agent Uptime (' . $uptime . "s)\n  ";
     }//end if
 }//end if
 
@@ -50,9 +50,9 @@ if ($device["os"] != "edgeswitch") {
     }
 }
 
-if (is_numeric($uptime) && $config['os'][$os]['bad_uptime'] !== true) {
+if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
+        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }
 
     $tags = array(
@@ -62,7 +62,7 @@ if (is_numeric($uptime) && $config['os'][$os]['bad_uptime'] !== true) {
 
     $graphs['uptime'] = true;
 
-    echo 'Uptime: '.formatUptime($uptime)."\n";
+    echo 'Uptime: ' . formatUptime($uptime) . "\n";
 
     $update_array['uptime'] = $uptime;
 }//end if
@@ -93,13 +93,13 @@ foreach (array('sysLocation', 'sysContact') as $elem) {
 foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     if ($poll_device[$elem] && $poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
-        log_event("$elem -> ".$poll_device[$elem], $device, 'system');
+        log_event("$elem -> " . $poll_device[$elem], $device, 'system');
     }
 }
 
 if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
     $update_array['location'] = $poll_device['sysLocation'];
-    log_event('Location -> '.$poll_device['sysLocation'], $device, 'system');
+    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system');
 }
 
 if ($config['geoloc']['latlng'] === true) {
