@@ -33,7 +33,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
 
   foreach (explode("\n", $gpsd) as $line) {
     list ($field, $data) = explode(':', $line);
-    $gpsd_parsed[$field] = $line;
+    $gpsd_parsed[$field] = $data;
   }
 
   $rrd_name = array('app', $name, $app_id);
@@ -44,14 +44,16 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     'DS:satellites_used:GAUGE:0:40:1200',
   );
 
-  $fields = array(
-    'mode' => NULL,
-    'hdop' => NULL,
-    'satellites' => NULL,
-    'satellites_used' => NULL,
+  $check_fields = array(
+    'mode',
+    'hdop',
+    'satellites',
+    'satellites_used',
   );
 
-  foreach ($fields as $field) {
+  $fields = array();
+
+  foreach ($check_fields as $field) {
     if (!empty($gpsd_parsed[$field])) {
       $fields[$field] = $gpsd_parsed[$field];
     }
