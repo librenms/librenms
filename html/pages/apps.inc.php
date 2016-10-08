@@ -121,9 +121,9 @@ $graphs['ups-apcups'] = array(
 );
 
 $graphs['gpsd'] = array(
-    'mode',
-    'hdop',
     'satellites',
+    'hdop',
+    'mode',
 );
 
 print_optionbar_start();

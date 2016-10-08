@@ -28,7 +28,7 @@ $nototal      = (($width < 224) ? 1 : 0);
 $unit_text    = 'Satellites';
 $rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 $array        = array(
-  'satellites' => array('descr' => 'Total'),
+  'satellites' => array('descr' => 'Visible'),
   'satellites_used' => array('descr' => 'Used'),
 );
 
