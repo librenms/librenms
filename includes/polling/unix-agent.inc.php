@@ -61,7 +61,9 @@ if ($device['os_group'] == 'unix') {
             "powerdns-recursor",
             "proxmox",
             "rrdcached",
-            "tinydns");
+            "tinydns",
+            "gpsd",
+          );
 
         foreach (explode('<<<', $agent_raw) as $section) {
             list($section, $data) = explode('>>>', $section);

@@ -120,6 +120,12 @@ $graphs['ups-apcups'] = array(
     'voltage_input',
 );
 
+$graphs['gpsd'] = array(
+    'satellites',
+    'dop',
+    'mode',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
