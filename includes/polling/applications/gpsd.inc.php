@@ -27,7 +27,7 @@
 $name = 'gpsd';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name]) && $app_id > 0) {
-  echo ' gpsd';
+  echo ' '.$name;
   $gpsd = $agent_data['app'][$name];
   $gpsd_parsed  = array();
 
