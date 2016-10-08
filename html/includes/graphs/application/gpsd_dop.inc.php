@@ -28,7 +28,7 @@ $colour_area     = 'EEEEEE';
 $colour_line     = '36393D';
 $colour_area_max = 'FFEE99';
 $graph_max       = 0;
-$unit_text       = 'Meters';
+$unit_text       = 'HDOP';
 $gpsd  = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 if (rrdtool_check_rrd_exists($gpsd)) {
   $rrd_filename = $gpsd;
