@@ -158,27 +158,27 @@ function poll_service($service)
                     d_echo($ds_name . " collides with an existing index\n");
                     $perf_unique = 0;
                     //try to generate a unique name
-                    for($i = 0; $i<10; $i++) {
-                        $tmp_ds_name = substr($ds_name,0,18) . $i;
-                            if (!isset($perf[$tmp_ds_name])) {
-                                $ds_name = $tmp_ds_name;
-                                $perf_unique = 1;
-                                break 1;
-                            }
+                    for ($i = 0; $i<10; $i++) {
+                        $tmp_ds_name = substr($ds_name, 0, 18) . $i;
+                        if (!isset($perf[$tmp_ds_name])) {
+                            $ds_name = $tmp_ds_name;
+                            $perf_unique = 1;
+                            break 1;
                         }
+                    }
                     if ($perf_unique == 0) {
                         //try harder to generate a unique name
-                        for($i = 0; $i<10; $i++) {
-                            for($j = 0; $j<10; $j++) {
+                        for ($i = 0; $i<10; $i++) {
+                            for ($j = 0; $j<10; $j++) {
                                 $tmp_ds_name = substr($ds_name, 0, 17) . $j . $i;
-                                    if (!isset($perf[$tmp_ds_name])) {
-                                        $ds_name = $tmp_ds_name;
-                                        $perf_unique = 1;
-                                        break 2;
-                                    }
+                                if (!isset($perf[$tmp_ds_name])) {
+                                    $ds_name = $tmp_ds_name;
+                                    $perf_unique = 1;
+                                    break 2;
                                 }
                             }
                         }
+                    }
                     if ($perf_unique == 0) {
                         d_echo("could not generate a unique ds-name for " . $k . "\n");
                     }
