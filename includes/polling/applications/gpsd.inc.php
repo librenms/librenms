@@ -40,6 +40,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
   $rrd_def = array(
     'DS:mode:GAUGE:600:0:4',
     'DS:hdop:GAUGE:600:0:100',
+    'DS:vdop:GAUGE:600:0:100',
     'DS:satellites:GAUGE:600:0:40',
     'DS:satellites_used:GAUGE:600:0:40',
   );
@@ -47,6 +48,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
   $check_fields = array(
     'mode',
     'hdop',
+    'vdop',
     'satellites',
     'satellites_used',
   );

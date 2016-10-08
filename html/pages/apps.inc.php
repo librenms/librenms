@@ -122,7 +122,7 @@ $graphs['ups-apcups'] = array(
 
 $graphs['gpsd'] = array(
     'satellites',
-    'hdop',
+    'dop',
     'mode',
 );
 
