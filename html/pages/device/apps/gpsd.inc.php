@@ -23,7 +23,7 @@
 global $config;
 
 $graphs = array(
-    'gpsd_mode' => 'Mode: ',
+    'gpsd_mode' => 'Fix type: ',
     'gpsd_hdop' => 'Horizontal dilution of precision: ',
     'gpsd_satellites' => 'Satellites: ',
 );
