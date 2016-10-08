@@ -143,6 +143,9 @@ function poll_service($service)
         // Yes, We have perf data.
         $rrd_name = array('services', $service_id);
 
+        // Set the DS in the DB if it is blank.
+        $DS = array();
+
         // rrdtool requires A ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
         foreach ($perf as $k => $v) {
             // normalize ds_name
