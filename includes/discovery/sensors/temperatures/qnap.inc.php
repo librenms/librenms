@@ -39,7 +39,6 @@ if ($device['os'] == 'qnap') {
             }
 
             discover_sensor($valid['sensor'], 'temperature', $device, $disk_temperature_oid . '.' . $index, $index, 'snmp', $disk_descr, '1', '1', null, null, null, null, $disk_temperature);
-
         }
     }
 }
