@@ -104,7 +104,7 @@ A small shell script that reports GPSD status.
 
 You may need to configure `$server` or `$port`.
 
-Verify it is working by running /usr/lib/check_mk_agent/local/gpsd
+Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
 
 
