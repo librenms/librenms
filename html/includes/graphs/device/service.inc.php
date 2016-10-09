@@ -24,8 +24,7 @@ if (isset($vars['service'])) {
             $vars['service'] = $key;
         }
     }
-}
-else {
+} else {
     // No service set, set the first one.
     if (isset($services[0])) {
         $vars['service'] = 0;
@@ -33,8 +32,7 @@ else {
 }
 
 // We know our service. build the filename.
-$filename = "services-".$services[$vars['service']]['service_id'].".rrd";
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+$rrd_filename = rrd_name($device['hostname'], array('services', $services[$vars['service']]['service_id']));
 
 // if we have a script for this check, use it.
 $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($services[$vars['service']]['service_type']).'.inc.php';
@@ -56,7 +54,7 @@ $rrd_additions = "";
 $services[$vars['service']]['service_ds'] = htmlspecialchars_decode($services[$vars['service']]['service_ds']);
 
 if ($services[$vars['service']]['service_ds'] != "") {
-    $graphinfo = json_decode($services[$vars['service']]['service_ds'],TRUE);
+    $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
 
     // Do we have a DS set
     if (!isset($graphinfo[$vars['ds']])) {
@@ -71,17 +69,15 @@ if ($services[$vars['service']]['service_ds'] != "") {
     $label = $graphinfo[$vars['ds']];
 
     if (file_exists($rrd_filename)) {
-
         if (isset($check_graph)) {
             // We have a graph definition, use it.
             $rrd_additions .= $check_graph[$ds];
-        }
-        else {
+        } else {
             // Build the graph ourselves
             $color = $config['graph_colours']['mixed'][2];
 
             $rrd_additions .= " DEF:DS=" . $rrd_filename . ":".$ds.":AVERAGE ";
-            $rrd_additions .= " AREA:DS#" . $color . ":'" . str_pad(substr(ucfirst($ds)." (".$label.")",0,15),15) . "' ";
+            $rrd_additions .= " AREA:DS#" . $color . ":'" . str_pad(substr(ucfirst($ds)." (".$label.")", 0, 15), 15) . "' ";
             $rrd_additions .= " GPRINT:DS:LAST:%5.2lf%s ";
             $rrd_additions .= " GPRINT:DS:AVERAGE:%5.2lf%s ";
             $rrd_additions .= " GPRINT:DS:MAX:%5.2lf%s\\\l ";
@@ -91,7 +87,6 @@ if ($services[$vars['service']]['service_ds'] != "") {
 
 if ($rrd_additions == "") {
     // We didn't add any data points.
-}
-else {
+} else {
     $rrd_options .= $rrd_additions;
 }

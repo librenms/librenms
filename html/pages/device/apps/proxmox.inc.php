@@ -20,9 +20,7 @@ include('includes/application/proxmox.inc.php');
 
 if (!isset($config['enable_proxmox']) || !$config['enable_proxmox']) {
     print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');
-}
-else {
-
+} else {
     $graphs = array(
         'proxmox_traffic'       => 'Traffic',
     );

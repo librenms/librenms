@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/aruba-controller.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'aruba-controller');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr']    = 'Clients';

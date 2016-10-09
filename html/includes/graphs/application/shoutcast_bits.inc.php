@@ -18,8 +18,7 @@ $colour_line_out = '000099';
 $colour_area_in  = 'CDEB8B';
 $colour_area_out = 'C3D9FF';
 
-$rrddir       = $config['rrd_dir'].'/'.$device['hostname'];
-$hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
-$rrd_filename = $rrddir.'/app-shoutcast-'.$app['app_id'].'-'.$hostname.'.rrd';
+$hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unknown');
+$rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
 
 require 'includes/graphs/generic_data.inc.php';

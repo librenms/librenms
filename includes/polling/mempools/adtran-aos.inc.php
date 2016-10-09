@@ -23,4 +23,3 @@
 $mempool['used']  = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
 $mempool['total'] = snmp_get($device, 'adGenAOSMemPool.0', '-OvQ', 'ADTRAN-AOSCPU');
 $mempool['free']  = ($mempool['total'] - $mempool['used']);
-

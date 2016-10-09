@@ -1,13 +1,12 @@
 <?php
 
 /*
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage billing
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -20,8 +19,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -43,26 +41,23 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require 'includes/jpgraph/src/jpgraph.php';
-require 'includes/jpgraph/src/jpgraph_line.php';
-require 'includes/jpgraph/src/jpgraph_utils.inc.php';
-require 'includes/jpgraph/src/jpgraph_date.php';
+require 'lib/jpgraph/jpgraph.php';
+require 'lib/jpgraph/jpgraph_line.php';
+require 'lib/jpgraph/jpgraph_utils.inc.php';
+require 'lib/jpgraph/jpgraph_date.php';
 
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
             $bill_id = $_GET['bill_id'];
-        }
-        else {
+        } else {
             echo 'Unauthorised Access Prohibited.';
             exit;
         }
-    }
-    else {
+    } else {
         $bill_id = $_GET['bill_id'];
     }
-}
-else {
+} else {
     echo 'Unauthorised Access Prohibited.';
     exit;
 }
@@ -80,8 +75,7 @@ if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
     $end          = $histrow['to'];
     $rate_95th    = $histrow['rate_95th'];
     $rate_average = $histrow['rate_average'];
-} 
-else {
+} else {
     $start        = $_GET[from];
     $end          = $_GET[to];
     $rate_95th    = $rate_data['rate_95th'];
@@ -96,8 +90,7 @@ $iter  = 1;
 
 if ($_GET[type]) {
     $type = $_GET[type];
-}
-else {
+} else {
     $type = 'date';
 }
 
@@ -198,19 +191,17 @@ $graph->yaxis->title->Set('Bits per second');
 $graph->yaxis->SetLabelFormatCallback('format_si');
 
 
-function TimeCallback($aVal) {
+function TimeCallback($aVal)
+{
     global $dur;
 
     if ($dur < 172800) {
         return date('H:i', $aVal);
-    }
-    else if ($dur < 604800) {
+    } elseif ($dur < 604800) {
         return date('D', $aVal);
-    }
-    else {
+    } else {
         return date('j M', $aVal);
     }
-
 }//end TimeCallback()
 
 

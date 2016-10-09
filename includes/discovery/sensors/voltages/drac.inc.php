@@ -11,17 +11,17 @@ if ($device['os'] == "drac") {
         $data = trim($data);
         if ($data) {
             list($oid,$kind) = explode(" ", $data);
-            $split_oid = explode('.',$oid);
+            $split_oid = explode('.', $oid);
             $index = $split_oid[count($split_oid)-1];
             $voltage_oid   = ".1.3.6.1.4.1.674.10892.5.4.600.12.1.16.1.$index";
             $descr_oid     = "powerSupplyLocationName.1.$index";
             $limit_oid     = "powerSupplyMaximumInputVoltage.1.$index";
-            $descr         = trim(snmp_get($device, $descr_oid, "-Oqv", "IDRAC-MIB-SMIv2"),'"');
-            $descr         = preg_replace("/(Status)/","", $descr);
+            $descr         = trim(snmp_get($device, $descr_oid, "-Oqv", "IDRAC-MIB-SMIv2"), '"');
+            $descr         = preg_replace("/(Status)/", "", $descr);
             $current       = snmp_get($device, $voltage_oid, "-Oqv", "IDRAC-MIB-SMIv2");
             $high_limit     = snmp_get($device, $limit_oid, "-Oqv", "IDRAC-MIB-SMIv2");
             $divisor       = "1";
-            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', 0, NULL, NULL, $high_limit, $current);
+            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', 0, null, null, $high_limit, $current);
         }
     }
 }

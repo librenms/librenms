@@ -19,69 +19,67 @@ $where = '';
 foreach ($vars as $var => $value) {
     if ($value != '') {
         switch ($var) {
-        case 'hostname':
-            $where  .= ' AND D.hostname LIKE ?';
-            $param[] = '%'.$value.'%';
-            break;
+            case 'hostname':
+                $where  .= ' AND D.hostname LIKE ?';
+                $param[] = '%'.$value.'%';
+                break;
 
-        case 'location':
-            $where  .= ' AND D.location LIKE ?';
-            $param[] = '%'.$value.'%';
-            break;
+            case 'location':
+                $where  .= ' AND D.location LIKE ?';
+                $param[] = '%'.$value.'%';
+                break;
 
-        case 'device_id':
-            $where  .= ' AND D.device_id = ?';
-            $param[] = $value;
-            break;
+            case 'device_id':
+                $where  .= ' AND D.device_id = ?';
+                $param[] = $value;
+                break;
 
-        case 'deleted':
-        case 'ignore':
-            if ($value == 1) {
-                $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
-            }
-            break;
+            case 'deleted':
+            case 'ignore':
+                if ($value == 1) {
+                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
+                }
+                break;
 
-        case 'disable':
-        case 'ifSpeed':
-            if (is_numeric($value)) {
+            case 'disable':
+            case 'ifSpeed':
+                if (is_numeric($value)) {
+                    $where  .= " AND I.$var = ?";
+                    $param[] = $value;
+                }
+                break;
+
+            case 'ifType':
                 $where  .= " AND I.$var = ?";
                 $param[] = $value;
-            }
-            break;
+                break;
 
-        case 'ifType':
-            $where  .= " AND I.$var = ?";
-            $param[] = $value;
-            break;
+            case 'ifAlias':
+            case 'port_descr_type':
+                $where  .= " AND I.$var LIKE ?";
+                $param[] = '%'.$value.'%';
+                break;
 
-        case 'ifAlias':
-        case 'port_descr_type':
-            $where  .= " AND I.$var LIKE ?";
-            $param[] = '%'.$value.'%';
-            break;
+            case 'errors':
+                if ($value == 1) {
+                    $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
+                }
+                break;
 
-        case 'errors':
-            if ($value == 1) {
-                $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
-            }
-            break;
-
-        case 'state':
-            if ($value == 'down') {
-                $where  .= 'AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
-                $param[] = 'up';
-                $param[] = 'down';
-            }
-            else if ($value == 'up') {
-                $where  .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
-                $param[] = 'up';
-                $param[] = 'up';
-            }
-            else if ($value == 'admindown') {
-                $where  .= 'AND I.ifAdminStatus = ? AND D.ignore = 0';
-                $param[] = 'down';
-            }
-            break;
+            case 'state':
+                if ($value == 'down') {
+                    $where  .= 'AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
+                    $param[] = 'up';
+                    $param[] = 'down';
+                } elseif ($value == 'up') {
+                    $where  .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
+                    $param[] = 'up';
+                    $param[] = 'up';
+                } elseif ($value == 'admindown') {
+                    $where  .= 'AND I.ifAdminStatus = ? AND D.ignore = 0';
+                    $param[] = 'down';
+                }
+                break;
         }//end switch
     }//end if
 }//end foreach
@@ -95,53 +93,53 @@ list($format, $subformat) = explode('_', $vars['format']);
 $ports = dbFetchRows($query, $param);
 
 switch ($vars['sort']) {
-case 'traffic':
-    $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
-    break;
+    case 'traffic':
+        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        break;
 
-case 'traffic_in':
-    $ports = array_sort($ports, 'ifInOctets_rate', SORT_DESC);
-    break;
+    case 'traffic_in':
+        $ports = array_sort($ports, 'ifInOctets_rate', SORT_DESC);
+        break;
 
-case 'traffic_out':
-    $ports = array_sort($ports, 'ifOutOctets_rate', SORT_DESC);
-    break;
+    case 'traffic_out':
+        $ports = array_sort($ports, 'ifOutOctets_rate', SORT_DESC);
+        break;
 
-case 'packets':
-    $ports = array_sort($ports, 'ifUcastPkts_rate', SORT_DESC);
-    break;
+    case 'packets':
+        $ports = array_sort($ports, 'ifUcastPkts_rate', SORT_DESC);
+        break;
 
-case 'packets_in':
-    $ports = array_sort($ports, 'ifInUcastOctets_rate', SORT_DESC);
-    break;
+    case 'packets_in':
+        $ports = array_sort($ports, 'ifInUcastOctets_rate', SORT_DESC);
+        break;
 
-case 'packets_out':
-    $ports = array_sort($ports, 'ifOutUcastOctets_rate', SORT_DESC);
-    break;
+    case 'packets_out':
+        $ports = array_sort($ports, 'ifOutUcastOctets_rate', SORT_DESC);
+        break;
 
-case 'errors':
-    $ports = array_sort($ports, 'ifErrors_rate', SORT_DESC);
-    break;
+    case 'errors':
+        $ports = array_sort($ports, 'ifErrors_rate', SORT_DESC);
+        break;
 
-case 'speed':
-    $ports = array_sort($ports, 'ifSpeed', SORT_DESC);
-    break;
+    case 'speed':
+        $ports = array_sort($ports, 'ifSpeed', SORT_DESC);
+        break;
 
-case 'port':
-    $ports = array_sort($ports, 'ifDescr', SORT_ASC);
-    break;
+    case 'port':
+        $ports = array_sort($ports, 'ifDescr', SORT_ASC);
+        break;
 
-case 'media':
-    $ports = array_sort($ports, 'ifType', SORT_ASC);
-    break;
+    case 'media':
+        $ports = array_sort($ports, 'ifType', SORT_ASC);
+        break;
 
-case 'descr':
-    $ports = array_sort($ports, 'ifAlias', SORT_ASC);
-    break;
+    case 'descr':
+        $ports = array_sort($ports, 'ifAlias', SORT_ASC);
+        break;
 
-case 'device':
-default:
-    $ports = array_sort($ports, 'hostname', SORT_ASC);
+    case 'device':
+    default:
+        $ports = array_sort($ports, 'hostname', SORT_ASC);
 }//end switch
 
 $csv[] = array(

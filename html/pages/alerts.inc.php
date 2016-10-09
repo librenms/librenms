@@ -14,5 +14,5 @@
 
 $device['device_id'] = '-1';
 require_once 'includes/common/alerts.inc.php';
-echo implode('',$common_output);
+echo implode('', $common_output);
 unset($device['device_id']);

@@ -25,24 +25,28 @@
  * @subpackage Discovery
  */
 
-$ts = microtime(true);
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostUnreachablePingException;
 
-chdir(dirname($argv[0]));
+chdir(__DIR__); // cwd to the directory containing this script
+
+$ts = microtime(true);
 
 require 'includes/defaults.inc.php';
 require 'config.php';
 require 'includes/definitions.inc.php';
+require 'includes/functions.php';
+require 'includes/discovery/functions.inc.php';
 
 if ($config['autodiscovery']['snmpscan'] == false) {
     echo 'SNMP-Scan disabled.'.PHP_EOL;
     exit(2);
 }
 
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
-
-function perform_snmp_scan($net) {
-    global $stats, $config, $quiet;
+function perform_snmp_scan($net)
+{
+    global $stats, $config, $debug, $vdebug;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
@@ -52,6 +56,10 @@ function perform_snmp_scan($net) {
     while ($start++ < $end) {
         $stats['count']++;
         $host = long2ip($start);
+        if (match_network($config['autodiscovery']['nets-exclude'], $host)) {
+            echo '|';
+            continue;
+        }
         $test = isPingable($host);
         if ($test['result'] === false) {
             echo '.';
@@ -63,29 +71,37 @@ function perform_snmp_scan($net) {
             continue;
         }
         foreach (array('udp','tcp') as $transport) {
-            $result = addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $quiet, $config['distributed_poller_group'], 0);
-            if (is_numeric($result)) {
+            try {
+                addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $config['distributed_poller_group']);
                 $stats['added']++;
                 echo '+';
                 break;
-            } elseif (substr($result, 0, 12) === 'Already have') {
+            } catch (HostExistsException $e) {
                 $stats['known']++;
                 echo '*';
                 break;
-            } elseif (substr($result, 0 , 14) === 'Could not ping') {
+            } catch (HostUnreachablePingException $e) {
                 echo '.';
                 break;
-            } elseif ($transport == 'tcp') {
-                // tried both udp and tcp without success
-                $stats['failed']++;
-                echo '-';
+            } catch (HostUnreachableException $e) {
+                if ($debug) {
+                    print_error($e->getMessage() . " over $transport");
+                    foreach ($e->getReasons() as $reason) {
+                        echo "  $reason\n";
+                    }
+                }
+                if ($transport == 'tcp') {
+                    // tried both udp and tcp without success
+                    $stats['failed']++;
+                    echo '-';
+                }
             }
         }
     }
     echo PHP_EOL;
 }
 
-$opts  = getopt('r:d::l::h::');
+$opts  = getopt('r:d::v::l::h::');
 $stats = array('count'=> 0, 'known'=>0, 'added'=>0, 'failed'=>0);
 $start = false;
 $debug = false;
@@ -98,16 +114,19 @@ if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($con
     echo '                    This argument is only requied if $config[\'nets\'] is not set'.PHP_EOL;
     echo '                    Example: 192.168.0.0/24'.PHP_EOL;
     echo '  -d                Enable Debug'.PHP_EOL;
+    echo '  -v                Enable verbose Debug'.PHP_EOL;
     echo '  -l                Show Legend'.PHP_EOL;
     echo '  -h                Print this text'.PHP_EOL;
     exit(0);
 }
-if (isset($opts['d'])) {
+if (isset($opts['d']) || isset($opts['v'])) {
+    if (isset($opts['v'])) {
+        $vdebug = true;
+    }
     $debug = true;
-    $quiet = 0;
 }
 if (isset($opts['l'])) {
-    echo '   * = Known Device;   . = Unpingable Device;   + = Added Device;   - = Failed To Add Device;'.PHP_EOL;
+    echo '   * = Known Device;   . = Unpingable Device;   + = Added Device;   - = Failed To Add Device;  | = Excluded by config.php'.PHP_EOL;
 }
 if (isset($opts['r'])) {
     $net = Net_IPv4::parseAddress($opts['r']);
@@ -123,7 +142,7 @@ if (isset($opts['r'])) {
     if (!is_array($config['nets'])) {
         $config['nets'] = array( $config['nets'] );
     }
-    foreach( $config['nets'] as $subnet ) {
+    foreach ($config['nets'] as $subnet) {
         $net = Net_IPv4::parseAddress($subnet);
         perform_snmp_scan($net);
     }
@@ -133,4 +152,3 @@ if (isset($opts['r'])) {
     echo 'Please either add a range argument with \'-r <CIDR_RANGE>\' or define $config[\'nets\'] in your config.php'.PHP_EOL;
     exit(2);
 }
-

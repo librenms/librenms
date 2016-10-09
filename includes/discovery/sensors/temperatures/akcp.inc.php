@@ -15,7 +15,7 @@ if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms') {
             list($oid,$status) = explode(' ', $data, 2);
             if ($status == 2) {
                 // 2 = normal, 0 = not connected
-            $split_oid            = explode('.', $oid);
+                $split_oid            = explode('.', $oid);
                 $temperature_id   = $split_oid[(count($split_oid) - 1)];
                 $descr_oid        = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.1.$temperature_id";
                 $temperature_oid  = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.3.$temperature_id";

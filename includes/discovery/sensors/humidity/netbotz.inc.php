@@ -17,9 +17,22 @@ if ($device['os'] == 'netbotz') {
             $descr        = str_replace('"', '', $descr);
             $descr        = trim($descr);
             if ($humidity >= 0) {
-                discover_sensor($valid['sensor'], 'humidity', $device,
-                    $humidity_oid, $humidity_id, 'netbotz',
-                    $descr, '1', '1', null, null, null, null, $humidity);
+                discover_sensor(
+                    $valid['sensor'],
+                    'humidity',
+                    $device,
+                    $humidity_oid,
+                    $humidity_id,
+                    'netbotz',
+                    $descr,
+                    '1',
+                    '1',
+                    null,
+                    null,
+                    null,
+                    null,
+                    $humidity
+                );
             }
         }
 

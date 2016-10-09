@@ -23,7 +23,7 @@
  */
 
 if ($config['map']['engine'] == 'leaflet') {
-    if (defined('show_settings') && $config['front_page'] == "pages/front/tiles.php") {
+    if (defined('SHOW_SETTINGS') && $config['front_page'] == "pages/front/tiles.php") {
         $temp_output = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
@@ -50,10 +50,9 @@ if ($config['map']['engine'] == 'leaflet') {
       <select class="form-control" name="init_zoom" id="select_zoom'.$unique_id.'">
         ';
         for ($i=0; $i<19; $i++) {
-    	if ($i == $widget_settings['init_zoom']) {
+            if ($i == $widget_settings['init_zoom']) {
                 $temp_output .= '<option selected value="'.$i.'">'.$i.'</option>';
-            }
-            else {
+            } else {
                 $temp_output .= '<option value="'.$i.'">'.$i.'</option>';
             }
         }
@@ -77,19 +76,19 @@ if ($config['map']['engine'] == 'leaflet') {
             <select class="form-control" name="status" id="status_'.$unique_id.'">';
 
                 $temp_output .= '<option value="0,1"';
-                if ($widget_settings['status'] == '0,1') {
-                    $temp_output .= ' selected';
-                }
+        if ($widget_settings['status'] == '0,1') {
+            $temp_output .= ' selected';
+        }
                 $temp_output .= '>Up + Down</option>
                 <option value="1"';
-                if ($widget_settings['status'] == '1') {
-                    $temp_output .= ' selected';
-                }
+        if ($widget_settings['status'] == '1') {
+            $temp_output .= ' selected';
+        }
                 $temp_output .= '>Up</option>
                 <option value="0"';
-                if ($widget_settings['status'] == '0') {
-                    $temp_output .= ' selected';
-                }
+        if ($widget_settings['status'] == '0') {
+            $temp_output .= ' selected';
+        }
                 $temp_output .= '>Down</option>
             </select>
         </div>
@@ -101,8 +100,7 @@ if ($config['map']['engine'] == 'leaflet') {
   </div>
 </form>
         ';
-    }
-    else {
+    } else {
         $temp_output = '
 <script src="js/leaflet.js"></script>
 <script src="js/leaflet.markercluster-src.js"></script>
@@ -114,16 +112,14 @@ if ($config['map']['engine'] == 'leaflet') {
             $init_lat = $widget_settings['init_lat'];
             $init_lng = $widget_settings['init_lng'];
             $init_zoom = $widget_settings['init_zoom'];
-        }
-        elseif (isset($config['leaflet'])) {
+        } elseif (isset($config['leaflet'])) {
             $init_lat = $config['leaflet']['default_lat'];
             $init_lng = $config['leaflet']['default_lng'];
             $init_zoom = $config['leaflet']['default_zoom'];
         }
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
-        }
-        else {
+        } else {
             $group_radius = 80;
         }
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
@@ -166,8 +162,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                       AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
-        }
-        else {
+        } else {
         // Normal user - grab devices that user has permissions to
             $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng`
                     FROM `devices_perms`, `devices`
@@ -208,8 +203,7 @@ $(document).ready(function(){
 });
 </script>';
     }
-}
-else {
+} else {
     $temp_output = 'Mapael engine not supported here';
 }
 

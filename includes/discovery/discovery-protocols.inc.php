@@ -25,8 +25,7 @@ if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
                 if ($remote_device_id) {
                     $if             = $fdp['snFdpCacheDevicePort'];
                     $remote_port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?', array($if, $if, $remote_device_id));
-                }
-                else {
+                } else {
                     $remote_port_id = '0';
                 }
 
@@ -53,10 +52,9 @@ if ($config['autodiscovery']['xdp'] === true) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
                     if (!$remote_device_id) {
-                        if($config['discovery_by_ip'] !== true) {
+                        if ($config['discovery_by_ip'] !== true) {
                             $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
-                        }
-                        else {
+                        } else {
                             $ip_arr = explode(" ", $cdp['cdpCacheAddress']);
 
                             $a = hexdec($ip_arr[0]);
@@ -73,16 +71,14 @@ if ($config['autodiscovery']['xdp'] === true) {
                     if ($remote_device_id) {
                         $if             = $cdp['cdpCacheDevicePort'];
                         $remote_port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?', array($if, $if, $remote_device_id));
-                    }
-                    else {
+                    } else {
                         $remote_port_id = '0';
                     }
 
                     if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
                         discover_link($interface['port_id'], 'cdp', $remote_port_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion'], $device['device_id'], $remote_device_id);
                     }
-                }
-                else {
+                } else {
                     echo 'X';
                 }//end if
             }//end foreach
@@ -94,9 +90,8 @@ if ($config['autodiscovery']['xdp'] === true) {
 unset($lldp_array);
 
 if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
-
-    echo ' NMS-LLDP-MIB: '; 
-    $lldp_array  = snmpwalk_cache_oid($device, 'lldpRemoteSystemsData', array(), 'NMS-LLDP-MIB');
+    echo ' NMS-LLDP-MIB: ';
+    $lldp_array  = snmpwalk_cache_oid($device, 'lldpRemoteSystemsData', array(), 'NMS-LLDP-MIB', 'pbn');
     d_echo($lldp_array);
     if ($lldp_array) {
         unset($lldp_links);
@@ -114,8 +109,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                 $if             = $lldp['lldpRemPortDesc'];
                 $id             = $lldp['lldpRemPortId'];
                 $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_device_id));
-            }
-            else {
+            } else {
                 $remote_port_id = '0';
             }
 
@@ -124,9 +118,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
             }
         }//end foreach
     }//end if
-
 } elseif ($config['autodiscovery']['xdp'] === true) {
-    
     echo ' LLDP-MIB: ';
     $lldp_array  = snmpwalk_cache_threepart_oid($device, 'lldpRemoteSystemsData', array(), 'LLDP-MIB');
     d_echo($lldp_array);
@@ -140,8 +132,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
             foreach (array_keys($lldp_if_array) as $entry_key) {
                 if (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                     $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
-                }
-                else {
+                } else {
                     $ifIndex = $entry_key;
                 }
 
@@ -156,15 +147,16 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                     }
                     // normalize MAC address if present
-                    if ($lldp['lldpRemChassisIdSubtype'] == 'macAddress') {
-                        $remote_mac_address = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemChassisId']));
+                    $remote_port_mac_address = '';
+                    if ($lldp['lldpRemPortIdSubtype'] == 'macAddress') {
+                        $remote_port_mac_address = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
                     }
                     // get remote device hostname from db by MAC address and replace lldpRemSysName if absent
-                    if (!$remote_device_id && $remote_mac_address) {
-                        $remote_device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE ifPhysAddress = ? AND `deleted` = ?', array($remote_mac_address, '0'));
+                    if (!$remote_device_id && $remote_port_mac_address) {
+                        $remote_device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE ifPhysAddress = ? AND `deleted` = ?', array($remote_port_mac_address, '0'));
                         if ($remote_device_id) {
                             $remote_device_hostname = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = ?', array($remote_device_id));
-                        }    
+                        }
                         if ($remote_device_hostname['hostname']) {
                             $lldp['lldpRemSysName'] = $remote_device_hostname['hostname'];
                         }
@@ -172,9 +164,8 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     if ($remote_device_id) {
                         $if             = $lldp['lldpRemPortDesc'];
                         $id             = $lldp['lldpRemPortId'];
-                        $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_mac_address, $remote_device_id));
-                    }
-                    else {
+                        $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_port_mac_address, $remote_device_id));
+                    } else {
                         $remote_port_id = '0';
                     }
 
@@ -206,8 +197,7 @@ if ($config['autodiscovery']['ospf'] === true) {
         $name             = gethostbyaddr($ip);
         $remote_device_id = discover_new_device($name, $device, 'OSPF');
     }
-}
-else {
+} else {
     echo "disabled\n";
 }
 

@@ -20,8 +20,7 @@ $notes = $_POST['notes'];
 if (isset($notes) && (dbUpdate(array('notes' => $notes), 'devices', 'device_id = ?', array($device_id)))) {
     $status  = 'ok';
     $message = 'Updated';
-}
-else {
+} else {
     $status  = 'error';
     $message = 'ERROR: Could not update';
 }

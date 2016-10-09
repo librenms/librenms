@@ -33,23 +33,22 @@ if ($device['os'] == 'apc') {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 
-    /*
-        [iemConfigProbeHighHumidThreshold] => -1
-            [iemConfigProbeLowHumidThreshold] => -1
-            [iemConfigProbeHighHumidEnable] => disabled
-            [iemConfigProbeLowHumidEnable] => disabled
-            [iemConfigProbeMaxHumidThreshold] => -1
-            [iemConfigProbeMinHumidThreshold] => -1
-            [iemConfigProbeMaxHumidEnable] => disabled
-            [iemConfigProbeMinHumidEnable] => disabled
-            [iemConfigProbeHumidHysteresis] => -1
+    $apc_env_data = snmpwalk_cache_oid($device, 'emsProbeStatus', array(), 'PowerNet-MIB');
 
-            [iemStatusProbeStatus] => connected
-            [iemStatusProbeCurrentTemp] => 25
-            [iemStatusProbeTempUnits] => celsius
+    foreach (array_keys($apc_env_data) as $index) {
+        if ($apc_env_data[$index]['emsProbeStatusProbeCommStatus'] != 'commsNeverDiscovered') {
+            $descr = $apc_env_data[$index]['emsProbeStatusProbeName'];
+            $current = $apc_env_data[$index]['emsProbeStatusProbeTemperature'];
+            $sensorType = 'apc';
+            $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.3.' . $index;
+            $low_limit = $apc_env_data[$index]['emsProbeStatusProbeMinTempThresh'];
+            $low_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeLowTempThresh'];
+            $high_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeHighTempThresh'];
+            $high_limit = $apc_env_data[$index]['emsProbeStatusProbeMaxTempThresh'];
 
-            [iemStatusProbeCurrentHumid] => 0
-     */
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        }
+    }
 
     // InRow Chiller.
     // A silly check to find out if it's the right hardware.
@@ -89,8 +88,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Supply Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Supply Temperature';
         }
 
@@ -112,8 +110,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Return Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Return Temperature';
         }
 
@@ -134,8 +131,7 @@ if ($device['os'] == 'apc') {
             list(, $set_point_raw) = explode(' ', $set_oids);
             $set_point             = ($set_point_raw / $precision);
             $descr                 = 'Remote Temp - Setpoint: '.$set_point.'&deg;C';
-        }
-        else {
+        } else {
             $descr = 'Remote Temperature';
         }
 

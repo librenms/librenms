@@ -57,15 +57,13 @@ $i = '0';
 foreach (dbFetchRows('SELECT * FROM `loadbalancer_vservers` WHERE `device_id` = ? ORDER BY `classmap`', array($device['device_id'])) as $vserver) {
     if (is_integer($i / 2)) {
         $bg_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $bg_colour = $list_colour_b;
     }
 
     if ($vserver['serverstate'] == 'inService') {
         $vserver_class = 'green';
-    }
-    else {
+    } else {
         $vserver_class = 'red';
     }
 

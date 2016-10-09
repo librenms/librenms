@@ -21,7 +21,7 @@
 */
 
 
-if(!isset($vars['section'])) {
+if (!isset($vars['section'])) {
     $vars['section'] = "performance";
 }
 
@@ -51,8 +51,38 @@ if (empty($vars['dtpickerto'])) {
 <hr />
 <script type="text/javascript">
     $(function () {
-        $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-        $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+        $("#dtpickerfrom").datetimepicker({
+            useCurrent: true,
+            sideBySide: true,
+            useStrict: false,
+            icons: {
+                time: 'fa fa-clock-o',
+                date: 'fa fa-calendar',
+                up: 'fa fa-chevron-up',
+                down: 'fa fa-chevron-down',
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-calendar-check-o',
+                clear: 'fa fa-trash-o',
+                close: 'fa fa-close'
+            }
+        });
+        $("#dtpickerto").datetimepicker({
+            useCurrent: true,
+            sideBySide: true,
+            useStrict: false,
+            icons: {
+                time: 'fa fa-clock-o',
+                date: 'fa fa-calendar',
+                up: 'fa fa-chevron-up',
+                down: 'fa fa-chevron-down',
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-calendar-check-o',
+                clear: 'fa fa-trash-o',
+                close: 'fa fa-close'
+            }
+        });
     });
 </script>
 
@@ -61,8 +91,7 @@ if (empty($vars['dtpickerto'])) {
 if (is_admin() === true || is_read() === true) {
     $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf` WHERE `device_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?";
     $param = array($device['device_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
-}
-else {
+} else {
     $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf`,`devices_perms` WHERE `device_id` = ? AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = ? AND `timestamp` >= ? AND `timestamp` <= ?";
     $param = array($device['device_id'], $_SESSION['user_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
 }
@@ -75,27 +104,27 @@ else {
 
     var container = document.getElementById('visualization');
     <?php
-$groups = array();
-$max_val = 0;
+    $groups = array();
+    $max_val = 0;
 
-foreach(dbFetchRows($query, $param) as $return_value) {
-    $date = $return_value['Date'];
-    $loss = $return_value['loss'];
-    $min = $return_value['min'];
-    $max = $return_value['max'];
-    $avg = $return_value['avg'];
+    foreach (dbFetchRows($query, $param) as $return_value) {
+        $date = $return_value['Date'];
+        $loss = $return_value['loss'];
+        $min = $return_value['min'];
+        $max = $return_value['max'];
+        $avg = $return_value['avg'];
 
-    if ($max > $max_val) {
-        $max_val = $max;
+        if ($max > $max_val) {
+            $max_val = $max;
+        }
+
+        $data[] = array('x' => $date,'y' => $loss,'group' => 0);
+        $data[] = array('x' => $date,'y' => $min,'group' => 1);
+        $data[] = array('x' => $date,'y' => $max,'group' => 2);
+        $data[] = array('x' => $date,'y' => $avg,'group' => 3);
     }
 
-    $data[] = array('x' => $date,'y' => $loss,'group' => 0);
-    $data[] = array('x' => $date,'y' => $min,'group' => 1);
-    $data[] = array('x' => $date,'y' => $max,'group' => 2);
-    $data[] = array('x' => $date,'y' => $avg,'group' => 3);
-}
-
-$graph_data = _json_encode($data);
+    $graph_data = _json_encode($data);
 ?>
     var names = ['Loss','Min latency','Max latency','Avg latency'];
     var groups = new vis.DataSet();
@@ -156,7 +185,7 @@ $graph_data = _json_encode($data);
 
     var items =
         <?php
-echo $graph_data; ?>
+        echo $graph_data; ?>
     ;
     var dataset = new vis.DataSet(items);
     var options = {
@@ -170,10 +199,10 @@ echo $graph_data; ?>
         },
         zoomMin: 86400, //24hrs
         zoomMax: <?php
-$first_date = reset($data);
-$last_date = end($data);
-$milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
-echo $milisec_diff;
+        $first_date = reset($data);
+        $last_date = end($data);
+        $milisec_diff = abs(strtotime($first_date[x]) - strtotime($last_date[x])) * 1000;
+        echo $milisec_diff;
 ?>,
         orientation:'top'
     };

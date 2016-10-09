@@ -3,7 +3,7 @@
 require 'includes/graphs/common.inc.php';
 
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ib_dns_performance.rrd');
+$rrd_filename = rrd_name($device['hostname'], 'ib_dns_performance');
 $rrd_options .= " --vertical-label='Answer time in milliseconds'";
 $rrd_options .= " --lower-limit='0'";
 
@@ -16,17 +16,16 @@ $i = 0;
 foreach ($stats as $stat => $color) {
     $i++;
     $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr']    = ucfirst ($stat);
+    $rrd_list[$i]['descr']    = ucfirst($stat);
     $rrd_list[$i]['ds']       = $stat;
 
     # Set up DEFs
     $rrd_options .= " DEF:".$stat."=".$rrd_filename.':'.$stat.':AVERAGE ';
 
     # Set up area graphing with stacking
-    if ( $i == "0" ) {
+    if ($i == "0") {
         $rrd_options .= " 'AREA:".$stat . $color.":".$stat."'";
-    } 
-    else {
+    } else {
         $rrd_options .= " 'AREA:".$stat . $color.":".$stat.":STACK'";
     }
 
@@ -46,4 +45,3 @@ $current_pad = str_pad("", $filler, ' ', STR_PAD_LEFT);
 $rrd_options .= " 'GPRINT:cdeftotal:LAST:".$current_pad."Current\:%8.0lf'";
 $rrd_options .= " 'GPRINT:cdeftotal:AVERAGE:Average\:%8.0lf'";
 $rrd_options .= " 'GPRINT:cdeftotal:MAX:Maximum\:%8.0lf\\n'";
-

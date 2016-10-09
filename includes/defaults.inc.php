@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
+ * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -11,9 +11,8 @@
  *
  * See COPYING for more details.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage config
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  * @license    http://gnu.org/copyleft/gpl.html GNU GPL
  */
@@ -21,30 +20,30 @@
 //
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
-error_reporting(E_ERROR);
+error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
-function set_debug($debug) {
+// set install_dir
+$config['install_dir'] = realpath(__DIR__ . '/..');
 
-    if (isset($debug)) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 0);
-        ini_set('log_errors', 0);
-        ini_set('allow_url_fopen', 0);
-        ini_set('error_reporting', E_ALL);
-    }
-
-}//end set_debug()
+// initialize the class loader and add custom mappings
+require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
+$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/lib/console_colour.php');
+$classLoader->registerClass('Console_Table', $config['install_dir'] . '/lib/console_table.php');
+$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/lib/phpmailer/class.phpmailer.php");
+$classLoader->registerClass('SMTP', $config['install_dir'] . "/lib/phpmailer/class.smtp.php");
+$classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
+$classLoader->register();
 
 // Default directories
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
 
 $config['temp_dir']    = '/tmp';
-$config['install_dir'] = '/opt/'.$config['project_id'];
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
-$config['db']['extension']       = 'mysql';//mysql and mysqli available
+$config['db']['extension']       = 'mysqli';//mysql and mysqli available
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
@@ -91,15 +90,13 @@ $config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
 
 // RRDCacheD - Make sure it can write to your RRD dir!
 // $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
-$config['rrdcached_dir'] = false;
-// Set this if you are using tcp connections to rrdcached
+
 // Web Interface Settings
 if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
     if (strpos($_SERVER['SERVER_NAME'], ':')) {
         // Literal IPv6
         $config['base_url'] = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    }
-    else {
+    } else {
         $config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
     }
 }
@@ -163,7 +160,7 @@ $config['show_services'] = 0;
 $config['ports_page_default'] = 'details';
 // eg "details" or "basic"
 // Adding Host Settings
-$config['addhost_alwayscheckip']   = FALSE;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
+$config['addhost_alwayscheckip']   = false;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
 // SNMP Settings - Timeouts/Retries disabled as default
 // $config['snmp']['timeout'] = 1;            # timeout in seconds
 // $config['snmp']['retries'] = 5;            # how many times to retry the query
@@ -440,8 +437,6 @@ $config['enable_vrfs'] = 1;
 // Enable VRFs
 $config['enable_vrf_lite_cisco'] = 1;
 // Enable routes for VRF lite cisco
-$config['enable_printers'] = 0;
-// Enable Printer support
 $config['enable_sla'] = 0;
 // Enable Cisco SLA collection and display
 // Ports extension modules
@@ -595,6 +590,10 @@ $config['auth_ldap_emailattr']                  = 'mail';
 $config['auth_ldap_cache_ttl'] = 300;
 // How long in seconds should ldap* module cache user information in $_SESSION
 
+// Active Directory Authentication
+$config['auth_ad_user_filter'] = "(objectclass=user)";
+$config['auth_ad_group_filter'] = "(objectclass=group)";
+
 // Sensors
 $config['allow_entity_sensor']['amperes']     = 1;
 $config['allow_entity_sensor']['celsius']     = 1;
@@ -715,6 +714,7 @@ $config['poller_modules']['cisco-voice']                 = 1;
 $config['poller_modules']['cisco-cbqos']                 = 1;
 $config['poller_modules']['stp']                         = 1;
 $config['poller_modules']['cisco-otv']                   = 1;
+$config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 
 // List of discovery modules. Need to be in this array to be
@@ -752,6 +752,7 @@ $config['discovery_modules']['charge']         = 1;
 $config['discovery_modules']['cisco-cbqos']    = 0;
 $config['discovery_modules']['stp']            = 1;
 $config['discovery_modules']['cisco-otv']      = 1;
+$config['discovery_modules']['ntp']            = 1;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;
@@ -874,7 +875,7 @@ $config['update_channel']                               = 'master';
 $config['default_port_association_mode'] = 'ifIndex';
 // Ignore ports which can't be mapped using a devices port_association_mode
 // See include/polling/ports.inc.php for a lenghty explanation.
-$config['ignore_unmapable_port'] = False;
+$config['ignore_unmapable_port'] = false;
 
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
@@ -882,4 +883,3 @@ $config['influxdb']['verifySSL']    = false;
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
-

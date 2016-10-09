@@ -19,7 +19,6 @@ global $debug;
 
 // This one only will work with the CISCO-CONTEXT-MAPPING-MIB V2 of cisco
 if ($config['enable_vrf_lite_cisco']) {
-
     $ids = array();
 
     // For the moment only will be cisco and the version 3
@@ -27,7 +26,7 @@ if ($config['enable_vrf_lite_cisco']) {
         $mib = "SNMP-COMMUNITY-MIB";
         $mib = "CISCO-CONTEXT-MAPPING-MIB";
         //-Osq because if i put the n the oid from the first command is not the same of this one
-        $listVrf = snmp_walk($device, "cContextMappingVrfName", "-Osq -Ln", $mib, NULL);
+        $listVrf = snmp_walk($device, "cContextMappingVrfName", "-Osq -Ln", $mib, null);
         $listVrf = str_replace("cContextMappingVrfName.", "", $listVrf);
         $listVrf = str_replace('"', "", $listVrf);
         $listVrf = trim($listVrf);
@@ -45,13 +44,13 @@ if ($config['enable_vrf_lite_cisco']) {
         }
         unset($listVrf);
         
-        $listIntance = snmp_walk($device, "cContextMappingProtoInstName", "-Osq -Ln", $mib, NULL);
+        $listIntance = snmp_walk($device, "cContextMappingProtoInstName", "-Osq -Ln", $mib, null);
         $listIntance = str_replace("cContextMappingProtoInstName.", "", $listIntance);
         $listIntance = str_replace('"', "", $listIntance);
         $listIntance = trim($listIntance);
         
-        d_echo ("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
-        d_echo ("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
+        d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
+        d_echo("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
         
         foreach (explode("\n", $listIntance) as $lineIntance) {
             $tmpIntance = explode(" ", $lineIntance, 2);
@@ -76,12 +75,12 @@ if ($config['enable_vrf_lite_cisco']) {
                 $vrfUpdate=array();
                 
                 foreach ($vrfUpdate as $key => $value) {
-                    if($vrf[$key]!=$value){
+                    if ($vrf[$key]!=$value) {
                         $vrfUpdate[$key]=$value;
                     }
                 }
                 if (!empty($vrfUpdate)) {
-               dbUpdate($vrfUpdate, 'vrf_lite_cisco', 'vrf_lite_cisco_id=?', array(
+                    dbUpdate($vrfUpdate, 'vrf_lite_cisco', 'vrf_lite_cisco_id=?', array(
                         $tmp['vrf_lite_cisco_id']
                     ));
                 }
@@ -98,7 +97,7 @@ if ($config['enable_vrf_lite_cisco']) {
         unset($tableVrf);
     }
 
-    //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work 
+    //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work
     $tmpVrfC = dbFetchRows("SELECT * FROM vrf_lite_cisco WHERE device_id = ? ", array(
         $device ['device_id']));
     $device['vrf_lite_cisco'] = $tmpVrfC;
@@ -115,4 +114,3 @@ if ($config['enable_vrf_lite_cisco']) {
     unset($ids);
     unset($tmpVrfC);
 } // enable_vrf_lite_cisco
-

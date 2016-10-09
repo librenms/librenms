@@ -14,8 +14,7 @@ if ($multiplier) {
 
     $rrd_options .= ' DEF:'.$ds.'_o='.$rrd_filename.':'.$ds.':AVERAGE';
     $rrd_options .= ' CDEF:'.$ds.'='.$ds."_o,$multiplier,$multiplier_action";
-}
-else {
+} else {
     $rrd_options .= ' DEF:'.$ds.'='.$rrd_filename.':'.$ds.':AVERAGE';
 }
 
@@ -36,8 +35,7 @@ if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' DEF:'.$ds.'_oX='.$rrd_filename.':'.$ds.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' SHIFT:'.$ds."_oX:$period";
         $rrd_options .= ' CDEF:'.$ds.'X='.$ds."_oX,$multiplier,*";
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$ds.'X='.$rrd_filename.':'.$ds.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' SHIFT:'.$ds."X:$period";
     }

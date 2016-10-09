@@ -91,14 +91,12 @@ foreach ($pkgs_id as $pkg) {
         if (!empty($pkg_update)) {
             dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($id));
             echo 'u';
-        }
-        else {
+        } else {
             echo '.';
         }
 
         unset($pkgs_db_id[$id]);
-    }
-    else {
+    } else {
         if (count($pkgs[$manager][$name][$arch], 1) > '10' || count($pkgs_db[$manager][$name][$arch], 1) == '0') {
             dbInsert(
                 array(
@@ -115,20 +113,17 @@ foreach ($pkgs_id as $pkg) {
             );
             if ($build != '') {
                 $dbuild = '-'.$build;
-            }
-            else {
+            } else {
                 $dbuild = '';
             }
 
             echo '+'.$name.'-'.$version.$dbuild.'-'.$arch;
             log_event('Package installed: '.$name.' ('.$arch.') version '.$version.$dbuild, $device, 'package');
-        }
-        else if (count($pkgs_db[$manager][$name][$arch], 1)) {
+        } elseif (count($pkgs_db[$manager][$name][$arch], 1)) {
             $pkg_c = dbFetchRow('SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC', array($device['device_id'], $manager, $name, $arch));
             if ($pkg_c['build'] != '') {
                 $pkg_c_dbuild = '-'.$pkg_c['build'];
-            }
-            else {
+            } else {
                 $pkg_c_dbuild = '';
             }
 

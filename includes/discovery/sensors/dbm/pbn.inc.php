@@ -41,5 +41,4 @@ if ($device['os'] == 'pbn' || $device['os_group'] == 'pbn') {
             discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
-
 }

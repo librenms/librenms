@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', $config['install_dir'].'/mibs/equallogic');
+$eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
 if (is_array($eql_storage)) {
     echo 'EqliscsiVolumeEntry ';
@@ -24,8 +24,7 @@ if (is_array($eql_storage)) {
         $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
         if (is_int($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
-        }
-        else {
+        } else {
             // Trying to search the last '.' and take something after it as index
             $arrindex = explode(".", $index);
             $newindex = (int)(end($arrindex))+0;

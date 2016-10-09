@@ -4,7 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 $device = device_by_id_cache($id);
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/mem.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'mem');
 
 $rrd_options .= ' -b 1024';
 

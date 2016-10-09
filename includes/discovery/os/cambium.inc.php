@@ -7,22 +7,10 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */ 
+ */
 
-if (!$os) {
-    if (preg_match('/^Cambium PTP 50650/', $sysDescr)) {
-    	$os = 'cambium';
-    }
-    else if (preg_match('/^PTP250/', $sysDescr)) {
-    	$os = 'cambium';
-    }
-    else if (preg_match('/^Cambium/', $sysDescr)) {
-        $os = 'cambium';
-    }
-    else if (strstr($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
-        $os = 'cambium';
-    }
-    else if (strstr($sysObjectId, 'enterprises.17713.21')) {
-        $os = 'cambium';
-    }
+if (starts_with($sysDescr, array('Cambium PTP 50650', 'PTP250', 'Cambium'))) {
+    $os = 'cambium';
+} elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
+    $os = 'cambium';
 }

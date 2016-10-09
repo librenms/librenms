@@ -7,8 +7,7 @@ $i = '1';
 if (count_mib_processors($device) > 0) {
     $processors = get_mib_processors($device);
     $graph_type = 'device_processor';
-}
-else {
+} else {
     $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device['device_id']));
 }
 
@@ -16,8 +15,7 @@ foreach ($processors as $proc) {
     if ($graph_type == 'device_processor') {
         $id = 'device';
         $val = $device['device_id'];
-    }
-    else {
+    } else {
         $id = 'id';
         $val = $proc['processor_id'];
     }

@@ -20,15 +20,12 @@ if (is_admin() === false) {
 if (!is_numeric($_POST['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
-}
-else {
+} else {
     if ($_POST['state'] == 'true') {
         $state = 0;
-    }
-    else if ($_POST['state'] == 'false') {
+    } elseif ($_POST['state'] == 'false') {
         $state = 1;
-    }
-    else {
+    } else {
         $state = 1;
     }
 
@@ -36,8 +33,7 @@ else {
     if (!empty($update) || $update == '0') {
         echo 'Alert rule has been updated.';
         exit;
-    }
-    else {
+    } else {
         echo 'ERROR: Alert rule has not been updated.';
         exit;
     }

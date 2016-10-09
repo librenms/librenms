@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-alert" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -137,7 +136,7 @@ if(is_admin() !== false) {
         <div class='form-group'>
             <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
             <div class='col-sm-9'>
-                <input type='text' id='proc' name='proc' class='form-control' maxlength='30'>
+                <input type='text' id='proc' name='proc' class='form-control' maxlength='80'>
             </div>
         </div>
         <div class="form-group">
@@ -397,5 +396,4 @@ $( "#suggest, #value" ).blur(function() {
 </script>
 
 <?php
-
 }

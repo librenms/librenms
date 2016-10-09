@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/netstats-ip.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'netstats-ip');
 
 $rrd_options .= " DEF:ipInDelivers=$rrd_filename:ipInDelivers:AVERAGE";
 $rrd_options .= " DEF:ipReasmReqds=$rrd_filename:ipReasmReqds:AVERAGE";

@@ -22,29 +22,36 @@ print_optionbar_start();
             <div class="pull-left">
                 <form method="post" action="" class="form-inline" role="form" id="result_form">
                     <div class="form-group">
+                        <?php
+                        if (!is_numeric($vars['device'])) {
+                        ?>
                         <select name="device" id="device" class="form-control input-sm">
                             <option value="">All Devices</option>
-                                <?php
-                                foreach (get_all_devices() as $hostname) {
-                                    $device_id = getidbyname($hostname);
-                                    if (device_permitted($device_id)) {
-                                        echo '"<option value="'.$device_id.'"';
-                                        if ($device_id == $vars['device']) {
-                                            echo ' selected';
-                                        }
-
-                                        echo '>'.$hostname.'</option>';
+                            <?php
+                            foreach (get_all_devices() as $hostname) {
+                                $device_id = getidbyname($hostname);
+                                if (device_permitted($device_id)) {
+                                    echo '"<option value="' . $device_id . '"';
+                                    if ($device_id == $vars['device']) {
+                                        echo ' selected';
                                     }
+                                    echo '>' . $hostname . '</option>';
                                 }
-                                ?>
+                            }
+                            ?>
                         </select>
+                        <?php
+                        } else {
+                            echo '<input type="hidden" name="device" id="device" value="' . $vars['device'] . '">';
+                        }
+                        ?>
                     </div>
                     <div class="form-group">
                         <select name="program" id="program" class="form-control input-sm">
                             <option value="">All Programs</option>
                                 <?php
                                 foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
-                                    echo '"<option value="'.$data['program'].'"';
+                                    echo '"<option value="'.mres($data['program']).'"';
                                     if ($data['program'] == $vars['program']) {
                                         echo ' selected';
                                     }
@@ -59,7 +66,7 @@ print_optionbar_start();
                             <option value="">All Priorities</option>
                                 <?php
                                 foreach (dbFetchRows('SELECT DISTINCT `priority` FROM `syslog` ORDER BY `level`') as $data) {
-                                    echo '"<option value="'.$data['priority'].'"';
+                                    echo '"<option value="'.mres($data['priority']).'"';
                                     if ($data['priority'] == $vars['priority']) {
                                         echo ' selected';
                                     }
@@ -87,11 +94,35 @@ print_optionbar_start();
 
 <script>
 $(function () {
-    $("#dtpickerfrom").datetimepicker();
+    $("#dtpickerfrom").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#dtpickerfrom").on("dp.change", function (e) {
         $("#dtpickerto").data("DateTimePicker").minDate(e.date);
     });
-    $("#dtpickerto").datetimepicker();
+    $("#dtpickerto").datetimepicker({
+        icons: {
+            time: 'fa fa-clock-o',
+            date: 'fa fa-calendar',
+            up: 'fa fa-chevron-up',
+            down: 'fa fa-chevron-down',
+            previous: 'fa fa-chevron-left',
+            next: 'fa fa-chevron-right',
+            today: 'fa fa-calendar-check-o',
+            clear: 'fa fa-trash-o',
+            close: 'fa fa-close'
+        }
+    });
     $("#dtpickerto").on("dp.change", function (e) {
         $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
     });
@@ -109,6 +140,6 @@ $(function () {
 <?php
 print_optionbar_end();
 require_once 'includes/common/syslog.inc.php';
-echo implode('',$common_output);
+echo implode('', $common_output);
 ?>
 

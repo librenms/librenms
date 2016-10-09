@@ -1,10 +1,13 @@
 <?php
 
-class Test {
+namespace LibreNMS\Plugins;
 
-    public function menu() {
-        echo '<li><a href="plugin/p='.get_class().'">'.get_class().'</a></li>';
+class Test
+{
 
+    public function menu()
+    {
+        echo '<li><a href="plugin/p=Test">Test</a></li>';
     }//end menu()
 
 

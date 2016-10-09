@@ -36,8 +36,7 @@ $total_days = date('d', (strtotime($dateto) - strtotime($datefrom)));
 $total['data'] = format_bytes_billing($bill_data['total_data']);
 if ($bill_data['bill_type'] == 'quota') {
     $total['allow'] = format_bytes_billing($bill_data['bill_quota']);
-}
-else {
+} else {
     $total['allow'] = '-';
 }
 
@@ -71,13 +70,13 @@ $ousage['per']   = (($ousage['per'] < 0) ? '0' : $ousage['per']);
 $ousage['bg']    = get_percentage_colours($ousage['per']);
 
 
-function showPercent($per) {
+function showPercent($per)
+{
     $background       = get_percentage_colours($per);
     $right_background = $background['right'];
     $left_background  = $background['left'];
     $res              = print_percentage_bar(200, 20, $per, null, 'ffffff', $left_background, $per.'%', 'ffffff', $right_background);
     return $res;
-
 }//end showPercent()
 
 ?>
@@ -152,7 +151,7 @@ function showPercent($per) {
 
 
 
-<?php 
+<?php
 $bi  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
 $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
 $bi .= '&amp;type=day&imgbill=1';

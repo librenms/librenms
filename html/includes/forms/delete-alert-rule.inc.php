@@ -20,20 +20,17 @@ if (is_admin() === false) {
 if (!is_numeric($_POST['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
-}
-else {
+} else {
     if (dbDelete('alert_rules', '`id` =  ?', array($_POST['alert_id']))) {
         if (dbDelete('alert_map', 'rule = ?', array($_POST['alert_id'])) || dbFetchCell('COUNT(id) FROM alert_map WHERE rule = ?', array($_POST['alert_id'])) == 0) {
             echo 'Maps has been deleted.';
-        }
-        else {
+        } else {
             echo 'WARNING: Maps could not be deleted.';
         }
 
         echo 'Alert rule has been deleted.';
         exit;
-    }
-    else {
+    } else {
         echo 'ERROR: Alert rule has not been deleted.';
         exit;
     }

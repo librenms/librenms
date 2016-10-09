@@ -63,7 +63,7 @@ foreach (dbFetchRows("SELECT `type` FROM `eventlog` GROUP BY `type`") as $types)
 print_optionbar_end();
 
 require_once 'includes/common/eventlog.inc.php';
-echo implode('',$common_output);
+echo implode('', $common_output);
 
 ?>
 

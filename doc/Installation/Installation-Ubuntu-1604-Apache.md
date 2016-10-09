@@ -1,3 +1,4 @@
+source: Installation/Installation-Ubuntu-1604-Apache.md
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 ### DB Server ###
@@ -104,13 +105,17 @@ Now head to: http://librenms.example.com/install.php and follow the on-screen in
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.example /etc/snmpd.conf
-vim /etc/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+vim /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-`service snmpd restart`
+```bash
+curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+service snmpd restart
+```
 
 #### Cron job
 
@@ -122,7 +127,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 chown -R librenms:librenms /opt/librenms
 ```
 
-Now run validate your install and make sure everything is ok:
+Run validate.php as root in the librenms directory:
 
 ```bash
 cd /opt/librenms
@@ -139,10 +144,10 @@ We now suggest that you add localhost as your first device from within the WebUI
 
 Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
 
- - (Performance tuning)[http://docs.librenms.org/Support/Performance]
- - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
- - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
- - (Auto discovery)[http://docs.librenms.org/Extensions/Auto-Discovery/]
+ - [Performance tuning](http://docs.librenms.org/Support/Performance)
+ - [Alerting](http://docs.librenms.org/Extensions/Alerting/)
+ - [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
+ - [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
 
 #### Closing
 

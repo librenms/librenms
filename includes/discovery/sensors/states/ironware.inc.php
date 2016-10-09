@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'ironware') {
-
     $temp = snmpwalk_cache_multi_oid($device, 'snChasPwrSupplyTable', array(), 'FOUNDRY-SN-AGENT-MIB');
     $cur_oid = '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.';
 
@@ -27,7 +26,7 @@ if ($device['os'] == 'ironware') {
                 array($state_index_id,'normal',0,2,0) ,
                 array($state_index_id,'failure',0,3,2)
              );
-            foreach($states as $value){ 
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -42,9 +41,9 @@ if ($device['os'] == 'ironware') {
         foreach ($temp as $index => $entry) {
                 //Discover Sensors
                 $descr = $temp[$index]['snChasPwrSupplyDescription'];
-                if (empty($descr)) {
-                    $descr = "Power Supply " . $index;
-                }
+            if (empty($descr)) {
+                $descr = "Power Supply " . $index;
+            }
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index]['snChasPwrSupplyOperStatus'], 'snmp', $index);
 
                 //Create Sensor To State Index

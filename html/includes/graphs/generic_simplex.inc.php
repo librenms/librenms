@@ -2,8 +2,7 @@
 
 if ($config['old_graphs']) {
     include 'includes/graphs/old_generic_simplex.inc.php';
-}
-else {
+} else {
     // Draw generic bits graph
     // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
     include 'includes/graphs/common.inc.php';
@@ -23,8 +22,7 @@ else {
         $rrd_options .= ' CDEF:'.$ds.'='.$ds."_o,$multiplier,$multiplier_action";
         $rrd_options .= ' CDEF:'.$ds.'_max='.$ds."_max_o,$multiplier,$multiplier_action";
         $rrd_options .= ' CDEF:'.$ds.'_min='.$ds."_min_o,$multiplier,$multiplier_action";
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$ds.'='.$rrd_filename.':'.$ds.':AVERAGE';
         $rrd_options .= ' DEF:'.$ds.'_max='.$rrd_filename.':'.$ds.':MAX';
         $rrd_options .= ' DEF:'.$ds.'_min='.$rrd_filename.':'.$ds.':MIN';
@@ -50,8 +48,7 @@ else {
 
             $rrd_options .= ' CDEF:'.$ds.'X='.$ds."_oX,$multiplier,$multiplier_action";
             $rrd_options .= ' CDEF:'.$ds.'_maxX='.$ds."_max_oX,$multiplier,$multiplier_action";
-        }
-        else {
+        } else {
             $rrd_options .= ' DEF:'.$ds.'X='.$rrd_filename.':'.$ds.':AVERAGE:start='.$prev_from.':end='.$from;
             $rrd_options .= ' DEF:'.$ds.'_maxX='.$rrd_filename.':'.$ds.':MAX:start='.$prev_from.':end='.$from;
             $rrd_options .= ' SHIFT:'.$ds."X:$period";
@@ -75,8 +72,7 @@ else {
     if ($colour_minmax) {
         $rrd_options .= ' AREA:'.$ds.'_max#c5c5c5';
         $rrd_options .= ' AREA:'.$ds.'_min#ffffffff';
-    }
-    else {
+    } else {
         $rrd_options .= ' AREA:'.$ds.'#'.$colour_area.':';
         if ($graph_max) {
             $rrd_options .= ' AREA:'.$ds.'_max#'.$colour_area_max.':';

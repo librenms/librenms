@@ -15,7 +15,6 @@
 
 if ($device['os'] == 'binos') {
     if (strpos($device['sysObjectID'], 'enterprises.738.1.5.100') !== false) {
-
         echo 'Telco Systems:';
         $descr = 'Processor';
         $usage = snmp_get($device, '.1.3.6.1.4.1.738.1.111.3.1.2.1.0', '-Ovq');
@@ -26,4 +25,3 @@ if ($device['os'] == 'binos') {
         }
     }
 }
-

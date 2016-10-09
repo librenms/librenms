@@ -28,8 +28,7 @@ foreach ($serverfarm_array as $index => $vserver) {
 
     if (!is_array($classmaps[$classmap])) {
         $classmap_in = dbInsert(array('device_id' => $device['device_id'], 'classmap_id' => $classmap_id, 'classmap' => $classmap, 'serverstate' => $vserver['slbVServerState']), 'loadbalancer_vservers');
-    }
-    else {
+    } else {
         foreach ($db_oids as $db_oid => $db_value) {
             $db_update[$db_value] = $vserver[$db_oid];
         }
@@ -37,36 +36,27 @@ foreach ($serverfarm_array as $index => $vserver) {
         $updated = dbUpdate($db_update, 'loadbalancer_vservers', '`classmap_id` = ?', $vserver['slbVServerState']['classmap']);
     }
 
-    $rrd_file   = $config['rrd_dir'].'/'.$device['hostname'].'/vserver-'.$classmap_id.'.rrd';
-    $rrd_create = $config['rrd_rra'];
-
+    $rrd_name = array('vserver', $classmap_id);
+    $rrd_def = array();
     foreach ($oids as $oid) {
-        $oid_ds      = truncate(str_replace('slbVServer', '', $oid), 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000000";
+        $oid_ds    = truncate(str_replace('slbVServer', '', $oid), 19, '');
+        $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
     }
 
     $fields = array();
-
     foreach ($oids as $oid) {
         if (is_numeric($vserver[$oid])) {
             $value = $vserver[$oid];
-        }
-        else {
+        } else {
             $value = '0';
         }
         $fields[$oid] = $value;
     }
 
     if (isset($classmaps[$classmap])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
-        }
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array('classmap_id' => $classmap_id);
-        influx_update($device,'vservers',$tags,$fields);
-
+        $tags = compact('classmap_id', 'rrd_name', 'rrd_def');
+        data_update($device, 'vservers', $tags, $fields);
     }
 }//end foreach
 
-unset($oids, $oid, $vserver);
+unset($rrd_name, $rrd_def, $oids, $oid, $vserver);

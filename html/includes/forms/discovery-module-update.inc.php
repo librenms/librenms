@@ -3,7 +3,7 @@ header('Content-type: text/plain');
 
 // FUA
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
@@ -13,22 +13,18 @@ $module              = 'discover_'.$_POST['discovery_module'];
 if (!isset($module) && validate_device_id($device['device_id']) === false) {
     echo 'error with data';
     exit;
-}
-else {
+} else {
     if ($_POST['state'] == 'true') {
         $state = 1;
-    }
-    else if ($_POST['state'] == 'false') {
+    } elseif ($_POST['state'] == 'false') {
         $state = 0;
-    }
-    else {
+    } else {
         $state = 0;
     }
 
     if (isset($attribs['discover_'.$module]) && $attribs['discover_'.$module] != $config['discover_modules'][$module]) {
         del_dev_attrib($device, $module);
-    }
-    else {
+    } else {
         set_dev_attrib($device, $module, $state);
     }
 }

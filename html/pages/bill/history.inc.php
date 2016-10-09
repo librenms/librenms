@@ -20,19 +20,18 @@ $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
     <?php echo $img['his'] ?>
 </div>
 
-<?php 
+<?php
 
-function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype='Quota') {
+function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype = 'Quota')
+{
     if ($imgtype == 'bitrate') {
         $res = '<img src="billing-graph.php?bill_id='.$bill_id;
         if ($bittype == 'Quota') {
             $res .= '&amp;ave=yes';
-        }
-        else if ($bittype == 'CDR') {
+        } elseif ($bittype == 'CDR') {
             $res .= '&amp;95th=yes';
         }
-    }
-    else {
+    } else {
         $res = '<img src="bandwidth-graph.php?bill_id='.$bill_id;
     }
 
@@ -42,7 +41,6 @@ function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype='Quota') {
     $res .= '&amp;bill_hist_id='.$bill_hist_id;
     $res .= '" style="margin: 15px 5px 25px 5px;" />';
     return $res;
-
 }//end showDetails()
 
 
@@ -87,8 +85,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             $in      = formatRates($history['rate_95th_in']);
             $out     = formatRates($history['rate_95th_out']);
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.formatRates($history['bill_overuse']).'</span>');
-        }
-        else if ($type == 'Quota') {
+        } elseif ($type == 'Quota') {
             $allowed = format_number($history['bill_allowed'], $config['billing']['base']);
             $used    = format_number($history['total_data'], $config['billing']['base']);
             $in      = format_number($history['traf_in'], $config['billing']['base']);

@@ -29,8 +29,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == 'cisco') {
         if (!empty($device['pws_db'][$pw['cpwVcID']])) {
             $pseudowire_id = $device['pws_db'][$pw['cpwVcID']];
             echo '.';
-        }
-        else {
+        } else {
             $pseudowire_id = dbInsert(
                 array(
                     'device_id'      => $device['device_id'],

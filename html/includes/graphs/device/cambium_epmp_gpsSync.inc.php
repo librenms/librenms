@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-epmp-gpsSync.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-gpsSync');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'1 - GPS Sync Up       2 - GPS Sync Down      3 - CMM Sync     \\n'";
     $rrd_options .= ' DEF:gpsSync='.$rrdfilename.':gpsSync:AVERAGE ';

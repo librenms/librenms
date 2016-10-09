@@ -41,41 +41,32 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
-    }
-    else {
+    } else {
         if (dbDelete('config', '`config_id`=?', array($config_id))) {
             if ($action == 'remove-slack') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.slack.$config_id.%'");
-            }
-            else if ($action == 'remove-hipchat') {
+            } elseif ($action == 'remove-hipchat') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.hipchat.$config_id.%'");
-            }
-            else if ($action == 'remove-pushover') {
+            } elseif ($action == 'remove-pushover') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.pushover.$config_id.%'");
-            }
-            elseif ($action == 'remove-boxcar') {
+            } elseif ($action == 'remove-boxcar') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.boxcar.$config_id.%'");
-            }
-            elseif ($action == 'remove-clickatell') {
+            } elseif ($action == 'remove-clickatell') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.clickatell.$config_id.%'");
-            }
-            elseif ($action == 'remove-playsms') {
+            } elseif ($action == 'remove-playsms') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.playsms.$config_id.%'");
             }
 
             $status  = 'ok';
             $message = 'Config item removed';
-        }
-        else {
+        } else {
             $message = 'General error, could not remove config';
         }
     }
-}
-else if ($action == 'add-slack') {
+} elseif ($action == 'add-slack') {
     if (empty($config_value)) {
         $message = 'No Slack url provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.slack.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Slack Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.slack.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
@@ -88,17 +79,14 @@ else if ($action == 'add-slack') {
                     dbInsert(array('config_name' => 'alert.transports.slack.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Slack Transport'), 'config');
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }
-}
-else if ($action == 'add-hipchat') {
+} elseif ($action == 'add-hipchat') {
     if (empty($config_value) || empty($config_room_id) || empty($config_from)) {
         $message = 'No hipchat url, room id or from provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.hipchat.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Hipchat Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
@@ -113,17 +101,14 @@ else if ($action == 'add-hipchat') {
                     dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Hipchat '.$v), 'config');
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }//end if
-}
-else if ($action == 'add-pushover') {
+} elseif ($action == 'add-pushover') {
     if (empty($config_value) || empty($config_userkey)) {
         $message = 'No pushover appkey or userkey provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.pushover.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Pushover Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.pushover.'.$config_id.'.appkey'), 'config', 'config_id=?', array($config_id));
@@ -137,17 +122,14 @@ else if ($action == 'add-pushover') {
                     dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Pushover '.$v), 'config');
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }
-}
-else if ($action == 'add-boxcar') {
+} elseif ($action == 'add-boxcar') {
     if (empty($config_value)) {
         $message = 'No Boxcar access token provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.boxcar.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Boxcar Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.access_token'), 'config', 'config_id=?', array($config_id));
@@ -160,20 +142,16 @@ else if ($action == 'add-boxcar') {
                     dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Boxcar '.$v), 'config');
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }
-}
-else if ($action == 'add-clickatell') {
+} elseif ($action == 'add-clickatell') {
     if (empty($config_value)) {
         $message = 'No Clickatell token provided';
-    }
-    elseif (empty($config_to)) {
+    } elseif (empty($config_to)) {
         $message = 'No mobile numbers provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.clickatell.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Clickatell Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.token'), 'config', 'config_id=?', array($config_id));
@@ -187,23 +165,18 @@ else if ($action == 'add-clickatell') {
                     $x++;
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }
-}
-elseif ($action == 'add-playsms') {
+} elseif ($action == 'add-playsms') {
     if (empty($config_value)) {
         $message = 'No PlaySMS URL provided';
-    }
-    elseif (empty($config_user)) {
+    } elseif (empty($config_user)) {
         $message = 'No PlaySMS User provided';
-    }
-    elseif (empty($config_to)) {
+    } elseif (empty($config_to)) {
         $message = 'No mobile numbers provided';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.playsms.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'PlaySMS Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.playsms.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
@@ -220,24 +193,20 @@ elseif ($action == 'add-playsms') {
                     $x++;
                 }
             }
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }
-}
-else {
+} else {
     if (empty($config_group) || empty($config_sub_group) || empty($config_name) || empty($config_value)) {
         $message = 'Missing config name or value';
-    }
-    else {
+    } else {
         $config_id = dbInsert(array('config_name' => $config_name, 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'API Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => $config_name.$config_id), 'config', 'config_id=?', array($config_id));
             $status  = 'ok';
             $message = 'Config item created';
-        }
-        else {
+        } else {
             $message = 'Could not create config item';
         }
     }

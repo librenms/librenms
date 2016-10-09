@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (stristr($sysDescr, 'bcm963')) {
-        $os = 'bcm963';
-    }
+if (str_contains($sysDescr, 'bcm963', true)) {
+    $os = 'bcm963';
 }

@@ -11,13 +11,12 @@
  */
 
 if ($device['os'] == 'comware') {
-
     $tables = array(
         array('hh3cdevMFanStatusTable','.1.3.6.1.4.1.25506.8.35.9.1.1.1.2.','hh3cDevMFanStatus') ,
-        array('hh3cdevMPowerStatusTable','.1.3.6.1.4.1.25506.8.35.9.1.2.1.2.','hh3cDevMPowerStatus') 
+        array('hh3cdevMPowerStatusTable','.1.3.6.1.4.1.25506.8.35.9.1.2.1.2.','hh3cDevMPowerStatus')
     );
 
-    foreach($tables as $tablevalue){
+    foreach ($tables as $tablevalue) {
         $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], array(), 'HH3C-LswDEVM-MIB');
         $cur_oid = $tablevalue[1];
 
@@ -34,7 +33,7 @@ if ($device['os'] == 'comware') {
                      array($state_index_id,'not-install',0,3,3) ,
                      array($state_index_id,'unsupport',0,4,1)
                  );
-                foreach($states as $value){ 
+                foreach ($states as $value) {
                     $insert = array(
                         'state_index_id' => $value[0],
                         'state_descr' => $value[1],
@@ -60,4 +59,3 @@ if ($device['os'] == 'comware') {
         }
     }
 }
-

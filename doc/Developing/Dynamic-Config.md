@@ -1,3 +1,4 @@
+source: Developing/Dynamic-Config.md
 # Adding new config options to WebUI
 
 Adding support for users to update a new config option via the WebUI is now a lot easier for general options. This
@@ -39,7 +40,7 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('Email transport',true,$config_groups,$mail_conf,'mail');
+echo generate_dynamic_config_panel('Email transport',$config_groups,$mail_conf,'mail');
 
 echo '
     </form>

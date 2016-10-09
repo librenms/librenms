@@ -1,3 +1,4 @@
+source: Support/FAQ.md
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)
@@ -17,6 +18,9 @@
  - [How do I change the IP / hostname of a device?](#faq16)
  - [My device doesn't finish polling within 300 seconds](#faq19)
  - [Things aren't working correctly?](#faq18)
+ - [What do the values mean in my graphs?](#faq21)
+ - [Why does a device show as a warning?](#faq22)
+ - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -39,6 +43,8 @@ You have two options for adding a new device into LibreNMS.
 ```ssh
 ./addhost.php [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
+
+> Please note that if the community contains special characters such as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
 
  2. Using the web interface, go to Devices and then Add Device. Enter the details required for the device that you want to add and then click 'Add Host'.
 
@@ -141,6 +147,64 @@ Re-run `./validate.php` once you've resolved any issues raised.
 
 You have an odd issue - we'd suggest you join our irc channel to discuss.
 
+#### <a name="faq21"> What do the values mean in my graphs?</a>
+
+The values you see are reported as metric values. Thanks to a post on [Reddit](https://www.reddit.com/r/networking/comments/4xzpfj/rrd_graph_interface_error_label_what_is_the_m/) 
+here are those values:
+
+```
+10^-18  a - atto
+10^-15  f - femto
+10^-12  p - pico
+10^-9   n - nano
+10^-6   u - micro
+10^-3   m - milli
+0    (no unit)
+10^3    k - kilo
+10^6    M - mega
+10^9    G - giga
+10^12   T - tera
+10^15   P - peta
+```
+
+#### <a name="faq22"> Why does a device show as a warning?</a>
+
+This is indicating that the device has rebooted within the last 24 hours (by default). If you want to adjust this 
+threshold then you can do so by setting `$config['uptime_warning']` in config.php. The value must be in seconds.
+
+#### <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
+
+By default numerous interface types and interface descriptions are excluded from this graph. The excluded defailts are:
+
+```php
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/l2vlan/';
+$config['device_traffic_iftype'][] = '/ppp/';
+
+$config['device_traffic_descr'][] = '/loopback/';
+$config['device_traffic_descr'][] = '/vlan/';
+$config['device_traffic_descr'][] = '/tunnel/';
+$config['device_traffic_descr'][] = '/bond/';
+$config['device_traffic_descr'][] = '/null/';
+$config['device_traffic_descr'][] = '/dummy/';
+```
+
+If you would like to re-include l2vlan interfaces for instance, you first need to `unset` the config array and set your options:
+
+```php
+unset($config['device_traffic_iftype']);
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/ppp/';
+```
+
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
 The easiest way to show you how to do that is to link to an existing pull request that has been merged in on [GitHub](https://github.com/librenms/librenms/pull/352/files)
@@ -157,16 +221,20 @@ This file will usually set the variables for $version and $hardware gained from 
 **html/images/os/$os.png**
 This is a 32x32 png format image of the OS you are adding support for.
 
+You will also need to supply a test unit within `tests/OSDiscoveryTest.php`. Please see [Support-New-OS](Support-New-OS.md) for further information.
+
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
-Please provide the following output as seperate non-expiring pastebin.com links.
+Under the device, click the gear and select Capture. 
+Please provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring pastebin.com links.
 
-Replace the relevant information in these commands such as HOSTNAME and COMMUNITY.
+You can also use the command line to obtain the information.  Especially, if snmpwalk results in a large amount of data.
+Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
 ```bash
 ./discovery.php -h HOSTNAME -d -m os
 ./poller.php -h HOSTNAME -r -f -d -m os
-snmpbulkwalk -On -v2c -c COMMUNITY HOSTNAME .
+snmpbulkwalk -Onet -v2c -c COMMUNITY HOSTNAME .
 ```
 
 If possible please also provide what the OS name should be if it doesn't exist already.

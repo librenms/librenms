@@ -11,8 +11,7 @@ if (is_array($netapp_storage)) {
         if (isset($storage['df64TotalKBytes']) && is_numeric($storage['df64TotalKBytes'])) {
             $size = ($storage['df64TotalKBytes'] * $units);
             $used = ($storage['df64UsedKBytes'] * $units);
-        }
-        else {
+        } else {
             $size = ($storage['dfKBytesTotal'] * $units);
             $used = ($storage['dfKBytesUsed'] * $units);
         }

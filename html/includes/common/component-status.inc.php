@@ -1,7 +1,6 @@
 <?php
 
-require_once "../includes/component.php";
-$OBJCOMP = new component();
+$OBJCOMP = new LibreNMS\Component();
 
 $common_output[] = '
 <div>
@@ -18,12 +17,10 @@ foreach ($OBJCOMP->getComponentStatus() as $k => $v) {
     if ($k == 0) {
         $status = 'Ok';
         $color = 'green';
-    }
-    elseif ($k == 1) {
+    } elseif ($k == 1) {
         $status = 'Warning';
         $color = 'grey';
-    }
-    else {
+    } else {
         $status = 'Critical';
         $color = 'red';
     }

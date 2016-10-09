@@ -1,13 +1,12 @@
 <?php
 
 /*
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage discovery
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -35,7 +34,7 @@ if (strstr($device['hardware'], 'Dell')) {
     }
 
     foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
+        $data = trim($data);
         if ($data) {
             list($oid,$status) = explode(' ', $data, 2);
             d_echo('status : '.$status."\n");

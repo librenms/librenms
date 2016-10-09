@@ -12,7 +12,6 @@
  */
 
 if ($device['os_group'] == "cisco") {
-
     // Define some error messages
     $error_vpn = array();
     $error_vpn[0] = "Other";
@@ -59,17 +58,16 @@ if ($device['os_group'] == "cisco") {
 
     $module = 'Cisco-OTV';
 
-    require_once 'includes/component.php';
-    $component = new component();
+    $component = new LibreNMS\Component();
     $options['filter']['type'] = array('=',$module);
     $options['filter']['disabled'] = array('=',0);
-    $components = $component->getComponents($device['device_id'],$options);
+    $components = $component->getComponents($device['device_id'], $options);
 
     // We only care about our device id.
     $components = $components[$device['device_id']];
 
     // Only collect SNMP data if we have enabled components
-    if (count($components > 0)) {
+    if (count($components) > 0) {
         // Let's gather the stats..
         $tblOverlayEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.2.1.1');
         $tblAdjacencyDatabaseEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.3.1.1', 0);
@@ -82,11 +80,10 @@ if ($device['os_group'] == "cisco") {
             $count_mac[$v]++;
         }
         // Let's log some debugging
-        d_echo("\n\nMAC Addresses: ".print_r($count_mac,TRUE));
+        d_echo("\n\nMAC Addresses: ".print_r($count_mac, true));
 
         // Loop through the components and extract the data.
         foreach ($components as $key => &$array) {
-
             if ($array['otvtype'] == 'overlay') {
                 // Let's check the various status' of the overlay
                 $message = false;
@@ -107,8 +104,7 @@ if ($device['os_group'] == "cisco") {
                 if ($message !== false) {
                     $array['error'] = $message;
                     $array['status'] = 2;
-                }
-                else {
+                } else {
                     $array['error'] = "";
                     $array['status'] = 0;
                 }
@@ -129,19 +125,17 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    Message: ".$array['error']."\n");
                 d_echo("    VLAN Count: ".$count_vlan."\n");
 
-                $filename = "cisco-otv-".$array['label']."-vlan.rrd";
-                $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+                $label = $array['label'];
+                $rrd_name = array('cisco', 'otv', $label, 'vlan');
+                $rrd_def = 'DS:count:GAUGE:600:0:U';
 
-                if (!file_exists ($rrd_filename)) {
-                    rrdtool_create ($rrd_filename, " DS:count:GAUGE:600:0:U" . $config['rrd_rra']);
-                }
-                $rrd['count'] = $count_vlan;
+                $fields = array(
+                    'count' => $count_vlan
+                );
 
-                // Update RRD
-                rrdtool_update ($rrd_filename, $rrd);
-
-            }
-            elseif ($array['otvtype'] == 'adjacency') {
+                $tags = compact('label', 'rrd_name', 'rrd_def');
+                data_update($device, 'cisco-otv-vlan', $tags, $fields);
+            } elseif ($array['otvtype'] == 'adjacency') {
                 $array['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$array['index'].'.1.4.'.$array['endpoint']];
                 $message = false;
                 if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.5.'.$array['index'].'.1.4.'.$array['endpoint']] != 1) {
@@ -155,8 +149,7 @@ if ($device['os_group'] == "cisco") {
                 if ($message !== false) {
                     $array['error'] = $message;
                     $array['status'] = 1;
-                }
-                else {
+                } else {
                     $array['error'] = "";
                     $array['status'] = 0;
                 }
@@ -167,37 +160,32 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    Index: ".$array['index']."\n");
                 d_echo("    Status: ".$array['status']."\n");
                 d_echo("    Message: ".$array['error']."\n");
-            }
-            elseif ($array['otvtype'] == 'endpoint') {
-                if (isset($count_mac[$array['endpoint']])) {
-                    $rrd['count'] = $count_mac[$array['endpoint']];
-                }
-                else {
-                    $rrd['count'] = "0";
+            } elseif ($array['otvtype'] == 'endpoint') {
+                $count = 0;
+                $endpoint = $array['endpoint'];
+
+                if (isset($count_mac[$endpoint])) {
+                    $count = $count_mac[$endpoint];
                 }
 
                 // Let's log some debugging
                 d_echo("\n\nEndpoint Component: ".$key."\n");
                 d_echo("    Label: ".$array['label']."\n");
-                d_echo("    MAC Count: ".$rrd['count']."\n");
+                d_echo("    MAC Count: ".$count."\n");
 
-                $filename = "cisco-otv-".$array['endpoint']."-mac.rrd";
-                $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+                $rrd_name = array('cisco', 'otv', $endpoint, 'mac');
+                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $fields = array(
+                    'count' => $count
+                );
 
-                if (!file_exists ($rrd_filename)) {
-                    rrdtool_create ($rrd_filename, " DS:count:GAUGE:600:0:U" . $config['rrd_rra']);
-                }
-
-                // Update RRD
-                rrdtool_update ($rrd_filename, $rrd);
-
+                $tags = compact('endpoint', 'rrd_name', 'rrd_def');
+                data_update($device, 'cisco-otv-mac', $tags, $fields);
             } // End If
-
         } // End foreach components
 
         // Write the Components back to the DB.
-        $component->setComponentPrefs($device['device_id'],$components);
-
+        $component->setComponentPrefs($device['device_id'], $components);
     } // end if count components
 
     // Clean-up after yourself!

@@ -1,3 +1,4 @@
+source: Developing/Code-Guidelines.md
 # Coding guidelines
 
 This document is here to help code standards for contributions towards LibreNMS. The original code base that we forked from had a lack of standards and as such the code base has a variety of different styles. Whilst we don't want to restrict how people write code, these guidelines should mean we have a good standard going forward that makes reading the code easier. All modern day ide's should be able to assist in these guidelines without breaking your usual workflow.

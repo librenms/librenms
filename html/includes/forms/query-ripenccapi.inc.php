@@ -19,8 +19,7 @@ if (isset($data_param) && isset($query_param)) {
     $status  = 'ok';
     $message = 'Queried';
     $output = get_ripe_api_whois_data_json($data_param, $query_param);
-}
-else {
+} else {
     $status  = 'error';
     $message = 'ERROR: Could not query';
 }

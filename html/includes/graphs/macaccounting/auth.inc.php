@@ -11,31 +11,28 @@ if (is_numeric($vars['id'])) {
 
     if (is_array($acc)) {
         if ($auth || port_permitted($acc['port_id'])) {
-            d_echo($config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd'));
+            $filename = rrd_name($acc['hostname'], array('cip', $acc['ifIndex'], $acc['mac']));
+            d_echo($filename);
 
-            if (is_file($config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd'))) {
+            if (is_file($filename)) {
                 d_echo('exists');
 
-                $rrd_filename = $config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
+                $rrd_filename = $filename;
                 $port         = get_port_by_id($acc['port_id']);
                 $device       = device_by_id_cache($port['device_id']);
                 $title        = generate_device_link($device);
                 $title       .= ' :: Port  '.generate_port_link($port);
                 $title       .= ' :: '.formatMac($acc['mac']);
                 $auth         = true;
-            }
-            else {
+            } else {
                 graph_error('file not found');
             }
-        }
-        else {
+        } else {
             graph_error('unauthenticated');
         }
-    }
-    else {
+    } else {
         graph_error('entry not found');
     }
-}
-else {
+} else {
     graph_error('invalid id');
 }

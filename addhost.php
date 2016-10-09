@@ -2,17 +2,18 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage cli
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
+use LibreNMS\Exceptions\HostUnreachableException;
+
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';
@@ -37,19 +38,19 @@ if (isset($options['f']) && $options['f'] == 0) {
     $cmd = array_shift($argv);
     array_shift($argv);
     array_unshift($argv, $cmd);
-    $force_add = 1;
+    $force_add = true;
 } else {
-    $force_add = 0;
+    $force_add = false;
 }
 
 $port_assoc_mode = $config['default_port_association_mode'];
-$valid_assoc_modes = get_port_assoc_modes ();
-if (isset ($options['p'])) {
+$valid_assoc_modes = get_port_assoc_modes();
+if (isset($options['p'])) {
     $port_assoc_mode = $options['p'];
-    if (! in_array ($port_assoc_mode, $valid_assoc_modes)) {
+    if (! in_array($port_assoc_mode, $valid_assoc_modes)) {
         echo "Invalid port association mode '" . $port_assoc_mode . "'\n";
-        echo 'Valid modes: ' . join (', ', $valid_assoc_modes) . "\n";
-        exit(2);
+        echo 'Valid modes: ' . join(', ', $valid_assoc_modes) . "\n";
+        exit(1);
     }
 
     $cmd = array_shift($argv);
@@ -115,7 +116,7 @@ if (!empty($argv[1])) {
                     $v3['authalgo'] = $arg;
                 } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    exit(2);
+                    exit(1);
                 }
             }
 
@@ -139,7 +140,7 @@ if (!empty($argv[1])) {
                     $v3['cryptoalgo'] = $arg;
                 } else {
                     echo 'Invalid argument: '.$arg."\n";
-                    exit(2);
+                    exit(1);
                 }
             }//end while
 
@@ -165,21 +166,24 @@ if (!empty($argv[1])) {
         }
     }//end if
 
-    $result = addHost($host, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
-
-    if (is_numeric($result)) {
-        $device = device_by_id_cache($result);
-        echo 'Added device '.$device['hostname'].' ('.$result.")\n";
+    try {
+        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
+        $device = device_by_id_cache($device_id);
+        echo "Added device {$device['hostname']} ($device_id)\n";
         exit(0);
-    }
-    else {
-        print $console_color->convert("%rWe couldn't add this device:\n  " . $result . "%n\n");
-        exit(1);
+    } catch (HostUnreachableException $e) {
+        print_error($e->getMessage());
+        foreach ($e->getReasons() as $reason) {
+            echo "  $reason\n";
+        }
+        exit(2);
+    } catch (Exception $e) {
+        print_error($e->getMessage());
+        exit(3);
     }
 } else {
-
-    print $console_color->convert(
-    "\n".$config['project_name_version'].' Add Host Tool
+    c_echo(
+        "\n".$config['project_name_version'].' Add Host Tool
 
     Usage (SNMPv1/2c): ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
     Usage (SNMPv3)   :  Config Defaults : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
@@ -192,10 +196,10 @@ if (!empty($argv[1])) {
 	-p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by \'ifIndex\'.
 	                     For Linux/Unix based devices \'ifName\' or \'ifDescr\' might be useful for a stable iface mapping.
 	                     The default for this installation is \'' . $config['default_port_association_mode'] . '\'
-	                     Valid port assoc modes are: ' . join (', ', $valid_assoc_modes) . '
+	                     Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
 
     %rRemember to run discovery for the host afterwards.%n
 '
     );
-    exit(2);
+    exit(1);
 }

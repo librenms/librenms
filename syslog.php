@@ -2,16 +2,17 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage syslog
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
+
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';
@@ -23,7 +24,7 @@ require_once 'includes/functions.php';
 
 $i = "1";
 
-$s = fopen('php://stdin','r');
+$s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
     #logfile($line);
     list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));

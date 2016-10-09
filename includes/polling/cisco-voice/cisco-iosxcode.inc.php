@@ -13,34 +13,32 @@
 
 if ($device['os_group'] == "cisco") {
     // Total
-    $total = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.7.1.0", NULL);
+    $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.1.0", null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.7.1.0'][''];
 
     if (isset($total) && ($total != "") && ($total != 0)) {
         // Available
-        $available = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.7.2.0", NULL);
+        $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.2.0", null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.7.2.0'][''];
 
         // Active
         $active = $total - $available;
 
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iosxcode.rrd");
-        if (!file_exists ($rrd_filename)) {
-            rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
-        }
+        $rrd_def = array(
+            'DS:total:GAUGE:600:0:U',
+            'DS:active:GAUGE:600:0:U'
+        );
 
         $fields = array(
             'total'  => $total,
             'active' => $active,
         );
 
-        rrdtool_update ($rrd_filename, $fields);
+        $tags = compact('rrd_def');
+        dat_update($device, 'cisco-iosxcode', $tags, $fields);
 
-        $tags = array();
-        influx_update($device,'cisco-iosxcode',$tags,$fields);
-
-        $graphs['cisco-iosxcode'] = TRUE;
+        $graphs['cisco-iosxcode'] = true;
         echo (" Cisco IOS Transcoder ");
     }
-    unset($rrd_filename, $total, $active, $available);
+    unset($rrd_def, $total, $active, $available, $fields, $tags);
 }

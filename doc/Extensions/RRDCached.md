@@ -1,13 +1,36 @@
+source: Extensions/RRDCached.md
 # Setting up RRDCached
 
 This document will explain how to setup RRDCached for LibreNMS.
 
-> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. To
-enable this set the following config:
+> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. 
+If you have rrdcached 1.5.5 or above, we can also tune over rrdcached.
+To enable this set the following config:
 
 ```php
-$config['rrdtool_version'] = 1.5;
+$config['rrdtool_version'] = '1.5.5';
 ```
+
+### Support matrix
+
+Shared FS: Is a shared filesystem required?
+
+Features: Supported features in the version indicated.
+
+          G = Graphs.
+
+          C = Create RRD files.
+
+          U = Update RRD files.
+
+          T = Tune RRD files.
+
+| Version | Shared FS | Features |
+| ------- | :-------: | -------- |
+| 1.4.x   | Yes       | G,U      |
+| <1.5.5  | Yes       | G,U      |
+| >=1.5.5 | No        | G,C,U    |
+| >=1.6.x | No        | G,C,U    |
 
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
@@ -29,7 +52,7 @@ vi /etc/yum.repos.d/rpmforge.repo
 vi /etc/sysconfig/rrdcached
 
 # Settings for rrdcached
-OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
+OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
 RRDC_USER=librenms
 
 mkdir /var/run/rrdcached
@@ -77,8 +100,7 @@ After=network.service
 [Service]
 Type=forking
 PIDFile=/run/rrdcached.pid
-ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
-RRDC_USER=librenms
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
 
 [Install]
 WantedBy=default.target
@@ -107,5 +129,5 @@ Disk I/O can be found under the menu Devices>All Devices>[localhost hostname]>He
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
 
-[1]: http://librenms.readthedocs.org/Installation/Installation-(RHEL-CentOS)/#add-localhost
+[1]: http://librenms.readthedocs.org/Installation/Installation-CentOS-7-Apache/
 "Add localhost to LibreNMS"

@@ -21,8 +21,7 @@ $attrib_value = $_POST['notes'];
 if (isset($attrib_value) && set_dev_attrib(array('device_id' => $device_id), $port_id_notes, $attrib_value)) {
     $status  = 'ok';
     $message = 'Updated';
-}
-else {
+} else {
     $status  = 'error';
     $message = 'ERROR: Could not update';
 }

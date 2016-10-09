@@ -14,15 +14,13 @@ foreach ($stack_poll_array as $port_id_high => $entry_high) {
         if (isset($stack_db_array[$port_id_high][$port_id_low])) {
             if ($stack_db_array[$port_id_high][$port_id_low]['ifStackStatus'] == $ifStackStatus) {
                 echo '.';
-            }
-            else {
+            } else {
                 dbUpdate(array('ifStackStatus' => $ifStackStatus), 'ports_stack', 'device_id=? AND port_id_high=? AND `port_id_low`=?', array($device['device_id'], $port_id_high, $port_id_low));
                 echo 'U';
             }
 
             unset($stack_db_array[$port_id_high][$port_id_low]);
-        }
-        else {
+        } else {
             dbInsert(array('device_id' => $device['device_id'], 'port_id_high' => $port_id_high, 'port_id_low' => $port_id_low, 'ifStackStatus' => $ifStackStatus), 'ports_stack');
             echo '+';
         }

@@ -23,19 +23,18 @@
  * */
 
 
-function dbQuery($sql, $parameters=array()) {
-    global $fullSql, $debug, $sql_debug, $console_color, $database_link;
+function dbQuery($sql, $parameters = array())
+{
+    global $fullSql, $debug, $sql_debug, $database_link;
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
-            if (preg_match('/(INSERT INTO `alert_log`).*(details)/i',$fullSql)) {
+            if (preg_match('/(INSERT INTO `alert_log`).*(details)/i', $fullSql)) {
                 echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
+            } else {
+                c_echo('SQL[%y'.$fullSql."%n] \n");
             }
-            else {
-                print $console_color->convert("\nSQL[%y".$fullSql.'%n] ');
-            }
-        }
-        else {
+        } else {
             $sql_debug[] = $fullSql;
         }
     }
@@ -60,7 +59,6 @@ function dbQuery($sql, $parameters=array()) {
     }
 
     return $result;
-
 }//end dbQuery()
 
 
@@ -70,9 +68,11 @@ function dbQuery($sql, $parameters=array()) {
  * */
 
 
-function dbInsert($data, $table) {
-    global $fullSql, $database_link;
-    global $db_stats;
+function dbInsert($data, $table)
+{
+    global $database_link, $db_stats;
+    dbInitStats();
+
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
     // follow closer with SQL convention:
@@ -93,8 +93,7 @@ function dbInsert($data, $table) {
         $id = mysqli_insert_id($database_link);
         dbCommitTransaction();
         // return $id;
-    }
-    else {
+    } else {
         if ($table != 'Contact') {
             trigger_error('QDB - Insert failed.', E_USER_WARNING);
         }
@@ -105,11 +104,10 @@ function dbInsert($data, $table) {
 
     // logfile($fullSql);
     $time_end                = microtime(true);
-    $db_stats['insert_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['insert_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['insert']++;
 
     return $id;
-
 }//end dbInsert()
 
 
@@ -120,8 +118,11 @@ function dbInsert($data, $table) {
  * */
 
 
-function dbBulkInsert($data, $table) {
+function dbBulkInsert($data, $table)
+{
     global $db_stats;
+    dbInitStats();
+
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
     // follow closer with SQL convention:
@@ -160,11 +161,10 @@ function dbBulkInsert($data, $table) {
 
     // logfile($fullSql);
     $time_end                = microtime(true);
-    $db_stats['insert_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['insert_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['insert']++;
 
     return $result;
-
 }//end dbBulkInsert()
 
 
@@ -174,9 +174,11 @@ function dbBulkInsert($data, $table) {
  * */
 
 
-function dbUpdate($data, $table, $where=null, $parameters=array()) {
-    global $fullSql, $database_link;
-    global $db_stats;
+function dbUpdate($data, $table, $where = null, $parameters = array())
+{
+    global $fullSql, $database_link, $db_stats;
+    dbInitStats();
+
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
     // follow closer with SQL convention:
@@ -205,23 +207,22 @@ function dbUpdate($data, $table, $where=null, $parameters=array()) {
     $time_start = microtime(true);
     if (dbQuery($sql, $data)) {
         $return = mysqli_affected_rows($database_link);
-    }
-    else {
+    } else {
         // echo("$fullSql");
         trigger_error('QDB - Update failed.', E_USER_WARNING);
         $return = false;
     }
 
     $time_end                = microtime(true);
-    $db_stats['update_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['update_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['update']++;
 
     return $return;
-
 }//end dbUpdate()
 
 
-function dbDelete($table, $where=null, $parameters=array()) {
+function dbDelete($table, $where = null, $parameters = array())
+{
     global $database_link;
     $sql = 'DELETE FROM `'.$table.'`';
     if ($where) {
@@ -230,11 +231,9 @@ function dbDelete($table, $where=null, $parameters=array()) {
 
     if (dbQuery($sql, $parameters)) {
         return mysqli_affected_rows($database_link);
-    }
-    else {
+    } else {
         return false;
     }
-
 }//end dbDelete()
 
 
@@ -244,11 +243,13 @@ function dbDelete($table, $where=null, $parameters=array()) {
  * */
 
 
-function dbFetchRows($sql, $parameters=array(), $nocache=false) {
+function dbFetchRows($sql, $parameters = array(), $nocache = false)
+{
     global $db_stats, $config;
+    dbInitStats();
 
     if ($config['memcached']['enable'] && $nocache === false) {
-        $result = $config['memcached']['resource']->get(hash('sha512',$sql.'|'.serialize($parameters)));
+        $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
         }
@@ -265,7 +266,7 @@ function dbFetchRows($sql, $parameters=array(), $nocache=false) {
 
         mysqli_free_result($result);
         if ($config['memcached']['enable'] && $nocache === false) {
-            $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$rows,$config['memcached']['ttl']);
+            $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $rows, $config['memcached']['ttl']);
         }
         return $rows;
     }
@@ -273,13 +274,12 @@ function dbFetchRows($sql, $parameters=array(), $nocache=false) {
     mysqli_free_result($result);
 
     $time_end                   = microtime(true);
-    $db_stats['fetchrows_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['fetchrows_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['fetchrows']++;
 
     // no records, thus return empty array
     // which should evaluate to false, and will prevent foreach notices/warnings
     return array();
-
 }//end dbFetchRows()
 
 
@@ -289,7 +289,8 @@ function dbFetchRows($sql, $parameters=array(), $nocache=false) {
  * */
 
 
-function dbFetch($sql, $parameters=array(), $nocache=false) {
+function dbFetch($sql, $parameters = array(), $nocache = false)
+{
     return dbFetchRows($sql, $parameters, $nocache);
     /*
         // for now, don't do the iterator thing
@@ -301,7 +302,6 @@ function dbFetch($sql, $parameters=array(), $nocache=false) {
         return null; // ??
         }
      */
-
 }//end dbFetch()
 
 
@@ -311,11 +311,13 @@ function dbFetch($sql, $parameters=array(), $nocache=false) {
  * */
 
 
-function dbFetchRow($sql=null, $parameters=array(), $nocache=false) {
+function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
+{
     global $db_stats, $config;
+    dbInitStats();
 
     if ($config['memcached']['enable'] && $nocache === false) {
-        $result = $config['memcached']['resource']->get(hash('sha512',$sql.'|'.serialize($parameters)));
+        $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
         }
@@ -328,20 +330,16 @@ function dbFetchRow($sql=null, $parameters=array(), $nocache=false) {
         mysqli_free_result($result);
         $time_end = microtime(true);
 
-        $db_stats['fetchrow_sec'] += number_format(($time_end - $time_start), 8);
+        $db_stats['fetchrow_sec'] += (float)number_format(($time_end - $time_start), 8);
         $db_stats['fetchrow']++;
 
         if ($config['memcached']['enable'] && $nocache === false) {
-            $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$row,$config['memcached']['ttl']);
+            $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $row, $config['memcached']['ttl']);
         }
         return $row;
-    }
-    else {
+    } else {
         return null;
     }
-
-    $time_start = microtime(true);
-
 }//end dbFetchRow()
 
 
@@ -350,8 +348,10 @@ function dbFetchRow($sql=null, $parameters=array(), $nocache=false) {
  * */
 
 
-function dbFetchCell($sql, $parameters=array(), $nocache=false) {
+function dbFetchCell($sql, $parameters = array(), $nocache = false)
+{
     global $db_stats, $config;
+    dbInitStats();
 
     $time_start = microtime(true);
     $row            = dbFetchRow($sql, $parameters, $nocache);
@@ -362,11 +362,10 @@ function dbFetchCell($sql, $parameters=array(), $nocache=false) {
 
     $time_end = microtime(true);
 
-    $db_stats['fetchcell_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['fetchcell_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['fetchcell']++;
 
     return null;
-
 }//end dbFetchCell()
 
 
@@ -376,8 +375,11 @@ function dbFetchCell($sql, $parameters=array(), $nocache=false) {
  * */
 
 
-function dbFetchColumn($sql, $parameters=array(), $nocache=false) {
+function dbFetchColumn($sql, $parameters = array(), $nocache = false)
+{
     global $db_stats;
+    dbInitStats();
+
     $time_start = microtime(true);
     $cells          = array();
     foreach (dbFetch($sql, $parameters, $nocache) as $row) {
@@ -386,11 +388,10 @@ function dbFetchColumn($sql, $parameters=array(), $nocache=false) {
 
     $time_end = microtime(true);
 
-    $db_stats['fetchcol_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['fetchcol_sec'] += (float)number_format(($time_end - $time_start), 8);
     $db_stats['fetchcol']++;
 
     return $cells;
-
 }//end dbFetchColumn()
 
 
@@ -401,7 +402,8 @@ function dbFetchColumn($sql, $parameters=array(), $nocache=false) {
  */
 
 
-function dbFetchKeyValue($sql, $parameters=array(), $nocache=false) {
+function dbFetchKeyValue($sql, $parameters = array(), $nocache = false)
+{
     $data = array();
     foreach (dbFetch($sql, $parameters, $nocache) as $row) {
         $key = array_shift($row);
@@ -409,8 +411,7 @@ function dbFetchKeyValue($sql, $parameters=array(), $nocache=false) {
             // if there were only 2 fields in the result
             // use the second for the value
             $data[$key] = array_shift($row);
-        }
-        else {
+        } else {
             // if more than 2 fields were fetched
             // use the array of the rest as the value
             $data[$key] = $row;
@@ -418,7 +419,6 @@ function dbFetchKeyValue($sql, $parameters=array(), $nocache=false) {
     }
 
     return $data;
-
 }//end dbFetchKeyValue()
 
 
@@ -428,7 +428,8 @@ function dbFetchKeyValue($sql, $parameters=array(), $nocache=false) {
  */
 
 
-function dbMakeQuery($sql, $parameters) {
+function dbMakeQuery($sql, $parameters)
+{
     // bypass extra logic if we have no parameters
     if (sizeof($parameters) == 0) {
         return $sql;
@@ -441,8 +442,7 @@ function dbMakeQuery($sql, $parameters) {
     foreach ($parameters as $key => $value) {
         if (is_numeric($key)) {
             $questionParams[] = $value;
-        }
-        else {
+        } else {
             $namedParams[':'.$key] = $value;
         }
     }
@@ -464,19 +464,18 @@ function dbMakeQuery($sql, $parameters) {
             $test = $result[$j];
             if ($test == '?') {
                 $query .= array_shift($questionParams);
-            }
-            else {
+            } else {
                 $query .= $namedParams[$test];
             }
         }
     }
 
     return $query;
-
 }//end dbMakeQuery()
 
 
-function dbPrepareData($data) {
+function dbPrepareData($data)
+{
     global $database_link;
     $values = array();
 
@@ -495,91 +494,75 @@ function dbPrepareData($data) {
         // if(!in_array($key, $columns)) // skip invalid fields
         // continue;
         if ($escape) {
-            $values[$key] = "'".mysqli_real_escape_string($database_link,$value)."'";
-        }
-        else {
+            $values[$key] = "'".mysqli_real_escape_string($database_link, $value)."'";
+        } else {
             $values[$key] = $value;
         }
     }
 
     return $values;
-
 }//end dbPrepareData()
 
+function dbInitStats()
+{
+    global $db_stats;
 
-/*
+    if (!isset($db_stats)) {
+        $db_stats = array(
+            'insert' => 0,
+            'insert_sec' => 0.0,
+            'update' => 0,
+            'update_sec' => 0.0,
+            'fetchcell' => 0,
+            'fetchcell_sec' => 0.0,
+            'fetchcol' => 0,
+            'fetchcol_sec' => 0.0,
+            'fetchrow' => 0,
+            'fetchrow_sec' => 0.0,
+            'fetchrows' => 0,
+            'fetchrows_sec' => 0.0,
+        );
+    }
+}
+
+/**
  * Given a data array, this returns an array of placeholders
  * These may be question marks, or ":email" type
+ *
+ * @param array $values
+ * @return array
  */
-
-
-function dbPlaceHolders($values) {
+function dbPlaceHolders($values)
+{
     $data = array();
     foreach ($values as $key => $value) {
         if (is_numeric($key)) {
             $data[] = '?';
-        }
-        else {
+        } else {
             $data[] = ':'.$key;
         }
     }
 
     return $data;
-
 }//end dbPlaceHolders()
 
 
-function dbBeginTransaction() {
+function dbBeginTransaction()
+{
     global $database_link;
     mysqli_query($database_link, 'begin');
-
 }//end dbBeginTransaction()
 
 
-function dbCommitTransaction() {
+function dbCommitTransaction()
+{
     global $database_link;
     mysqli_query($database_link, 'commit');
-
 }//end dbCommitTransaction()
 
 
-function dbRollbackTransaction() {
+function dbRollbackTransaction()
+{
     global $database_link;
     mysqli_query($database_link, 'rollback');
-
 }//end dbRollbackTransaction()
-
-
-/*
-    class dbIterator implements Iterator {
-    private $result;
-    private $i;
-
-    public function __construct($r) {
-    $this->result = $r;
-    $this->i = 0;
-    }
-    public function rewind() {
-    mysql_data_seek($this->result, 0);
-    $this->i = 0;
-    }
-    public function current() {
-    $a = mysql_fetch_assoc($this->result);
-    return $a;
-    }
-    public function key() {
-    return $this->i;
-    }
-    public function next() {
-    $this->i++;
-    $a = mysql_data_seek($this->result, $this->i);
-    if($a === false) {
-    $this->i = 0;
-    }
-    return $a;
-    }
-    public function valid() {
-    return ($this->current() !== false);
-    }
-    }
- */

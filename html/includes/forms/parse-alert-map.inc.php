@@ -13,7 +13,7 @@
  */
 
 if (is_admin() === false) {
-	header('Content-type: text/plain');
+    header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -23,8 +23,7 @@ if (is_numeric($map_id) && $map_id > 0) {
     $map = dbFetchRow('SELECT alert_rules.name,alert_map.target FROM alert_map,alert_rules WHERE alert_map.rule=alert_rules.id && alert_map.id = ?', array($map_id));
     if ($map['target'][0] == 'g') {
         $map['target'] = 'g:'.dbFetchCell('SELECT name FROM device_groups WHERE id = ?', array(substr($map['target'], 1)));
-    }
-    else {
+    } else {
         $map['target'] = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', array($map['target']));
     }
 
@@ -32,6 +31,6 @@ if (is_numeric($map_id) && $map_id > 0) {
                'rule'   => $map['name'],
                'target' => $map['target'],
               );
-	header('Content-type: application/json');
+    header('Content-type: application/json');
     echo _json_encode($output);
 }

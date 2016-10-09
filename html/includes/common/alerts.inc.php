@@ -20,8 +20,8 @@ $alert_severities = array(
     'critical' => 3
 );
 
-//if( defined('show_settings') || empty($widget_settings) ) {
-if(defined('show_settings')) {
+//if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
     $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
@@ -117,8 +117,7 @@ if(defined('show_settings')) {
   </div>
 </form>
 ';
-}
-else {
+} else {
     $device_id    = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
     $state        = $widget_settings['state'];
@@ -132,16 +131,14 @@ else {
     if (is_numeric($state)) {
         $state_name = array_search($state, $alert_states);
         $title = "$title ($state_name)";
-    }
-    elseif ($state) {
+    } elseif ($state) {
         $title = "$title ($state)";
     }
 
     if (is_numeric($acknowledged)) {
         if ($acknowledged == '0') {
             $title = "Unacknowledged $title";
-        }
-        elseif ($acknowledged == '1') {
+        } elseif ($acknowledged == '1') {
             $title = "Acknowledged $title";
         }
     }
@@ -183,9 +180,12 @@ else {
                 <th data-column-id="severity" data-formatter="severity">Severity</th>
                 <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>';
     if (is_numeric($proc)) {
-        if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
+        if ($proc) {
+            $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>';
+        }
+    } else {
+        $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>';
     }
-    else { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
     $common_output[] = '
             </tr>
         </thead>
@@ -227,7 +227,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";
         },
         "ack": function(column,row) {
-            return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><span class=\'glyphicon glyphicon-"+row.ack_ico+"\'aria-hidden=\'true\'></span></button>";
+            return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><i class=\'fa fa-"+row.ack_ico+"\'aria-hidden=\'true\'></i></button>";
         },
         "proc": function(column,row) {
             return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
@@ -248,7 +248,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     }).on("click", function(e) {
       var target = $(this).data("target");
       $(target).collapse(\'toggle\');
-      $(this).toggleClass(\'glyphicon-plus glyphicon-minus\');
+      $(this).toggleClass(\'fa-plus fa-minus\');
     });
     alerts_grid.find(".incident").each( function() {
       $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
@@ -258,8 +258,8 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         $(this).find(".incident-toggle").fadeOut(200);
       }).on("click", "td:not(.incident-toggle-td)", function() {
         var target = $(this).parent().find(".incident-toggle").data("target");
-        if( $(this).parent().find(".incident-toggle").hasClass(\'glyphicon-plus\') ) {
-          $(this).parent().find(".incident-toggle").toggleClass(\'glyphicon-plus glyphicon-minus\');
+        if( $(this).parent().find(".incident-toggle").hasClass(\'fa-plus\') ) {
+          $(this).parent().find(".incident-toggle").toggleClass(\'fa-plus fa-minus\');
           $(target).collapse(\'toggle\');
         }
       });
@@ -273,10 +273,12 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             data: { type: "open-proc", alert_id: alert_id },
             success: function(msg){
 	        if (msg != "ERROR") { window.open(msg); }
-                else { $("#message").html(\'<div class="alert alert-info">Procedure link does not seem to be valid, please check the rule.</div>\'); }
+                else {
+                    toastr.error("Procedure link does not seem to be valid, please check the rule");
+                }
             },
             error: function(){
-                 $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure link was configured  ?</div>\');
+                 toastr.error("An error occurred opening procedure for this alert. Was the procedure link configured?");
             }
         });
     });
@@ -289,17 +291,17 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             url: "ajax_form.php",
             data: { type: "ack-alert", alert_id: alert_id, state: state },
             success: function(msg){
-                $("#message").html(\'<div class="alert alert-info">\'+msg+\'</div>\');
+                toastr.success(msg);
                 if(msg.indexOf("ERROR:") <= -1) {
-                    location.reload();
+                    var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
+                    alerts_grid.bootgrid("sort", $sortDictionary); 
                 }
             },
             error: function(){
-                 $("#message").html(\'<div class="alert alert-info">An error occurred acking this alert.</div>\');
+                 toastr.error("An error occurred acking this alert");
             }
         });
     });
 });
 </script>';
 }
-

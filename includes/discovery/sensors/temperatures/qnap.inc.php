@@ -1,7 +1,7 @@
 <?php
 
 if ($device['os'] == 'qnap') {
-    echo 'QNAP temperature ';
+    echo 'QNAP: ';
 
     // Turbo NAS Temperature
     $turbonas_temperature_oid = '.1.3.6.1.4.1.24681.1.3.6.0';

@@ -62,9 +62,9 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('Oxidized integration',true,$config_groups,$oxidized_conf);
-echo generate_dynamic_config_panel('Unix-agent integration',true,$config_groups,$unixagent_conf);
-echo generate_dynamic_config_panel('RRDTool Setup',true,$config_groups,$rrdtool_conf);
+echo generate_dynamic_config_panel('Oxidized integration', $config_groups, $oxidized_conf);
+echo generate_dynamic_config_panel('Unix-agent integration', $config_groups, $unixagent_conf);
+echo generate_dynamic_config_panel('RRDTool Setup', $config_groups, $rrdtool_conf);
 
 echo '
     </form>

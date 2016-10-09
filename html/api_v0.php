@@ -20,7 +20,7 @@ require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/rrdtool.inc.php';
-require 'includes/Slim/Slim.php';
+require 'lib/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 require_once 'includes/api_functions.inc.php';
@@ -140,7 +140,7 @@ $app->group(
                         );
                     }
                 );
-		// End Routing
+            // End Routing
                 // Resources section
                 $app->group(
                     '/resources',
@@ -154,6 +154,15 @@ $app->group(
                     }
                 );
                 // End Resources
+                // Service section
+                $app->group(
+                    '/services',
+                    function () use ($app) {
+                        $app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
+                    }
+                );
+                $app->get('/services', 'authToken', 'list_services')->name('list_services');
+                // End Service
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');

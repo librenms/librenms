@@ -1,0 +1,105 @@
+site_name: LibreNMS Docs
+docs_dir: doc
+theme_dir: 'librenms_theme'
+site_dir: out
+site_url: http://docs.librenms.org
+markdown_extensions:
+    - pymdownx.tasklist
+    - mdx_del_ins
+extra_css:
+    - librenms.css
+include_next_prev: false
+site_author: LibreNMS
+site_description: LibreNMS user and developer documentation
+repo_url: https://github.com/librenms/librenms
+repo_name: GitHub
+google_analytics: ['UA-79149977-2', 'docs.librenms.org']
+pages:
+- Home: index.md
+- Installation:
+    - Installing LibreNMS: Installation/Installing-LibreNMS.md
+    - Ubuntu VM Image: Installation/Ubuntu-image.md
+    - CentOS VM Image: Installation/CentOS-image.md
+    - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
+    - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
+    - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
+    - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
+    - Older Docs: Installation/Installing-LibreNMS.md
+    - Migrating from Observium: Installation/Migrating-from-Observium.md
+- General:
+    - General/Acknowledgement.md
+    - General/Callback-Stats-and-Privacy.md
+    - General/Changelog.md
+    - General/Contributing.md
+    - General/Credits.md
+    - General/Updating.md
+    - General/Releases.md
+    - General/Welcome-to-Observium-users.md
+- Extensions:
+    - Extensions/Alerting.md
+    - Extensions/Applications.md
+    - Extensions/Authentication.md
+    - Extensions/Auto-Discovery.md
+    - Extensions/Billing-Module.md
+    - Extensions/Component.md
+    - Extensions/Dell-OpenManage.md
+    - Extensions/Device-Groups.md
+    - Extensions/Distributed-Poller.md
+    - Extensions/Email-Alerting.md
+    - Extensions/Globe-Frontpage.md
+    - Extensions/Graylog.md
+    - Extensions/IRC-Bot.md
+    - Extensions/IRC-Bot-Extensions.md
+    - Extensions/InfluxDB.md
+    - Extensions/Interface-Description-Parsing.md
+    - Extensions/MIB-based-polling.md
+    - Extensions/Memcached.md
+    - Extensions/Network-Map.md
+    - Extensions/NFSen.md
+    - Extensions/Oxidized.md
+    - Extensions/Plugin-System.md
+    - Extensions/Poller-Service.md
+    - Extensions/Port-Description-Parser.md
+    - Extensions/Proxmox.md
+    - Extensions/RRDCached.md
+    - Extensions/RRDTune.md
+    - Extensions/SNMP-Proxy.md
+    - Extensions/SNMP-Trap-Handler.md
+    - Extensions/Services.md
+    - Extensions/Smokeping.md
+    - Extensions/Sub-Directory.md
+    - Extensions/Syslog.md
+    - Extensions/Two-Factor-Auth.md
+    - Extensions/Varnish.md
+- Developing:
+    - Developing/Using-Git.md
+    - Developing/Code-Guidelines.md
+    - Developing/Style-Guidelines.md
+    - Developing/Validating-Code.md
+    - Developing/Code-Structure.md
+
+    - Developing/Creating-Documentation.md
+    - Developing/Support-New-OS.md
+    - Developing/Dynamic-Config.md
+    - Developing/Sensor-State-Support.md
+
+    - Developing/Merging-Pull-Requests.md
+    - Developing/Creating-Release.md
+- API: API/API-Docs.md
+- Support:
+    - Support/Configuration.md
+    - Support/Discovery Support.md
+    - Support/FAQ.md
+    - Support/Features.md
+    - Support/Install Validation.md
+    - Support/Performance.md
+    - Support/Poller Support.md
+    - Support/SNMP-Configuration-Examples.md
+- hidden:
+    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
+    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
+    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
+    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
+    - Installation/Installation-(Debian-Ubuntu).md
+    - Installation/Installation-(RHEL-CentOS).md
+    - Support/Support-New-OS.md

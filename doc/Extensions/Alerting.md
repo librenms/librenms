@@ -1,3 +1,4 @@
+source: Extensions/Alerting.md
 Table of Content:
 
 - [About](#about)
@@ -65,8 +66,8 @@ __Conditions__ can be any of:
 
 - Equals `=`
 - Not Equals `!=`
-- Matches `~`
-- Not Matches `!~`
+- Like `~`
+- Not Like `!~`
 - Greater `>`
 - Greater or Equal `>=`
 - Smaller `<`
@@ -75,7 +76,7 @@ __Conditions__ can be any of:
 __Values__ can be Entities or any single-quoted data.
 __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
-__Note__: The difference between `Equals` and `Matches` (and its negation) is that `Equals` does a strict comparison and `Matches` allows the usage of RegExp.
+__Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of RegExp.
 Arithmetics are allowed as well.
 
 ## <a name="rules-examples">Examples</a>
@@ -116,6 +117,8 @@ Placeholders:
 - Hostname of the Device: `%hostname`
 - sysName of the Device: `%sysName`
 - location of the Device: `%location`
+- description (purpose db field) of the Device: `%description`
+- notes of the Device: `%notes`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
@@ -128,6 +131,20 @@ Placeholders:
 - Timestamp: `%timestamp`
 - Transport name: `%transport`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
+
+Placeholders can be used within the subjects for templates as well although %faults is most likely going to be worthless.
+
+> NOTE: Placeholder names which are contained within another need to be ordered correctly. As an example:
+
+```text
+Limit: %value.sensor_limit / %value.sensor_limit_low
+```
+
+Should be done as:
+
+```text
+Limit: %value.sensor_limit_low / %value.sensor_limit
+```
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
 Templates can be matched against several rules.
@@ -175,18 +192,17 @@ By default the Contacts will be only gathered when the alert triggers and will i
 The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.
 At the moment LibreNMS only supports Port or Device permissions.
 You can exclude the `SysContact` by setting:
-~~
+
 ```php
 $config['alert']['syscontact'] = false;
 ```
-~
+
 To include users that have `Global-Read` or `Administrator` permissions it is required to add these additions to the `config.php` respectively:
-~
+
 ```php
 $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
 $config['alert']['admins']  = true; //Include Administrators into alert-contacts
 ```
-~~
 
 ## <a name="transports-email">E-Mail</a>
 

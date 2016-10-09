@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/canopy-generic-crcErrors.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-crcErrors');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:crcErrors='.$rrdfilename.':crcErrors:AVERAGE ';

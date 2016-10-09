@@ -5,62 +5,58 @@
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
   $base = $config['billing']['base'];
   
-  if ($bill_data['bill_type'] == 'quota') {
-      $data      = $bill_data['bill_quota'];
-      $tmp['mb'] = ($data / $base / $base);
-      $tmp['gb'] = ($data / $base / $base / $base);
-      $tmp['tb'] = ($data / $base / $base / $base / $base);
-      if ($tmp['tb'] >= 1) {
-          $quota = array(
-              'type'      => 'tb',
-              'select_tb' => ' selected',
-              'data'      => $tmp['tb'],
-          );
-      }
-      else if (($tmp['gb'] >= 1) and ($tmp['gb'] < $base)) {
-          $quota = array(
-              'type'      => 'gb',
-              'select_gb' => ' selected',
-              'data'      => $tmp['gb'],
-          );
-      }
-      else if (($tmp['mb'] >= 1) and ($tmp['mb'] < $base)) {
-          $quota = array(
-              'type'      => 'mb',
-              'select_mb' => ' selected',
-              'data'      => $tmp['mb'],
-          );
-      }
-  }//end if
+if ($bill_data['bill_type'] == 'quota') {
+    $data      = $bill_data['bill_quota'];
+    $tmp['mb'] = ($data / $base / $base);
+    $tmp['gb'] = ($data / $base / $base / $base);
+    $tmp['tb'] = ($data / $base / $base / $base / $base);
+    if ($tmp['tb'] >= 1) {
+        $quota = array(
+            'type'      => 'tb',
+            'select_tb' => ' selected',
+            'data'      => $tmp['tb'],
+        );
+    } elseif (($tmp['gb'] >= 1) and ($tmp['gb'] < $base)) {
+        $quota = array(
+            'type'      => 'gb',
+            'select_gb' => ' selected',
+            'data'      => $tmp['gb'],
+        );
+    } elseif (($tmp['mb'] >= 1) and ($tmp['mb'] < $base)) {
+        $quota = array(
+            'type'      => 'mb',
+            'select_mb' => ' selected',
+            'data'      => $tmp['mb'],
+        );
+    }
+}//end if
   
-  if ($bill_data['bill_type'] == 'cdr') {
-      $data        = $bill_data['bill_cdr'];
-      $tmp['kbps'] = ($data / $base);
-      $tmp['mbps'] = ($data / $base / $base);
-      $tmp['gbps'] = ($data / $base / $base / $base);
-      if ($tmp['gbps'] >= 1) {
-          $cdr = array(
-              'type'        => 'gbps',
-              'select_gbps' => ' selected',
-              'data'        => $tmp['gbps'],
-          );
-      }
-      else if (($tmp['mbps'] >= 1) and ($tmp['mbps'] < $base)) {
-          $cdr = array(
-              'type'        => 'mbps',
-              'select_mbps' => ' selected',
-              'data'        => $tmp['mbps'],
-          );
-      }
-      else if (($tmp['kbps'] >= 1) and ($tmp['kbps'] < $base)) {
-          $cdr = array(
-              'type'        => 'kbps',
-              'select_kbps' => ' selected',
-              'data'        => $tmp['kbps'],
-          );
-      }
-  }//end if
-  ?>
+if ($bill_data['bill_type'] == 'cdr') {
+    $data        = $bill_data['bill_cdr'];
+    $tmp['kbps'] = ($data / $base);
+    $tmp['mbps'] = ($data / $base / $base);
+    $tmp['gbps'] = ($data / $base / $base / $base);
+    if ($tmp['gbps'] >= 1) {
+        $cdr = array(
+            'type'        => 'gbps',
+            'select_gbps' => ' selected',
+            'data'        => $tmp['gbps'],
+        );
+    } elseif (($tmp['mbps'] >= 1) and ($tmp['mbps'] < $base)) {
+        $cdr = array(
+            'type'        => 'mbps',
+            'select_mbps' => ' selected',
+            'data'        => $tmp['mbps'],
+        );
+    } elseif (($tmp['kbps'] >= 1) and ($tmp['kbps'] < $base)) {
+        $cdr = array(
+            'type'        => 'kbps',
+            'select_kbps' => ' selected',
+            'data'        => $tmp['kbps'],
+        );
+    }
+}//end if
+    ?>
 <div class="row">
 <div class="col-lg-6 col-md-12">
     <div class="panel panel-default">
@@ -76,7 +72,7 @@
                     $('#quotaDiv').toggle();
                 }
               </script>
-              <?php   include 'pages/bill/addoreditbill.inc.php'; ?>
+                <?php   include 'pages/bill/addoreditbill.inc.php'; ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">
                     <button type="submit" class="btn btn-primary" name="Submit" value="Save" /><i class="fa fa-check"></i> Save Properties</button>
@@ -93,7 +89,7 @@
         </div>
         <div class="panel-body">
         <div class="form-group">
-          <?php
+            <?php
             //This needs a proper cleanup
             $ports = dbFetchRows(
                 'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
@@ -105,7 +101,7 @@
             if (is_array($ports)) {
         ?>
             <div class="list-group">
-        <?php   foreach ($ports as $port) { 
+        <?php   foreach ($ports as $port) {
                     $emptyCheck = true;
                     $portalias  = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
 
@@ -124,14 +120,14 @@
                     <i class="fa fa-random"></i>
                     <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
                 </div>
-        <?php   }  
-                if (!$emptyCheck) { ?>
+        <?php   }
+if (!$emptyCheck) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
-        <?php   } ?>
+        <?php                   } ?>
             
             </div>
                 
-        <?php         
+        <?php
             }
         ?>
         </div>
@@ -149,11 +145,11 @@
                         <option value=''>Select a device</option>
                         <?php
                           $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-                          foreach ($devices as $device) {
-                              echo "<option value='${device['device_id']}'>${device['hostname']}</option>\n";
-                          }
+                        foreach ($devices as $device) {
+                            echo "<option value='${device['device_id']}'>${device['hostname']}</option>\n";
+                        }
                           
-                          ?>
+                            ?>
                     </select>
                 </div>
             </div>

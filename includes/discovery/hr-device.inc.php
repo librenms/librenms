@@ -30,8 +30,7 @@ if (is_array($hrDevices)) {
 
                 dbUpdate($update_array, 'hrDevice', 'device_id=? AND hrDeviceIndex=?', array($device['device_id'], $hrDevice['hrDeviceIndex']));
                 echo '.';
-            }
-            else {
+            } else {
                 $inserted_rows = dbInsert(array('hrDeviceIndex' => mres($hrDevice['hrDeviceIndex']), 'device_id' => mres($device['device_id']), 'hrDeviceType' => mres($hrDevice['hrDeviceType']), 'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']), 'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']), 'hrDeviceErrors' => (int) mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
                 echo '+';
                 d_echo($hrDevice);

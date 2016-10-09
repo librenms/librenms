@@ -15,8 +15,8 @@
 
 
 if ($device['os'] == 'aen') {
-    if ($device['version'] == 'AEN_5.3.1_22558') { 
-     } // don't poll v5.3.1_22558 devices due to bug that crashes snmpd
+    if ($device['version'] == 'AEN_5.3.1_22558') {
+    } // don't poll v5.3.1_22558 devices due to bug that crashes snmpd
     else {
         echo 'Accedian MetroNID:';
         $descr = 'Processor';

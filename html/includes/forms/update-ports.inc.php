@@ -39,8 +39,7 @@ foreach ($_POST as $key => $val) {
         }
 
         $rows_updated += $n;
-    }
-    else if (strncmp($key, 'olddis_', 7) == 0) {
+    } elseif (strncmp($key, 'olddis_', 7) == 0) {
         // Interface identifier passed as part of the field name
         $port_id = intval(substr($key, 7));
 
@@ -67,12 +66,10 @@ foreach ($_POST as $key => $val) {
 if ($rows_updated > 0) {
     $message = $rows_updated.' Device record updated.';
     $status         = 'ok';
-}
-else if ($rows_updated = '-1') {
+} elseif ($rows_updated = '-1') {
     $message = 'Device record unchanged. No update necessary.';
     $status         = 'ok';
-}
-else {
+} else {
     $message = 'Device record update error.';
 }
 

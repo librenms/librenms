@@ -10,7 +10,7 @@
  */
 
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/canopy-generic-jitter.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-jitter');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:jitter='.$rrdfilename.':jitter:AVERAGE ';

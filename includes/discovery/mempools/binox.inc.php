@@ -25,6 +25,6 @@ if ($device['os'] == "binox") {
     $percent    = $used;
 
     if (is_numeric($used)) {
-        discover_mempool($valid_mempool, $device, 0, "binox", "Memory", "1", NULL, NULL);
+        discover_mempool($valid_mempool, $device, 0, "binox", "Memory", "1", null, null);
     }
 }

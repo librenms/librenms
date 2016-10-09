@@ -14,7 +14,17 @@ if ($device['os'] == 'cambium') {
     $usage = str_replace('"', "", snmp_get($device, 'CAMBIUM-PMP80211-MIB::sysCPUUsage.0', '-OvQ'));
 
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, 'CAMBIUM-PMP80211-MIB::sysCPUUsage.0', '0', 'cambium-cpu', $descr,
- '100', $usage, null, null);
+        discover_processor(
+            $valid['processor'],
+            $device,
+            'CAMBIUM-PMP80211-MIB::sysCPUUsage.0',
+            '0',
+            'cambium-cpu',
+            $descr,
+            '100',
+            $usage,
+            null,
+            null
+        );
     }
 }

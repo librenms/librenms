@@ -88,11 +88,10 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '".$port['
 }
 
 // Are there any CBQoS components for this device?
-require_once "../includes/component.php";
-$component = new component();
+$component = new LibreNMS\Component();
 $options = array();         // Re-init array in case it has been declared previously.
 $options['filter']['type'] = array('=','Cisco-CBQOS');
-$components = $component->getComponents($device['device_id'],$options);
+$components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];        // We only care about our device id.
 if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
@@ -227,7 +226,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
     }
 }//end if
 
-if ($_SESSION['userlevel'] >= '10') {
+if ($_SESSION['userlevel'] >= '10' && $config['enable_billing'] == 1) {
     echo "<span style='float: right;'><a href='" . generate_url(array('page'=>'bills', 'view'=>'add', 'port'=>$port['port_id'])) . "'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>";
 }
 

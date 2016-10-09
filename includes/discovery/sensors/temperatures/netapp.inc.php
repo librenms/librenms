@@ -8,7 +8,7 @@ if ($device['os'] == "netapp") {
     if ($oids) {
         echo "NetApp ";
         foreach (explode("\n", $oids) as $data) {
-            list($oid,$descr) = explode(" ", $data,2);
+            list($oid,$descr) = explode(" ", $data, 2);
             $split_oid = explode('.', $oid);
             $temperature_id = $split_oid[count($split_oid)-1];
             $x=1;
@@ -19,10 +19,10 @@ if ($device['os'] == "netapp") {
             preg_match_all("/([0-9]+C)+/", snmp_get($device, $main_oid.'.29.'.$temperature_id, "-Ovq"), $under_warn);
             $x = 0;
             foreach ($temps[0] as $temperature) {
-                $low_limit = str_replace("C","",$under_fail[0][$x]);
-                $low_warn_limit = str_replace("C","",$under_warn[0][$x]);
-                $warn_limit = str_replace("C","",$over_warn[0][$x]);
-                $high_limit = str_replace("C","",$over_fail[0][$x]);
+                $low_limit = str_replace("C", "", $under_fail[0][$x]);
+                $low_warn_limit = str_replace("C", "", $under_warn[0][$x]);
+                $warn_limit = str_replace("C", "", $over_warn[0][$x]);
+                $high_limit = str_replace("C", "", $over_fail[0][$x]);
                 $temperature_oid = $main_oid . ".25." . $temperature_id;
                 $temp_id = $temperature_id . "." . $x;
                 $descr = "Temp Sensor";

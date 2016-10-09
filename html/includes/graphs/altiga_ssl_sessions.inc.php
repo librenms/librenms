@@ -6,7 +6,7 @@ require 'includes/graphs/common.inc.php';
 
 $device = device_by_id_cache($id);
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/altiga-ssl.rrd.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'altiga-ssl');
 
 $rrd_options .= " DEF:TotalSessions=$rrd_filename:TotalSessions:AVERAGE";
 $rrd_options .= " DEF:ActiveSessions=$rrd_filename:ActiveSessions:AVERAGE";

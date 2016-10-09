@@ -13,7 +13,7 @@
  */
 
 if (is_admin() === false) {
-	header('Content-type: text/plain');
+    header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -25,8 +25,7 @@ if (is_numeric($group_id) && $group_id > 0) {
     $count       = (count($group_split) - 1);
     if (preg_match('/\&\&$/', $group_split[$count]) == 1 || preg_match('/\|\|$/', $group_split[$count]) == 1) {
         $group_split[$count] = $group_split[$count];
-    }
-    else {
+    } else {
         $group_split[$count] = $group_split[$count].'  &&';
     }
 
@@ -35,6 +34,6 @@ if (is_numeric($group_id) && $group_id > 0) {
         'desc'    => $group['desc'],
         'pattern' => $group_split,
     );
-	header('Content-type: application/json');
+    header('Content-type: application/json');
     echo _json_encode($output);
 }

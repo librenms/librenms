@@ -27,7 +27,5 @@ if ($device['os'] == 'pbn' || $device['os_group'] == 'pbn') {
             $entPhysicalIndex_measured = 'ports';
             discover_sensor($valid['sensor'], 'current', $device, $oid, ''.$index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
-
     }
-
 }

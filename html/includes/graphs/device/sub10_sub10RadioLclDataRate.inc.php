@@ -4,7 +4,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/sub10systems.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'sub10systems');
 
 
 if (file_exists($rrdfilename)) {
@@ -15,6 +15,3 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:sub10RadioLclDataRa:MIN:%3.2lf ';
     $rrd_options .= ' GPRINT:sub10RadioLclDataRa:MAX:%3.2lf\\\l ';
 }
-
-
-

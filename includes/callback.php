@@ -91,8 +91,7 @@ if ($enabled == 1) {
     curl_setopt($post, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($post, CURLOPT_RETURNTRANSFER, 1);
     $result = curl_exec($post);
-}
-else if ($enabled == 2) {
+} elseif ($enabled == 2) {
     $uuid   = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
     $fields = "uuid=$uuid";
 

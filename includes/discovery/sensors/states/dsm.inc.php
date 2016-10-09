@@ -45,8 +45,7 @@ if ($device['os'] == 'dsm') {
     // Temp because only support INT
     if ((string) $ups_status == '"OL"') {
         $ups_status = 1;
-    }
-    else {
+    } else {
         $ups_status = 2;
     }
 

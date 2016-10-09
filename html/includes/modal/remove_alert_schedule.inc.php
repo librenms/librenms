@@ -12,8 +12,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="delete-maintenance" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
@@ -72,5 +71,4 @@ $('#sched-maintenance-removal').click('', function(e) {
 
 </script>
 <?php
-
 }

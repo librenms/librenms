@@ -4,8 +4,7 @@ if (preg_match('/^Cisco IOS XR Software \(Cisco ([^\)]+)\),\s+Version ([^\[]+)\[
     $hardware = $regexp_result[1];
     $features = $regexp_result[3];
     $version  = $regexp_result[2];
-}
-else {
+} else {
     // It is not an IOS-XR ... What should we do ?
 }
 

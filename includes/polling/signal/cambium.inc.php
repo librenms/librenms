@@ -11,23 +11,19 @@
 $cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
 $is_epmp = snmp_get($device, 'sysObjectID.0', '-Oqv', '');
 if (strstr($cambium_type, 'Cambium PTP 50650')) {
-		$mib = ':CAMBIUM-PTP650-MIB';
-	}
-else if (strstr($cambium_type, 'PTP250')) {
-   	$mib = ':CAMBIUM-PTP250-MIB';
-}
-else if (strstr($is_epmp, '.17713.21')) {
-	$epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
+        $mib = ':CAMBIUM-PTP650-MIB';
+} elseif (strstr($cambium_type, 'PTP250')) {
+    $mib = ':CAMBIUM-PTP250-MIB';
+} elseif (strstr($is_epmp, '.17713.21')) {
+    $epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     $epmp_number = snmp_get($device, 'cambiumSubModeType.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
-   	if ($epmp_ap == 1) {
+    if ($epmp_ap == 1) {
         if ($epmp_number != 1) {
             $mib = ':CAMBIUM-PMP80211-MIB';
         }
-    }
-    else {
+    } else {
         $mib = ':CAMBIUM-PMP80211-MIB';
     }
-}
-else {
-   	$mib = ':WHISP-BOX-MIBV2-MIB';
+} else {
+    $mib = ':WHISP-BOX-MIBV2-MIB';
 }

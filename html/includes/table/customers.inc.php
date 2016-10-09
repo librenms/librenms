@@ -18,7 +18,7 @@ $count_sql = "SELECT COUNT(DISTINCT(`port_descr_descr`)) $sql";
 
 $sql .= ' GROUP BY `port_descr_descr`';
 
-$total = dbFetchCell($count_sql,$param);
+$total = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
 }
@@ -54,11 +54,9 @@ foreach (dbFetchRows($sql, $param) as $customer) {
         if ($device['os'] == 'ios') {
             if ($port['ifTrunk']) {
                 $vlan = '<span class=box-desc><span class=red>'.$port['ifTrunk'].'</span></span>';
-            }
-            else if ($port['ifVlan']) {
+            } elseif ($port['ifVlan']) {
                 $vlan = '<span class=box-desc><span class=blue>VLAN '.$port['ifVlan'].'</span></span>';
-            }
-            else {
+            } else {
                 $vlan = '';
             }
         }

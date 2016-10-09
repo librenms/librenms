@@ -22,7 +22,8 @@ require 'includes/collectd/functions.php';
 require 'includes/collectd/definitions.php';
 
 
-function makeTextBlock($text, $fontfile, $fontsize, $width) {
+function makeTextBlock($text, $fontfile, $fontsize, $width)
+{
     // TODO: handle explicit line-break!
     $words       = explode(' ', $text);
     $lines       = array($words[0]);
@@ -31,8 +32,7 @@ function makeTextBlock($text, $fontfile, $fontsize, $width) {
         $lineSize = imagettfbbox($fontsize, 0, $fontfile, $lines[$currentLine].' '.$word);
         if (($lineSize[2] - $lineSize[0]) < $width) {
             $lines[$currentLine] .= ' '.$word;
-        }
-        else {
+        } else {
             $currentLine++;
             $lines[$currentLine] = $word;
         }
@@ -40,7 +40,6 @@ function makeTextBlock($text, $fontfile, $fontsize, $width) {
 
     error_log(sprintf('Handles message "%s", %d words => %d/%d lines', $text, count($words), $currentLine, count($lines)));
     return implode("\n", $lines);
-
 }//end makeTextBlock()
 
 
@@ -51,7 +50,8 @@ function makeTextBlock($text, $fontfile, $fontsize, $width) {
  * @title Title for fake RRD graph
  * @msg Complete error message to display in place of graph content
  */
-function error($code, $code_msg, $title, $msg) {
+function error($code, $code_msg, $title, $msg)
+{
     global $config;
 
     header(sprintf('HTTP/1.0 %d %s', $code, $code_msg));
@@ -98,38 +98,36 @@ function error($code, $code_msg, $title, $msg) {
         $fmt_msg = makeTextBlock($msg, $errorfont, 10, ($w - 86));
         $fmtbox  = imagettfbbox(12, 0, $errorfont, $fmt_msg);
         imagettftext($png, 10, 0, 55, (35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1]), $c_txt, $errorfont, $fmt_msg);
-    }
-    else {
+    } else {
         imagestring($png, 4, 53, (35 + 6 + imagefontwidth(5)), $msg, $c_txt);
     }
 
     imagepng($png);
     imagedestroy($png);
-
 }//end error()
 
 
 /**
  * No RRD files found that could match request
  */
-function error404($title, $msg) {
+function error404($title, $msg)
+{
     return error(404, 'Not found', $title, $msg);
-
 }//end error404()
 
 
-function error500($title, $msg) {
+function error500($title, $msg)
+{
     return error(500, 'Not found', $title, $msg);
-
 }//end error500()
 
 
 /**
  * Incomplete / invalid request
  */
-function error400($title, $msg) {
+function error400($title, $msg)
+{
     return error(400, 'Bad request', $title, $msg);
-
 }//end error400()
 
 
@@ -138,22 +136,18 @@ function error400($title, $msg) {
 $host = $device['hostname'];
 if (is_null($host)) {
     return error400('?/?-?/?', 'Missing host name');
-}
-else if (!is_string($host)) {
+} elseif (!is_string($host)) {
     return error400('?/?-?/?', 'Expecting exactly 1 host name');
-}
-else if (strlen($host) == 0) {
+} elseif (strlen($host) == 0) {
     return error400('?/?-?/?', 'Host name may not be blank');
 }
 
 $plugin = read_var('c_plugin', $_GET, null);
 if (is_null($plugin)) {
     return error400($host.'/?-?/?', 'Missing plugin name');
-}
-else if (!is_string($plugin)) {
+} elseif (!is_string($plugin)) {
     return error400($host.'/?-?/?', 'Plugin name must be a string');
-}
-else if (strlen($plugin) == 0) {
+} elseif (strlen($plugin) == 0) {
     return error400($host.'/?-?/?', 'Plugin name may not be blank');
 }
 
@@ -165,11 +159,9 @@ if (!is_string($pinst)) {
 $type = read_var('c_type', $_GET, '');
 if (is_null($type)) {
     return error400($host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/?', 'Missing type name');
-}
-else if (!is_string($type)) {
+} elseif (!is_string($type)) {
     return error400($host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/?', 'Type name must be a string');
-}
-else if (strlen($type) == 0) {
+} elseif (strlen($type) == 0) {
     return error400($host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/?', 'Type name may not be blank');
 }
 
@@ -218,23 +210,21 @@ $rrd_cmd = false;
 if (isset($MetaGraphDefs[$type])) {
     $identifiers = array();
     foreach ($all_tinst as &$atinst) {
-        $identifiers[] = collectd_identifier($host, $plugin, is_null($pinst) ? '' : $pinst, $type, $atinst);
+        $identifiers[] = collectd_identifier($host, $plugin, $type, is_null($pinst) ? '' : $pinst, $atinst);
     }
 
     collectd_flush($identifiers);
     $rrd_cmd = $MetaGraphDefs[$type]($host, $plugin, $pinst, $type, $all_tinst, $opts);
-}
-else {
+} else {
     if (!in_array(is_null($tinst) ? '' : $tinst, $all_tinst)) {
         return error404($host.'/'.$plugin.(!is_null($pinst) ? '-'.$pinst : '').'/'.$type.(!is_null($tinst) ? '-'.$tinst : ''), 'No rrd file found for graphing');
     }
 
-    collectd_flush(collectd_identifier($host, $plugin, is_null($pinst) ? '' : $pinst, $type, is_null($tinst) ? '' : $tinst));
+    collectd_flush(collectd_identifier($host, $plugin, $type, is_null($pinst) ? '' : $pinst, is_null($tinst) ? '' : $tinst));
     if (isset($GraphDefs[$type])) {
-        $rrd_cmd = collectd_draw_generic($timespan, $host, $plugin, $pinst, $type, $tinst);
-    }
-    else {
-        $rrd_cmd = collectd_draw_rrd($host, $plugin, $pinst, $type, $tinst);
+        $rrd_cmd = collectd_draw_generic($timespan, $host, $plugin, $type, $pinst, $tinst);
+    } else {
+        $rrd_cmd = collectd_draw_rrd($host, $plugin, $type, $pinst, $tinst);
     }
 }
 
@@ -260,8 +250,7 @@ if ($height < '99') {
 
 if ($width <= '300') {
     $rrd_cmd .= ' --font LEGEND:7:'.$config['mono_font'].' --font AXIS:6:'.$config['mono_font'].' ';
-}
-else {
+} else {
     $rrd_cmd .= ' --font LEGEND:8:'.$config['mono_font'].' --font AXIS:7:'.$config['mono_font'].' ';
 }
 
@@ -269,8 +258,7 @@ if (isset($_GET['debug'])) {
     header('Content-Type: text/plain; charset=utf-8');
     printf("Would have executed:\n%s\n", $rrd_cmd);
     return 0;
-}
-else if ($rrd_cmd) {
+} elseif ($rrd_cmd) {
     header('Content-Type: image/png');
     header('Cache-Control: max-age=60');
     $rt = 0;
@@ -280,7 +268,6 @@ else if ($rrd_cmd) {
     }
 
     return $rt;
-}
-else {
+} else {
     return error500($graph_identifier, 'Failed to tell RRD how to generate the graph');
 }

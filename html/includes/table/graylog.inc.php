@@ -17,8 +17,7 @@ $filter_range = mres($_POST['range']);
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $query = 'message:"'.$searchPhrase.'"';
-}
-else {
+} else {
     $query = '*';
 }
 
@@ -43,7 +42,15 @@ if (!empty($filter_hostname)) {
     }
 }
 
-$graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . '/search/universal/relative?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
+if (isset($config['graylog']['base_uri'])) {
+    $graylog_base = $config['graylog']['base_uri'];
+} elseif (version_compare($config['graylog']['version'], '2.1', '>=')) {
+    $graylog_base = '/api/search/universal/relative';
+} else {
+    $graylog_base = '/search/universal/relative';
+}
+
+$graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . $graylog_base . '?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
 
 $context = stream_context_create(array(
     'http' => array(
@@ -52,7 +59,7 @@ $context = stream_context_create(array(
     )
 ));
 
-$messages = json_decode(file_get_contents($graylog_url, false, $context),true);
+$messages = json_decode(file_get_contents($graylog_url, false, $context), true);
 
 foreach ($messages['messages'] as $message) {
     $response[] = array(
@@ -66,8 +73,7 @@ foreach ($messages['messages'] as $message) {
 
 if (empty($messages['total_results'])) {
     $total = 0;
-}
-else {
+} else {
     $total = $messages['total_results'];
 }
 

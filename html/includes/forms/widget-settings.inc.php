@@ -30,23 +30,20 @@ $widget_id = (int) $_REQUEST['id'];
 if ($widget_id < 1) {
     $status  = 'error';
     $message = 'ERROR: malformed widget ID.';
-}
-else {
+} else {
     $widget_settings = $_REQUEST['settings'];
     if (!is_array($widget_settings)) {
         $widget_settings = array();
     }
-    if (dbFetchCell('select 1 from users_widgets inner join dashboards on users_widgets.dashboard_id = dashboards.dashboard_id where user_widget_id = ? && (users_widgets.user_id = ? || dashboards.access = 2)',array($widget_id,$_SESSION['user_id'])) == 1) {
-        if (dbUpdate(array('settings'=>json_encode($widget_settings)),'users_widgets','user_widget_id=?',array($widget_id)) >= 0) {
+    if (dbFetchCell('select 1 from users_widgets inner join dashboards on users_widgets.dashboard_id = dashboards.dashboard_id where user_widget_id = ? && (users_widgets.user_id = ? || dashboards.access = 2)', array($widget_id,$_SESSION['user_id'])) == 1) {
+        if (dbUpdate(array('settings'=>json_encode($widget_settings)), 'users_widgets', 'user_widget_id=?', array($widget_id)) >= 0) {
             $status  = 'ok';
             $message = 'Updated';
-        }
-        else {
+        } else {
             $status  = 'error';
             $message = 'ERROR: Could not update';
         }
-    }
-    else {
+    } else {
         $status  = 'error';
         $message = 'ERROR: You have no write-access to this dashboard';
     }

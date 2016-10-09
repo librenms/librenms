@@ -15,8 +15,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
     foreach ($config['libvirt_protocols'] as $method) {
         if (strstr($method, 'qemu')) {
             $uri = $method.'://'.$userHostname.'/system';
-        }
-        else {
+        } else {
             $uri = $method.'://'.$userHostname;
         }
 
@@ -78,8 +77,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                         $inserted_id = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
                         echo '+';
                         log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', $inserted_id);
-                    }
-                    else {
+                    } else {
                         if ($result['vmwVmState'] != $vmwVmState
                             || $result['vmwVmDisplayName'] != $vmwVmDisplayName
                             || $result['vmwVmCpus'] != $vmwVmCpus
@@ -89,8 +87,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                             dbUpdate(array('vmwVmState' => mres($vmwVmState), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus)), 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", array($device['device_id'], $dom_id));
                             echo 'U';
                             // FIXME eventlog
-                        }
-                        else {
+                        } else {
                             echo '.';
                         }
                     }

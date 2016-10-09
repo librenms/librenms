@@ -1,3 +1,4 @@
+source: Extensions/InfluxDB.md
 # Enabling support for InfluxDB.
 
 Before we get started it is important that you know and understand that InfluxDB support is currently alpha at best.

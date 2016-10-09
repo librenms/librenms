@@ -14,8 +14,7 @@ if ($device['os'] == 'avtech') {
             'descr_oid' => $device_oid.'1.2.2.0',
         );
         avtech_add_sensor($device, $switch);
-    }
-    elseif (strpos($device['sysObjectID'], '.20916.1.6') !== false) {
+    } elseif (strpos($device['sysObjectID'], '.20916.1.6') !== false) {
         //  RoomAlert 4E
         $device_oid = '.1.3.6.1.4.1.20916.1.6.';
 

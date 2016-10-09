@@ -1,5 +1,29 @@
 <?php
-include "includes/syslog.php";
+/**
+ * SyslogTest.php
+ *
+ * Tests various syslog input for proper parsing
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2016 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace LibreNMS\Tests;
 
 class SyslogTest extends \PHPUnit_Framework_TestCase
 {
@@ -8,13 +32,15 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
 
-    private function fillLine($line) {
+    private function fillLine($line)
+    {
         $entry = array();
         list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));
         return $entry;
     }
 
-    private function createData($line, $resultDelta) {
+    private function createData($line, $resultDelta)
+    {
         $entry = $this->fillLine($line);
         $data = array();
         $data['input'] = $entry;
@@ -30,7 +56,8 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
     * @param string $inputline The line from the syslog daemon including the ||'s
     * @param array $modified of the modified fields, most likely containging the keys program and msg
     */
-    private function checkSyslog($inputline, $modified) {
+    private function checkSyslog($inputline, $modified)
+    {
             $data = $this->createData($inputline, $modified);
             $res = process_syslog($data['input'], 0);
             $this->assertEquals($data['result'], $res);
@@ -102,18 +129,18 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         );
 
         // With program from syslog
-	$this->checkSyslog(
+        $this->checkSyslog(
             "1.1.1.1||local7||notice||notice||bd||2016-04-04 15:18:43||Apr 4 13:18:42.670: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/32, changed state to up||345735",
             array('device_id'=>1, 'program'=>'%LINEPROTO-5-UPDOWN', 'msg'=>'Line protocol on Interface GigabitEthernet0/32, changed state to up')
         );
 
         // Incorrect time
-	$this->checkSyslog(
+        $this->checkSyslog(
             "1.1.1.1||user||info||info||0e||2016-04-06 15:20:35||*Apr 4 21:26:41.778 UTC: %LWAPP-3-REPLAY_ERR: 1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx||",
             array('device_id'=>1, 'program'=>'%LWAPP-3-REPLAY_ERR', 'msg'=>'1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx')
         );
 
-	$this->checkSyslog(
+        $this->checkSyslog(
             "1.1.1.1||user||info||info||0e||2016-04-06 15:20:35||.Apr 4 21:26:41.778 UTC: %LWAPP-3-REPLAY_ERR: 1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx||",
             array('device_id'=>1, 'program'=>'%LWAPP-3-REPLAY_ERR', 'msg'=>'1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx')
         );
@@ -208,4 +235,3 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-

@@ -18,8 +18,7 @@ if (strpos($_SERVER['PATH_INFO'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -56,8 +55,7 @@ if (isset($_GET['report']) && !empty($_GET['report'])) {
     $report = mres($_GET['report']);
     $pdf->SetHeaderData('../../'.$config['title_image'], 40, ucfirst($report), $config['project_name'], array(0, 0, 0), array(0, 64, 128));
     include_once "includes/reports/$report.pdf.inc.php";
-}
-else {
+} else {
     $report = 'report';
 }
 

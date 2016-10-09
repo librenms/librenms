@@ -49,7 +49,6 @@ if (is_module_enabled('poller', 'mib')) {
     });
 </script>
 <?php
-}
-else {
+} else {
     print_mib_poller_disabled();
 }

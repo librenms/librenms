@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/hr_users.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'hr_users');
 
 $ds = 'users';
 

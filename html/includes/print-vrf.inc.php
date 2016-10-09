@@ -3,8 +3,7 @@
 // fixme new url format
 if (is_integer($i / 2)) {
     $bg_colour = $list_colour_a;
-}
-else {
+} else {
     $bg_colour = $list_colour_b;
 }
 
@@ -28,8 +27,7 @@ foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?'
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '').'</div>
    </div>';
-    }
-    else {
+    } else {
         echo $vrf['port_sep'].generate_port_link($port, makeshortif($port['ifDescr']));
         $vrf['port_sep'] = ', ';
     }

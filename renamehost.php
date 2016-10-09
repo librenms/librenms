@@ -2,17 +2,16 @@
 <?php
 
 /*
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage cli
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';
@@ -28,16 +27,13 @@ if ($argv[1] && $argv[2]) {
         $toid   = getidbyname($tohost);
         if ($toid) {
             echo "NOT renamed. New hostname $tohost already exists.\n";
-        }
-        else {
+        } else {
             renamehost($id, $tohost, 'console');
             echo "Renamed $host\n";
         }
-    }
-    else {
+    } else {
         echo "Host doesn't exist!\n";
     }
-}
-else {
+} else {
     echo "Host Rename Tool\nUsage: ./renamehost.php <old hostname> <new hostname>\n";
 }

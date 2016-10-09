@@ -227,7 +227,7 @@ class Radius
      * @param integer accounting port
      * @return NULL
      *********************************************************************/
-    public function Radius($ip_radius_server = '127.0.0.1', $shared_secret = '', $radius_suffix = '', $udp_timeout = 5, $authentication_port = 1812, $accounting_port = 1813)
+    public function __construct($ip_radius_server = '127.0.0.1', $shared_secret = '', $radius_suffix = '', $udp_timeout = 5, $authentication_port = 1812, $accounting_port = 1813)
     {
         $this->_radius_packet_info[1] = 'Access-Request';
         $this->_radius_packet_info[2] = 'Access-Accept';

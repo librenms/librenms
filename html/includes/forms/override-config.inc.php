@@ -30,12 +30,10 @@ $message = 'Error with config';
 
 if (empty($device['device_id'])) {
     $message = 'No device passed';
-}
-else {
+} else {
     if ($state == true) {
         set_dev_attrib($device, $attrib, $state);
-    }
-    else {
+    } else {
         del_dev_attrib($device, $attrib);
     }
     $status = 'ok';

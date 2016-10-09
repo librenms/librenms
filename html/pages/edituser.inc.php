@@ -10,8 +10,7 @@ $pagetitle[] = 'Edit user';
 
 if ($_SESSION['userlevel'] != '10') {
     include 'includes/error-no-perm.inc.php';
-}
-else {
+} else {
     if ($vars['user_id'] && !$vars['edit']) {
         $user_data = dbFetchRow('SELECT * FROM users WHERE user_id = ?', array($vars['user_id']));
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
@@ -241,12 +240,10 @@ else {
           <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
         </div>";
-    }
-    else if ($vars['user_id'] && $vars['edit']) {
+    } elseif ($vars['user_id'] && $vars['edit']) {
         if ($_SESSION['userlevel'] == 11) {
             demo_account();
-        }
-        else {
+        } else {
             if (!empty($vars['new_level'])) {
                 if ($vars['can_modify_passwd'] == 'on') {
                     $vars['can_modify_passwd'] = '1';
@@ -255,17 +252,15 @@ else {
                 update_user($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
                 print_message('User has been updated');
                 if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && passwordscanchange($vars['cur_username'])) {
-                    if (changepassword($vars['cur_username'],$vars['new_pass1']) == 1) {
+                    if (changepassword($vars['cur_username'], $vars['new_pass1']) == 1) {
                         print_message("User password has been updated");
-                }
-                else {
-                    print_error("Password couldn't be updated");
+                    } else {
+                        print_error("Password couldn't be updated");
+                    }
+                } elseif (!empty($vars['new_pass1']) && $vars['new_pass1'] != $vars['new_pass2']) {
+                    print_error("The supplied passwords didn't match so weren't updated");
                 }
             }
-            elseif (!empty($vars['new_pass1']) && $vars['new_pass1'] != $vars['new_pass2']) {
-                print_error("The supplied passwords didn't match so weren't updated");
-            }
-        }
 
             if (can_update_users() == '1') {
                 $users_details = get_user($vars['user_id']);
@@ -280,8 +275,7 @@ else {
 
                     if (empty($vars['can_modify_passwd'])) {
                         $vars['can_modify_passwd'] = $users_details['can_modify_passwd'];
-                    }
-                    else if ($vars['can_modify_passwd'] == 'on') {
+                    } elseif ($vars['can_modify_passwd'] == 'on') {
                         $vars['can_modify_passwd'] = '1';
                     }
 
@@ -293,8 +287,7 @@ else {
                         if ($vars['twofactorremove']) {
                             if (dbUpdate(array('twofactor' => ''), users, 'user_id = ?', array($vars['user_id']))) {
                                 echo "<div class='alert alert-success'>TwoFactor credentials removed.</div>";
-                            }
-                            else {
+                            } else {
                                 echo "<div class='alert alert-danger'>Couldnt remove user's TwoFactor credentials.</div>";
                             }
                         }
@@ -305,15 +298,14 @@ else {
                             $twofactor['fails'] = 0;
                             if (dbUpdate(array('twofactor' => json_encode($twofactor)), users, 'user_id = ?', array($vars['user_id']))) {
                                 echo "<div class='alert alert-success'>User unlocked.</div>";
-                            }
-                            else {
+                            } else {
                                 echo "<div class='alert alert-danger'>Couldnt reset user's TwoFactor failures.</div>";
                             }
                         }
                     }
 
                     if (!empty($vars['dashboard'])) {
-                        dbUpdate(array('dashboard'=>$vars['dashboard']),'users','user_id = ?',array($vars['user_id']));
+                        dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($vars['user_id']));
                     }
 
                     echo "<form class='form-horizontal' role='form' method='post' action=''>
@@ -362,8 +354,8 @@ else {
     </div>
   </div>";
 
-if (passwordscanchange($users_details['username'])) {
-    echo "
+                    if (passwordscanchange($users_details['username'])) {
+                        echo "
         <div class='form-group'>
             <label for='new_pass1' class='col-sm-2 control-label'>Password</label>
             <div class='col-sm-4'>
@@ -377,21 +369,21 @@ if (passwordscanchange($users_details['username'])) {
             </div>
         </div>
         ";
-}
-    echo "
+                    }
+                    echo "
        <div class='form-group'>
            <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
            <div class='col-sm-4'><select class='form-control' name='dashboard'>";
-    $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?",array($vars['user_id']));
-    foreach(dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?",array($vars['user_id'],$vars['user_id'])) as $dash) {
-        echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
-    }
-    echo "</select>
+                    $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?", array($vars['user_id']));
+                    foreach (dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?", array($vars['user_id'],$vars['user_id'])) as $dash) {
+                        echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
+                    }
+                    echo "</select>
            </div>
        </div>
        ";
 
-  echo "<div class='form-group'>
+                    echo "<div class='form-group'>
     <div class='col-sm-6'>
       <div class='checkbox'>
         <label>
@@ -431,22 +423,18 @@ if (passwordscanchange($users_details['username'])) {
   <button type='submit' class='btn btn-danger'>Disable TwoFactor</button>
 </form>
 </div>";
-                        }
-                        else {
+                        } else {
                             echo '<p>No TwoFactor key generated for this user, Nothing to do.</p>';
                         }
                     }//end if
-                }
-                else {
+                } else {
                     print_error('Error getting user details');
                 }//end if
-            }
-            else {
+            } else {
                 print_error("Authentication method doesn't support updating users");
             }//end if
         }//end if
-    }
-    else {
+    } else {
         $user_list = get_userlist();
 
         echo '<h3>Select a user to edit</h3>';

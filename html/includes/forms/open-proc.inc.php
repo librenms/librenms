@@ -17,11 +17,14 @@ $alert_id = $_POST['alert_id'];
 if (!is_numeric($alert_id)) {
     echo 'ERROR: No alert selected';
     exit;
-}
-else {
+} else {
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert_id));
-    if (($proc == "") || ($proc == "NULL")) { echo header("HTTP/1.0 404 Not Found"); }
-    else if (! preg_match ('/^http:\/\//', $proc)) { echo "ERROR"; }
-    else { echo $proc; }
+    if (($proc == "") || ($proc == "NULL")) {
+        echo header("HTTP/1.0 404 Not Found");
+    } elseif (! preg_match('/^http:\/\//', $proc)) {
+        echo "ERROR";
+    } else {
+        echo $proc;
+    }
     exit;
 }

@@ -1,7 +1,6 @@
 <?php
 
 if ($config['discover_services']) {
-
     // FIXME: use /etc/services?
     $known_services = array(
         22  => 'ssh',

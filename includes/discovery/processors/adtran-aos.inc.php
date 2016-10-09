@@ -14,7 +14,6 @@
 
 
 if ($device['os'] == 'adtran-aos') {
-
     echo 'ADTRAN AOS:';
     $descr = 'Processor';
     $usage = snmp_get($device, '.1.3.6.1.4.1.664.5.53.1.4.1.0', '-Ovq');
@@ -24,4 +23,3 @@ if ($device['os'] == 'adtran-aos') {
         discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.664.5.53.1.4.1.0', '0', 'adtran-aos', $descr, '1', $usage, null, null);
     }
 }
-

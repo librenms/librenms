@@ -35,8 +35,7 @@ if (!empty($_POST['to'])) {
 if ($_SESSION['userlevel'] >= '5') {
     $sql  = 'FROM syslog AS S';
     $sql .= ' WHERE '.$where;
-}
-else {
+} else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
     $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
     $sql  .= $where;
@@ -74,6 +73,7 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
         'msg'       => htmlspecialchars($syslog['msg']),
+        'status'    => generate_priority_status($syslog['priority']),
     );
 }
 

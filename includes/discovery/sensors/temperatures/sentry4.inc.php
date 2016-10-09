@@ -44,10 +44,22 @@ if ($device['os'] == 'sentry4') {
             $current         = (snmp_get($device, "$temperature_oid", '-Ovq', 'Sentry4-MIB') / $divisor);
 
             if ($current >= 0) {
-                discover_sensor($valid['sensor'], 'temperature', $device,
-                    $temperature_oid, $index, 'sentry4',
-                    $descr, $divisor, $multiplier, $low_limit, $low_warn_limit,
-                    $high_warn_limit, $high_limit, $current);
+                discover_sensor(
+                    $valid['sensor'],
+                    'temperature',
+                    $device,
+                    $temperature_oid,
+                    $index,
+                    'sentry4',
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $current
+                );
             }
         }
     }

@@ -11,9 +11,11 @@
 * the source code distribution for details.
 */
 
-include_once("../includes/defaults.inc.php");
-include_once("../config.php");
-include_once("../includes/definitions.inc.php");
+chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
+
+include_once("includes/defaults.inc.php");
+include_once("config.php");
+include_once("includes/definitions.inc.php");
 
 ?>
 
@@ -28,7 +30,7 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `ignore` = 0 AND `disab
     echo 'title = ' . $groups['type'] . PHP_EOL;
     foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0", array($groups['type'])) as $devices) {
         //Dot needs to be replaced, since smokeping doesn't accept it at this level
-        echo '++ ' . str_replace(".","_",$devices['hostname']) . PHP_EOL;
+        echo '++ ' . str_replace(".", "_", $devices['hostname']) . PHP_EOL;
         echo 'menu = ' . $devices['hostname'] . PHP_EOL;
         echo 'title = ' . $devices['hostname'] . PHP_EOL;
         echo 'host = ' . $devices['hostname'] . PHP_EOL . PHP_EOL;

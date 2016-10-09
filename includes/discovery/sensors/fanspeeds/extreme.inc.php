@@ -8,7 +8,7 @@ if ($device['os'] == 'xos') {
     $oids = snmpwalk_cache_multi_oid($device, $oid, array(), "EXTREME-BASE-MIB");
 
     foreach ($oids as $index => $entry) {
-	// fix index to a proper int
+    // fix index to a proper int
         preg_match('/^.*\.([^\.]*)$/', "$index", $matches);
         $index = $matches[1];
         // substract 100 from index to start from 1 instead of 101

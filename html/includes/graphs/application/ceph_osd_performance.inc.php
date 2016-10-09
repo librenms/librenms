@@ -8,7 +8,7 @@ $out_text = 'Commit';
 
 $ceph_osd_rrd = ceph_rrd('osd');
 
-if (is_file($ceph_osd_rrd)) {
+if (rrdtool_check_rrd_exists($ceph_osd_rrd)) {
     $rrd_filename = $ceph_osd_rrd;
 }
 

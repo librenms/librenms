@@ -4,8 +4,7 @@
 if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $poll_device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
-}
-else if (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $poll_device['sysDescr'], $regexp_result)) {
+} elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $poll_device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
 } // If we have not managed to match any IOS string yet (and that would be surprising)
@@ -46,4 +45,3 @@ $serial = get_main_serial($device);
 if (strstr($hardware, 'cisco819')) {
       include 'includes/polling/wireless/cisco-wwan.inc.php';
 }
-

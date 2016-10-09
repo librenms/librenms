@@ -14,40 +14,40 @@ foreach (dbFetchRows('SELECT * FROM toner where device_id = ?', array($device['d
         switch ($iter) {
             case '1':
                 $colour['left'] = '000000';
-            break;
+                break;
 
             case '2':
                 $colour['left'] = '008C00';
-            break;
+                break;
 
             case '3':
                 $colour['left'] = '4096EE';
-            break;
+                break;
 
             case '4':
                 $colour['left'] = '73880A';
-            break;
+                break;
 
             case '5':
                 $colour['left'] = 'D01F3C';
-            break;
+                break;
 
             case '6':
                 $colour['left'] = '36393D';
-            break;
+                break;
 
             case '7':
             default:
                 $colour['left'] = 'FF0000';
                 unset($iter);
-            break;
+                break;
         }//end switch
     }//end if
 
     $hostname = gethostbyid($toner['device_id']);
 
     $descr        = substr(str_pad($toner['toner_descr'], 16), 0, 16);
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('toner-'.$toner['toner_index'].'.rrd');
+    $rrd_filename = rrd_name($device['hostname'], array('toner', $toner['toner_index']));
     $toner_id     = $toner['toner_id'];
 
     $rrd_options .= " DEF:toner$toner_id=$rrd_filename:toner:AVERAGE";

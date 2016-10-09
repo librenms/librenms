@@ -1,8 +1,5 @@
 <?php
-if (!$os) {
-    if (strstr($sysDescr, 'Samsung CLX') || 
-        strstr($sysDescr, 'Samsung SCX') ||
-        strstr($sysDescr, 'Samsun C')) {
-            $os = 'samsungprinter';
-    }
+
+if (str_contains($sysDescr, array('Samsung CLX', 'Samsung SCX', 'Samsung C', 'Samsung S'))) {
+    $os = 'samsungprinter';
 }

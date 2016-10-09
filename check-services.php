@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-chdir(dirname($argv[0]));
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';
@@ -28,8 +28,7 @@ if (isset($options['d'])) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', 1);
-}
-else {
+} else {
     $debug = false;
     // ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -37,11 +36,20 @@ else {
     // ini_set('error_reporting', 0);
 }
 
-rrdtool_pipe_open($rrd_process, $rrd_pipes);
+if (isset($options['f'])) {
+    $config['noinfluxdb'] = true;
+}
+
+if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+    $influxdb = influxdb_connect();
+} else {
+    $influxdb = false;
+}
+
+rrdtool_initialize();
 
 foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC') as $service) {
     // Run the polling function
     poll_service($service);
-
 } //end foreach
-rrdtool_pipe_close($rrd_process, $rrd_pipes);
+rrdtool_close();

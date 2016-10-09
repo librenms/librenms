@@ -14,15 +14,13 @@
 
 if ($bg == $list_colour_b) {
     $bg = $list_colour_a;
-}
-else {
+} else {
     $bg = $list_colour_b;
 }
 
 if ($device['status'] == '0') {
     $class = 'bg-danger';
-}
-else {
+} else {
     $class = 'bg-primary';
 }
 

@@ -12,8 +12,7 @@ if ($rrd_filename) {
 if ($inverse) {
     $in  = 'out';
     $out = 'in';
-}
-else {
+} else {
     $in  = 'in';
     $out = 'out';
 }
@@ -27,8 +26,7 @@ if ($multiplier) {
     $rrd_options .= " CDEF:outoctets=poutoctets,$multiplier,*";
     $rrd_options .= " CDEF:inoctets_max=pinoctets_max,$multiplier,*";
     $rrd_options .= " CDEF:outoctets_max=poutoctets_max,$multiplier,*";
-}
-else {
+} else {
     $rrd_options .= ' DEF:'.$out.'octets='.$rrd_filename_out.':'.$ds_out.':AVERAGE';
     $rrd_options .= ' DEF:'.$in.'octets='.$rrd_filename_in.':'.$ds_in.':AVERAGE';
     $rrd_options .= ' DEF:'.$out.'octets_max='.$rrd_filename_out.':'.$ds_out.':MAX';
@@ -43,8 +41,7 @@ if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' SHIFT:p'.$in."octetsX:$period";
         $rrd_options .= " CDEF:inoctetsX=pinoctetsX,$multiplier,*";
         $rrd_options .= " CDEF:outoctetsX=poutoctetsX,$multiplier,*";
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$out.'octetsX='.$rrd_filename_out.':'.$ds_out.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' DEF:'.$in.'octetsX='.$rrd_filename_in.':'.$ds_in.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' SHIFT:'.$out."octetsX:$period";
@@ -92,8 +89,7 @@ if ($format == 'octets' || $format == 'bytes') {
     $rrd_options .= ' VDEF:95thout=outoctets,95,PERCENT';
     $units  = 'Bps';
     $format = 'octets';
-}
-else {
+} else {
     $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
     $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
     $units  = 'bps';

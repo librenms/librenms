@@ -17,59 +17,47 @@ $filtered_words = array(
         'timeing',
 );
 if (strstr($cambium_type, 'BHUL450')) {
-    $masterSlaveMode = str_replace($filtered_words,"",snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
+    $masterSlaveMode = str_replace($filtered_words, "", snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
     $hardware = 'PTP 450 '.$masterSlaveMode;
     $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else if (strstr($cambium_type, 'BHUL')) {
-    $masterSlaveMode = str_replace($filtered_words,"",snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
+} elseif (strstr($cambium_type, 'BHUL')) {
+    $masterSlaveMode = str_replace($filtered_words, "", snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
     $hardware = 'PTP 230 '. $masterSlaveMode;
     $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else if (strstr($cambium_type, 'BH20') || strstr($cambium_type, 'BH10')) {
-    $masterSlaveMode = str_replace($filtered_words,"",snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
+} elseif (strstr($cambium_type, 'BH20') || strstr($cambium_type, 'BH10')) {
+    $masterSlaveMode = str_replace($filtered_words, "", snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
     $hardware = 'PTP 100 '. $masterSlaveMode;
     $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else if (strstr($cambium_type, 'CMM')) {
+} elseif (strstr($cambium_type, 'CMM')) {
     $hardware = 'CMM';
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else if (strstr($PMP, 'MIMO OFDM')) {
+} elseif (strstr($PMP, 'MIMO OFDM')) {
     if (strstr($version, "AP")) {
         $hardware = 'PMP 450 AP';
-    }
-    else if (strstr($version, "SM")) {
+    } elseif (strstr($version, "SM")) {
         $hardware = 'PMP 450 SM';
-    }
-    else {
+    } else {
         $hardware = 'PMP 450';
     }
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else if (strstr($PMP, 'OFDM')) {
+} elseif (strstr($PMP, 'OFDM')) {
     if (strstr($version, "AP")) {
         $hardware = 'PMP 430 AP';
-    }
-    else if (strstr($version, "SM")) {
+    } elseif (strstr($version, "SM")) {
         $hardware = 'PMP 430 SM';
-    }
-    else {
+    } else {
         $hardware = 'PMP 430';
     }
     include 'includes/polling/wireless/canopy-generic.inc.php';
-}
-else {
+} else {
     if (strstr($version, "AP")) {
         $hardware = 'PMP 100 AP';
-    }
-    else if (strstr($version, "SM")) {
+    } elseif (strstr($version, "SM")) {
         $hardware = 'PMP 100 SM';
-    }
-    else {
+    } else {
         $hardware = 'PMP 100';
     }
     include 'includes/polling/wireless/canopy-generic.inc.php';

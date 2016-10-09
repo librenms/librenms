@@ -26,27 +26,22 @@ if (!empty($group_name)) {
     if (is_numeric($group_id)) {
         if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id))) {
             $ok = 'Updated poller group';
-        }
-        else {
+        } else {
             $error = 'Failed to update the poller group';
         }
-    }
-    else {
+    } else {
         if (dbInsert(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups') >= 0) {
             $ok = 'Added new poller group';
-        }
-        else {
+        } else {
             $error = 'Failed to create new poller group';
         }
     }
-}
-else {
+} else {
     $error = "You haven't given your poller group a name, it feels sad :( - $group_name";
 }
 
 if (!empty($ok)) {
     die("$ok");
-}
-else {
+} else {
     die("ERROR: $error");
 }

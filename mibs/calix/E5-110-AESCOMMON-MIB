@@ -1,0 +1,546 @@
+-- $Log: E5-110-AESCOMMON-MIB.mib $
+-- Revision 1.3  2010/03/29 02:05:56  maverick
+-- Revision 1.2  2009/11/23 06:51:48  maverick
+-- Revision 1.1  2008/07/11 09:36:18  maverick
+-- Initial revision
+-- Revision 1.2  2008/04/28 02:29:15  maverick
+-- Revision 1.1  2007/12/03 01:45:26  niceguy
+-- Initial revision
+-- Initial revision
+
+
+E5-110-AESCOMMON-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE		FROM RFC-1212
+		DisplayString, ifIndex 	FROM RFC1213-MIB
+		Unsigned32		FROM SNMPv2-SMI
+		aesSeriesCommon 	FROM E5-110-MIB;
+
+        aesMaxNumOfProfiles OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      "The maximum number of ADSL profiles which the system supports."
+        ::= { aesSeriesCommon 1 }
+
+        aesLineConfTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AesLineConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	"This table includes common attributes describing the ADSL line."
+        ::= { aesSeriesCommon 2 }
+
+	aesLineConfEntry OBJECT-TYPE
+        SYNTAX	AesLineConfEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in aesLineConfTable."
+        INDEX          	{ ifIndex }
+        ::= { aesLineConfTable 1 }
+
+        AesLineConfEntry ::=
+           SEQUENCE {
+        	aesLineConfAdslMode	INTEGER,
+		aesLineConfEncap	INTEGER,
+		aesLineConfVpi		INTEGER,
+		aesLineConfVci		INTEGER,
+		aesLineConfAnnexL	INTEGER,
+		aesLineConfPmMode	INTEGER,
+		aesLineConfRateMode	INTEGER,
+		aesLineConfAnnexM	INTEGER
+           }
+
+        aesLineConfAdslMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+			gDotLite(1),
+			gDotDmt(2),
+			t1Dot413(3),
+			auto(4),
+			etsi(5),
+			adsl2(6),
+			adsl2Plus(7)
+	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The mode of the ADSL line."
+        ::= { aesLineConfEntry 1 }
+
+        aesLineConfEncap OBJECT-TYPE
+        SYNTAX  INTEGER {
+			llc(1),
+			vc(2)
+	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The encapsulation of the ADSL line."
+        ::= { aesLineConfEntry 2 }
+
+        aesLineConfVpi OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The VPI of the ADSL line."
+        ::= { aesLineConfEntry 3 }
+
+        aesLineConfVci OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The VCI of the ADSL line."
+        ::= { aesLineConfEntry 4 }
+
+        aesLineConfAnnexL OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		enableNarrowMode(1),
+        		enableWideMode(2),
+        		disable(3)
+        	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The annex L setting of the ADSL line(Only in AnnexA)."
+        ::= { aesLineConfEntry 5 }
+
+        aesLineConfPmMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		enableL2Mode(1),
+        		enableL2Mode(2),
+        		disable(3)
+        	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The power management mode of the ADSL line."
+        ::= { aesLineConfEntry 6 }
+
+        aesLineConfRateMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+                 	fixed(1),		-- no rate adaptation
+                 	adaptAtStartup(2),	-- perform rate adaptation
+                                         	-- only at initialization
+                 	adaptAtRuntime(3)	-- perform rate adaptation at
+                                         	-- any time
+             	}
+        MAX-ACCESS  read-write
+        STATUS	current
+        DESCRIPTION
+                 	"Defines what form of transmit rate adaptation is
+                 	configured on this modem.  See ADSL Forum TR-005 [3]
+                 	for more information."
+        ::= { aesLineConfEntry 7 }
+
+        aesLineConfAnnexM OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		enable(1),
+        		disable(2)
+        	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The annex M setting of the ADSL line."
+        ::= { aesLineConfEntry 8 }
+                        
+
+-- ADSL Line Diagnostic
+
+	aesLineDiagnostic	OBJECT IDENTIFIER ::= { aesSeriesCommon 3 }
+
+	aesAtucLineDiagLATN OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Line Attenuation."
+	::= { aesLineDiagnostic 1 }
+
+	aesAtucLineDiagSATN OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Signal Attenuation."
+	::= { aesLineDiagnostic 2 }
+
+	aesAtucLineDiagSNRM OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Signal-to-Noise Ratio Margin."
+	::= { aesLineDiagnostic 3 }
+
+	aesAtucLineDiagACTATP OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Actual Aggregate Transmit Power."
+	::= { aesLineDiagnostic 4 }
+
+	aesAtucLineDiagATTNDR OBJECT-TYPE
+	SYNTAX	Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Attainable Net Data Rate, in bps."
+	::= { aesLineDiagnostic 5 }
+
+	aesAturLineDiagLATN OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Line Attenuation."
+	::= { aesLineDiagnostic 6 }
+
+	aesAturLineDiagSATN OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Signal Attenuation."
+	::= { aesLineDiagnostic 7 }
+
+	aesAturLineDiagSNRM OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Signal-to-Noise Ratio Margin."
+	::= { aesLineDiagnostic 8 }
+
+	aesAturLineDiagACTATP OBJECT-TYPE
+	SYNTAX	INTEGER
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Actual Aggregate Transmit Power."
+	::= { aesLineDiagnostic 9 }
+
+	aesAturLineDiagATTNDR OBJECT-TYPE
+	SYNTAX	Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Attainable Net Data Rate, in bps."
+	::= { aesLineDiagnostic 10 }
+
+	aesLineDiagTarget OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Ifindex of the ADSL port which will be diagnosed."
+	::= { aesLineDiagnostic 11 }
+
+	aesLineDiagOps OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The manager sets the object to one to start line diagnostics and the agent clears the
+		object to zero when diagnostics is successfully completed."
+	::= { aesLineDiagnostic 12 }
+
+	aesLineDiagFailReason OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The reason of failed diagnostics."
+	::= { aesLineDiagnostic 13 }
+
+
+-- ADSL Line Diagnostic Per Subcarrier
+
+	aesLineDiagPs		OBJECT IDENTIFIER ::= { aesSeriesCommon 4 }
+
+	aesAtucNumOfSubcarriersPerPort OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of subcarriers per port for ATU-C."
+	::= { aesLineDiagPs 1 }
+
+	aesAturNumOfSubcarriersPerPort OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of subcarriers per port for ATU-R."
+	::= { aesLineDiagPs 2 }
+
+	aesLineDiagPsCCFLirl1 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value is the real
+		part of a complex value in liner scale.
+		The first two octets specify the li.rl value for subcarrier 1, and the second
+		two octets specify the li.rl value for subcarrier 2, and so on. The object
+		provides li.rl values for subcarrier 1 to 256."
+	::= { aesLineDiagPs 3 }
+
+	aesLineDiagPsCCFLirl2 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value is the real
+		part of a complex value in liner scale.
+		The first two octets specify the li.rl value for subcarrier 257, and the second
+		two octets specify the li.rl value for subcarrier 258, and so on. The object
+		provides li.rl values for subcarrier 257 to 512."
+	::= { aesLineDiagPs 4 }
+
+	aesLineDiagPsCCFLiim1 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value is the image
+		part of a complex value in liner scale.
+		The first two octets specify the li.im value for subcarrier 1, and the second
+		two octets specify the li.im value for subcarrier 2, and so on. The object
+		provides li.im values for subcarrier 1 to 256."
+	::= { aesLineDiagPs 5 }
+
+	aesLineDiagPsCCFLiim2 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value is the image
+		part of a complex value in liner scale.
+		The first two octets specify the li.im value for subcarrier 257, and the second
+		two octets specify the li.im value for subcarrier 258, and so on. The object
+		provides li.im values for subcarrier 257 to 512."
+	::= { aesLineDiagPs 6 }
+
+	aesLineDiagPsCCFLog1 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value
+		provides magnitude value in a logarithmic scale.
+		The first two octets specify the log value for subcarrier 1, and the second
+		two octets specify the log value for subcarrier 2, and so on. The object
+		provides log values for subcarrier 1 to 256."
+	::= { aesLineDiagPs 7 }
+
+	aesLineDiagPsCCFLog2 OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Channel Characteristics Function H(f) per subcarrier. The value
+		provides magnitude value in a logarithmic scale.
+		The first two octets specify the log value for subcarrier 257, and the second
+		two octets specify the log value for subcarrier 258, and so on. The object
+		provides log values for subcarrier 257 to 512."
+	::= { aesLineDiagPs 8 }
+
+	aesLineDiagPsQLN OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Quiet Line Noise PSD QLN(f) per subcarrier. The first octet specify QLN
+		for subcarrier 1, and the second octet specify QLN for subcarrier 2, and so on.
+		The object provides QLN for subcarrier 1 to 512."
+	::= { aesLineDiagPs 9 }
+
+	aesLineDiagPsSNR OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	UNITS	"tenth dB"
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Signal-to-Noise Ratio SNR(f) per subcarrier. The first octet specify SNR
+		for subcarrier 1, and the second octet specify SNR for subcarrier 2, and so on.
+		The object provides SNR for subcarrier 1 to 512."
+	::= { aesLineDiagPs 10 }
+
+
+-- Max # of Alarm Profiles
+
+        aesMaxNumOfAlarmProfiles OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        	"The maximum number of ADSL alarm profiles which the system supports."
+        ::= { aesSeriesCommon 5 }
+
+
+-- Bit Loading
+
+        aesBitLoadingTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AesBitLoadingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"This table provides the number of bits per carrier for each ADSL port."
+        ::= { aesSeriesCommon 6 }
+
+	aesBitLoadingEntry OBJECT-TYPE
+        SYNTAX	AesBitLoadingEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in aesBitLoadingTable."
+        INDEX          	{ ifIndex }
+        ::= { aesBitLoadingTable 1 }
+
+        AesBitLoadingEntry ::=
+           SEQUENCE {
+        	aesBitLoadingBits		OCTET STRING,
+        	aesBitLoadingAtucNumOfCarriers 	INTEGER,
+        	aesBitLoadingAturNumOfCarriers	INTEGER
+           }
+
+        aesBitLoadingBits OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        	"This object provides the number of bits for all carriers in the port.
+        	The first octet specify the number of bits for carrier 1, and the second
+        	octet specify the number of bits for carrier 2, and so on.
+		The object provides the number of bits for carrier 1 to 512."
+        ::= { aesBitLoadingEntry 1 }
+
+	aesBitLoadingAtucNumOfCarriers OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of carriers for ATU-C."
+	::= { aesBitLoadingEntry 2 }
+
+	aesBitLoadingAturNumOfCarriers OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of carriers for ATU-R."
+	::= { aesBitLoadingEntry 3 }
+
+
+-- Line Status
+
+        aesLineStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AesLineStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	"This table includes the ADSL line status."
+        ::= { aesSeriesCommon 7 }
+
+	aesLineStatusEntry OBJECT-TYPE
+        SYNTAX	AesLineStatusEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in aesLineStatusTable."
+        INDEX          	{ ifIndex }
+        ::= { aesLineStatusTable 1 }
+
+        AesLineStatusEntry ::=
+           SEQUENCE {
+        	aesLineStatusAdslMode	INTEGER
+           }
+
+        aesLineStatusAdslMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+			gDotLite(1),
+			gDotDmt(2),
+			t1Dot413(3),
+			etsi(4),
+			adsl2(5),
+			adsl2Plus(6)
+	}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"The link up mode of the ADSL line."
+        ::= { aesLineStatusEntry 1 }
+
+--------------------
+-- selt
+--------------------
+
+	selt		OBJECT IDENTIFIER ::= { aesSeriesCommon 8 }
+	
+	seltTarget OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"IfIndex of the port which would be performed single end loopback test."
+	::= { selt 1 }
+	
+	seltOps OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The manager sets the object to 1 to start the selt
+        	and the agent clears the object to zero when selt is successfully completed."
+	::= { selt 2 }
+
+	seltStatus OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Status description of the selt result."
+	::= { selt 3 }
+
+	seltCableType OBJECT-TYPE
+	SYNTAX 	INTEGER {
+			awg24(1),
+			awg26(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The cable type that selt result indicates."
+	::= { selt 4 }
+
+	seltLoopEstimateLengthFt OBJECT-TYPE
+	SYNTAX INTEGER
+	UNITS "feet"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The estimated loop length that selt result indicates."
+	::= { selt 5 }
+	
+	seltLoopEstimateLengthMeter OBJECT-TYPE
+	SYNTAX INTEGER
+	UNITS "meter"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The estimated loop length that selt result indicates."
+	::= { selt 6 }
+	               		
+END

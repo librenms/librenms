@@ -38,14 +38,14 @@
  */
 
 
-if (! isset ($_SESSION['username'])) {
+if (! isset($_SESSION['username'])) {
     $_SESSION['username'] = '';
 }
 
 /**
  * Set up connection to LDAP server
  */
-$ldap_connection = @ldap_connect ($config['auth_ldap_server'], $config['auth_ldap_port']);
+$ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
 if (! $ldap_connection) {
     echo '<h2>Fatal error while connecting to LDAP server ' . $config['auth_ldap_server'] . ':' . $config['auth_ldap_port'] . ': ' . ldap_error($ldap_connection) . '</h2>';
     exit;
@@ -63,13 +63,14 @@ if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional
 }
 
 
-function authenticate ($username, $password) {
+function authenticate($username, $password)
+{
     global $config;
 
-    if (isset ($_SERVER['REMOTE_USER'])) {
-        $_SESSION['username'] = mres ($_SERVER['REMOTE_USER']);
+    if (isset($_SERVER['REMOTE_USER'])) {
+        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
 
-        if (user_exists ($_SESSION['username'])) {
+        if (user_exists($_SESSION['username'])) {
             return 1;
         }
 
@@ -81,51 +82,58 @@ function authenticate ($username, $password) {
 }
 
 
-function reauthenticate ($sess_id='', $token='') {
+function reauthenticate($sess_id = '', $token = '')
+{
     // Not supported
     return 0;
 }
 
 
-function passwordscanchange ($username='') {
+function passwordscanchange($username = '')
+{
     // Not supported
     return 0;
 }
 
 
-function changepassword ($username, $newpassword) {
+function changepassword($username, $newpassword)
+{
     // Not supported
     return 0;
 }
 
 
-function auth_usermanagement () {
+function auth_usermanagement()
+{
     // Not supported
     return 0;
 }
 
 
-function adduser ($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '', $twofactor = 0) {
+function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '', $twofactor = 0)
+{
     // Not supported
     return false;
 }
 
 
-function user_exists ($username) {
+function user_exists($username)
+{
     global $config, $ldap_connection;
 
-    if (auth_ldap_session_cache_get ('user_exists'))
+    if (auth_ldap_session_cache_get('user_exists')) {
         return 1;
+    }
 
     $filter  = '(' . $config['auth_ldap_prefix'] . $username . ')';
-    $search  = ldap_search ($ldap_connection, trim ($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries ($ldap_connection, $search);
+    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
+    $entries = ldap_get_entries($ldap_connection, $search);
     if ($entries['count']) {
         /*
 	 * Cache positiv result as this will result in more queries which we
 	 * want to speed up.
 	 */
-        auth_ldap_session_cache_set ('user_exists', 1);
+        auth_ldap_session_cache_set('user_exists', 1);
         return 1;
     }
 
@@ -138,10 +146,11 @@ function user_exists ($username) {
 }
 
 
-function get_userlevel ($username) {
+function get_userlevel($username)
+{
     global $config, $ldap_connection;
 
-    $userlevel = auth_ldap_session_cache_get ('userlevel');
+    $userlevel = auth_ldap_session_cache_get('userlevel');
     if ($userlevel) {
         return $userlevel;
     } else {
@@ -149,8 +158,8 @@ function get_userlevel ($username) {
     }
 
     // Find all defined groups $username is in
-    $filter  = '(&(|(cn=' . join (')(cn=', array_keys ($config['auth_ldap_groups'])) . '))(' . $config['auth_ldap_groupmemberattr'] .'=' . get_membername ($username) . '))';
-    $search  = ldap_search ($ldap_connection, $config['auth_ldap_groupbase'], $filter);
+    $filter  = '(&(|(cn=' . join(')(cn=', array_keys($config['auth_ldap_groups'])) . '))(' . $config['auth_ldap_groupmemberattr'] .'=' . get_membername($username) . '))';
+    $search  = ldap_search($ldap_connection, $config['auth_ldap_groupbase'], $filter);
     $entries = ldap_get_entries($ldap_connection, $search);
 
     // Loop the list and find the highest level
@@ -161,49 +170,52 @@ function get_userlevel ($username) {
         }
     }
 
-    auth_ldap_session_cache_set ('userlevel', $userlevel);
+    auth_ldap_session_cache_set('userlevel', $userlevel);
     return $userlevel;
 }
 
 
 
-function get_userid ($username) {
+function get_userid($username)
+{
     global $config, $ldap_connection;
 
-    $user_id = auth_ldap_session_cache_get ('userid');
-    if (isset ($user_id)) {
+    $user_id = auth_ldap_session_cache_get('userid');
+    if (isset($user_id)) {
         return $user_id;
     } else {
         $user_id = -1;
     }
 
     $filter  = '(' . $config['auth_ldap_prefix'] . $username . ')';
-    $search  = ldap_search ($ldap_connection, trim ($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries ($ldap_connection, $search);
+    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
+    $entries = ldap_get_entries($ldap_connection, $search);
 
     if ($entries['count']) {
         $user_id = $entries[0]['uidnumber'][0];
     }
 
-    auth_ldap_session_cache_set ('userid', $user_id);
+    auth_ldap_session_cache_set('userid', $user_id);
     return $user_id;
 }
 
 
-function deluser ($username) {
+function deluser($username)
+{
     // Not supported
     return 0;
 }
 
 
-function get_userlist () {
+function get_userlist()
+{
     global $config, $ldap_connection;
     $userlist = array ();
 
     $filter = '(' . $config['auth_ldap_prefix'] . '*)';
 
-    $search  = ldap_search ($ldap_connection, trim ($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries ($ldap_connection, $search);
+    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
+    $entries = ldap_get_entries($ldap_connection, $search);
 
     if ($entries['count']) {
         foreach ($entries as $entry) {
@@ -211,7 +223,7 @@ function get_userlist () {
             $realname    = $entry['cn'][0];
             $user_id     = $entry['uidnumber'][0];
             $email       = $entry[$config['auth_ldap_emailattr']][0];
-            $ldap_groups = get_group_list ();
+            $ldap_groups = get_group_list();
             foreach ($ldap_groups as $ldap_group) {
                 $ldap_comparison = ldap_compare(
                     $ldap_connection,
@@ -219,7 +231,7 @@ function get_userlist () {
                     $config['auth_ldap_groupmemberattr'],
                     get_membername($username)
                 );
-                if (! isset ($config['auth_ldap_group']) || $ldap_comparison === true) {
+                if (! isset($config['auth_ldap_group']) || $ldap_comparison === true) {
                     $userlist[] = array(
                                    'username' => $username,
                                    'realname' => $realname,
@@ -235,38 +247,42 @@ function get_userlist () {
 }
 
 
-function can_update_users () {
+function can_update_users()
+{
     // not supported
     return 0;
 }
 
 
-function get_user ($user_id) {
+function get_user($user_id)
+{
     foreach (get_userlist() as $users) {
-         if ($users['user_id'] === $user_id) return $users['username'];
+        if ($users['user_id'] === $user_id) {
+            return $users['username'];
+        }
     }
     return 0;
 }
 
 
-function update_user ($user_id, $realname, $level, $can_modify_passwd, $email) {
+function update_user($user_id, $realname, $level, $can_modify_passwd, $email)
+{
     // Not supported
     return 0;
 }
 
 
-function get_membername ($username) {
+function get_membername($username)
+{
     global $config, $ldap_connection;
     if ($config['auth_ldap_groupmembertype'] == 'fulldn') {
         $membername = $config['auth_ldap_prefix'] . $username . $config['auth_ldap_suffix'];
-    }
-    elseif ($config['auth_ldap_groupmembertype'] == 'puredn') {
+    } elseif ($config['auth_ldap_groupmembertype'] == 'puredn') {
         $filter  = '(' . $config['auth_ldap_attr']['uid'] . '=' . $username . ')';
         $search  = ldap_search($ldap_connection, $config['auth_ldap_groupbase'], $filter);
         $entries = ldap_get_entries($ldap_connection, $search);
         $membername = $entries[0]['dn'];
-    }
-    else {
+    } else {
         $membername = $username;
     }
 
@@ -274,32 +290,38 @@ function get_membername ($username) {
 }
 
 
-function auth_ldap_session_cache_get ($attr) {
+function auth_ldap_session_cache_get($attr)
+{
     global $config;
 
     $ttl = 300;
-    if ($config['auth_ldap_cache_ttl'])
+    if ($config['auth_ldap_cache_ttl']) {
         $ttl = $config['auth_ldap_cache_ttl'];
+    }
 
     // auth_ldap cache present in this session?
-    if (! isset ($_SESSION['auth_ldap']))
-        return Null;
+    if (! isset($_SESSION['auth_ldap'])) {
+        return null;
+    }
 
     $cache = $_SESSION['auth_ldap'];
 
     // $attr present in cache?
-    if (! isset ($cache[$attr]))
-        return Null;
+    if (! isset($cache[$attr])) {
+        return null;
+    }
 
     // Value still valid?
-    if (time () - $cache[$attr]['last_updated'] >= $ttl)
-        return Null;
+    if (time() - $cache[$attr]['last_updated'] >= $ttl) {
+        return null;
+    }
 
     $cache[$attr]['value'];
 }
 
 
-function auth_ldap_session_cache_set ($attr, $value) {
+function auth_ldap_session_cache_set($attr, $value)
+{
     $_SESSION['auth_ldap'][$attr]['value'] = $value;
-    $_SESSION['auth_ldap'][$attr]['last_updated'] = time ();
+    $_SESSION['auth_ldap'][$attr]['last_updated'] = time();
 }

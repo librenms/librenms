@@ -1,6 +1,6 @@
 --
 -- DATACOM Telematica
--- Copyright 2014 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
+-- Copyright 2015 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
 -- This DATACOM SNMP MIB Specification is DATACOM proprietary intellectual property.
 --
 -- This module will be extend, as required. The specification and other information
@@ -29,7 +29,7 @@ IMPORTS
 
 
 dmSwitchMIB MODULE-IDENTITY
-        LAST-UPDATED "201407180000Z"
+        LAST-UPDATED "201512100000Z"
         ORGANIZATION "DATACOM"
         CONTACT-INFO
                 "DATACOM
@@ -82,6 +82,7 @@ eapsMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 24 }
 cfmProbeMgmt        OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 25 }
 cpumonMgmt          OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 26 }
 queuePortMgmt       OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 27 }
+ddTransceiversMgmt  OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 28 }
 
 -- -------------------------------------------------------------
 -- Textual Conventions
@@ -327,14 +328,12 @@ swProdModelId OBJECT-TYPE
            eth44gt4gc2xxsmplsdc(63),
            eth44gt4gc4xxmplsdc(64),
            eth24gx2x10gxhseriesII(65),
-           eth20gt4gc2xssl3(66),
-           eth20gp4gc2xssl3(67),
-           eth20gt4gc4xsl3(68),
-           eth20gp4gc4xsl3(69),
-           eth44gt4gc2xssl3(70),
-           eth44gp4gc2xssl3(71),
-           eth44gt4gc4xsl3(72),
-           eth44gp4gc4xsl3(73)
+           eth20gt4gc4xs(66),
+           eth24gxhseriesII(67),
+           eth2x10gxhseriesII(68),
+           eth48gxhseriesII(69),
+           eth4x10gxhseriesII(70),
+           eth24gx4xs(71)
         }
         MAX-ACCESS  read-only
         STATUS      current
@@ -780,7 +779,7 @@ swChassisModel OBJECT-TYPE
         ::= { switchMgt 17 }
 
 switchSessionTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwitchIndivAlarmOutEntry
+    SYNTAX      SEQUENCE OF SwitchSessionEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table about CLI sessions informations."
@@ -938,7 +937,8 @@ portType OBJECT-TYPE
             thousandBaseSfp(8),
             hundredBaseFxScSingleMode(9),
             hundredBaseFxScMultiMode(10),
-            tenG(11)
+            tenG(11),
+            tenGSfp(12)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -2876,7 +2876,10 @@ trapSystemWarningsUnits OBJECT-TYPE
                     sysWarUnitsHsEnNoError(1),
                     sysWarUnitsHsEnWES(2),
                     sysWarUnitsHsEnWHSDis(3),
-                    sysWarUnitsHsEnWDifMod(4)
+                    sysWarUnitsHsEnWDifMod(4),
+                    sysWarUnitsCommFail(5),
+                    sysWarUnitsMPLS(6),
+                    sysWarUnitsL3(7)
                 }
      MAX-ACCESS  accessible-for-notify
      STATUS      current
@@ -4527,7 +4530,7 @@ cpuActiveUsageTable OBJECT-TYPE
         ::= { cpumonMgmt 1 }
 
 cpuActiveUsageEntry OBJECT-TYPE
-        SYNTAX      CpuUsageEntry
+        SYNTAX      CpuActiveUsageEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table of cpu usage."
@@ -4603,7 +4606,7 @@ cpuStandbyUsageTable OBJECT-TYPE
         ::= { cpumonMgmt 3 }
 
 cpuStandbyUsageEntry OBJECT-TYPE
-        SYNTAX      CpuUsageEntry
+        SYNTAX      CpuStandbyUsageEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table of cpu usage."
@@ -4668,4 +4671,153 @@ memStandbyUsageValue OBJECT-TYPE
         STATUS      current
         DESCRIPTION "The memory usage (percentage)."
         ::= { memStandbyUsageEntry 2 }
+
+
+
+--
+-- queuePortMgmt
+--
+
+queuePortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF QueuePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for statistics of interface queues."
+        ::= { queuePortMgmt 1 }
+
+queuePortEntry OBJECT-TYPE
+        SYNTAX      QueuePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one switch port of the switch."
+        INDEX       { queuePortIfIndex, queuePortQueueIndex }
+        ::= { queuePortTable 1 }
+
+QueuePortEntry ::= SEQUENCE
+{
+    queuePortIfIndex         Integer32,
+    queuePortQueueIndex      Integer32,
+    queuePortSentPackets     Counter64,
+    queuePortSentBytes       Counter64,
+    queuePortDroppedPackets  Counter64,
+    queuePortDroppedBytes    Counter64
+}
+
+queuePortIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { queuePortEntry 1 }
+
+queuePortQueueIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The COS queue from the interface."
+        ::= { queuePortEntry 2 }
+
+queuePortSentPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of sent packets."
+        ::= { queuePortEntry 3 }
+
+queuePortSentBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of sent bytes."
+        ::= { queuePortEntry 4 }
+
+queuePortDroppedPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of dropped packets."
+        ::= { queuePortEntry 5 }
+
+queuePortDroppedBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of dropped bytes."
+        ::= { queuePortEntry 6 }
+
+
+
+--
+-- ddTransceiversMgmt
+--
+
+ddTransceiversTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DdTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Transceivers digital diagnostic table."
+        ::= { ddTransceiversMgmt 1 }
+
+ddTransceiversEntry OBJECT-TYPE
+        SYNTAX      DdTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about digital diagnostic."
+        INDEX       { ddTransceiversIfIndex}
+        ::= { ddTransceiversTable 1 }
+
+DdTransceiversEntry ::= SEQUENCE
+{
+    ddTransceiversIfIndex      Integer32,
+    ddTransceiversTemperature  DisplayString,
+    ddTransceiversVcc3v3       DisplayString,
+    ddTransceiversRxPower      DisplayString,
+    ddTransceiversTxPower      DisplayString,
+    ddTransceiversTxBias       DisplayString
+}
+
+ddTransceiversIfIndex OBJECT-TYPE
+      SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { ddTransceiversEntry 1 }
+
+ddTransceiversTemperature OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver temperature information in Celsius"
+        ::= { ddTransceiversEntry 2 }
+
+ddTransceiversVcc3v3 OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver Vcc 3v3 information in Volts"
+        ::= { ddTransceiversEntry 3 }
+
+ddTransceiversRxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver rx power information in Decibels"
+        ::= { ddTransceiversEntry 4 }
+
+ddTransceiversTxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx power information in Decibels"
+        ::= { ddTransceiversEntry 5 }
+
+ddTransceiversTxBias OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx bias information in Amperes"
+        ::= { ddTransceiversEntry 6 }
+
 END

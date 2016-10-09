@@ -2,7 +2,7 @@
 
 // Set Defaults here
 
-if(!isset($vars['format'])) {
+if (!isset($vars['format'])) {
     $vars['format'] = "list_detail";
 }
 
@@ -67,14 +67,14 @@ foreach ($menu_options as $option => $text) {
     onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
 <?php
     $type = 'device';
-    foreach (get_graph_subtypes($type) as $avail_type) {
-        echo("<option value='".generate_url($vars, array('format' => 'graph_'.$avail_type))."'");
-        if ('graph_'.$avail_type == $vars['format']) {
-            echo(" selected");
-        }
-        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
-        echo(">$display_type</option>");
+foreach (get_graph_subtypes($type) as $avail_type) {
+    echo("<option value='".generate_url($vars, array('format' => 'graph_'.$avail_type))."'");
+    if ('graph_'.$avail_type == $vars['format']) {
+        echo(" selected");
     }
+    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+    echo(">$display_type</option>");
+}
 ?>
     </select>
 
@@ -82,8 +82,7 @@ foreach ($menu_options as $option => $text) {
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
     echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Restore Search</a>');
-}
-else {
+} else {
     echo('<a href="'. generate_url($vars, array('searchbar' => 'hide')).'">Remove Search</a>');
 }
 
@@ -91,8 +90,7 @@ echo("  | ");
 
 if (isset($vars['bare']) && $vars['bare'] == "yes") {
     echo('<a href="'. generate_url($vars, array('bare' => '')).'">Restore Header</a>');
-}
-else {
+} else {
     echo('<a href="'. generate_url($vars, array('bare' => 'yes')).'">Remove Header</a>');
 }
 
@@ -105,18 +103,15 @@ print_optionbar_end();
 
 list($format, $subformat) = explode("_", $vars['format'], 2);
 
-if($format == "graph") {
-
+if ($format == "graph") {
     if (empty($vars['from'])) {
         $graph_array['from'] = $config['time']['day'];
-    }
-    else {
+    } else {
         $graph_array['from'] = $vars['from'];
     }
     if (empty($vars['to'])) {
         $graph_array['to'] = $config['time']['now'];
-    }
-    else {
+    } else {
         $graph_array['to'] = $vars['to'];
     }
 
@@ -136,11 +131,10 @@ if($format == "graph") {
 
     $sql_param = array();
 
-    if(isset($vars['state'])) {
-        if($vars['state'] == 'up') {
+    if (isset($vars['state'])) {
+        if ($vars['state'] == 'up') {
             $state = '1';
-        }
-        elseif($vars['state'] == 'down') {
+        } elseif ($vars['state'] == 'down') {
             $state = '0';
         }
     }
@@ -170,8 +164,7 @@ if($format == "graph") {
         if ($vars['type'] == 'generic') {
             $where .= " AND ( type = ? OR type = '')";
             $sql_param[] = $vars['type'];
-        }
-        else {
+        } else {
             $where .= " AND type = ?";
             $sql_param[] = $vars['type'];
         }
@@ -186,7 +179,7 @@ if($format == "graph") {
         $where .= " AND disabled= ?";
         $sql_param[] = $vars['disabled'];
     }
-    if (!empty($vars['ignore']))   {
+    if (!empty($vars['ignore'])) {
         $where .= " AND `ignore`= ?";
         $sql_param[] = $vars['ignore'];
     }
@@ -196,10 +189,10 @@ if($format == "graph") {
     if (!empty($vars['location'])) {
         $location_filter = $vars['location'];
     }
-    if( !empty($vars['group']) ) {
+    if (!empty($vars['group'])) {
         require_once('../includes/device-groups.inc.php');
         $where .= " AND ( ";
-        foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
+        foreach (GetDevicesFromGroup($vars['group']) as $dev) {
             $where .= "device_id = ? OR ";
             $sql_param[] = $dev;
         }
@@ -219,8 +212,7 @@ if($format == "graph") {
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row/2)) {
             $row_colour = $list_colour_a;
-        }
-        else {
+        } else {
             $row_colour = $list_colour_b;
         }
 
@@ -230,8 +222,7 @@ if($format == "graph") {
 
                 if ($_SESSION['widescreen']) {
                     $width=270;
-                }
-                else {
+                } else {
                     $width=315;
                 }
 
@@ -253,14 +244,12 @@ if($format == "graph") {
                 $overlib_link = "device/device=".$device['device_id']."/";
                 echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+90)."px; max-width:".($width+90)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
                 echo '<div class="panel panel-default">';
-                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array_new), generate_graph_tag($graph_array_zoom), NULL);
+                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array_new), generate_graph_tag($graph_array_zoom), null);
                 echo "</div></div>\n\n";
             }
         }
     }
-}
-else {
-
+} else {
 ?>
 
 <div class="panel panel-default panel-condensed">
@@ -293,23 +282,22 @@ else {
                 "<option value=''>All OSes</option>"+
 <?php
 
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";
-    }
-    else {
-        $sql = "SELECT `os` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `os` ORDER BY `os`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['os']) {
-            $tmp_os = clean_bootgrid($data['os']);
-            echo('"<option value=\"'.$tmp_os.'\""+');
-            if ($tmp_os == $vars['os']) {
-                echo('" selected "+');
-            }
-            echo('">'.$config['os'][$tmp_os]['text'].'</option>"+');
+if (is_admin() === true || is_read() === true) {
+    $sql = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";
+} else {
+    $sql = "SELECT `os` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `os` ORDER BY `os`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql, $param) as $data) {
+    if ($data['os']) {
+        $tmp_os = clean_bootgrid($data['os']);
+        echo('"<option value=\"'.$tmp_os.'\""+');
+        if ($tmp_os == $vars['os']) {
+            echo('" selected "+');
         }
+        echo('">'.$config['os'][$tmp_os]['text'].'</option>"+');
     }
+}
 ?>
                 "</select>"+
                 "</div>"+
@@ -318,23 +306,22 @@ else {
                 "<option value=''>All Versions</option>"+
 <?php
 
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
-    }
-    else {
-        $sql = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['version']) {
-            $tmp_version = clean_bootgrid($data['version']);
-            echo('"<option value=\"'.$tmp_version.'\""+');
-            if ($tmp_version == $vars['version']) {
-                echo('" selected "+');
-            }
-            echo('">'.$tmp_version.'</option>"+');
+if (is_admin() === true || is_read() === true) {
+    $sql = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
+} else {
+    $sql = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql, $param) as $data) {
+    if ($data['version']) {
+        $tmp_version = clean_bootgrid($data['version']);
+        echo('"<option value=\"'.$tmp_version.'\""+');
+        if ($tmp_version == $vars['version']) {
+            echo('" selected "+');
         }
+        echo('">'.$tmp_version.'</option>"+');
     }
+}
 ?>
                 "</select>"+
                 "</div>"+
@@ -343,23 +330,22 @@ else {
                  "<option value=\"\">All Platforms</option>"+
 <?php
 
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
-    }
-    else {
-        $sql = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['hardware']) {
-            $tmp_hardware = clean_bootgrid($data['hardware']);
-            echo('"<option value=\"'.$tmp_hardware.'\""+');
-            if ($tmp_hardware == $vars['hardware']) {
-                echo('" selected"+');
-            }
-            echo('">'.$tmp_hardware.'</option>"+');
+if (is_admin() === true || is_read() === true) {
+    $sql = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
+} else {
+    $sql = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql, $param) as $data) {
+    if ($data['hardware']) {
+        $tmp_hardware = clean_bootgrid($data['hardware']);
+        echo('"<option value=\"'.$tmp_hardware.'\""+');
+        if ($tmp_hardware == $vars['hardware']) {
+            echo('" selected"+');
         }
+        echo('">'.$tmp_hardware.'</option>"+');
     }
+}
 
 ?>
                 "</select>"+
@@ -369,24 +355,23 @@ else {
                 "<option value=\"\">All Featuresets</option>"+
 <?php
 
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
-    }
-    else {
-        $sql = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
-        $param[] = $_SESSION['user_id'];
-    }
+if (is_admin() === true || is_read() === true) {
+    $sql = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
+} else {
+    $sql = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
+    $param[] = $_SESSION['user_id'];
+}
 
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['features']) {
-            $tmp_features = clean_bootgrid($data['features']);
-            echo('"<option value=\"'.$tmp_features.'\""+');
-            if ($tmp_features == $vars['features']) {
-                echo('" selected"+');
-            }
-            echo('">'.$tmp_features.'</option>"+');
+foreach (dbFetch($sql, $param) as $data) {
+    if ($data['features']) {
+        $tmp_features = clean_bootgrid($data['features']);
+        echo('"<option value=\"'.$tmp_features.'\""+');
+        if ($tmp_features == $vars['features']) {
+            echo('" selected"+');
         }
+        echo('">'.$tmp_features.'</option>"+');
     }
+}
 
 ?>
                    "</select>"+
@@ -398,16 +383,16 @@ else {
 <?php
 // fix me function?
 
-    foreach (getlocations() as $location) {
-        if ($location) {
-            $location = clean_bootgrid($location);
-            echo('"<option value=\"'.$location.'\""+');
-            if ($location == $vars['location']) {
-                echo('" selected"+');
-            }
-            echo('">'.$location.'</option>"+');
+foreach (getlocations() as $location) {
+    if ($location) {
+        $location = clean_bootgrid($location);
+        echo('"<option value=\"'.$location.'\""+');
+        if ($location == $vars['location']) {
+            echo('" selected"+');
         }
+        echo('">'.$location.'</option>"+');
     }
+}
 ?>
                     "</select>"+
                     "</div>"+
@@ -416,22 +401,21 @@ else {
                     "<option value=\"\">All Device Types</option>"+
 <?php
 
-    if (is_admin() === TRUE || is_read() === TRUE) {
-        $sql = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
-    }
-    else {
-        $sql = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-        $param[] = $_SESSION['user_id'];
-    }
-    foreach (dbFetch($sql,$param) as $data) {
-        if ($data['type']) {
-            echo('"<option value=\"'.$data['type'].'\""+');
-            if ($data['type'] == $vars['type']) {
-                echo('" selected"+');
-            }
-            echo('">'.ucfirst($data['type']).'</option>"+');
+if (is_admin() === true || is_read() === true) {
+    $sql = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
+} else {
+    $sql = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
+    $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetch($sql, $param) as $data) {
+    if ($data['type']) {
+        echo('"<option value=\"'.$data['type'].'\""+');
+        if ($data['type'] == $vars['type']) {
+            echo('" selected"+');
         }
+        echo('">'.ucfirst($data['type']).'</option>"+');
     }
+}
 
 ?>
                       "</select>"+
@@ -445,9 +429,9 @@ else {
                       "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
 
 <?php
-    if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-        echo "searchbar = ''";
-    }
+if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
+    echo "searchbar = ''";
+}
 ?>
 
 var grid = $("#devices").bootgrid({
@@ -486,5 +470,4 @@ var grid = $("#devices").bootgrid({
 </script>
 
 <?php
-
 }

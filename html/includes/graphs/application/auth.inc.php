@@ -6,8 +6,7 @@ if (is_numeric($vars['id']) && ($auth || application_permitted($vars['id']))) {
     if ($app['app_type'] != 'proxmox') {
         $title  = generate_device_link($device);
         $title .= $graph_subtype;
-    }
-    else {
+    } else {
         $title = $vars['port'].'@'.$vars['hostname'].' on '.generate_device_link($device);
     }
     $auth   = true;

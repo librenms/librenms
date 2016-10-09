@@ -59,8 +59,7 @@ foreach ($graph_enable as $graph => $entry) {
             $graph_array['type']   = 'munin_graph';
             $graph_array['device'] = $device['device_id'];
             $graph_array['plugin'] = $entry['plugin'];
-        }
-        else {
+        } else {
             $graph_title         = $config['graph_types']['device'][$graph]['descr'];
             $graph_array['type'] = 'device_'.$graph;
         }

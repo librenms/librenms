@@ -14,34 +14,32 @@
 if ($device['os_group'] == "cisco") {
     // Total
     $total = 0;
-    foreach (snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", NULL) as $key => $value) {
+    foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", null) as $key => $value) {
         $total += $value[''];
     }
 
     if (isset($total) && ($total != "") && ($total != 0)) {
         // Active
         $active = 0;
-        foreach ( snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.7", NULL) as $key => $value) {
+        foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.7", null) as $key => $value) {
             $active += $value[''];
         }
 
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iosdsp.rrd");
-        if (!file_exists ($rrd_filename)) {
-            rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
-        }
+        $rrd_def = array(
+            'DS:total:GAUGE:600:0:U',
+            'DS:active:GAUGE:600:0:U'
+        );
 
         $fields = array(
             'total'  => $total,
             'active' => $active,
         );
 
-        rrdtool_update ($rrd_filename, $fields);
+        $tags = compact('rrd_def');
+        data_update($device, 'cisco-iosdsp', $tags, $fields);
 
-        $tags = array();
-        influx_update($device,'cisco-iosdsp',$tags,$fields);
-
-        $graphs['cisco-iosdsp'] = TRUE;
+        $graphs['cisco-iosdsp'] = true;
         echo (" Cisco IOS DSP ");
     }
-    unset($rrd_filename, $total, $active);
+    unset($rrd_def, $total, $active, $tags, $fields);
 }

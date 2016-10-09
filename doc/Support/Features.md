@@ -1,3 +1,4 @@
+source: Support/Features.md
 ### Features
 
 Here's a brief list of supported features, some might be missing.

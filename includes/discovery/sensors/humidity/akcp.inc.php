@@ -31,9 +31,22 @@ if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms') {
                 $lowlimit     = snmp_get($device, $lowlimit_oid, '-Oqv', '');
                 $warnlowlimit = snmp_get($device, $warnlowlimit_oid, '-Oqv', '');
 
-                discover_sensor($valid['sensor'], 'humidity', $device,
-                    $oid, $index, 'akcp',
-                    $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
+                discover_sensor(
+                    $valid['sensor'],
+                    'humidity',
+                    $device,
+                    $oid,
+                    $index,
+                    'akcp',
+                    $descr,
+                    '1',
+                    '1',
+                    $lowlimit,
+                    $warnlowlimit,
+                    $limit,
+                    $warnlimit,
+                    $humidity
+                );
             }
         }
     }

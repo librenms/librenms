@@ -1,3 +1,4 @@
+source: Extensions/Auto-Discovery.md
 # Auto discovery support
 
 ### Getting started with auto discovery.
@@ -85,7 +86,7 @@ It's designed to scan through all of the subnets in your config or what you have
 to automatically add devices. An example of it's usage is:
 
 ```bash
-./snmp-scan.php r 192.168.0.0/24
+./snmp-scan.php -r 192.168.0.0/24
 ```
 
 #### Discovering devices by IP

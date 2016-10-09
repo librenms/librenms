@@ -10,23 +10,19 @@
  */
 $cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
 if (strstr($cambium_type, 'BHUL450-DES') || stristr($cambium_type, 'BHUL450-AES')) {
-	$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-	if ($masterSlaveMode == "timingMaster") {
-   		$mib = ':WHISP-APS-MIB';
-   	}
-   	else {
-   		$mib = ':WHISP-SM-MIB';
-   	}
-}
-else if (strstr($cambium_type, 'BHUL') || stristr($cambium_type, 'BH')) {
-   	$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-	if ($masterSlaveMode == "timingMaster") {
-   		$mib = ':WHISP-APS-MIB';
-   	}
-   	else {
-   		$mib = ':WHISP-BOX-MIBV2-MIB';
-   	}
-}
-else {
-   	$mib = ':WHISP-BOX-MIBV2-MIB';
+    $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
+    if ($masterSlaveMode == "timingMaster") {
+        $mib = ':WHISP-APS-MIB';
+    } else {
+        $mib = ':WHISP-SM-MIB';
+    }
+} elseif (strstr($cambium_type, 'BHUL') || stristr($cambium_type, 'BH')) {
+    $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
+    if ($masterSlaveMode == "timingMaster") {
+        $mib = ':WHISP-APS-MIB';
+    } else {
+        $mib = ':WHISP-BOX-MIBV2-MIB';
+    }
+} else {
+    $mib = ':WHISP-BOX-MIBV2-MIB';
 }

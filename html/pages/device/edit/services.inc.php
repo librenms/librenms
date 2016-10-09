@@ -31,7 +31,6 @@ if (is_admin() === true || is_read() === true) {
     echo '<div class="col-sm-6">';
 
     include_once 'includes/print-service-add.inc.php';
-}
-else {
+} else {
     include 'includes/error-no-perm.inc.php';
 }

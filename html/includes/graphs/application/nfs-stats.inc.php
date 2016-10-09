@@ -82,8 +82,7 @@ if (is_file($rrd_filename)) {
         $rrd_list[$i]['colour']   = $vars['colour'];
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

@@ -12,8 +12,7 @@
  * the source code distribution for details.
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
-
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
     <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
@@ -33,7 +32,6 @@ if( defined('show_settings') || empty($widget_settings) ) {
             </div>
         </div>
     </form>';
-}
-else {
+} else {
     $common_output[] = stripslashes(nl2br($widget_settings['notes']));
 }

@@ -1,3 +1,4 @@
+source: Extensions/IRC-Bot-Extensions.md
 # Quick Guide
 
 Okay this is a very quick walk-through in writing own `commands` for the IRC-Bot.

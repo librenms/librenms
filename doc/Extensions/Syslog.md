@@ -1,3 +1,4 @@
+source: Extensions/Syslog.md
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.
@@ -103,9 +104,8 @@ $ModLoad omprog
 
 $template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%\n"
 
-:inputname, isequal, "imudp" action(type="omprog"
-                                    binary="/opt/librenms/syslog.php"
-                                    template="librenms")
+*.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
+
 & stop
 
 ```

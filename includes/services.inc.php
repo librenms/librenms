@@ -1,6 +1,7 @@
 <?php
 
-function get_service_status($device = null) {
+function get_service_status($device = null)
+{
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
     $sql_param = array();
     $add = 0;
@@ -17,7 +18,6 @@ function get_service_status($device = null) {
         $sql_query = substr($sql_query, 0, strlen($sql_query)-6);
     }
     $sql_query .= " GROUP BY service_status";
-    d_echo("SQL Query: ".$sql_query);
 
     // $service is not null, get only what we want.
     $result = dbFetchRows($sql_query, $sql_param);
@@ -29,11 +29,11 @@ function get_service_status($device = null) {
         $service_count[$v['service_status']] = $v['count'];
     }
 
-    d_echo("Service Count by Status: ".print_r($service_count,TRUE)."\n");
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip='localhost', $param = "", $ignore = 0) {
+function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ignore = 0)
+{
 
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
@@ -47,7 +47,8 @@ function add_service($device, $type, $desc, $ip='localhost', $param = "", $ignor
     return dbInsert($insert, 'services');
 }
 
-function service_get($device = null, $service = null) {
+function service_get($device = null, $service = null)
+{
     $sql_query = "SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds` FROM `services` WHERE";
     $sql_param = array();
     $add = 0;
@@ -69,8 +70,7 @@ function service_get($device = null, $service = null) {
     if ($add == 0) {
         // No filters, remove " WHERE" -6
         $sql_query = substr($sql_query, 0, strlen($sql_query)-6);
-    }
-    else {
+    } else {
         // We have filters, remove " AND" -4
         $sql_query = substr($sql_query, 0, strlen($sql_query)-4);
     }
@@ -78,12 +78,13 @@ function service_get($device = null, $service = null) {
 
     // $service is not null, get only what we want.
     $services = dbFetchRows($sql_query, $sql_param);
-    d_echo("Service Array: ".print_r($services,TRUE)."\n");
+    d_echo("Service Array: ".print_r($services, true)."\n");
 
     return $services;
 }
 
-function edit_service($update=array(), $service=null) {
+function edit_service($update = array(), $service = null)
+{
     if (!is_numeric($service)) {
         return false;
     }
@@ -91,7 +92,8 @@ function edit_service($update=array(), $service=null) {
     return dbUpdate($update, 'services', '`service_id`=?', array($service));
 }
 
-function delete_service($service=null) {
+function delete_service($service = null)
+{
     if (!is_numeric($service)) {
         return false;
     }
@@ -99,7 +101,8 @@ function delete_service($service=null) {
     return dbDelete('services', '`service_id` =  ?', array($service));
 }
 
-function discover_service($device, $service) {
+function discover_service($device, $service)
+{
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
         add_service($device, $service, "(Auto discovered) $service");
         log_event('Autodiscovered service: type '.mres($service), $device, 'service');
@@ -108,8 +111,10 @@ function discover_service($device, $service) {
     echo "$service ";
 }
 
-function poll_service($service) {
+function poll_service($service)
+{
     global $config;
+
     $update = array();
     $old_status = $service['service_status'];
     $check_cmd = "";
@@ -126,17 +131,17 @@ function poll_service($service) {
         $check_cmd .= " " . $service['service_param'];
     }
 
+    $service_id = $service['service_id'];
     // Some debugging
-    d_echo("\nNagios Service - ".$service['service_id']."\n");
-    d_echo("Request:  ".$check_cmd."\n");
+    d_echo("\nNagios Service - $service_id\n");
+    d_echo("Request:  $check_cmd\n");
     list($new_status, $msg, $perf) = check_service($check_cmd);
-    d_echo("Response: ".$msg."\n");
+    d_echo("Response: $msg\n");
 
     // If we have performance data we will store it.
     if (count($perf) > 0) {
         // Yes, We have perf data.
-        $filename = "services-".$service['service_id'].".rrd";
-        $rrd_filename = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename ($filename);
+        $rrd_name = array('services', $service_id);
 
         // Set the DS in the DB if it is blank.
         $DS = array();
@@ -148,28 +153,27 @@ function poll_service($service) {
             $update['service_ds'] = json_encode($DS);
         }
 
-        // Create the RRD
-        if (!file_exists ($rrd_filename)) {
-            $rra = "";
-            foreach ($perf as $k => $v) {
-                if ($v['uom'] == 'c') {
-                    // This is a counter, create the DS as such
-                    $rra .= " DS:".$k.":COUNTER:600:0:U";
-                }
-                else {
-                    // Not a counter, must be a gauge
-                    $rra .= " DS:".$k.":GAUGE:600:0:U";
-                }
+        // rrd definition
+        $rrd_def = array();
+        foreach ($perf as $k => $v) {
+            if ($v['uom'] == 'c') {
+                // This is a counter, create the DS as such
+                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+            } else {
+                // Not a counter, must be a gauge
+                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
             }
-            rrdtool_create ($rrd_filename, $rra . $config['rrd_rra']);
         }
 
-        // Update RRD
-        $rrd = array();
+        // Update data
+        $fields = array();
         foreach ($perf as $k => $v) {
-            $rrd[$k] = $v['value'];
+            $fields[$k] = $v['value'];
         }
-        rrdtool_update ($rrd_filename, $rrd);
+
+        $tags = compact('service_id', 'rrd_name', 'rrd_def');
+        //TODO not sure if we have $device at this point, if we do replace faked $device
+        data_update(array('hostname' => $service['hostname']), 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {
@@ -185,13 +189,14 @@ function poll_service($service) {
     }
 
     if (count($update) > 0) {
-        edit_service($update,$service['service_id']);
+        edit_service($update, $service['service_id']);
     }
 
     return true;
 }
 
-function check_service($command) {
+function check_service($command)
+{
     // This array is used to test for valid UOM's to be used for graphing.
     // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
     // Note: This array must be decend from 2 char to 1 char so that the search works correctly.
@@ -229,7 +234,7 @@ function check_service($command) {
 
         // is the UOM valid - https://nagios-plugins.org/doc/guidelines.html#AEN200
         foreach ($valid_uom as $v) {
-            if ((strlen($value)-strlen($v)) === strpos($value,$v)) {
+            if ((strlen($value)-strlen($v)) === strpos($value, $v)) {
                 // Yes, store and strip it off the value
                 $uom = $v;
                 $value = substr($value, 0, -strlen($v));
@@ -241,8 +246,7 @@ function check_service($command) {
             // We have a DS. Add an entry to the array.
             d_echo("Perf Data - DS: ".$ds.", Value: ".$value.", UOM: ".$uom."\n");
             $metrics[$ds] = array ('value'=>$value, 'uom'=>$uom);
-        }
-        else {
+        } else {
             // No DS. Don't add an entry to the array.
             d_echo("Perf Data - None.\n");
         }

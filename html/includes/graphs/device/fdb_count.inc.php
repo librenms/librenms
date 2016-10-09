@@ -4,7 +4,7 @@ $scale_min = '0';
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/fdb_count.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'fdb_count');
 
 $rrd_options .= " DEF:value=$rrd_filename:value:AVERAGE";
 $rrd_options .= " DEF:value_min=$rrd_filename:value:MIN";

@@ -26,26 +26,22 @@ header('Content-type: application/json');
 $status    = 'error';
 $message   = 'unknown error';
 if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
-    if ($_REQUEST['action'] == 'read' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>$_SESSION['user_id'],'key'=>'read','value'=>1),'notifications_attribs')) {
+    if ($_REQUEST['action'] == 'read' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>$_SESSION['user_id'],'key'=>'read','value'=>1), 'notifications_attribs')) {
         $status  = 'ok';
         $message = 'Set as Read';
-    }
-    elseif ($_SESSION['userlevel'] == 10 && $_REQUEST['action'] == 'stick' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>$_SESSION['user_id'],'key'=>'sticky','value'=>1),'notifications_attribs')) {
+    } elseif ($_SESSION['userlevel'] == 10 && $_REQUEST['action'] == 'stick' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>$_SESSION['user_id'],'key'=>'sticky','value'=>1), 'notifications_attribs')) {
         $status  = 'ok';
         $message = 'Set as Sticky';
-    }
-    elseif ($_SESSION['userlevel'] == 10 && $_REQUEST['action'] == 'unstick' && dbDelete('notifications_attribs',"notifications_id = ? && user_id = ? AND `key`='sticky'",array($_REQUEST['notification_id'],$_SESSION['user_id']))) {
+    } elseif ($_SESSION['userlevel'] == 10 && $_REQUEST['action'] == 'unstick' && dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", array($_REQUEST['notification_id'],$_SESSION['user_id']))) {
         $status  = 'ok';
         $message = 'Removed Sticky';
     }
-}
-elseif ($_REQUEST['action'] == 'create' && $_SESSION['userlevel'] == 10 && (isset($_REQUEST['title']) && isset($_REQUEST['body']))) {
-    if (dbInsert(array('title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512',$_SESSION['user_id'].'.LOCAL.'.$_REQUEST['title']),'source'=>$_SESSION['user_id']),'notifications')) {
+} elseif ($_REQUEST['action'] == 'create' && $_SESSION['userlevel'] == 10 && (isset($_REQUEST['title']) && isset($_REQUEST['body']))) {
+    if (dbInsert(array('title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', $_SESSION['user_id'].'.LOCAL.'.$_REQUEST['title']),'source'=>$_SESSION['user_id']), 'notifications')) {
         $status  = 'ok';
         $message = 'Created';
     }
-}
-else {
+} else {
     $status  = 'error';
     $message = 'ERROR: Missing Params';
 }
@@ -54,4 +50,3 @@ die(json_encode(array(
     'status'       => $status,
     'message'      => $message,
 )));
-

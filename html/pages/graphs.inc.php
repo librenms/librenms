@@ -4,11 +4,10 @@ unset($vars['page']);
 
 // Setup here
 
-if($_SESSION['widescreen']) {
+if ($_SESSION['widescreen']) {
     $graph_width=1700;
     $thumb_width=180;
-}
-else {
+} else {
     $graph_width=1075;
     $thumb_width=113;
 }
@@ -26,10 +25,9 @@ $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 $id = $vars['id'];
 
-if(is_numeric($vars['device'])) {
+if (is_numeric($vars['device'])) {
     $device = device_by_id_cache($vars['device']);
-}
-elseif(!empty($vars['device'])) {
+} elseif (!empty($vars['device'])) {
     $device = device_by_name($vars['device']);
 }
 
@@ -39,12 +37,10 @@ if (is_file("includes/graphs/".$type."/auth.inc.php")) {
 
 if (!$auth) {
     require 'includes/error-no-perm.inc.php';
-}
-else {
+} else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: ".$config['graph_types'][$type][$subtype]['descr'];
-    }
-    else {
+    } else {
         $title .= " :: ".ucfirst($subtype);
     }
 
@@ -64,14 +60,14 @@ else {
     onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
 <?php
 
-    foreach (get_graph_subtypes($type, $device) as $avail_type) {
-        echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
-        if ($avail_type == $subtype) {
-            echo(" selected");
-        }
-        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
-        echo(">$display_type</option>");
+foreach (get_graph_subtypes($type, $device) as $avail_type) {
+    echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
+    if ($avail_type == $subtype) {
+        echo(" selected");
     }
+    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+    echo(">$display_type</option>");
+}
 ?>
     </select>
   </form>
@@ -102,7 +98,6 @@ else {
         echo generate_lazy_graph_tag($graph_array);
         echo('</a>');
         echo('</td>');
-
     }
 
     echo('</tr></table>');
@@ -111,21 +106,19 @@ else {
     $graph_array['height'] = $config['webui']['min_graph_height'];
     $graph_array['width']  = $graph_width;
 
-    if($_SESSION['screen_width']) {
-        if($_SESSION['screen_width'] > 800) {
+    if ($_SESSION['screen_width']) {
+        if ($_SESSION['screen_width'] > 800) {
             $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/10));
-        }
-        else {
+        } else {
             $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/4));
         }
     }
 
-    if($_SESSION['screen_height']) {
-        if($_SESSION['screen_height'] > 960 ) { 
+    if ($_SESSION['screen_height']) {
+        if ($_SESSION['screen_height'] > 960) {
             $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
-        }
-        else {
-            $graph_array['height'] = max($graph_array['height'],($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5)));
+        } else {
+            $graph_array['height'] = max($graph_array['height'], ($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5)));
         }
     }
 
@@ -136,10 +129,9 @@ else {
     echo ('<div style="padding-top: 5px";></div>');
     echo('<center>');
     if ($vars['legend'] == "no") {
-        echo(generate_link("Show Legend",$vars, array('page' => "graphs", 'legend' => NULL)));
-    }
-    else {
-        echo(generate_link("Hide Legend",$vars, array('page' => "graphs", 'legend' => "no")));
+        echo(generate_link("Show Legend", $vars, array('page' => "graphs", 'legend' => null)));
+    } else {
+        echo(generate_link("Hide Legend", $vars, array('page' => "graphs", 'legend' => "no")));
     }
 
     // FIXME : do this properly
@@ -147,19 +139,17 @@ else {
     #  {
     echo(' | ');
     if ($vars['previous'] == "yes") {
-        echo(generate_link("Hide Previous",$vars, array('page' => "graphs", 'previous' => NULL)));
-    }
-    else {
-        echo(generate_link("Show Previous",$vars, array('page' => "graphs", 'previous' => "yes")));
+        echo(generate_link("Hide Previous", $vars, array('page' => "graphs", 'previous' => null)));
+    } else {
+        echo(generate_link("Show Previous", $vars, array('page' => "graphs", 'previous' => "yes")));
     }
     #  }
 
     echo(' | ');
     if ($vars['showcommand'] == "yes") {
-        echo(generate_link("Hide RRD Command",$vars, array('page' => "graphs", 'showcommand' => NULL)));
-    }
-    else {
-        echo(generate_link("Show RRD Command",$vars, array('page' => "graphs", 'showcommand' => "yes")));
+        echo(generate_link("Hide RRD Command", $vars, array('page' => "graphs", 'showcommand' => null)));
+    } else {
+        echo(generate_link("Show RRD Command", $vars, array('page' => "graphs", 'showcommand' => "yes")));
     }
     echo('</center>');
 
@@ -172,7 +162,6 @@ else {
     echo("</center></div>");
 
     if (isset($config['graph_descr'][$vars['type']])) {
-
         print_optionbar_start();
         echo('<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">

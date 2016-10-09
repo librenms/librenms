@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'ibm-amm') {
-
     $descr_prefix = 'Blower ';
     $oids = array(
         '.1.3.6.1.4.1.2.3.51.2.2.3.20.0', // BLADE-MIB:blower1speedRPM
@@ -29,5 +28,4 @@ if ($device['os'] == 'ibm-amm') {
             discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
         }
     }
-
 }

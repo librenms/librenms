@@ -12,29 +12,23 @@ foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device[
     // FIXME generic colour function
     if ($iter == '1') {
         $colour = 'CC0000';
-    }
-    else if ($iter == '2') {
+    } elseif ($iter == '2') {
         $colour = '008C00';
-    }
-    else if ($iter == '3') {
+    } elseif ($iter == '3') {
         $colour = '4096EE';
-    }
-    else if ($iter == '4') {
+    } elseif ($iter == '4') {
         $colour = '73880A';
-    }
-    else if ($iter == '5') {
+    } elseif ($iter == '5') {
         $colour = 'D01F3C';
-    }
-    else if ($iter == '6') {
+    } elseif ($iter == '6') {
         $colour = '36393D';
-    }
-    else if ($iter == '7') {
+    } elseif ($iter == '7') {
         $colour = 'FF0084';
         $iter   = '0';
     }
 
     $descr        = rrdtool_escape($storage['storage_descr'], 12);
-    $rrd          = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('storage-'.$storage['storage_mib'].'-'.$storage['storage_descr'].'.rrd');
+    $rrd          = rrd_name($device['hostname'], array('storage', $storage['storage_mib'], $storage['storage_descr']));
     $rrd_options .= " DEF:$storage[storage_id]used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:$storage[storage_id]free=$rrd:free:AVERAGE";
     $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";

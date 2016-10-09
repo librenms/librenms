@@ -44,5 +44,4 @@ if ($device['os'] == 'ibm-amm') {
         $current = $fptemp;
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
     }
-
 }

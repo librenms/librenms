@@ -19,8 +19,7 @@ if ($_SESSION['widescreen']) {
         'year',
         'twoyear',
     );
-}
-else {
+} else {
     if (!$graph_array['height']) {
         $graph_array['height'] = '100';
     }
@@ -37,15 +36,13 @@ else {
     );
 }//end if
 
-if($_SESSION['screen_width']) {
-    if($_SESSION['screen_width'] < 1024 && $_SESSION['screen_width'] > 700) {
-        $graph_array['width'] = round(($_SESSION['screen_width'] - 90 )/2,0);
-    }
-    else {
-        if($_SESSION['screen_width'] > 1024) {
-            $graph_array['width'] = round(($_SESSION['screen_width'] - 90 )/count($periods)+1,0);
-        }
-        else {
+if ($_SESSION['screen_width']) {
+    if ($_SESSION['screen_width'] < 1024 && $_SESSION['screen_width'] > 700) {
+        $graph_array['width'] = round(($_SESSION['screen_width'] - 90 )/2, 0);
+    } else {
+        if ($_SESSION['screen_width'] > 1024) {
+            $graph_array['width'] = round(($_SESSION['screen_width'] - 90 )/count($periods)+1, 0);
+        } else {
             $graph_array['width'] = $_SESSION['screen_width'] - 70;
         }
     }
@@ -68,11 +65,10 @@ foreach ($periods as $period) {
     $link = generate_url($link_array);
 
     if ($return_data === true) {
-        $graph_data[] = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
-    }
-    else {
+        $graph_data[] = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+    } else {
         echo "<div class='col-md-3'>";
-        echo(overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
+        echo(overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null));
         echo "</div>";
     }
 }

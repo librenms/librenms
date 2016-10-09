@@ -23,8 +23,7 @@ if ($config['enable_vrfs']) {
 
             $descrs_oid = '.1.3.6.1.3.118.1.2.2.1.2';
             $ports_oid  = '.1.3.6.1.3.118.1.2.1.1.2';
-        }
-        else {
+        } else {
             $vpnmib = 'MPLS-L3VPN-STD-MIB';
             $rds    = str_replace('.1.3.6.1.2.1.10.166.11.1.2.2.1.4.', '', $rds);
 
@@ -59,8 +58,7 @@ if ($config['enable_vrfs']) {
 
             if (empty($port_table[$vrf_oid])) {
                 $port_table[$vrf_oid][0] = $port_id;
-            }
-            else {
+            } else {
                 array_push($port_table[$vrf_oid], $port_id);
             }
         }
@@ -94,8 +92,7 @@ if ($config['enable_vrfs']) {
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid))) {
                     dbUpdate(array('mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd), 'vrfs', 'device_id=? AND vrf_oid=?', array($device['device_id'], $vrf_oid));
-                }
-                else {
+                } else {
                     dbInsert(array('vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']), 'vrfs');
                 }
 
@@ -123,8 +120,7 @@ if ($config['enable_vrfs']) {
                 if (!$valid_vrf_if[$vrf_id][$if]) {
                     echo '-';
                     dbUpdate(array('ifVrf' => 'NULL'), 'ports', 'port_id=?', array($if));
-                }
-                else {
+                } else {
                     echo '.';
                 }
             }
@@ -136,8 +132,7 @@ if ($config['enable_vrfs']) {
             if (!$valid_vrf[$vrf_id]) {
                 echo '-';
                 dbDelete('vrfs', '`vrf_id` = ?', array($vrf_id));
-            }
-            else {
+            } else {
                 echo '.';
             }
         }

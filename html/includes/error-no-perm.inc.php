@@ -1,7 +1,7 @@
 <?php
 
 echo("<div style='margin:auto; text-align: center; margin-top: 50px; max-width:600px'>");
-print_optionbar_start(100,600);
+print_optionbar_start(100, 600);
 echo("
    <table height=100% width=100%><tr>
    <td><img src='images/no-48.png' valign=absmiddle></td>

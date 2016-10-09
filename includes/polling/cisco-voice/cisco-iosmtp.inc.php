@@ -13,34 +13,32 @@
 
 if ($device['os_group'] == "cisco") {
     // Total
-    $total = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.3", NULL);
+    $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.3", null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.6.4.1.3'][''];
 
     if (isset($total) && ($total != "") && ($total != 0)) {
         // Available
-        $available = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.4", NULL);
+        $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.4", null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.6.4.1.4'][''];
 
         // Active
         $active = $total - $available;
 
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iosmtp.rrd");
-        if (!file_exists ($rrd_filename)) {
-            rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
-        }
+        $rrd_def = array(
+            'DS:total:GAUGE:600:0:U',
+            'DS:active:GAUGE:600:0:U'
+        );
 
         $fields = array(
             'total'  => $total,
             'active' => $active,
         );
 
-        rrdtool_update ($rrd_filename, $fields);
+        $tags = compact('rrd_def');
+        data_update($device, 'cisco-iosmtp', $tags, $fields);
 
-        $tags = array();
-        influx_update($device,'cisco-iosmtp',$tags,$fields);
-
-        $graphs['cisco-iosmtp'] = TRUE;
+        $graphs['cisco-iosmtp'] = true;
         echo (" Cisco IOS MTP ");
     }
-    unset($rrd_filename, $total, $active, $available);
+    unset($rrd_def, $total, $active, $available, $fields, $tags);
 }

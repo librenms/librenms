@@ -4,4 +4,4 @@
 
 preg_match('/Data Domain OS (.*)/', $poll_device['sysDescr'], $matches);
 $version  = $matches[1];
-$hardware = trim(snmp_get($device, "systemHardwareDevice", "-OQv", "DATA-DOMAIN-MIB"),'"');
+$hardware = trim(snmp_get($device, "systemHardwareDevice", "-OQv", "DATA-DOMAIN-MIB"), '"');

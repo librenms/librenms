@@ -10,8 +10,7 @@ if (count($app_rows)) {
         $app_include = $config['install_dir'].'/includes/polling/applications/'.$app['app_type'].'.inc.php';
         if (is_file($app_include)) {
             include $app_include;
-        }
-        else {
+        } else {
             echo $app['app_type'].' include missing! ';
         }
     }

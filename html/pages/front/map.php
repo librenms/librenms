@@ -24,37 +24,36 @@
 
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
-    echo implode('',$common_output);
+    echo implode('', $common_output);
 } else {
+    if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
+        $default_map = $config['mapael']['default_map'];
+    } else {
+        $default_map = 'maps/world_countries.js';
+    }
+    $map_tmp = preg_split("/\//", $default_map);
+    $map_name = $map_tmp[count($map_tmp)-1];
+    $map_name = str_replace('.js', '', $map_name);
 
-if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
-    $default_map = $config['mapael']['default_map'];
-} else {
-    $default_map = 'maps/world_countries.js';
-}
-$map_tmp = preg_split("/\//",$default_map);
-$map_name = $map_tmp[count($map_tmp)-1];
-$map_name = str_replace('.js','',$map_name);
+    if (isset($config['mapael']['map_width']) && is_numeric($config['mapael']['map_width'])) {
+        $map_width = $config['mapael']['map_width'];
+    } else {
+        $map_width = '800';
+    }
 
-if (isset($config['mapael']['map_width']) && is_numeric($config['mapael']['map_width'])) {
-    $map_width = $config['mapael']['map_width'];
-} else {
-    $map_width = '800';
-}
+    if (isset($config['mapael']['default_zoom'])) {
+        $default_zoom = $config['mapael']['default_zoom'];
+    } else {
+        $default_zoom = 0;
+    }
 
-if (isset($config['mapael']['default_zoom'])) {
-    $default_zoom = $config['mapael']['default_zoom'];
-} else {
-    $default_zoom = 0;
-}
-
-if (isset($config['mapael']['default_lat']) && isset($config['mapael']['default_lng'])) {
-    $init_zoom = "init: {
+    if (isset($config['mapael']['default_lat']) && isset($config['mapael']['default_lng'])) {
+        $init_zoom = "init: {
                             latitude: " . $config['mapael']['default_lat'] . ",
                             longitude: " . $config['mapael']['default_lng'] . ",
                             level: $default_zoom
                         }\n";
-}
+    }
 
 
 
@@ -123,11 +122,11 @@ $(function () {
 });
 </script>
 <div class="container">
-		<div class="mapcontainer">
-			<div class="map">
-				<span>Alternative content for the map</span>
-			</div>
-		</div>
+        <div class="mapcontainer">
+            <div class="map">
+                <span>Alternative content for the map</span>
+            </div>
+        </div>
 </div>
 <?php
 }
@@ -135,30 +134,30 @@ include_once 'includes/object-cache.inc.php';
 echo '<div class="container-fluid">
 	<div class="row">
 		<div class="col-md-4">';
-			include_once 'includes/front/boxes.inc.php';
+            include_once 'includes/front/boxes.inc.php';
 echo '		</div>
                 <div class="col-md-2">
                 </div>
 		<div class="col-md-4">';
-			include_once 'includes/common/device-summary-vert.inc.php';
-                        echo implode('',$common_output);
+            include_once 'includes/common/device-summary-vert.inc.php';
+                        echo implode('', $common_output);
 echo '		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">';
-			$device['device_id'] = '-1';
-			require_once 'includes/common/alerts.inc.php';
-                        echo implode('',$common_output);
-			unset($device['device_id']);
+            $device['device_id'] = '-1';
+            require_once 'includes/common/alerts.inc.php';
+                        echo implode('', $common_output);
+            unset($device['device_id']);
 echo '		</div>
 	</div>
 </div>';
 
 //From default.php - This code is not part of above license.
 if ($config['enable_syslog']) {
-$sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY seq DESC LIMIT 20";
+    $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY seq DESC LIMIT 20";
 
-echo('<div class="container-fluid">
+    echo('<div class="container-fluid">
           <div class="row">
             <div class="col-md-12">
               &nbsp;
@@ -172,31 +171,27 @@ echo('<div class="container-fluid">
               </div>
               <table class="table table-hover table-condensed table-striped">');
 
-  foreach (dbFetchRows($sql) as $entry)
-  {
-    $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
+    foreach (dbFetchRows($sql) as $entry) {
+        $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
-    unset($syslog_output);
-    include("includes/print-syslog.inc.php");
-    echo $syslog_output;
-  }
-  echo("</table>");
-  echo("</div>");
-  echo("</div>");
-  echo("</div>");
-  echo("</div>");
-
+        unset($syslog_output);
+        include("includes/print-syslog.inc.php");
+        echo $syslog_output;
+    }
+    echo("</table>");
+    echo("</div>");
+    echo("</div>");
+    echo("</div>");
+    echo("</div>");
 } else {
-
-  if ($_SESSION['userlevel'] == '10')
-  {
-    $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
-  } else {
-    $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
+    if ($_SESSION['userlevel'] == '10') {
+        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
+    } else {
+        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
     P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
-  }
+    }
 
-  echo('<div class="container-fluid">
+    echo('<div class="container-fluid">
           <div class="row">
             <div class="col-md-12">
               &nbsp;
@@ -214,10 +209,10 @@ echo('<div class="container-fluid">
         include 'includes/print-event.inc.php';
     }
 
-  echo("</table>");
-  echo("</div>");
-  echo("</div>");
-  echo("</div>");
-  echo("</div>");
+    echo("</table>");
+    echo("</div>");
+    echo("</div>");
+    echo("</div>");
+    echo("</div>");
 }
 ?>

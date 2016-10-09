@@ -1,3 +1,4 @@
+source: Extensions/IRC-Bot.md
 Table of Content:
 -   [About](#about)
    -   [Configuration](#config)

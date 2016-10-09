@@ -1,4 +1,5 @@
 # It's recommended not to run this cron anymore - please see librenms.nonroot.cron
+# PLEASE DO NOT USE THIS FILE
 
 33  */6   * * *   root    /opt/librenms/discovery.php -h all >> /dev/null 2>&1
 */5  *    * * *   root    /opt/librenms/discovery.php -h new >> /dev/null 2>&1

@@ -8,7 +8,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
 
     if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost') {
-        $remote = ' -H '.$ipmi['host'].' -U '.$ipmi['user'].' -P '.$ipmi['password'];
+        $remote = " -H ".$ipmi['host']." -U '".$ipmi['user']."' -P '".$ipmi['password']."' -L USER";
     }
 
     foreach ($config['ipmi']['type'] as $ipmi_type) {
@@ -50,3 +50,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     echo "\n";
 }
+
+check_valid_sensors($device, 'voltage', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'temperature', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'fanspeed', $valid['sensor'], 'ipmi');
+check_valid_sensors($device, 'power', $valid['sensor'], 'ipmi');

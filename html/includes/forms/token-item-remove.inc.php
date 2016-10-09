@@ -13,22 +13,20 @@
  */
 header('Content-type: text/plain');
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 if (!is_numeric($_POST['token_id'])) {
     echo 'error with data';
     exit;
-}
-else {
+} else {
     if ($_POST['confirm'] == 'yes') {
         $delete = dbDelete('api_tokens', '`id` = ?', array($_POST['token_id']));
         if ($delete > '0') {
             echo 'API token has been removed';
             exit;
-        }
-        else {
+        } else {
             echo 'An error occurred removing the API token';
             exit;
         }

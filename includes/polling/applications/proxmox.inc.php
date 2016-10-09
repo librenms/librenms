@@ -1,9 +1,5 @@
 <?php
 
-if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app']['proxmox'])) {
-    $proxmox = $agent_data['app']['proxmox'];
-}
-
 /**
  * Check if a port on a Proxmox VM exists
  * @param string  $p Port name
@@ -11,7 +7,8 @@ if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($age
  * @param integer $i VM ID
  * @return integer|boolean The port-ID if the port exists, false if it doesn't exist
  */
-function proxmox_port_exists($i, $c, $p) {
+function proxmox_port_exists($i, $c, $p)
+{
     if ($row = dbFetchRow("SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?", array($p, $c, $i))) {
         return $row['id'];
     }
@@ -26,7 +23,8 @@ function proxmox_port_exists($i, $c, $p) {
  * @param array   $pmxcache Reference to the Proxmox VM Cache
  * @return boolean true if the VM exists, false if it doesn't
  */
-function proxmox_vm_exists($i, $c, &$pmxcache) {
+function proxmox_vm_exists($i, $c, &$pmxcache)
+{
 
     if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
         return true;
@@ -39,58 +37,80 @@ function proxmox_vm_exists($i, $c, &$pmxcache) {
     return false;
 }
 
-$pmxlines = explode("\n", $proxmox);
+$name = 'proxmox';
+$app_id = $app['app_id'];
 
-$pmxcluster = array_shift($pmxlines);
-
-$pmxcdir = join('/', array($config['rrd_dir'],'proxmox',$pmxcluster));
-if (!is_dir($pmxcdir)) {
-    mkdir($pmxcdir, 0775, true);
+if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app'][$name])) {
+    $proxmox = $agent_data['app'][$name];
+} elseif (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
+    $options = '-O qv';
+    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
+    $proxmox = snmp_get($device, $oid, $options);
+    $proxmox = preg_replace('/^.+\n/', '', $proxmox);
+    $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-dbUpdate(array('device_id' => $device['device_id'], 'app_type' => 'proxmox', 'app_instance' => $pmxcluster), 'applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], 'proxmox'));
+if ($proxmox) {
+    $pmxlines = explode("\n", $proxmox);
+    $pmxcluster = array_shift($pmxlines);
+    dbUpdate(
+        array('device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster),
+        'applications',
+        '`device_id` = ? AND `app_type` = ?',
+        array($device['device_id'], $name)
+    );
 
-if (count($pmxlines) > 0) {
-    $pmxcache = [];
+    if (count($pmxlines) > 0) {
+        $pmxcache = array();
 
-    foreach ($pmxlines as $vm) {
-        list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode('/', $vm, 5);
+        foreach ($pmxlines as $vm) {
+            list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode('/', $vm, 5);
+            print "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
 
-        $rrd_filename = join('/', array(
-            $pmxcdir,
-            $vmid.'_netif_'.$vmport.'.rrd'));
+            $rrd_proxmox_name = array(
+                'pmxcluster' => $pmxcluster,
+                'vmid' => $vmid,
+                'vmport' => $vmport
+            );
+            $rrd_def = array(
+                'DS:INOCTETS:DERIVE:600:0:12500000000',
+                'DS:OUTOCTETS:DERIVE:600:0:12500000000'
+            );
+            $fields = array(
+                'INOCTETS' => $vmpin,
+                'OUTOCTETS' => $vmpout
+            );
 
-        if (!is_file($rrd_filename)) {
-            rrdtool_create(
-                $rrd_filename,
-                ' --step 300 
-                DS:INOCTETS:DERIVE:600:0:12500000000 
-                DS:OUTOCTETS:DERIVE:600:0:12500000000 '.$config['rrd_rra']);
+            $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
+            data_update($device, 'app', $tags, $fields);
+
+            if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
+                dbUpdate(array(
+                    'device_id' => $device['device_id'],
+                    'last_seen' => array('NOW()'),
+                    'description' => $vmdesc
+                ), $name, '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster));
+            } else {
+                $pmxcache[$pmxcluster][$vmid] = dbInsert(array(
+                    'cluster' => $pmxcluster,
+                    'vmid' => $vmid,
+                    'description' => $vmdesc,
+                    'device_id' => $device['device_id']
+                ), $name);
+            }
+
+            if ($portid = proxmox_port_exists($vmid, $pmxcluster, $vmport) !== false) {
+                dbUpdate(
+                    array('last_seen' => array('NOW()')),
+                    'proxmox_ports',
+                    '`vm_id` = ? AND `port` = ?',
+                    array($pmxcache[$pmxcluster][$vmid], $vmport)
+                );
+            } else {
+                dbInsert(array('vm_id' => $pmxcache[$pmxcluster][$vmid], 'port' => $vmport), 'proxmox_ports');
+            }
         }
-
-        rrdtool_update($rrd_filename, array("INOCTETS" => $vmpin, "OUTOCTETS" => $vmpout));
-        print "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
-
-        if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
-            dbUpdate(array('device_id' => $device['device_id'], 'last_seen' => array('NOW()'), 'description' => $vmdesc), 'proxmox', '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster));
-        }
-        else {
-            $pmxcache[$pmxcluster][$vmid] = dbInsert(array('cluster' => $pmxcluster, 'vmid' => $vmid, 'description' => $vmdesc, 'device_id' => $device['device_id']), 'proxmox');
-        }
-
-        if ($portid = proxmox_port_exists($vmid, $pmxcluster, $vmport) !== false) {
-            dbUpdate(array('last_seen' => array('NOW()')), 'proxmox_ports', '`vm_id` = ? AND `port` = ?', array($pmxcache[$pmxcluster][$vmid], $vmport));
-        }
-        else {
-            dbInsert(array('vm_id' => $pmxcache[$pmxcluster][$vmid], 'port' => $vmport), 'proxmox_ports');
-        }
-
     }
 }
 
-
-unset($pmxlines);
-unset($pmxcluster);
-unset($pmxcdir);
-unset($proxmox);
-unset($pmxcache);
+unset($pmxlines, $pmxcluster, $pmxcdir, $proxmox, $pmxcache);

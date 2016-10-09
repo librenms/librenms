@@ -13,16 +13,13 @@
 
 if (is_admin() === false) {
     $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete services');
-}
-else {
+} else {
     if (!is_numeric($vars['service_id'])) {
         $status = array('status' =>1, 'message' => 'No Service has been selected');
-    }
-    else {
+    } else {
         if (delete_service($vars['service_id'])) {
             $status = array('status' =>0, 'message' => 'Service: <i>'.$vars['service_id'].', has been deleted.</i>');
-        }
-        else {
+        } else {
             $status = array('status' =>1, 'message' => 'Service: <i>'.$vars['service_id'].', has NOT been deleted.</i>');
         }
     }

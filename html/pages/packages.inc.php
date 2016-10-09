@@ -6,7 +6,7 @@ foreach ($vars as $var => $value) {
             case 'name':
                 $where  .= " AND `$var` = ?";
                 $param[] = $value;
-            break;
+                break;
         }
     }
 }
@@ -28,8 +28,7 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
         foreach ($bleu as $build => $bloo) {
             if ($build) {
                 $dbuild = '-'.$build;
-            }
-            else {
+            } else {
                 $dbuild = '';
             }
 
@@ -45,8 +44,7 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
         $content .= '</div>';
         if (empty($vars['name'])) {
             echo "<span style='margin:5px;'>".overlib_link('', $version, $content, null).'</span>';
-        }
-        else {
+        } else {
             echo "$version $content";
         }
     }//end foreach

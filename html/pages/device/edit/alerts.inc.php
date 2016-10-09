@@ -10,8 +10,7 @@ if ($_POST['editing']) {
 
         if ($override_sysContact_bool) {
             set_dev_attrib($device, 'override_sysContact_bool', '1');
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'override_sysContact_bool');
         }
 
@@ -20,23 +19,20 @@ if ($_POST['editing']) {
         };
         if ($disable_notify) {
             set_dev_attrib($device, 'disable_notify', '1');
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'disable_notify');
         }
 
         $update_message = 'Device alert settings updated.';
         $updated        = 1;
-    }
-    else {
+    } else {
         include 'includes/error-no-perm.inc.php';
     }//end if
 }//end if
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-else if ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 

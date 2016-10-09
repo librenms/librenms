@@ -49,12 +49,10 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql, $param) as $sensor) {
     if (!isset($sensor['sensor_current'])) {
         $sensor['sensor_current'] = 'NaN';
-    }
-    else {
+    } else {
         if ($sensor['sensor_current'] >= $sensor['sensor_limit']) {
             $alert = '<img src="images/16/flag_red.png" alt="alert" />';
-        }
-        else {
+        } else {
             $alert = '';
         }
     }
@@ -107,7 +105,6 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     );
 
     if ($_POST['view'] == 'graphs') {
-
         $daily_graph = 'graph.php?id='.$sensor['sensor_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=211&amp;height=100';
         $daily_url   = 'graph.php?id='.$sensor['sensor_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=400&amp;height=150';
 

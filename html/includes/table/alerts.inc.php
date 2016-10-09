@@ -20,7 +20,7 @@ $alert_severities = array(
     'critical' => 3
 );
 
-$show_recovered = FALSE;
+$show_recovered = false;
 
 if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`='.$_POST['device_id'];
@@ -34,15 +34,14 @@ if (is_numeric($_POST['acknowledged'])) {
 if (is_numeric($_POST['state'])) {
     $where .= " AND `alerts`.`state`=".$_POST['state'];
     if ($_POST['state'] == $alert_states['recovered']) {
-        $show_recovered = TRUE;
+        $show_recovered = true;
     }
 }
 
 if (isset($_POST['min_severity'])) {
     if (is_numeric($_POST['min_severity'])) {
         $min_severity_id = $_POST['min_severity'];
-    }
-    else if (!empty($_POST['min_severity'])) {
+    } elseif (!empty($_POST['min_severity'])) {
         $min_severity_id = $alert_severities[$_POST['min_severity']];
     }
     if (isset($min_severity_id)) {
@@ -51,14 +50,8 @@ if (isset($_POST['min_severity'])) {
 }
 
 if (is_numeric($_POST['group'])) {
-    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$_POST['group']);
-    $group_pattern = rtrim($group_pattern, '&&');
-    $group_pattern = rtrim($group_pattern, '||');
-
-    $device_id_sql = GenGroupSQL($group_pattern);
-    if ($device_id_sql) {
-        $where .= " AND devices.device_id IN ($device_id_sql)";
-    }
+    $where .= " AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
+    $param[] = $_POST['group'];
 }
 
 if (!$show_recovered) {
@@ -108,29 +101,26 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $log          = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
 
-    $ico   = 'ok';
+    $ico   = 'check';
     $col   = 'green';
     $extra = '';
     $msg   = '';
     if ((int) $alert['state'] === 0) {
-        $ico   = 'ok';
+        $ico   = 'check';
         $col   = 'green';
         $extra = 'success';
         $msg   = 'ok';
-    }
-    else if ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
+    } elseif ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
         $ico   = 'volume-up';
         $col   = 'red';
         $extra = 'danger';
         $msg   = 'alert';
         if ((int) $alert['state'] === 3) {
             $msg = 'worse';
-        }
-        else if ((int) $alert['state'] === 4) {
+        } elseif ((int) $alert['state'] === 4) {
             $msg = 'better';
         }
-    }
-    else if ((int) $alert['state'] === 2) {
+    } elseif ((int) $alert['state'] === 2) {
         $ico   = 'volume-off';
         $col   = '#800080';
         $extra = 'warning';
@@ -144,8 +134,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $severity = $alert['severity'];
     if ($alert['state'] == 3) {
         $severity .= ' <strong>+</strong>';
-    }
-    else if ($alert['state'] == 4) {
+    } elseif ($alert['state'] == 4) {
         $severity .= ' <strong>-</strong>';
     }
 
@@ -165,7 +154,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $response[] = array(
         'id'        => $rulei++,
         'rule'      => '<i title="'.htmlentities($alert['rule']).'"><a href="'.generate_url(array('page'=>'alert-rules')).'">'.htmlentities($alert['name']).'</a></i>',
-        'details'   => '<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
+        'details'   => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
         'hostname'  => $hostname,
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity'  => $severity,

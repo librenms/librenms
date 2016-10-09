@@ -6,7 +6,7 @@ if (is_numeric($vars['id'])) {
     if (is_numeric($vsvr['device_id']) && ($auth || device_permitted($vsvr['device_id']))) {
         $device = device_by_id_cache($vsvr['device_id']);
 
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('netscaler-vsvr-'.$vsvr['vsvr_name'].'.rrd');
+        $rrd_filename = rrd_name($device['hostname'], array('netscaler', 'vsvr', $vsvr['vsvr_name']));
 
         $title  = generate_device_link($device);
         $title .= ' :: Netscaler VServer :: '.htmlentities($vsvr['vsvr_name']);

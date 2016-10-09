@@ -4,8 +4,8 @@ $i = 0;
 
 foreach (explode(',', $vars['id']) as $ifid) {
     $port = dbFetchRow('SELECT * FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
-    $rrd_file = get_port_rrdfile_path ($port['hostname'], $ifid);
-    if (is_file($rrd_file)) {
+    $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
+    if (rrdtool_check_rrd_exists($rrd_file)) {
         $port = ifLabel($port);
         $rrd_list[$i]['filename']  = $rrd_file;
         $rrd_list[$i]['descr']     = $port['hostname'].' '.$port['ifDescr'];

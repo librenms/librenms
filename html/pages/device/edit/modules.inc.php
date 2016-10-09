@@ -27,10 +27,9 @@ foreach ($poller_modules as $module => $module_status) {
         <td>
         ');
 
-    if($module_status == 1) {
+    if ($module_status == 1) {
         echo('<span class="text-success">Enabled</span>');
-    }
-    else {
+    } else {
         echo('<span class="text-danger">Disabled</span>');
     }
 
@@ -43,18 +42,15 @@ foreach ($poller_modules as $module => $module_status) {
         if ($attribs['poll_'.$module]) {
             echo('<span id="poller-module-'.$module.'" class="text-success">Enabled</span>');
             $module_checked = 'checked';
-        }
-        else {
+        } else {
             echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
             $module_checked = '';
         }
-    }
-    else {
-        if($module_status == 1) {
+    } else {
+        if ($module_status == 1) {
             echo('<span id="poller-module-'.$module.'"class="text-success">Enabled</span>');
             $module_checked = 'checked';
-        }
-        else {
+        } else {
             echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
             $module_checked = '';
         }
@@ -99,10 +95,9 @@ foreach ($discovery_modules as $module => $module_status) {
         <td>
         ');
 
-    if($module_status == 1) {
+    if ($module_status == 1) {
         echo('<span class="text-success">Enabled</span>');
-    }
-    else {
+    } else {
         echo('<span class="text-danger">Disabled</span>');
     }
 
@@ -111,21 +106,18 @@ foreach ($discovery_modules as $module => $module_status) {
         <td>');
 
     if (isset($attribs['discover_'.$module])) {
-        if($attribs['discover_'.$module]) {
+        if ($attribs['discover_'.$module]) {
             echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
             $module_checked = 'checked';
-        }
-        else {
+        } else {
             echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
             $module_checked = '';
         }
-    }
-    else {
-        if($module_status == 1) {
+    } else {
+        if ($module_status == 1) {
             echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
             $module_checked = 'checked';
-        }
-        else {
+        } else {
             echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
             $module_checked = '';
         }
@@ -140,7 +132,6 @@ foreach ($discovery_modules as $module => $module_status) {
     echo('
         </td>
       </tr>');
-
 }
 echo('
     </table>

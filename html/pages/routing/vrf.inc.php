@@ -97,8 +97,7 @@ if ($_SESSION['userlevel'] >= '5') {
         foreach (dbFetchRows("SELECT $vrf_fields, $dev_fields FROM `vrfs` AS V, `devices` AS D WHERE D.device_id = V.device_id") as $vrf_device) {
             if (empty($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']])) {
                 $vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']][0] = $vrf_device;
-            }
-            else {
+            } else {
                 array_push($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']], $vrf_device);
             }
         }
@@ -106,8 +105,7 @@ if ($_SESSION['userlevel'] >= '5') {
         foreach (dbFetchRows("SELECT $port_fields FROM `ports` WHERE ifVrf<>0") as $port) {
             if (empty($ports[$port['ifvrf']][$port['device_id']])) {
                 $ports[$port['ifvrf']][$port['device_id']][0] = $port;
-            }
-            else {
+            } else {
                 array_push($ports[$port['ifvrf']][$port['device_id']], $port);
             }
         }
@@ -117,8 +115,7 @@ if ($_SESSION['userlevel'] >= '5') {
         foreach (dbFetchRows('SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`') as $vrf) {
             if (($i % 2)) {
                 $bg_colour = $list_colour_a;
-            }
-            else {
+            } else {
                 $bg_colour = $list_colour_b;
             }
 
@@ -132,16 +129,13 @@ if ($_SESSION['userlevel'] >= '5') {
                 if (($i % 2)) {
                     if (($x % 2)) {
                         $dev_colour = $list_colour_a_a;
-                    }
-                    else {
+                    } else {
                         $dev_colour = $list_colour_a_b;
                     }
-                }
-                else {
+                } else {
                     if (($x % 2)) {
                         $dev_colour = $list_colour_b_b;
-                    }
-                    else {
+                    } else {
                         $dev_colour = $list_colour_b_a;
                     }
                 }
@@ -193,8 +187,7 @@ if ($_SESSION['userlevel'] >= '5') {
         }//end foreach
 
         echo '</table></div>';
-    }
-    else {
+    } else {
         echo "<div style='background: $list_colour_a; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($_GET['optb']));
         echo "<tr valign=top bgcolor='$bg_colour'>";
@@ -210,8 +203,7 @@ if ($_SESSION['userlevel'] >= '5') {
             $hostname = $device['hostname'];
             if (($x % 2)) {
                 $device_colour = $list_colour_a;
-            }
-            else {
+            } else {
                 $device_colour = $list_colour_b;
             }
 
@@ -227,16 +219,13 @@ if ($_SESSION['userlevel'] >= '5') {
                 if (($x % 2)) {
                     if (($i % 2) === 0) {
                         $int_colour = $list_colour_a_b;
-                    }
-                    else {
+                    } else {
                         $int_colour = $list_colour_a_a;
                     }
-                }
-                else {
+                } else {
                     if (($i % 2) === 0) {
                         $int_colour = $list_colour_b_a;
-                    }
-                    else {
+                    } else {
                         $int_colour = $list_colour_b_b;
                     }
                 }
@@ -251,7 +240,6 @@ if ($_SESSION['userlevel'] >= '5') {
             echo "<div style='height: 10px;'></div>";
         }//end foreach
     }//end if
-}
-else {
+} else {
     include 'includes/error-no-perm.inc.php';
 } //end if

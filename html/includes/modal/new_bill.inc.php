@@ -10,8 +10,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if(is_admin() !== false) {
-    
+if (is_admin() !== false) {
     require 'includes/javascript-interfacepicker.inc.php';
     
     $port_device_id = -1;
@@ -42,11 +41,11 @@ if(is_admin() !== false) {
                             <option value=''>Select a device</option>
                             <?php
                               $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-                              foreach ($devices as $device) {
-                                  $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                  echo "<option value='${device['device_id']}' $selected>${device['hostname']}</option>\n";
-                              }
-                              ?>
+                            foreach ($devices as $device) {
+                                $selected = $device['device_id'] == $port_device_id ? " selected" : "";
+                                echo "<option value='${device['device_id']}' $selected>${device['hostname']}</option>\n";
+                            }
+                                ?>
                         </select>
                     </div>
                 </div>
@@ -62,7 +61,7 @@ if(is_admin() !== false) {
                                 $selected = $interface['port_id'] === $port['port_id'] ? " selected" : "";
                                 echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
                             }
-                        }   ?>
+}   ?>
                         </select>
                     </div>
                 </div>                
@@ -87,5 +86,4 @@ if(is_admin() !== false) {
 </div>
 
 <?php
-
 }

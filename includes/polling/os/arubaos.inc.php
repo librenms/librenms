@@ -20,7 +20,6 @@ echo "\n";
 
 if ($aruba_info[0]['wlsxSwitchRole'] == 'master') {
     $features = 'Master Controller';
-}
-else {
+} else {
     $features = 'Local Controller for '.$aruba_info[0]['wlsxSwitchMasterIp'];
 }

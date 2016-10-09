@@ -2,8 +2,7 @@
 
 if ($_SESSION['userlevel'] < '10') {
     include 'includes/error-no-perm.inc.php';
-}
-else {
+} else {
     if ($vars['addsrv']) {
         if ($_SESSION['userlevel'] >= '10') {
             $updated = '1';

@@ -36,8 +36,7 @@ if ($device['os'] == 'asa' || $device['os'] == 'pix') {
             if ($value > 0) {
                 $got_value = true;
             }
-        }
-        else {
+        } else {
             $value = '0';
         }
         $fields[$oid] = $value;

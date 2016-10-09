@@ -1,32 +1,32 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage webinterface
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
 
 if (empty($_SERVER['PATH_INFO'])) {
-    if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME']) ) {
+    if (strstr($_SERVER['SERVER_SOFTWARE'], "nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'] . $_SERVER['PHP_SELF'], "", $_SERVER['ORIG_SCRIPT_FILENAME']);
-    }
-    else {
+    } else {
         $_SERVER['PATH_INFO'] = isset($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '';
     }
 }
 
-function logErrors($errno, $errstr, $errfile, $errline) {
+function logErrors($errno, $errstr, $errfile, $errline)
+{
     global $php_debug;
     $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
 }
 
-function catchFatal() {
+function catchFatal()
+{
     $last_error = error_get_last();
     if ($last_error['type'] == 1) {
         $log_error = array($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
@@ -34,17 +34,18 @@ function catchFatal() {
     }
 }
 
-if (strpos($_SERVER['PATH_INFO'], "debug")) {
-    $debug = "1";
+if (strpos($_SERVER['REQUEST_URI'], "debug")) {
+    $debug = true;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
     set_error_handler('logErrors');
     register_shutdown_function('catchFatal');
-}
-else {
-    $debug = FALSE;
+    $sql_debug = array();
+    $php_debug = array();
+} else {
+    $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
@@ -66,11 +67,10 @@ require_once '../includes/definitions.inc.php';
 require '../includes/functions.php';
 require 'includes/functions.inc.php';
 require 'includes/vars.inc.php';
-require 'includes/plugins.inc.php';
 
 $config['memcached']['ttl'] = $config['time']['now']+300;
 
-Plugins::start();
+LibreNMS\Plugins::start();
 
 $runtime_start = microtime(true);
 
@@ -94,8 +94,7 @@ if (isset($config['branding']) && is_array($config['branding'])) {
         foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
             eval("\$config['" . $confitem . "'] = \$confval;");
         }
-    }
-    else {
+    } else {
         foreach ($config['branding']['default'] as $confitem => $confval) {
             eval("\$config['" . $confitem . "'] = \$confval;");
         }
@@ -128,8 +127,7 @@ if (empty($config['favicon'])) {
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="msapplication-TileImage" content="images/favicon-144.png">
 <?php
-}
-else {
+} else {
     echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
 }
 ?>
@@ -166,12 +164,12 @@ else {
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
     <?php
-        if ($config['enable_lazy_load'] === true) {
+    if ($config['enable_lazy_load'] === true) {
     ?>
   <script src="js/jquery.lazyload.min.js"></script>
   <script src="js/lazyload.js"></script>
     <?php
-        }
+    }
     ?>
   <script src="js/librenms.js"></script>
   <script type="text/javascript">
@@ -192,7 +190,7 @@ else {
 
 <?php
 
-if(empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
+if (empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
     echo "<script>updateResolution();</script>";
 }
 
@@ -200,11 +198,9 @@ if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
     if ($_SESSION['authenticated']) {
         require 'includes/print-menubar.php';
     }
-}
-else {
+} else {
     echo "<style>body { padding-top: 0px !important;
     padding-bottom: 0px !important; }</style>";
-
 }
 
 ?>
@@ -226,24 +222,19 @@ if ($_SESSION['authenticated']) {
     // Authenticated. Print a page.
     if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
         require "pages/" . $vars['page'] . ".inc.php";
-    }
-    else {
+    } else {
         if (isset($config['front_page']) && is_file($config['front_page'])) {
             require $config['front_page'];
-        }
-        else {
+        } else {
             require 'pages/front/default.php';
         }
     }
-
-}
-else {
+} else {
     // Not Authenticated. Show status page if enabled
-    if ( $config['public_status'] === true ) {
+    if ($config['public_status'] === true) {
         if (isset($vars['page']) && strstr("login", $vars['page'])) {
             require 'pages/logon.inc.php';
-        }
-        else {
+        } else {
             echo '<div id="public-status">';
             require 'pages/public.inc.php';
             echo '</div>';
@@ -252,8 +243,7 @@ else {
             require 'pages/logon.inc.php';
             echo '</div>';
         }
-    }
-    else {
+    } else {
         require 'pages/logon.inc.php';
     }
 }
@@ -269,10 +259,10 @@ $gentime = substr($runtime, 0, 5);
 
 # FIXME - move this
 if ($config['page_gen']) {
-    echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
-        ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
-        ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
-        ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
+    echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0, 3).'s'.
+        ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0, 3).'s'.
+        ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0, 3).'s'.
+        ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0, 3).'s');
 
     $fullsize = memory_get_usage();
     unset($cache);
@@ -288,7 +278,7 @@ if ($config['page_gen']) {
 if (isset($pagetitle) && is_array($pagetitle)) {
     # if prefix is set, put it in front
     if ($config['page_title_prefix']) {
-        array_unshift($pagetitle,$config['page_title_prefix']);
+        array_unshift($pagetitle, $config['page_title_prefix']);
     }
 
     # if suffix is set, put it in the back
@@ -297,13 +287,13 @@ if (isset($pagetitle) && is_array($pagetitle)) {
     }
 
     # create and set the title
-    $title = join(" - ",$pagetitle);
+    $title = join(" - ", $pagetitle);
     echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
 ?>
 
 <?php
-if($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes")) {
+if ($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes")) {
 ?>
 <nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-bottom">
   <div class="container">
@@ -319,11 +309,11 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" c
 <?php
 }
 
-if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1",array()) > 0) {
+if (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
-if(is_array($msg_box)) {
+if (is_array($msg_box)) {
     echo("<script>
         toastr.options.timeout = 10;
         toastr.options.extendedTimeOut = 20;
@@ -337,11 +327,11 @@ if(is_array($msg_box)) {
     echo("</script>");
 }
 
-if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === TRUE) {
+if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === true) {
     require_once "includes/print-debug.php";
 }
 
-if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
+if ($no_refresh !== true && $config['page_refresh'] != 0) {
     $refresh = $config['page_refresh'] * 1000;
     echo('<script type="text/javascript">
         $(document).ready(function() {
@@ -393,11 +383,9 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
 
         });
     </script>');
-
-}
-else {
-
-echo('<script type="text/javascript">
+} else {
+    echo('<script type="text/javascript">
+    var no_refresh = ' . var_export((bool)$no_refresh, true) . ';
     $(document).ready(function() {
         $("#countdown_timer").html("Refresh disabled");
         $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i>");
@@ -406,7 +394,6 @@ echo('<script type="text/javascript">
         });
      });
 </script>');
-
 }
 
 ?>

@@ -16,7 +16,7 @@ $unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 10)), 0, ($descr_len + 10))."Now         Min         Max        Avg\l'";
-    if($printtotal === 1) {
+    if ($printtotal === 1) {
         $rrd_options .= " COMMENT:'Total      '";
     }
     $rrd_options .= " COMMENT:'\l'";
@@ -27,8 +27,7 @@ if ($width > '500') {
 foreach ($rrd_list as $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
-    }
-    else {
+    } else {
         if (!$config['graph_colours'][$colours][$colour_iter]) {
             $colour_iter = 0;
         }
@@ -48,8 +47,7 @@ foreach ($rrd_list as $rrd) {
     if ($simple_rrd) {
         $rrd_options .= ' CDEF:'.$rrd['ds'].$i.'min='.$rrd['ds'].$i.' ';
         $rrd_options .= ' CDEF:'.$rrd['ds'].$i.'max='.$rrd['ds'].$i.' ';
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$rrd['ds'].$i.'min='.$rrd['filename'].':'.$rrd['ds'].':MIN ';
         $rrd_options .= ' DEF:'.$rrd['ds'].$i.'max='.$rrd['filename'].':'.$rrd['ds'].':MAX ';
     }
@@ -73,7 +71,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' CDEF:'.$g_defname.$i.'='.$rrd['ds'].$i.','.$multiplier.',*';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'min='.$rrd['ds'].$i.'min,'.$multiplier.',*';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'max='.$rrd['ds'].$i.'max,'.$multiplier.',*';
-    } else if (is_numeric($divider)) {
+    } elseif (is_numeric($divider)) {
         $g_defname    = $rrd['ds'].'_cdef';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'='.$rrd['ds'].$i.','.$divider.',/';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'min='.$rrd['ds'].$i.'min,'.$divider.',/';
@@ -87,7 +85,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($i && ($dostack === 1)) {
-    	$stack = ':STACK';
+        $stack = ':STACK';
     }
     
     $rrd_options .= ' LINE2:'.$g_defname.$i.'#'.$colour.":'".$descr."'$stack";
@@ -104,13 +102,10 @@ foreach ($rrd_list as $rrd) {
 if ($_GET['previous'] == 'yes') {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX.','.$multiplier.',*';
-    }
-    else if (is_numeric($divider)) {
+    } elseif (is_numeric($divider)) {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX.','.$divider.',/';
-    }
-    else {
+    } else {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX;
     }
     $rrd_options .= ' HRULE:0#555555';
 }
-

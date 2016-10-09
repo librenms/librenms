@@ -2,17 +2,16 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage cli
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
+chdir(__DIR__); // cwd to the directory containing this script
 
 require 'includes/defaults.inc.php';
 require 'config.php';
@@ -25,11 +24,9 @@ if ($argv[1]) {
     $id   = getidbyname($host);
     if ($id) {
         echo delete_device($id)."\n";
-    }
-    else {
+    } else {
         echo "Host doesn't exist!\n";
     }
-}
-else {
+} else {
     echo "Host Removal Tool\nUsage: ./delhost.php <hostname>\n";
 }

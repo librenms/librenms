@@ -23,7 +23,6 @@ $stpprotocol = snmp_get($device, 'dot1dStpProtocolSpecification.0', '-Oqv', 'RST
 // FIXME I don't know what "unknown" means, perhaps MSTP? (saw it on some cisco devices)
 // But we can try to retrieve data
 if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
-
     // set time multiplier to convert from centiseconds to seconds
     // all time values are stored in databese as seconds
     $tm = '0.01';
@@ -63,20 +62,19 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     $time_since_change = snmp_get($device, 'dot1dStpTimeSinceTopologyChange.0', '-Ovt', 'RSTP-MIB');
     if ($time_since_change > '100') {
         $time_since_change = substr($time_since_change, 0, -2); // convert to seconds since change
-    }   
-    else {
+    } else {
         $time_since_change = '0';
-    }   
+    }
     $stp['timeSinceTopologyChange'] = $time_since_change;
 
-    // designated root is stored in format 2 octet bridge priority + MAC address, so we need to normalize it 
+    // designated root is stored in format 2 octet bridge priority + MAC address, so we need to normalize it
     $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[0]['dot1dStpDesignatedRoot']));
     $dr = substr($dr, -12); //remove first two octets
     $stp['designatedRoot'] = $dr;
 
     // normalize the MAC
     $mac_array = explode(':', $mac_raw);
-    foreach($mac_array as &$octet) {
+    foreach ($mac_array as &$octet) {
         if (strlen($octet) < 2) {
             $octet = "0" . $octet; // add suppressed 0
         }
@@ -86,8 +84,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     // I'm the boss?
     if ($stp['bridgeAddress'] == $stp['designatedRoot']) {
         $stp['rootBridge'] = '1';
-    }
-    else {
+    } else {
         $stp['rootBridge'] = '0';
     }
 
@@ -109,7 +106,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             // FIXME log_event should log really changing time, not polling time
             // but upstream function do not care about this at the moment.
             //
-            // saw same problem with this line librenms/includes/polling/system.inc.php 
+            // saw same problem with this line librenms/includes/polling/system.inc.php
             // log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
             // ToDo fix log_event()
             //
@@ -117,12 +114,12 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             log_event('STP topology changed after: '.formatUptime($stp['timeSinceTopologyChange']), $device, 'stp');
         }
         // Write to db
-        dbUpdate($stp,'stp','device_id = ?', array($device['device_id']));
+        dbUpdate($stp, 'stp', 'device_id = ?', array($device['device_id']));
         echo '.';
     }
 
     // STP port related stuff
-    foreach ($stp_raw as $port => $value){
+    foreach ($stp_raw as $port => $value) {
         if ($port) { // $stp_raw[0] ist not port related so we skip this one
             $stp_port = array(
                 'priority'              => $stp_raw[$port]['dot1dStpPortPriority'],
@@ -158,8 +155,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                     $dp = $stp_raw[$port]['dot1dStpPortDesignatedPort'] - $dp_value;
                     $stp_port['designatedPort'] = $dp;
                 }
-            }
-            else {
+            } else {
                 // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
                 $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
                 $stp_port['designatedPort'] = hexdec($dp);
@@ -168,7 +164,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             //d_echo($stp_port);
 
             // Update db
-            dbUpdate($stp_port,'ports_stp','`device_id` = ? AND `port_id` = ?', array($device['device_id'], $stp_port['port_id']));
+            dbUpdate($stp_port, 'ports_stp', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $stp_port['port_id']));
             echo '.';
         }
     }

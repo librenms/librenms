@@ -42,8 +42,7 @@ if (!empty($filter_device)) {
     $tmp_output .= '
             "<input type=\"hidden\" name=\"hostname\" id=\"hostname\" value=\"'. $filter_device .'\">"+
 ';
-}
-else {
+} else {
     $tmp_output .= '
             "<div class=\"form-group\"><select name=\"hostname\" id=\"hostname\" class=\"form-control input-sm\">"+
             "<option value=\"\">All devices</option>"+
@@ -51,26 +50,24 @@ else {
 
     if (is_admin() === true || is_read() === true) {
         $results = dbFetchRows("SELECT `hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-    }
-    else {
+    } else {
         $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
     }
 
     foreach ($results as $data) {
         $tmp_output .= '"<option value=\"'.$data['hostname'].'\""+';
-        if ($data['hostname'] == $vars['hostname']) {
+        if (isset($vars['hostname']) && $data['hostname'] == $vars['hostname']) {
             $tmp_output .= '"selected"+';
         }
         $tmp_output .= '">'.$data['hostname'].'</option>"+';
     }
 
-$tmp_output .= '
+    $tmp_output .= '
                 "</select>&nbsp;</div>"+
 ';
-
 }
 
-if (empty($filter_device)) {
+if (empty($filter_device) && isset($_POST['hostname'])) {
     $filter_device = mres($_POST['hostname']);
 }
 
@@ -99,7 +96,7 @@ $tmp_output .= '
         rowCount: ['. $results_limit .', 25,50,100,250,-1],
 ';
 
-if ($no_form !== true) {
+if (isset($no_form) && $no_form !== true) {
     $tmp_output .= '
         templates: {
             header: searchbar
@@ -112,8 +109,8 @@ $tmp_output .= '
         {
             return {
                 id: "graylog",
-                hostname: "' . $filter_device . '",
-                range: "' . mres($_POST['range'])  . '"
+                hostname: "' . (isset($filter_device) ? $filter_device : '') . '",
+                range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
             };
         },
         url: "ajax_table.php",

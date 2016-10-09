@@ -16,7 +16,7 @@ $scale_min = '0';
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/asa_conns.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'asa_conns');
 
 $rrd_options .= " DEF:connections=$rrd_filename:connections:AVERAGE";
 $rrd_options .= " DEF:connections_max=$rrd_filename:connections:MAX";
