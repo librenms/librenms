@@ -29,7 +29,7 @@ $nototal = 1;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', 'gpsd', $app['app_id']));
 $array = array(
-    'hdop' => array('descr' => 'Horiontal'),
+    'hdop' => array('descr' => 'Horizontal'),
     'vdop' => array('descr' => 'Vertical'),
 );
 
