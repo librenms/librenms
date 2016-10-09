@@ -1786,6 +1786,8 @@ $os = 'hikvision';
 $config['os'][$os]['text'] = 'Hikvision';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'hikvision';
+$config['os'][$os]['over'][0]['graph'] = 'device_uptime';
+$config['os'][$os]['over'][0]['text']  = 'Device Uptime';
 
 // Canopy / Cambium support
 $os = 'cambium';
