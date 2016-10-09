@@ -26,7 +26,7 @@
 if ($device['os'] == 'dsm') {
     echo 'Synology DSM : ';
     $oid = '.1.3.6.1.2.1.25.3.3.1.2';
-    $procs   = snmpwalk_cache_multi_oid($device, $oid, array());
+    $procs = snmpwalk_cache_multi_oid($device, $oid, array());
     $x = 0;
     foreach ($procs as $index => $proc) {
         $usage = $proc['hrProcessorLoad'];
