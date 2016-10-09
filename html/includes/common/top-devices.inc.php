@@ -15,23 +15,11 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-/**
- * Top devices
- * @author Sergiusz Paprzycki
- * @copyright 2015 Sergiusz Paprzycki <serek@walcz.net>
- * @copyright 2016 Cercel Valentin <crc@nuamchefazi.ro>
- * @license GPL
- * @package LibreNMS
- * @subpackage Widgets
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '11'));
-$widget_mode = json_decode($sql['settings'], true);
-
-$top_query = $widget_mode['top_query'];
-$sort_order = $widget_mode['sort_order'];
+$top_query = $widget_settings['top_query'];
+$sort_order = $widget_settings['sort_order'];
 
 $selected_sort_asc = '';
 $selected_sort_desc = '';
@@ -165,7 +153,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
-            ORDER BY total '.$sort_order.'
+            ORDER BY total ' . $sort_order . '
             LIMIT :count
             ';
         } else {
@@ -178,7 +166,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
-            ORDER BY total '.$sort_order.'
+            ORDER BY total ' . $sort_order . '
             LIMIT :count
             ';
         }
@@ -187,7 +175,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `uptime` '.$sort_order.' 
+                      ORDER BY `uptime` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `uptime`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -195,7 +183,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE  `P`.`user_id` = :user
                       AND `P`.`device_id` = `d`.`device_id`
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
-                      ORDER BY `uptime` '.$sort_order.' 
+                      ORDER BY `uptime` ' . $sort_order . ' 
                       LIMIT :count';
         }
     } elseif ($top_query === 'ping') {
@@ -203,7 +191,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
+                      ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `last_ping_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -211,7 +199,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user 
                       AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_ping_timetaken` '.$sort_order.' 
+                      ORDER BY `last_ping_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         }
     } elseif ($top_query === 'cpu') {
@@ -221,7 +209,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `d`.`device_id` = `procs`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       GROUP BY `d`.`device_id` 
-                      ORDER BY `cpuload` '.$sort_order.' 
+                      ORDER BY `cpuload` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload` 
@@ -229,7 +217,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       GROUP BY `procs`.`device_id` 
-                      ORDER BY `cpuload` '.$sort_order.'
+                      ORDER BY `cpuload` ' . $sort_order . '
                       LIMIT :count';
         }
     } elseif ($top_query === 'ram') {
@@ -239,7 +227,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `d`.`device_id` = `mem`.`device_id`
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `mempool_perc` '.$sort_order.'
+                      ORDER BY `mempool_perc` ' . $sort_order . '
                       LIMIT :count';
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc` 
@@ -247,7 +235,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id`
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `mempool_perc` '.$sort_order.'
+                      ORDER BY `mempool_perc` ' . $sort_order . '
                       LIMIT :count';
         }
     } elseif ($top_query === 'poller') {
@@ -255,7 +243,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `device_id` 
                       FROM `devices` 
                       WHERE unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
+                      ORDER BY `last_polled_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         } else {
             $query = 'SELECT `last_polled_timetaken`, `hostname`, `last_polled`, `d`.`device_id` 
@@ -263,7 +251,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                       WHERE `P`.`user_id` = :user 
                       AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
-                      ORDER BY `last_polled_timetaken` '.$sort_order.' 
+                      ORDER BY `last_polled_timetaken` ' . $sort_order . ' 
                       LIMIT :count';
         }
     }
