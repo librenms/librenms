@@ -8,6 +8,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Apache](#apache) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
+1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [MySQL](#mysql) - Agent
@@ -35,8 +36,8 @@ Either use SNMP extend or use the agent.
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
 ```
 2. Make the script executable (chmod +x /etc/snmp/apache-stats.py)
-3. Verify it is working by running /etc/snmp/apache-stats.py  
-(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)  
+3. Verify it is working by running /etc/snmp/apache-stats.py
+(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend apache /etc/snmp/apache-stats.py
@@ -46,8 +47,8 @@ extend apache /etc/snmp/apache-stats.py
 ##### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 
-1. Verify it is working by running /usr/lib/check_mk_agent/local/apache  
-(If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)  
+1. Verify it is working by running /usr/lib/check_mk_agent/local/apache
+(If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
 2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
 
@@ -92,6 +93,18 @@ extend dhcpstats /etc/snmp/dhcp-status.sh
 ```
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `DHCP Stats` under the Applications tab.
+
+
+
+### GSPD
+A small shell script that reports GPSD status.
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
+
+You may need to configure `$server` or `$port`.
+
+Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
 
 

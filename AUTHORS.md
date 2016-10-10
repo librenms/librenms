@@ -138,6 +138,7 @@ LibreNMS contributors:
 - Johan Zaxmy <johan@zaxmy.com> (Zaxmy)
 - Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
 - Layne Breitkreutz <github@thelenon.com> (Gorian)
+- Karl Shea <karl@karlshea.com> (karlshea)
 - Jason Ellison <infotek@gmail.com> (infotek)
 
 [1]: http://observium.org/ "Observium web site"
