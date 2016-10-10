@@ -1,16 +1,16 @@
 <?php
 
-if ($device['os'] == 'ceragon') {
+if ($device['os'] == 'ceraos') {
     $mib  = 'MWRM-UNIT-MIB::genEquipUnitIduVoltageInput.0';
     $oid = '.1.3.6.1.4.1.2281.10.1.1.10.0';
     $oids = snmp_get($device, $mib, '-OsqnU', 'MWRM-UNIT-MIB');
     d_echo($oids."\n");
 
     if (!empty($oids)) {
-        echo ' Ceragon Voltage ';
+        echo ' Ceragon CeraOS Voltage ';
 
         $divisor = 1;
-        $type    = 'ceragon';
+        $type    = 'ceraos';
 
         list(,$current) = explode(' ', $oids);
         $index          = $oid;
