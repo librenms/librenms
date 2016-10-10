@@ -795,9 +795,9 @@ $config['os'][$os]['text']  = 'ZTE ZXR10';
 $config['os'][$os]['type']  = 'network';
 $config['os'][$os]['icon']  = 'zte';
 
-// Ceragon
-$os = 'ceragon';
-$config['os'][$os]['text']             = 'Ceargon';
+// Ceragon CeraOS
+$os = 'ceraos';
+$config['os'][$os]['text']             = 'Ceragon CeraOS';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ceragon';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
