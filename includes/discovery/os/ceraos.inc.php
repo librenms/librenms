@@ -1,5 +1,7 @@
 <?php
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.2281')) {
+$genEquipInventoryCardName = snmp_get($device, 'MWRM-UNIT-MIB::genEquipInventoryCardName.127', '-Osqnv');
+
+if (preg_match('/IP-[1,2]0/', $genEquipInventoryCardName)) {
     $os = 'ceraos';
 }
