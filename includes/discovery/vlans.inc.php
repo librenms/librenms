@@ -17,7 +17,7 @@ require 'includes/discovery/vlans/cisco-vtp.inc.php';
 foreach ($device['vlans'] as $domain_id => $vlans) {
     foreach ($vlans as $vlan_id => $vlan) {
         // FIXME - do this only when vlan type == ethernet?
-        if (is_numeric($vlan_id) && ($vlan_id < 1002 || $vlan_id > 1105)) {
+        if (is_numeric($vlan_id) && ($vlan_id < 1002 || $vlan_id > 1005)) {
             // Ignore reserved VLAN IDs
             if ($device['os_group'] == 'cisco' || $device['os'] == 'ios') {
                 // This shit only seems to work on IOS
