@@ -226,7 +226,7 @@ $ports = $ports_mapped['ports'];
 // Rename any old RRD files still named after the previous ifIndex based naming schema.
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
     foreach (array ('', '-adsl', '-dot3') as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix.rrd";
+        $old_rrd_name = "port-$ifIndex$suffix";
         $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
 
         rrd_file_rename($device, $old_rrd_name, $new_rrd_name);

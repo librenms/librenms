@@ -28,17 +28,17 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     echo 'Caching Oids: ';
     foreach ($aruba_oids as $oid) {
         echo "$oid ";
-        $aruba_stats = snmpwalk_cache_oid($device, $oid, $aruba_stats, 'WLSX-SWITCH-MIB');
+        $aruba_stats = snmpwalk_cache_oid($device, $oid, array(), 'WLSX-SWITCH-MIB');
     }
 
     foreach ($switch_apinfo_oids as $oid) {
         echo "$oid ";
-        $aruba_apstats = snmpwalk_cache_oid_num($device, $oid, $aruba_apstats, 'WLSX-WLAN-MIB');
+        $aruba_apstats = snmpwalk_cache_oid_num($device, $oid, array(), 'WLSX-WLAN-MIB');
     }
 
     foreach ($switch_apname_oids as $oid) {
         echo "$oid ";
-        $aruba_apnames = snmpwalk_cache_oid_num($device, $oid, $aruba_apnames, 'WLSX-WLAN-MIB');
+        $aruba_apnames = snmpwalk_cache_oid_num($device, $oid, array(), 'WLSX-WLAN-MIB');
     }
 
 

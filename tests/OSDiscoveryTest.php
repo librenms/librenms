@@ -147,6 +147,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-switched-rack');
         $this->checkOS('apc', 'apc-masterswitch');
         $this->checkOS('apc', 'apc-metered-rack');
+        $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
     public function testAreca()
@@ -312,6 +313,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cimc');
     }
 
+    public function testCips()
+    {
+        $this->checkOS('cips');
+    }
+
     public function testCiscosb()
     {
         $this->checkOS('ciscosb');
@@ -450,6 +456,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'eaton-powerxpert');
     }
 
+    public function testEdgecore()
+    {
+        $this->checkOS('edge-core', 'edgecore-es3528m');
+    }
+
     public function testEdgeos()
     {
         $this->checkOS('edgeos');
@@ -573,6 +584,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHikvision()
     {
         $this->checkOS('hikvision');
+        $this->checkOS('hikvision', 'hikvision1');
     }
 
     public function testHp3par()
@@ -802,11 +814,17 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
         $this->checkOS('mgeups', 'mgeups-proxy');
+        $this->checkOS('mgeups', 'mgeups-comet');
     }
 
     public function testMicrosemitime()
     {
         $this->checkOS('microsemitime');
+    }
+
+    public function testMimosa()
+    {
+        $this->checkOS('mimosa');
     }
 
     public function testMinkelsrms()
@@ -817,6 +835,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMonowall()
     {
         $this->checkOS('monowall');
+    }
+
+    public function testMoxaNport()
+    {
+        $this->checkOS('moxa-nport');
     }
 
     public function testMrvld()
@@ -1039,6 +1062,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testProcurve()
     {
         $this->checkOS('procurve');
+        $this->checkOS('procurve', 'procurve-1800-8g');
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
         $this->checkOS('procurve', 'procurve-2530');

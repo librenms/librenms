@@ -1,8 +1,8 @@
 <?php
 
 if ($device['os'] == 'cambium') {
-    $oid  = 'boxTemperatureC.0';
-    $oids = trim(str_replace('"', '', snmp_get($device, "$oid", '-OsqnU', 'WHISP-BOX-MIBV2-MIB')));
+    $oid  = '.1.3.6.1.4.1.161.19.3.3.1.35.0';
+    $oids = trim(str_replace('"', '', snmp_get($device, "$oid", '-OsqnU')));
         d_echo($oids."\n");
 
     if (!empty($oids)) {

@@ -133,6 +133,12 @@ LibreNMS contributors:
 - Yves Boudreau <yves.boudreau@bgp.ca> (boudreau)
 - Konrad Bechler <konrad@bechler.pl> (kbechler)
 - Florent Bruchez <ftbz@me.com> (ftbz)
+- Bartosz Radwan <b.radwan@citypartner.pl> (bartoszradwan)
+- Kate Gerry <kate@fansubber.com> (kate66)
+- Johan Zaxmy <johan@zaxmy.com> (Zaxmy)
+- Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
+- Layne Breitkreutz <github@thelenon.com> (Gorian)
+- Karl Shea <karl@karlshea.com> (karlshea)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

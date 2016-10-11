@@ -5,21 +5,21 @@ if ($device['os'] == 'ipoman') {
     echo ' IPOMANII-MIB ';
 
     if (!is_array($cache['ipoman'])) {
-        echo 'outletConfigDesc ';
+        d_echo('outletConfigDesc ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', $cache['ipoman']['out'], 'IPOMANII-MIB');
-        echo 'outletConfigLocation ';
+        d_echo('outletConfigLocation ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigLocation', $cache['ipoman']['out'], 'IPOMANII-MIB');
-        echo 'inletConfigDesc ';
+        d_echo('inletConfigDesc ');
         $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, 'inletConfigDesc', $cache['ipoman']['in'], 'IPOMANII-MIB');
     }
 
     $oids = array();
 
-    echo 'inletConfigVoltageHigh ';
+    d_echo('inletConfigVoltageHigh ');
     $oids = snmpwalk_cache_multi_oid($device, 'inletConfigVoltageHigh', $oids, 'IPOMANII-MIB');
-    echo 'inletConfigVoltageLow ';
+    d_echo('inletConfigVoltageLow ');
     $oids = snmpwalk_cache_multi_oid($device, 'inletConfigVoltageLow', $oids, 'IPOMANII-MIB');
-    echo 'inletStatusVoltage ';
+    d_echo('inletStatusVoltage ');
     $oids = snmpwalk_cache_multi_oid($device, 'inletStatusVoltage', $oids, 'IPOMANII-MIB');
 
     if (is_array($oids)) {

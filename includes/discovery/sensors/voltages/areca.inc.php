@@ -2,7 +2,7 @@
 
 // Areca Voltages
 if ($device['os'] == 'areca') {
-    $oids = snmp_walk($device, '1.3.6.1.4.1.18928.1.2.2.1.8.1.2', '-OsqnU', '');
+    $oids = snmp_walk($device, '.1.3.6.1.4.1.18928.1.2.2.1.8.1.2', '-OsqnU', '');
     d_echo($oids."\n");
 
     if ($oids) {
@@ -17,7 +17,7 @@ if ($device['os'] == 'areca') {
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $index            = $split_oid[(count($split_oid) - 1)];
-            $oid              = '1.3.6.1.4.1.18928.1.2.2.1.8.1.3.'.$index;
+            $oid              = '.1.3.6.1.4.1.18928.1.2.2.1.8.1.3.'.$index;
             $current          = (snmp_get($device, $oid, '-Oqv', '') / $divisor);
             if (trim($descr, '"') != 'Battery Status') {
                 // Battery Status is charge percentage, or 255 when no BBU

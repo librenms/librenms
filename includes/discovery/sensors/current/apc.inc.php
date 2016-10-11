@@ -25,15 +25,15 @@ if ($device['os'] == 'apc') {
                 $split_oid       = explode('.', $oid);
                 $index           = $split_oid[(count($split_oid) - 1)];
 
-                $current_oid = '1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.'.$index;
+                $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.'.$index;
                 // rPDULoadStatusLoad
-                $phase_oid = '1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.'.$index;
+                $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.'.$index;
                 // rPDULoadStatusPhaseNumber
-                $limit_oid = '1.3.6.1.4.1.318.1.1.12.2.2.1.1.4.'.$index;
+                $limit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.4.'.$index;
                 // rPDULoadPhaseConfigOverloadThreshold
-                $lowlimit_oid = '1.3.6.1.4.1.318.1.1.12.2.2.1.1.2.'.$index;
+                $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.2.'.$index;
                 // rPDULoadPhaseConfigLowLoadThreshold
-                $warnlimit_oid = '1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.'.$index;
+                $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.'.$index;
                 // rPDULoadPhaseConfigNearOverloadThreshold
                 $phase   = snmp_get($device, $phase_oid, '-Oqv', '');
                 $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
@@ -99,15 +99,15 @@ if ($device['os'] == 'apc') {
                     }
                 }
 
-                $current_oid = '1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.'.$index;
+                $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.'.$index;
                 // rPDULoadStatusLoad
-                $bank_oid = '1.3.6.1.4.1.318.1.1.12.2.3.1.1.5.'.$index;
+                $bank_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.5.'.$index;
                 // rPDULoadStatusBankNumber
-                $limit_oid = '1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.'.$index;
+                $limit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.'.$index;
                 // rPDULoadBankConfigOverloadThreshold
-                $lowlimit_oid = '1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.'.$index;
+                $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.'.$index;
                 // rPDULoadBankConfigLowLoadThreshold
-                $warnlimit_oid = '1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.'.$index;
+                $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.'.$index;
                 // rPDULoadBankConfigNearOverloadThreshold
                 $bank      = snmp_get($device, $bank_oid, '-Oqv', '');
                 $current   = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
@@ -127,7 +127,7 @@ if ($device['os'] == 'apc') {
     unset($oids);
 
     // Per Outlet Power Bar
-    $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
+    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
     if ($oids) {
         echo 'APC PowerNet-MIB Outlets ';
         d_echo($oids."\n");
@@ -144,17 +144,17 @@ if ($device['os'] == 'apc') {
 
                 $index = $split_oid[(count($split_oid) - 1)];
 
-                $voltage_oid = '1.3.6.1.4.1.318.1.1.26.6.3.1.6';
+                $voltage_oid = '.1.3.6.1.4.1.318.1.1.26.6.3.1.6';
                 // rPDU2PhaseStatusVoltage
-                $current_oid = '1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.'.$index;
+                $current_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.'.$index;
                 // rPDU2OutletMeteredStatusCurrent
-                $limit_oid = '1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.'.$index;
+                $limit_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.'.$index;
                 // rPDU2OutletMeteredConfigOverloadCurrentThreshold
-                $lowlimit_oid = '1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.'.$index;
+                $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.'.$index;
                 // rPDU2OutletMeteredConfigLowLoadCurrentThreshold
-                $warnlimit_oid = '1.3.6.1.4.1.318.1.1.26.9.4.1.1.6.'.$index;
+                $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.1.1.6.'.$index;
                 // rPDU2OutletMeteredConfigNearOverloadCurrentThreshold
-                $name_oid = '1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.'.$index;
+                $name_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.'.$index;
                 // rPDU2OutletMeteredStatusName
                 $voltage = snmp_get($device, $voltage_oid, '-Oqv', '');
 
@@ -182,13 +182,13 @@ if ($device['os'] == 'apc') {
             echo 'APC PowerNet-MIB ATS ';
         }
 
-        $current_oid = '1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1';
+        $current_oid = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1';
         // atsOutputCurrent
-        $limit_oid = '1.3.6.1.4.1.318.1.1.8.4.16.1.5.1';
+        $limit_oid = '.1.3.6.1.4.1.318.1.1.8.4.16.1.5.1';
         // atsConfigPhaseOverLoadThreshold
-        $lowlimit_oid = '1.3.6.1.4.1.318.1.1.8.4.16.1.3.1';
+        $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.8.4.16.1.3.1';
         // atsConfigPhaseLowLoadThreshold
-        $warnlimit_oid = '1.3.6.1.4.1.318.1.1.8.4.16.1.4.1';
+        $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.8.4.16.1.4.1';
         // atsConfigPhaseNearOverLoadThreshold
         $index = 1;
 
@@ -226,9 +226,9 @@ if ($device['os'] == 'apc') {
         $oids           = snmp_get($device, $item['HighPrecOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
         if (empty($oids)) {
             $oids        = snmp_get($device, $item['AdvOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
-            $current_oid = $item['AdvOid'];
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.2.4';
         } else {
-            $current_oid = $item['HighPrecOid'];
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.4';
         }
 
         if (!empty($oids)) {

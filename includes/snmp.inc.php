@@ -38,10 +38,34 @@ function prep_snmp_setting($device, $setting)
 }//end prep_snmp_setting()
 
 
-function mibdir($mibdir)
+/**
+ * Generate the mib search directory argument for snmpcmd
+ * If null return the default mib dir
+ * If $mibdir is empty '', return an empty string
+ *
+ * @param string $mibdir should be the name of the directory within $config['mib_dir']
+ * @return string The option string starting with -M
+ */
+function mibdir($mibdir = null)
 {
     global $config;
-    return ' -M '.($mibdir ? $mibdir : $config['mibdir']);
+    // FIXME: prepend + to allow system mibs?
+
+    if (is_null($mibdir)) {
+        return " -M ${config['mib_dir']}";
+    }
+
+    if (empty($mibdir)) {
+        return '';
+    }
+
+    if (str_contains($mibdir, '/')) {
+        // pass through mib dir (for legace compatability
+        return " -M $mibdir";
+    } else {
+        // automatically set up includes
+        return " -M ${config['mib_dir']}/$mibdir:${config['mib_dir']}";
+    }
 }//end mibdir()
 
 /**
@@ -151,6 +175,30 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     return $array;
 }//end snmp_get_multi()
 
+function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
+{
+    global $runtime_stats;
+
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
+
+    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    $runtime_stats['snmpget']++;
+    $array = array();
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        if (!strstr($value, 'at this OID') && isset($oid)) {
+            $array[$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmp_get_multi_oid()
 
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -295,11 +343,19 @@ function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mib
     return $array;
 }//end snmpwalk_cache_oid()
 
-
-// just like snmpwalk_cache_oid except that it returns the numerical oid as the index
-// this is useful when the oid is indexed by the mac address and snmpwalk would
-// return periods (.) for non-printable numbers, thus making many different indexes appear
-// to be the same.
+/**
+ * Just like snmpwalk_cache_oid except that it returns the numerical oid as the index
+ * this is useful when the oid is indexed by the mac address and snmpwalk would
+ * return periods (.) for non-printable numbers, thus making many different indexes appear
+ * to be the same.
+ *
+ * @param array $device
+ * @param string $oid
+ * @param array $array Pass an array to add the cache to, useful for multiple calls
+ * @param string $mib
+ * @param string $mibdir
+ * @return boolean|array
+ */
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = null, $mibdir = null)
 {
     return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
@@ -528,8 +584,8 @@ function snmp_gen_auth(&$device)
         
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
-            // FIXME: There are two other places this is set - why are they ignored here?
-            $cmd .= ' -u root';
+            $username = !empty($device['authname']) ? $device['authname'] : 'root';
+            $cmd .= " -u '".$username."'";
         } elseif ($device['authlevel'] === 'authNoPriv') {
             $cmd .= " -a '".$device['authalgo']."'";
             $cmd .= " -A '".$device['authpass']."'";
@@ -1046,7 +1102,7 @@ function register_mibs($device, $mibs, $included_by)
  * @param $OID
  * @param int $indexes
  * @internal param $string
- * @return array
+ * @return boolean|array
  */
 function snmpwalk_array_num($device, $oid, $indexes = 1)
 {

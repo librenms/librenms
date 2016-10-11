@@ -98,40 +98,40 @@ if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' &&
 }
 
 echo "
-        <td><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
-        <td><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
+        <td><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td class='text-right'>$stat_devices</td>
+        <td><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td class='text-right'>$stat_ports</td>
       </tr>
       <tr>
-        <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td align=right>$stat_ipv4_addy</td>
-        <td><img src='images/icons/ipv4.png' class='optionicon'> <b>IPv4 Networks</b></td><td align=right>$stat_ipv4_nets</td>
+        <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td class='text-right'>$stat_ipv4_addy</td>
+        <td><img src='images/icons/ipv4.png' class='optionicon'> <b>IPv4 Networks</b></td><td class='text-right'>$stat_ipv4_nets</td>
       </tr>
       <tr>
-        <td><img src='images/icons/ipv6.png'  class='optionicon'> <b>IPv6 Addresses<b></td><td align=right>$stat_ipv6_addy</td>
-        <td><img src='images/icons/ipv6.png' class='optionicon'> <b>IPv6 Networks</b></td><td align=right>$stat_ipv6_nets</td>
+        <td><img src='images/icons/ipv6.png'  class='optionicon'> <b>IPv6 Addresses<b></td><td class='text-right'>$stat_ipv6_addy</td>
+        <td><img src='images/icons/ipv6.png' class='optionicon'> <b>IPv6 Networks</b></td><td class='text-right'>$stat_ipv6_nets</td>
        </tr>
      <tr>
-        <td><img src='images/icons/services.png'  class='optionicon'> <b>Services<b></td><td align=right>$stat_services</td>
-        <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td align=right>$stat_apps</td>
+        <td><img src='images/icons/services.png'  class='optionicon'> <b>Services<b></td><td class='text-right'>$stat_services</td>
+        <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td class='text-right'>$stat_apps</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/processor.png' class='optionicon'> <b>Processors</b></td><td align=right>$stat_processors</td>
-        <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td align=right>$stat_memory</td>
+        <td ><img src='images/icons/processor.png' class='optionicon'> <b>Processors</b></td><td class='text-right'>$stat_processors</td>
+        <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td class='text-right'>$stat_memory</td>
       </tr>
       <tr>
-        <td><img src='images/icons/storage.png' class='optionicon'> <b>Storage</b></td><td align=right>$stat_storage</td>
-        <td><img src='images/icons/diskio.png' class='optionicon'> <b>Disk I/O</b></td><td align=right>$stat_diskio</td>
+        <td><img src='images/icons/storage.png' class='optionicon'> <b>Storage</b></td><td class='text-right'>$stat_storage</td>
+        <td><img src='images/icons/diskio.png' class='optionicon'> <b>Disk I/O</b></td><td class='text-right'>$stat_diskio</td>
       </tr>
       <tr>
-        <td><img src='images/icons/inventory.png' class='optionicon'> <b>HR-MIB</b></td><td align=right>$stat_hrdev</td>
-        <td><img src='images/icons/inventory.png' class='optionicon'> <b>Entity-MIB</b></td><td align=right>$stat_entphys</td>
+        <td><img src='images/icons/inventory.png' class='optionicon'> <b>HR-MIB</b></td><td class='text-right'>$stat_hrdev</td>
+        <td><img src='images/icons/inventory.png' class='optionicon'> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/syslog.png' class='optionicon'> <b>Syslog Entries</b></td><td align=right>$stat_syslog</td>
-        <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td align=right>$stat_events</td>
+        <td ><img src='images/icons/syslog.png' class='optionicon'> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
+        <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/sensors.png' class='optionicon'> <b>Sensors</b></td><td align=right>$stat_sensors</td>
-        <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner</td>
+        <td ><img src='images/icons/sensors.png' class='optionicon'> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
+        <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
       </tr>
     </table>
 </div>

@@ -4,6 +4,6 @@ if (str_contains($sysDescr, array('Pulsar M', 'MGE UPS SYSTEMS - Network Managem
     $os = 'mgeups';
 }
 
-if (starts_with($sysDescr, array('Galaxy ', 'Evolution '))) {
+if (starts_with($sysDescr, array('Galaxy ', 'Evolution ', 'Comet'))) {
     $os = 'mgeups';
 }
