@@ -93,7 +93,6 @@ if ($device['os'] == 'f5') {
             $current         = $temp1[$index]['sysCmFailoverStatusId'];
             $sensorType      = 'f5';
             $oid             = '.1.3.6.1.4.1.3375.2.1.14.3.1.'.$index;
-            $oid_status    = snmp_get($device, $oid, '-Oqv');
             discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current, 'snmp', $index);
 
             //Create Sensor To State Index
@@ -161,7 +160,6 @@ if ($device['os'] == 'f5') {
             $current         = $temp1[$index]['sysCmFailoverStatusColor'];
             $sensorType      = 'f5';
             $oid             = '.1.3.6.1.4.1.3375.2.1.14.3.3.'.$index;
-            $oid_status    = snmp_get($device, $oid, '-Oqev');
             discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current, 'snmp', $index);
 
             //Create Sensor To State Index
@@ -201,7 +199,6 @@ if ($device['os'] == 'f5') {
             $current         = $temp3[$index]['sysChassisFanStatus'];
             $sensorType      = 'f5';
             $oid             = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.'.$index;
-            $oid_status    = snmp_get($device, $oid, '-Oqv');
             discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current, 'snmp', $index);
 
             //Create Sensor To State Index
