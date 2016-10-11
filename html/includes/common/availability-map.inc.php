@@ -12,13 +12,10 @@
  * the source code distribution for details.
  */
 
-$sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
-$widget_mode = json_decode($sql['settings'], true);
-
 if (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
     $mode = $_SESSION["map_view"];
 } else {
-    $mode = $widget_mode['mode'];
+    $mode = $widget_settings['mode'];
 }
 
 $select_modes = array(
@@ -28,10 +25,10 @@ $select_modes = array(
 );
 
 if ($config['webui']['availability_map_compact'] == 1) {
-    $compact_tile = $widget_mode['tile_width'];
+    $compact_tile = $widget_settings['tile_width'];
 }
 
-$show_disabled_ignored = $widget_mode['show_disabled_and_ignored'];
+$show_disabled_ignored = $widget_settings['show_disabled_and_ignored'];
 
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
