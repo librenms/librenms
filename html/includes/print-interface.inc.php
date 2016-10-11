@@ -103,29 +103,28 @@ if ($port[ifDuplex] != 'unknown') {
     echo '-';
 }
 
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    if ($port['ifTrunk']) {
-        echo '<p class=box-desc><span class=purple><a title="';
-        $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` ='".$port['port_id']."' and PV.`device_id` = '".$device['device_id']."' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
-        foreach ($vlans as $vlan) {
-            if ($vlan['state'] == 'blocking') {
-                $class = 'red';
-            } elseif ($vlan['state'] == 'forwarding') {
-                $class = 'green';
-            } else {
-                $class = 'none';
-            }
+$vlans = dbFetchColumn(
+    'SELECT vlan FROM `ports_vlans` AS PV, vlans AS V ' .
+    'WHERE PV.`port_id`=? AND PV.`device_id`=? AND V.`vlan_vlan`=PV.vlan AND V.device_id = PV.device_id',
+    array($port['port_id'], $device['device_id'])
+);
+$vlan_count = count($vlans);
 
-            echo '<b class='.$class.'>'.$vlan['vlan'].'</b> '.$vlan['vlan_descr'].'<br />';
-        }
-
-        echo '">'.$port['ifTrunk'].'</a></span></p>';
-    } elseif ($port['ifVlan']) {
-        echo '<p class=box-desc><span class=blue>VLAN '.$port['ifVlan'].'</span></p>';
-    } elseif ($port['ifVrf']) {
-        $vrf = dbFetchRow('SELECT * FROM vrfs WHERE vrf_id = ?', array($port['ifVrf']));
-        echo "<p style='color: green;'>".$vrf['vrf_name'].'</p>';
-    }//end if
+if ($vlan_count > 1) {
+    echo '<p class=box-desc><span class=purple><a href="';
+    echo generate_device_url($device, array('tab' => 'vlans'));
+    echo '" title="';
+    echo implode(', ', $vlans);
+    echo '">VLANs: ';
+    echo $vlan_count;
+    echo '</a></span></p>';
+} elseif ($vlan_count == 1 || $port['ifVlan']) {
+    echo '<p class=box-desc><span class=blue>VLAN: ';
+    echo ($vlans[0] ?: $port['ifVlan']);
+    echo '</span></p>';
+} elseif ($port['ifVrf']) {
+    $vrf = dbFetchRow('SELECT * FROM vrfs WHERE vrf_id = ?', array($port['ifVrf']));
+    echo "<p style='color: green;'>".$vrf['vrf_name'].'</p>';
 }//end if
 
 if ($port_adsl['adslLineCoding']) {
