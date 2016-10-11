@@ -1,31 +1,26 @@
 <?php
 
 if ($device['os'] == 'f5') {
-    $f5 = null;
+    $f5_chassis = array();
     // Get the Chassis Temperature values
     //Pull the sysChassisTempTable table from the snmpwalk
-    $f5 = snmpwalk_cache_oid($device, 'sysChassisTempTable', array(), 'F5-BIGIP-SYSTEM-MIB');
+    $f5_chassis = snmpwalk_cache_multi_oid($device, 'sysChassisTempTable', array(), 'F5-BIGIP-SYSTEM-MIB');
 
-    if (is_array($f5)) {
+    if (is_array($f5_chassis)) {
         echo "sysChassisTempTable ";
 
-        foreach (array_keys($f5) as $index) {
-            $descr           = "sysChassisTempTemperature.".$f5[$index]['sysChassisTempIndex'];
-            $current         = $f5[$index]['sysChassisTempTemperature'];
+        foreach (array_keys($f5_chassis) as $index) {
+            $descr           = "sysChassisTempTemperature.".$f5_chassis[$index]['sysChassisTempIndex'];
+            $current         = $f5_chassis[$index]['sysChassisTempTemperature'];
             $sensorType      = 'f5';
             $oid             = '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.'.$index;
-            $low_limit       =  null;
-            $low_warn_limit  =  null;
-            $high_warn_limit =  null;
-            $high_limit      =  null;
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
         }
     }
 
     // Get the CPU Temperature values
-    $f5cpu = null;
-    //    $f5cpu = snmpwalk_cache_oid($device, 'sysCpuSensorTemperature', array(), 'F5-BIGIP-SYSTEM-MIB');
+    $f5cpu = array();
     $f5cpu = snmpwalk_cache_multi_oid($device, 'sysCpuSensorTemperature', array(), 'F5-BIGIP-SYSTEM-MIB');
 
     if (is_array($f5cpu)) {
@@ -41,12 +36,8 @@ if ($device['os'] == 'f5') {
             $current         = $f5cpu[$index]['sysCpuSensorTemperature'];
             $sensorType      = 'f5';
             $oid             = '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.'.$index;
-            $low_limit       =  null;
-            $low_warn_limit  =  null;
-            $high_warn_limit =  null;
-            $high_limit      =  null;
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
         }
     }
 }//end if
