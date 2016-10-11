@@ -4,7 +4,7 @@
 if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
     echo("RFC1628 ");
 
-    $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.4.3.0", "-OsqnU"));
+    $oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.4.3.0", "-OsqnU"));
     d_echo($oids."\n");
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -21,11 +21,11 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     }
 
-    $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
+    $oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
     d_echo($oids."\n");
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
-        $current_oid   = "1.3.6.1.2.1.33.1.3.3.1.5.$i";
+        $current_oid   = ".1.3.6.1.2.1.33.1.3.3.1.5.$i";
         $descr      = "Input";
         if ($numPhase > 1) {
             $descr .= " Phase $i";
@@ -38,7 +38,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     }
 
-    $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
+    $oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
     d_echo($oids."\n");
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {

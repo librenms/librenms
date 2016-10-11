@@ -11,6 +11,7 @@ if ($_POST['editing']) {
         $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
         $port_assoc_mode = mres($_POST['port_assoc_mode']);
         $max_repeaters = mres($_POST['max_repeaters']);
+        $max_oid      = mres($_POST['max_oid']);
         $v3           = array(
             'authlevel'  => mres($_POST['authlevel']),
             'authname'   => mres($_POST['authname']),
@@ -49,6 +50,7 @@ if ($_POST['editing']) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = false;
+            $max_oid_set = false;
 
             if (is_numeric($max_repeaters) && $max_repeaters != 0) {
                 set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
@@ -58,12 +60,25 @@ if ($_POST['editing']) {
                 $max_repeaters_set = true;
             }
 
+            if (is_numeric($max_oid) && $max_oid != 0) {
+                set_dev_attrib($device, 'snmp_max_oid', $max_oid);
+                $max_oid_set = true;
+            } else {
+                del_dev_attrib($device, 'snmp_max_oid');
+                $max_oid_set = true;
+            }
+
             if ($rows_updated > 0) {
                 $update_message = $rows_updated.' Device record updated.';
                 $updated        = 1;
             } elseif ($rows_updated = '-1') {
-                if ($max_repeaters_set === true) {
-                    $update_message = 'SNMP Max repeaters updated, no other changes made';
+                if ($max_repeaters_set === true || $max_repeaters_set === true) {
+                    if ($max_repeaters_set === true) {
+                        $update_message = 'SNMP Max repeaters updated, no other changes made';
+                    }
+                    if ($max_oid_set === true) {
+                        $update_message .= '<br />SNMP Max OID updated, no other changes made';
+                    }
                 } else {
                     $update_message = 'Device record unchanged. No update necessary.';
                 }
@@ -89,6 +104,7 @@ if ($updated && $update_message) {
 }
 
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+$max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
@@ -153,6 +169,12 @@ echo "        </select>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
         <div class='col-sm-1'>
             <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max rep' />
+        </div>
+    </div>
+    <div class='form-group'>
+        <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
+        <div class='col-sm-1'>
+            <input id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
         </div>
     </div>
     <div id='snmpv1_2'>

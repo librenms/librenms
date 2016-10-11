@@ -5,24 +5,24 @@ if ($device['os'] == 'ipoman') {
     echo ' IPOMANII-MIB ';
 
     if (!is_array($cache['ipoman'])) {
-        echo 'outletConfigDesc ';
+        d_echo('outletConfigDesc ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', $cache['ipoman']['out'], 'IPOMANII-MIB');
-        echo 'outletConfigLocation ';
+        d_echo('outletConfigLocation ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigLocation', $cache['ipoman']['out'], 'IPOMANII-MIB');
-        echo 'inletConfigDesc ';
+        d_echo('inletConfigDesc ');
         $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, 'inletConfigDesc', $cache['ipoman'], 'IPOMANII-MIB');
     }
 
     $oids_in  = array();
     $oids_out = array();
 
-    echo 'inletConfigCurrentHigh ';
+    d_echo('inletConfigCurrentHigh ');
     $oids_in = snmpwalk_cache_multi_oid($device, 'inletConfigCurrentHigh', $oids_in, 'IPOMANII-MIB');
-    echo 'inletStatusCurrent ';
+    d_echo('inletStatusCurrent ');
     $oids_in = snmpwalk_cache_multi_oid($device, 'inletStatusCurrent', $oids_in, 'IPOMANII-MIB');
-    echo 'outletConfigCurrentHigh ';
+    d_echo('outletConfigCurrentHigh ');
     $oids_out = snmpwalk_cache_multi_oid($device, 'outletConfigCurrentHigh', $oids_out, 'IPOMANII-MIB');
-    echo 'outletStatusCurrent ';
+    d_echo('outletStatusCurrent ');
     $oids_out = snmpwalk_cache_multi_oid($device, 'outletStatusCurrent', $oids_out, 'IPOMANII-MIB');
 
     if (is_array($oids_in)) {

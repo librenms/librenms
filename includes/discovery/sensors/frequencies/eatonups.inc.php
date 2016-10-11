@@ -26,7 +26,7 @@ if ($device['os'] == 'eatonups') {
     $oids = snmpwalk_cache_oid($device, 'xupsOutputFrequency', array(), 'XUPS-MIB');
 
     foreach ($oids as $freq_id => $data) {
-        $freq_oid = "1.3.6.1.4.1.534.1.4.2.$freq_id";
+        $freq_oid = ".1.3.6.1.4.1.534.1.4.2.$freq_id";
         $descr = 'Output';
         if (count($oids) > 1) {
             $descr .= " Phase $freq_id";
@@ -43,7 +43,7 @@ if ($device['os'] == 'eatonups') {
     $oids = snmpwalk_cache_oid($device, 'xupsBypassFrequency', array(), 'XUPS-MIB');
 
     foreach ($oids as $freq_id => $data) {
-        $freq_oid = "1.3.6.1.4.1.534.1.5.1.$freq_id";
+        $freq_oid = ".1.3.6.1.4.1.534.1.5.1.$freq_id";
         $descr = 'Bypass';
         if (count($oids) > 1) {
             $descr .= " Phase $freq_id";
