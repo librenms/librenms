@@ -71,8 +71,6 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
     }
 
-
-
     if (isset($wificlients1) && $wificlients1 != '') {
         $tags = array(
             'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
