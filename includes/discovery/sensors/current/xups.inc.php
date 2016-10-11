@@ -14,7 +14,7 @@ if ($device['os'] == 'powerware') {
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $current_id       = $split_oid[(count($split_oid) - 1)];
-            $current_oid      = "1.3.6.1.4.1.534.1.2.3.$current_id";
+            $current_oid      = ".1.3.6.1.4.1.534.1.2.3.$current_id";
             $divisor          = 1;
             $current          = snmp_get($device, $current_oid, '-O vq');
             $descr            = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
@@ -30,7 +30,7 @@ if ($device['os'] == 'powerware') {
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
-        $current_oid = "1.3.6.1.4.1.534.1.4.4.1.3.$i";
+        $current_oid = ".1.3.6.1.4.1.534.1.4.4.1.3.$i";
         $descr   = 'Output';
         if ($numPhase > 1) {
             $descr .= " Phase $i";
@@ -49,7 +49,7 @@ if ($device['os'] == 'powerware') {
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
-        $current_oid = "1.3.6.1.4.1.534.1.3.4.1.3.$i";
+        $current_oid = ".1.3.6.1.4.1.534.1.3.4.1.3.$i";
         $descr       = 'Input';
         if ($numPhase > 1) {
             $descr .= " Phase $i";

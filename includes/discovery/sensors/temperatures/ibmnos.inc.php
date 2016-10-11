@@ -5,12 +5,12 @@ if (strstr($device['sysDescr'], 'IBM Flex System Fabric')) {
             $index = 0;
         echo 'IBM Flex System Fabric ';
         $temps = array();
-        $temps['1.3.6.1.4.1.20301.2.5.1.3.1.22.0'] = 'Temperature Sensor 1';
-        $temps['1.3.6.1.4.1.20301.2.5.1.3.1.23.0'] = 'Temperature Sensor 2';
-        $temps['1.3.6.1.4.1.20301.2.5.1.3.1.26.0'] = 'Temperature Sensor 3';
-        $temps['1.3.6.1.4.1.20301.2.5.1.3.1.27.0'] = 'Temperature Sensor 4';
+        $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.22.0'] = 'Temperature Sensor 1';
+        $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.23.0'] = 'Temperature Sensor 2';
+        $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.26.0'] = 'Temperature Sensor 3';
+        $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.27.0'] = 'Temperature Sensor 4';
         if (strstr($device['hardware'], 'EN4093R 10Gb Scalable Switch')) {
-            $temps['1.3.6.1.4.1.20301.2.5.1.3.1.36.0'] = 'Temperature Sensor 5';
+            $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.36.0'] = 'Temperature Sensor 5';
         }
 
         foreach ($temps as $obj => $descr) {

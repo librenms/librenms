@@ -4,7 +4,7 @@ if ($device['os'] == 'xos') {
     echo(" EXTREME-BASE-MIB ");
 
     // Fan Speed
-    $oid = "1.3.6.1.4.1.1916.1.1.1.9.1.4";
+    $oid = ".1.3.6.1.4.1.1916.1.1.1.9.1.4";
     $oids = snmpwalk_cache_multi_oid($device, $oid, array(), "EXTREME-BASE-MIB");
 
     foreach ($oids as $index => $entry) {
@@ -13,7 +13,7 @@ if ($device['os'] == 'xos') {
         $index = $matches[1];
         // substract 100 from index to start from 1 instead of 101
         $modindex = ($index - 100);
-        $oid = "1.3.6.1.4.1.1916.1.1.1.9.1.4.$index";
+        $oid = ".1.3.6.1.4.1.1916.1.1.1.9.1.4.$index";
         $value = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
         $descr = "Fan Speed $modindex";
         // round function used to round limit values to hundreds to avoid h/w/l limits being changed on every discovery as a change of 1rpm for fan speed would cause the limit values to change since they're dynamically calculated

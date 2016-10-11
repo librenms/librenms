@@ -13,11 +13,10 @@
 if ($device['os'] == 'riverbed') {
     d_echo('Riverbed');
 
-    $oid = 'systemTemperature.0';
-    $mib = 'STEELHEAD-MIB';
+    $oid = '.1.3.6.1.4.1.17163.1.1.2.9.0';
     $descr = 'System Temperature';
     $index = $oid;
-    $temp = snmp_get($device, $oid, 'Oqv', $mib);
+    $temp = snmp_get($device, $oid, 'Oqv');
 
     if (is_numeric($temp)) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'riverbed', $descr, '1', '1', 0, null, null, 65, $current);

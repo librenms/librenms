@@ -23,9 +23,9 @@ if ($device['os'] == 'apc') {
         $oids           = snmp_get($device, $item['HighPrecOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
         if (empty($oids)) {
             $oids        = snmp_get($device, $item['AdvOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
-            $current_oid = $item['AdvOid'];
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.3';
         } else {
-            $current_oid = $item['HighPrecOid'];
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.3';
         }
 
         if (!empty($oids)) {
