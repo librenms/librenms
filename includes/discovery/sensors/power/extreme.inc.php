@@ -5,7 +5,7 @@ if ($device['os'] == 'xos') {
     echo(" EXTREME-BASE-MIB ");
     // Power Usage
     $descr   = "Power Usage";
-    $oid     = "1.3.6.1.4.1.1916.1.1.1.40.1.0"; // extremeSystemPowerUsage
+    $oid     = ".1.3.6.1.4.1.1916.1.1.1.40.1.0"; // extremeSystemPowerUsage
     $value   = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
     $divisor = "1000";
 

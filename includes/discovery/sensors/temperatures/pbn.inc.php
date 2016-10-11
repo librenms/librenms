@@ -16,7 +16,7 @@ if ($device['os'] == 'pbn' || $device['os_group'] == 'pbn') {
     $divisor    = 256;
     foreach ($pbn_oids as $index => $entry) {
         if (is_numeric($entry['temperature']) && ($entry['temperature'] !== '-65535')) {
-            $oid = 'NMS-IF-MIB::temperature.'.$index;
+            $oid = '.1.3.6.1.4.1.11606.10.9.63.1.7.1.4.'.$index;
             $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Temperature';
             $limit_low = -256;
             $warn_limit_low = 10;
