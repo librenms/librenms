@@ -30,15 +30,24 @@ foreach ($vlans as $vlan) {
 
     echo '<td>'.$vlan['cost'].'</td><td>'.$vlan['priority']."</td><td class=$class>".$vlan['state'].'</td>';
 
+    $traverse_ifvlan = true;
     $vlan_ports = array();
     $otherports = dbFetchRows('SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id', array($device['device_id'], $vlan['vlan']));
     foreach ($otherports as $otherport) {
+        if ($otherport['untagged']) {
+            $traverse_ifvlan = false;
+        }
         $vlan_ports[$otherport[ifIndex]] = $otherport;
     }
 
-    $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan']));
-    foreach ($otherports as $otherport) {
-        $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+    if ($traverse_ifvlan) {
+        $otherports = dbFetchRows(
+            'SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?',
+            array($device['device_id'], $vlan['vlan'])
+        );
+        foreach ($otherports as $otherport) {
+            $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+        }
     }
 
     ksort($vlan_ports);

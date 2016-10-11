@@ -1,7 +1,7 @@
 <?php
 
 if ($device['os_group'] == 'cisco') {
-    echo 'Cisco VLANs : ';
+    echo "Cisco VLANs:\n";
 
     // Not sure why we check for VTP, but this data comes from that MIB, so...
     $vtpversion = snmp_get($device, 'vtpVersion.0', '-OnvQ', 'CISCO-VTP-MIB');
@@ -11,9 +11,9 @@ if ($device['os_group'] == 'cisco') {
         $vlans      = snmpwalk_cache_twopart_oid($device, 'vtpVlanEntry', array(), 'CISCO-VTP-MIB');
 
         foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
-            echo 'VTP Domain  '.$vtpdomain_id.' '.$vtpdomain['managementDomainName'].' ';
+            echo 'VTP Domain '.$vtpdomain_id.' '.$vtpdomain['managementDomainName'].' ';
             foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan) {
-                echo " $vlan_id";
+                d_echo(" $vlan_id");
                 if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
                     echo '.';
                 } else {
@@ -22,7 +22,7 @@ if ($device['os_group'] == 'cisco') {
                 }
                 $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
             }
+            echo PHP_EOL;
         }
     }
-    echo "\n";
 }
