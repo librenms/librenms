@@ -20,7 +20,7 @@ if ($device['os'] == 'f5') {
             $descr            = 'Fan Speed '.$index;
             $oid              = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.'.$index;
 #            $fanspeed         = (snmp_get($device, $oid, '-Oqv') / $divisor);
-            $fanspeed         = ($oids[$index]['sysChassisFanSpeed']) / $divisor);
+            $fanspeed         = ($oids[$index]['sysChassisFanSpeed']) / $divisor;
             if ($fanspeed > 0) {
                 discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $fanspeed);
             }
