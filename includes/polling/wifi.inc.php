@@ -61,6 +61,14 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1', '-Ovq', '""');
 
         echo (($wificlients1 + 0).' clients on wireless connector, ');
+    } else if ($device['os'] == 'unifi') {
+        echo 'Checking Unifi Wireless clients... ';
+
+        $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.41112.1.6.1.2.1.8.0', '-Ovq', '""');
+        $wificlients2 = snmp_get($device, '.1.3.6.1.4.1.41112.1.6.1.2.1.8.1', '-Ovq', '""');
+
+        echo (($wificlients1 + 0).' clients on radio0, '.($wificlients2 + 0)." clients on radio1\n");
+
     }
 
     if (isset($wificlients1) && $wificlients1 != '') {
