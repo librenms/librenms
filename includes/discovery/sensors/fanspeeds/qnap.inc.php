@@ -27,7 +27,7 @@ if ($device['os'] == 'qnap') {
             $index = str_replace($speed_oid, '', $index);
             $fan_speed = $entry['enterprises'];
             $fan_serial = str_replace('"', '', $fans_descr[$descr_oid . $index]['enterprises']);
-            discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_speed_oid.$index, $index, 'snmp', $fan_serial, '1', '1', null, null, null, null, $fan_speed);
+            discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_speed_oid . '.' . $index, $index, 'snmp', $fan_serial, '1', '1', null, null, null, null, $fan_speed);
         }
     }
 }
