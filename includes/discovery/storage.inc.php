@@ -5,7 +5,7 @@ $include_dir = 'includes/discovery/storage';
 require 'includes/include-dir.inc.php';
 
 // Remove storage which weren't redetected here
-$sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."'";
+$sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."' AND storage_ignore = `0`";
 
 d_echo($valid_storage);
 
