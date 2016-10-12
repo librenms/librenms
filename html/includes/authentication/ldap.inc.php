@@ -38,7 +38,7 @@ function authenticate($username, $password)
                 }
             }
         } elseif (!isset($password) || $password == '') {
-           echo "A password is required"; 
+            echo 'A password is required';
         } else {
             echo ldap_error($ldap_connection);
         }
