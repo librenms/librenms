@@ -45,9 +45,9 @@ function poll_sensor($device, $class, $unit)
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require_once 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
+            } else {
+                $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
             }
-
-            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
 
             if ($class == 'temperature') {
                 preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
