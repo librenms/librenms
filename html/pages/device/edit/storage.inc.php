@@ -45,20 +45,20 @@
         url: "ajax_table.php",
         formatters: {
             "perc_update": function(column,row) {
-                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_perc_warn' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_perc='"+row.storage_perc_warn+"' value='"+row.storage_perc_warn+"'></div>";
+                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_perc_warn_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_perc='"+row.storage_perc_warn+"' value='"+row.storage_perc_warn+"'></div>";
             },
             "descr": function(column,row) {
-                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_descr' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_descr='"+row.storage_descr+"' value='"+row.storage_descr+"'></div>";
+                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_descr_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_descr='"+row.storage_descr+"' value='"+row.storage_descr+"'></div>";
             },
             "ignore": function(column,row) {
                 if (row.storage_ignore == 1) {
-                    var checkedyes = "selected=\"selected\"";
+                    var checkedyes = "selected='selected'";
                     var checkedno = "";
                 } else {
                     var checkedyes = "";
-                    var checkedno = "selected=\"selected\"";
+                    var checkedno = "selected='selected'";
                 }
-                return "<div class='form-group'><select class='form-control input-sm storage' id='storage_ignore' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"'><option value='1' "+checkedyes+">yes</option><option value='0' "+checkedno+">no</option></select></div>";
+                return "<div class='form-group'><select class='form-control input-sm storage' id='storage_ignore_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"'><option value='1' "+checkedyes+">yes</option><option value='0' "+checkedno+">no</option></select></div>";
             }
         },
         templates: {
@@ -70,13 +70,13 @@
             var storage_id = $(this).data("storage_id");
 
             var storage_descr = $(this).data("storage_descr");
-            storage_descr = $('#storage_descr').val();
+            storage_descr = $('#storage_descr_'+storage_id).val();
 
             var storage_ignore = $(this).data("storage_ignore");
-            storage_ignore = $('#storage_ignore').val();
+            storage_ignore = $('#storage_ignore_'+storage_id).val();
 
             var data = $(this).data("storage_perc_warn");
-            data = $('#storage_perc_warn').val();
+            data = $('#storage_perc_warn_'+storage_id).val();
 
             var $this = $(this);
             $.ajax({

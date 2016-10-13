@@ -28,6 +28,8 @@ $message = 'Error updating storage information';
 $device_id = mres($_POST['device_id']);
 $storage_id = mres($_POST['storage_id']);
 $data = mres($_POST['data']);
+$storage_descr = mres($_POST['storage_descr']);
+$storage_ignore = mres($_POST['storage_ignore']);
 
 if (!is_numeric($device_id)) {
     $message = 'Missing device id';
@@ -36,7 +38,7 @@ if (!is_numeric($device_id)) {
 } elseif (!is_numeric($data)) {
     $message = 'Missing value';
 } else {
-    if (dbUpdate(array('storage_perc_warn'=>$data), 'storage', '`storage_id`=? AND `device_id`=?', array($storage_id,$device_id))) {
+    if (dbUpdate(array('storage_perc_warn'=>$data, 'storage_descr'=>$storage_descr, 'storage_ignore'=>$storage_ignore), 'storage', '`storage_id`=? AND `device_id`=?', array($storage_id,$device_id))) {
         $message = 'Storage information updated';
         $status = 'ok';
     } else {
