@@ -5,11 +5,8 @@ $toner_data = dbFetchRows('SELECT * FROM toner WHERE device_id = ?', array($devi
 foreach ($toner_data as $toner) {
     echo 'Checking toner '.$toner['toner_descr'].'... ';
 
-    if ($toner['toner_capacity_oid']) {
-        $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], '-OUqnv');
-    }
-
-    $tonerperc = round((snmp_get($device, $toner['toner_oid'], '-OUqnv') / $toner['toner_capacity'] * 100));
+    $raw_toner = snmp_get($device, $toner['toner_oid'], '-OUqnv');
+    $tonerperc = get_toner_levels($device, $raw_toner, $toner['toner_capacity']);
     echo $tonerperc." %\n";
 
     $tags = array(
@@ -20,7 +17,11 @@ foreach ($toner_data as $toner) {
     );
     data_update($device, 'toner', $tags, $tonerperc);
 
-    // FIXME should report for toner out... :)
+    // Log empty supplies (but only once)
+    if ($tonerperc == 0 && $toner['toner_current'] > 0) {
+        log_event('Toner '.$toner['toner_descr'].' is empty', $device, 'toner', $toner['toner_id']);
+    }
+
     // Log toner swap
     if ($tonerperc > $toner['toner_current']) {
         log_event('Toner '.$toner['toner_descr'].' was replaced (new level: '.$tonerperc.'%)', $device, 'toner', $toner['toner_id']);
