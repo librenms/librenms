@@ -16,7 +16,7 @@ if ($device['os_group'] == 'printer') {
 
     //samsung ml series does not responde to snmpwalk
     if ($os == 'samsungprinter' && str_contains($device['sysDescr'], 'Samsung ML')) {
-        $toner_oid = '.1.3.6.1.2.1.43.12.1.1.4.1.1';
+        $toner_oid = '.1.3.6.1.2.1.43.11.1.1.9.1.1';
         $descr_oid = '.1.3.6.1.2.1.43.11.1.1.6.1.1';
         $capacity_oid = '.1.3.6.1.2.1.43.11.1.1.8.1.1';
         $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqv'))));
@@ -45,7 +45,7 @@ if ($device['os_group'] == 'printer') {
                         $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
                     }
 
-                    $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqv'))));
+                    $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqva'))));
 
                     if ($descr != '') {
                         $oid_toner = snmp_get($device, $toner_oid, '-Oqv');
@@ -55,9 +55,6 @@ if ($device['os_group'] == 'printer') {
                         $current = get_toner_levels($device, $oid_toner, $oid_capacity);
 
                         $type = 'jetdirect';
-                        if (isHexString($descr)) {
-                            $descr = preg_replace('/[^ \w]+/', '', snmp_hexstring($descr));
-                        }
 
                         discover_toner($valid_toner, $device, $toner_oid, $index, $type, $descr, $capacity_oid, $capacity, $current);
                     }
