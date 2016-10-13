@@ -18,8 +18,9 @@
 #######################################
 # CONSTANTS
 #######################################
-LOG_DIR=$(php -r "include '/opt/librenms/config.php'; isset(\$config['log_dir']) ? print \$config['log_dir'] : print \$config['install_dir'] . '/logs';");
 DIR_LIBRENMS=$(dirname "$0");
+LOG_DIR=$(php -r "include '${DIR_LIBRENMS}/config.php'; isset(\$config['log_dir']) ? print \$config['log_dir'] : print \$config['install_dir'] . '/logs';");
+
 
 #######################################
 # Fancy-Print and run commands
