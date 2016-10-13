@@ -14,32 +14,35 @@
 if ($device['os_group'] == "cisco") {
     // Total
     $total = 0;
-    foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", null) as $key => $value) {
-        $total += $value[''];
-    }
-
-    if (isset($total) && ($total != "") && ($total != 0)) {
-        // Active
-        $active = 0;
-        foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.7", null) as $key => $value) {
-            $active += $value[''];
+    $output = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", null);
+    if (is_array($output)) {
+        foreach ($output as $key => $value) {
+            $total += $value[''];
         }
 
-        $rrd_def = array(
-            'DS:total:GAUGE:600:0:U',
-            'DS:active:GAUGE:600:0:U'
-        );
+        if (isset($total) && $total > 0) {
+            // Active
+            $active = 0;
+            foreach (snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.7", null) as $key => $value) {
+                $active += $value[''];
+            }
 
-        $fields = array(
-            'total'  => $total,
-            'active' => $active,
-        );
+            $rrd_def = array(
+                'DS:total:GAUGE:600:0:U',
+                'DS:active:GAUGE:600:0:U'
+            );
 
-        $tags = compact('rrd_def');
-        data_update($device, 'cisco-iosdsp', $tags, $fields);
+            $fields = array(
+                'total' => $total,
+                'active' => $active,
+            );
 
-        $graphs['cisco-iosdsp'] = true;
-        echo (" Cisco IOS DSP ");
+            $tags = compact('rrd_def');
+            data_update($device, 'cisco-iosdsp', $tags, $fields);
+
+            $graphs['cisco-iosdsp'] = true;
+            echo(" Cisco IOS DSP ");
+        }
+        unset($rrd_def, $total, $active, $tags, $fields);
     }
-    unset($rrd_def, $total, $active, $tags, $fields);
 }

@@ -16,7 +16,7 @@ if ($device['os_group'] == "cisco") {
     $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.1.0", null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.7.1.0'][''];
 
-    if (isset($total) && ($total != "") && ($total != 0)) {
+    if (isset($total) && $total > 0) {
         // Available
         $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.7.2.0", null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.7.2.0'][''];
@@ -35,7 +35,7 @@ if ($device['os_group'] == "cisco") {
         );
 
         $tags = compact('rrd_def');
-        dat_update($device, 'cisco-iosxcode', $tags, $fields);
+        data_update($device, 'cisco-iosxcode', $tags, $fields);
 
         $graphs['cisco-iosxcode'] = true;
         echo (" Cisco IOS Transcoder ");
