@@ -25,7 +25,7 @@ function authenticate($username, $password)
 
     if ($ldap_connection) {
         // bind with sAMAccountName instead of full LDAP DN
-        if ($username && ldap_bind($ldap_connection, "{$username}@{$config['auth_ad_domain']}", $password)) {
+        if ($username && $password && ldap_bind($ldap_connection, "{$username}@{$config['auth_ad_domain']}", $password)) {
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership']) {
@@ -66,7 +66,9 @@ function authenticate($username, $password)
         }
     }
 
-    if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+    if (!isset($password) || $password == '') {
+        $auth_error = "A password is required";
+    } elseif (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
         ldap_get_option($ldap_connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
         $auth_error = ldap_error($ldap_connection).'<br />'.$extended_error;
     } else {
