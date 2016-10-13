@@ -404,6 +404,10 @@ function sensor_limit($class, $current)
         case 'signal':
             $limit = -30;
             break;
+
+        case 'load':
+            $limit = 80;
+            break;
     }//end switch
 
     return $limit;

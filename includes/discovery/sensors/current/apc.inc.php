@@ -218,17 +218,18 @@ if ($device['os'] == 'apc') {
             'mib'         => '+PowerNet-MIB',
         ),
     );
+
     foreach ($oid_array as $item) {
-        $low_limit      = null;
-        $low_limit_warn = null;
-        $warn_limit     = null;
-        $high_limit     = null;
         $oids           = snmp_get($device, $item['HighPrecOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
         if (empty($oids)) {
             $oids        = snmp_get($device, $item['AdvOid'].'.'.$item['index'], '-OsqnU', $item['mib']);
             $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.2.4';
+            $current = $oids;
+            $item['divisor'] = 1;
         } else {
             $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.4';
+            $value = explode(" ", $oids);
+            $current = $value[1]/$item['divisor'];
         }
 
         if (!empty($oids)) {
@@ -239,14 +240,7 @@ if ($device['os'] == 'apc') {
                 echo $item['type'].' '.$item['mib'].' UPS';
             }
 
-            if (stristr($current_oid, 'HighPrec')) {
-                $current = ($oids / $item['divisor']);
-            } else {
-                $current         = $oids;
-                $item['divisor'] = 1;
-            }
-
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid.'.'.$item['index'], $current_oid.'.'.$item['index'], $item['type'], $item['descr'], $item['divisor'], 1, $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid.'.'.$item['index'], $current_oid.'.'.$item['index'], $item['type'], $item['descr'], $item['divisor'], 1, null, null, null, null, $current);
         }
     }
 }
