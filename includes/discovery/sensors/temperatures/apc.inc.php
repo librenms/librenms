@@ -1,11 +1,11 @@
 <?php
 
 if ($device['os'] == 'apc') {
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
-    d_echo($oids."\n");
+    echo 'APC ';
+    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
 
     if ($oids) {
-        echo 'APC UPS Internal ';
+        d_echo('Internal ');
         list($oid,$current) = explode(' ', $oids);
         $precision          = 1;
         $sensorType         = 'apc';
@@ -18,33 +18,35 @@ if ($device['os'] == 'apc') {
     // Environmental monitoring on UPSes etc
     // FIXME emConfigProbesTable may also be used? But not filled out on my device...
     $apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', array(), 'PowerNet-MIB');
-    $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB');
+    if (!empty($apc_env_data)) {
+        $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB');
+    }
 
-    foreach (array_keys($apc_env_data) as $index) {
-        $descr           = $apc_env_data[$index]['iemStatusProbeName'];
-        $current         = $apc_env_data[$index]['iemStatusProbeCurrentTemp'];
+    foreach ($apc_env_data as $index => $data) {
+        $descr           = $data['iemStatusProbeName'];
+        $current         = $data['iemStatusProbeCurrentTemp'];
         $sensorType      = 'apc';
         $oid             = '.1.3.6.1.4.1.318.1.1.10.2.3.2.1.4.'.$index;
-        $low_limit       = ($apc_env_data[$index]['iemConfigProbeMinTempEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeMinTempThreshold'] : null);
-        $low_warn_limit  = ($apc_env_data[$index]['iemConfigProbeLowTempEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeLowTempThreshold'] : null);
-        $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighTempEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeHighTempThreshold'] : null);
-        $high_limit      = ($apc_env_data[$index]['iemConfigProbeMaxTempEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeMaxTempThreshold'] : null);
+        $low_limit       = ($data['iemConfigProbeMinTempEnable'] != 'disabled' ? $data['iemConfigProbeMinTempThreshold'] : null);
+        $low_warn_limit  = ($data['iemConfigProbeLowTempEnable'] != 'disabled' ? $data['iemConfigProbeLowTempThreshold'] : null);
+        $high_warn_limit = ($data['iemConfigProbeHighTempEnable'] != 'disabled' ? $data['iemConfigProbeHighTempThreshold'] : null);
+        $high_limit      = ($data['iemConfigProbeMaxTempEnable'] != 'disabled' ? $data['iemConfigProbeMaxTempThreshold'] : null);
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 
     $apc_env_data = snmpwalk_cache_oid($device, 'emsProbeStatus', array(), 'PowerNet-MIB');
 
-    foreach (array_keys($apc_env_data) as $index) {
-        if ($apc_env_data[$index]['emsProbeStatusProbeCommStatus'] != 'commsNeverDiscovered') {
-            $descr = $apc_env_data[$index]['emsProbeStatusProbeName'];
-            $current = $apc_env_data[$index]['emsProbeStatusProbeTemperature'];
+    foreach ($apc_env_data as $index => $data) {
+        if ($data['emsProbeStatusProbeCommStatus'] != 'commsNeverDiscovered') {
+            $descr = $data['emsProbeStatusProbeName'];
+            $current = $data['emsProbeStatusProbeTemperature'];
             $sensorType = 'apc';
             $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.3.' . $index;
-            $low_limit = $apc_env_data[$index]['emsProbeStatusProbeMinTempThresh'];
-            $low_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeLowTempThresh'];
-            $high_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeHighTempThresh'];
-            $high_limit = $apc_env_data[$index]['emsProbeStatusProbeMaxTempThresh'];
+            $low_limit = $data['emsProbeStatusProbeMinTempThresh'];
+            $low_warn_limit = $data['emsProbeStatusProbeLowTempThresh'];
+            $high_warn_limit = $data['emsProbeStatusProbeHighTempThresh'];
+            $high_limit = $data['emsProbeStatusProbeMaxTempThresh'];
 
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
@@ -54,7 +56,7 @@ if ($device['os'] == 'apc') {
     // A silly check to find out if it's the right hardware.
     $oids = snmp_get($device, 'airIRRCGroupSetpointsCoolMetric.0', '-OsqnU', 'PowerNet-MIB');
     if ($oids) {
-        echo 'APC InRow Chiller ';
+        d_echo('InRow Chiller ');
         $temps = array();
         $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.7']            = 'Rack Inlet'; //airIRRCUnitStatusRackInletTempMetric
         $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.9']            = 'Supply Air'; //airIRRCUnitStatusSupplyAirTempMetric
@@ -71,14 +73,11 @@ if ($device['os'] == 'apc') {
     }
 
     // Portable Air Conditioner
-    $set_oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.4.0', '-OsqnU', '');
-
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.10.0', '-OsqnU', '');
-    d_echo($oids."\n");
-    d_echo($set_oids."\n");
+    $set_oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.4.0', '-OsqnU', '');
+    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.10.0', '-OsqnU', '');
 
     if ($oids !== false) {
-        echo 'APC Portable Supply Temp ';
+        d_echo('Portable Supply ');
         list($oid,$current_raw) = explode(' ', $oids);
         $precision              = 10;
         $current                = ($current_raw / $precision);
@@ -96,11 +95,10 @@ if ($device['os'] == 'apc') {
     }
 
     unset($oids);
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.12.0', '-OsqnU', '');
-    d_echo($oids."\n");
+    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.12.0', '-OsqnU', '');
 
     if ($oids !== false) {
-        echo 'APC Portable Return Temp ';
+        d_echo('Portable Return ');
         list($oid,$current_raw) = explode(' ', $oids);
         $precision              = 10;
         $current                = ($current_raw / $precision);
@@ -118,10 +116,10 @@ if ($device['os'] == 'apc') {
     }
 
     unset($oids);
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.13.2.2.14.0', '-OsqnU', '');
-    d_echo($oids."\n");
+    $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.13.2.2.14.0', '-OsqnU', '');
+
     if ($oids !== false) {
-        echo 'APC Portable Remote Temp ';
+        d_echo('Portable Remote ');
         list($oid,$current_raw) = explode(' ', $oids);
         $precision              = 10;
         $current                = ($current_raw / $precision);
