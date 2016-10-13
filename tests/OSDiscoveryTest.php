@@ -1146,6 +1146,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('samsungprinter', 'samsungprinter-scx');
         $this->checkOS('samsungprinter', 'samsungprinter-c');
         $this->checkOS('samsungprinter', 'samsungprinter-s');
+        $this->checkOS('samsungprinter', 'samsungprinter-ml');
     }
 
     public function testSanos()
