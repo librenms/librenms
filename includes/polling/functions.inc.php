@@ -12,7 +12,7 @@ function bulk_sensor_snmpget($device, $sensors)
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
-        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQn');
+        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQnt');
         $cache = array_merge($cache, $multi_response);
     }
     return $cache;
