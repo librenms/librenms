@@ -2,7 +2,7 @@
 
 $storage_cache = array();
 
-foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device['device_id'])) as $storage) {
+foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ? AND storage_ignore = ?', array($device['device_id'], 0)) as $storage) {
     $descr = $storage['storage_descr'];
     $mib = $storage['storage_mib'];
 
