@@ -23,13 +23,13 @@ if (is_array($eql_storage)) {
         $size = $storage['eqliscsiVolumeSize'] * $units;
         $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
         if (is_int($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $descr, $size, $units, $used);
         } else {
             // Trying to search the last '.' and take something after it as index
             $arrindex = explode(".", $index);
             $newindex = (int)(end($arrindex))+0;
             if (is_int($newindex)) {
-                discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
+                discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $descr, $size, $units, $used);
             }
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);

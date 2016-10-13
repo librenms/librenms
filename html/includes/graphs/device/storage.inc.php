@@ -28,7 +28,7 @@ foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device[
     }
 
     $descr        = rrdtool_escape($storage['storage_descr'], 12);
-    $rrd          = rrd_name($device['hostname'], array('storage', $storage['storage_mib'], $storage['storage_descr']));
+    $rrd          = rrd_name($device['hostname'], array('storage', $storage['storage_mib'], $storage['storage_descr_internal']));
     $rrd_options .= " DEF:$storage[storage_id]used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:$storage[storage_id]free=$rrd:free:AVERAGE";
     $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";
