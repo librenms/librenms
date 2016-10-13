@@ -12,7 +12,7 @@ function bulk_sensor_snmpget($device, $sensors)
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
-        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQn');
+        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQnt');
         $cache = array_merge($cache, $multi_response);
     }
     return $cache;
@@ -45,9 +45,9 @@ function poll_sensor($device, $class, $unit)
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require_once 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
-            } else {
-                $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
             }
+
+            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
 
             if ($class == 'temperature') {
                 preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
