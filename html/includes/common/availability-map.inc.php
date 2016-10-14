@@ -213,7 +213,7 @@ if (defined('SHOW_SETTINGS')) {
                     </a>';
                 } else {
                     if ($widget_settings['color_only_select'] == 1) {
-                        $deviceState = ' '; 
+                        $deviceState = ' ';
                         $deviceLabel .= ' widget-availability-fixed';
                     }
                     $temp_output[] = '
@@ -263,7 +263,7 @@ if (defined('SHOW_SETTINGS')) {
                         </a>';
                     } else {
                         if ($widget_settings['color_only_select'] == 1) {
-                            $serviceState = ' '; 
+                            $serviceState = ' ';
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
