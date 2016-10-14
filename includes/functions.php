@@ -1721,7 +1721,7 @@ function get_toner_levels($device, $raw_value, $capacity)
             return 0;
         }
     } elseif ($device['os'] == 'brother') {
-        if (!str_contains($device['hardware'], 'NC-8600h')) {
+        if (!str_contains($device['hardware'], 'MFC-L8850')) {
             switch ($raw_value) {
                 case '0':
                     return 100;
