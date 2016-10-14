@@ -39,7 +39,10 @@ switch ($type) {
         $rules = GetRules($device_id);
         $output = '';
         foreach ($rules as $rule) {
-            $sql = GenSQL($rule['rule']);
+            if (empty($rule['query'])) {
+                $rule['query'] = GenSQL($rule['rule']);
+            }
+            $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
             if (is_array($qry)) {
                 $response = 'matches';
@@ -48,6 +51,7 @@ switch ($type) {
             }
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
             $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
+            $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
         if ($config['alert']['transports']['mail'] === true) {
