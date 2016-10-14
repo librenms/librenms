@@ -50,6 +50,28 @@ switch ($type) {
             $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
+        if ($config['alert']['transports']['mail'] === true) {
+            $contacts = GetContacts($rules);
+            if (count($contacts) > 0) {
+                $output .= 'Found ' . count(contacts) . ' contacts to send alerts to.' . PHP_EOL;
+            }
+            foreach ($contacts as $email => $name) {
+                $output .= $name . '<' . $email . '>' . PHP_EOL;
+            }
+            $output .= PHP_EOL;
+        }
+        $transports = '';
+        $x = 0;
+        foreach ($config['alert']['transports'] as $name => $v) {
+            if ($config['alert']['transports'][$name] === true) {
+                $transports .= 'Transport: ' . $name . PHP_EOL;
+                $x++;
+            }
+        }
+        if (!empty($transports)) {
+            $output .= 'Found ' . $x . ' transports to send alerts to.' . PHP_EOL;
+            $output .= $transports;
+        }
         break;
     default:
         echo 'You must specify a valid type';
