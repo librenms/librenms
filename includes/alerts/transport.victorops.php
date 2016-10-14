@@ -44,6 +44,7 @@ foreach( $obj['faults'] as $fault=>$data ) {
 }
 
 $curl = curl_init();
+set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_URL, $url );
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type'=> 'application/json'));
