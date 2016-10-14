@@ -93,13 +93,30 @@ $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
 
+#### Proxy support
+
+For alerting and the callback functionality, we support the use of a http proxy setting. 
+These can be any one of the following:
+
+```php
+$config['callback_proxy'] = 'proxy.domain.com';
+$config['http_proxy']     = 'proxy.domain.com';
+```
+
+We can also make use of one of these environment variables which can be set in `/etc/environment`:
+
+```bash
+http_proxy=proxy.domain.com
+https_proxy=proxy.domain.com
+```
+
 #### Memcached
 
-[Memcached](../Extensions/Memcached.md]
+[Memcached](../Extensions/Memcached.md)
 
 #### RRDCached
 
-[RRDCached](../Extensions/RRDCached.md]
+[RRDCached](../Extensions/RRDCached.md)
 
 #### WebUI Settings
 
