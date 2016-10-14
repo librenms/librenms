@@ -27,7 +27,7 @@ if (!empty($opts['from'])) {
 }
 $url  = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($data);
 $curl = curl_init($url);
-
+set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
