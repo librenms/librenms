@@ -172,7 +172,7 @@ function RunFollowUp()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
         if (empty($alert['rule']) || !IsRuleValid($tmp[1], $tmp[0])) {
             // Alert-Rule does not exist anymore, let's remove the alert-state.
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
@@ -186,7 +186,10 @@ function RunFollowUp()
             continue;
         }
 
-        $chk   = dbFetchRows(GenSQL($alert['rule']), array($alert['device_id']));
+        if (empty($alert['query'])) {
+            $alert['query'] = GenSQL($alert['rule']);
+        }
+        $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
         $o     = sizeof($alert['details']['rule']);
         $n     = sizeof($chk);
         $ret   = 'Alert #'.$alert['id'];
