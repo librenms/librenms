@@ -35,4 +35,7 @@ if ($icon && $icon != $device['icon']) {
     log_event('Icon -> '.$icon, $device, 'system');
 }
 
-echo "\nHardware: ".$hardware.' Version: '.$version.' Features: '.$features.' Serial: '.$serial."\n";
+echo 'Hardware: ' . $hardware . PHP_EOL;
+echo 'Version: ' . $version . PHP_EOL;
+echo 'Features: ' . $features . PHP_EOL;
+echo 'Serial: ' . $serial . PHP_EOL;
