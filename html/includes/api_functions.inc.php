@@ -92,10 +92,18 @@ function get_port_stats_by_port_hostname()
     $hostname  = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
-    $stats     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
+    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
+
+    $port['in_rate'] = (formatRates($port['ifInOctets_rate'] * 8));
+    $port['out_rate'] = (formatRates($port['ifOutOctets_rate'] * 8));
+    $port['in_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $port['out_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
+    $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
+    
     $output    = array(
         'status' => 'ok',
-        'port'   => $stats,
+        'port'   => $port,
     );
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
