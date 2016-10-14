@@ -166,10 +166,10 @@ function poll_device($device, $options)
 
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
-        echo ' ('.$device['os_group'].')' . PHP_EOL;
+        echo ' ('.$device['os_group'].')';
     }
 
-    echo "\n";
+    echo PHP_EOL.PHP_EOL;
 
     unset($poll_update);
     unset($poll_update_query);
