@@ -82,6 +82,7 @@ else
         ;;
         cleanup)
             # Cleanups
+            php daily.php -f refresh_alert_rules
             php daily.php -f syslog
             php daily.php -f eventlog
             php daily.php -f authlog

@@ -169,7 +169,10 @@ function RunRules($device)
         }
         d_echo(PHP_EOL);
         $chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
-        $sql = GenSQL($rule['rule']);
+        if (empty($rule['query'])) {
+            $rule['query'] = GenSQL($rule['rule']);
+        }
+        $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
         if (isset($qry[0]['ip'])) {
             $qry[0]['ip'] = inet6_ntop($qry[0]['ip']);
