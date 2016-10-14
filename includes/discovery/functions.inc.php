@@ -929,7 +929,7 @@ function get_toner_levels($device, $oid_value, $oid_capacity)
             $current = ($oid_value / $oid_capacity * 100);
         }
     } elseif ($device['os'] == 'brother') {
-        if (str_contains($device['hardware'], 'NC-8600h')) {
+        if (str_contains($device['hardware'], 'MFC-L8850')) {
             switch ($oid_value) {
                 case '0':
                     $current = 0;
