@@ -156,6 +156,9 @@ function get_userlevel($username)
     global $config, $ldap_connection;
 
     $userlevel = 0;
+    if (isset($config['auth_ad_require_groupmembership']) && $config['auth_ad_require_groupmembership'] == 0 && isset($config['auth_ad_default_level'])) {
+        $userlevel = $config['auth_ad_default_level'];
+    }
 
     // Find all defined groups $username is in
     $search = ldap_search(
@@ -254,7 +257,7 @@ function get_userlist()
             'email'    => $userhash[$key]['email']
         );
     }
-    
+
     return $userlist;
 }
 
