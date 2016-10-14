@@ -811,8 +811,7 @@ function snmp_hexstring($hex)
 }
 
 # Check if the supplied string is an SNMP hex string
-function
-isHexString($str)
+function isHexString($str)
 {
     return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
 }
