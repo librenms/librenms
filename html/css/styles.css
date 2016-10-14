@@ -1757,7 +1757,17 @@ tr.search:nth-child(odd) {
 }
 
 .edit-storage-input {
-    width: 100px;
+    width: 90px;
+}
+
+.edit-storage-device {
+  width:300px;
+}
+
+.edit-storage-checkbox {
+  width:24px;
+  height:24px;
+
 }
 
 label {

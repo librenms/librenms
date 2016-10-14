@@ -2,7 +2,7 @@
 
 $graph_type = 'storage_usage';
 
-$drives = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY `storage_descr` ASC', array($device['device_id']));
+$drives = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? AND storage_ignore = ? ORDER BY `storage_descr` ASC', array($device['device_id'], 0));
 
 if (count($drives)) {
     echo '<div class="container-fluid">

@@ -523,7 +523,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 //end discover_link()
 
-function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
+function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $descr_internal, $size, $units, $used = null)
 {
     d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
@@ -540,13 +540,15 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                     'storage_units' => $units,
                     'storage_size' => $size,
                     'storage_used' => $used,
+                    'storage_ignore' => 0,
+                    'storage_descr_internal' => $descr_internal,
                 ),
                 'storage'
             );
 
             echo '+';
         } else {
-            $updated = dbUpdate(array('storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
+            $updated = dbUpdate(array('storage_descr' => $descr, 'storage_descr_internal' => $descr_internal, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
             if ($updated) {
                 echo 'U';
             } else {

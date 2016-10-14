@@ -5,12 +5,12 @@ $hrstorage_array = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RES
 if (is_array($hrstorage_array)) {
     echo 'hrStorage : ';
     foreach ($hrstorage_array as $index => $storage) {
-        $fstype                   = $storage['hrStorageType'];
-        $descr                    = $storage['hrStorageDescr'];
+        $fstype = $storage['hrStorageType'];
+        $descr = $storage['hrStorageDescr'];
         $storage['hrStorageSize'] = fix_integer_value($storage['hrStorageSize']);
         $storage['hrStorageUsed'] = fix_integer_value($storage['hrStorageUsed']);
-        $size  = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
-        $used  = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
+        $size = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
+        $used = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
         $units = $storage['hrStorageAllocationUnits'];
 
         switch ($fstype) {
@@ -75,7 +75,19 @@ if (is_array($hrstorage_array)) {
         }
 
         if (!$deny && is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $descr, $size, $units, $used);
+            $sql = "SELECT * FROM `storage` WHERE `device_id`  = '" . $device['device_id'] . "' AND `storage_index` = '" . $index . "'";
+            $storage_entry = dbFetchRow($sql);
+
+            if (!empty($storage_entry)) {
+                if ($storage_entry['storage_ignore'] != 1) {
+                    if (empty($storage_entry['storage_descr_internal'])) {
+                        $storage_entry['storage_descr_internal'] = $descr;
+                    }
+                    discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $storage_entry['storage_descr'], $descr, $size, $units, $used);
+                }
+            } else {
+                discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $descr, $descr, $size, $units, $used);
+            }
         }
 
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);

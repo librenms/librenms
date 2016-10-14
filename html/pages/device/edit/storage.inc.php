@@ -4,6 +4,7 @@
  * LibreNMS
  *
  * Copyright (c) 2015 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ * Copyright (c) 2016 Cercel Valentin <crc@nuamchefazi.ro>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,10 +21,11 @@
     <table id="storage" class="table table-hover table-condensed storage">
         <thead>
         <tr>
-            <th data-column-id="hostname">Device</th>
-            <th data-column-id="storage_descr">Storage</th>
-            <th data-column-id="storage_perc">%</th>
-            <th data-column-id="storage_perc_warn" data-formatter="perc_update" data-header-css-class="edit-storage-input">% Warn</th>
+            <th data-column-id="hostname" data-header-css-class="edit-storage-device">Device</th>
+            <th data-column-id="storage_descr" data-formatter="descr">Storage</th>
+            <th data-column-id="storage_perc" data-header-css-class="edit-storage-input">Usage</th>
+            <th data-column-id="storage_perc_warn" data-formatter="perc_update" data-header-css-class="edit-storage-input">% warn</th>
+            <th data-column-id="storage_ignore" data-formatter="ignore" data-header-css-class="edit-storage-input">Ignore</th>
         </tr>
         </thead>
     </table>
@@ -43,23 +45,44 @@
         url: "ajax_table.php",
         formatters: {
             "perc_update": function(column,row) {
-                return "<div class='form-group'><input type='text' class='form-control input-sm storage' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' value='"+row.storage_perc_warn+"'></div>";
+                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_perc_warn_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_perc='"+row.storage_perc_warn+"' value='"+row.storage_perc_warn+"'></div>";
+            },
+            "descr": function(column,row) {
+                return "<div class='form-group'><input type='text' class='form-control input-sm storage' id='storage_descr_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' data-storage_descr='"+row.storage_descr+"' value='"+row.storage_descr+"'></div>";
+            },
+            "ignore": function(column,row) {
+                if (row.storage_ignore == 1) {
+                    var checkedyes = "selected='selected'";
+                    var checkedno = "";
+                } else {
+                    var checkedyes = "";
+                    var checkedno = "selected='selected'";
+                }
+                return "<div class='form-group'><select class='form-control input-sm storage' id='storage_ignore_"+row.storage_id+"' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"'><option value='1' "+checkedyes+">yes</option><option value='0' "+checkedno+">no</option></select></div>";
             }
         },
         templates: {
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
-
         grid.find(".storage").blur(function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var storage_id = $(this).data("storage_id");
-            var data = $(this).val();
+
+            var storage_descr = $(this).data("storage_descr");
+            storage_descr = $('#storage_descr_'+storage_id).val();
+
+            var storage_ignore = $(this).data("storage_ignore");
+            storage_ignore = $('#storage_ignore_'+storage_id).val();
+
+            var data = $(this).data("storage_perc_warn");
+            data = $('#storage_perc_warn_'+storage_id).val();
+
             var $this = $(this);
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "storage-update", device_id: device_id, data: data, storage_id: storage_id},
+                data: {type: "storage-update", device_id: device_id, data: data, storage_id: storage_id, storage_descr: storage_descr, storage_ignore: storage_ignore},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {

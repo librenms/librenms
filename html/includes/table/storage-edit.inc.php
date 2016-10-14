@@ -42,7 +42,8 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
         'storage_perc' => $perc . "%",
-        'storage_perc_warn' => $perc_warn);
+        'storage_perc_warn' => $perc_warn,
+        'storage_ignore' => $drive["storage_ignore"]);
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
