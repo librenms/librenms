@@ -10,6 +10,10 @@ $skip_oids = array(
     '.1.3.6.1.4.1.9.1.1348' // Cisco Unified Communications Manager
 );
 
+$skip_gandi = array(
+    '.1.3.6.1.4.1.8072.3.2.10',
+);
+
 if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
     $os = 'linux';
 
@@ -31,7 +35,7 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         } elseif (snmp_get($device, 'fwVersion.1', '-Osqnv', 'UBNT-AirFIBER-MIB') !== false) {
             $os = 'airos-af';
         }
-    } elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
+    } elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false && !starts_with($sysObjectId, $skip_gandi)) {
         $os = 'pktj';
         $pktj_mibs = array(
             "rxCounter" => "GANDI-MIB",  // RX Packets
@@ -48,7 +52,7 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         $os = 'cumulus';
     } elseif (str_contains($sysDescr, array('g56fa85e', 'gc80f187', 'g829be90', 'g63c0044', 'gba768e5'))) {
         $os = 'sophos';
-    } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
+    } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false && !starts_with($sysObjectId, $skip_gandi)) {
         $os = 'ddnos';
     } elseif (str_contains(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'), 'syno_hw_version')) {
         $os = 'dsm'; // Synology DSM
