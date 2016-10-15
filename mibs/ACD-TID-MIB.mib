@@ -48,19 +48,19 @@ acdTidConformance       OBJECT IDENTIFIER ::= { acdTid 2 }
 acdTidGeneral           OBJECT IDENTIFIER ::= { acdTidMIBObjects 1 }
 acdTidInfo              OBJECT IDENTIFIER ::= { acdTidMIBObjects 2 }
 
----------------------------------------------------------------------------
--- Textual conventions
----------------------------------------------------------------------------
+---------------------------------------------------------------------------
+-- Textual conventions
+---------------------------------------------------------------------------
 
-AcdTidType ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
+AcdTidType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
        "Indicate if the object is covers by the acdTidCfgLastChangeTid or
-        or by the acdTidStatusLastChangeTid transaction identifier."
-    SYNTAX      INTEGER {
-                    configuration(1),
-                    status(2)
-    }
+        or by the acdTidStatusLastChangeTid transaction identifier."
+    SYNTAX      INTEGER {
+                    configuration(1),
+                    status(2)
+    }
 
 ---------------------------------------------------------------------------
  -- Transaction Identifier General onfiguration
