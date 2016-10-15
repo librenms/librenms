@@ -35,6 +35,8 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
+    $sess_id = clean($sess_id);
+    $token = clean($token);
     list($uname,$hash) = explode('|', $token);
     $session           = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'", array(), true);
     $hasher            = new PasswordHash(8, false);
