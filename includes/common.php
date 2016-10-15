@@ -1481,3 +1481,21 @@ function get_auth_ad_group_filter($groupname)
     }
     return $group_filter;
 }
+
+/**
+ * @param $value
+ * @return string
+ */
+function clean($value)
+{
+    return strip_tags(mres($value));
+}
+
+/**
+ * @param $value
+ * @return string
+ */
+function display($value)
+{
+    return htmlentities(stripslashes(strip_tags($value)));
+}
