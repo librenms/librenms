@@ -442,6 +442,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDsm()
     {
         $this->checkOS('dsm');
+        $this->checkOS('dsm', 'dsm-ds214');
     }
 
     public function testEatonpdu()

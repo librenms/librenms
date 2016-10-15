@@ -50,8 +50,6 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         $os = 'sophos';
     } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
         $os = 'ddnos';
-    } elseif (str_contains(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'), 'syno_hw_version')) {
-        $os = 'dsm'; // Synology DSM
     } elseif (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB')))) {
         $os = 'pcoweb'; // Carel PCOweb
     }
