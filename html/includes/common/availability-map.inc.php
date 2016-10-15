@@ -42,6 +42,22 @@ if (defined('SHOW_SETTINGS')) {
             </div>
         </div>';
 
+    if ($config['webui']['availability_map_compact'] === false) {
+        $common_output[] = '
+    <div class="form-group">
+        <div class="col-sm-4">
+            <label for="color_only_select" class="control-label availability-map-widget-header">Uniform Tiles</label>
+        </div>
+        <div class="col-sm-6">
+            <select class="form-control" name="color_only_select">
+                <option value="1"' . ($widget_settings['color_only_select'] == 1 ? ' selected' : '')  . ' >yes</option>
+                <option value="0"' . ($widget_settings['color_only_select'] == 1 ? '' : ' selected')  . ' >no</option>
+            </select>
+        </div>
+    </div>
+';
+    }
+
     if ($config['webui']['availability_map_compact'] == 1) {
         $common_output[] = '
         <div class="form-group">
@@ -196,6 +212,10 @@ if (defined('SHOW_SETTINGS')) {
                     </div>
                     </a>';
                 } else {
+                    if ($widget_settings['color_only_select'] == 1) {
+                        $deviceState = ' ';
+                        $deviceLabel .= ' widget-availability-fixed';
+                    }
                     $temp_output[] = '
                     <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
@@ -242,6 +262,10 @@ if (defined('SHOW_SETTINGS')) {
                             </div>
                         </a>';
                     } else {
+                        if ($widget_settings['color_only_select'] == 1) {
+                            $serviceState = ' ';
+                            $serviceLabel .= ' widget-availability-fixed';
+                        }
                         $temp_output[] = '
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
