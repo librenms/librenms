@@ -132,7 +132,11 @@ if (!isset($query)) {
 
 foreach (dbFetch($query) as $device) {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = " .$device['device_id']);
-    $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ".$device['device_id']);
+    if ($device['os_group'] == 'cisco') {
+        $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = " . $device['device_id']);
+    } else {
+        $device['vrf_lite_cisco'] = '';
+    }
     poll_device($device, $options);
     echo "#### Start Alerts ####\n";
     RunRules($device['device_id']);
