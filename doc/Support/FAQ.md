@@ -234,7 +234,7 @@ Replace the relevant information in these commands such as HOSTNAME and COMMUNIT
 ```bash
 ./discovery.php -h HOSTNAME -d -m os
 ./poller.php -h HOSTNAME -r -f -d -m os
-snmpbulkwalk -Onet -v2c -c COMMUNITY HOSTNAME .
+snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .
 ```
 
 If possible please also provide what the OS name should be if it doesn't exist already.
