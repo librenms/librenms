@@ -1267,11 +1267,12 @@ function get_ports_mapped($device_id, $with_statistics = false)
         'ifDescr' => array(),
     );
 
-    /* Query all information available for ports for this device ... */
-    $query = 'SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY port_id';
     if ($with_statistics) {
         /* ... including any related ports_statistics if requested */
         $query = 'SELECT *, `ports_statistics`.`port_id` AS `ports_statistics_port_id`, `ports`.`port_id` AS `port_id` FROM `ports` LEFT OUTER JOIN `ports_statistics` ON `ports`.`port_id` = `ports_statistics`.`port_id` WHERE `ports`.`device_id` = ? ORDER BY ports.port_id';
+    } else {
+        /* Query all information available for ports for this device ... */
+        $query = 'SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY port_id';
     }
 
     // Query known ports in order of discovery to make sure the latest

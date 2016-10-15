@@ -3,7 +3,7 @@
 // Gather our SLA's from the DB.
 $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id']));
 
-if (count($slas > 0)) {
+if (count($slas) > 0) {
     // We have SLA's, lets go!!!
 
     // Go get some data from the device.
