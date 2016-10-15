@@ -39,7 +39,7 @@ switch ($type) {
     case 'snmpwalk':
         $device = device_by_name(mres($hostname));
 
-        $cmd = gen_snmpwalk_cmd($device, '.', ' -Onet');
+        $cmd = gen_snmpwalk_cmd($device, '.', ' -OUneb');
 
         if ($debug) {
             $cmd .= ' 2>&1';
