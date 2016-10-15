@@ -24,7 +24,6 @@
  */
 
 if ($device['os'] == 'sinetica') {
-
     $oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.4', array());
 
     foreach ($oids as $oid => $data) {
