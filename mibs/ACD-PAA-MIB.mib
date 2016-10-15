@@ -2788,7 +2788,7 @@ acdPaaUdpCfgGroup OBJECT-GROUP
         acdPaaUdpCfgIgmpMaxLvDly,
         acdPaaUdpCfgIgmpLvDlyThresh,
         acdPaaUdpCfgIgmpLvAvgDlyThresh,
-        acdPaaUdpCfgPktLossThreshExt
+        acdPaaUdpCfgPktLossThreshExt
     }
     STATUS      current
     DESCRIPTION
@@ -2907,6 +2907,6 @@ acdPaaCompliance MODULE-COMPLIANCE
          }
 
     ::= { acdPaaCompliances 1 }
-
+
 
 END
