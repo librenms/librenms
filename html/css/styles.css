@@ -1994,6 +1994,12 @@ label {
   curosr: pointer;
 }
 
+.widget-availability-fixed {
+  min-width: 2.4em;
+  min-height: 1.3em;
+  max-height: 1.6em;
+}
+
 .widget-availability-host {
   float:left;
   margin-bottom: 10px;
@@ -2035,7 +2041,7 @@ label {
 }
 
 .availability-map-widget-header {
-  line-height:30px;
+  line-height:34px;
 }
 
 @media only screen and (max-width: 1240px) and (min-width: 1200px) {
