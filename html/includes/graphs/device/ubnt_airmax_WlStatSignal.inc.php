@@ -1,7 +1,7 @@
 <?php
 
-$scale_min = -20;
-$scale_max = -100;
+$scale_min = -100;
+$scale_max = -20;
 
 require 'includes/graphs/common.inc.php';
 
