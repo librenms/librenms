@@ -10,7 +10,7 @@ $rigid = true;
 $print_total = true;
 $simple_rrd = true;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list = array(
         array(
             'ds' => 'Radio0OtherBss',
