@@ -814,6 +814,14 @@ $config['os'][$os]['icon']             = 'saf';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Ceragon
+$os = 'ceragon';
+$config['os'][$os]['text']             = 'Ceragon';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ceragon';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Sub10
 $os = 'sub10';
 $config['os'][$os]['text']             = 'Sub10 Systems';
@@ -2333,6 +2341,9 @@ $config['graph_types']['device']['saf_modemRadialMSE']['descr'] = 'Radial MSE';
 $config['graph_types']['device']['saf_modemCapacity']['section'] = 'wireless';
 $config['graph_types']['device']['saf_modemCapacity']['order'] = '3';
 $config['graph_types']['device']['saf_modemCapacity']['descr'] = 'Capacity';
+
+// Ceragon support
+
 
 // Sub10 support
 $config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';
