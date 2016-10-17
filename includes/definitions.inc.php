@@ -12,7 +12,11 @@ if ($config['db']['extension'] == 'mysqli') {
 }
 
 if (!$database_link) {
-    echo '<h2>MySQL Error</h2>';
+    if (isCli()) {
+        c_echo("[%RFAIL%n]  Could not connect to MySQL\n");
+    } else {
+        echo '<h2>MySQL Error: could not connect</h2>';
+    }
     if ($config['db']['extension'] == 'mysqli') {
         echo mysqli_error($database_link);
     } else {
