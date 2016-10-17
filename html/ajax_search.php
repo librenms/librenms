@@ -59,7 +59,7 @@ if (isset($_REQUEST['search'])) {
 
                 foreach ($results as $result) {
                     $name = $result['hostname'];
-                    if ($result['sysName'] != $name && !empty($result['sysName'])) {
+                    if ($_REQUEST['map'] != 1 && $result['sysName'] != $name && !empty($result['sysName'])) {
                         $name .= ' ('.$result['sysName'].') ';
                     }
                     if ($result['disabled'] == 1) {
