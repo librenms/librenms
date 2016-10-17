@@ -2295,6 +2295,15 @@ $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['section'] = 'wire
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['order'] = '7';
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['descr'] = 'RF Total Packets Rx';
 
+// Unifi Support
+$config['graph_types']['device']['ubnt_unifi_RadioCu_0']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_unifi_RadioCu_0']['order'] = '0';
+$config['graph_types']['device']['ubnt_unifi_RadioCu_0']['descr'] = 'Radio0 Capacity Used';
+
+$config['graph_types']['device']['ubnt_unifi_RadioCu_1']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_unifi_RadioCu_1']['order'] = '1';
+$config['graph_types']['device']['ubnt_unifi_RadioCu_1']['descr'] = 'Radio1 Capacity Used';
+
 // Siklu support
 $config['graph_types']['device']['siklu_rfAverageRssi']['section'] = 'wireless';
 $config['graph_types']['device']['siklu_rfAverageRssi']['order'] = '0';
