@@ -67,6 +67,27 @@ Enabled by default.
 
 This includes FDP, CDP and LLDP support based on the device type.
 
+Devices may be excluded from xdp discovery by name, description, or platform.
+
+```php
+//Exclude devices by name
+$config['autodiscovery']['xdp_exclude']['sysname_regexp'][] = '/^dev/'
+
+//Exclude devices by description
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/unmanaged switch/'
+
+//Exclude devices by platform(Cisco only)
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = 'WS-C3750G-12S'
+```
+
+These devices are excluded by default:
+
+```php
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^CIVS-IPC-/'; //Cisco IP Camera
+```
+
 #### OSPF
 Enabled by default.
 
