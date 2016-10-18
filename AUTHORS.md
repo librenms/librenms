@@ -140,6 +140,8 @@ LibreNMS contributors:
 - Layne Breitkreutz <github@thelenon.com> (Gorian)
 - Karl Shea <karl@karlshea.com> (karlshea)
 - Justin Settle <jus10@partlycloudy.org> (jquagga)
+- Alexander Kratzsch <klump@devrandom.se> (klump)
+- Joseph Eames <j.eames@outlook.com> (j-ems)
 - Eric Conroy <eric@conroy.co> (NetworkNub)
 
 [1]: http://observium.org/ "Observium web site"

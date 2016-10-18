@@ -34,6 +34,7 @@ pages:
     - General/Credits.md
     - General/Updating.md
     - General/Releases.md
+    - General/Security.md
     - General/Welcome-to-Observium-users.md
 - Extensions:
     - Extensions/Alerting.md
