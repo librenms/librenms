@@ -19,21 +19,15 @@ if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
                 $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDeviceId']));
 
                 if (!$remote_device_id) {
-                    unset($skip_discovery);
-                    foreach ($config['autodiscovery']['xdp_exclude']['sysname_regexp'] as $filter) {
-                        if (preg_match($filter ."i", $fdp['snFdpCacheDeviceId'])) {
-                            $skip_discovery = 1;
-                            d_echo("{$fdp['snFdpCacheDeviceId']} - regexp '{$filter}' matches '{$fdp['snFdpCacheDeviceId']}' - skipping device discovery \n");
-                        }
+                    $skip_discovery = false;
+                    if ($skip_discovery === false) {
+                        $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDeviceId']);
                     }
-                    foreach ($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'] as $filter) {
-                        if (preg_match($filter ."i", $fdp['cdpCacheVersion'])) {
-                            $skip_discovery = 1;
-                            d_echo("{$fdp['snFdpCacheDeviceId']} - regexp '{$filter}' matches '{$fdp['cdpCacheVersion']}' - skipping device discovery \n");
-                        }
+                    if ($skip_discovery === false) {
+                        $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $fdp['cdpCacheVersion'], $fdp['snFdpCacheDeviceId']);
                     }
 
-                    if (!$skip_discovery) {
+                    if ($skip_discovery === false) {
                         $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device, 'FDP', $interface);
                     }
                 }
@@ -68,27 +62,18 @@ if ($config['autodiscovery']['xdp'] === true) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
                     if (!$remote_device_id) {
-                        unset($skip_discovery);
-                        foreach ($config['autodiscovery']['cdp_exclude']['platform_regexp'] as $filter) {
-                            if (preg_match($filter ."i", $cdp['cdpCachePlatform'])) {
-                                $skip_discovery = 1;
-                                d_echo("{$cdp['cdpCacheDeviceId']} - regexp '{$filter}' matches '{$cdp['cdpCachePlatform']}' - skipping device discovery \n");
-                            }
+                        $skip_discovery = false;
+                        if ($skip_discovery === false) {
+                            $skip_discovery = can_skip_discovery($config['autodiscovery']['cdp_exclude']['platform_regexp'], $cdp['cdpCachePlatform'], $cdp['cdpCacheDeviceId']);
                         }
-                        foreach ($config['autodiscovery']['xdp_exclude']['sysname_regexp'] as $filter) {
-                            if (preg_match($filter ."i", $cdp['cdpCacheDeviceId'])) {
-                                $skip_discovery = 1;
-                                d_echo("{$cdp['cdpCacheDeviceId']} - regexp '{$filter}' matches '{$cdp['cdpCacheDeviceId']}' - skipping device discovery \n");
-                            }
+                        if ($skip_discovery === false) {
+                            $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']);
                         }
-                        foreach ($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'] as $filter) {
-                            if (preg_match($filter ."i", $cdp['cdpCacheVersion'])) {
-                                $skip_discovery = 1;
-                                d_echo("{$cdp['cdpCacheDeviceId']} - regexp '{$filter}' matches '{$cdp['cdpCacheVersion']}' - skipping device discovery \n");
-                            }
+                        if ($skip_discovery === false) {
+                            $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $cdp['cdpCacheVersion'], $cdp['cdpCacheDeviceId']);
                         }
 
-                        if (!$skip_discovery) {
+                        if ($skip_discovery === false) {
                             if ($config['discovery_by_ip'] !== true) {
                                 $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
                             } else {
@@ -140,21 +125,15 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
             $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($lldp['lldpRemSysName'], $lldp['lldpRemSysName']));
 
             if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName'])) {
-                unset($skip_discovery);
-                foreach ($config['autodiscovery']['xdp_exclude']['sysname_regexp'] as $filter) {
-                    if (preg_match($filter ."i", $lldp['lldpRemSysName'])) {
-                        $skip_discovery = 1;
-                        d_echo("{$lldp['lldpRemSysName']} - regexp '{$filter}' matches '{$lldp['lldpRemSysName']}' - skipping device discovery \n");
-                    }
+                $skip_discovery = false;
+                if ($skip_discovery === false) {
+                    $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $lldp['lldpRemSysName'], $lldp['lldpRemSysName']);
                 }
-                foreach ($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'] as $filter) {
-                    if (preg_match($filter ."i", $lldp['lldpRemSysDesc'])) {
-                        $skip_discovery = 1;
-                        d_echo("{$lldp['lldpRemSysName']} - regexp '{$filter}' matches '{$lldp['lldpRemSysDesc']}' - skipping device discovery \n");
-                    }
+                if ($skip_discovery === false) {
+                    $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName']);
                 }
 
-                if (!$skip_discovery) {
+                if ($skip_discovery === false) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                 }
             }
@@ -198,21 +177,15 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($lldp['lldpRemSysName'], $lldp['lldpRemSysName']));
 
                     if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName'])) {
-                        unset($skip_discovery);
-                        foreach ($config['autodiscovery']['xdp_exclude']['sysname_regexp'] as $filter) {
-                            if (preg_match($filter ."i", $lldp['lldpRemSysName'])) {
-                                $skip_discovery = 1;
-                                d_echo("{$lldp['lldpRemSysName']} - regexp '{$filter}' matches '{$lldp['lldpRemSysName']}' - skipping device discovery \n");
-                            }
+                        $skip_discovery = false;
+                        if ($skip_discovery === false) {
+                            $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $lldp['lldpRemSysName'], $lldp['lldpRemSysName']);
                         }
-                        foreach ($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'] as $filter) {
-                            if (preg_match($filter ."i", $lldp['lldpRemSysDesc'])) {
-                                $skip_discovery = 1;
-                                d_echo("{$lldp['lldpRemSysName']} - regexp '{$filter}' matches '{$lldp['lldpRemSysDesc']}' - skipping device discovery \n");
-                            }
+                        if ($skip_discovery === false) {
+                            $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName']);
                         }
 
-                        if (!$skip_discovery) {
+                        if ($skip_discovery === true) {
                             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                         }
                     }
