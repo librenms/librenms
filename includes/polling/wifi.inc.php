@@ -77,6 +77,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         }
 
         echo (($wificlients1 + 0).' clients on Radio0, '.($wificlients2 + 0)." clients on Radio1\n");
+        include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
     }
 
     if (isset($wificlients1) && $wificlients1 != '') {
