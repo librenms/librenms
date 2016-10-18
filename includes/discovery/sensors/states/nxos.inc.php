@@ -24,36 +24,38 @@ if ($device['os'] == 'nxos') {
      *  warning(4)
      */
 
-    foreach ($fan_trays as $oid => $array) {
-        $state = current($array);
-        $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 1)];
-        $current_oid = "$fan_tray_oid.$index";
-        $descr = current($entities["$entity_oid.$index"]);
+    if ($is_array($fan_trays)) {
+        foreach ($fan_trays as $oid => $array) {
+            $state = current($array);
+            $split_oid = explode('.', $oid);
+            $index = $split_oid[(count($split_oid) - 1)];
+            $current_oid = "$fan_tray_oid.$index";
+            $descr = current($entities["$entity_oid.$index"]);
 
-        $state_name = "cefcFanTrayOperStatus";
-        $state_index_id = create_state_index($state_name);
+            $state_name = "cefcFanTrayOperStatus";
+            $state_index_id = create_state_index($state_name);
 
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 1, 3),
-                array($state_index_id, 'up',      1, 2, 0),
-                array($state_index_id, 'down',    1, 3, 2),
-                array($state_index_id, 'warning', 1, 4, 1),
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
+            if ($state_index_id !== null) {
+                $states = array(
+                    array($state_index_id, 'unknown', 0, 1, 3),
+                    array($state_index_id, 'up',      1, 2, 0),
+                    array($state_index_id, 'down',    1, 3, 2),
+                    array($state_index_id, 'warning', 1, 4, 1),
                 );
-                dbInsert($insert, 'state_translations');
+                foreach ($states as $value) {
+                    $insert = array(
+                        'state_index_id' => $value[0],
+                        'state_descr' => $value[1],
+                        'state_draw_graph' => $value[2],
+                        'state_value' => $value[3],
+                        'state_generic_value' => $value[4]
+                    );
+                    dbInsert($insert, 'state_translations');
+                }
             }
-        }
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $state_name, $descr, 1, 1);
-        create_sensor_to_state_index($device, $state_name, $index);
+            discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $state_name, $descr, 1, 1);
+            create_sensor_to_state_index($device, $state_name, $index);
+        }
     }
 }
