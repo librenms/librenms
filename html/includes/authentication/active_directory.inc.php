@@ -156,8 +156,10 @@ function get_userlevel($username)
     global $config, $ldap_connection;
 
     $userlevel = 0;
-    if (isset($config['auth_ad_require_groupmembership']) && $config['auth_ad_require_groupmembership'] == 0 && isset($config['auth_ad_default_level'])) {
-        $userlevel = $config['auth_ad_default_level'];
+    if (isset($config['auth_ad_require_groupmembership']) && $config['auth_ad_require_groupmembership'] == 0) {
+       if (isset($config['auth_ad_global_read']) && $config['auth_ad_global_read'] === 1) {
+           $userlevel = 5;
+       }
     }
 
     // Find all defined groups $username is in
