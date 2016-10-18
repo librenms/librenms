@@ -24,7 +24,7 @@ if ($device['os'] == 'nxos') {
      *  warning(4)
      */
 
-    if ($is_array($fan_trays)) {
+    if (is_array($fan_trays)) {
         foreach ($fan_trays as $oid => $array) {
             $state = current($array);
             $split_oid = explode('.', $oid);
