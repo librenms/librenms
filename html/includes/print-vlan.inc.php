@@ -19,17 +19,17 @@ foreach ($otherports as $otherport) {
     if ($otherport['untagged']) {
         $traverse_ifvlan = false;
     }
-    $vlan_ports[$otherport[ifIndex]] = $otherport;
+    $vlan_ports[$otherport['ifIndex']] = $otherport;
 }
 
 if ($traverse_ifvlan) {
     $otherports = dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?', array($device['device_id'], $vlan['vlan_vlan']));
     foreach ($otherports as $otherport) {
-        $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+        $vlan_ports[$otherport['ifIndex']] = array_merge($otherport, array('untagged' => '1'));
     }
 }
 
-  ksort($vlan_ports);
+ksort($vlan_ports);
 
 foreach ($vlan_ports as $port) {
     $port = ifLabel($port, $device);
