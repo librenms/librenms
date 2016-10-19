@@ -2557,6 +2557,11 @@ $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['section']    
 $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['order']        = '0';
 $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['descr']        = 'Optimized TCP Connections';
 
+// SonicWALL Sessions
+$config['graph_types']['device']['sonicwall_sessions']['section']      = 'firewall';
+$config['graph_types']['device']['sonicwall_sessions']['order']        = '0';
+$config['graph_types']['device']['sonicwall_sessions']['descr']        = 'Active Sessions';
+
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
 $config['graph_types']['device']['bits']['descr']                 = 'Total Traffic';
