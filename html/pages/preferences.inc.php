@@ -190,17 +190,19 @@ echo "
         <div class='col-sm-4'>
           <select class='form-control' name='dashboard'>";
 $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?", array($_SESSION['user_id']));
-$dashoptions = dbFetchRows("SELECT dashboards.*,users.username 
-    FROM `dashboards` 
-    INNER JOIN `users` ON users.user_id = dashboards.user_id 
+$dashoptions = dbFetchRows(
+    "SELECT dashboards.*,users.username
+    FROM `dashboards`
+    INNER JOIN `users` ON users.user_id = dashboards.user_id
     WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?",
-    array($_SESSION['user_id'],$_SESSION['user_id'])); 
+    array($_SESSION['user_id'],$_SESSION['user_id'])
+);
 
 foreach ($dashoptions as $dash) {
     echo "
             <option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
-}       
-echo "  
+}
+echo "
           </select>
           <br>
           <center><button type='submit' class='btn btn-default'>Update Dashboard</button></center>
