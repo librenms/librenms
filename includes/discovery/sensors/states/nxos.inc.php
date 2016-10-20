@@ -11,9 +11,6 @@
  */
 
 if ($device['os'] == 'nxos') {
-    $entity_oid = '1.3.6.1.2.1.47.1.1.1.1.7';
-    $entities = snmpwalk_cache_oid_num($device, $entity_oid, array());
-
     $fan_tray_oid = '.1.3.6.1.4.1.9.9.117.1.4.1.1.1';
     $fan_trays = snmpwalk_cache_oid_num($device, $fan_tray_oid, array());
 
@@ -25,6 +22,9 @@ if ($device['os'] == 'nxos') {
      */
 
     if (is_array($fan_trays)) {
+        $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';
+        $entities = snmpwalk_cache_oid_num($device, $entity_oid, array());
+
         foreach ($fan_trays as $oid => $array) {
             $state = current($array);
             $split_oid = explode('.', $oid);
