@@ -25,6 +25,7 @@ Table of Content:
     - [PlaySMS](#transports-playsms)
     - [VictorOps](#transports-victorops)
     - [Canopsis](#transports-canopsis)
+    - [osTicket](#transports-osticket)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -520,6 +521,23 @@ $config['alert']['transports']['canopsis']['vhost'] = 'canopsis';
 For more information about canopsis and its events, take a look here :
  http://www.canopsis.org/
  http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html
+
+## <a name="transports-osticket">osTicket</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+osTicket, open source ticket system. LibreNMS can send alerts to osTicket API which are then converted to osTicket tickets. To configure the transport, go to:
+
+Global Settings -> Alerting Settings -> osTicket Transport.
+
+This can also be done manually in config.php :
+
+~~
+```php
+$config['alert']['transports']['osticket']['url'] = 'http://osticket.example.com/api/http.php/tickets.json';
+$config['alert']['transports']['osticket']['token'] = '123456789';
+```
+~~
 
 # <a name="entities">Entities
 
