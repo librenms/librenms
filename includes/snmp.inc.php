@@ -85,6 +85,13 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } // end gen_snmpget_cmd()
 
+function gen_snmpgetnext_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
+{
+    global $config;
+    $snmpcmd  = $config['snmpgetnext'];
+    return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
+} // end gen_snmpget_cmd()
+
 /**
  * Generate an snmpwalk command
  *
@@ -221,6 +228,31 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         return false;
     }
 }//end snmp_get()
+
+
+function snmp_get_next($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    global $runtime_stats;
+
+    if (strstr($oid, ' ')) {
+        echo report_this_text("snmp_get_next called for multiple OIDs: $oid");
+    }
+
+    $cmd = gen_snmpgetnext_cmd($device, $oid, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    $runtime_stats['snmpgetnext']++;
+
+    if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
+        return false;
+    } elseif ($data || $data === '0') {
+        return $data;
+    } else {
+        return false;
+    }
+}//end snmp_get_next()
+
+
 
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)

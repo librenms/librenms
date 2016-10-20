@@ -13,6 +13,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     } elseif ($device['os'] == 'saf') {
         echo 'It is SAF Tehnika' . PHP_EOL;
         include 'includes/polling/mib/saf-mib.inc.php';
+    } elseif ($device['os'] == 'ceragon') {
+        echo 'It is Ceragon' . PHP_EOL;
+        include 'includes/polling/mib/ceragon-mib.inc.php';
     } elseif ($device['os'] == 'sub10') {
         echo 'It is Sub10' . PHP_EOL;
         include 'includes/polling/mib/sub10-mib.inc.php';

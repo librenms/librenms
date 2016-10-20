@@ -44,10 +44,5 @@ $serial = snmp_walk($device, 'genEquipInventorySerialNumber', '-mMWRM-RADIO-MIB 
 $latitude = snmp_walk($device, 'genEquipUnitLatitude', '-mMWRM-RADIO-MIB -Oqv', '');
 $longitude = snmp_walk($device, 'genEquipUnitLongitude', '-mMWRM-RADIO-MIB -Oqv', '');
 
-$radioslot1_id = snmp_get_next($device, 'genEquipRadioCfgRadioId', '-mMWRM-RADIO-MIB -Oqv', '');
-//$radioslot2_id = snmp_getnext(($device, 'genEquipRadioCfgRadioId'.$radioslot1_id, '-mMWRM-RADIO-MIB -Oqv', ''));
-//$radioslot1-id = $radioslot-ids[0];
-//$radioslot2-id = $radioslot-ids[1];
-
 ?>
 
