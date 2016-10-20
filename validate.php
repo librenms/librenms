@@ -101,8 +101,8 @@ if (function_exists('posix_getpwuid')) {
 } else {
     $username = getenv('USERNAME') ?: getenv('USER'); //http://php.net/manual/en/function.get-current-user.php
 }
-if ($username !== 'root') {
-    print_fail("You need to run this script as root");
+if (!($username === 'root' || (isset($config['user']) && $username === $config['user']))) {
+    print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
 if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
@@ -238,9 +238,9 @@ if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_discovered
 // check poller
 if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
     print_fail('The poller has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
     print_fail("The poller has not run in the last 5 minutes, check the cron job");
-} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE (`last_polled` <= DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
     print_warn("Some devices have not been polled in the last 5 minutes, check your poll log");
 }
 
