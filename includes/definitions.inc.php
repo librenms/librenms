@@ -817,6 +817,10 @@ $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'saf';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_saf_radioRxLevel';
+$config['os'][$os]['over'][1]['text']  = 'Rx Level';
+$config['os'][$os]['over'][2]['graph'] = 'device_ping_perf';
+$config['os'][$os]['over'][2]['text']  = 'Ping Times';
 
 // Sub10
 $os = 'sub10';
