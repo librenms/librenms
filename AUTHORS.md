@@ -141,7 +141,11 @@ LibreNMS contributors:
 - Karl Shea <karl@karlshea.com> (karlshea)
 - Justin Settle <jus10@partlycloudy.org> (jquagga)
 - Alexander Kratzsch <klump@devrandom.se> (klump)
+<<<<<<< HEAD
 - Joseph Eames <j.eames@outlook.com> (j-ems)
+=======
+- Barry O'Donovan barry.odonovan@lightnet.ie (barryodonovan)
+>>>>>>> contrib-agree
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
