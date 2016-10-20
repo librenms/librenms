@@ -506,6 +506,8 @@ For more information about canopsis and its events, take a look here :
 
 ## <a name="transports-osticket">osTicket</a>
 
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
 osTicket, open source ticket system. LibreNMS can send alerts to osTicket API which are then converted to osTicket tickets. To configure the transport, go to:
 
 Global Settings -> Alerting Settings -> osTicket Transport.
