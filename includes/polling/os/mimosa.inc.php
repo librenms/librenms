@@ -10,6 +10,9 @@
  * the source code distribution for details.
  */
 
-$explodeddata = explode(" ", $poll_device['sysDescr']);
-$hardware = $explodeddata['1'];
-$version = $explodeddata['3'];
+$hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:MIMOSA-NETWORKS-BASE-MIB');
+$oids = 'mimosaSerialNumber.0 mimosaFirmwareVersion.0';
+$data = snmp_get_multi($device, $oids, '-OQUs', 'MIMOSA-NETWORKS-BFIVE-MIB');
+
+$serial = $data[0]['mimosaSerialNumber'];
+$version = $data[0]['mimosaFirmwareVersion'];

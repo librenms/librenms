@@ -12,7 +12,11 @@ if ($config['db']['extension'] == 'mysqli') {
 }
 
 if (!$database_link) {
-    echo '<h2>MySQL Error</h2>';
+    if (isCli()) {
+        c_echo("[%RFAIL%n]  Could not connect to MySQL\n");
+    } else {
+        echo '<h2>MySQL Error: could not connect</h2>';
+    }
     if ($config['db']['extension'] == 'mysqli') {
         echo mysqli_error($database_link);
     } else {
@@ -2552,6 +2556,11 @@ $config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 
 $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['section']      = 'graphs';
 $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['order']        = '0';
 $config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['descr']        = 'Optimized TCP Connections';
+
+// SonicWALL Sessions
+$config['graph_types']['device']['sonicwall_sessions']['section']      = 'firewall';
+$config['graph_types']['device']['sonicwall_sessions']['order']        = '0';
+$config['graph_types']['device']['sonicwall_sessions']['descr']        = 'Active Sessions';
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
