@@ -248,7 +248,7 @@ if ($count < 1) {
             <div class="col-sm-12">
             <form role="form" method="post">
             <p class="text-center">
-            <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default">Create default global alerts!</button>
+            <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
             </p>
             </form>
             </div>
