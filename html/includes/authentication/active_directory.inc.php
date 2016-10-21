@@ -157,9 +157,9 @@ function get_userlevel($username)
 
     $userlevel = 0;
     if (isset($config['auth_ad_require_groupmembership']) && $config['auth_ad_require_groupmembership'] == 0) {
-       if (isset($config['auth_ad_global_read']) && $config['auth_ad_global_read'] === 1) {
-           $userlevel = 5;
-       }
+        if (isset($config['auth_ad_global_read']) && $config['auth_ad_global_read'] === 1) {
+            $userlevel = 5;
+        }
     }
 
     // Find all defined groups $username is in
