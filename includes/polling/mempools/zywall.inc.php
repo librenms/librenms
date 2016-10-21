@@ -1,10 +1,8 @@
 <?php
-
 /*
  * LibreNMS
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
- *
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -14,8 +12,11 @@
 
 if ($device['os'] == 'zywall') {
     d_echo('Zywall');
-    $usage = snmp_get($device, '.1.3.6.1.4.1.890.1.6.22.1.2.0', '-Ovq');
-    if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, '0', 'zywall', 'Memory', '1', null, null);
+    $perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
     }
 }
