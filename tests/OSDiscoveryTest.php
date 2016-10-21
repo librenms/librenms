@@ -310,6 +310,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('catos');
     }
 
+    public function testCeraos()
+    {
+        $this->checkOS('ceraos');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
