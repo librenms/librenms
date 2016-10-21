@@ -24,7 +24,7 @@ if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
                         $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDeviceId']);
                     }
                     if ($skip_discovery === false) {
-                        $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $fdp['cdpCacheVersion'], $fdp['snFdpCacheDeviceId']);
+                        $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $fdp['snFdpCacheVersion'], $fdp['snFdpCacheDeviceId']);
                     }
 
                     if ($skip_discovery === false) {
