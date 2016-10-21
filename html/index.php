@@ -61,12 +61,8 @@ if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     exit;
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/vars.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $config['memcached']['ttl'] = $config['time']['now']+300;
 
@@ -78,8 +74,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-require 'includes/authenticate.inc.php';
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) {
     $_SESSION['widescreen'] = 1;

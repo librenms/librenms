@@ -1,7 +1,5 @@
 <?php
 
-require_once $config['install_dir'].'/includes/device-groups.inc.php';
-
 function bulk_sensor_snmpget($device, $sensors)
 {
     $oid_per_pdu = get_device_oid_limit($device);

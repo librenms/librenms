@@ -25,6 +25,26 @@
  */
 
 
+/**
+ * merge the database config with the global config
+ * Global config overrides db
+ */
+function mergedb()
+{
+    global $config;
+
+    $clone = $config;
+    foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
+        $clone = array_replace_recursive($clone, mergecnf($obj));
+    }
+    $config = array_replace_recursive($clone, $config);
+}
+
+
+/**
+ * @param $obj
+ * @return array
+ */
 function mergecnf($obj)
 {
     $pointer = array();

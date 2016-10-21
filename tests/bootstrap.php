@@ -34,7 +34,11 @@ $config['mib_dir'] = $install_dir . '/mibs';
 $config['snmpget'] = 'snmpget';
 $runtime_stats = array('snmpget' => 0, 'snmpwalk' => 0);
 
+// initialize the class loader and add custom mappings
+require $install_dir . '/LibreNMS/ClassLoader.php';
+$classLoader = new LibreNMS\ClassLoader();
 $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
+$classLoader->register();
 
 require $install_dir . '/includes/common.php';
 require $install_dir . '/html/includes/functions.inc.php';

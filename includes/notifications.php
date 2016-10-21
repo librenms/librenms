@@ -22,11 +22,6 @@
  * @subpackage Notifications
  */
 
-require_once $config['install_dir'].'/includes/defaults.inc.php';
-require_once $config['install_dir'].'/config.php';
-require_once $config['install_dir'].'/includes/definitions.inc.php';
-require_once $config['install_dir'].'/includes/functions.php';
-
 /**
  * Pull notifications from remotes
  * @return array Notifications

@@ -27,12 +27,8 @@ if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     if (!$_SESSION['authenticated']) {
@@ -41,10 +37,10 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require 'lib/jpgraph/jpgraph.php';
-require 'lib/jpgraph/jpgraph_line.php';
-require 'lib/jpgraph/jpgraph_utils.inc.php';
-require 'lib/jpgraph/jpgraph_date.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_line.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_utils.inc.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_date.php';
 
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {

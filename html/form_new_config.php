@@ -12,19 +12,17 @@
  * the source code distribution for details.
  */
 
-enable_debug();
+//FIXME: unused file??
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!$_SESSION['authenticated']) {
     echo 'unauthenticated';
     exit;
 }
+
+set_debug($_REQUEST['debug']);
 
 $new_conf_type = $_POST['new_conf_type'];
 $new_conf_name = $_POST['new_conf_name'];
