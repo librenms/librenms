@@ -185,7 +185,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                             $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName']);
                         }
 
-                        if ($skip_discovery === true) {
+                        if ($skip_discovery === false) {
                             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                         }
                     }
