@@ -142,6 +142,7 @@ LibreNMS contributors:
 - Justin Settle <jus10@partlycloudy.org> (jquagga)
 - Alexander Kratzsch <klump@devrandom.se> (klump)
 - Joseph Eames <j.eames@outlook.com> (j-ems)
+- Eric Conroy <eric@conroy.co> (NetworkNub)
 - Timothy Willey <developer@timothywilley.net> (twilley)
 
 [1]: http://observium.org/ "Observium web site"
