@@ -80,7 +80,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
     }
 
-    if (isset($wificlients1) && $wificlients1 != '') {
+    if (is_numeric($wificlients1)) {
         $tags = array(
             'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
             'rrd_name'  => array('wificlients', 'radio1'),
@@ -90,7 +90,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         $graphs['wifi_clients'] = true;
     }
 
-    if (isset($wificlients2) && $wificlients2 != '') {
+    if (is_numeric($wificlients2)) {
         $tags = array(
             'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
             'rrd_name'  => array('wificlients', 'radio2'),
