@@ -480,7 +480,7 @@ class IRCBot
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
                 $tmp_user = get_user($this->user['id']);
                 $tmp = get_userlevel($tmp_user['username']);
-                $this->user['level']  = $tmp['level'];
+                $this->user['level'] = $tmp;
                 if ($this->user['level'] < 5) {
                     foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
                         $this->user['devices'][] = $tmp['device_id'];

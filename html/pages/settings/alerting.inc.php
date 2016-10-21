@@ -958,6 +958,38 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$osticket_url   = get_config_by_name('alert.transports.osticket.url');
+$osticket_token   = get_config_by_name('alert.transports.osticket.token');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#osticket_transport_expand"><i class="fa fa-caret-down"></i> osTicket transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="osticket" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="osticket_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="osticket_url" class="col-sm-4 control-label">osTicket API URL</label>
+                        <div class="col-sm-4">
+                            <input id="osticket_url" class="form-control" type="text" name="global-config-input" value="'.$osticket_url['config_value'].'" data-config_id="'.$osticket_url['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="osticket_token" class="col-sm-4 control-label">osTicket API Token</label>
+                        <div class="col-sm-4">
+                            <input id="osticket_token" class="form-control" type="text" name="global-config-input" value="'.$osticket_token['config_value'].'" data-config_id="'.$osticket_token['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
