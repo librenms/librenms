@@ -1466,6 +1466,13 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 
+$os = 'megatec';
+$config['os'][$os]['text']             = 'Megatec UPS';
+$config['os'][$os]['group']            = 'ups';
+$config['os'][$os]['type']             = 'power';
+$config['os'][$os]['over'][0]['graph'] = 'device_load';
+$config['os'][$os]['over'][0]['text']  = 'Load';
+
 $os = 'mgepdu';
 $config['os'][$os]['text'] = 'MGE PDU';
 $config['os'][$os]['type'] = 'power';
