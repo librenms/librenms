@@ -29,32 +29,32 @@ if ($device['os'] == 'megatec') {
     $ups_temperature = snmp_get($device, $ups_temperature_oid, '-Oqv');
 
     if (!empty($ups_temperature) || $ups_temperature == 0) {
-        $type			= 'megatec';
-		$index          = 0;
-		$limit 			= 50;
-		$warnlimit	  	= 40;
-        $lowlimit 		= 0;
-        $lowwarnlimit	= 6;
-		$divisor        = 10;
+        $type           = 'megatec';
+        $index          = 0;
+        $limit          = 50;
+        $warnlimit      = 40;
+        $lowlimit       = 0;
+        $lowwarnlimit   = 6;
+        $divisor        = 10;
         $temperature    = $ups_temperature / $divisor;
         $descr          = 'Temperature';
 
         discover_sensor(
-			$valid['sensor'],
-			'temperature',
-			$device,
-			$ups_temperature_oid,
-			$index,
-			$type,
-			$descr,
-			$divisor,
-			'1',
+            $valid['sensor'],
+            'temperature',
+            $device,
+            $ups_temperature_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-			$warnlimit,
-			$limit,
-			$temperature
-		);
+            $warnlimit,
+            $limit,
+            $temperature
+        );
     }
-	
+    
 }//end if

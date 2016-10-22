@@ -29,32 +29,32 @@ if ($device['os'] == 'megatec') {
     $battery_current = snmp_get($device, $battery_current_oid, '-Oqv');
 
     if (!empty($battery_current) || $battery_current == 0) {
-        $type			= 'megatec';
-		$index          = 0;
-		$limit 			= 30;
-		$warnlimit	  	= null;
-        $lowlimit 		= null;
-        $lowwarnlimit	= null;
-		$divisor        = 10;
+        $type           = 'megatec';
+        $index          = 0;
+        $limit          = 30;
+        $warnlimit      = null;
+        $lowlimit       = null;
+        $lowwarnlimit   = null;
+        $divisor        = 10;
         $current        = $battery_current / $divisor;
         $descr          = 'Battery Current';
 
         discover_sensor(
-			$valid['sensor'],
-			'current',
-			$device,
-			$battery_current_oid,
-			$index,
-			$type,
-			$descr,
-			$divisor,
-			'1',
+            $valid['sensor'],
+            'current',
+            $device,
+            $battery_current_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-			$warnlimit,
-			$limit,
-			$current
-		);
+            $warnlimit,
+            $limit,
+            $current
+        );
     }
 
 }//end if
