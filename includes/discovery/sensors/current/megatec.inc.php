@@ -56,5 +56,4 @@ if ($device['os'] == 'megatec') {
             $current
         );
     }
-
 }//end if
