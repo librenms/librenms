@@ -56,5 +56,4 @@ if ($device['os'] == 'megatec') {
             $temperature
         );
     }
-    
 }//end if
