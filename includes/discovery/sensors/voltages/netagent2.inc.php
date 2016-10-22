@@ -61,7 +61,7 @@ if ($device['os'] == 'netagent2') {
 
     if (!empty($out_voltage) || $out_voltage == 0) {
         $type           = 'netagent2';
-        $index          = 0;
+        $index          = 1;
         $limit          = 300;
         $warnlimit      = 253;
         $lowlimit       = 0;
