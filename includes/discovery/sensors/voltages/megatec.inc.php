@@ -88,5 +88,4 @@ if ($device['os'] == 'megatec') {
             $voltage
         );
     }
-
 }//end if

@@ -25,7 +25,6 @@
 
 
 if ($device['os'] == 'megatec') {
-    
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.4.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
@@ -60,7 +59,7 @@ if ($device['os'] == 'megatec') {
     
     $out_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.2.0';
     $out_frequency = snmp_get($device, $frequency_oid, '-Oqv');
-
+	
     if (!empty($out_frequency) || $out_frequency == 0) {
         $type             = 'megatec';
         $index            = 0;
@@ -89,5 +88,4 @@ if ($device['os'] == 'megatec') {
             $frequency
         );
     }
-
 }//end if

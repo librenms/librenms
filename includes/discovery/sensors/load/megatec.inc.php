@@ -56,5 +56,4 @@ if ($device['os'] == 'megatec') {
             $load
         );
     }
-
 }//end if
