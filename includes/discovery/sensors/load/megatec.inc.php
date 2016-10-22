@@ -29,32 +29,32 @@ if ($device['os'] == 'megatec') {
     $output_load = snmp_get($device, $load_oid, '-Oqv');
 
     if (!empty($output_load) || $output_load == 0) {
-        $type			= 'megatec';
-		$index          = 0;
-		$limit 			= 100;
-		$warnlimit	  	= 80;
-        $lowlimit 		= 0;
-        $lowwarnlimit	= null;
-		$divisor        = 1;
-        $load        	= $output_load / $divisor;
+        $type           = 'megatec';
+        $index          = 0;
+        $limit          = 100;
+        $warnlimit      = 80;
+        $lowlimit       = 0;
+        $lowwarnlimit   = null;
+        $divisor        = 1;
+        $load           = $output_load / $divisor;
         $descr          = 'Output load';
 
         discover_sensor(
-			$valid['sensor'],
-			'load',
-			$device,
-			$load_oid,
-			$index,
-			$type,
-			$descr,
-			$divisor,
-			'1',
+            $valid['sensor'],
+            'load',
+            $device,
+            $load_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-			$warnlimit,
-			$limit,
-			$load
-		);
+            $warnlimit,
+            $limit,
+            $load
+        );
     }
 
 }//end if
