@@ -1,6 +1,6 @@
 <?php
 /**
- * sinetica.inc.php
+ * netagent2.inc.php
  *
  * -Description-
  *
@@ -22,7 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 
 if ($device['os'] == 'netagent2') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.4.0';

@@ -1,6 +1,6 @@
 <?php
 /**
- * sinecta.php
+ * netagent2.inc.php
  *
  * -Description-
  *
