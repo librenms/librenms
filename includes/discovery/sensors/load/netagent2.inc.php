@@ -1,6 +1,6 @@
 <?php
 /**
- * sinecta.php
+ * sinetica.inc.php
  *
  * -Description-
  *
@@ -23,34 +23,37 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'megatec') {
-    $charge_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.1.0';
-    $charge = snmp_get($device, $charge_oid, '-Osqnv');
 
-    if (!empty($charge)) {
-        $type           = 'megatec';
+if ($device['os'] == 'netagent2') {
+    $load_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.3.0';
+    $output_load = snmp_get($device, $load_oid, '-Oqv');
+
+    if (!empty($output_load) || $output_load == 0) {
+        $type           = 'netagent2';
         $index          = 0;
         $limit          = 100;
+        $warnlimit      = 80;
         $lowlimit       = 0;
-        $lowwarnlimit   = 10;
+        $lowwarnlimit   = null;
         $divisor        = 1;
-        $descr          = 'Battery Charge';
+        $load           = $output_load / $divisor;
+        $descr          = 'Output load';
 
         discover_sensor(
             $valid['sensor'],
-            'charge',
+            'load',
             $device,
-            $charge_oid,
+            $load_oid,
             $index,
             $type,
             $descr,
             $divisor,
-            1,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-            null,
+            $warnlimit,
             $limit,
-            $charge
+            $load
         );
     }
-}
+}//end if

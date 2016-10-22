@@ -24,26 +24,26 @@
  */
 
 
-if ($device['os'] == 'megatec') {
-    $ups_temperature_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.3.0';
-    $ups_temperature = snmp_get($device, $ups_temperature_oid, '-Oqv');
+if ($device['os'] == 'netagent2') {
+    $battery_current_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
+    $battery_current = snmp_get($device, $battery_current_oid, '-Oqv');
 
-    if (!empty($ups_temperature) || $ups_temperature == 0) {
-        $type           = 'megatec';
+    if (!empty($battery_current) || $battery_current == 0) {
+        $type           = 'netagent2';
         $index          = 0;
-        $limit          = 50;
-        $warnlimit      = 40;
-        $lowlimit       = 0;
-        $lowwarnlimit   = 6;
+        $limit          = 30;
+        $warnlimit      = null;
+        $lowlimit       = null;
+        $lowwarnlimit   = null;
         $divisor        = 10;
-        $temperature    = $ups_temperature / $divisor;
-        $descr          = 'Temperature';
+        $current        = $battery_current / $divisor;
+        $descr          = 'Battery Current';
 
         discover_sensor(
             $valid['sensor'],
-            'temperature',
+            'current',
             $device,
-            $ups_temperature_oid,
+            $battery_current_oid,
             $index,
             $type,
             $descr,
@@ -53,7 +53,7 @@ if ($device['os'] == 'megatec') {
             $lowwarnlimit,
             $warnlimit,
             $limit,
-            $temperature
+            $current
         );
     }
 }//end if
