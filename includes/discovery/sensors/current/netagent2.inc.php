@@ -25,7 +25,7 @@
 
 
 if ($device['os'] == 'netagent2') {
-    $battery_current_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
+    $battery_current_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.7.0';
     $battery_current = snmp_get($device, $battery_current_oid, '-Oqv');
 
     if (!empty($battery_current) || $battery_current == 0) {
