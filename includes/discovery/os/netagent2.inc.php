@@ -1,8 +1,8 @@
 <?php
 /**
- * sinetica.inc.php
+ * netagent2.inc.php
  *
- * LibreNMS os discovery module for Sinetica
+ * LibreNMS os discovery module for Megatec Net Agent II
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

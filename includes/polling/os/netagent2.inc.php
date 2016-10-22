@@ -1,6 +1,6 @@
 <?php
 /**
- * megatec.inc.php
+ * netagent2.inc.php
  *
  * LibreNMS os polling module for Megatec
  *
