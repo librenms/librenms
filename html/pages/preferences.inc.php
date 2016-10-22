@@ -24,10 +24,10 @@ if ($_SESSION['userlevel'] == 11) {
             $changepass_message = 'Incorrect password';
         }
     }
-    if ($_POST['action'] == 'changedash') {
+    if ($vars['action'] === 'changedash') {
         if (!empty($vars['dashboard'])) {
             dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($_SESSION['user_id']));
-            print_message("User default dashboard updated");
+            $updatedashboard_message = "User default dashboard updated";
         }
     }
 
@@ -180,7 +180,9 @@ if ($_SESSION['userlevel'] == 11) {
 echo "<h3>Default Dashboard</h3>
 <hr>
 <div class='well'>";
-echo $updatedashboard_message;
+if (!empty($updatedashboard_message)) {
+    print_message($updatedashboard_message);
+}
 echo "
   <form method='post' action='preferences/' class='form-horizontal' role='form'>
     <div class='form-group'>
@@ -200,7 +202,7 @@ $dashoptions = dbFetchRows(
 
 foreach ($dashoptions as $dash) {
     echo "
-            <option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
+            <option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".display($dash['username']).':'.display($dash['dashboard_name'])."</option>";
 }
 echo "
           </select>
