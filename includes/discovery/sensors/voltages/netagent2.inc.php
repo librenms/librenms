@@ -24,12 +24,12 @@
  */
 
 
-if ($device['os'] == 'megatec') {
+if ($device['os'] == 'netagent2') {
     $in_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
     $in_voltage = snmp_get($device, $in_voltage_oid, '-Oqv');
 
     if (!empty($in_voltage) || $in_voltage == 0) {
-        $type           = 'megatec';
+        $type           = 'netagent2';
         $index          = 0;
         $limit          = 300;
         $warnlimit      = 253;
@@ -61,7 +61,7 @@ if ($device['os'] == 'megatec') {
     $out_voltage = snmp_get($device, $out_voltage_oid, '-Oqv');
 
     if (!empty($out_voltage) || $out_voltage == 0) {
-        $type           = 'megatec';
+        $type           = 'netagent2';
         $index          = 0;
         $limit          = 300;
         $warnlimit      = 253;

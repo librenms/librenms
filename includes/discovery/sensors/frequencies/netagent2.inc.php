@@ -24,12 +24,12 @@
  */
 
 
-if ($device['os'] == 'megatec') {
+if ($device['os'] == 'netagent2') {
     $in_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.4.0';
     $in_frequency = snmp_get($device, $in_frequency_oid, '-Oqv');
 
     if (!empty($in_frequency) || $in_frequency == 0) {
-        $type             = 'megatec';
+        $type             = 'netagent2';
         $index            = 0;
         $limit            = 60;
         $warnlimit        = 51;
@@ -61,7 +61,7 @@ if ($device['os'] == 'megatec') {
     $out_frequency = snmp_get($device, $frequency_oid, '-Oqv');
 
     if (!empty($out_frequency) || $out_frequency == 0) {
-        $type             = 'megatec';
+        $type             = 'netagent2';
         $index            = 0;
         $limit            = 60;
         $warnlimit        = 51;

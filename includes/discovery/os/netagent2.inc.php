@@ -24,5 +24,5 @@
  */
 
 if (starts_with($sysDescr, 'NET Agent II')) {
-    $os = 'megatec';
+    $os = 'netagent2';
 }
