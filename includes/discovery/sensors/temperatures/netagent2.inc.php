@@ -31,8 +31,8 @@ if ($device['os'] == 'netagent2') {
     if (!empty($ups_temperature) || $ups_temperature == 0) {
         $type           = 'netagent2';
         $index          = 0;
-        $limit          = 50;
-        $warnlimit      = 40;
+        $limit          = 110;
+        $warnlimit      = 50;
         $lowlimit       = 0;
         $lowwarnlimit   = 6;
         $divisor        = 10;
