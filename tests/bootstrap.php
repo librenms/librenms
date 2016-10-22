@@ -27,7 +27,6 @@
 $install_dir = realpath(__DIR__ . '/..');
 
 require $install_dir . '/includes/defaults.inc.php';
-#require $install_dir . '/includes/definitions.inc.php';
 
 // definitions, don't want to initialize mysql...
 $config['install_dir'] = $install_dir;
@@ -40,6 +39,7 @@ $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 require $install_dir . '/includes/common.php';
 if (getenv('SNMPSIM')) {
     require $install_dir . '/includes/functions.php';
+    require $install_dir . '/includes/definitions.inc.php';
 } else {
     require $install_dir . '/includes/rrdtool.inc.php';
     require $install_dir . '/includes/syslog.php';
