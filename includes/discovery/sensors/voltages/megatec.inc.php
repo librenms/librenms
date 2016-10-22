@@ -29,64 +29,64 @@ if ($device['os'] == 'megatec') {
     $in_voltage = snmp_get($device, $in_voltage_oid, '-Oqv');
 
     if (!empty($in_voltage) || $in_voltage == 0) {
-        $type			= 'megatec';
-		$index          = 0;
-		$limit 			= 300;
-		$warnlimit	  	= 253;
-        $lowlimit 		= 0;
-        $lowwarnlimit	= 216;
-		$divisor        = 10;
+        $type           = 'megatec';
+        $index          = 0;
+        $limit          = 300;
+        $warnlimit      = 253;
+        $lowlimit       = 0;
+        $lowwarnlimit   = 216;
+        $divisor        = 10;
         $voltage        = $in_voltage / $divisor;
         $descr          = 'Input Voltage';
 
         discover_sensor(
-			$valid['sensor'],
-			'voltage',
-			$device,
-			$in_voltage_oid,
-			$index,
-			$type,
-			$descr,
-			$divisor,
-			'1',
+            $valid['sensor'],
+            'voltage',
+            $device,
+            $in_voltage_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-			$warnlimit,
-			$limit,
-			$voltage
-		);
+            $warnlimit,
+            $limit,
+            $voltage
+        );
     }
-	
-	$out_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.1.0';
+    
+    $out_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.1.0';
     $out_voltage = snmp_get($device, $out_voltage_oid, '-Oqv');
 
     if (!empty($out_voltage) || $out_voltage == 0) {
-        $type			= 'megatec';
-		$index          = 0;
-		$limit 			= 300;
-		$warnlimit	  	= 253;
-        $lowlimit 		= 0;
-        $lowwarnlimit	= 216;
-		$divisor        = 10;
+        $type           = 'megatec';
+        $index          = 0;
+        $limit          = 300;
+        $warnlimit      = 253;
+        $lowlimit       = 0;
+        $lowwarnlimit   = 216;
+        $divisor        = 10;
         $voltage        = $out_voltage / $divisor;
         $descr          = 'Output Voltage';
 
         discover_sensor(
-			$valid['sensor'],
-			'voltage',
-			$device,
-			$in_voltage_oid,
-			$index,
-			$type,
-			$descr,
-			$divisor,
-			'1',
+            $valid['sensor'],
+            'voltage',
+            $device,
+            $in_voltage_oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            '1',
             $lowlimit,
             $lowwarnlimit,
-			$warnlimit,
-			$limit,
-			$voltage
-		);
+            $warnlimit,
+            $limit,
+            $voltage
+        );
     }
 
 }//end if
