@@ -61,7 +61,7 @@ if ($device['os'] == 'netagent2') {
 
     if (!empty($out_frequency) || $out_frequency == 0) {
         $type             = 'netagent2';
-        $index            = 0;
+        $index            = 1;
         $limit            = 60;
         $warnlimit        = 51;
         $lowlimit         = 0;
