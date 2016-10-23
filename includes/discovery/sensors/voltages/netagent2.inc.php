@@ -74,7 +74,7 @@ if ($device['os'] == 'netagent2') {
             $valid['sensor'],
             'voltage',
             $device,
-            $in_voltage_oid,
+            $out_voltage_oid,
             $index,
             $type,
             $descr,
