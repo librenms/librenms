@@ -21,6 +21,7 @@ source: Support/FAQ.md
  - [What do the values mean in my graphs?](#faq21)
  - [Why does a device show as a warning?](#faq22)
  - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
+ - [How do I move my LibreNMS install to another server?](#faq24)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -204,6 +205,19 @@ $config['device_traffic_iftype'][] = '/mpls/';
 $config['device_traffic_iftype'][] = '/ieee8023adLag/';
 $config['device_traffic_iftype'][] = '/ppp/';
 ```
+#### <a name="faq24"> How do I move my LibreNMS install to another server?</a>
+
+If you are moving from one CPU architecture to another then you will need to dump the rrd files and re-create them. If you are in 		
+this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).		
+		
+If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:		
+		
+    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.		
+    - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
+    - Dump the MySQL database `librenms` and import this into your new server.
+    - Copy the `rrd/` folder to the new server.
+    - Copy the `config.php` file to the new server.
+    - Renable cron by uncommenting all lines in `/etc/cron.d/librenms`
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
