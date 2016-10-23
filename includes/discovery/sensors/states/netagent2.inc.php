@@ -24,26 +24,26 @@
  */
 
 if ($device['os'] == 'netagent2') {
-    $ups_status_oid = '.1.3.6.1.4.1.935.1.1.1.4.1.1.0';
-    $ups_status = snmp_get($device, $ups_status_oid, '-Oqv');
+    $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.4.1.1.0';
+    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
 
-    if (!empty($ups_status) || $ups_status == 0) {
-        // UPS status OID (Value : 0-1 Unknown, 2 On Line, 3 On Battery, 4 On Boost, 5 Sleeping, 6 On Bypass, 7 Rebooting, 8 Standby, 9 On Buck )
-        $state_name = 'netagent2upsstatus';
+    if (!empty($ups_state) || $ups_state == 0) {
+        // UPS state OID (Value : 0-1 Unknown, 2 On Line, 3 On Battery, 4 On Boost, 5 Sleeping, 6 On Bypass, 7 Rebooting, 8 Standby, 9 On Buck )
+        $state_name = 'netagent2upsstate';
         $state_index_id = create_state_index($state_name);
 
-        if ($state_index_id) {
+        if ($state_index_id !== null) {
             $states = array(
                  array($state_index_id,'unknown',0,0,3) ,
                  array($state_index_id,'unknown',0,1,3) ,
-                 array($state_index_id,'OnLine',1,2,0) ,
-                 array($state_index_id,'OnBattery',1,3,1) ,
-                 array($state_index_id,'OnBoost',1,4,0) ,
-                 array($state_index_id,'Sleeping',1,4,1) ,
-                 array($state_index_id,'OnBypass',1,6,0) ,
-                 array($state_index_id,'Rebooting',1,7,1) ,
-                 array($state_index_id,'Standby',1,8,0) ,
-                 array($state_index_id,'OnBuck',1,9,0)
+                 array($state_index_id,'OnLine',0,2,0) ,
+                 array($state_index_id,'OnBattery',0,3,1) ,
+                 array($state_index_id,'OnBoost',0,4,0) ,
+                 array($state_index_id,'Sleeping',0,4,1) ,
+                 array($state_index_id,'OnBypass',0,6,0) ,
+                 array($state_index_id,'Rebooting',0,7,1) ,
+                 array($state_index_id,'Standby',0,8,0) ,
+                 array($state_index_id,'OnBuck',0,9,0)
              );
 
             foreach ($states as $value) {
@@ -64,14 +64,14 @@ if ($device['os'] == 'netagent2') {
         $lowlimit       = null;
         $lowwarnlimit   = null;
         $divisor        = 1;
-        $status         = $ups_status / $divisor;
-        $descr          = 'UPS Status';
+        $state         = $ups_state / $divisor;
+        $descr          = 'UPS state';
 
         discover_sensor(
             $valid['sensor'],
-            'status',
+            'state',
             $device,
-            $in_voltage_oid,
+            $ups_state_oid,
             $index,
             $state_name,
             $descr,
@@ -81,7 +81,7 @@ if ($device['os'] == 'netagent2') {
             $lowwarnlimit,
             $warnlimit,
             $limit,
-            $status
+            $state
         );
         create_sensor_to_state_index(
             $device,
