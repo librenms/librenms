@@ -1,0 +1,1262 @@
+-- *******************************************************************
+-- Juniper Traffic Load Balancer (TLB) MIB.
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+	JUNIPER-TLB-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+
+        Gauge32, Integer32, Unsigned32, Counter64,
+        NOTIFICATION-TYPE,
+    	MODULE-IDENTITY, OBJECT-TYPE,
+        OBJECT-IDENTITY, 
+        Counter32
+        	FROM SNMPv2-SMI
+
+        InterfaceIndex                  
+            FROM IF-MIB
+
+	DateAndTime, DisplayString		        
+            FROM SNMPv2-TC 
+
+    	InetAddressType, InetAddress, InetAddressIPv4 	        
+            FROM INET-ADDRESS-MIB
+
+        jnxSDKApplicationsRoot          
+            FROM JUNIPER-SMI
+
+        SnmpAdminString                                                             
+            FROM SNMP-FRAMEWORK-MIB                                                 
+                                                                                
+        MODULE-COMPLIANCE, OBJECT-GROUP                                                            
+            FROM SNMPv2-CONF                                                
+                                                                                
+        sysName, sysLocation, sysContact                                            
+            FROM SNMPv2-MIB;                                                     
+
+	jnxTLBMIB MODULE-IDENTITY
+        LAST-UPDATED  "201402122022Z" -- Feb 12, 2014" 
+    	ORGANIZATION  "Juniper Networks, Inc."
+    	CONTACT-INFO
+					"Juniper Technical Assistance Center
+					 Juniper Networks, Inc.
+					 1194 N. Mathilda Avenue
+					 Sunnyvale, CA 94089
+
+					 E-mail: support@juniper.net
+					 HTTP://www.juniper.net"
+    	DESCRIPTION
+            "This module defines the object that are used to monitor
+             traffic load balancer attributes."
+
+        REVISION        "201402122022Z" -- Feb 12, 2014
+    	DESCRIPTION 	"Creation Date"
+
+        ::= { jnxSDKApplicationsRoot 1 }
+
+    jnxTLBrealServer           OBJECT IDENTIFIER ::= { jnxTLBMIB 1 }
+    jnxTLBvirtualService       OBJECT IDENTIFIER ::= { jnxTLBMIB 2 }
+    jnxTLBserverGroup          OBJECT IDENTIFIER ::= { jnxTLBMIB 3 }
+    jnxTLBNetworkMonitorProfile OBJECT IDENTIFIER ::= { jnxTLBMIB 6 } 
+-- jnxTLBMIB 4 and 5 are used by tlbDataMib and tlbTrapMib respectively 
+
+-- ***************************************************************
+--  Real Server Table
+-- ***************************************************************
+
+    jnxTLBRealServerTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxRealServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes Traffic-load-balance real server
+         statistics. "
+        ::= { jnxTLBrealServer 1 }
+
+    jnxTLBRealServerEntry OBJECT-TYPE
+        SYNTAX        JnxRealServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "real server entries.  It is indexed by
+             virtual-service-name.real-server-name."
+        INDEX   { jnxTLBRealServerNameKey } 
+        ::= { jnxTLBRealServerTable 1 }
+
+    JnxRealServerEntry ::= SEQUENCE
+    {
+        jnxTLBRealServerNameKey                   DisplayString,
+        jnxTLBRealServerName                      DisplayString,
+        jnxTLBRealServerInstance                  DisplayString,
+        jnxTLBRealServerIPVersion                 INTEGER,
+        jnxTLBRealServerIP                        DisplayString, 
+        jnxTLBRealServerOperStatus                INTEGER,
+        jnxTLBRealServerAdminStatus               INTEGER,
+        jnxTLBRealServerSubUnitNo                 Unsigned32, 
+        jnxTLBRealServerFailures                  Unsigned32,
+        jnxTLBRSClientPacketForwardCount          Counter64, 
+        jnxTLBRSClientByteForwardCount            Counter64,
+        jnxTLBRSClientPacketReverseCount          Counter64,
+        jnxTLBRSClientByteReverseCount            Counter64,
+        jnxTLBRSTotalUpCount                      Unsigned32,
+        jnxTLBRSTotalDownCount                    Unsigned32,
+        jnxTLBRSTotalRejoinCount                  Unsigned32, 
+        jnxTLBRSTotalProbeFail                    Unsigned32,
+        jnxTLBRSTotalProbeSent                    Unsigned32,
+        jnxTLBRSTotalProbeSuccess                 Unsigned32,
+        jnxTLBRSTotalProbeSentFail                Unsigned32
+    }
+
+
+    jnxTLBRealServerNameKey OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..255))
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "The name of virtual-service.real-server used as key." 
+        ::= { jnxTLBRealServerEntry 1 }
+
+    jnxTLBRealServerName OBJECT-TYPE                                            
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The name of Real Server. "                                         
+        ::= { jnxTLBRealServerEntry 2 }           
+
+    jnxTLBRealServerInstance OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The instance of Real Server. "
+        ::= { jnxTLBRealServerEntry 3 }
+
+    jnxTLBRealServerIPVersion OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        ipv4       (1),
+                        ipv6       (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of IP address
+            For TLB MIB, supporting ipv4(1) and ipv6(2) only."
+        ::= { jnxTLBRealServerEntry 4 }
+
+    jnxTLBRealServerIP OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IP of  Real Server. "
+        ::= { jnxTLBRealServerEntry 5 }
+
+    jnxTLBRealServerOperStatus OBJECT-TYPE 
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The operation status 
+            For TLB MIB, supporting up(1) and down(2) only."
+        ::= { jnxTLBRealServerEntry 6 }
+
+    jnxTLBRealServerAdminStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The admin status
+            For TLB MIB, supporting up(1) and down(2) only."
+        ::= { jnxTLBRealServerEntry 7 }
+
+    jnxTLBRealServerSubUnitNo OBJECT-TYPE 
+        SYNTAX        Unsigned32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Subunit number of Real Server" 
+        ::= { jnxTLBRealServerEntry 8 }
+
+    jnxTLBRealServerFailures OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of Real Server Failures"
+        ::= { jnxTLBRealServerEntry 9 }
+
+    jnxTLBRSClientPacketForwardCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Forward Packet Count"
+        ::= { jnxTLBRealServerEntry 10 }
+
+    jnxTLBRSClientByteForwardCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Forward Byte Count"
+        ::= { jnxTLBRealServerEntry 11 }
+
+    jnxTLBRSClientPacketReverseCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reverse Packet Count"
+        ::= { jnxTLBRealServerEntry 12 }
+
+    jnxTLBRSClientByteReverseCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reverse Byte Count"
+        ::= { jnxTLBRealServerEntry 13 }
+
+    jnxTLBRSTotalUpCount  OBJECT-TYPE                
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of Real Server Up"
+        ::= { jnxTLBRealServerEntry 14 }
+
+    jnxTLBRSTotalDownCount  OBJECT-TYPE            
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of Real Server Down"
+        ::= { jnxTLBRealServerEntry 15 }
+
+    jnxTLBRSTotalRejoinCount  OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of times Real Server Rejoined."
+        ::= { jnxTLBRealServerEntry 16 }
+
+    jnxTLBRSTotalProbeSent  OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of Probe Sent"
+        ::= { jnxTLBRealServerEntry 17 }
+
+    jnxTLBRSTotalProbeSuccess  OBJECT-TYPE  
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total Number of Probe Successful"
+        ::= { jnxTLBRealServerEntry 18 }
+
+    jnxTLBRSTotalProbeFail  OBJECT-TYPE  
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total Number of Probe Failed"
+        ::= { jnxTLBRealServerEntry 19 }
+
+    jnxTLBRSTotalProbeSentFail  OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of Probe Sent Failed"
+        ::= { jnxTLBRealServerEntry 20 }
+
+-- ***************************************************************
+--  Virtual Service Table
+-- ***************************************************************
+
+    jnxTLBVirtualServiceTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxVirtualServiceEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes Traffic-load-balance virtual service 
+         statistics. "
+
+        ::= { jnxTLBvirtualService 1 }
+
+    jnxTLBVirtualServiceEntry OBJECT-TYPE
+        SYNTAX        JnxVirtualServiceEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "virtual service entries. It is indexed by virtual service name."
+        INDEX   { jnxTLBVirtualServiceNameKey }
+        ::= { jnxTLBVirtualServiceTable 1 }
+
+    JnxVirtualServiceEntry ::= SEQUENCE
+    {
+        jnxTLBVirtualServiceNameKey                   DisplayString,
+        jnxTLBVirtualServiceName                      DisplayString,        
+        jnxTLBVirtualServiceTranslationMode           DisplayString,
+        jnxTLBVirtualServiceInstance                  DisplayString,
+        jnxTLBVirtualServiceIPVersion                 INTEGER,
+        jnxTLBVirtualServiceIP                        DisplayString,
+        jnxTLBVirtualServiceVirtualPort               Unsigned32,
+        jnxTLBVirtualServiceRealPort                  Unsigned32,
+        jnxTLBVirtualServiceSubUnitNo                 Unsigned32,
+        jnxTLBVirtualServiceNextHopIndex              Unsigned32,
+        jnxTLBVirtualServiceOperStatus                INTEGER,   
+        jnxTLBVirtualServiceAdminStatus               INTEGER, 
+        jnxTLBVirtualServiceFailures                  Unsigned32,
+        jnxTLBVSClientPacketForwardCount              Counter64,
+        jnxTLBVSClientByteForwardCount                Counter64,
+        jnxTLBVSClientPacketReverseCount              Counter64,
+        jnxTLBVSClientByteReverseCount                Counter64,
+        jnxTLBVSNetworkMonitorProfileCount            Unsigned32,
+        jnxTLBVSTotalDownCount                        Unsigned32,
+        jnxTLBVSTotalUpCount                          Unsigned32,
+        jnxTLBVSTotalRealServerCount                  Unsigned32,
+        jnxTLBVSActiveRealServerCount                 Unsigned32,
+        jnxTLBVSServiceUpTime                         DisplayString,
+        jnxTLBVirtualServiceProtocol                  DisplayString,
+        jnxTLBVirtualServiceDemuxNextHopIndex         Unsigned32,
+        jnxTLBVirtualServiceInterface                 DisplayString,
+        jnxTLBVirtualServiceRoutingInstance           DisplayString,
+        jnxTLBVirtualServiceHashMethod                DisplayString,
+        jnxTLBVirtualServiceRouteMetric               Unsigned32,
+        jnxTLBVirtualServiceAutoRejoin                INTEGER,
+        jnxTLBVirtualServiceRouteHoldTimer            INTEGER,
+        jnxTLBVirtualServiceWarmUpTime                INTEGER 
+    }
+
+    jnxTLBVirtualServiceNameKey OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..255))
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The name of Virtual Service used as key. "
+        ::= { jnxTLBVirtualServiceEntry 1 }
+
+    jnxTLBVirtualServiceName OBJECT-TYPE                                        
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The name of Virtual Service. "                                         
+        ::= { jnxTLBVirtualServiceEntry 2 }                            
+
+    jnxTLBVirtualServiceTranslationMode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Translation mode of Virtual Service. "
+        ::= { jnxTLBVirtualServiceEntry 3 }
+
+    jnxTLBVirtualServiceInstance OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The instance name of Virtual Service. "
+        ::= { jnxTLBVirtualServiceEntry 4 }
+
+    jnxTLBVirtualServiceIPVersion OBJECT-TYPE 
+        SYNTAX        INTEGER {
+                        ipv4       (1),
+                        ipv6       (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of IP address
+            For TLB MIB, supporting ipv4(1) and ipv6(2) only."
+        ::= { jnxTLBVirtualServiceEntry 5 }
+
+    jnxTLBVirtualServiceIP OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IP of Virtual Service."
+        ::= { jnxTLBVirtualServiceEntry 6 }
+
+    jnxTLBVirtualServiceOperStatus OBJECT-TYPE 
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The operation status
+            For TLB MIB, supporting up(1) and down(2) only."
+        ::= { jnxTLBVirtualServiceEntry 7 }
+
+    jnxTLBVirtualServiceAdminStatus OBJECT-TYPE 
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The admin status
+            For TLB MIB, supporting up(1) and down(2) only."
+        ::= { jnxTLBVirtualServiceEntry 8 }
+
+    jnxTLBVirtualServiceSubUnitNo OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Subunit number of virtual Service"
+        ::= { jnxTLBVirtualServiceEntry 9 }
+
+    jnxTLBVirtualServiceFailures OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Nunber of virtual service failures."
+        ::= { jnxTLBVirtualServiceEntry 10 }
+
+    jnxTLBVSClientPacketForwardCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Forward packet count."
+        ::= { jnxTLBVirtualServiceEntry 11 }
+
+    jnxTLBVSClientByteForwardCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Forward byte count."
+        ::= { jnxTLBVirtualServiceEntry 12 }
+
+    jnxTLBVSClientPacketReverseCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reverse packet count"
+        ::= { jnxTLBVirtualServiceEntry 13 }
+
+    jnxTLBVSClientByteReverseCount OBJECT-TYPE 
+        SYNTAX        Counter64 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Reverse byte count"
+        ::= { jnxTLBVirtualServiceEntry 14 }
+
+    jnxTLBVSTotalUpCount OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of real server up."
+        ::= { jnxTLBVirtualServiceEntry 15 }
+
+    jnxTLBVSTotalDownCount OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of real server down."
+        ::= { jnxTLBVirtualServiceEntry 16 }
+
+    jnxTLBVSTotalRealServerCount OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of real server."
+        ::= { jnxTLBVirtualServiceEntry 17 }
+
+    jnxTLBVSServiceUpTime OBJECT-TYPE 
+        SYNTAX        DisplayString 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Service up time."
+        ::= { jnxTLBVirtualServiceEntry 18 }
+
+    jnxTLBVSActiveRealServerCount OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of active real server."
+        ::= { jnxTLBVirtualServiceEntry 19 }
+
+    jnxTLBVSNetworkMonitorProfileCount OBJECT-TYPE 
+        SYNTAX        Unsigned32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Monitor Profile count."
+        ::= { jnxTLBVirtualServiceEntry 20 }
+
+    jnxTLBVirtualServiceVirtualPort OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Virtual port used."
+        ::= { jnxTLBVirtualServiceEntry 21 }
+
+     jnxTLBVirtualServiceRealPort OBJECT-TYPE 
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+               "Real port used."
+         ::= { jnxTLBVirtualServiceEntry 22 }
+                                                       
+     jnxTLBVirtualServiceNextHopIndex OBJECT-TYPE 
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+               "Virtual service nexthop index."
+        ::= { jnxTLBVirtualServiceEntry 23 }
+
+    jnxTLBVirtualServiceProtocol OBJECT-TYPE 
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+              "Virtual Service protocol used."
+        ::= { jnxTLBVirtualServiceEntry 24 }
+
+     jnxTLBVirtualServiceDemuxNextHopIndex OBJECT-TYPE                               
+         SYNTAX        Unsigned32                                               
+         MAX-ACCESS    read-only                                                
+         STATUS        current                                                  
+         DESCRIPTION                                                            
+               "Virtual service nexthop index."                                 
+        ::= { jnxTLBVirtualServiceEntry 25 }      
+
+    jnxTLBVirtualServiceInterface OBJECT-TYPE                                    
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "Virtual Service Interface used. "                                     
+        ::= { jnxTLBVirtualServiceEntry 26 }         
+
+    jnxTLBVirtualServiceRoutingInstance OBJECT-TYPE                                    
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "Routing Instance of virtual service. "                                    
+        ::= { jnxTLBVirtualServiceEntry 27 }           
+
+     jnxTLBVirtualServiceHashMethod OBJECT-TYPE                                   
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only                                                
+         STATUS        current                                                  
+         DESCRIPTION                                                            
+               "Hash method used."                                                
+         ::= { jnxTLBVirtualServiceEntry 28 }   
+
+     jnxTLBVirtualServiceRouteMetric OBJECT-TYPE                                 
+         SYNTAX        Unsigned32                                               
+         MAX-ACCESS    read-only                                                
+         STATUS        current                                                  
+         DESCRIPTION                                                            
+               "Raute metric of virtual service."                                      
+         ::= { jnxTLBVirtualServiceEntry 29 }          
+
+    jnxTLBVirtualServiceAutoRejoin OBJECT-TYPE                                   
+        SYNTAX        INTEGER {                                                 
+                        true         (0),                                         
+                        false        (1)                                          
+                      }                                                         
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION
+              "Virtual Service Auto Rejoin option" 
+        ::= { jnxTLBVirtualServiceEntry 30 }
+
+     jnxTLBVirtualServiceRouteHoldTimer   OBJECT-TYPE                               
+         SYNTAX      INTEGER (1..65535)                                              
+         MAX-ACCESS  read-only                                                       
+         STATUS      current                                                         
+         DESCRIPTION
+               "Virtual Service Route Hold Timer"
+         ::= { jnxTLBVirtualServiceEntry 31 }                   
+
+     jnxTLBVirtualServiceWarmUpTime   OBJECT-TYPE                                        
+         SYNTAX      INTEGER (1..65535)                                              
+         MAX-ACCESS  read-only                                                       
+         STATUS      current                                                         
+         DESCRIPTION
+               "Virtual Service Warm Up Time."
+         ::= { jnxTLBVirtualServiceEntry 32 }                                  
+ 
+
+-- ***************************************************************
+--  Server Group Table
+-- ***************************************************************
+
+    jnxTLBServerGroupTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxServerGroupEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+			"This table monitors server group  "
+        ::= { jnxTLBserverGroup 1 }  
+
+    jnxTLBServerGroupEntry OBJECT-TYPE
+        SYNTAX        JnxServerGroupEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Server group entries. It is indexed by server group name."
+        INDEX   { jnxTLBServerGroupNameKey }
+        ::= { jnxTLBServerGroupTable 1 }
+
+    JnxServerGroupEntry ::= SEQUENCE
+    {
+        jnxTLBServerGroupNameKey                  DisplayString,
+        jnxTLBServerGroupName                     DisplayString,
+        jnxTLBServerGroupInstance                 DisplayString, 
+        jnxTLBServerGroupIPVersion                INTEGER,
+        jnxTLBServerGroupOperStatus               INTEGER, 
+        jnxTLBServerGroupAdminStatus              INTEGER, 
+        jnxTLBServerGroupFailures                 Unsigned32,
+        jnxTLBServerGroupLastTimeUp               DisplayString,
+        jnxTLBServerGroupLastTimeDown             DisplayString,
+        jnxTLBServerGroupTotalUpCount             Unsigned32,
+        jnxTLBServerGroupTotalDownCount           Unsigned32 
+    }
+
+    jnxTLBServerGroupNameKey OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..255)) 
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+        	"Server Group Name used as Key. "
+    ::= { jnxTLBServerGroupEntry 1 }
+
+    jnxTLBServerGroupName OBJECT-TYPE                                           
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Server Group Name"                                            
+    ::= { jnxTLBServerGroupEntry 2 }                                   
+
+    jnxTLBServerGroupInstance OBJECT-TYPE
+        SYNTAX        DisplayString 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"Instance of Server Group "
+    ::= { jnxTLBServerGroupEntry 3 }
+
+    jnxTLBServerGroupIPVersion OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        ipv4       (1),
+                        ipv6       (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Server Group IP Version "
+         ::= { jnxTLBServerGroupEntry 4 }
+
+    jnxTLBServerGroupOperStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Server Group Operation Status "
+         ::= { jnxTLBServerGroupEntry 5 }
+
+    jnxTLBServerGroupAdminStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        up       (1),
+                        down     (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Server Group Admin Status "
+         ::= { jnxTLBServerGroupEntry 6 }
+
+     jnxTLBServerGroupFailures OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Number of Server Group Failures "
+         ::= { jnxTLBServerGroupEntry 7 }
+  
+     jnxTLBServerGroupLastTimeUp OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Server Group Last Time Up "
+         ::= { jnxTLBServerGroupEntry 8 }
+
+     jnxTLBServerGroupLastTimeDown OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Server Group Last Time Down "
+         ::= { jnxTLBServerGroupEntry 9 }
+
+     jnxTLBServerGroupTotalUpCount OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Total Number of Server Group UP."
+         ::= { jnxTLBServerGroupEntry 10 }
+
+     jnxTLBServerGroupTotalDownCount OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                 "Total number of Server Group Down"
+         ::= { jnxTLBServerGroupEntry 11 }
+
+
+-- ***************************************************************
+--  Network-Monitor-Profile Table
+-- ***************************************************************
+    jnxTLBNetworkMonitorProfileTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxNetworkMonitorProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table monitors server group  "
+        ::= { jnxTLBNetworkMonitorProfile 1 }
+
+    jnxTLBNetworkMonitorProfileEntry OBJECT-TYPE
+        SYNTAX        JnxNetworkMonitorProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Network Monitor Profile Entries. It is indexed by
+             virtual-service-name.real-server-name.profile-index. "
+        INDEX { jnxTLBNetworkMonitorProfileNameKey }
+        ::= { jnxTLBNetworkMonitorProfileTable 1 }
+
+    JnxNetworkMonitorProfileEntry ::= SEQUENCE
+    {
+        jnxTLBNetworkMonitorProfileNameKey                 DisplayString,
+        jnxTLBNetworkMonitorProfileVirtualServiceName      DisplayString,
+        jnxTLBNetworkMonitorProfileRealServerName          DisplayString,
+        jnxTLBNetworkMonitorProfileIndex                   Unsigned32,
+        jnxTLBNetworkMonitorProfileName                    DisplayString,
+        jnxTLBNetworkMonitorProfileType                    DisplayString,
+        jnxTLBNetworkMonitorProfileProbeInterval           Unsigned32,
+        jnxTLBNetworkMonitorProfileFailureRetry            Unsigned32,
+        jnxTLBNetworkMonitorProfileRecoverRetry            Unsigned32,
+        jnxTLBNetworkMonitorProfilePortNumber              Unsigned32,
+        jnxTLBNetworkMonitorProfileProbeState              INTEGER,
+        jnxTLBNetworkMonitorProfileProbeSent               Unsigned32,
+        jnxTLBNetworkMonitorProfileProbeSuccess            Unsigned32,
+        jnxTLBNetworkMonitorProfileProbeFail               Unsigned32,
+        jnxTLBNetworkMonitorProfileProbeConsecutiveSuccess Unsigned32,
+        jnxTLBNetworkMonitorProfileProbeConsecutiveFail    Unsigned32
+    }
+
+    jnxTLBNetworkMonitorProfileNameKey OBJECT-TYPE 
+        SYNTAX        DisplayString (SIZE(0..255))                               
+        MAX-ACCESS    not-accessible                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Network Monitor Profile Key Name.
+                 virtual-service-name.real-server-name.profile-index. "
+    ::= { jnxTLBNetworkMonitorProfileEntry 1 }
+
+    jnxTLBNetworkMonitorProfileVirtualServiceName OBJECT-TYPE 
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    not-accessible                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Virtual Service Name."                                            
+    ::= { jnxTLBNetworkMonitorProfileEntry 2 }
+
+    jnxTLBNetworkMonitorProfileRealServerName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    not-accessible                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Real Server Name."                                          
+    ::= { jnxTLBNetworkMonitorProfileEntry 3 }
+
+    jnxTLBNetworkMonitorProfileIndex OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    not-accessible                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Network Monitor Profile Index."                             
+         ::= { jnxTLBNetworkMonitorProfileEntry 4 } 
+
+    jnxTLBNetworkMonitorProfileName OBJECT-TYPE 
+        SYNTAX        DisplayString (SIZE(0..64))                               
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Network Monitor Profile name."                                              
+    ::= { jnxTLBNetworkMonitorProfileEntry 5 }
+
+    jnxTLBNetworkMonitorProfileType OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))                              
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                "Network Monitor Profile type."                                  
+    ::= { jnxTLBNetworkMonitorProfileEntry 6 }  
+
+    jnxTLBNetworkMonitorProfileProbeInterval OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                             
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Network Monitor Profile Probe Interval."                               
+    ::= { jnxTLBNetworkMonitorProfileEntry 7 } 
+   
+    jnxTLBNetworkMonitorProfileFailureRetry OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Network Monitor Failure Retry."                               
+    ::= { jnxTLBNetworkMonitorProfileEntry 8 }        
+
+    jnxTLBNetworkMonitorProfileRecoverRetry OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Network Monitor Profile Recover Retry."                               
+    ::= { jnxTLBNetworkMonitorProfileEntry 9 } 
+
+    jnxTLBNetworkMonitorProfilePortNumber OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Network Monitor Profile Port Number."                       
+    ::= { jnxTLBNetworkMonitorProfileEntry 10 }
+
+    jnxTLBNetworkMonitorProfileProbeState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     probeStateUp   (1),
+                     probeStateDown (2)
+                    }                                               
+        MAX-ACCESS  read-only                                                       
+        STATUS      current                                                         
+        DESCRIPTION                                                                 
+        "Probe State of the Network Monitor Profile."                               
+    ::= { jnxTLBNetworkMonitorProfileEntry 11 }       
+        
+    jnxTLBNetworkMonitorProfileProbeSent OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Count of probes sent for this Network Monitor profile."                         
+    ::= { jnxTLBNetworkMonitorProfileEntry 12 }      
+        
+    jnxTLBNetworkMonitorProfileProbeSuccess OBJECT-TYPE                    
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Count of Successful probes for this Network Monitor profile."                         
+    ::= { jnxTLBNetworkMonitorProfileEntry 13 }
+
+    jnxTLBNetworkMonitorProfileProbeFail OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Count of Failed probes for this Network Monitor profile."                        
+    ::= { jnxTLBNetworkMonitorProfileEntry 14 }
+
+    jnxTLBNetworkMonitorProfileProbeConsecutiveSuccess OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Count of Consecutive Successful probes for this Network Monitor profile."                         
+    ::= { jnxTLBNetworkMonitorProfileEntry 15 }
+
+    jnxTLBNetworkMonitorProfileProbeConsecutiveFail OBJECT-TYPE
+        SYNTAX        Unsigned32                                                
+        MAX-ACCESS    read-only                                                 
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+                 "Count of Consecutive Failed probes for this Network Monitor profile."                         
+    ::= { jnxTLBNetworkMonitorProfileEntry 16 }                      
+          
+
+
+
+tlbDataMib OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Traffic Load Balance data OIDs."
+   ::= { jnxTLBMIB 4 }
+
+   -- realServerMib OBJECT IDENTIFIER ::= { tlbDataMib 1 }
+   -- virtualServiceMib OBJECT IDENTIFIER ::= { tlbDataMib 2 }
+   -- tlbTrapsMib OBJECT IDENTIFIER ::= { tlbDataMib 3 }
+   -- serverGroupMib OBJECT IDENTIFIER ::= { tlbDataMib 4 }
+   
+   
+tlbTrapMib OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Traffic Load Balance trap OIDs."
+    ::= { jnxTLBMIB 5 }
+    
+    tlbNotificationObjMib  OBJECT IDENTIFIER ::= { tlbTrapMib 3 }
+    tlbNotificationMib OBJECT IDENTIFIER ::= { tlbTrapMib 4 }
+    
+--
+-- Objects used in Notifications
+--
+
+tlbInstanceName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name which uniquely identifies the TLB instance."
+    ::= { tlbNotificationObjMib 1001 }
+    
+tlbRealServerName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name which uniquely identifies the real server."
+    ::= { tlbNotificationObjMib 1002 }
+    
+tlbRealServerGroupName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name which uniquely identifies the real server group."
+    ::= { tlbNotificationObjMib 1003 }                                    
+    
+tlbRealServerIpAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the real server."
+    ::= { tlbNotificationObjMib 1004 }
+ 
+tlbVirtualServiceName   OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The name which uniquely identifies the virtual service."
+    ::= {tlbNotificationObjMib 1005}
+
+tlbVirtualServiceIpAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the virtual service."
+    ::= {tlbNotificationObjMib 1006}
+                            
+tlbVirtualServicePort   OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the virtual service."
+    ::= {tlbNotificationObjMib 1007}
+                            
+tlbProfileName  OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The name of service probe profile."
+    ::= {tlbNotificationObjMib 1008}
+
+tlbMultiserviceInterface OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Name of the multiservice interface."
+    ::= {tlbNotificationObjMib 1009}
+
+tlbMultiServicePIC  OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PIC ID."
+    ::= {tlbNotificationObjMib 1010}
+
+tlbNetmonCpuUsage  OBJECT-TYPE                                                 
+    SYNTAX      Unsigned32                                                  
+    MAX-ACCESS  read-only                                                       
+    STATUS      current                                                         
+    DESCRIPTION                                                                 
+        "CPU usage of Netmond"                                                 
+    ::= {tlbNotificationObjMib 1011}
+
+tlbMonitorMode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RE or PIC based net-monitord."
+    ::= { tlbNotificationObjMib 1099}
+                            
+
+                                                                                                                                                                                                                                                         
+-- ***************************************************************
+-- Trap variables
+-- ***************************************************************
+
+tlbRealServerUp NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbRealServerName,
+              tlbRealServerIpAddress,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact  
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when real server starts up."
+    ::= { tlbNotificationMib 1 }    
+
+tlbRealServerDown NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbRealServerName,
+              tlbRealServerIpAddress,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+     STATUS  current
+     DESCRIPTION
+         "The trap will be sent when real server is down."
+     ::= { tlbNotificationMib 2 }
+                             
+tlbRealServerRejoined NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbRealServerName,
+              tlbRealServerIpAddress,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+             }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when real server rejoins a group."
+    ::= { tlbNotificationMib 3 }
+
+
+tlbVirtualServiceUp NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbVirtualServiceName,
+              tlbVirtualServiceIpAddr,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+             }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when at least one service is up for the
+         virtual-server IP address."
+    ::= { tlbNotificationMib 5 }             
+
+tlbVirtualServiceDown NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbVirtualServiceName,
+              tlbVirtualServiceIpAddr,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when all services is down for a virtual-server
+         IP address."
+    ::= { tlbNotificationMib 6 }            
+
+
+
+--
+-- RealServerService :TODO:
+--
+
+tlbRealServerServiceUp NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbRealServerName,
+              tlbRealServerIpAddress,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when real server service is up."
+    ::= { tlbNotificationMib 7 }
+                                
+tlbRealServerServiceDown NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbRealServerName,
+              tlbRealServerIpAddress,
+              tlbRealServerGroupName,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when real server service is down."
+    ::= { tlbNotificationMib 8 }
+                                 
+tlbVirtualServerServiceUp NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbVirtualServiceName,
+              tlbVirtualServiceIpAddr,
+              tlbRealServerGroupName,
+              tlbVirtualServicePort,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when virtual service is up."
+    ::= { tlbNotificationMib 9 }
+                                  
+tlbVirtualServerServiceDown NOTIFICATION-TYPE
+    OBJECTS { tlbInstanceName,
+              tlbVirtualServiceName,
+              tlbVirtualServiceIpAddr,
+              tlbRealServerGroupName,
+              tlbVirtualServicePort,
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when virtual service is down."
+    ::= { tlbNotificationMib 10 }              
+
+tlbUp NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB is started or restarted."
+    ::= { tlbNotificationMib 11 }              
+
+tlbShutdown NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB is shutdown or restarted."
+    ::= { tlbNotificationMib 12 }
+                    
+tlbPicConnected NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              tlbMultiserviceInterface,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB connects to a PIC."
+    ::= { tlbNotificationMib 13 }
+                    
+tlbPicDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              tlbMultiserviceInterface,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB disconnects from a PIC."
+    ::= { tlbNotificationMib 14 }
+                    
+tlbCpuHigh NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              tlbNetmonCpuUsage,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB uses more than a predefined max percentage of CPU."
+    ::= { tlbNotificationMib 15 }
+                    
+tlbCpuNormal NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              tlbNetmonCpuUsage,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent when TLB drops below a predefined max percentage of CPU."
+    ::= { tlbNotificationMib 16 }
+
+tlbUnlicensedPic NOTIFICATION-TYPE
+    OBJECTS {
+              tlbMonitorMode,
+              sysName, sysLocation, sysContact
+            }
+    STATUS  current
+    DESCRIPTION
+        "The trap will be sent if no license is installed and it is required."
+    ::= { tlbNotificationMib 17 }              
+                                                                                                                                                                                 
+
+-- ***************************************************************
+--  END of File 
+-- ***************************************************************
+END
