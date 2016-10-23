@@ -1,0 +1,135 @@
+-- *****************************************************************
+-- JNX-DOT3OAM-CAPABILITY.mib: Juniper DOT3-OAM-MIB AGENT-CAPABILITIES
+--
+-- Copyright (c) 2015, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+JNX-DOT3OAM-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        jnxAgentCapability
+                FROM JUNIPER-SMI;   
+
+jnxDot3OamCapability MODULE-IDENTITY
+    LAST-UPDATED "201507250000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+
+    DESCRIPTION
+       "Agent capabilities for DOT3-OAM-MIB (RFC4878)"
+    ::= { jnxAgentCapability 6 }
+
+
+jnxDot3OamCapJunos AGENT-CAPABILITIES
+
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION     "DOT3-OAM MIB capabilities"
+
+    SUPPORTS        DOT3-OAM-MIB
+    INCLUDES        {
+                      dot3OamControlGroup, dot3OamPeerGroup,
+                      dot3OamStatsBaseGroup, dot3OamLoopbackGroup,
+                      dot3OamErrSymbolPeriodEventGroup,
+                      dot3OamErrFramePeriodEventGroup,
+                      dot3OamErrFrameEventGroup,
+                      dot3OamErrFrameSecsSummaryEventGroup,
+                      dot3OamFlagEventGroup, dot3OamEventLogGroup,
+                      dot3OamNotificationGroup
+                    }
+
+    VARIATION       dot3OamAdminState
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamMode
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamLoopbackStatus
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamLoopbackIgnoreRx
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrSymPeriodWindowHi
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrSymPeriodWindowLo
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrSymPeriodThresholdHi
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrSymPeriodThresholdLo
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrSymPeriodEvNotifEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFramePeriodWindow
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFramePeriodThreshold
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFramePeriodEvNotifEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFramePeriodEvNotifEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFrameThreshold
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFrameEvNotifEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFrameSecsSummaryWindow
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFrameSecsSummaryThreshold
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamErrFrameSecsEvNotifEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamDyingGaspEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    VARIATION       dot3OamCriticalEventEnable
+    ACCESS          read-only
+    DESCRIPTION     "Write access is not supported."
+
+    ::= { jnxDot3OamCapability 1 } 
+ 
+END
+
