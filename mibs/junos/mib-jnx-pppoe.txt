@@ -694,7 +694,7 @@ JnxPPPoESubIfEntry ::= SEQUENCE {
     jnxPPPoESubIfIndex          InterfaceIndex,
     jnxPPPoESubIfRowStatus      RowStatus,
     jnxPPPoESubIfLowerIfIndex   InterfaceIndexOrZero,
-    jnxPPPoESubIfId             Integer32,
+    jnxPPPoESubIfId             Unsigned32,
     jnxPPPoESubIfSessionId      Integer32,
     jnxPPPoESubIfMotm           DisplayString,
     jnxPPPoESubIfUrl            DisplayString }
@@ -756,7 +756,7 @@ jnxPPPoESubIfLowerIfIndex OBJECT-TYPE
     ::= { jnxPPPoESubIfEntry 3 }
 
 jnxPPPoESubIfId OBJECT-TYPE
-    SYNTAX      Integer32 (-1..2147483647)
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
