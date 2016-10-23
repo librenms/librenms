@@ -245,6 +245,7 @@ $rewrite_junos_hardware = array(
     // ?
     'jnxProductNameMX80'           => 'MX80',
     'jnxProductName'               => '',
+    'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
 );
 
 $rewrite_cisco_hardware = array('.1.3.6.1.4.1.9.1.275' => 'C2948G-L3');

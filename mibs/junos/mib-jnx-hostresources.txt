@@ -43,6 +43,7 @@ IMPORTS
    -- The Host Resources Storage Group
 
     jnxHrStorage OBJECT IDENTIFIER ::= { jnxHostResourcesMIB 1 }
+    jnxHrSystem  OBJECT IDENTIFIER ::= { jnxHostResourcesMIB 2 }
 
     jnxHrStorageTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF JnxHrStorageEntry
@@ -77,5 +78,12 @@ IMPORTS
             available."
         ::= { jnxHrStorageEntry 1 }
 
+    jnxHrSystemOpenFiles OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Number of open files in the system."
+        ::= { jnxHrSystem 1 }
 
 END
