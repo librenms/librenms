@@ -354,7 +354,7 @@
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
-            "The dynamic address pool utilization in terms of number of ports utilized."
+            "The dynamic address pool utilization in percentage."
         ::= { jnxNatTrapVars 1 }
 
     jnxNatTrapSrcPoolName OBJECT-TYPE
@@ -376,11 +376,11 @@
         DESCRIPTION
              "The Source NAT address pool utilization threshold status
               trap signifies that the address pool utilization
-	      is either exceeds threshold value, or clear of
-              that value.
+              is either exceeds certain percentage, or clear of 
+              that percentage.
 					
 			  jnxNatTrapPoolName is the name of the resource pool
-			  jnxNatAddrPoolUtil is the number of ports utilized 
+			  jnxNatAddrPoolUtil is the percentage of utilization 
               of the address pool." 
         ::= { jnxNatNotifications 1 }
 	

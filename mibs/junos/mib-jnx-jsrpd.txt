@@ -23,7 +23,7 @@
 
 
     jnxJsChassisClusterMIB  MODULE-IDENTITY
-        LAST-UPDATED  "201106280000Z"
+        LAST-UPDATED  "201309200000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -39,6 +39,12 @@
              a cluster fails, the other chassis in the cluster takes over the function 
              of the failed chassis with minimal service interruption.
              This module defines the objects pertaining to Chassis Cluster."
+
+        REVISION      "201309200000Z"
+        DESCRIPTION   "Added trap jnxJsChClusterWeightTrap"
+
+        REVISION      "201207200000Z"
+        DESCRIPTION   "Added trap jnxJsChClusterSpuMismatchTrap"
 
         REVISION      "201106280000Z"
         DESCRIPTION   "Added trap jnxJsChClusterIntfTrap"
@@ -85,10 +91,41 @@
                   jnxJsChClusterIntfStateReason }
         STATUS              current
         DESCRIPTION
-            "Notification to signal change in HA interface state."
+            "Notification to signal node health status change (healthy/unhealthy)."
         ::= { jnxJsChassisClusterNotifications 2 }
 
-	jnxJsChClusterSwitchoverInfoRedundancyGroup OBJECT-TYPE
+    -- ***************************************************************
+    -- definition of a trap that notifies cluster having different
+    -- SPU number
+    -- ***************************************************************
+
+    jnxJsChClusterSpuMismatchTrap NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterNodeZeroId,
+                  jnxJsChClusterNodeZeroSpuCount,
+                  jnxJsChClusterNodeOneId ,
+                  jnxJsChClusterNodeOneSpuCount }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal cluster having different SPU number."
+        ::= { jnxJsChassisClusterNotifications 3 }
+
+    -- ***************************************************************
+    -- definition of a trap that notifies changes in node weight
+    -- ***************************************************************
+
+    jnxJsChClusterWeightTrap NOTIFICATION-TYPE
+        OBJECTS { jnxJsChClusterClusterID,
+                  jnxJsChClusterRedundancyGroupID,
+                  jnxJsChClusterNodeID,
+                  jnxJsChClusterWeightHealthStatus,
+                  jnxJsChClusterWeightValue }
+        STATUS              current
+        DESCRIPTION
+            "Notification to signal node health status change (healthy/unhealthy)."
+        ::= { jnxJsChassisClusterNotifications 4 }
+
+    jnxJsChClusterSwitchoverInfoRedundancyGroup OBJECT-TYPE
+
         SYNTAX      DisplayString
         MAX-ACCESS  accessible-for-notify
         STATUS      current
@@ -176,5 +213,83 @@
             "This object contains the reason why the link state 
              changed."
         ::= { jnxJsChassisClusterTrapObjects 10 }
+
+    jnxJsChClusterNodeZeroId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains remote node identification information
+             where the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 11 }
+
+    jnxJsChClusterNodeOneId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains remote node identification information
+             where the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 12 }
+
+    jnxJsChClusterNodeZeroSpuCount OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains local node total SPU number."
+        ::= { jnxJsChassisClusterTrapObjects 13 }
+
+    jnxJsChClusterNodeOneSpuCount OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains remote node total SPU number."
+        ::= { jnxJsChassisClusterTrapObjects 14 }
+
+    jnxJsChClusterClusterID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of cluster, 
+             in which the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 15 }
+
+    jnxJsChClusterRedundancyGroupID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of RedundancyGroup, 
+             in which the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 16 }
+
+    jnxJsChClusterNodeID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains identification of node,
+             in which the event occured."
+        ::= { jnxJsChassisClusterTrapObjects 17 }
+
+    jnxJsChClusterWeightHealthStatus OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains health status, whether is healthy
+             or unhealthy."
+        ::= { jnxJsChassisClusterTrapObjects 18 }
+
+    jnxJsChClusterWeightValue OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This object contains weight value."
+        ::= { jnxJsChassisClusterTrapObjects 19 }
 
 END
