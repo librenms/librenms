@@ -1,14 +1,59 @@
-source: index.md
-### Welcome to the LibreNMS docs
-
-Some of these docs are work in progress or may be missing configuration examples for varying distros.
-If you find this is the case then please feel free to edit them on [GitHub](https://github.com/librenms/librenms/tree/master/doc)
-and submit a pull request.
-
-The docs should provide you with information on various elements to the software:
-
-  - [Installation](http://docs.librenms.org/Installation/Installing-LibreNMS/)
-  - [Support](http://docs.librenms.org/Support/FAQ/#faq3) / [FAQ](http://docs.librenms.org/Support/FAQ/)
-  - [Contributing to LibreNMS](http://docs.librenms.org/General/Contributing/)
-  - Developing for LibreNMS
-  - Available extensions (features)
+hide_toc: true
+<div class="row">
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-download fa-2x fa-pull-left"></i> Installing</h3><br />
+            <a href="/Installation/Installation-Ubuntu-1604-Nginx/">Ubuntu 16.04 + Nginx</a><br />
+            <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
+            <a href="/Installation/Migrating-from-Observium/">Migrating from Observium</a><br />
+            <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-plug fa-2x fa-pull-left"></i> Extensions</h3><br />
+            <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
+            <a href="/Extensions/Oxidized/">Oxidized</a><br />
+            <a href="/Extensions/RRDCached/">RRDCached</a><br />
+            <strong>More...</strong>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-bell fa-2x fa-pull-left"></i> Alerting</h3><br />
+            <a href="/Extensions/Alerting/#rules">Rules</a><br />
+            <a href="/Extensions/Alerting/#templates">Templates</a><br />
+            <a href="/Extensions/Alerting/#transports">Transports</a><br />
+            <a href="/Extensions/Alerting/"><strong>More...</strong></a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-connectdevelop fa-2x fa-pull-left"></i> API</h3><br />
+            <a href="/API/API-Docs/">API Docs</a><br />
+            <a href="/API/API-Docs/#api-structure">API Structure</a><br />
+            <a href="/API/API-Docs/#api-endpoints">API Endpoints</a><br />
+            <a href="/API/API-Docs/"><strong>More...</strong></a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-ambulance fa-2x fa-pull-left"></i> Support</h3><br />
+            <a href="/Support/FAQ/">FAQ</a><br />
+            <a href="/Support/Install%20Validation/">Install validation</a><br />
+            <a href="/Support/Performance/">Performance tweaks</a><br />
+            <strong>More...</strong>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <h3 class="text-danger"><i class="fa fa-code-fork fa-2x fa-pull-left"></i> Developing</h3><br />
+            <a href="/Developing/Code-Guidelines/">Code Guidelines</a><br />
+            <a href="/Developing/Validating-Code/">Validating Code</a><br />
+            <a href="/Developing/Using-Git/">Using Git</a><br />
+            <strong>More...</strong>
+        </div>
+    </div>
+</div>
