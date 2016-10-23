@@ -25,7 +25,7 @@
             FROM IPV6-TC;
 
     jnxJsPacketMirrorMIB  MODULE-IDENTITY
-        LAST-UPDATED  "201111230000Z"    -- November 23, 2011
+        LAST-UPDATED  "201604050000Z"    -- April 05, 2016
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -59,6 +59,10 @@
 
         REVISION     "201111230000Z"    -- November 23, 2011
         DESCRIPTION  "Add jnxJsPacketMirrorTriggerType circuitId."
+
+        REVISION     "201604050000Z"    -- April 05, 2016
+        DESCRIPTION  "Changed trap class from SNMP_TRAP_CLASS_AUTH
+                      to SNMP_TRAP_CLASS_V3_ONLY"
       	::= { jnxJsPacketMirror 1 }
 
     jnxJsPacketMirrorNotifications OBJECT IDENTIFIER ::= { jnxJsPacketMirrorMIB 0 }
