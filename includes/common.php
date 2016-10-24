@@ -1496,5 +1496,5 @@ function clean($value)
  */
 function display($value)
 {
-    return htmlentities(stripslashes(strip_tags($value)));
+    return htmlentities(stripslashes(stripslashes(strip_tags($value))));
 }
