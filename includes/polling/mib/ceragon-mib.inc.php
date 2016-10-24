@@ -5,7 +5,6 @@ $radioNumber = 0;
 $IfIndex = 0;
 
 $IfNumber = snmp_get_next($device, "ifNumber", "-mIF-MIB -Oqv", "");
-echo "IfNumber = " . $IfNumber . "\n";
 
 for ($i=0; $i < $IfNumber; $i++) {
 if ($IfIndex == "0") {
@@ -13,14 +12,10 @@ if ($IfIndex == "0") {
 } else {
     $IfIndex = snmp_get_next($device, "ifIndex.$IfIndex", "-mIF-MIB -Oqv", "");
 }
-echo "IfIndex = " . $IfIndex . "\n";
     $IfDescr = snmp_get($device, "ifDescr.$IfIndex", "-mIF-MIB -Oqv", "");
-echo "IfDescr = " . $IfDescr . "\n";
     $IfName = snmp_get($device, "ifName.$IfIndex", "-mIF-MIB -Oqv", "");
-echo "IfName = " . $IfName . "\n";
 if (stristr($IfDescr, "Radio")) {
     $radioNumber = $radioNumber+1;
-echo "In loop ... " . $radioNumber . " \n";
 
     $mib_oids["genEquipRfuStatusRxLevel.$IfIndex"] = array(
             "",
@@ -64,7 +59,6 @@ echo "In loop ... " . $radioNumber . " \n";
             $IfName." Rx Bit Rate",
             "GAUGE",
         );
-print_r($mib_oids);
 }
 }
     $mib_graphs = array(
