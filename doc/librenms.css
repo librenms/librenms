@@ -22,3 +22,7 @@ body {
 .navbar-collapse {
     max-height: 385px;
 }
+
+/* size and align the headers on the home screen */
+.home-header { font-size: 2em; }
+.home-header>span { vertical-align: middle; }
