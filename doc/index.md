@@ -2,8 +2,8 @@ hide_toc: true
 <div class="row">
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-download fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-download fa-2x"></i>
                 <span> Installing</span>
             </div>
             <br />
@@ -15,8 +15,8 @@ hide_toc: true
     </div>
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-plug fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-plug fa-2x"></i>
                 <span> Extensions</span>
             </div>
             <br />
@@ -28,8 +28,8 @@ hide_toc: true
     </div>
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-bell fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-bell fa-2x"></i>
                 <span> Alerting</span>
             </div>
             <br />
@@ -43,8 +43,8 @@ hide_toc: true
 <div class="row">
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-connectdevelop fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-connectdevelop fa-2x"></i>
                 <span> API</span>
             </div>
             <br />
@@ -56,8 +56,8 @@ hide_toc: true
     </div>
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-ambulance fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-ambulance fa-2x"></i>
                 <span> Support</span>
             </div>
             <br />
@@ -69,8 +69,8 @@ hide_toc: true
     </div>
     <div class="col-md-4">
         <div class="well">
-            <div class="home-header text-danger">
-                <i class="fa fa-code-fork fa-2x fa-pull-left"></i>
+            <div class="home-header">
+                <i class="fa fa-code-fork fa-2x"></i>
                 <span> Developing</span>
             </div>
             <br />
