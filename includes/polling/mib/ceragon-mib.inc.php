@@ -1,60 +1,72 @@
 <?php
+$mib_oids = array();
 
-$index = 0;
+$radioNumber = 0;
+$IfIndex = 0;
 
+$IfNumber = snmp_get_next($device, "ifNumber", "-mIF-MIB -Oqv", "");
+echo "IfNumber = " . $IfNumber . "\n";
 
-if (strtok(snmp_get_next($device, "genEquipRadioCfgRadioId.".$index, "-mMWRM-RADIO-MIB -OsqnU", ""), " ") === strtok(snmp_get_next($device, "genEquipRadioCfgRadioId", "-mMWRM-RADIO-MIB -OsqnU", ""), " ")) {
-
-echo "In loop ... " . $index . " \n";
-    $radioslot_id = snmp_get_next($device, "genEquipRadioCfgRadioId.".$index, "-mMWRM-RADIO-MIB -Oqv", "");
-
-    $mib_oids = array(
-        "genEquipRfuStatusRxLevel.".$radioslot_id => array(
-            "",
-            "radio".$index."RxLevel",
-            "Radio ".$index." RX Level",
-            "GAUGE",
-        ),
-        "genEquipRfuStatusTxLevel.".$radioslot_id => array(
-            "",
-            "radio".$index."TxPower",
-            "Radio ".$index." TX Power",
-            "GAUGE",
-        ),
-        "genEquipRadioStatusMSE.".$radioslot_id => array(
-            "",
-            "radio".$index."MSE",
-            "Radio ".$index." MSE",
-            "GAUGE",
-        ),
-        "genEquipRadioStatusXPI.".$radioslot_id => array(
-            "",
-            "radio".$index."XPI",
-            "Radio ".$index." Cross Polarisation Interference",
-            "GAUGE",
-        ),
-        "genEquipRadioStatusDefectedBlocks.".$radioslot_id => array(
-            "",
-            "radio".$index."DefectedBlocks",
-            "Radio ".$index." Defected Blocks",
-            "GAUGE",
-        ),
-        "genEquipRadioMRMCCurrTxBitrate.".$radioslot_id => array(
-            "",
-            "radio".$index."TxRate",
-            "Radio ".$index." Tx Bit Rate",
-            "GAUGE",
-        ),
-        "genEquipRadioMRMCCurrRxBitrate.".$radioslot_id => array(
-            "",
-            "radio".$index."RxRate",
-            "Radio ".$index." Rx Bit Rate",
-            "GAUGE",
-        ),
-    );
-    $index = $index+1;
+for ($i=0; $i < $IfNumber; $i++) {
+if ($IfIndex == "0") {
+    $IfIndex = snmp_get_next($device, "ifIndex", "-mIF-MIB -Oqv", "");
+} else {
+    $IfIndex = snmp_get_next($device, "ifIndex.$IfIndex", "-mIF-MIB -Oqv", "");
 }
+echo "IfIndex = " . $IfIndex . "\n";
+    $IfDescr = snmp_get($device, "ifDescr.$IfIndex", "-mIF-MIB -Oqv", "");
+echo "IfDescr = " . $IfDescr . "\n";
+    $IfName = snmp_get($device, "ifName.$IfIndex", "-mIF-MIB -Oqv", "");
+echo "IfName = " . $IfName . "\n";
+if (stristr($IfDescr, "Radio")) {
+    $radioNumber = $radioNumber+1;
+echo "In loop ... " . $radioNumber . " \n";
 
+    $mib_oids["genEquipRfuStatusRxLevel.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."RxLevel",
+            $IfName." RX Level",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRfuStatusTxLevel.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."TxPower",
+            $IfName." TX Power",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRadioStatusMSE.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."MSE",
+            $IfName." MSE",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRadioStatusXPI.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."XPI",
+            $IfName." Cross Polarisation Interference",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRadioStatusDefectedBlocks.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."DefectedBlocks",
+            $IfName." Defected Blocks",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRadioMRMCCurrTxBitrate.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."TxRate",
+            $IfName." Tx Bit Rate",
+            "GAUGE",
+        );
+    $mib_oids["genEquipRadioMRMCCurrRxBitrate.$IfIndex"] = array(
+            "",
+            "radio".$radioNumber."RxRate",
+            $IfName." Rx Bit Rate",
+            "GAUGE",
+        );
+print_r($mib_oids);
+}
+}
     $mib_graphs = array(
         "ceragon_RxLevel",
         "ceragon_TxPower",
@@ -66,7 +78,6 @@ echo "In loop ... " . $index . " \n";
     );
 
     unset($graph, $oids, $oid);
-
     poll_mib_def($device, "MWRM-RADIO-MIB:ceragon-radio", "ceragon", $mib_oids, $mib_graphs, $graphs);
 
 
