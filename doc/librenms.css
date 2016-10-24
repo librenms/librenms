@@ -25,7 +25,7 @@ body {
 
 /* size and align the headers on the home screen */
 .home-header {
-    font-size: 1.8em;
+    font-size: 1.6em;
     color: #da223a;
 }
 .home-header>i {
