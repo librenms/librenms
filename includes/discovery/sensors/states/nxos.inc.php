@@ -22,15 +22,14 @@ if ($device['os'] == 'nxos') {
      */
 
     if (is_array($fan_trays)) {
-        $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';
-        $entities = snmpwalk_cache_oid_num($device, $entity_oid, array());
-
         foreach ($fan_trays as $oid => $array) {
             $state = current($array);
             $split_oid = explode('.', $oid);
             $index = $split_oid[(count($split_oid) - 1)];
             $current_oid = "$fan_tray_oid.$index";
-            $descr = current($entities["$entity_oid.$index"]);
+
+            $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';
+            $descr = trim(snmp_get($device, "$entity_oid.$index", '-Ovq'), '"');
 
             $state_name = "cefcFanTrayOperStatus";
             $state_index_id = create_state_index($state_name);
