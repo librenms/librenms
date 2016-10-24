@@ -1874,6 +1874,22 @@ JnxFabricContainersFamily ::= TEXTUAL-CONVENTION
          ::= { jnxFabricChassisTraps 16 }     
 
 
+    jnxFabricHighPower NOTIFICATION-TYPE
+        OBJECTS         { jnxFabricDeviceIndex,
+                          jnxFabricContentsContainerIndex,
+                          jnxFabricContentsL1Index,
+                          jnxFabricContentsL2Index,
+                          jnxFabricFruName,
+                          jnxFabricFruType,
+                          jnxFabricFruSlot }
+         STATUS         current
+         DESCRIPTION
+                 "A jnxFabricHighPowerConsumption trap signifies that the SNMP
+                 entity, acting in an agent role, has detected that
+                 the specified fabric ASIC consumes more power than
+                 expected"
+         ::= { jnxFabricChassisTraps 17 }     
+
     -- Traps for chassis alarm cleared conditions
 
     jnxFabricPowerSupplyOK NOTIFICATION-TYPE
@@ -1943,6 +1959,20 @@ JnxFabricContainersFamily ::= TEXTUAL-CONVENTION
                 recovered from previous operational errors and it
                 is in ok state in the chassis."
         ::= { jnxFabricChassisOKTraps 4 }
-
+        
+    jnxFabricHighPowerCleared NOTIFICATION-TYPE
+        OBJECTS         { jnxFabricDeviceIndex,
+                          jnxFabricContentsContainerIndex,
+                          jnxFabricContentsL1Index,
+                          jnxFabricContentsL2Index,
+                          jnxFabricFruName,
+                          jnxFabricFruType,
+                          jnxFabricFruSlot }
+         STATUS         current
+         DESCRIPTION
+                 "A jnxFabricHighPowerCleared trap signifies that the SNMP
+                 entity, acting in an agent role, has detected that
+                 the specified fabric ASIC has cleared its high power condition"
+         ::= { jnxFabricChassisOKTraps 5 }         
 END
 

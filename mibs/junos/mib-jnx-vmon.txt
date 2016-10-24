@@ -1,0 +1,900 @@
+--
+-- Juniper Enterprise Specific MIB: Video Monitoring MIB
+--
+-- Copyright (c) 2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-VMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Integer32, Unsigned32, TimeTicks, IpAddress,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    jnxServices, jnxVmonMibRoot
+        FROM JUNIPER-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    InetAddress, InetAddressType, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB;
+
+jnxVmonMIB       MODULE-IDENTITY
+    LAST-UPDATED    "201312090000Z"
+    ORGANIZATION    "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+        "Implementation of enterprise specific MIB
+         for video monitoring traps."
+    REVISION    "201312090000Z"    -- Dec 09, 2013
+    DESCRIPTION
+             "Initial version."
+    ::=  {  jnxVmonMibRoot  1  }
+
+jnxVmonObjects           OBJECT IDENTIFIER ::=  {  jnxVmonMIB  1  }
+jnxVmonNotifications     OBJECT IDENTIFIER ::=  {  jnxVmonMIB  0  }
+
+jnxVmonServices          OBJECT IDENTIFIER ::=  {  jnxServices 1  }
+
+--
+-- Textual Conventions
+--
+
+JnxVmonFlowType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "This data type is to indication which type of flow we
+            are talking about i.e. if it is a mpeg flow or rtp flow"
+    SYNTAX       OCTET STRING (SIZE (0..4))
+ 
+JnxVmonTrapLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This data type is to indicate what is the level of trap 
+            being generated."
+    SYNTAX       INTEGER {
+                     critical(2),
+                     warning(4),
+                     info(6),
+                     clear(8)
+                 }
+
+JnxVmonFlowDirection ::=TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "This data type is to indication direction of the flow
+            i.e. if it is a input or output"
+    SYNTAX       OCTET STRING (SIZE (6))
+
+--
+-- Global VMON counters Table
+--
+
+jnxmdiStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxmdiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists mdi stats counters."
+    ::= { jnxVmonServices 1 }
+
+jnxmdiStatsEntry OBJECT-TYPE
+    SYNTAX      JnxmdiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing mdi stats counters."
+    INDEX       { jnxmdiFPCSlotNo }
+    ::= { jnxmdiStatsTable 1 }
+
+JnxmdiStatsEntry ::= SEQUENCE {
+    jnxmdiFPCSlotNo              Unsigned32,
+    jnxmdiActiveFlowsCount       Counter64,
+    jnxmdiInsertedFlowsCount     Counter64,
+    jnxmdiDeletedFlowsCount      Counter64,
+    jnxmdiTotalPktsCount         Counter64,
+    jnxmdiTotalBytesCount        Counter64,
+    jnxmdiDFTotalAlarmCount      Counter64,
+    jnxmdiDFInfoAlarmCount       Counter64,
+    jnxmdiDFWarningAlarmCount    Counter64,
+    jnxmdiDFCriticalAlarmCount   Counter64,
+    jnxmdiMLRTotalAlarmCount     Counter64,
+    jnxmdiMLRInfoAlarmCount      Counter64,
+    jnxmdiMLRWarningAlarmCount   Counter64,
+    jnxmdiMLRCriticalAlarmCount  Counter64,
+    jnxmdiMRVTotalAlarmCount     Counter64,
+    jnxmdiMRVInfoAlarmCount      Counter64,
+    jnxmdiMRVWarningAlarmCount   Counter64,
+    jnxmdiMRVCriticalAlarmCount  Counter64
+}
+
+jnxmdiFPCSlotNo  OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FPC Slot Number"
+    ::= { jnxmdiStatsEntry 1  }
+
+jnxmdiActiveFlowsCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Active Flows."
+    ::= {  jnxmdiStatsEntry 2 }
+
+
+jnxmdiInsertedFlowsCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Flows Inserted."
+    ::= {  jnxmdiStatsEntry 3 }
+
+jnxmdiDeletedFlowsCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Flows Deleted."
+    ::= {  jnxmdiStatsEntry 4 }
+
+jnxmdiTotalPktsCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Packets."
+    ::= {  jnxmdiStatsEntry 5 }
+
+jnxmdiTotalBytesCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Bytes."
+    ::= {  jnxmdiStatsEntry 6 }
+
+jnxmdiDFTotalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Alarm Generated for DF."
+    ::= {  jnxmdiStatsEntry 7 }
+
+jnxmdiDFInfoAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Info Alarm Generated for DF."
+    ::= {  jnxmdiStatsEntry 8 }
+
+jnxmdiDFWarningAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Warning Alarm Generated for DF."
+    ::= {  jnxmdiStatsEntry 9 }
+
+jnxmdiDFCriticalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Critical Alarm Generated for DF."
+    ::= {  jnxmdiStatsEntry 10 }
+
+jnxmdiMLRTotalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Alarm Generated for MLR."
+    ::= {  jnxmdiStatsEntry 11 }
+
+jnxmdiMLRInfoAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Info Alarm Generated for MLR."
+    ::= {  jnxmdiStatsEntry 12 }
+
+jnxmdiMLRWarningAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Warning Alarm Generated for MLR."
+    ::= {  jnxmdiStatsEntry 13 }
+
+jnxmdiMLRCriticalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Critical Alarm Generated for MLR."
+    ::= {  jnxmdiStatsEntry 14 }
+
+jnxmdiMRVTotalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Alarm Generated for MRV."
+    ::= {  jnxmdiStatsEntry 15 }
+
+jnxmdiMRVInfoAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Info Alarm Generated for MRV."
+    ::= {  jnxmdiStatsEntry 16 }
+
+jnxmdiMRVWarningAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Warning Alarm Generated for MRV."
+    ::= {  jnxmdiStatsEntry 17 }
+
+jnxmdiMRVCriticalAlarmCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Critical Alarm Generated for MRV."
+    ::= {  jnxmdiStatsEntry 18 }
+
+
+--
+-- Error Counter Table
+--
+
+jnxmdiErrsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxmdiErrsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists mdi errors counters."
+    ::= { jnxVmonServices 2 }
+
+jnxmdiErrsEntry OBJECT-TYPE
+    SYNTAX      JnxmdiErrsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing mdi errors counters."
+    INDEX       { jnxmdiFPCSlotNo }
+    ::= { jnxmdiErrsTable 1 }
+
+JnxmdiErrsEntry ::= SEQUENCE {
+    jnxmdiFPCSlotNo                 Unsigned32,
+    jnxmdiErrsFlowInsertErr         Counter64,
+    jnxmdiErrsPolicerDrop           Counter64,
+    jnxmdiErrsPIDLimitExceed        Counter64,
+    jnxmdiErrsUnsupportedMediaPkts  Counter64
+}
+
+jnxmdiErrsFlowInsertErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Flow Insert Errors."
+    ::= {  jnxmdiErrsEntry 1 }
+
+jnxmdiErrsPolicerDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of Policer Drop."
+    ::= {  jnxmdiErrsEntry 2 }
+
+jnxmdiErrsPIDLimitExceed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Number of PID Limit Exceed."
+    ::= {  jnxmdiErrsEntry 3 }
+
+jnxmdiErrsUnsupportedMediaPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Unsupported media packets."
+    ::= {  jnxmdiErrsEntry 4 }
+
+--
+-- Flow Table
+--
+
+jnxmdiFlowTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxmdiFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists mdi flows."
+    ::= { jnxVmonServices 3 }
+
+jnxmdiFlowEntry OBJECT-TYPE
+    SYNTAX      JnxmdiFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing mdi stats counters."
+    INDEX       {
+                   jnxmdiFPCSlotNo,
+                   jnxmdiFlowIdentifier
+                }
+    ::= { jnxmdiFlowTable 1 }
+
+JnxmdiFlowEntry ::= SEQUENCE {
+    jnxmdiFlowIdentifier          Unsigned32,
+    jnxmdiFlowSrcAddr             InetAddress,
+    jnxmdiFlowDstAddr             InetAddress,
+    jnxmdiFlowAddrFamily          InetAddressType,
+    jnxmdiFlowSrcPort             InetPortNumber,
+    jnxmdiFlowDstPort             InetPortNumber,
+    jnxmdiFlowInterfaceName       DisplayString,
+    jnxmdiFlowInterfaceSNMPIndex  InterfaceIndexOrZero,
+    jnxmdiFlowDirection           JnxVmonFlowDirection,
+    jnxmdiFlowType                JnxVmonFlowType,
+    jnxmdiFlowLastDF              DisplayString,
+    jnxmdiFlowLastMLR             Unsigned32,
+    jnxmdiFlowLastMRV             DisplayString,
+    jnxmdiFlowAvgDF               DisplayString,
+    jnxmdiFlowAvgMLR              Unsigned32,
+    jnxmdiFlowAvgMRV              DisplayString,
+    jnxmdiFlowTemplateName        DisplayString,
+    jnxmdiFlowMDIRecCount         Integer32,
+    jnxmdiFlowPIDCount            Integer32
+}
+
+jnxmdiFlowIdentifier OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Flow Identifier for the flow"
+    ::=   {  jnxmdiFlowEntry 1  }
+
+jnxmdiFlowSrcAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Source IP address for the flow"
+    ::=   {  jnxmdiFlowEntry 2  }
+
+jnxmdiFlowDstAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Destination IP address for the flow"
+    ::=   {  jnxmdiFlowEntry 3  }
+
+jnxmdiFlowAddrFamily OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Address family for the flow"
+    ::=   {  jnxmdiFlowEntry 4  }
+
+jnxmdiFlowSrcPort OBJECT-TYPE
+    SYNTAX       InetPortNumber
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Source Port Number for the flow"
+    ::=   {  jnxmdiFlowEntry 5  }
+
+jnxmdiFlowDstPort OBJECT-TYPE
+    SYNTAX       InetPortNumber
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Destination Port Number for the flow"
+    ::=   {  jnxmdiFlowEntry 6  }
+
+jnxmdiFlowInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Interface Name for the flow"
+    ::=   {  jnxmdiFlowEntry 7  }
+
+jnxmdiFlowInterfaceSNMPIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Interface SNMP Index for the flow"
+    ::=   {  jnxmdiFlowEntry 8  }
+
+jnxmdiFlowDirection OBJECT-TYPE
+    SYNTAX       JnxVmonFlowDirection
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Direction for the flow"
+    ::=   {  jnxmdiFlowEntry 9  }
+
+jnxmdiFlowType OBJECT-TYPE
+    SYNTAX       JnxVmonFlowType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Type of the flow"
+    ::=   {  jnxmdiFlowEntry 10  }
+
+jnxmdiFlowLastDF OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Last DF Value for the flow"
+    ::=   {  jnxmdiFlowEntry 11  }
+
+jnxmdiFlowLastMLR OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Last MLR Value for the flow"
+    ::=   {  jnxmdiFlowEntry 12  }
+
+jnxmdiFlowLastMRV OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Last MRV Value for the flow"
+    ::=   {  jnxmdiFlowEntry 13  }
+
+jnxmdiFlowAvgDF OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Average DF Value for the flow"
+    ::=   {  jnxmdiFlowEntry 14  }
+
+jnxmdiFlowAvgMLR OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Average MLR Value for the flow"
+    ::=   {  jnxmdiFlowEntry 15  }
+
+jnxmdiFlowAvgMRV OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Average MRV Value for the flow"
+    ::=   {  jnxmdiFlowEntry 16  }
+
+jnxmdiFlowTemplateName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Template Name of the Flow "
+    ::= {  jnxmdiFlowEntry 17 }
+
+jnxmdiFlowMDIRecCount OBJECT-TYPE
+    SYNTAX       Integer32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MDI Record Count for the flow"
+    ::=   {  jnxmdiFlowEntry 18  }
+
+jnxmdiFlowPIDCount OBJECT-TYPE
+    SYNTAX       Integer32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "PID Count for the flow"
+    ::=   {  jnxmdiFlowEntry 19  }
+
+--
+-- Flow MDI Record Table
+--
+
+jnxmdiFlowMDIRecTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxmdiFlowMDIRecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists mdi flow records."
+    ::= { jnxVmonServices 4 }
+
+jnxmdiFlowMDIRecEntry OBJECT-TYPE
+    SYNTAX      JnxmdiFlowMDIRecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing mdi flow record."
+    INDEX       {
+                   jnxmdiFPCSlotNo,
+                   jnxmdiFlowIdentifier,
+                   jnxmdiFlowMDIRecIndex
+                }
+    ::= { jnxmdiFlowMDIRecTable 1 }
+
+JnxmdiFlowMDIRecEntry ::= SEQUENCE {
+    jnxmdiFPCSlotNo             Unsigned32,
+    jnxmdiFlowIdentifier        Unsigned32,
+    jnxmdiFlowMDIRecIndex       Unsigned32,
+    jnxmdiFlowMDIRecDF          DisplayString,
+    jnxmdiFlowMDIRecMLR         Unsigned32,
+    jnxmdiFlowMDIRecMRV         DisplayString
+}
+
+jnxmdiFlowMDIRecIndex OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "MDI Flow Record Index"
+    ::=   {  jnxmdiFlowMDIRecEntry 1  }
+
+jnxmdiFlowMDIRecDF OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "DF Value of the Flow Record Index"
+    ::=   {  jnxmdiFlowMDIRecEntry 2  }
+
+jnxmdiFlowMDIRecMLR OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MLR Value of the Flow Record Index"
+    ::=   {  jnxmdiFlowMDIRecEntry 3  }
+
+jnxmdiFlowMDIRecMRV OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "MRV Value of the Flow Record Index"
+    ::=   {  jnxmdiFlowMDIRecEntry 4  }
+
+--
+-- Flow PID Table 
+--
+
+jnxmdiFlowPIDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxmdiFlowPIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists mdi flow PID."
+    ::= { jnxVmonServices 5 }
+
+jnxmdiFlowPIDEntry OBJECT-TYPE
+    SYNTAX      JnxmdiFlowPIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing mdi flow PID."
+    INDEX       {
+                   jnxmdiFPCSlotNo,
+                   jnxmdiFlowIdentifier,
+                   jnxmdiFlowMDIRecIndex,
+                   jnxmdiFlowPIDValue
+                }
+    ::= { jnxmdiFlowPIDTable 1 }
+
+JnxmdiFlowPIDEntry ::= SEQUENCE {
+    jnxmdiFPCSlotNo             Unsigned32,
+    jnxmdiFlowIdentifier        Unsigned32,
+    jnxmdiFlowMDIRecIndex       Unsigned32,
+    jnxmdiFlowPIDValue          Unsigned32,
+    jnxmdiFlowPIDMLR            Unsigned32
+}
+
+jnxmdiFlowPIDValue OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "PID Value of the Flow Record Index"
+    ::=   {  jnxmdiFlowPIDEntry 1  }
+
+jnxmdiFlowPIDMLR OBJECT-TYPE
+    SYNTAX       Unsigned32(0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "PID MLR Value of the Flow Record Index"
+    ::=   {  jnxmdiFlowPIDEntry 2  }
+
+--
+-- Video Monitoring Objects for DF, MLR, MRV Alarm
+--
+
+jnxVmonFlowIdentifier OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+        "Flow Identifier of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 1  }
+
+jnxVmonSourceIP OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+        "Source IP address of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 2  } 
+
+jnxVmonDestinationIP OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+        "Destination IP address of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 3  } 
+
+jnxVmonIPFamily OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "IP address family of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 4  }
+
+jnxVmonSourcePort OBJECT-TYPE
+    SYNTAX       InetPortNumber
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+        "Source Port number of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 5  } 
+
+jnxVmonDestinationPort OBJECT-TYPE
+    SYNTAX       InetPortNumber
+    MAX-ACCESS   read-only 
+    STATUS       current
+    DESCRIPTION
+        "Source Port number of the flow for SNMP trap"
+    ::=   {  jnxVmonObjects 6  }
+
+jnxVmonFlowType OBJECT-TYPE
+    SYNTAX       JnxVmonFlowType 
+    MAX-ACCESS   read-only 
+    STATUS       current
+    DESCRIPTION
+        "Flow type for SNMP trap"
+    ::=   {  jnxVmonObjects 7  }
+
+jnxVmonTrapLevel OBJECT-TYPE
+    SYNTAX        JnxVmonTrapLevel 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Level of the SNMP Trap "
+    ::= {  jnxVmonObjects 8 }
+
+jnxVmonFPCSlot OBJECT-TYPE
+    SYNTAX        Integer32(0..127)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Chassis FPC Slot "
+    ::= {  jnxVmonObjects 9 }
+
+jnxVmonInterfaceName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface Name for the Flow "
+    ::= {  jnxVmonObjects 10 }
+
+jnxVmonInterfaceSNMPIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndexOrZero
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " SNMP Index of the Flow "
+    ::= {  jnxVmonObjects 11 }
+
+jnxVmonTemplateName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Template Name of the Flow "
+    ::= {  jnxVmonObjects 12 }
+
+jnxVmonFlowDirection OBJECT-TYPE
+    SYNTAX        JnxVmonFlowDirection
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Flow of the direction "
+    ::= {  jnxVmonObjects 13 }
+
+jnxVmonExpectedVal OBJECT-TYPE
+    SYNTAX        DisplayString 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Expected value for the flow "
+    ::= {  jnxVmonObjects 14 }
+
+jnxVmonComputedVal OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Computed value for the flow "
+    ::= {  jnxVmonObjects 15 }
+
+jnxVmonMDIRecIdx OBJECT-TYPE
+    SYNTAX        Unsigned32(0..15)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " MDIRecIdx for which the trap is being generated "
+    ::= {  jnxVmonObjects 16 }
+
+jnxVmonAlarmMode OBJECT-TYPE
+    SYNTAX        Unsigned32(0..3)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Alarm mode "
+    ::= {  jnxVmonObjects 17 }
+
+-- ********************************************************************
+-- define branches for jnx vmon traps
+-- ********************************************************************
+
+jnxVmonMDIDFAlarm NOTIFICATION-TYPE
+    OBJECTS  {
+                jnxVmonFlowIdentifier,
+                jnxVmonSourceIP,
+                jnxVmonDestinationIP,
+                jnxVmonIPFamily,
+                jnxVmonSourcePort,
+                jnxVmonDestinationPort,
+                jnxVmonFlowType,
+                jnxVmonTrapLevel,
+                jnxVmonFPCSlot,
+                jnxVmonInterfaceName,
+                jnxVmonInterfaceSNMPIndex,
+                jnxVmonTemplateName,
+                jnxVmonFlowDirection,
+                jnxVmonExpectedVal,
+                jnxVmonComputedVal,
+                jnxVmonMDIRecIdx,
+                jnxVmonAlarmMode
+             }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap for the DF Alarm " 
+    ::= { jnxVmonNotifications 1 }
+
+jnxVmonMDIMLRAlarm NOTIFICATION-TYPE
+    OBJECTS  {
+                jnxVmonFlowIdentifier,
+                jnxVmonSourceIP,
+                jnxVmonDestinationIP,
+                jnxVmonIPFamily,
+                jnxVmonSourcePort,
+                jnxVmonDestinationPort,
+                jnxVmonFlowType,
+                jnxVmonTrapLevel,
+                jnxVmonFPCSlot,
+                jnxVmonInterfaceName,
+                jnxVmonInterfaceSNMPIndex,
+                jnxVmonTemplateName,
+                jnxVmonFlowDirection,
+                jnxVmonExpectedVal,
+                jnxVmonComputedVal,
+                jnxVmonMDIRecIdx,
+                jnxVmonAlarmMode
+             }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap for the MLR Alarm "
+    ::= { jnxVmonNotifications 2 }
+
+jnxVmonMDIMRVAlarm NOTIFICATION-TYPE
+    OBJECTS  {
+                jnxVmonFlowIdentifier,
+                jnxVmonSourceIP,
+                jnxVmonDestinationIP,
+                jnxVmonIPFamily,
+                jnxVmonSourcePort,
+                jnxVmonDestinationPort,
+                jnxVmonFlowType,
+                jnxVmonTrapLevel,
+                jnxVmonFPCSlot,
+                jnxVmonInterfaceName,
+                jnxVmonInterfaceSNMPIndex,
+                jnxVmonTemplateName,
+                jnxVmonFlowDirection,
+                jnxVmonExpectedVal,
+                jnxVmonComputedVal,
+                jnxVmonMDIRecIdx,
+                jnxVmonAlarmMode
+             }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap for the MRV Alarm "
+    ::= { jnxVmonNotifications 3 }
+
+jnxVmonMDIFlowInsertAlarm NOTIFICATION-TYPE
+    OBJECTS  {
+                jnxVmonFlowIdentifier,
+                jnxVmonSourceIP,
+                jnxVmonDestinationIP,
+                jnxVmonIPFamily,
+                jnxVmonSourcePort,
+                jnxVmonDestinationPort,
+                jnxVmonFlowType,
+                jnxVmonFPCSlot,
+                jnxVmonInterfaceName,
+                jnxVmonInterfaceSNMPIndex,
+                jnxVmonTemplateName,
+                jnxVmonFlowDirection
+             }
+    STATUS   current
+    DESCRIPTION 
+        "The SNMP trap for the New Flow Alarm "
+    ::= { jnxVmonNotifications 4 }
+
+jnxVmonMDIFlowDeleteAlarm NOTIFICATION-TYPE
+    OBJECTS  {
+                jnxVmonFlowIdentifier,
+                jnxVmonSourceIP,
+                jnxVmonDestinationIP,
+                jnxVmonIPFamily,
+                jnxVmonSourcePort,
+                jnxVmonDestinationPort,
+                jnxVmonFlowType,
+                jnxVmonFPCSlot,
+                jnxVmonInterfaceName, 
+                jnxVmonInterfaceSNMPIndex,
+                jnxVmonTemplateName,
+                jnxVmonFlowDirection
+             }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap for the New Flow Alarm "
+    ::= { jnxVmonNotifications 5 }
+
+END

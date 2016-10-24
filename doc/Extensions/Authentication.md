@@ -140,7 +140,7 @@ If you have issues with secure LDAP try setting `$config['auth_ad_check_certific
 
 ##### Require actual membership of the configured groups
 
-If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, but are limited to user level 0 and only have access to shared dashboards.
+If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, and will be either level 0 or you may set ```$config['auth_ad_global_read']``` to 1 and all users will have read only access unless otherwise specified.
 
 > Cleanup of old accounts is done using the authlog. You will need to set the cleanup date for when old accounts will be purged which will happen AUTOMATICALLY.
 > Please ensure that you set the $config['authlog_purge'] value to be greater than $config['active_directory]['users_purge'] otherwise old users won't be removed.

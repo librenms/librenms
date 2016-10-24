@@ -41,6 +41,9 @@ jnxTimingNotfnsMIB MODULE-IDENTITY
             "This is Juniper Networks' implementation of enterprise
              specific MIB for alarms from the router chassis box."
     --  Revision history
+    REVISION     "201510140000Z" -- Fri Mar 15 15:41 2013 UTC
+    DESCRIPTION  "Modifed jnxClksyncQualityCode to include the list 
+                  of possible values (similar to G.781 standard)"
     REVISION     "201303151541Z" -- Fri Mar 15 15:41 2013 UTC
     DESCRIPTION  "Initial Version"
 
@@ -132,22 +135,22 @@ jnxBootCpldFpgaRevMinor OBJECT-TYPE
 
 jnxClksyncQualityCode OBJECT-TYPE
     SYNTAX      INTEGER {
-        --eec1
-        prc(0),
-        ssu-a(1),
-        ssu-b(2),
-        sec(3),
-        dnu(4),
+        --eec1  
+        prc(2),
+        ssu-a(4),
+        ssu-b(8),
+        sec(11),
+        dnu(15),
         --eec2
-        stu(10),
-        prs(11),
-        tnc(13),
-        st2(14),
-        st3e(15),
-        st3(16),
-        smc(17),
-        st4(18),
-        dus(19)
+        prs(1),
+        stu(0),
+        st2(7),
+        tnc(16),
+        st3e(13),
+        st3(10),
+        smc(12),
+        st4(14),
+        dus(17) 
     }
     MAX-ACCESS  accessible-for-notify
     STATUS      current

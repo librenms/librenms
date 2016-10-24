@@ -1736,3 +1736,21 @@ function get_toner_levels($device, $raw_value, $capacity)
 
     return round($raw_value / $capacity * 100);
 }
+
+/**
+ * check if we should skip this device from discovery
+ * @param $needles
+ * @param $haystack
+ * @param $name
+ * @return bool
+ */
+function can_skip_discovery($needles, $haystack, $name)
+{
+    foreach ((array)$needles as $needle) {
+        if (preg_match($needle ."i", $haystack)) {
+            d_echo("{$name} - regexp '{$needle}' matches '{$haystack}' - skipping device discovery \n");
+            return true;
+        }
+    }
+    return false;
+}
