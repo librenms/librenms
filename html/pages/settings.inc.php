@@ -91,7 +91,7 @@ if (is_admin() === true) {
             $r = '<table class="table table-condensed table-hover"><tbody>';
             foreach ($a as $k => $v) {
                 if (!empty($v)) {
-                    if (!in_array($k, $excluded)) {
+                    if (!in_array($k, $excluded, true)) {
                         $r .= '<tr><td class="col-md-2"><i><b>' . $k . '</b></i></td><td class="col-md-10">';
                         $r .= is_array($v) ? a2t($v) : '<code>' . wordwrap($v, 75, '<br/>') . '</code>';
                         $r .= '</td></tr>';
