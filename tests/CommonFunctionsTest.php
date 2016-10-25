@@ -80,8 +80,7 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 
     public function testRrdDescriptions()
     {
-        $data = 'Toner S/N:CRUM-1';
-
-        $this->assertEquals('Toner S/N CRUM-1', safedescr($data));
+        $data = 'Toner, S/N:CR_UM-1.';
+        $this->assertEquals('Toner, S/N CR_UM-1.', safedescr($data));
     }
 }
