@@ -54,7 +54,7 @@ foreach (dbFetchRows('SELECT * FROM toner where device_id = ?', array($device['d
     $rrd_options .= " LINE2:toner$toner_id#".$colour['left'].":'".$descr."'";
     $rrd_options .= " GPRINT:toner$toner_id:LAST:'%5.0lf%%'";
     $rrd_options .= " GPRINT:toner$toner_id:MIN:'%5.0lf%%'";
-    $rrd_options .= " GPRINT:toner$toner_id:MAX:%5.0lf%%\\\\l";
+    $rrd_options .= " GPRINT:toner$toner_id:MAX:%5.0lf%%\l";
 
     $iter++;
 }//end foreach
