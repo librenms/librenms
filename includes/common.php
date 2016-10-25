@@ -492,7 +492,7 @@ function safename($name)
 
 function safedescr($descr)
 {
-    return safename($descr);
+    return preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
 }
 
 function zeropad($num, $length = 2)
