@@ -21,4 +21,4 @@ $rrd_options .= ' LINE1:toner'.$toner['toner_id'].'#'.$colour['left'].":'".$desc
 
 $rrd_options .= ' AREA:toner'.$toner['toner_id'].'#'.$background['right'].':';
 $rrd_options .= ' GPRINT:toner'.$toner['toner_id'].":LAST:'%5.0lf%%'";
-$rrd_options .= ' GPRINT:toner'.$toner['toner_id'].':MAX:%5.0lf%%\\\\l';
+$rrd_options .= ' GPRINT:toner'.$toner['toner_id'].':MAX:%5.0lf%%\l';
