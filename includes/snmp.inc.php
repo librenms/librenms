@@ -1148,7 +1148,10 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
     return $array;
 }
 
-
+/**
+ * @param $device
+ * @return bool
+ */
 function get_device_max_repeaters($device)
 {
     global $config;
