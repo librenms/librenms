@@ -1091,6 +1091,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('quanta', 'quanta1');
         $this->checkOS('quanta', 'quanta2');
         $this->checkOS('quanta', 'quanta3');
+        $this->checkOS('quanta', 'quanta-lb9');
     }
 
     public function testRadlan()
