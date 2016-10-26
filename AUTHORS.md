@@ -146,6 +146,7 @@ LibreNMS contributors:
 - Eric Conroy <eric@conroy.co> (NetworkNub)
 - Timothy Willey <developer@timothywilley.net> (twilley)
 - Jon Ward	<librenms@yonzb.net> (yon2004)
+- Ian Viemeister <github@ian.viemeister.com> (iviemeister)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
