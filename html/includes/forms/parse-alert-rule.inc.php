@@ -18,9 +18,22 @@ if (is_admin() === false) {
 }
 
 $alert_id = $_POST['alert_id'];
+$template_id = $_POST['template_id'];
 
 if (is_numeric($alert_id) && $alert_id > 0) {
     $rule               = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', array($alert_id));
+} elseif (is_numeric($template_id) && $template_id >= 0) {
+    $x=0;
+    foreach (get_rules_from_json() as $tmp_rule) {
+        if ($x == $template_id) {
+            $rule = $tmp_rule;
+            break;
+        }
+        $x++;
+    }
+    logfile(json_encode($rule));
+}
+if (is_array($rule)) {
     $rule_split         = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\|]+[&&|\|\|]{2})/', $rule['rule'], -1, (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
     $count              = (count($rule_split) - 1);
     $rule_split[$count] = $rule_split[$count].'  &&';
