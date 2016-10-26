@@ -1,0 +1,26 @@
+[
+  {
+    "rule": "%macros.bill_quota_over_quota >= \"75\"",
+    "name": "Quota bills over 75% used"
+  },
+  {
+    "rule": "%macros.bill_cdr_over_quota >= \"75\"",
+    "name": "CDR bills over 75% used"
+  },
+  {
+    "rule": "%ipsec_tunnels.tunnel_status != \"active\" && %macros.device_up = \"1\"",
+    "name": "IPSec tunnels down"
+  },
+  {
+    "rule": "%pollers.time_taken >= \"250\"",
+    "name": "Poller is taking too long"
+  },
+  {
+    "rule": "%macros.device_up = \"1\" && %devices.os = \"asa\" && %ciscoASA.data > \"5000\"",
+    "name": "Cisco ASA connections over 5000"
+  },
+  {
+    "rule": "%processors.processor_usage > \"85\" && %macros.device_up = \"1\"",
+    "name": "Processor usage over 85%"
+  }
+]
