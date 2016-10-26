@@ -39,14 +39,14 @@ require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
-if ($config['autodiscovery']['snmpscan'] == false) {
+if ($config['autodiscovery']['snmpscan'] === false) {
     echo 'SNMP-Scan disabled.'.PHP_EOL;
     exit(2);
 }
 
-function perform_snmp_scan($net)
+function perform_snmp_scan($net, $force_network, $force_broadcast)
 {
-    global $stats, $config, $debug, $vdebug, $force_network, $force_broadcast;
+    global $stats, $config, $debug, $vdebug;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
@@ -54,51 +54,39 @@ function perform_snmp_scan($net)
     $start = ip2long($net->network);
     $end   = ip2long($net->broadcast)-1;
 
-    if ($force_network == true) { //Force-scan network address
-        if ($debug == true) {
-            echo "Forcing network address scan".PHP_EOL;
-        }
+    if ($force_network === true) { //Force-scan network address
+        d_echo("Forcing network address scan".PHP_EOL);
         $start = $start-1;
     }
 
-    if ($force_broadcast == true) { //Force-scan broadcast address
-        if ($debug == true) {
-            echo "Forcing broadcast address scan".PHP_EOL;
-        }
+    if ($force_broadcast === true) { //Force-scan broadcast address
+        d_echo("Forcing broadcast address scan".PHP_EOL);
         $end = $end+1;
     }
 
-    if ($net->bitmask == 31) { //Handle RFC3021 /31 prefixes
+    if ($net->bitmask === "31") { //Handle RFC3021 /31 prefixes
         $start = ip2long($net->network)-1;
         $end   = ip2long($net->broadcast);
-    }
-
-    if ($net->bitmask == 32) { //Handle single-host /32 prefixes
+        d_echo("RFC3021 network, hosts ".long2ip($start+1)." and ".long2ip($end).PHP_EOL.PHP_EOL);
+    } elseif ($net->bitmask === "32") { //Handle single-host /32 prefixes
         $start = ip2long($net->network)-1;
         $end   = $start+1;
-    }
-
-    if ($debug == true) {
-        if ($net->bitmask == 31) {
-            echo "RFC3021 network, hosts ".long2ip($start+1)." and ".long2ip($end).PHP_EOL.PHP_EOL;
-        } elseif ($net->bitmask == 32) {
-            echo "Single host ".long2ip($start+1).PHP_EOL.PHP_EOL;
-        } else {
-            echo 'Network:   '.($net->network).PHP_EOL;
-            echo 'Broadcast: '.($net->broadcast).PHP_EOL.PHP_EOL;
-        }
+        d_echo("RFC3021 network, hosts ".long2ip($start+1)." and ".long2ip($end).PHP_EOL.PHP_EOL);
+    } else {
+        d_echo("Network:   ".($net->network).PHP_EOL);
+        d_echo("Broadcast: ".($net->broadcast).PHP_EOL.PHP_EOL);
     }
 
     while ($start++ < $end) {
         $stats['count']++;
         $host = long2ip($start);
 
-        if ($vdebug == true) {
+        if ($vdebug) {
             echo "Scanning: ".$host.PHP_EOL;
         }
 
         if (match_network($config['autodiscovery']['nets-exclude'], $host)) {
-            if ($vdebug == true) {
+            if ($vdebug) {
                 echo "Excluded by config.php".PHP_EOL.PHP_EOL;
             } else {
                 echo '|';
@@ -107,7 +95,7 @@ function perform_snmp_scan($net)
         }
         $test = isPingable($host);
         if ($test['result'] === false) {
-            if ($vdebug == true) {
+            if ($vdebug) {
                 echo "Unpingable Device".PHP_EOL.PHP_EOL;
             } else {
                 echo '.';
@@ -116,7 +104,7 @@ function perform_snmp_scan($net)
         }
         if (ip_exists($host)) {
             $stats['known']++;
-            if ($vdebug == true) {
+            if ($vdebug) {
                 echo "Known Device".PHP_EOL;
             } else {
                 echo '*';
@@ -127,7 +115,7 @@ function perform_snmp_scan($net)
             try {
                 addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $config['distributed_poller_group']);
                 $stats['added']++;
-                if ($vdebug == true) {
+                if ($vdebug) {
                     echo "Added Device".PHP_EOL.PHP_EOL;
                 } else {
                     echo '+';
@@ -135,14 +123,14 @@ function perform_snmp_scan($net)
                 break;
             } catch (HostExistsException $e) {
                 $stats['known']++;
-                if ($vdebug == true) {
+                if ($vdebug) {
                     echo "Known Device".PHP_EOL.PHP_EOL;
                 } else {
                     echo '*';
                 }
                 break;
             } catch (HostUnreachablePingException $e) {
-                if ($vdebug == true) {
+                if ($vdebug) {
                     echo "Unpingable Device".PHP_EOL.PHP_EOL;
                 } else {
                     echo '.';
@@ -155,10 +143,10 @@ function perform_snmp_scan($net)
                         echo "  $reason".PHP_EOL;
                     }
                 }
-                if ($transport == 'tcp') {
+                if ($transport === 'tcp') {
                     // tried both udp and tcp without success
                     $stats['failed']++;
-                    if ($vdebug == true) {
+                    if ($vdebug) {
                         echo "Failed to Add Device".PHP_EOL.PHP_EOL;
                     } else {
                         echo '-';
@@ -214,7 +202,7 @@ if (isset($opts['b'])) {
 if (isset($opts['r'])) {
     $net = Net_IPv4::parseAddress($opts['r']);
     if (ip2long($net->network) !== false) {
-        perform_snmp_scan($net);
+        perform_snmp_scan($net, $force_network, $force_broadcast);
         echo 'Scanned '.$stats['count'].' IPs, Already known '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
         echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
     } else {
@@ -227,7 +215,7 @@ if (isset($opts['r'])) {
     }
     foreach ($config['nets'] as $subnet) {
         $net = Net_IPv4::parseAddress($subnet);
-        perform_snmp_scan($net);
+        perform_snmp_scan($net, $force_network, $force_broadcast);
     }
     echo 'Scanned '.$stats['count'].' IPs, Already know '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
     echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
