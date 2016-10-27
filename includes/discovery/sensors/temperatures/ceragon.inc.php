@@ -17,4 +17,3 @@ if ($device['os'] == 'ceragon') {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     } else echo 'Cant get Ceragon Temp';
 }
-?>

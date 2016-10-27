@@ -18,4 +18,3 @@ if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:Radio2XPIcalc:MIN:"%0.2lf dB" ';
     $rrd_options .= ' GPRINT:Radio2XPIcalc:MAX:"%0.2lf dB\r" ';
 }
-?>

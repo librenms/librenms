@@ -18,5 +18,3 @@ if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:radio2RxBitrateMbps:MIN:"%0.2lf Mbps" ';
     $rrd_options .= ' GPRINT:radio2RxBitrateMbps:MAX:"%0.2lf Mbps\r" ';
 }
-
-?>

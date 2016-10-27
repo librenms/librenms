@@ -16,4 +16,3 @@ if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:radio2RxLevel:MIN:"%3.2lf dBm" ';
     $rrd_options .= ' GPRINT:radio2RxLevel:MAX:"%3.2lf dBm\r" ';
 }
-?>

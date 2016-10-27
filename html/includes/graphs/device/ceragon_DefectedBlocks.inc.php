@@ -16,4 +16,4 @@ if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:Radio2DefectedBlocks:MIN:"%0.2lf " ';
     $rrd_options .= ' GPRINT:Radio2DefectedBlocks:MAX:"%0.2lf \r" ';
 }
-?>
+

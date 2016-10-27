@@ -18,4 +18,4 @@ if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:divided2MSE:MIN:"%3.2lf dB" ';
     $rrd_options .= ' GPRINT:divided2MSE:MAX:"%3.2lf dB\r" ';
 }
-?>
+
