@@ -43,4 +43,3 @@ $version = snmp_get($device, 'genEquipMngSwIDUVersionsRunningVersion.1', '-mMWRM
 $serial = snmp_walk($device, 'genEquipInventorySerialNumber', '-mMWRM-RADIO-MIB -Oqv', '');
 $latitude = snmp_walk($device, 'genEquipUnitLatitude', '-mMWRM-RADIO-MIB -Oqv', '');
 $longitude = snmp_walk($device, 'genEquipUnitLongitude', '-mMWRM-RADIO-MIB -Oqv', '');
-
