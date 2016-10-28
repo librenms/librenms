@@ -17,6 +17,8 @@ This is the API routing file which directs users to the correct API function bas
 This is the main file which all links within LibreNMS are parsed through. It loads the majority of the relevant includes needed for the control panel to function. CSS and JS files are also loaded here.
 ### html/css
 All used css files are located here. Apart from legacy files, anything in here is now a symlink.
+### html/css/custom
+This is a folder you can put custom css files into that won't interfere with auto updates
 ### html/forms
 This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php.
 ### html/includes

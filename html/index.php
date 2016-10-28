@@ -148,6 +148,13 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
+<?php
+
+foreach ((array)$config['webui']['custom_css'] as $custom_css) {
+    echo '<link href="' . $custom_css . '" rel="stylesheet" type="text/css" />';
+}
+
+?>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
