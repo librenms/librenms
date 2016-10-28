@@ -102,7 +102,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
         $snmpcmd = $config['snmpwalk'];
     } else {
         $snmpcmd = $config['snmpbulkwalk'];
-        $max_repeaters = $device['snmp_max_repeaters'];
+        $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
             $snmpcmd .= " -Cr$max_repeaters ";
         }
@@ -1146,4 +1146,23 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
         $array = array_replace_recursive($array, array($key => $value));
     }
     return $array;
+}
+
+/**
+ * @param $device
+ * @return bool
+ */
+function get_device_max_repeaters($device)
+{
+    global $config;
+
+    $max_repeaters = $device['snmp_max_repeaters'];
+
+    if (isset($max_repeaters) && $max_repeaters > 0) {
+        return $max_repeaters;
+    } elseif (isset($config['snmp']['max_repeaters']) && $config['snmp']['max_repeaters'] > 0) {
+        return $config['snmp']['max_repeaters'];
+    } else {
+        return false;
+    }
 }
