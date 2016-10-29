@@ -2,6 +2,7 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
+        $no_checks    = ($_POST['no_checks'] == 'on');
         $community    = mres($_POST['community']);
         $snmpver      = mres($_POST['snmpver']);
         $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
@@ -46,7 +47,7 @@ if ($_POST['editing']) {
         $update = array_merge($update, $v3);
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if (isSNMPable($device_tmp)) {
+        if ($no_checks === true || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = false;
@@ -240,6 +241,18 @@ echo "        </select>
     </div>
     </div>";
 
+?>
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-9">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="no_checks" id="no_checks"> Don't perform ICMP or SNMP checks?
+            </label>
+        </div>
+    </div>
+</div>
+<?php
+
 if ($config['distributed_poller'] === true) {
     echo '
         <div class="form-group">
@@ -269,7 +282,7 @@ if ($config['distributed_poller'] === true) {
 echo '
     <div class="row">
         <div class="col-md-1 col-md-offset-2">
-            <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+            <button type="submit" name="Submit"  class="btn btn-success"><i class="fa fa-check"></i> Save</button>
         </div>
     </div>
     </form>
