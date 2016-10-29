@@ -17,11 +17,11 @@ if (is_admin() === false) {
 }
 
 $service_id = $vars['service_id'];
-$type = mres($vars['stype']);
-$desc = mres($vars['desc']);
-$ip = mres($vars['ip']);
-$param = mres($vars['param']);
-$device_id = mres($vars['device_id']);
+$type = $vars['stype'];
+$desc = $vars['desc'];
+$ip = $vars['ip'];
+$param = $vars['param'];
+$device_id = $vars['device_id'];
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
