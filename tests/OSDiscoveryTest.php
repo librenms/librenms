@@ -386,6 +386,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('deliberant');
     }
 
+    public function testDellrcs()
+    {
+        $this->checkOS('dell-rcs');
+    }
+
     public function testDelllaser()
     {
         $this->checkOS('dell-laser');
