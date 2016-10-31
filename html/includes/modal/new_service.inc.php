@@ -55,7 +55,7 @@ if (is_admin() !== false) {
                     <div class='form-service'>
                         <label for='desc' class='col-sm-3 control-label'>Description: </label>
                         <div class='col-sm-9'>
-                            <input type='text' id='desc' name='desc' class='form-control'/>
+                            <textarea id='desc' name='desc' class='form-control'></textarea>
                         </div>
                     </div>
                     <div class="form-service">
