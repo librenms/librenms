@@ -1361,7 +1361,7 @@ function list_services()
             $sql_param[1] = $_GET['type'];
         }
 
-        $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
+        $services[] = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
     }
     $count = count($services);
     $output = array(
