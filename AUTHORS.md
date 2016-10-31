@@ -147,6 +147,7 @@ LibreNMS contributors:
 - Timothy Willey <developer@timothywilley.net> (twilley)
 - Jon Ward	<librenms@yonzb.net> (yon2004)
 - Ian Viemeister <github@ian.viemeister.com> (iviemeister)
+- Thane Gill <me@thanegill.com> (thanegill)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
