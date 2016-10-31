@@ -271,7 +271,7 @@ This script uses `rec_control get-all` to collect stats.
 ### Proxmox
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 `wget https://github.com/librenms/librenms-agent/blob/master/agent-local/proxmox -O /usr/local/bin/proxmox`
-2. Make the script executable: `chmod +x /usr/local/proxmox`
+2. Make the script executable: `chmod +x /usr/local/bin/proxmox`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
 (Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
