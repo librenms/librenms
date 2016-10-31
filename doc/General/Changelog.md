@@ -1,4 +1,118 @@
 source: General/Changelog.md
+## v1.21
+*(2016-10-30)*
+
+#### Features
+* Added support for global max repeaters for snmp ([#4880](https://github.com/librenms/librenms/issues/4880))
+* Added custom css and include directories which are ignored by git ([#4871](https://github.com/librenms/librenms/issues/4871))
+* Add an option for ad authentication to have a default level ([#4801](https://github.com/librenms/librenms/issues/4801))
+* Add ping and RxLevel for SAF devices ([#4840](https://github.com/librenms/librenms/issues/4840))
+* Added ability to exclude devices from xDP disco based on sysdescr, sysname or platform
+* Add Extra Mimosa Discovery ([#4831](https://github.com/librenms/librenms/issues/4831))
+* Add support for NX-OS fan status ([#4824](https://github.com/librenms/librenms/issues/4824))
+* Add osTicket Alert Transport ([#4791](https://github.com/librenms/librenms/issues/4791))
+* Add SonicWALL Sessions [#1686](https://github.com/librenms/librenms/issues/1686)
+* Updated libvirt-vminfo to support oVirt
+* Enhance Unifi Wireless Client count for multiple VAPs ([#4794](https://github.com/librenms/librenms/issues/4794))
+* Added CEF Display page ([#3978](https://github.com/librenms/librenms/issues/3978))
+* Added CPU detection for Synology DSM [#2081](https://github.com/librenms/librenms/issues/2081) ([#4756](https://github.com/librenms/librenms/issues/4756))
+* Added CPU detection for Synology DSM [#2081](https://github.com/librenms/librenms/issues/2081)
+* Stop displaying sensitive info in the settings page ([#4724](https://github.com/librenms/librenms/issues/4724))
+* Added Cisco Integrated Management Console inventory and sensor support [#4454](https://github.com/librenms/librenms/issues/4454)
+* Added support for show faults array in recovery alerts ([#4708](https://github.com/librenms/librenms/issues/4708))
+* Add description and notes to be used in alerts templates ([#4706](https://github.com/librenms/librenms/issues/4706))
+* validate.php: check poller and discovery status ([#4663](https://github.com/librenms/librenms/issues/4663))
+* Added GlobalProtect sessions to PANOS
+
+#### Bugfixes
+* Replace \\\\l with \l on GPRINT lines ([#4882](https://github.com/librenms/librenms/issues/4882))
+* fix missing config entries on global settings page [#4884](https://github.com/librenms/librenms/issues/4884)
+* Fix the detection of NX-OS fan names ([#4864](https://github.com/librenms/librenms/issues/4864))
+* API call to services only returned first one
+* Change the wording for the create default rules button
+* incomplete polling on aruba controllers
+* Fixed wifi clients not reporting when value 0
+* ZyWALL Fixes for OS and mem polling [#1652](https://github.com/librenms/librenms/issues/1652)
+* Fix irc bot user level ([#4833](https://github.com/librenms/librenms/issues/4833))
+* Updated min/max values for ubnt graphs ([#4811](https://github.com/librenms/librenms/issues/4811))
+* Fix Riverbed temperature discovery ([#4832](https://github.com/librenms/librenms/issues/4832))
+* only poll cipsec for cisco devices. ([#4819](https://github.com/librenms/librenms/issues/4819))
+* Zywall Fixes [#1652](https://github.com/librenms/librenms/issues/1652)
+* do not show fail if running as the librenms user + slightly less false positives ([#4821](https://github.com/librenms/librenms/issues/4821))
+* Do not create rrd folder when -r is specified for poller ([#4812](https://github.com/librenms/librenms/issues/4812))
+* Delete all port_id references [#4684](https://github.com/librenms/librenms/issues/4684)
+* Used dos2unix on all mibs to prevent .index issue ([#4803](https://github.com/librenms/librenms/issues/4803))
+* availability map multiple instances ([#4773](https://github.com/librenms/librenms/issues/4773))
+* top widget multiple instances ([#4757](https://github.com/librenms/librenms/issues/4757))
+* Updated bin/bash to use env in cronic script ([#4752](https://github.com/librenms/librenms/issues/4752))
+* skip ip_exists function when we force add ([#4738](https://github.com/librenms/librenms/issues/4738))
+* Stopped showing sub menus when empty [#4713](https://github.com/librenms/librenms/issues/4713)
+* Samsun ML typo, remove need for hex_string translation ([#4788](https://github.com/librenms/librenms/issues/4788))
+* apc load, runtime and current sensors ([#4780](https://github.com/librenms/librenms/issues/4780))
+* Prevent accidental anonymous binds ([#4784](https://github.com/librenms/librenms/issues/4784))
+* Update brocade fanspeed description
+* qnap temperature sensors [#4586](https://github.com/librenms/librenms/issues/4586)
+* Stop displaying sensitive info in the settings page ([#4724](https://github.com/librenms/librenms/issues/4724))
+* Ignore meraki bad_uptime [#4691](https://github.com/librenms/librenms/issues/4691)
+* Fixed trying to map devices to alert rules
+* Re-enable the edit device groups button ([#4726](https://github.com/librenms/librenms/issues/4726))
+* Raise version size for packages table to 255 char  ([#4656](https://github.com/librenms/librenms/issues/4656))
+* Adjusted padding based on screen width to fit all icons ([#4711](https://github.com/librenms/librenms/issues/4711))
+* fixed count test for cisco-otv poller module ([#4714](https://github.com/librenms/librenms/issues/4714))
+* Fall back to ipNetToMediaPhysAddress when ipNetToPhysicalPhysAddress not available [#4559](https://github.com/librenms/librenms/issues/4559)
+* ipmi poller, run with USER rights and surround username and password with '' [#4710](https://github.com/librenms/librenms/issues/4710)
+* Wrapped ipmi user / pass in quotes [#4686](https://github.com/librenms/librenms/issues/4686) and [#4702](https://github.com/librenms/librenms/issues/4702)
+* Use snmpv3 username even when NoAuthNoPriv is selected [#4677](https://github.com/librenms/librenms/issues/4677)
+
+#### Documentation
+* homepage headers: vertical align, match color, add spacing ([#4870](https://github.com/librenms/librenms/issues/4870))
+* Added FAQ on moving install to another server
+* Updated index page to make it look more attractive ([#4855](https://github.com/librenms/librenms/issues/4855))
+* Adding setup of distro script for Linux (snmpd) configuration
+* Added doc on security and vulnerabilities
+* Update Graylog.md ([#4717](https://github.com/librenms/librenms/issues/4717))
+
+#### Refactoring
+* populate native vlans in the ports_vlan table for cisco devices too ([#4805](https://github.com/librenms/librenms/issues/4805))
+* Small poller improvements, removes unecessary queries / execs ([#4741](https://github.com/librenms/librenms/issues/4741))
+* Cleanup poller include files ([#4751](https://github.com/librenms/librenms/issues/4751))
+* Update alert rules to generate sql query and store in db ([#4748](https://github.com/librenms/librenms/issues/4748))
+* toner support ([#4795](https://github.com/librenms/librenms/issues/4795))
+* Updated and added more options for http proxy support ([#4718](https://github.com/librenms/librenms/issues/4718))
+* small fixes for cisco-voice code ([#4719](https://github.com/librenms/librenms/issues/4719))
+* Improve sensors polling for performance increase ([#4725](https://github.com/librenms/librenms/issues/4725))
+* Improve sensors polling for performance increase
+* Rewrite for qnap fanspeeds ([#4590](https://github.com/librenms/librenms/issues/4590))
+* edituser page to allow user selection of a default dashboard ([#4551](https://github.com/librenms/librenms/issues/4551))
+* snmp cleanup ([#4683](https://github.com/librenms/librenms/issues/4683))
+
+#### Devices
+* Added support for Megatec NetAgent II
+* Add UniFi Wireless MIB polling for Capacity [#4266](https://github.com/librenms/librenms/issues/4266)
+* Added support for Sinetica UPS ¢4613
+* Added additional support for Synology DSM devices [#2738](https://github.com/librenms/librenms/issues/2738)
+* Add additional F5 sensor support ([#4642](https://github.com/librenms/librenms/issues/4642))
+* Added Unifi Wireless Client statistics [#4772](https://github.com/librenms/librenms/issues/4772)
+* Additional support for Hikvision products
+* More dnos additions [#4745](https://github.com/librenms/librenms/issues/4745) ([#4749](https://github.com/librenms/librenms/issues/4749))
+* Additional support for Hikvision products ([#4750](https://github.com/librenms/librenms/issues/4750))
+* Add support for Moxa [#4733](https://github.com/librenms/librenms/issues/4733)
+* Add additional features to SAF Tehnika ([#4666](https://github.com/librenms/librenms/issues/4666))
+* Add support for more Pulse Secure devices [#4680](https://github.com/librenms/librenms/issues/4680)
+* Add support for more DNOS devices [#4627](https://github.com/librenms/librenms/issues/4627)
+* Added support for Sinetica UPS
+* Add support for Mimosa Wireless [#4676](https://github.com/librenms/librenms/issues/4676)
+* Add support for Mimosa Wireless [#4676](https://github.com/librenms/librenms/issues/4676)
+
+#### WebUI
+* Allow users to set their default dashboard from preferences page
+* Updated devices view ([#4700](https://github.com/librenms/librenms/issues/4700))
+* Disable page refresh on the search pages.  Users can manually hit the refresh on the grid. ([#4787](https://github.com/librenms/librenms/issues/4787))
+* Display vlans for all devices. [#4349](https://github.com/librenms/librenms/issues/4349), [#3059](https://github.com/librenms/librenms/issues/3059)
+* Added sorting and poller time support to top-devices widget [#4668](https://github.com/librenms/librenms/issues/4668)
+
+---
+
 ## Release: 201609
 *September 2016*
 

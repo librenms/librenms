@@ -12,10 +12,12 @@
  * the source code distribution for details.
  */
 
-if (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
+if (isset($widget_settings['mode_select']) && $widget_settings['mode_select'] !== '') {
+    $mode = $widget_settings['mode_select'];
+} elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
     $mode = $_SESSION["map_view"];
 } else {
-    $mode = $widget_settings['mode'];
+    $mode = 0;
 }
 
 $select_modes = array(
@@ -87,6 +89,31 @@ if (defined('SHOW_SETTINGS')) {
             <select class="form-control" name="show_disabled_and_ignored">
                 <option value="1" '.$selected_yes.'>yes</option>
                 <option value="0" '.$selected_no.'>no</option>
+            </select>
+        </div>
+    </div>';
+
+    $common_output[] = '
+    <div class ="form-group">
+        <div class="col-sm-4">
+            <label for="mode_select" class="control-lable availability-map-widget-header">Mode</label>
+        </div>
+        <div class="col-sm-6">
+            <select name="mode_select" class="form-control">';
+
+    if ($config['show_services'] == 0) {
+        $common_output[] = '<option value="0" selected>only devices</option>';
+    } else {
+        foreach ($select_modes as $mode_select => $option) {
+            if ($mode_select == $widget_settings["mode_select"]) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+            $common_output[] = '<option value="' . $mode_select . '" ' . $selected . '>' . $option . '</option>';
+        }
+    }
+    $common_output[] = '
             </select>
         </div>
     </div>';
