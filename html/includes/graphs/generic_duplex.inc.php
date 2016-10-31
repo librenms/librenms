@@ -109,7 +109,7 @@ $rrd_options .= " COMMENT:\\n";
 if ($print_total) {
     $rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";
     $rrd_options .= " GPRINT:totin:'(In %6.2lf%s'";
-    $rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\\\l'";
+    $rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\l'";
 }
 
 if ($percentile) {
