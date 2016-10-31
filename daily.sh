@@ -56,7 +56,7 @@ status_run() {
     if [[ ${exit_code} -eq 0 ]]; then
         printf " \033[0;32mOK\033[0m\n";
     else
-        printf "\033[0;31mFAIL\033[0m\n";
+        printf " \033[0;31mFAIL\033[0m\n";
     fi
     return ${exit_code}
 }
