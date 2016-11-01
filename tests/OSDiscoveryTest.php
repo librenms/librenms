@@ -570,6 +570,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFujitsupyos()
     {
         $this->checkOS('fujitsupyos');
+        $this->checkOS('fujitsupyos', 'fujitsupyos-10gbe');
     }
 
     public function testFxos()
