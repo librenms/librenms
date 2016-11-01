@@ -38,7 +38,7 @@ if ($stage == "4" || $stage == "3") {
 }
 
 require '../includes/defaults.inc.php';
-$config['db']['extension']='mysqli';
+
 // Work out the install directory
 $cur_dir = explode('/', __DIR__);
 $check = end($cur_dir);
@@ -304,11 +304,10 @@ if ($ext_loaded == 'no') {
          <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
 <?php
 // Ok now let's set the db connection up
-    $config['db_host']=$dbhost;
-    $config['db_user']=$dbuser;
-    $config['db_pass']=$dbpass;
-    $config['db_name']=$dbname;
-    $config['db']['extension']='mysqli';
+    $config['db_host'] = $dbhost;
+    $config['db_user'] = $dbuser;
+    $config['db_pass'] = $dbpass;
+    $config['db_name'] = $dbname;
     $sql_file = '../build.sql';
     $_SESSION['last'] = time();
     ob_end_flush();

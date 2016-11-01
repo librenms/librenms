@@ -5,11 +5,7 @@ require_once $config['install_dir'].'/includes/dbFacile.php';
 require_once $config['install_dir'].'/includes/mergecnf.inc.php';
 
 // Connect to database
-if ($config['db']['extension'] == 'mysqli') {
-    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-} else {
-    $database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-}
+$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
 
 if (!$database_link) {
     if (isCli()) {
@@ -17,19 +13,11 @@ if (!$database_link) {
     } else {
         echo '<h2>MySQL Error: could not connect</h2>';
     }
-    if ($config['db']['extension'] == 'mysqli') {
-        echo mysqli_error($database_link);
-    } else {
-        echo mysql_error();
-    }
+    echo mysqli_error($database_link);
     die;
 }
 
-if ($config['db']['extension'] == 'mysqli') {
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
-} else {
-    $database_db = mysql_select_db($config['db_name'], $database_link);
-}
+$database_db = mysqli_select_db($database_link, $config['db_name']);
 
 if ($config['memcached']['enable'] === true) {
     if (class_exists('Memcached')) {

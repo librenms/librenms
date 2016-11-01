@@ -31,12 +31,6 @@ $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
-You can also select between the mysql and mysqli php extensions:
-
-```php
-$config['db']['extension'] = 'mysqli';
-```
-
 #### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
