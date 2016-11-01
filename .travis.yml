@@ -43,7 +43,6 @@ before_script:
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
-  - test bash -n daily.sh
 
 after_failure:
   - cat /tmp/snmpsimd.log
@@ -52,3 +51,4 @@ script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
   - SNMPSIM=1 phpunit --stop-on-failure
+  - test bash -n daily.sh
