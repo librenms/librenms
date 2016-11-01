@@ -148,6 +148,7 @@ LibreNMS contributors:
 - Jon Ward	<librenms@yonzb.net> (yon2004)
 - Ian Viemeister <github@ian.viemeister.com> (iviemeister)
 - Thane Gill <me@thanegill.com> (thanegill)
+- Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
