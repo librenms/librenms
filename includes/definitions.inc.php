@@ -1090,6 +1090,13 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'dell-rcs';
+$config['os'][$os]['text']             = 'Dell Remote Console';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'dell';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 $os = 'avaya-ers';
 $config['os'][$os]['text']             = 'ERS Firmware';
 $config['os'][$os]['type']             = 'network';
