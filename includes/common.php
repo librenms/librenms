@@ -490,6 +490,16 @@ function safename($name)
     return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
 }
 
+/**
+ * Function format the rrdtool description text correctly.
+ * @param $descr
+ * @return mixed
+ */
+function safedescr($descr)
+{
+    return preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+}
+
 function zeropad($num, $length = 2)
 {
     while (strlen($num) < $length) {
