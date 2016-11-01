@@ -197,3 +197,4 @@ fi
 =======
 main "$@"
 >>>>>>> Refactored and added support for $config['log_dir']
+
