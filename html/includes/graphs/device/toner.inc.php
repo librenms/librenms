@@ -46,7 +46,7 @@ foreach (dbFetchRows('SELECT * FROM toner where device_id = ?', array($device['d
 
     $hostname = gethostbyid($toner['device_id']);
 
-    $descr        = substr(str_pad($toner['toner_descr'], 16), 0, 16);
+    $descr        = safedescr(substr(str_pad($toner['toner_descr'], 16), 0, 16));
     $rrd_filename = rrd_name($device['hostname'], array('toner', $toner['toner_index']));
     $toner_id     = $toner['toner_id'];
 
