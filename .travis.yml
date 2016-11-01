@@ -52,5 +52,5 @@ script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
   - SNMPSIM=1 phpunit --stop-on-failure
-  - test bash -n daily.sh
+  - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py poller-service.py
