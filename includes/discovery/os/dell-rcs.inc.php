@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (str_contains($sysObjectId, '.1.3.6.1.4.1.10418.18.21.17')) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.10418.18.21.17')) {
     $os = 'dell-rcs';
 }
