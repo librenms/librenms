@@ -149,6 +149,7 @@ LibreNMS contributors:
 - Ian Viemeister <github@ian.viemeister.com> (iviemeister)
 - Thane Gill <me@thanegill.com> (thanegill)
 - Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
+- Markus Wigge <markus@cultcom.de> (cultcom)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
