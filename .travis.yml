@@ -43,6 +43,7 @@ before_script:
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
+  - test bash -n daily.sh
 
 after_failure:
   - cat /tmp/snmpsimd.log
