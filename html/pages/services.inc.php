@@ -131,7 +131,7 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
         <td><?php echo $devlink?></td>
         <td><?php echo $status?></td>
         <td><?php echo formatUptime(time() - $service['service_changed'])?></td>
-        <td><span class='box-desc'><?php echo nl2br(trim(stripslashes($service['service_message'])))?></span></td>
+        <td><span class='box-desc'><?php echo nl2br(display($service['service_message']))?></span></td>
         <td><span class='box-desc'><?php echo nl2br(display($service['service_desc']))?></span></td>
         <td>
             <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
