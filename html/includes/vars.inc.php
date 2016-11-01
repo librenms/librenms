@@ -38,5 +38,5 @@ foreach ($_GET as $name => $value) {
 }
 
 foreach ($_POST as $name => $value) {
-    $vars[$name] = clean($value);
+    $vars[$name] = ($value);
 }
