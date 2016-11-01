@@ -21,7 +21,7 @@ if (!is_numeric($alert_id)) {
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert_id));
     if (($proc == "") || ($proc == "NULL")) {
         echo header("HTTP/1.0 404 Not Found");
-    } elseif (! preg_match('/^http:\/\//', $proc)) {
+    } elseif (! preg_match('/^http[s]*:\/\//', $proc)) {
         echo "ERROR";
     } else {
         echo $proc;
