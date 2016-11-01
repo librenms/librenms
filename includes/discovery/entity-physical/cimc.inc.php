@@ -590,7 +590,9 @@ if (is_null($tblUCSObjects)) {
             $component->deleteComponent($key);
         }
     }
-    // Write the Components back to the DB.
-    $component->setComponentPrefs($device['device_id'], $components);
-    echo "\n";
+    if (is_array($components)) {
+        // Write the Components back to the DB.
+        $component->setComponentPrefs($device['device_id'], $components);
+        echo "\n";
+    }
 } // End if not error
