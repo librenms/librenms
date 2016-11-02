@@ -1,4 +1,4 @@
-<fuji?php
+<?php
 /**
  * DiscoveryTest.php
  *
