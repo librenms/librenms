@@ -49,7 +49,7 @@ if [ -z "$arg" ]; then
         old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
         status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))'
         new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-        if [ "$old_ver" -ne "$new_ver" ]; then
+        if [ "$old_ver" != "$new_ver" ]; then
             status_run "Updated from $old_ver to $new_ver" ''
         fi
     fi
@@ -82,6 +82,7 @@ else
         ;;
         cleanup)
             # Cleanups
+            php daily.php -f refresh_alert_rules
             php daily.php -f syslog
             php daily.php -f eventlog
             php daily.php -f authlog

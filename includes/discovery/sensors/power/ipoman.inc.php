@@ -6,9 +6,9 @@ if ($device['os'] == 'ipoman') {
 
     // Inlet Disabled due to the fact thats it's Kwh instead of just Watt
     if (!is_array($cache['ipoman'])) {
-        echo 'outletConfigDesc ';
+        d_echo('outletConfigDesc ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', $cache['ipoman']['out'], 'IPOMANII-MIB');
-        echo 'outletConfigLocation ';
+        d_echo('outletConfigLocation ');
         $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigLocation', $cache['ipoman']['out'], 'IPOMANII-MIB');
         // echo("inletConfigDesc ");
         // $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, "inletConfigDesc", $cache['ipoman'], "IPOMANII-MIB");
@@ -19,7 +19,7 @@ if ($device['os'] == 'ipoman') {
 
     // echo("inletStatusWH ");
     // $oids_in = snmpwalk_cache_multi_oid($device, "inletStatusWH", $oids_in, "IPOMANII-MIB");
-    echo 'outletStatusWH ';
+    d_echo('outletStatusWH ');
     $oids_out = snmpwalk_cache_multi_oid($device, 'outletStatusWH', $oids_out, 'IPOMANII-MIB');
 
     // if (is_array($oids_in))

@@ -25,6 +25,7 @@ Table of Content:
     - [PlaySMS](#transports-playsms)
     - [VictorOps](#transports-victorops)
     - [Canopsis](#transports-canopsis)
+    - [osTicket](#transports-osticket)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -289,7 +290,9 @@ $config['alert']['transports']['irc'] = true;
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
-The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options:
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options: 
 
 ~~
 ```php
@@ -303,6 +306,8 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 ## <a name="transports-hipchat">HipChat</a>
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
 
 The HipChat transport requires the following:
 
@@ -353,6 +358,8 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
 Enabling PagerDuty transports is almost as easy as enabling email-transports.
 
 All you need is to create a Service with type Generic API on your PagerDuty dashboard.
@@ -370,6 +377,8 @@ That's it!
 __Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
 
 ## <a name="transports-pushover">Pushover</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
@@ -400,6 +409,8 @@ $config['alert']['transports']['pushover'][] = array(
 
 ## <a name="transports-boxcar">Boxcar</a>
 
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
 Enabling Boxcar support is super easy.
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport in your config.php like:
 
@@ -424,6 +435,8 @@ $config['alert']['transports']['boxcar'][] = array(
 
 ## <a name="transports-pushbullet">Pushbullet</a>
 
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
 Enabling Pushbullet is a piece of cake.
 Get your Access Token from your Pushbullet's settings page and set it in your config like:
 
@@ -434,6 +447,8 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ~~
 
 ## <a name="transports-clickatell">Clickatell</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.
 Please consult Clickatell's documentation regarding number formatting.
@@ -449,6 +464,8 @@ $config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
 ~~
 
 ## <a name="transports-playsms">PlaySMS</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
 
 PlaySMS is an open source SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.
 Please consult PlaySMS's documentation regarding number formatting.
@@ -466,6 +483,8 @@ $config['alert']['transports']['playsms']['to'][]  = '+1234567891';
 ~~
 
 ## <a name="transports-victorops">VictorOps</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
 
 VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps account and go to:
 
@@ -502,6 +521,23 @@ $config['alert']['transports']['canopsis']['vhost'] = 'canopsis';
 For more information about canopsis and its events, take a look here :
  http://www.canopsis.org/
  http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html
+
+## <a name="transports-osticket">osTicket</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+osTicket, open source ticket system. LibreNMS can send alerts to osTicket API which are then converted to osTicket tickets. To configure the transport, go to:
+
+Global Settings -> Alerting Settings -> osTicket Transport.
+
+This can also be done manually in config.php :
+
+~~
+```php
+$config['alert']['transports']['osticket']['url'] = 'http://osticket.example.com/api/http.php/tickets.json';
+$config['alert']['transports']['osticket']['token'] = '123456789';
+```
+~~
 
 # <a name="entities">Entities
 

@@ -300,7 +300,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     } else {
         $ip = $host;
     }
-    if (ip_exists($ip)) {
+    if ($force_add !== true && ip_exists($ip)) {
         throw new HostIpExistsException("Already have host with this IP $host");
     }
 
@@ -1118,18 +1118,28 @@ function guidv4($data)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function set_curl_proxy($post)
+/**
+ * @param $curl
+ */
+function set_curl_proxy($curl)
 {
     global $config;
-    if (isset($_ENV['https_proxy'])) {
-        $tmp = rtrim($_ENV['https_proxy'], "/");
-        $proxystr = str_replace(array("http://", "https://"), "", $tmp);
-        $config['callback_proxy'] = $proxystr;
-        echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
+
+    $proxy = '';
+    if (getenv('http_proxy')) {
+        $proxy = getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        $proxy = getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        $proxy = $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        $proxy = $config['http_proxy'];
     }
-    if (isset($config['callback_proxy'])) {
-        echo "Using ".$config['callback_proxy']." as proxy\n";
-        curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
+
+    $tmp = rtrim($proxy, "/");
+    $proxy = str_replace(array("http://", "https://"), "", $tmp);
+    if (!empty($proxy)) {
+        curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
 }
 
@@ -1647,3 +1657,100 @@ function getCIMCentPhysical($location, &$entphysical, &$index)
         return $index;
     } // end if - Level 1
 } // end function
+
+
+/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+function hex2bin_compat($str)
+{
+    if (strlen($str) % 2 !== 0) {
+        trigger_error(__FUNCTION__.'(): Hexadecimal input string must have an even length', E_USER_WARNING);
+    }
+    return pack("H*", $str);
+}
+
+if (!function_exists('hex2bin')) {
+    // This is only a hack
+    function hex2bin($str)
+    {
+        return hex2bin_compat($str);
+    }
+}
+
+function q_bridge_bits2indices($hex_data)
+{
+    /* convert hex string to an array of 1-based indices of the nonzero bits
+     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+    */
+    $hex_data = str_replace(' ', '', $hex_data);
+    $value = hex2bin($hex_data);
+    $length = strlen($value);
+    $indices = array();
+    for ($i = 0; $i < $length; $i++) {
+        $byte = ord($value[$i]);
+        for ($j = 7; $j >= 0; $j--) {
+            if ($byte & (1 << $j)) {
+                $indices[] = 8*$i + 8-$j;
+            }
+        }
+    }
+    return $indices;
+}
+
+/**
+ * @param array $device
+ * @param int|string $raw_value The value returned from snmp
+ * @param int $capacity the normalized capacity
+ * @return int the toner level as a percentage
+ */
+function get_toner_levels($device, $raw_value, $capacity)
+{
+    // -3 means some toner is left
+    if ($raw_value == '-3') {
+        return 50;
+    }
+
+    // -2 means unknown, -1 mean no restrictions
+    if ($raw_value == '-2' || $raw_value == '-1') {
+        return 0;  // FIXME: is 0 what we should return?
+    }
+
+    // Non-standard snmp values
+    if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
+        if ($raw_value == '-100') {
+            return 0;
+        }
+    } elseif ($device['os'] == 'brother') {
+        if (!str_contains($device['hardware'], 'MFC-L8850')) {
+            switch ($raw_value) {
+                case '0':
+                    return 100;
+                case '1':
+                    return 5;
+                case '2':
+                    return 0;
+                case '3':
+                    return 1;
+            }
+        }
+    }
+
+    return round($raw_value / $capacity * 100);
+}
+
+/**
+ * check if we should skip this device from discovery
+ * @param $needles
+ * @param $haystack
+ * @param $name
+ * @return bool
+ */
+function can_skip_discovery($needles, $haystack, $name)
+{
+    foreach ((array)$needles as $needle) {
+        if (preg_match($needle ."i", $haystack)) {
+            d_echo("{$name} - regexp '{$needle}' matches '{$haystack}' - skipping device discovery \n");
+            return true;
+        }
+    }
+    return false;
+}

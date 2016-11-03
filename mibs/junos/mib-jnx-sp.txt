@@ -39,6 +39,10 @@ jnxSpMIB  MODULE-IDENTITY
     REVISION  "200504020000Z"
     DESCRIPTION
             "Initial revision."
+    REVISION  "201302230000Z"    --Feb  23, 2013
+    DESCRIPTION
+            "Added OID jnxSpSvcSetFlowLimitUtilised under jnxSpNotificationPrefix 
+            Depreated OID jnxSpSvcSetFlowLimitUtilized ."
     ::= { jnxMibs 32 }
 
     jnxSpNotifications    OBJECT IDENTIFIER ::= { jnxSpMIB 0 }
@@ -523,10 +527,19 @@ jnxSpMIB  MODULE-IDENTITY
    jnxSpSvcSetFlowLimitUtilized NOTIFICATION-TYPE
         OBJECTS {jnxSpSvcSetFlowLimitUtil,
                  jnxSpSvcSetNameUtil}
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
             "This indicates a Service Set has reached its upper limit of flows
             threshold of a maximun flows allowed for a service set."
         ::= { jnxSpNotifications 1 }
+
+   jnxSpSvcSetFlowLimitUtilised NOTIFICATION-TYPE
+        OBJECTS {jnxSpSvcSetFlowLimitUtil,
+                 jnxSpSvcSetNameUtil}
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Set has reached its upper limit of flows
+            threshold of a maximun flows allowed for a service set."
+        ::= { jnxSpNotificationPrefix 5 }
 
 END

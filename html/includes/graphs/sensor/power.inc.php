@@ -21,7 +21,7 @@ if ($sensor['poller_type'] == "ipmi") {
 }
 
 $rrd_options .= ' GPRINT:sensor:LAST:%6.2lfW';
-$rrd_options .= ' GPRINT:sensor:MAX:%6.2lfW\\\\l';
+$rrd_options .= ' GPRINT:sensor:MAX:%6.2lfW\l';
 
 if (is_numeric($sensor['sensor_limit'])) {
     $rrd_options .= ' HRULE:'.$sensor['sensor_limit'].'#999999::dashes';

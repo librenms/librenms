@@ -12,6 +12,7 @@ require 'includes/defaults.inc.php';
 require 'config.php';
 require_once 'includes/definitions.inc.php';
 require 'includes/functions.php';
+require_once 'includes/alerts.inc.php';
 
 $options = getopt('f:d');
 
@@ -149,6 +150,19 @@ if ($options['f'] === 'purgeusers') {
         $del_users = '"'.implode('","', $users).'"';
         if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
             echo "Removed users that haven't logged in for $purge days";
+        }
+    }
+}
+
+if ($options['f'] === 'refresh_alert_rules') {
+    echo 'Refreshing alert rules queries' . PHP_EOL;
+    $rules = dbFetchRows('SELECT `id`, `rule` FROM `alert_rules`');
+    foreach ($rules as $rule) {
+        $data['query'] = GenSQL($rule['rule']);
+        if (!empty($data['query'])) {
+            $debug=1;
+            dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
+            unset($data);
         }
     }
 }

@@ -102,7 +102,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
         $snmpcmd = $config['snmpwalk'];
     } else {
         $snmpcmd = $config['snmpbulkwalk'];
-        $max_repeaters = $device['snmp_max_repeaters'];
+        $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
             $snmpcmd .= " -Cr$max_repeaters ";
         }
@@ -175,6 +175,30 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     return $array;
 }//end snmp_get_multi()
 
+function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
+{
+    global $runtime_stats;
+
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
+
+    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    $runtime_stats['snmpget']++;
+    $array = array();
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        if (!strstr($value, 'at this OID') && isset($oid)) {
+            $array[$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmp_get_multi_oid()
 
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -1122,4 +1146,23 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
         $array = array_replace_recursive($array, array($key => $value));
     }
     return $array;
+}
+
+/**
+ * @param $device
+ * @return bool
+ */
+function get_device_max_repeaters($device)
+{
+    global $config;
+
+    $max_repeaters = $device['snmp_max_repeaters'];
+
+    if (isset($max_repeaters) && $max_repeaters > 0) {
+        return $max_repeaters;
+    } elseif (isset($config['snmp']['max_repeaters']) && $config['snmp']['max_repeaters'] > 0) {
+        return $config['snmp']['max_repeaters'];
+    } else {
+        return false;
+    }
 }

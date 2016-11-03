@@ -12,13 +12,12 @@
  * the source code distribution for details.
  */
 
-$sql = dbFetchRow('SELECT `settings` FROM `users_widgets` WHERE `user_id` = ? AND `widget_id` = ?', array($_SESSION["user_id"], '1'));
-$widget_mode = json_decode($sql['settings'], true);
-
-if (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
+if (isset($widget_settings['mode_select']) && $widget_settings['mode_select'] !== '') {
+    $mode = $widget_settings['mode_select'];
+} elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
     $mode = $_SESSION["map_view"];
 } else {
-    $mode = $widget_mode['mode'];
+    $mode = 0;
 }
 
 $select_modes = array(
@@ -28,10 +27,10 @@ $select_modes = array(
 );
 
 if ($config['webui']['availability_map_compact'] == 1) {
-    $compact_tile = $widget_mode['tile_width'];
+    $compact_tile = $widget_settings['tile_width'];
 }
 
-$show_disabled_ignored = $widget_mode['show_disabled_and_ignored'];
+$show_disabled_ignored = $widget_settings['show_disabled_and_ignored'];
 
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
@@ -44,6 +43,22 @@ if (defined('SHOW_SETTINGS')) {
                 <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($widget_settings['title']).'">
             </div>
         </div>';
+
+    if ($config['webui']['availability_map_compact'] === false) {
+        $common_output[] = '
+    <div class="form-group">
+        <div class="col-sm-4">
+            <label for="color_only_select" class="control-label availability-map-widget-header">Uniform Tiles</label>
+        </div>
+        <div class="col-sm-6">
+            <select class="form-control" name="color_only_select">
+                <option value="1"' . ($widget_settings['color_only_select'] == 1 ? ' selected' : '')  . ' >yes</option>
+                <option value="0"' . ($widget_settings['color_only_select'] == 1 ? '' : ' selected')  . ' >no</option>
+            </select>
+        </div>
+    </div>
+';
+    }
 
     if ($config['webui']['availability_map_compact'] == 1) {
         $common_output[] = '
@@ -74,6 +89,31 @@ if (defined('SHOW_SETTINGS')) {
             <select class="form-control" name="show_disabled_and_ignored">
                 <option value="1" '.$selected_yes.'>yes</option>
                 <option value="0" '.$selected_no.'>no</option>
+            </select>
+        </div>
+    </div>';
+
+    $common_output[] = '
+    <div class ="form-group">
+        <div class="col-sm-4">
+            <label for="mode_select" class="control-lable availability-map-widget-header">Mode</label>
+        </div>
+        <div class="col-sm-6">
+            <select name="mode_select" class="form-control">';
+
+    if ($config['show_services'] == 0) {
+        $common_output[] = '<option value="0" selected>only devices</option>';
+    } else {
+        foreach ($select_modes as $mode_select => $option) {
+            if ($mode_select == $widget_settings["mode_select"]) {
+                $selected = 'selected';
+            } else {
+                $selected = '';
+            }
+            $common_output[] = '<option value="' . $mode_select . '" ' . $selected . '>' . $option . '</option>';
+        }
+    }
+    $common_output[] = '
             </select>
         </div>
     </div>';
@@ -199,6 +239,10 @@ if (defined('SHOW_SETTINGS')) {
                     </div>
                     </a>';
                 } else {
+                    if ($widget_settings['color_only_select'] == 1) {
+                        $deviceState = ' ';
+                        $deviceLabel .= ' widget-availability-fixed';
+                    }
                     $temp_output[] = '
                     <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
@@ -245,6 +289,10 @@ if (defined('SHOW_SETTINGS')) {
                             </div>
                         </a>';
                     } else {
+                        if ($widget_settings['color_only_select'] == 1) {
+                            $serviceState = ' ';
+                            $serviceLabel .= ' widget-availability-fixed';
+                        }
                         $temp_output[] = '
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>

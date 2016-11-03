@@ -72,7 +72,7 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
         'timestamp' => '<div style="white-space:nowrap;">'.$syslog['date'].'</div>',
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
-        'msg'       => htmlspecialchars($syslog['msg']),
+        'msg'       => display($syslog['msg']),
         'status'    => generate_priority_status($syslog['priority']),
     );
 }

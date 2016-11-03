@@ -42,12 +42,23 @@ You can disable modules globally then re-enable the module per device or the opp
 We have support for SNMP Max repeaters which can be handy on devices where we poll a lot of ports or bgp sessions for instance and 
 where snmpwalk or snmpbulkwalk is used. This needs to be enabled on a per device basis under edit device -> snmp -> Max repeaters.
 
+You can also set this globally with the config option `$config['snmp']['max_repeaters'] = X;`.
+
 It's advisable to test the time taken to snmpwalk IF-MIB or something similar to work out what the best value is. To do this run the following 
 but replace <REPEATERS> with varying numbers from 10 upto around 50. You will also need to set the correct snmp version, hostname and community string:
 
-`time snmpbulkwalk -v2c -cpublic HOSTNAME -Cr<REPEATERS> -M /opt/librenms/mibs -m IF-MIB`
+`time snmpbulkwalk -v2c -cpublic HOSTNAME -Cr<REPEATERS> -M /opt/librenms/mibs -m IF-MIB IfEntry`
 
 > NOTE: Do not go blindly setting this value as you can impact polling negatively.
+
+#### SNMP Max OIDs
+
+For sensors polling we now do bulk snmp gets to speed things up. By default this is ten but you can overwrite this per device under 
+edit device -> snmp -> Max OIDs.
+
+You can also set this globally with the config option `$config['snmp']['max_oid'] = X;`.
+
+> NOTE: It is advisable to monitor sensor polling when you change this to ensure you don't set the value too high.
 
 #### Optimise poller-wrapper
 

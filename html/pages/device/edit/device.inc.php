@@ -26,7 +26,7 @@ if ($_POST['editing']) {
 
         #FIXME needs more sanity checking! and better feedback
 
-        $param = array('purpose' => $_POST['descr'], 'type' => $_POST['type'], 'ignore' => $_POST['ignore'], 'disabled' => $_POST['disabled']);
+        $param = array('purpose' => $vars['descr'], 'type' => $vars['type'], 'ignore' => $vars['ignore'], 'disabled' => $vars['disabled']);
 
         $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
 
@@ -81,7 +81,7 @@ if ($updated && $update_message) {
     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo($device['purpose']); ?></textarea>
+            <textarea id="descr" name="descr" class="form-control"><?php echo(display($device['purpose'])); ?></textarea>
         </div>
     </div>
     <div class="form-group">

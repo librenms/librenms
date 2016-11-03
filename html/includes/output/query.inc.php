@@ -39,7 +39,10 @@ switch ($type) {
         $rules = GetRules($device_id);
         $output = '';
         foreach ($rules as $rule) {
-            $sql = GenSQL($rule['rule']);
+            if (empty($rule['query'])) {
+                $rule['query'] = GenSQL($rule['rule']);
+            }
+            $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
             if (is_array($qry)) {
                 $response = 'matches';
@@ -48,7 +51,30 @@ switch ($type) {
             }
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
             $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
+            $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
+        }
+        if ($config['alert']['transports']['mail'] === true) {
+            $contacts = GetContacts($rules);
+            if (count($contacts) > 0) {
+                $output .= 'Found ' . count(contacts) . ' contacts to send alerts to.' . PHP_EOL;
+            }
+            foreach ($contacts as $email => $name) {
+                $output .= $name . '<' . $email . '>' . PHP_EOL;
+            }
+            $output .= PHP_EOL;
+        }
+        $transports = '';
+        $x = 0;
+        foreach ($config['alert']['transports'] as $name => $v) {
+            if ($config['alert']['transports'][$name] === true) {
+                $transports .= 'Transport: ' . $name . PHP_EOL;
+                $x++;
+            }
+        }
+        if (!empty($transports)) {
+            $output .= 'Found ' . $x . ' transports to send alerts to.' . PHP_EOL;
+            $output .= $transports;
         }
         break;
     default:

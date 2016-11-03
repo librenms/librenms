@@ -99,7 +99,7 @@ if ($config['old_graphs']) {
     $rrd_options .= " COMMENT:\\n";
 
     if ($print_total) {
-        $rrd_options .= ' GPRINT:'.$ds.'_tot:Total\ %6.2lf%s\)\\\\l';
+        $rrd_options .= ' GPRINT:'.$ds.'_tot:Total\ %6.2lf%s\)\l';
     }
 
     if ($percentile) {

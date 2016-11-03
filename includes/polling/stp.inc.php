@@ -16,7 +16,6 @@
 
 // Pre-cache existing state of STP for this device from database
 $stp_db = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', array($device['device_id']));
-//d_echo($stp_db);
 
 $stpprotocol = snmp_get($device, 'dot1dStpProtocolSpecification.0', '-Oqv', 'RSTP-MIB');
 

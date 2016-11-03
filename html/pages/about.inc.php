@@ -145,7 +145,7 @@ echo "
 <?php
 $versions = version_info(false);
 $project_name    = $config['project_name'];
-$apache_version  = str_replace('Apache/', '', $_SERVER['SERVER_SOFTWARE']);
+$webserv_version = $_SERVER['SERVER_SOFTWARE'];
 $php_version     = $versions['php_ver'];
 $mysql_version   = $versions['mysql_ver'];
 $netsnmp_version = $versions['netsnmp_ver'];
@@ -159,7 +159,7 @@ echo "
     <table class='table table-condensed' border='0'>
       <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
       <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
-      <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
+      <tr><td><b>Web Server</b></td><td>$webserv_version</td></tr>
       <tr><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>
       <tr><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>

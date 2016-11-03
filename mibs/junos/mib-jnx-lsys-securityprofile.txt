@@ -38,5 +38,6 @@ jnxLsysSpNATconebind        OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 15 }
 jnxLsysSpNATpoipnum         OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 16 }
 jnxLsysSpNATRuleRefPfx      OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 17 }
 jnxLsysSpCPU                OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 18 }
+-- jnxLsysSpGRsc               OBJECT IDENTIFIER ::= { jnxLsysSecurityProfile 19 }
 
 END

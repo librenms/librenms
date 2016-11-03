@@ -83,5 +83,5 @@ It's also possible to write your own parser, the existing one is: includes/port-
 Once you've created your own then you can enable it with:
 
 ```php
-$config['port_descr_parser'] = "includes/my-port-descr-parser.inc.php";
+$config['port_descr_parser'] = "includes/custom/my-port-descr-parser.inc.php";
 ```

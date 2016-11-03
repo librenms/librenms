@@ -14,8 +14,10 @@
 /composer.lock
 Thumbs.db
 config.php
+html/css/custom/*
 html/plugins/*
 !html/plugins/Test/
+includes/custom/*
 junk
 logs
 nbproject

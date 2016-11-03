@@ -13,7 +13,7 @@
 
 
 if ($device['os'] == "nos") {
-    $oids = snmp_walk($device, '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2', '-Osqn');
+    $oids = snmp_walk($device, '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2', '-Osqn');
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
@@ -25,7 +25,7 @@ if ($device['os'] == "nos") {
             if (!strstr($descr, 'No') and !strstr($value, 'No')) {
                 $descr = str_replace('"', '', $descr);
                 $descr = trim($descr);
-                discover_sensor($valid['sensor'], 'temperature', $device, $value_oid, $data[35], 'nos', $descr, '1', '1', null, null, '80', '100', $value);
+                discover_sensor($valid['sensor'], 'fanspeed', $device, $value_oid, $data[35], 'nos', $descr, '1', '1', null, null, '80', '100', $value);
             }
         }
     }

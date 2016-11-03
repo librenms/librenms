@@ -133,9 +133,6 @@ if (is_module_enabled('poller', 'mib')) {
         <li class="dropdown">
           <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Devices</span></a>
           <ul class="dropdown-menu">
-            <li class="dropdown-submenu">
-              <a href="devices/"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> All Devices</a>
-              <ul class="dropdown-menu scrollable-menu">
 <?php
 
 $param = array();
@@ -146,15 +143,25 @@ if (is_admin() === true || is_read() === true) {
     $param[] = $_SESSION['user_id'];
 }
 
-foreach (dbFetchRows($sql, $param) as $devtype) {
+$device_types = dbFetchRows($sql, $param);
+
+if (count($device_types) > 0) {
+?>
+              <li class="dropdown-submenu">
+                  <a href="devices/"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> All Devices</a>
+                  <ul class="dropdown-menu scrollable-menu">
+<?php
+foreach ($device_types as $devtype) {
     if (empty($devtype['type'])) {
-        $devtype['type'] = 'generic';
+            $devtype['type'] = 'generic';
     }
-    echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> ' . ucfirst($devtype['type']) . '</a></li>');
+        echo('            <li><a href="devices/type=' . $devtype['type'] . '/"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> ' . ucfirst($devtype['type']) . '</a></li>');
+}
+    echo ('</ul></li>');
+} else {
+    echo '<li class="dropdown-submenu"><a href="#">No devices</a></li>';
 }
 
-        echo ('</ul>
-             </li>');
 if (count($devices_groups) > 0) {
     echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
     foreach ($devices_groups as $group) {
@@ -165,21 +172,24 @@ if (count($devices_groups) > 0) {
 }
 if ($_SESSION['userlevel'] >= '10') {
     if ($config['show_locations']) {
-        echo('
-            <li role="presentation" class="divider"></li>
-            <li class="dropdown-submenu">
-            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Locations</a>
-            <ul class="dropdown-menu scrollable-menu">
-            ');
         if ($config['show_locations_dropdown']) {
-            foreach (getlocations() as $location) {
-                echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building-o fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
+            $locations = getlocations();
+            if (count($locations) > 0) {
+                echo('
+                    <li role="presentation" class="divider"></li>
+                    <li class="dropdown-submenu">
+                    <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Locations</a>
+                    <ul class="dropdown-menu scrollable-menu">
+                ');
+                foreach ($locations as $location) {
+                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building-o fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
+                }
+                echo('
+                    </ul>
+                    </li>
+                ');
             }
         }
-        echo('
-            </ul>
-            </li>
-            ');
     }
     echo '
             <li role="presentation" class="divider"></li>';

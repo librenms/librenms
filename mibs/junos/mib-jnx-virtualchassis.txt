@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Virtual Chassis
 --
--- Copyright (c) 2007-2013, Juniper Networks, Inc.
+-- Copyright (c) 2007-2014, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -91,7 +91,10 @@ IMPORTS
         jnxVirtualChassisMemberPriority                   INTEGER,
         jnxVirtualChassisMemberUptime                     INTEGER,
         jnxVirtualChassisMemberModel                      DisplayString,
-        jnxVirtualChassisMemberLocation                   DisplayString
+        jnxVirtualChassisMemberLocation                   DisplayString,
+        jnxVirtualChassisMemberAlias                      DisplayString,
+        jnxVirtualChassisMemberFabricMode                 DisplayString,
+        jnxVirtualChassisMemberMixedMode                  DisplayString
     }
 
     jnxVirtualChassisMemberId OBJECT-TYPE
@@ -174,6 +177,32 @@ IMPORTS
         "Specifies the virtual-chassis member location. "
     ::= {  jnxVirtualChassisMemberEntry 9 }
 
+    jnxVirtualChassisMemberAlias OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Alias name for the virtual-chassis member."
+    ::= {  jnxVirtualChassisMemberEntry 10 }
+
+    jnxVirtualChassisMemberFabricMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies virtual-chassis member's route mode. VC/VCF mode
+         indicates multi-path routing is disabled/enabled for the member. "
+    ::= {  jnxVirtualChassisMemberEntry 11 }
+
+    jnxVirtualChassisMemberMixedMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies virtual-chassis member's mixed mode. If mixed-mode is
+         is enabled, devices from different product families are allowed
+         to become virtual chassis member. "
+    ::= {  jnxVirtualChassisMemberEntry 12 }
 
    -- jnxVirtualChassisPortTable holds the vccp port's admin/operation status
 
@@ -218,7 +247,7 @@ IMPORTS
     }
     
    jnxVirtualChassisFpcId OBJECT-TYPE
-       SYNTAX      INTEGER (0..9)
+       SYNTAX      INTEGER (0..31)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION

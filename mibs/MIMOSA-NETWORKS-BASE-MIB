@@ -1,0 +1,188 @@
+MIMOSA-NETWORKS-BASE-MIB DEFINITIONS ::= BEGIN
+
+--  Copyright (C) 2015, Mimosa Networks, Inc. All Rights Reserved.
+--
+--  Mimosa Networks MIB
+--  Revision: 1.00
+--  Date: June 03, 2015
+--
+--  Mimosa Networks, Inc.
+--  300 Orchard City Dr.
+--  Campbell, CA 95008
+--  support@mimosa.co
+--
+--  This MIB defines the base MIB specification for Mimosa Network's
+--  products.
+--
+--  Mimosa reserves the right to make changes to this MIB specification as
+--  well as other information related to this specification without prior
+--  notice.  The user of this specification should consult Mimosa Networks,
+--  to determine if any such changes have been made.
+--
+--  Current MIBs are available from Mimosa Networks at the following URLs:
+--
+--		http://help.mimosa.co
+--
+--  In no event shall Mimosa Networks, Inc. be liable for any indirect,
+--  consequential, special or incidental damages whatsoever (including
+--  but not limited to lost profits or lost revenue) arising out of or
+--  related to this specification or the information contained in it.
+--  This non-liability extends to even if Mimosa Networks Inc. has been
+--  advised of, known, or should have known, the potential for such damages.
+
+--  Mimosa Networks, Inc. hereby grants end-users, and other parties a
+--  a non-exclusive license to use this MIB specification in order to
+--  manage products of Mimosa Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    NOTIFICATION-TYPE            			FROM SNMPv2-SMI
+    OBJECT-GROUP, NOTIFICATION-GROUP		FROM SNMPv2-CONF
+    enterprises				     			FROM RFC1155-SMI 
+    ifIndex						 			FROM IF-MIB;
+
+
+-- EXPORTS mimosa...
+mimosa MODULE-IDENTITY
+    LAST-UPDATED "201506030000Z"
+    ORGANIZATION "Mimosa Networks
+    			  www.mimosa.co"
+    CONTACT-INFO
+    	"postal:
+    	Mimosa Networks, Inc.
+		300 Orchard City Dr.
+		Campbell, CA 95008
+        email: support@mimosa.co"
+    DESCRIPTION
+		"Mimosa device MIB definitions"
+	REVISION	"201506030000Z"
+    DESCRIPTION
+		"First draft"
+    ::= { enterprises 43356 }
+    
+--mimosa                        OBJECT IDENTIFIER ::= { enterprises 43356 }
+
+mimosaProduct                 OBJECT IDENTIFIER ::= { mimosa 1 }
+mimosaMgmt                    OBJECT IDENTIFIER ::= { mimosa 2 }
+
+
+mimosaHardware                OBJECT IDENTIFIER ::= { mimosaProduct 1 }
+mimosaSoftware                OBJECT IDENTIFIER ::= { mimosaProduct 2 }
+
+mimosaB5                      OBJECT IDENTIFIER ::= { mimosaHardware 1 }
+mimosaB5Lite                  OBJECT IDENTIFIER ::= { mimosaHardware 2 }
+mimosaA5                      OBJECT IDENTIFIER ::= { mimosaHardware 3 }
+mimosaC5                      OBJECT IDENTIFIER ::= { mimosaHardware 4 }
+
+mimosaTrap                    OBJECT IDENTIFIER ::= { mimosaMgmt 0 }
+mimosaMib                     OBJECT IDENTIFIER ::= { mimosaMgmt 1 }
+mimosaMIBGroups               OBJECT IDENTIFIER ::= { mimosaMgmt 3 }
+mimosaConformanceGroup        OBJECT IDENTIFIER ::= { mimosaMgmt 4 }
+
+mimosaTrapMib                 OBJECT IDENTIFIER ::= { mimosaMib 1 }
+mimosaWireless                OBJECT IDENTIFIER ::= { mimosaMib 2 }
+
+
+-- **********************************************************************
+-- ***       Mimosa General MIB variables are specified below.        ***
+-- ***       These varbinds are common to all Mimosa products.        ***
+-- **********************************************************************
+
+mimosaTrapMIBGroup OBJECT-GROUP
+    OBJECTS { mimosaTrapMessage,
+              mimosaOldSpeed,
+              mimosaNewSpeed
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic Trap function."
+    ::= { mimosaMIBGroups 1 }
+
+
+mimosaTrapMessage OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "General Octet String object to contain message sent with traps."
+    ::= { mimosaTrapMib 1 }
+
+mimosaOldSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The speed of the Ethernet link before the change within Ethernet
+         Speed Change Notifications."
+    ::= { mimosaTrapMib 2 }
+
+mimosaNewSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The speed of the Ethernet link after the change within Ethernet
+         Speed Change Notifications."
+    ::= { mimosaTrapMib 3 }
+
+
+-- **********************************************************************
+-- ***       Mimosa Generic Traps are specified below.                ***
+-- ***       These traps are common to all Mimosa products.           ***
+-- **********************************************************************
+
+mimosaGenericNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { mimosaCriticalFault, mimosaTempWarning,
+    				mimosaTempNormal, mimosaEthernetSpeedChange }
+    STATUS        current
+    DESCRIPTION
+       "The basic Trap notifications for all Mimosa products."
+    ::= { mimosaMIBGroups 2 }
+
+
+mimosaCriticalFault NOTIFICATION-TYPE
+    OBJECTS { mimosaTrapMessage }
+    STATUS current
+    DESCRIPTION
+        "The mimosaCriticalFault notification is sent when the log manager
+         in the Mimosa product determines that a fault with a critical
+         severity has been detected. The mimosaCriticalFaultLog contains
+         the description of the general error."
+    ::= {mimosaTrap 1 }
+
+mimosaTempWarning NOTIFICATION-TYPE
+    OBJECTS { mimosaTrapMessage }
+    STATUS current
+    DESCRIPTION
+        "The mimosaTempWarning notification is sent when the log manager in
+         the Mimosa product receives an indication that the temperature is
+         outside the safe range."
+    ::= {mimosaTrap 2 }
+
+mimosaTempNormal NOTIFICATION-TYPE
+    OBJECTS { mimosaTrapMessage }
+    STATUS current
+    DESCRIPTION
+        "The mimosaTempNormal notification is sent when the log manager in the
+         Mimosa product receives an indication that the temperature is with
+         in the safe range."
+    ::= {mimosaTrap 3 }
+
+mimosaEthernetSpeedChange NOTIFICATION-TYPE
+    OBJECTS  { ifIndex, mimosaOldSpeed, mimosaNewSpeed }
+    STATUS   current
+    DESCRIPTION
+        "The mimosaEthernetSpeedChange notification is sent when the log manager
+         in the Mimosa product determines that a speed change on the Ethernet
+         port was detected. The mimosaOldSpeed and mimosaNewSpeed indicates the
+         speed in bits per second of the change. ifIndex is used per the ifTable
+         in the IF-MIB."
+    ::= {mimosaTrap 4 }
+
+-- Note the following publicly defined traps are also used for Mimosa Product
+-- Notifications:
+--
+-- From SNMPv2-MIB:	coldStart, warmStart, linkUp, LinkDown and
+--                      authenticationFailure
+END
+
