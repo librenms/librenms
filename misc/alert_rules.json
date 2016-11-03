@@ -22,5 +22,13 @@
   {
     "rule": "%processors.processor_usage > \"85\" && %macros.device_up = \"1\"",
     "name": "Processor usage over 85%"
+  },
+  {
+    "rule": "%sensors.sensor_descr = \"Primary Unit.*\" && %sensors.sensor_current = \"10\" && %sensors.sensor_prev = \"9\"",
+    "name": "Cisco ASA Primary unit changed to standby"
+  },
+  {
+    "rule": "%ports.ifOperStatus = \"down\" && %ports.ifOperStatus_prev = \"up\" && %macros.device_up = \"1\"",
+    "name": "Port status change from up to down"
   }
 ]
