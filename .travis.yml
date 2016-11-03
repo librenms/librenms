@@ -37,6 +37,7 @@ before_install:
 install:
   - composer install --prefer-dist --no-interaction
   - pip install --user snmpsim
+  - pip install --user pylint
 
 before_script:
   - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log --daemon --pid-file=/tmp/snmpsimd.pid
@@ -51,3 +52,5 @@ script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
   - SNMPSIM=1 phpunit --stop-on-failure
+  - bash -n daily.sh
+  - pylint -E poller-wrapper.py discovery-wrapper.py poller-service.py
