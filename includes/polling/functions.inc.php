@@ -506,7 +506,7 @@ function location_to_latlng($device)
                     SELECT `location`
                     FROM `locations` AS `locationsAlias`)";
 		
-		if (dbQuery($query, array($device_location, $loc['lat'], $loc['lng'], $device_location))) {
+                if (dbQuery($query, array($device_location, $loc['lat'], $loc['lng'], $device_location))) {
                     d_echo("Device lat/lng created\n");
                 } else {
                     d_echo("Device lat/lng could not be created\n");
