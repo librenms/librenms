@@ -65,7 +65,6 @@ class Proc
         $env = null,
         $blocking = false
     ) {
-        d_echo("Starting process: $cmd");
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
         if (!is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
@@ -198,11 +197,10 @@ class Proc
 
         if (!$closed) {
             // try harder
-            $pid = $status['pid'];
-            $killed = posix_kill($pid, 9); //9 is the SIGKILL signal
+            $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
             proc_close($this->_process);
 
-            if (!$killed) {
+            if (!$killed && $this->isRunning()) {
                 throw new Exception("Terminate failed!");
             }
         }

@@ -1,0 +1,244 @@
+-- *****************************************************************
+-- IPMCAST-CAPABILITY.mib: Juniper IPMCAST AGENT-CAPABILITIES
+--
+-- Copyright (c) 2014, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+IPMCAST-MIB-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+            FROM SNMPv2-CONF
+    jnxAgentCapability
+            FROM JUNIPER-SMI;
+
+jnxipMcastCapability MODULE-IDENTITY
+    LAST-UPDATED "201409180000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+            Juniper Networks, Inc.
+            1194 N. Mathilda Avenue
+            Sunnyvale, CA 94089
+            E-mail: support@juniper.net"
+
+    DESCRIPTION
+        "Agent capabilities for IPMCAST-MIB (RFC5132)"
+    ::= { jnxAgentCapability 5 }
+
+jnxipMcastCapJunos AGENT-CAPABILITIES
+
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION     "IPMCAST capabilities"
+
+    SUPPORTS        IPMCAST-MIB
+    INCLUDES        { ipMcastMIBRouteProtoGroup,
+                      ipMcastMIBBasicGroup,
+                      ipMcastMIBSsmGroup,
+                      ipMcastMIBRouteGroup,
+                      ipMcastMIBBoundaryIfGroup,
+                      ipMcastMIBScopeNameGroup
+                    }
+
+-- ipMcastMIBRouteProtoGroup
+    VARIATION    ipMcastRouteProtocol
+    ACCESS       read-only
+    DESCRIPTION  "Write is not supported. This object return protocol via 
+                  which multicast entry learned" 
+
+    VARIATION   ipMcastRouteRtProtocol
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return routing mechanism via 
+                which the route used to find the upstream or parent interface 
+                for this multicast forwarding  entry was learned"
+     
+    VARIATION   ipMcastRouteRtAddressType
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return value indicating the 
+                address family of the address contained in ipMcastRouteRtAddress"
+
+    VARIATION   ipMcastRouteRtAddress
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return The address portion 
+                of the route used to find the upstream or parent interface for 
+                this multicast forwarding entry"
+
+
+    VARIATION   ipMcastRouteRtPrefixLength
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return length in bits
+                of the mask associated with the route used to find the 
+                upstream or parent interface"
+
+    VARIATION   ipMcastRouteRtType
+    SYNTAX      INTEGER {
+                    unicast (1),
+                    multicast (2)
+                }       
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported"
+
+    VARIATION   ipMcastRouteNextHopProtocol
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return routing mechanism via 
+                 which this next-hop was learned"
+
+-- ipMcastMIBBasicGroup 
+
+    VARIATION   ipMcastEnabled
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   ipMcastRouteEntryCount
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return The number of rows
+                in the ipMcastRouteTable"
+
+    VARIATION   ipMcastDeviceConfigStorageType
+    ACCESS      read-only 
+    DESCRIPTION "Write is not supported. Always returns value 2 meaning it is
+                volatile"
+
+-- ipMcastMIBSsmGroup
+
+    VARIATION   ipMcastSsmRangeRowStatus
+    ACCESS      read-only
+    DESCRIPTION "Write access is not Supported."
+
+    VARIATION   ipMcastSsmRangeStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always returns value 2 meaning it is
+                volatile"
+
+-- ipMcastMIBRouteGroup
+
+    VARIATION   ipMcastInterfaceTtl
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always return 0 which means all the
+                multicast packets are forwarded out the interface."
+
+    VARIATION   ipMcastInterfaceRateLimit
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always return value 0 means no rate
+                limiting is done."
+
+    VARIATION   ipMcastInterfaceStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always returns value 2 meaning it is
+                volatile."
+
+    VARIATION   ipMcastRouteUpstreamNeighborType
+    ACCESS      read-only
+    DESCRIPTION "Support either ipv4 or ipv6. This object return  value
+                indicating the address family of the address contained 
+                in ipMcastRouteUpstreamNeighbor"
+
+    VARIATION   ipMcastRouteUpstreamNeighbor
+    ACCESS      read-only
+    DESCRIPTION "This object return address of the upstream neighbor from which
+                IP datagrams from these sources to this multicast address are 
+                received."
+
+    VARIATION   ipMcastRouteInIfIndex
+    ACCESS      read-only
+    DESCRIPTION "This object return ifIndex for the interface on which IP
+                datagrams sent by these sources to this multicast address
+                are received."
+    
+    VARIATION   ipMcastRouteTimeStamp
+    ACCESS      read-only
+    DESCRIPTION "This object return value of sysUpTime at which the multicast
+                routing information represented by this entry was learned by the
+                router."
+    
+    VARIATION   ipMcastRouteExpiryTime
+    ACCESS      read-only
+    DESCRIPTION "This object return The minimum amount of time remaining before
+                this entry will be aged out."
+
+    VARIATION   ipMcastRouteNextHopState
+    SYNTAX      INTEGER { 
+                            pruned(1), 
+                            forwarding(2) 
+                }
+    ACCESS      read-only
+    DESCRIPTION "This object return state of interface currently being used to
+                forward IP datagrams."
+    
+    VARIATION   ipMcastRouteNextHopTimeStamp
+    ACCESS      read-only
+    DESCRIPTION "This object return value of sysUpTime at which the multicast 
+                routing information represented by this entry was learned by the
+                router."
+    
+    VARIATION   ipMcastRouteNextHopExpiryTime
+    ACCESS      read-only
+    DESCRIPTION "Always return Zero (0)."
+    
+-- ipMcastMIBBoundaryIfGroup
+
+    VARIATION   ipMcastBoundaryTimeStamp 
+    ACCESS      read-only
+    DESCRIPTION "Always return  Zero (0)"
+
+    VARIATION   ipMcastBoundaryDroppedMcastOctets
+    ACCESS      read-only
+    DESCRIPTION "Always return Zero (0)."
+
+    VARIATION   ipMcastBoundaryDroppedMcastPkts 
+    ACCESS      read-only
+    DESCRIPTION "This object return the number of multicast packets that
+                 have been dropped as a result of this zone boundary 
+                 configuration."
+
+    VARIATION   ipMcastBoundaryStatus 
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always display as active."
+
+    VARIATION   ipMcastBoundaryStorageType 
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Alayws return nonVolatile(3)"
+
+    VARIATION   ipMcastZoneScopeDefaultZoneIndex
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+    VARIATION   ipMcastZoneScopeAddressType
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+    VARIATION   ipMcastZoneScopeAddress
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+    VARIATION   ipMcastZoneScopeAddressPrefixLength
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+-- ipMcastMIBScopeNameGroup
+
+    VARIATION   ipMcastScopeNameString
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. This object return textual name
+                associated with the multicast scope."
+
+    VARIATION   ipMcastScopeNameDefault 
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always set as false."
+    
+    VARIATION   ipMcastScopeNameStatus
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Always display as active."
+
+    VARIATION   ipMcastScopeNameStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write is not supported. Alayws return nonVolatile(3)."
+
+::= { jnxipMcastCapability 1 }
+
+END

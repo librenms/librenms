@@ -10,7 +10,7 @@ if ($device['os'] == 'xos') {
     $low_limit      = 5;
 
     $descr   = "Chassis Temperature";
-    $oid     = "1.3.6.1.4.1.1916.1.1.1.8.0"; // extremeCurrentTemperature
+    $oid     = ".1.3.6.1.4.1.1916.1.1.1.8.0"; // extremeCurrentTemperature
     $value   = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
 
     if (is_numeric($value)) {

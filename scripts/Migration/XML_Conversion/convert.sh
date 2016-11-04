@@ -17,7 +17,7 @@
 # the same location.                                              #
 ###################################################################
 
-############################# CREDITS #############################             
+############################# CREDITS #############################
 # LibreNMS work is done by a great group - http://librenms.org    #
 # Script Written by - Dan Brown - http://vlan50.com               #
 ###################################################################
@@ -38,14 +38,16 @@ NODELIST=/tmp/nodelist.txt
 # This line SSHs to LibreNMS server and makes directories based on node list text file
 ssh root@$DEST 'bash -s' < $MKDIR
 
-# Conversion and transfer loop 
-while read line; 
+# Conversion and transfer loop
+while read line;
 	# Enter RRD Directory
-	do cd $O_RRDPATH"${line%/*}" 
+	do cd $O_RRDPATH"${line%/*}"
 		# Convert each RRD to XML
 		for f in *.rrd; do rrdtool dump ${f} > ${f}.xml; done
 		# Transfer XML file to LibreNMS Server
-		scp *.xml root@$DEST:$L_RRDPATH"${line%/*}"/ 
+		scp *.xml root@$DEST:$L_RRDPATH"${line%/*}"/
+		# Remove leftover XML files
+		rm *.xml
 		# Exit to parent dir
 		cd ..
 	done < $NODELIST

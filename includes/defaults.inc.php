@@ -199,6 +199,8 @@ $config['icmp_check'] = true;
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
 // Autodiscover hosts via discovery protocols
 $config['autodiscovery']['ospf'] = true;
 // Autodiscover hosts via OSPF

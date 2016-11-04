@@ -6,23 +6,23 @@ if ($device['os'] == 'canopy') {
     if (strstr($cambium_type, 'BHUL450')) {
         $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
         if ($masterSlaveMode == "timingMaster") {
-            $oid = 'lastPowerLevel.2';
+            $oid = '.1.3.6.1.4.1.17713.21.1.2.3.2';
             $mib = 'WHISP-APS-MIB';
         } else {
-            $oid = 'radioDbmInt.0';
+            $oid = '.1.3.6.1.4.1.161.19.3.2.2.21.0';
             $mib = 'WHISP-SM-MIB';
         }
     } elseif (strstr($cambium_type, 'BHUL') || strstr($cambium_type, 'BH')) {
         $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
         if ($masterSlaveMode == "timingMaster") {
-            $oid = 'lastPowerLevel.2';
+            $oid = '.1.3.6.1.4.1.17713.21.1.2.3.2';
             $mib = 'WHISP-APS-MIB';
         } else {
-            $oid  = '1.3.6.1.4.1.161.19.3.2.2.21.0';
+            $oid  = '.1.3.6.1.4.1.161.19.3.2.2.21.0';
             $mib = 'WHISP-BOX-MIBV2-MIB';
         }
     } else {
-        $oid  = '1.3.6.1.4.1.161.19.3.2.2.21.0';
+        $oid  = '.1.3.6.1.4.1.161.19.3.2.2.21.0';
         $mib = 'WHISP-BOX-MIBV2-MIB';
     }
     

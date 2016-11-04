@@ -147,6 +147,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-switched-rack');
         $this->checkOS('apc', 'apc-masterswitch');
         $this->checkOS('apc', 'apc-metered-rack');
+        $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
     public function testAreca()
@@ -312,6 +313,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cimc');
     }
 
+    public function testCips()
+    {
+        $this->checkOS('cips');
+    }
+
     public function testCiscosb()
     {
         $this->checkOS('ciscosb');
@@ -380,6 +386,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('deliberant');
     }
 
+    public function testDellrcs()
+    {
+        $this->checkOS('dell-rcs');
+    }
+
     public function testDelllaser()
     {
         $this->checkOS('dell-laser');
@@ -436,6 +447,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDsm()
     {
         $this->checkOS('dsm');
+        $this->checkOS('dsm', 'dsm-ds214');
     }
 
     public function testEatonpdu()
@@ -448,6 +460,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'eaton-5p');
         $this->checkOS('eatonups', 'eaton-5px');
         $this->checkOS('eatonups', 'eaton-powerxpert');
+    }
+
+    public function testEdgecore()
+    {
+        $this->checkOS('edge-core', 'edgecore-es3528m');
     }
 
     public function testEdgeos()
@@ -553,6 +570,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFujitsupyos()
     {
         $this->checkOS('fujitsupyos');
+        $this->checkOS('fujitsupyos', 'fujitsupyos-10gbe');
     }
 
     public function testFxos()
@@ -573,6 +591,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHikvision()
     {
         $this->checkOS('hikvision');
+        $this->checkOS('hikvision', 'hikvision1');
     }
 
     public function testHp3par()
@@ -802,11 +821,17 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
         $this->checkOS('mgeups', 'mgeups-proxy');
+        $this->checkOS('mgeups', 'mgeups-comet');
     }
 
     public function testMicrosemitime()
     {
         $this->checkOS('microsemitime');
+    }
+
+    public function testMimosa()
+    {
+        $this->checkOS('mimosa');
     }
 
     public function testMinkelsrms()
@@ -817,6 +842,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMonowall()
     {
         $this->checkOS('monowall');
+    }
+
+    public function testMoxaNport()
+    {
+        $this->checkOS('moxa-nport');
     }
 
     public function testMrvld()
@@ -1039,6 +1069,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testProcurve()
     {
         $this->checkOS('procurve');
+        $this->checkOS('procurve', 'procurve-1800-8g');
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
         $this->checkOS('procurve', 'procurve-2530');
@@ -1066,6 +1097,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('quanta', 'quanta1');
         $this->checkOS('quanta', 'quanta2');
         $this->checkOS('quanta', 'quanta3');
+        $this->checkOS('quanta', 'quanta-lb9');
     }
 
     public function testRadlan()
@@ -1122,6 +1154,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('samsungprinter', 'samsungprinter-scx');
         $this->checkOS('samsungprinter', 'samsungprinter-c');
         $this->checkOS('samsungprinter', 'samsungprinter-s');
+        $this->checkOS('samsungprinter', 'samsungprinter-ml');
     }
 
     public function testSanos()
@@ -1162,6 +1195,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testSiklu()
     {
         $this->checkOS('siklu');
+    }
+
+    public function testSinetica()
+    {
+        $this->checkOS('sinetica');
+    }
+
+    public function testMegatec()
+    {
+        $this->checkOS('netagent2');
     }
 
     public function testSmartax()

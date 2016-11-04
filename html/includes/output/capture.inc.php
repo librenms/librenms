@@ -39,7 +39,7 @@ switch ($type) {
     case 'snmpwalk':
         $device = device_by_name(mres($hostname));
 
-        $cmd = gen_snmpwalk_cmd($device, '.', ' -Onet');
+        $cmd = gen_snmpwalk_cmd($device, '.', ' -OUneb');
 
         if ($debug) {
             $cmd .= ' 2>&1';
@@ -78,16 +78,5 @@ if ($_GET['format'] == 'text') {
 
     $output = preg_replace('/\033\[[\d;]+m/', '', $output);
 
-    $length = strlen($output);
-
-    header('Content-Description: File Transfer');
-    header('Content-Type: text/plain');
-    header("Content-Disposition: attachment; filename=$filename");
-    header('Content-Transfer-Encoding: binary');
-    header('Content-Length: ' . $length);
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Expires: 0');
-    header('Pragma: public');
-
-    echo $output;
+    file_download($filename, $output);
 }

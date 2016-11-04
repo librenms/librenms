@@ -61,7 +61,9 @@ if ($device['os_group'] == 'unix') {
             "powerdns-recursor",
             "proxmox",
             "rrdcached",
-            "tinydns");
+            "tinydns",
+            "gpsd",
+          );
 
         foreach (explode('<<<', $agent_raw) as $section) {
             list($section, $data) = explode('>>>', $section);
@@ -97,7 +99,7 @@ if ($device['os_group'] == 'unix') {
             dbDelete('processes', 'device_id = ?', array($device['device_id']));
             $data=array();
             foreach (explode("\n", $agent_data['ps']) as $process) {
-                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
+                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.\-]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
                 list($user, $vsz, $rss, $cputime, $pid, $command) = explode('|', $process, 6);
                 if (!empty($command)) {
                     $data[]=array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command);

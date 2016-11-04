@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = true;
+
 $pagetitle[] = 'Search';
 
 $sections = array(

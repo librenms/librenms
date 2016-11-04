@@ -16,7 +16,7 @@ if ($device['os_group'] == "cisco") {
     $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.3", null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.6.4.1.3'][''];
 
-    if (isset($total) && ($total != "") && ($total != 0)) {
+    if (isset($total) && $total > 0) {
         // Available
         $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.4", null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.6.4.1.4'][''];

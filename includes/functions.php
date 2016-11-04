@@ -300,7 +300,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     } else {
         $ip = $host;
     }
-    if (ip_exists($ip)) {
+    if ($force_add !== true && ip_exists($ip)) {
         throw new HostIpExistsException("Already have host with this IP $host");
     }
 
@@ -1118,18 +1118,28 @@ function guidv4($data)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function set_curl_proxy($post)
+/**
+ * @param $curl
+ */
+function set_curl_proxy($curl)
 {
     global $config;
-    if (isset($_ENV['https_proxy'])) {
-        $tmp = rtrim($_ENV['https_proxy'], "/");
-        $proxystr = str_replace(array("http://", "https://"), "", $tmp);
-        $config['callback_proxy'] = $proxystr;
-        echo "Setting proxy to ".$proxystr." (from https_proxy=".$_ENV['https_proxy'].")\n";
+
+    $proxy = '';
+    if (getenv('http_proxy')) {
+        $proxy = getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        $proxy = getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        $proxy = $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        $proxy = $config['http_proxy'];
     }
-    if (isset($config['callback_proxy'])) {
-        echo "Using ".$config['callback_proxy']." as proxy\n";
-        curl_setopt($post, CURLOPT_PROXY, $config['callback_proxy']);
+
+    $tmp = rtrim($proxy, "/");
+    $proxy = str_replace(array("http://", "https://"), "", $tmp);
+    if (!empty($proxy)) {
+        curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
 }
 
@@ -1567,4 +1577,180 @@ function hytera_h2f($number, $nd)
     }
 
     return number_format($floatfinal, $nd, '.', '');
+}
+
+/*
+ * Cisco CIMC functions
+ */
+// Create an entry in the entPhysical table if it doesnt already exist.
+function setCIMCentPhysical($location, $data, &$entphysical, &$index)
+{
+    // Go get the location, this will create it if it doesnt exist.
+    $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
+
+    // See if we need to update
+    $update = array();
+    foreach ($data as $key => $value) {
+        // Is the Array(DB) value different to the supplied data
+        if ($entphysical[$location][$key] != $value) {
+            $update[$key] = $value;
+            $entphysical[$location][$key] = $value;
+        } // End if
+    } // end foreach
+
+    // Do we need to update
+    if (count($update) > 0) {
+        dbUpdate($update, 'entPhysical', '`entPhysical_id` = ?', array($entphysical[$location]['entPhysical_id']));
+    }
+    $entPhysicalId = $entphysical[$location]['entPhysical_id'];
+    return array($entPhysicalId, $entPhysicalIndex);
+}
+
+function getCIMCentPhysical($location, &$entphysical, &$index)
+{
+    global $device;
+
+    // Level 1 - Does the location exist
+    if (isset($entphysical[$location])) {
+        // Yes, return the entPhysicalIndex.
+        return $entphysical[$location]['entPhysicalIndex'];
+    } else {
+        /*
+         * No, the entry doesnt exist.
+         * Find its parent so we can create it.
+         */
+
+        // Pull apart the location
+        $parts = explode('/', $location);
+
+        // Level 2 - Are we at the root
+        if (count($parts) == 1) {
+            // Level 2 - Yes. We are the root, there is no parent
+            d_echo("ROOT - ".$location."\n");
+            $shortlocation = $location;
+            $parent = 0;
+        } else {
+            // Level 2 - No. Need to go deeper.
+            d_echo("NON-ROOT - ".$location."\n");
+            $shortlocation = array_pop($parts);
+            $parentlocation = implode('/', $parts);
+            d_echo("Decend - parent location: ".$parentlocation."\n");
+            $parent = getCIMCentPhysical($parentlocation, $entphysical, $index);
+        } // end if - Level 2
+        d_echo("Parent: ".$parent."\n");
+
+        // Now we have an ID, create the entry.
+        $index++;
+        $insert = array(
+            'device_id'                 => $device['device_id'],
+            'entPhysicalIndex'          => $index,
+            'entPhysicalClass'          => 'container',
+            'entPhysicalVendorType'     => $location,
+            'entPhysicalName'           => $shortlocation,
+            'entPhysicalContainedIn'    => $parent,
+            'entPhysicalParentRelPos'   => '-1',
+        );
+
+        // Add to the DB and Array.
+        $id = dbInsert($insert, 'entPhysical');
+        $entphysical[$location] = dbFetchRow('SELECT * FROM entPhysical WHERE entPhysical_id=?', array($id));
+        return $index;
+    } // end if - Level 1
+} // end function
+
+
+/* idea from http://php.net/manual/en/function.hex2bin.php comments */
+function hex2bin_compat($str)
+{
+    if (strlen($str) % 2 !== 0) {
+        trigger_error(__FUNCTION__.'(): Hexadecimal input string must have an even length', E_USER_WARNING);
+    }
+    return pack("H*", $str);
+}
+
+if (!function_exists('hex2bin')) {
+    // This is only a hack
+    function hex2bin($str)
+    {
+        return hex2bin_compat($str);
+    }
+}
+
+function q_bridge_bits2indices($hex_data)
+{
+    /* convert hex string to an array of 1-based indices of the nonzero bits
+     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+    */
+    $hex_data = str_replace(' ', '', $hex_data);
+    $value = hex2bin($hex_data);
+    $length = strlen($value);
+    $indices = array();
+    for ($i = 0; $i < $length; $i++) {
+        $byte = ord($value[$i]);
+        for ($j = 7; $j >= 0; $j--) {
+            if ($byte & (1 << $j)) {
+                $indices[] = 8*$i + 8-$j;
+            }
+        }
+    }
+    return $indices;
+}
+
+/**
+ * @param array $device
+ * @param int|string $raw_value The value returned from snmp
+ * @param int $capacity the normalized capacity
+ * @return int the toner level as a percentage
+ */
+function get_toner_levels($device, $raw_value, $capacity)
+{
+    // -3 means some toner is left
+    if ($raw_value == '-3') {
+        return 50;
+    }
+
+    // -2 means unknown, -1 mean no restrictions
+    if ($raw_value == '-2' || $raw_value == '-1') {
+        return 0;  // FIXME: is 0 what we should return?
+    }
+
+    // Non-standard snmp values
+    if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
+        if ($raw_value == '-100') {
+            return 0;
+        }
+    } elseif ($device['os'] == 'brother') {
+        if (!str_contains($device['hardware'], 'MFC-L8850')) {
+            switch ($raw_value) {
+                case '0':
+                    return 100;
+                case '1':
+                    return 5;
+                case '2':
+                    return 0;
+                case '3':
+                    return 1;
+            }
+        }
+    }
+
+    return round($raw_value / $capacity * 100);
+}
+
+/**
+ * check if we should skip this device from discovery
+ * @param $needles
+ * @param $haystack
+ * @param $name
+ * @return bool
+ */
+function can_skip_discovery($needles, $haystack, $name)
+{
+    foreach ((array)$needles as $needle) {
+        if (preg_match($needle ."i", $haystack)) {
+            d_echo("{$name} - regexp '{$needle}' matches '{$haystack}' - skipping device discovery \n");
+            return true;
+        }
+    }
+    return false;
 }

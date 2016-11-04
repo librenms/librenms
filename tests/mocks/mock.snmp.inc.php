@@ -134,7 +134,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
     }
 
     $cmd = "snmptranslate -IR -On $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mibdir']);
+    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mib_dir']);
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -153,7 +153,7 @@ function snmp_translate_type($oid, $mib = null, $mibdir = null)
     global $config;
 
     $cmd = "snmptranslate -IR -Td $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mibdir']);
+    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mib_dir']);
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }

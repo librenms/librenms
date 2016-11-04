@@ -94,6 +94,9 @@ function nicecase($item)
         case 'ups-apcups':
             return 'UPS apcups';
 
+        case 'gpsd':
+            return 'GPSD';
+
         default:
             return ucfirst($item);
     }
@@ -1342,4 +1345,22 @@ function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
     } else {
         return $sensorIpmi;
     }
+}
+
+/**
+ * @param $filename
+ * @param $content
+ */
+function file_download($filename, $content)
+{
+    $length = strlen($content);
+    header('Content-Description: File Transfer');
+    header('Content-Type: text/plain');
+    header("Content-Disposition: attachment; filename=$filename");
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Length: ' . $length);
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Expires: 0');
+    header('Pragma: public');
+    echo $content;
 }

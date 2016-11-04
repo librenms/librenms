@@ -11,7 +11,7 @@ echo ' UBNT-AirMAX-MIB ';
 
 // Check If It Is A Device that supports latest Airmax MIB By Trying To Read Frequency
 // if (substr($device['version'],0,3) == "5.6")
-if (is_numeric(snmp_get($device, 'ubntRadioFreq.1', '-OUqnv', 'UBNT-AirMAX-MIB', $config['mib_dir']))) {
+if (is_numeric(snmp_get($device, 'ubntRadioFreq.1', '-OUqnv', 'UBNT-AirMAX-MIB'))) {
     // $mib_oids                              (oidindex,dsname,dsdescription,dstype)
     $mib_oids = array(
         'ubntRadioFreq'        => array(
@@ -105,7 +105,7 @@ if (is_numeric(snmp_get($device, 'ubntRadioFreq.1', '-OUqnv', 'UBNT-AirMAX-MIB',
     // Build Graph List Array
     if (1 == 1) {
         // Is It An AP
-        if (stristr(snmp_get($device, 'ubntRadioMode.1', '-OUqnv', 'UBNT-AirMAX-MIB', $config['mib_dir']), 'ap')) {
+        if (stristr(snmp_get($device, 'ubntRadioMode.1', '-OUqnv', 'UBNT-AirMAX-MIB'), 'ap')) {
             // Yes - Add Station Count Graph
             array_push($mib_graphs, 'ubnt_airmax_WlStatStaCount');
         }
@@ -126,9 +126,9 @@ if (is_numeric(snmp_get($device, 'ubntRadioFreq.1', '-OUqnv', 'UBNT-AirMAX-MIB',
             'ubnt_airmax_WlStatRxRate'
         );
         // Is Airmax Enabled?
-        if (snmp_get($device, 'ubntAirMaxEnabled.1', '-OUqnv', 'UBNT-AirMAX-MIB', $config['mib_dir']) == 'true') {
+        if (snmp_get($device, 'ubntAirMaxEnabled.1', '-OUqnv', 'UBNT-AirMAX-MIB') == 'true') {
             // Check To See If It Is An AC Device - Returns Airmax Capacity of 0
-            if (snmp_get($device, 'ubntAirMaxCapacity.1', '-OUqnv', 'UBNT-AirMAX-MIB', $config['mib_dir']) != 0) {
+            if (snmp_get($device, 'ubntAirMaxCapacity.1', '-OUqnv', 'UBNT-AirMAX-MIB') != 0) {
                 // No - Not AC - add AirMax Graphs
                 array_push($mib_graphs, 'ubnt_airmax_AirMaxQuality', 'ubnt_airmax_AirMaxCapacity');
             }

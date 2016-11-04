@@ -2,15 +2,17 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
+        $no_checks    = ($_POST['no_checks'] == 'on');
         $community    = mres($_POST['community']);
         $snmpver      = mres($_POST['snmpver']);
         $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
         $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
         $timeout      = mres($_POST['timeout']);
         $retries      = mres($_POST['retries']);
-        $poller_group = mres($_POST['poller_group']);
+        $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
         $port_assoc_mode = mres($_POST['port_assoc_mode']);
         $max_repeaters = mres($_POST['max_repeaters']);
+        $max_oid      = mres($_POST['max_oid']);
         $v3           = array(
             'authlevel'  => mres($_POST['authlevel']),
             'authname'   => mres($_POST['authname']),
@@ -45,10 +47,11 @@ if ($_POST['editing']) {
         $update = array_merge($update, $v3);
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if (isSNMPable($device_tmp)) {
+        if ($no_checks === true || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = false;
+            $max_oid_set = false;
 
             if (is_numeric($max_repeaters) && $max_repeaters != 0) {
                 set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
@@ -58,12 +61,25 @@ if ($_POST['editing']) {
                 $max_repeaters_set = true;
             }
 
+            if (is_numeric($max_oid) && $max_oid != 0) {
+                set_dev_attrib($device, 'snmp_max_oid', $max_oid);
+                $max_oid_set = true;
+            } else {
+                del_dev_attrib($device, 'snmp_max_oid');
+                $max_oid_set = true;
+            }
+
             if ($rows_updated > 0) {
                 $update_message = $rows_updated.' Device record updated.';
                 $updated        = 1;
             } elseif ($rows_updated = '-1') {
-                if ($max_repeaters_set === true) {
-                    $update_message = 'SNMP Max repeaters updated, no other changes made';
+                if ($max_repeaters_set === true || $max_repeaters_set === true) {
+                    if ($max_repeaters_set === true) {
+                        $update_message = 'SNMP Max repeaters updated, no other changes made';
+                    }
+                    if ($max_oid_set === true) {
+                        $update_message .= '<br />SNMP Max OID updated, no other changes made';
+                    }
                 } else {
                     $update_message = 'Device record unchanged. No update necessary.';
                 }
@@ -89,6 +105,7 @@ if ($updated && $update_message) {
 }
 
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+$max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
@@ -155,6 +172,12 @@ echo "        </select>
             <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max rep' />
         </div>
     </div>
+    <div class='form-group'>
+        <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
+        <div class='col-sm-1'>
+            <input id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
+        </div>
+    </div>
     <div id='snmpv1_2'>
     <div class='form-group'>
     <label class='col-sm-3 control-label text-left'><h4><strong>SNMPv1/v2c Configuration</strong></h4></label>
@@ -218,6 +241,18 @@ echo "        </select>
     </div>
     </div>";
 
+?>
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-9">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="no_checks" id="no_checks"> Don't perform ICMP or SNMP checks?
+            </label>
+        </div>
+    </div>
+</div>
+<?php
+
 if ($config['distributed_poller'] === true) {
     echo '
         <div class="form-group">
@@ -247,7 +282,7 @@ if ($config['distributed_poller'] === true) {
 echo '
     <div class="row">
         <div class="col-md-1 col-md-offset-2">
-            <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+            <button type="submit" name="Submit"  class="btn btn-success"><i class="fa fa-check"></i> Save</button>
         </div>
     </div>
     </form>

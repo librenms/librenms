@@ -26,20 +26,5 @@ if ($device['os'] == 'sub10') {
     }
 
     // Create Sensor
-    discover_sensor(
-        $valid['sensor'],
-        'temperature',
-        $device,
-        $oid,
-        $oid,
-        'sub10',
-        'Modem',
-        '1',
-        '1',
-        $thresholds[$indexes['low']],
-        null,
-        null,
-        $thresholds[$indexes['high']],
-        $current
-    );
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'sub10', 'Modem', '1', '1', $thresholds[$indexes['low']], null, null, $thresholds[$indexes['high']], $current);
 }

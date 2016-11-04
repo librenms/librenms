@@ -2,7 +2,7 @@
 
 // Supermicro Voltages
 if ($device['os'] == 'linux') {
-    $oids = snmp_walk($device, '1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB');
+    $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB');
     d_echo($oids."\n");
 
     $oids = trim($oids);
@@ -19,11 +19,11 @@ if ($device['os'] == 'linux') {
             $split_oid       = explode('.', $oid);
             $index           = $split_oid[(count($split_oid) - 1)];
             if ($kind == 1) {
-                $volt_oid     = '1.3.6.1.4.1.10876.2.1.1.1.1.4.'.$index;
-                $descr_oid    = '1.3.6.1.4.1.10876.2.1.1.1.1.2.'.$index;
-                $monitor_oid  = '1.3.6.1.4.1.10876.2.1.1.1.1.10.'.$index;
-                $limit_oid    = '1.3.6.1.4.1.10876.2.1.1.1.1.5.'.$index;
-                $lowlimit_oid = '1.3.6.1.4.1.10876.2.1.1.1.1.6.'.$index;
+                $volt_oid     = '.1.3.6.1.4.1.10876.2.1.1.1.1.4.'.$index;
+                $descr_oid    = '.1.3.6.1.4.1.10876.2.1.1.1.1.2.'.$index;
+                $monitor_oid  = '.1.3.6.1.4.1.10876.2.1.1.1.1.10.'.$index;
+                $limit_oid    = '.1.3.6.1.4.1.10876.2.1.1.1.1.5.'.$index;
+                $lowlimit_oid = '.1.3.6.1.4.1.10876.2.1.1.1.1.6.'.$index;
 
                 $descr    = snmp_get($device, $descr_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB');
                 $current  = (snmp_get($device, $volt_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB') / $divisor);

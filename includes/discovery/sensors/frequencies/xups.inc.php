@@ -15,7 +15,7 @@ if ($device['os'] == 'powerware') {
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 
     // XUPS-MIB::xupsOutputFrequency.0 = INTEGER: 500
-    $freq_oid = '1.3.6.1.4.1.534.1.4.2.0';
+    $freq_oid = '.1.3.6.1.4.1.534.1.4.2.0';
     $descr    = 'Output';
     $divisor  = 10;
     $current  = (snmp_get($device, $freq_oid, '-Oqv') / $divisor);
@@ -24,7 +24,7 @@ if ($device['os'] == 'powerware') {
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 
     // XUPS-MIB::xupsBypassFrequency.0 = INTEGER: 500
-    $freq_oid = '1.3.6.1.4.1.534.1.5.1.0';
+    $freq_oid = '.1.3.6.1.4.1.534.1.5.1.0';
     $descr    = 'Bypass';
     $divisor  = 10;
     $current  = snmp_get($device, $freq_oid, '-Oqv');

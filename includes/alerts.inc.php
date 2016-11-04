@@ -169,7 +169,10 @@ function RunRules($device)
         }
         d_echo(PHP_EOL);
         $chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
-        $sql = GenSQL($rule['rule']);
+        if (empty($rule['query'])) {
+            $rule['query'] = GenSQL($rule['rule']);
+        }
+        $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
         if (isset($qry[0]['ip'])) {
             $qry[0]['ip'] = inet6_ntop($qry[0]['ip']);
@@ -225,7 +228,7 @@ function GetContacts($results)
     if (sizeof($results) == 0) {
         return array();
     }
-    if ($config['alert']['default_only'] == true || $config['alerts']['email']['default_only'] == true) {
+    if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
         return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => 'NOC');
     }
     $users = get_userlist();
@@ -252,7 +255,9 @@ function GetContacts($results)
                 } else {
                     $tmpa = dbFetchCell("SELECT sysContact FROM devices WHERE device_id = ?", array($result["device_id"]));
                 }
-                $contacts[$tmpa] = "NOC";
+                if (!empty($tmpa)) {
+                    $contacts[$tmpa] = "NOC";
+                }
             }
             $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE access_level >= 0 AND device_id = ?", array($result["device_id"]));
             foreach ($tmpa as $tmp) {

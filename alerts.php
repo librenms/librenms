@@ -172,7 +172,7 @@ function RunFollowUp()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
         if (empty($alert['rule']) || !IsRuleValid($tmp[1], $tmp[0])) {
             // Alert-Rule does not exist anymore, let's remove the alert-state.
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
@@ -186,7 +186,10 @@ function RunFollowUp()
             continue;
         }
 
-        $chk   = dbFetchRows(GenSQL($alert['rule']), array($alert['device_id']));
+        if (empty($alert['query'])) {
+            $alert['query'] = GenSQL($alert['rule']);
+        }
+        $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
         $o     = sizeof($alert['details']['rule']);
         $n     = sizeof($chk);
         $ret   = 'Alert #'.$alert['id'];
@@ -441,17 +444,19 @@ function FormatAlertTpl($obj)
  */
 function DescribeAlert($alert)
 {
-    $obj              = array();
-    $i                = 0;
-    $device           = dbFetchRow('SELECT hostname, sysName, location, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
-    $tpl              = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
-    $default_tpl      = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
-    $obj['hostname']  = $device['hostname'];
-    $obj['sysName']   = $device['sysName'];
-    $obj['location']  = $device['location'];
-    $obj['uptime']    = $device['uptime'];
-    $obj['device_id'] = $alert['device_id'];
-    $extra            = $alert['details'];
+    $obj         = array();
+    $i           = 0;
+    $device      = dbFetchRow('SELECT hostname, sysName, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $tpl         = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
+    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
+    $obj['hostname']    = $device['hostname'];
+    $obj['sysName']     = $device['sysName'];
+    $obj['location']    = $device['location'];
+    $obj['uptime']      = $device['uptime'];
+    $obj['description'] = $device['purpose'];
+    $obj['notes']       = $device['notes'];
+    $obj['device_id']   = $alert['device_id'];
+    $extra              = $alert['details'];
     if (!isset($tpl['template'])) {
         $obj['template'] = $default_tpl;
     } else {
@@ -498,7 +503,15 @@ function DescribeAlert($alert)
         }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
-        $obj['faults']  = false;
+        foreach ($extra['rule'] as $incident) {
+            $i++;
+            $obj['faults'][$i] = $incident;
+            foreach ($incident as $k => $v) {
+                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                }
+            }
+        }
     } else {
         return 'Unknown State';
     }//end if

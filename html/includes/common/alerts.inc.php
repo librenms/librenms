@@ -230,7 +230,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><i class=\'fa fa-"+row.ack_ico+"\'aria-hidden=\'true\'></i></button>";
         },
         "proc": function(column,row) {
-            return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
+            return "<button type=\'button\' class=\'btn btn-sm command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
         },
         "severity": function(column,row) {
             var eventColor = "info";

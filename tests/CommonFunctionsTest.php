@@ -77,4 +77,10 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(ends_with($data, array('this', 'tesTing', 'no'), true));
         $this->assertFalse(ends_with($data, array('this', 'Test'), true));
     }
+
+    public function testRrdDescriptions()
+    {
+        $data = 'Toner, S/N:CR_UM-16021314488.';
+        $this->assertEquals('Toner, S/N CR_UM-16021314488.', safedescr($data));
+    }
 }

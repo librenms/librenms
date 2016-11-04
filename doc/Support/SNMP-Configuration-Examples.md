@@ -106,6 +106,13 @@ The LibreNMS server include a copy of this example here:
 /opt/librenms/snmpd.conf.example
 ```
 
+The binary /usr/bin/distro must be copied from the original source repository:
+
+```
+curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+```
+
 #### Restart the snmpd service:
 
 ##### CentOS 6 / Red hat 6

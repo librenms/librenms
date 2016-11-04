@@ -3,95 +3,61 @@
 $valid_toner = array();
 
 if ($device['os_group'] == 'printer') {
-    $oids = trim(snmp_walk($device, 'SNMPv2-SMI::mib-2.43.12.1.1.2.1 ', '-OsqnU'));
-    if (!$oids) {
-        $oids = trim(snmp_walk($device, 'SNMPv2-SMI::mib-2.43.11.1.1.2.1 ', '-OsqnU'));
+    echo 'Toner: ';
+    $oids = snmpwalk_cache_oid($device, 'prtMarkerColorantMarkerIndex', array(), 'Printer-MIB');
+    if (empty($oids)) {
+        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMarkerIndex', $oids, 'Printer-MIB');
     }
 
-    d_echo($oids."\n");
-
-    if ($oids) {
-        echo 'Jetdirect ';
+    if (!empty($oids)) {
+        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', $oids, 'Printer-MIB');
+        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
+        $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUsa');
     }
 
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$role) = explode(' ', $data);
-            $split_oid       = explode('.', $oid);
-            $index           = $split_oid[(count($split_oid) - 1)];
-            if (is_numeric($role)) {
-                //ricoh using private oids to expose toner levels
-                if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
-                    $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$index";
-                    $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$index";
-                } else {
-                    $toner_oid    = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
-                    $descr_oid    = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
-                    $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.1.$index";
-                }
+    foreach ($oids as $index => $data) {
+        $last_index = substr($index, strrpos($index, '.') + 1);
+        if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
+            $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
+            $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$last_index";
+            $capacity_oid = '';
 
-                $descr = trim(str_replace("\n", '', preg_replace('/[^ \w]+/', '', snmp_get($device, $descr_oid, '-Oqv'))));
+            $descr = snmp_get($device, $descr_oid, '-Oqva');
+            $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
+        } else {
+            $toner_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+            $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
-                if ($descr != '') {
-                    $current = snmp_get($device, $toner_oid, '-Oqv');
+            $descr = $data['prtMarkerSuppliesDescription'];
+            $raw_toner = $data['prtMarkerSuppliesLevel'];
+        }
 
-                    //ricoh private mibs returns values as percent, no capacity is disclosed as it is not needed
-                    if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
-                        $capacity = 100;
-                    } else {
-                        $capacity = snmp_get($device, $capacity_oid, '-Oqv');
-                    }
+        $type = 'jetdirect';
+        $capacity = get_toner_capacity($data['prtMarkerSuppliesMaxCapacity']);
+        $current = get_toner_levels($device, $raw_toner, $capacity);
 
-                    //fix for ricoh devices returning garbage and devices returning percentage
-                    if ($os == 'ricoh' || $os == 'nrg' || $os == 'lanier') {
-                        if ($current == '-3') {
-                            $current = 50;
-                        } elseif ($current == '-100') {
-                            $current = 0;
-                        } else {
-                            $current = ($current / $capacity * 100);
-                        }
-                    } elseif ($os == 'brother') {
-                        switch ($current) {
-                            case '0':
-                                $current = 100;
-                                break;
-                            case '1':
-                                $current = 5;
-                                break;
-                            case '2':
-                                $current = 0;
-                                break;
-                            case '3':
-                                $current = 1;
-                                break;
-                        }
-                    } else {
-                        //normal devices returning toner values
-                        $current = ($current / $capacity * 100);
-                    }
-
-                    $type = 'jetdirect';
-                    if (isHexString($descr)) {
-                        $descr = preg_replace('/[^ \w]+/', '', snmp_hexstring($descr));
-                    }
-
-                    discover_toner($valid_toner, $device, $toner_oid, $index, $type, $descr, $capacity_oid, $capacity, $current);
-                }
-            }
-        }//end if
-    }//end foreach
-}//end if
+        discover_toner(
+            $valid_toner,
+            $device,
+            $toner_oid,
+            $last_index,
+            $type,
+            $descr,
+            $capacity_oid,
+            $capacity,
+            $current
+        );
+    }
+}
 
 // Delete removed toners
-d_echo("\n Checking ... \n");
+d_echo("\n Checking valid toner ... \n");
 d_echo($valid_toner);
 
-$sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM toner WHERE device_id = '" . $device['device_id'] . "'";
 foreach (dbFetchRows($sql) as $test_toner) {
     $toner_index = $test_toner['toner_index'];
-    $toner_type  = $test_toner['toner_type'];
+    $toner_type = $test_toner['toner_type'];
     if (!$valid_toner[$toner_type][$toner_index]) {
         echo '-';
         dbDelete('toner', '`toner_id` = ?', array($test_toner['toner_id']));
@@ -99,4 +65,4 @@ foreach (dbFetchRows($sql) as $test_toner) {
 }
 
 unset($valid_toner);
-echo "\n";
+echo PHP_EOL;

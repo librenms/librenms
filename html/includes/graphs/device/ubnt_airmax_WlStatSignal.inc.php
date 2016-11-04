@@ -1,5 +1,8 @@
 <?php
 
+$scale_min = -100;
+$scale_max = -20;
+
 require 'includes/graphs/common.inc.php';
 
 //$rrd_options .= " -l 0 -E ";

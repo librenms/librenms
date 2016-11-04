@@ -3,7 +3,7 @@
 // MGE UPS Frequencies
 if ($device['os'] == 'mgeups') {
     echo 'MGE ';
-    $oids = trim(snmp_walk($device, '1.3.6.1.4.1.705.1.7.1', '-OsqnU'));
+    $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.7.1', '-OsqnU'));
     d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));
@@ -27,7 +27,7 @@ if ($device['os'] == 'mgeups') {
         discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    $oids = trim(snmp_walk($device, '1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
+    $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
     d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));

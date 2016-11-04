@@ -8,9 +8,9 @@ if ($device['os'] == 'serveriron') {
     $high_warn_limit    = 95;
 
     $descr    = "Chassis Temperature";
-    $oid      = "1.3.6.1.4.1.1991.1.1.1.1.18.0"; // snChasActualTemperature
-    $warn_oid = "1.3.6.1.4.1.1991.1.1.1.1.19.0"; // snChasWarningTemperature
-    $high_oid = "1.3.6.1.4.1.1991.1.1.1.1.20.0"; // snChasShutdownTemperature
+    $oid      = ".1.3.6.1.4.1.1991.1.1.1.1.18.0"; // snChasActualTemperature
+    $warn_oid = ".1.3.6.1.4.1.1991.1.1.1.1.19.0"; // snChasWarningTemperature
+    $high_oid = ".1.3.6.1.4.1.1991.1.1.1.1.20.0"; // snChasShutdownTemperature
     $value    = snmp_get($device, $oid, '-Oqv');
 
 

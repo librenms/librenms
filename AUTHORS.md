@@ -133,6 +133,23 @@ LibreNMS contributors:
 - Yves Boudreau <yves.boudreau@bgp.ca> (boudreau)
 - Konrad Bechler <konrad@bechler.pl> (kbechler)
 - Florent Bruchez <ftbz@me.com> (ftbz)
+- Bartosz Radwan <b.radwan@citypartner.pl> (bartoszradwan)
+- Kate Gerry <kate@fansubber.com> (kate66)
+- Johan Zaxmy <johan@zaxmy.com> (Zaxmy)
+- Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
+- Layne Breitkreutz <github@thelenon.com> (Gorian)
+- Karl Shea <karl@karlshea.com> (karlshea)
+- Justin Settle <jus10@partlycloudy.org> (jquagga)
+- Alexander Kratzsch <klump@devrandom.se> (klump)
+- Barry O'Donovan barry.odonovan@lightnet.ie (barryodonovan)
+- Joseph Eames <j.eames@outlook.com> (j-ems)
+- Eric Conroy <eric@conroy.co> (NetworkNub)
+- Timothy Willey <developer@timothywilley.net> (twilley)
+- Jon Ward	<librenms@yonzb.net> (yon2004)
+- Ian Viemeister <github@ian.viemeister.com> (iviemeister)
+- Thane Gill <me@thanegill.com> (thanegill)
+- Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
+- Markus Wigge <markus@cultcom.de> (cultcom)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
