@@ -85,14 +85,19 @@ require_once 'includes/alerts.inc.php';
 $versions = version_info();
 $cur_sha = $versions['local_sha'];
 
-echo "==========================================================\n";
-echo "LibreNMS Version: $cur_sha\n";
-echo "DB Schema: ".$versions['db_schema']."\n";
-echo "PHP: ".$versions['php_ver']."\n";
-echo "MySQL: ".$versions['mysql_ver']."\n";
-echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-echo "SNMP: ".$versions['netsnmp_ver']."\n";
-echo "==========================================================\n\n";
+echo <<< EOF
+==========================================================
+Component | Version
+--------- | -------
+LibreNMS  | {$cur_sha}
+DB Schema | {$versions['db_schema']}
+PHP       | {$versions['php_ver']}
+MySQL     | {$versions['mysql_ver']}
+RRDTool   | {$versions['rrdtool_ver']}
+SNMP      | {$versions['netsnmp_ver']}
+==========================================================
+\n
+EOF;
 
 // Check we are running this as the root user
 if (function_exists('posix_getpwuid')) {
