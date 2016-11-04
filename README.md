@@ -86,8 +86,8 @@ exception):
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
 [4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
-[6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
-[7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
+[6]: http://freenode.net/changuide "Freenode channel guidelines"
+[7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [9]: http://observium.org/ "Observium web site"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
