@@ -471,6 +471,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('edgeos');
         $this->checkOS('edgeos', 'edgeos-erl');
+        $this->checkOS('edgeos', 'edgeos-er');
     }
 
     public function testEdgeswitch()
