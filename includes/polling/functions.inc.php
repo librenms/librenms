@@ -500,9 +500,13 @@ function location_to_latlng($device)
             if ($bad_loc === true) {
                 d_echo("Bad lat / lng received\n");
             } else {
-                $loc['timestamp'] = array('NOW()');
-                $loc['location'] = $device_location;
-                if (dbInsert($loc, 'locations')) {
+                $query = "INSERT INTO `locations` (`location`, `lat`, `lng`, `timestamp`) SELECT ?, ?, ?, NOW() FROM dual
+                    WHERE ? NOT IN
+                    (
+                    SELECT `location`
+                    FROM `locations` AS `locationsAlias`)";
+		
+                if (dbQuery($query, array($device_location, $loc['lat'], $loc['lng'], $device_location))) {
                     d_echo("Device lat/lng created\n");
                 } else {
                     d_echo("Device lat/lng could not be created\n");
