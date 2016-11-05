@@ -1870,6 +1870,14 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'pbn';
 
+// PBN CPE, Pacific Broadband Networks
+$os = 'pbn-cpe';
+$config['os'][$os]['text']             = 'PBN CPE';
+$config['os'][$os]['type']             = 'cpe';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['icon']             = 'pbn';
+
 // Enterasys
 $os = 'enterasys';
 $config['os'][$os]['text']             = 'Enterasys';
@@ -2799,6 +2807,11 @@ $i++;
 $config['device_types'][$i]['text'] = 'Appliance';
 $config['device_types'][$i]['type'] = 'appliance';
 $config['device_types'][$i]['icon'] = 'appliance.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'CPE';
+$config['device_types'][$i]['type'] = 'cpe';
+$config['device_types'][$i]['icon'] = 'cpe.png';
 
 //
 // No changes below this line #
