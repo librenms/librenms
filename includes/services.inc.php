@@ -249,18 +249,18 @@ function check_service($command)
             // if ds_name is longer than 19 characters, only use the first 19
             if (strlen($normalized_ds) > 19) {
                 $normalized_ds = substr($normalized_ds, 0, 19);
-                echo($ds . " exceeded 19 characters, renaming to " . $normalized_ds . "\n");
+                d_echo($ds . " exceeded 19 characters, renaming to " . $normalized_ds . "\n");
             }
             if ($ds != $normalized_ds) {
                 // ds has changed. check if normalized_ds is already in the array
                 if (isset($metrics[$normalized_ds])) {
-                    echo($normalized_ds . " collides with an existing index\n");
+                    d_echo($normalized_ds . " collides with an existing index\n");
                     $perf_unique = 0;
                     // Try to generate a unique name
                     for ($i = 0; $i<10; $i++) {
                         $tmp_ds_name = substr($normalized_ds, 0, 18) . $i;
                         if (!isset($metrics[$tmp_ds_name])) {
-                            echo($normalized_ds . " collides with an existing index\n");
+                            d_echo($normalized_ds . " collides with an existing index\n");
                             $normalized_ds = $tmp_ds_name;
                             $perf_unique = 1;
                             break 1;
@@ -280,7 +280,7 @@ function check_service($command)
                         }
                     }
                     if ($perf_unique == 0) {
-                        echo("could not generate a unique ds-name for " . $ds . "\n");
+                        d_echo("could not generate a unique ds-name for " . $ds . "\n");
                     }
                 }
                 $ds = $normalized_ds ;
