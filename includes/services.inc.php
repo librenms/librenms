@@ -134,7 +134,10 @@ function poll_service($service)
     $service_id = $service['service_id'];
     // Some debugging
     d_echo("\nNagios Service - $service_id\n");
-    d_echo("Request:  $check_cmd\n");
+    // the check_service function runs $check_cmd through escapeshellcmd, so
+    // echo the command as it will be run after being escaped
+    $escaped_check_cmd = escapeshellcmd($check_cmd);
+    d_echo("Request:  $escaped_check_cmd\n");
     list($new_status, $msg, $perf) = check_service($check_cmd);
     d_echo("Response: $msg\n");
 
