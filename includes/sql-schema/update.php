@@ -70,9 +70,9 @@ $updating = 0;
 
 $include_dir_regexp = '/\.sql$/';
 
-if ($handle = opendir($config['install_dir'].'/sql-schema')) {
+if ($handle = opendir($config['install_dir'].'/schema/sql/')) {
     while (false !== ($file = readdir($handle))) {
-        if (filetype($config['install_dir'].'/sql-schema/'.$file) == 'file' && preg_match($include_dir_regexp, $file)) {
+        if (filetype($config['install_dir'].'/schema/sql/'.$file) == 'file' && preg_match($include_dir_regexp, $file)) {
             $filelist[] = $file;
         }
     }
@@ -110,7 +110,7 @@ foreach ($filelist as $file) {
 
         $err = 0;
 
-        if ($fd = @fopen($config['install_dir'].'/sql-schema/'.$file, 'r')) {
+        if ($fd = @fopen($config['install_dir'].'/schema/sql/'.$file, 'r')) {
             $data = fread($fd, 4096);
             while (!feof($fd)) {
                 $data .= fread($fd, 4096);
