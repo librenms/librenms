@@ -1,8 +1,8 @@
 <?php
 /**
- * FileExistsException.php
+ * RenameFailedException.php
  *
- * Thrown when a file exists that should not.
+ * Thrown when a file rename operation fails.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Exceptions;
 
-class FileExistsException extends \Exception
+class RenameFailedException extends \Exception
 {
 
 }

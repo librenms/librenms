@@ -1522,3 +1522,36 @@ function display($value)
     );
     return $purifier->purify(stripslashes($value));
 }
+
+function has_rrds()
+{
+    global $config;
+    $dir = $config['rrd_dir'];
+
+    try {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            /** @var $file SplFileInfo */
+            if ($file->isFile() && $file->getExtension() == 'rrd') {
+                d_echo('Found an rrd: ' . $file->getRealpath() . PHP_EOL);
+                if ($file->isWritable()) {
+                    return true;
+                } else {
+                    d_echo("Cannot obtain write access.\n");
+                    return false;
+                }
+            }
+        }
+    } catch (UnexpectedValueException $e) {
+        d_echo(str_replace(
+            'RecursiveDirectoryIterator::__construct',
+            '',
+            $e->getMessage() . PHP_EOL
+        ));
+    }
+
+    return false;
+}

@@ -23,7 +23,7 @@ junk
 logs
 nbproject
 patches
-rrd
+/rrd
 /vendor
 composer.phar
 librenms_theme
