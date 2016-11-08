@@ -92,4 +92,3 @@ $check_graph['Qcache'] .= " LINE1.25:DS5#" . $config['graph_colours']['mixed'][5
 $check_graph['Qcache'] .= " GPRINT:DS5:LAST:%9.2lf ";
 $check_graph['Qcache'] .= " GPRINT:DS5:AVERAGE:%9.2lf ";
 $check_graph['Qcache'] .= " GPRINT:DS5:MAX:%9.2lf\l ";
-
