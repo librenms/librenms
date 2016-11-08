@@ -31,14 +31,16 @@ include 'includes/definitions.inc.php';
 include 'includes/functions.php';
 
 // get current rrd revision
-$insert = false;
 $rrd_rev = @dbFetchCell("SELECT `version` FROM `versions` WHERE `component`='rrd' ORDER BY `version` DESC LIMIT 1");
+$insert = is_null($rrd_rev);
+
 $options = getopt('df');
 $debug = isset($options['d']);
-if (!$rrd_rev || isset($options['f'])) {
+if (isset($options['f'])) {
     $rrd_rev = 0;
 }
 $new_rrd_rev = $rrd_rev;
+d_echo("Current RRD Rename revision $rrd_rev\n");
 
 // get list of rrd rename operations
 $dir = $config['install_dir'] . '/schema/rrd/';
@@ -57,11 +59,14 @@ try {
     }
 
     if ($new_rrd_rev > $rrd_rev) {  // insert/update the rrd rename version, if needed
-        if ($rrd_rev === 0) {
+        if ($insert) {
             dbInsert(array('component' => 'rrd', 'version' => $new_rrd_rev), 'versions');
         } else {
             dbUpdate(array('component' => 'rrd', 'version' => $new_rrd_rev), 'versions');
         }
+        d_echo("Updated to revision $new_rrd_rev.\n");
+    } else {
+        d_echo("No RRD renames needed.\n");
     }
 } catch (Exception $e) {
     c_echo('%rRename failed%n: ' . $e->getMessage() . PHP_EOL);
