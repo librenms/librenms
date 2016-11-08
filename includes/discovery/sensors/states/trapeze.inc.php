@@ -9,11 +9,11 @@ if ($device['os'] == 'trapeze') {
         //Create State Index
         $state_name = 'trpzSysPowerSupplyStatus';
         $state_index_id = create_state_index($state_name);
-		/*
-		Create State Translation
-		
-		TrpzSysPowerSupplyStatus
-		INTEGER {
+        /*
+        Create State Translation
+
+        TrpzSysPowerSupplyStatus
+            INTEGER {
                     other        (1),
                     unknown      (2),
                     ac-failed    (3),
@@ -21,12 +21,12 @@ if ($device['os'] == 'trapeze') {
                     ac-ok-dc-ok  (5)
                 }
 
-		The LibreNMS generic states is derived from Nagios:
-		0 = OK
-		1 = Warning
-		2 = Critical
-		3 = Unknown
-		*/
+        The LibreNMS generic states is derived from Nagios:
+        0 = OK
+        1 = Warning
+        2 = Critical
+        3 = Unknown
+        */
         if ($state_index_id !== null) {
             $states = array(
                  array($state_index_id,'other',0,1,3) ,

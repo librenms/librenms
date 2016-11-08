@@ -5,10 +5,10 @@
 if (!$os) {
     if (preg_match('/^Juniper Networks/', $sysDescr)) {
         if (str_contains($sysDescr, 'MX-')) {
-            $os = 'trapeze';
+          $os = 'trapeze';
         }
         if (str_contains($sysDescr, 'WLC-')) {
-            $os = 'trapeze';
+          $os = 'trapeze';
         }
     }
 }
