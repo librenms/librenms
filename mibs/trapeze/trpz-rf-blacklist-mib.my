@@ -1,0 +1,186 @@
+TRAPEZE-NETWORKS-RF-BLACKLIST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, MacAddress
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzRFBlacklistMib MODULE-IDENTITY
+    LAST-UPDATED "201102240014Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "RF Blacklist objects for
+        Trapeze Networks wireless switches.
+
+        Copyright (c) 2009-2011 by Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+
+    REVISION "201102240014Z"
+    DESCRIPTION "v1.0.4: Initial version, for 7.5 release"
+
+    ::= { trpzMibs 18 }
+
+
+-- Textual conventions
+
+TrpzRFBlacklistedEntryType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the Type of a Blacklisted Entry:
+        configuredPermanent:
+                The MAC address has been permanently blacklisted
+                by administrative action;
+        configuredDynamic:
+                The MAC address has been temporarily blacklisted
+                by administrative action;
+        assocReqFlood,
+        reassocReqFlood,
+        disassocReqFlood,
+        unknownDynamic:
+                The MAC address has been automatically blacklisted
+                by RF Detection."
+    SYNTAX      INTEGER {
+                    other                 (1),
+                    unknownDynamic        (2),
+                    configuredPermanent   (3),
+                    configuredDynamic     (4),
+                    assocReqFlood         (5),
+                    reassocReqFlood       (6),
+                    disassocReqFlood      (7)
+                }
+
+
+-- Object definitions
+
+--
+-- The RF Blacklist MIB Tree
+--
+
+trpzRFBlacklistMibObjects      OBJECT IDENTIFIER ::= { trpzRFBlacklistMib 1 }
+-- Reserved for future scalar objects (high-level or summary status info):
+-- trpzRFBlacklistGlobalObjects  OBJECT IDENTIFIER ::= { trpzRFBlacklistMibObjects 1 }
+
+
+-- ================================
+-- RF Blacklisted Transmitter table
+
+trpzRFBlacklistXmtrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzRFBlacklistXmtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing transmitters blacklisted by RF Detection."
+    ::= { trpzRFBlacklistMibObjects 2 }
+
+trpzRFBlacklistXmtrEntry OBJECT-TYPE
+    SYNTAX      TrpzRFBlacklistXmtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular blacklisted transmitter."
+    INDEX   { trpzRFBlacklistXmtrMacAddress }
+    ::= { trpzRFBlacklistXmtrTable 1 }
+
+TrpzRFBlacklistXmtrEntry ::= SEQUENCE {
+        trpzRFBlacklistXmtrMacAddress  MacAddress,
+
+        trpzRFBlacklistXmtrType        TrpzRFBlacklistedEntryType,
+        trpzRFBlacklistXmtrTimeToLive  Unsigned32
+    }
+
+trpzRFBlacklistXmtrMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of this Blacklisted Transmitter."
+    ::= { trpzRFBlacklistXmtrEntry 1 }
+
+trpzRFBlacklistXmtrType OBJECT-TYPE
+    SYNTAX      TrpzRFBlacklistedEntryType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Type of this Blacklisted Transmitter."
+    ::= { trpzRFBlacklistXmtrEntry 2 }
+
+trpzRFBlacklistXmtrTimeToLive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remaining time in seconds until this Transmitter
+        is removed from the RF Blacklist.
+        For permanent entries, the value will be always zero."
+    ::= { trpzRFBlacklistXmtrEntry 3 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzRFBlacklistConformance  OBJECT IDENTIFIER ::= { trpzRFBlacklistMib 2 }
+trpzRFBlacklistCompliances  OBJECT IDENTIFIER ::= { trpzRFBlacklistConformance 1 }
+trpzRFBlacklistGroups       OBJECT IDENTIFIER ::= { trpzRFBlacklistConformance 2 }
+
+
+-- Compliance
+
+
+trpzRFBlacklistCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement RF Blacklist MIB.
+
+        This compliance statement is for releases 7.5 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzRFBlacklistMib)
+
+    MANDATORY-GROUPS {
+            trpzRFBlacklistXmtrGroup
+            }
+
+    ::= { trpzRFBlacklistCompliances 1 }
+
+
+-- Units of Conformance
+
+
+trpzRFBlacklistXmtrGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzRFBlacklistXmtrType,
+                 trpzRFBlacklistXmtrTimeToLive
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Blacklisted Transmitter info in releases 7.5 and greater."
+        ::= { trpzRFBlacklistGroups 1 }
+
+
+END

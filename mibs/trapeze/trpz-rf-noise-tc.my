@@ -1,0 +1,74 @@
+TRAPEZE-NETWORKS-RF-NOISE-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzRFNoiseTc MODULE-IDENTITY
+    LAST-UPDATED "201101100000Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        Copyright 2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201101100000Z"
+    DESCRIPTION "v1.0.0: initial version, for 7.5 release"
+
+    ::= { trpzMibs 22 }
+
+
+TrpzRFNoiseSourceID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+        "RF Noise Source ID."
+    SYNTAX       OCTET STRING (SIZE (6))
+
+TrpzRFNoiseSourceType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "RF Noise Source Type."
+    SYNTAX       INTEGER {
+            -- Generic noise types:
+            nsUnknown        (0),
+            nsContinuousWave (1),
+
+            -- Specific continuous-wave types:
+            nsVideo (16),
+
+            -- Specific pulse source types:
+            nsMicrowaveOven (33),
+
+            -- Specific cordless phone and home monitoring types:
+            nsPhoneDECT (49),
+            nsPhoneFHSS (50),
+
+            -- Specific Bluetooth and similar 802.15 types:
+            nsBluetoothAny       (64),
+            nsBluetoothHeadset   (65),
+            nsBluetoothHandsfree (66)
+        }
+
+
+END

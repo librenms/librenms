@@ -1,0 +1,237 @@
+TRAPEZE-NETWORKS-EXTERNAL-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    TrpzIpPort
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzExternalServerMib MODULE-IDENTITY
+    LAST-UPDATED "201106220040Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "External Server configuration MIB.
+
+        Copyright 2006-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201106220040Z"
+    DESCRIPTION "v1.4.0: Revised for 7.5 release."
+
+    REVISION "200910020021Z"
+    DESCRIPTION "v1.2.1: Added two scalars:
+                    trpzExtServerPrimaryDnsIpAddress,
+                    trpzExtServerSecondaryDnsIpAddress."
+
+    REVISION "200810240010Z"
+    DESCRIPTION "v1.1.0: Factored out 'TrpzIpPort' textual convention
+                (was moved to the new module Basic TC).
+                This will be published in 7.1 release."
+
+    REVISION "200607310004Z"
+    DESCRIPTION "v1.0.4: Initial version, for 6.0 release"
+
+    ::= { trpzMibs 7 }
+
+
+-- Textual conventions
+
+TrpzSyslogServerEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Syslog Server mode (administratively enabled or disabled)."
+    SYNTAX      INTEGER {
+                    enabled  (1),
+                    disabled (2)
+                }
+
+
+--
+-- The External Server Configuration MIB Tree
+--
+
+trpzExternalServerObjects      OBJECT IDENTIFIER ::= { trpzExternalServerMib 1 }
+trpzExternalServerDataObjects  OBJECT IDENTIFIER ::= { trpzExternalServerObjects 1 }
+trpzExternalServerGlobalObjects  OBJECT IDENTIFIER ::= { trpzExternalServerDataObjects 2 }
+
+--
+-- Object definitions
+--
+
+-- ====================
+-- Syslog Server table
+
+trpzExtServerSyslogTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TrpzExtServerSyslogEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Configured Syslog server table."
+   ::= { trpzExternalServerDataObjects 1 }
+
+trpzExtServerSyslogEntry OBJECT-TYPE
+   SYNTAX      TrpzExtServerSyslogEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entry for Syslog server table."
+   INDEX { trpzExtServerSyslogIndex }
+   ::= { trpzExtServerSyslogTable 1 }
+
+TrpzExtServerSyslogEntry ::= SEQUENCE {
+    trpzExtServerSyslogIndex    Unsigned32,
+    trpzExtServerSyslogAddress  IpAddress,
+    trpzExtServerSyslogPort     TrpzIpPort,
+    trpzExtServerSyslogEnable   TrpzSyslogServerEnable
+    }
+
+trpzExtServerSyslogIndex  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the Syslog sever"
+   ::= { trpzExtServerSyslogEntry 1 }
+
+trpzExtServerSyslogAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "IP Address of the Syslog server."
+   ::= { trpzExtServerSyslogEntry 2 }
+
+trpzExtServerSyslogPort OBJECT-TYPE
+   SYNTAX      TrpzIpPort
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The Syslog server Port number."
+   ::= { trpzExtServerSyslogEntry 3 }
+
+trpzExtServerSyslogEnable OBJECT-TYPE
+   SYNTAX      TrpzSyslogServerEnable
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The administrative status of the Syslog server (enabled/disabled)"
+   ::= { trpzExtServerSyslogEntry 4 }
+
+
+--
+-- Scalars
+--
+
+trpzExtServerPrimaryDnsIpAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "Configured IP address of the Primary DNS Server."
+   ::= { trpzExternalServerGlobalObjects 1 }
+
+trpzExtServerSecondaryDnsIpAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "Configured IP address of the Secondary DNS Server."
+   ::= { trpzExternalServerGlobalObjects 2 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzExternalServerConformance  OBJECT IDENTIFIER ::= { trpzExternalServerObjects 2 }
+trpzExternalServerCompliances  OBJECT IDENTIFIER ::= { trpzExternalServerConformance 1 }
+trpzExternalServerGroups       OBJECT IDENTIFIER ::= { trpzExternalServerConformance 2 }
+
+-- Compliance
+
+trpzExternalServerCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the External Server MIB.
+
+        This compliance statement was for releases 6.0 to 7.3
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzExternalServerComplianceRev2."
+    MODULE  -- trpzExternalServerMib
+
+    MANDATORY-GROUPS { trpzExternalServerConfigGroup }
+
+    ::= { trpzExternalServerCompliances 1 }
+
+trpzExternalServerComplianceRev2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the External Server MIB.
+
+        This compliance statement is for releases 7.5 and greater
+        of AC (wireless switch) software."
+    MODULE  -- trpzExternalServerMib
+
+    MANDATORY-GROUPS { 
+              trpzExternalServerConfigGroup,
+              trpzExternalServerDnsServerGroup
+            }
+
+    ::= { trpzExternalServerCompliances 2 }
+
+
+-- Units of Conformance
+
+trpzExternalServerConfigGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzExtServerSyslogAddress,
+                 trpzExtServerSyslogPort,
+                 trpzExtServerSyslogEnable
+                }
+        STATUS      current
+        DESCRIPTION
+            "Mandatory group of objects implemented to provide
+             External Server configuration info."
+        ::= { trpzExternalServerGroups 1 }
+
+trpzExternalServerDnsServerGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzExtServerPrimaryDnsIpAddress,
+                 trpzExtServerSecondaryDnsIpAddress
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of objects implemented to provide
+            DNS Server configuration info
+            in releases 7.5 and greater."
+        ::= { trpzExternalServerGroups 2 }
+
+END

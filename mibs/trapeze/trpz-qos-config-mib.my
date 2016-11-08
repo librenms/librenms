@@ -1,0 +1,148 @@
+TRAPEZE-NETWORKS-QOS-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzQosConfigMib MODULE-IDENTITY
+    LAST-UPDATED "201102240011Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "QoS Configuration objects MIB
+        for Trapeze Networks wireless switches.
+
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright (c) 2010-2011 by Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+
+    REVISION "201102240011Z"
+    DESCRIPTION "v1.0.1: Initial version, for 7.5 release"
+
+    ::= { trpzMibs 20 }
+
+
+-- Textual conventions
+
+
+-- Object definitions
+
+--
+-- The QoS Configuration MIB Tree
+--
+
+trpzQosConfigMibObjects  OBJECT IDENTIFIER ::= { trpzQosConfigMib 1 }
+
+
+-- ===============================
+-- QoS Profile Configuration table
+
+trpzQosConfQosProfileConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzQosConfQosProfileConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the QoS Profiles configured on this AC."
+    ::= { trpzQosConfigMibObjects 1 }
+
+trpzQosConfQosProfileConfigEntry OBJECT-TYPE
+    SYNTAX      TrpzQosConfQosProfileConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular QoS Profile on the AC."
+    INDEX   { trpzQosConfQosProfConfProfileName }
+    ::= { trpzQosConfQosProfileConfigTable 1 }
+
+TrpzQosConfQosProfileConfigEntry ::= SEQUENCE {
+        trpzQosConfQosProfConfProfileName  OCTET STRING,
+
+        trpzQosConfQosProfConfMaxBandwidthKbps  Unsigned32
+    }
+
+trpzQosConfQosProfConfProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Name of this QoS Profile."
+    ::= { trpzQosConfQosProfileConfigEntry 1 }
+
+trpzQosConfQosProfConfMaxBandwidthKbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The bandwidth limit for an entity using this QoS profile,
+        in Kbits/second. A value of zero means unlimited."
+    ::= { trpzQosConfQosProfileConfigEntry 2 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzQosConfigConformance  OBJECT IDENTIFIER ::= { trpzQosConfigMib 2 }
+trpzQosConfigCompliances  OBJECT IDENTIFIER ::= { trpzQosConfigConformance 1 }
+trpzQosConfigGroups       OBJECT IDENTIFIER ::= { trpzQosConfigConformance 2 }
+
+
+-- Compliance
+
+
+trpzQosConfigCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        QoS Configuration MIB.
+
+        This compliance statement is for releases 7.5 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzQosConfigMib)
+
+    MANDATORY-GROUPS {
+            trpzQosConfQosProfileConfigGroup
+            }
+
+    ::= { trpzQosConfigCompliances 1 }
+
+
+-- Units of Conformance
+
+
+trpzQosConfQosProfileConfigGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzQosConfQosProfConfMaxBandwidthKbps
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            QoS Profile Configuration info in releases 7.5 and greater."
+        ::= { trpzQosConfigGroups 1 }
+
+
+END

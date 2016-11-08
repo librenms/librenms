@@ -1,0 +1,215 @@
+TRAPEZE-NETWORKS-AP-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress
+        FROM SNMPv2-TC
+    IANAifType
+        FROM IANAifType-MIB
+    TrpzApSerialNum
+        FROM TRAPEZE-NETWORKS-AP-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzApIfMib MODULE-IDENTITY
+    LAST-UPDATED "200811200001Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "AP network Interface objects for
+        Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright (c) 2008-2009 by Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+
+    REVISION "200811200001Z"
+    DESCRIPTION "v1.0: Initial version, for 7.1 release"
+
+    ::= { trpzMibs 16 }
+
+
+-- Textual conventions
+
+TrpzApInterfaceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each AP network interface."
+    SYNTAX      Unsigned32 (1..1024)
+
+
+-- Object definitions
+
+--
+-- The AP If MIB Tree
+--
+
+trpzApIfMibObjects      OBJECT IDENTIFIER ::= { trpzApIfMib 1 }
+
+
+-- ==================
+-- AP Interface table
+
+trpzApIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the network interfaces on all the APs
+        currently present and managed by this AC (APs in ''ALIVE'' state)."
+    ::= { trpzApIfMibObjects 1 }
+
+trpzApIfEntry OBJECT-TYPE
+    SYNTAX      TrpzApIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular network interface
+        on an AP attached to the AC."
+    INDEX   { trpzApIfApSerialNum,
+              trpzApIfIndex }
+    ::= { trpzApIfTable 1 }
+
+TrpzApIfEntry ::= SEQUENCE {
+        trpzApIfApSerialNum    TrpzApSerialNum,
+        trpzApIfIndex          TrpzApInterfaceIndex,
+
+        trpzApIfName           DisplayString,
+        trpzApIfType           IANAifType,
+        trpzApIfMtu            Unsigned32,
+        trpzApIfHighSpeed      Gauge32,
+        trpzApIfMac            MacAddress
+    }
+
+trpzApIfApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this network interface."
+    ::= { trpzApIfEntry 1 }
+
+trpzApIfIndex OBJECT-TYPE
+    SYNTAX      TrpzApInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value, greater than zero, for each AP network interface."
+    ::= { trpzApIfEntry 2 }
+
+trpzApIfName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual name of the interface."
+    ::= { trpzApIfEntry 3 }
+
+trpzApIfType OBJECT-TYPE
+    SYNTAX      IANAifType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of AP network interfaces."
+    ::= { trpzApIfEntry 4 }
+
+trpzApIfMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of the largest packet which can be sent/received
+        on the interface, specified in octets."
+    ::= { trpzApIfEntry 5 }
+
+trpzApIfHighSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The nominal bandwidth of AP network interfaces
+         in units of 1,000,000 bits per second."
+    ::= { trpzApIfEntry 6 }
+
+trpzApIfMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of this network interface."
+    ::= { trpzApIfEntry 7 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzApIfConformance  OBJECT IDENTIFIER ::= { trpzApIfMib 2 }
+trpzApIfCompliances  OBJECT IDENTIFIER ::= { trpzApIfConformance 1 }
+trpzApIfGroups       OBJECT IDENTIFIER ::= { trpzApIfConformance 2 }
+
+
+-- Compliance
+
+
+trpzApIfCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement AP If MIB.
+
+        This compliance statement is for releases 7.1 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzApIfMib)
+
+    MANDATORY-GROUPS {
+            trpzApIfBasicGroup
+            }
+
+    ::= { trpzApIfCompliances 1 }
+
+
+-- Units of Conformance
+
+
+trpzApIfBasicGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzApIfName,
+                 trpzApIfType,
+                 trpzApIfMtu,
+                 trpzApIfHighSpeed,
+                 trpzApIfMac
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            basic Interface info in releases 7.1 and greater."
+        ::= { trpzApIfGroups 1 }
+
+
+END

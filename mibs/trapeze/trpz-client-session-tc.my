@@ -1,0 +1,186 @@
+TRAPEZE-NETWORKS-CLIENT-SESSION-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzClientSessionTc MODULE-IDENTITY
+    LAST-UPDATED "201212210050Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent using these TCs.
+
+        Copyright 2006-2012 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201212210050Z"
+    DESCRIPTION "v1.5.0: New client session state
+                (enum value in TrpzClientSessionState):
+                        'ap-managed(12)'.
+                (for 9.0 release)"
+
+    REVISION "201204190040Z"
+    DESCRIPTION "v1.4.0: Introduced TCs:
+                     TrpzClientDeviceType,
+                     TrpzClientDeviceGroupName,
+                     TrpzClientDeviceProfileName.
+                (for 8.0 release)"
+
+    REVISION "201101270033Z"
+    DESCRIPTION "v1.3.3: Added User Access Type value
+                 'profile' (5).
+                Reserved User Access Type value 6.
+                (for 7.5 release)"
+
+    REVISION "200911300021Z"
+    DESCRIPTION "v1.2.1: Improved description."
+
+    REVISION "200710080010Z"
+    DESCRIPTION "v1.1.0: Introduced TrpzClientAccessMode
+                 to be used instead of TrpzAccessType from trpzApTc module.
+                 (In 6.0, direct- and network-attached APs were unified.)"
+
+    REVISION "200609260001Z"
+    DESCRIPTION "v1.0.1: initial version"
+
+    ::= { trpzMibs 10 }
+
+
+TrpzUserAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of user access types
+        (also referred to as ''login types'')."
+    SYNTAX      INTEGER {
+            mac                 (1),
+            web                 (2),
+            dot1x               (3),
+            last-resort         (4),
+            profile             (5)
+            --
+            -- Reserved value:   6
+            --
+        }
+
+TrpzClientSessionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the client session states.
+        Value 'associated(1)' applies only to wireless sessions.
+        Value 'wired(8)' applies only to wired sessions."
+    SYNTAX      INTEGER {
+            associated          (1),
+            authorizing         (2),
+            authorized          (3),
+            active              (4),
+            de-associated       (5),
+            roaming-away        (6),
+            updated-to-roam     (7),
+            wired               (8),
+            clearing            (9),
+            invalid             (10),
+            web-authing         (11),
+            ap-managed          (12)
+            }
+
+TrpzClientDot1xState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the dot1x states for a client."
+    SYNTAX      INTEGER {
+            initialize          (1),
+            disconnected        (2),
+            connecting          (3),
+            authenticating      (4),
+            authenticated       (5),
+            wired               (6),
+            aborting            (7),
+            held                (8)
+        }
+
+TrpzClientAuthenProtocolType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the dot1x client authentication protocol types."
+    SYNTAX      INTEGER {
+            none                (1),
+            eap-tls             (2),
+            eap-ttls            (3),
+            md5                 (4),
+            peap                (5),
+            leap                (6),
+            pass-through        (7)
+        }
+
+TrpzClientAccessMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the access mode (type) used by client.
+        Value 'ap(2)' indicates a client that is attached
+        to the switch via an access point.
+        Value 'wired(3)' indicates a client that is
+        attached to the switch via the wired network
+        (no access point is involved)."
+    SYNTAX      INTEGER {
+            other               (1),
+            ap                  (2),
+            wired               (3)
+        }
+
+TrpzClientDeviceType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+        "The type of a client device.
+        Consists of printable ASCII characters between 0x21 (!),
+        and 0x7e (~), with no leading, embedded, or trailing space.
+        Is a zero length string if unknown."
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+TrpzClientDeviceGroupName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+        "The name of a group of device types.
+        Consists of printable ASCII characters between 0x21 (!),
+        and 0x7e (~), with no leading, embedded, or trailing space.
+        Is a zero length string if unknown."
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+TrpzClientDeviceProfileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+        "The name of a device profile.
+        A device profile is a collection of policies that
+        apply to one or more types of client devices.
+        Consists of printable ASCII characters between 0x21 (!)
+        and 0x7e (~), with no leading, embedded, or trailing space.
+        Is a zero length string if unknown."
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+
+END

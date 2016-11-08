@@ -2228,6 +2228,11 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'trapeze';
+$config['os'][$os]['text']             = 'Juniper Wireless';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'junos';
+
 
 
 // Graph Types

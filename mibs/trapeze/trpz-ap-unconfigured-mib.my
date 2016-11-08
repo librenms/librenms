@@ -1,0 +1,240 @@
+TRAPEZE-NETWORKS-AP-UNCONFIGURED-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    TrpzApSerialNum
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzPhysPortNumber
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzApUnconfiguredMib MODULE-IDENTITY
+    LAST-UPDATED "201106150011Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Unconfigured/orphan APs info for Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Orphan AP = an AP currently detected by this AC
+                    but not managed by any AC.
+
+        Copyright 2008-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201106150011Z"
+    DESCRIPTION "v1.1.1: Revised for 7.5 release"
+
+    REVISION "200811140004Z"
+    DESCRIPTION "v1.0.4: Initial version, for 7.1 release"
+
+    ::= { trpzMibs 15 }
+
+
+-- Textual conventions
+
+
+TrpzApUnconfiguredOrphanReason ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Enumeration of the reasons why an AP could be unconfigured/orphan:
+          no-configuration:
+                the AC has no configuration corresponding to that AP;
+          ap-license-exceeded:
+                AP license capacity exceeded;
+          controller-behind-nat:
+                the AC is behind NAT, and cannot suggest
+                another AC for that AP to attach to
+                (the first AC does not know what the AP's view
+                of the public IP address of the other AC is);
+          ap-model-mismatch:
+                AP model does not match configuration;
+          no-macs:
+                the AC must allocate MAC address for that AP
+                but no MAC is available."
+    SYNTAX  INTEGER {
+            other                    (1),
+            no-configuration         (2),
+            ap-license-exceeded      (3),
+            controller-behind-nat    (4),
+            ap-model-mismatch        (5),
+            no-macs                  (6)
+        }
+
+
+--
+-- The AP Unconfigured MIB Tree
+--
+
+trpzApUnconfMibObjects  OBJECT IDENTIFIER ::= { trpzApUnconfiguredMib 1 }
+
+-- Reserved for future scalar objects (high-level or summary status info):
+-- trpzApUnconfGlobalObjects  OBJECT IDENTIFIER ::= { trpzApUnconfMibObjects 1 }
+
+
+-- Object definitions
+
+
+-- ================
+-- Orphan APs table
+
+trpzApUnconfOrphanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApUnconfOrphanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently detected by this AC
+        but not managed by any AC.
+        Such APs are reported as ''unconfigured'' or ''orphan''
+        in other management interfaces of the AC (CLI, Web etc)."
+    ::= { trpzApUnconfMibObjects 2 }
+
+trpzApUnconfOrphanEntry OBJECT-TYPE
+    SYNTAX      TrpzApUnconfOrphanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular orphan AP detected by this AC."
+    INDEX   { trpzApUnconfOrphanApSerialNum }
+    ::= { trpzApUnconfOrphanTable 1 }
+
+TrpzApUnconfOrphanEntry ::= SEQUENCE {
+        trpzApUnconfOrphanApSerialNum     TrpzApSerialNum,
+
+        trpzApUnconfOrphanApModelName     DisplayString,
+        trpzApUnconfOrphanIpAddress       IpAddress,
+        trpzApUnconfOrphanPhysPortNum     TrpzPhysPortNumber,
+        trpzApUnconfOrphanVLANName        DisplayString,
+        trpzApUnconfOrphanReason          TrpzApUnconfiguredOrphanReason
+    }
+
+trpzApUnconfOrphanApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of this orphan AP."
+    ::= { trpzApUnconfOrphanEntry 1 }
+
+trpzApUnconfOrphanApModelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this orphan AP."
+    ::= { trpzApUnconfOrphanEntry 2 }
+
+-- reserving two positions (3 and 4) for future use
+-- strictly related to the AP model
+
+trpzApUnconfOrphanIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 Address of this orphan AP."
+    ::= { trpzApUnconfOrphanEntry 5 }
+
+trpzApUnconfOrphanPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Number of the Physical Port on which this orphan AP
+        was detected by the AC (usually the uplink port going to
+        other switches/routers connecting this AP to the network)."
+    ::= { trpzApUnconfOrphanEntry 6 }
+
+trpzApUnconfOrphanVLANName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the VLAN containing this orphan AP.
+        This is the VLAN Name as configured on this AC
+        (another AC might have a different name corresponding
+        to same VLAN tag used in the network)."
+    ::= { trpzApUnconfOrphanEntry 7 }
+
+trpzApUnconfOrphanReason OBJECT-TYPE
+    SYNTAX      TrpzApUnconfiguredOrphanReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason why this AP is orphan."
+    ::= { trpzApUnconfOrphanEntry 8 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzApUnconfConformance  OBJECT IDENTIFIER ::= { trpzApUnconfiguredMib 2 }
+
+trpzApUnconfCompliances  OBJECT IDENTIFIER ::= { trpzApUnconfConformance 1 }
+trpzApUnconfGroups       OBJECT IDENTIFIER ::= { trpzApUnconfConformance 2 }
+
+
+-- Compliance
+
+
+trpzApUnconfCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        AP Unconfigured MIB."
+
+    MODULE  -- this module (trpzApUnconfiguredMib)
+
+    MANDATORY-GROUPS {
+                  trpzApUnconfOrphanBasicGroup
+                }
+
+    ::= { trpzApUnconfCompliances 1 }
+
+
+-- Units of Conformance
+
+
+trpzApUnconfOrphanBasicGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApUnconfOrphanApModelName,
+                  trpzApUnconfOrphanIpAddress,
+                  trpzApUnconfOrphanPhysPortNum,
+                  trpzApUnconfOrphanVLANName,
+                  trpzApUnconfOrphanReason
+                }
+        STATUS      current
+        DESCRIPTION
+            "Mandatory group of objects implemented to provide
+            info about Orphan APs."
+        ::= { trpzApUnconfGroups 1 }
+
+
+END

@@ -1,0 +1,202 @@
+TRAPEZE-NETWORKS-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    TrpzPhysPortNumber,
+    TrpzPhysPortNumberOrZero
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzPortMib MODULE-IDENTITY
+    LAST-UPDATED "200810230010Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Port information MIB.
+
+        Copyright 2006-2008 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200810230010Z"
+    DESCRIPTION "v1.2.0: Factored out the 'TrpzPhysPortNumber'
+                textual convention (moved to the new module Basic TC).
+
+                Added in Basic TC MIB an extension of 'TrpzPhysPortNumber'
+                to permit a value of zero.  The new textual convention
+                is 'TrpzPhysPortNumberOrZero'.
+                Using it in this MIB because 'trpzPortConfigTrunkMaster'
+                must be zero for a port that is not part of any port group.
+
+                This will be published in 7.1 release."
+
+    REVISION "200805190004Z"
+    DESCRIPTION "v1.1.0: Clarified descriptions"
+
+    REVISION "200611090001Z"
+    DESCRIPTION "v1.0.1: Fixed imports and compliance group"
+
+    REVISION "200604060000Z"
+    DESCRIPTION "v1.0: Initial version, for 5.0 release"
+
+    ::= { trpzMibs 6 }
+
+
+-- Textual conventions
+
+
+TrpzPortMode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Enumeration for the port mode (administratively controlled)."
+        SYNTAX          INTEGER {
+                                directAttachAP  (1),
+                                networkPort     (2),
+                                wired           (3)
+                                }
+
+TrpzPortPoeMode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Enumeration for the port PoE supply configuration:
+            the availability of Power over Ethernet is
+            administratively controlled, can be enabled or disabled.
+            Some ports may not have the Power over Ethernet hardware:
+            they should always appear as disabled."
+        SYNTAX          INTEGER {
+                                poeEnable  (1),
+                                poeDisable (2)
+                                }
+
+
+--
+-- The Port MIB Tree
+--
+
+trpzPortObjects      OBJECT IDENTIFIER ::= { trpzPortMib 1 }
+trpzPortDataObjects  OBJECT IDENTIFIER ::= { trpzPortObjects 1 }
+
+
+-- Object definitions
+
+trpzPortConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TrpzPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+                "Port configuration table"
+        ::= { trpzPortDataObjects 1 }
+
+trpzPortConfigEntry OBJECT-TYPE
+        SYNTAX          TrpzPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Port configuration entry"
+        INDEX   { trpzPortConfigPortNumber }
+        ::= { trpzPortConfigTable 1 }        
+
+TrpzPortConfigEntry ::= SEQUENCE {
+        trpzPortConfigPortNumber          TrpzPhysPortNumber,
+        trpzPortConfigPortMode            TrpzPortMode,
+        trpzPortConfigPoeMode             TrpzPortPoeMode,
+        trpzPortConfigTrunkMaster         TrpzPhysPortNumberOrZero
+        }
+
+trpzPortConfigPortNumber  OBJECT-TYPE
+        SYNTAX          TrpzPhysPortNumber
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Physical Port Number"
+        ::= { trpzPortConfigEntry 1 }
+
+trpzPortConfigPortMode   OBJECT-TYPE
+        SYNTAX          TrpzPortMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Indicates whether this port is configured
+                     for directly attached AP,
+                     as network port, or
+                     for wired auth."
+        ::= { trpzPortConfigEntry 2 }
+
+trpzPortConfigPoeMode     OBJECT-TYPE
+        SYNTAX          TrpzPortPoeMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Indicates whether this port is configured to 
+                 supply PoE (Power over Ethernet)."
+        ::= { trpzPortConfigEntry 3 }
+
+trpzPortConfigTrunkMaster OBJECT-TYPE
+        SYNTAX          TrpzPhysPortNumberOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The master port of the group this port belongs to
+                 (identified by the physical port number).
+                 A zero value means information is not available
+                 (usually if this port is not part of any port group)."
+        ::= { trpzPortConfigEntry 4 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzPortConformance  OBJECT IDENTIFIER ::= { trpzPortObjects 2 }
+trpzPortCompliances  OBJECT IDENTIFIER ::= { trpzPortConformance 1 }
+trpzPortGroups       OBJECT IDENTIFIER ::= { trpzPortConformance 2 }
+
+-- Compliance
+
+trpzPortCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Port MIB."
+    MODULE  -- trpzPortMib
+
+    MANDATORY-GROUPS { trpzPortConfigGroup }
+
+    ::= { trpzPortCompliances 1 }
+
+-- Units of Conformance
+
+trpzPortConfigGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzPortConfigPortMode,
+                 trpzPortConfigPoeMode,
+                 trpzPortConfigTrunkMaster     
+                }
+        STATUS      current
+        DESCRIPTION
+        "Mandatory group of objects implemented to provide
+         Port configuration info."
+        ::= { trpzPortGroups 1 }
+
+END

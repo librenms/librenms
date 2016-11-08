@@ -1,0 +1,77 @@
+TRAPEZE-NETWORKS-LICENSE-FEATURE-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzLicenseFeatureTc MODULE-IDENTITY
+    LAST-UPDATED "201101270100Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Convention for the Licensable Features
+        of Trapeze Networks wireless switches.
+
+        Copyright 2009-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201101270100Z"
+    DESCRIPTION "v1.0.0: Added two license feature values:
+                    'maxSupportedRemoteOfficeAPs(17)',
+                    'maxSupportedSpectrumAnalysisAPs(18)'.
+                (for 7.5 release)"
+
+    REVISION "200911170020Z"
+    DESCRIPTION "v0.2.0: Added license feature value 'maxSupportedSessions(3)'
+                (for 7.3 release)"
+
+    REVISION "200911160001Z"
+    DESCRIPTION "v0.1.1: initial version, for 7.1 release"
+
+    ::= { trpzMibs 19 }
+
+
+TrpzLicenseFeature ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the licensable features."
+    SYNTAX      INTEGER {
+            none (1),
+            maxSupportedAPsOrDAPs (2),
+            maxSupportedSessions (3),
+            --
+            -- Reserved values: 4 - 10
+            --
+            fips (11),
+            advancedVoice (12),
+            highAvailability (13),
+            maxSupportedHighSpeedMeshBridgingAPs (14),
+            --
+            -- Reserved value: 15
+            --
+            maxSupportedAdvancedLocalSwitchingAPs (16),
+            maxSupportedRemoteOfficeAPs (17),
+            maxSupportedSpectrumAnalysisAPs (18)
+        }
+
+
+END

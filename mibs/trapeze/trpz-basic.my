@@ -1,0 +1,227 @@
+TRAPEZE-NETWORKS-BASIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+	FROM SNMPv2-SMI
+    DisplayString
+	FROM SNMPv2-TC
+    TrpzLicenseFeature
+	FROM TRAPEZE-NETWORKS-LICENSE-FEATURE-TC-MIB
+    trpzMibs
+	FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzBasic MODULE-IDENTITY
+    LAST-UPDATED "200911160010Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+	"Trapeze Networks Technical Support
+	 www.trapezenetworks.com
+	 US:            866.TRPZ.TAC
+	 International: 925.474.2400
+	 support@trapezenetworks.com"
+    DESCRIPTION
+	"Basic objects for Trapeze Networks wireless switches.
+
+	Copyright 2004-2009 Trapeze Networks, Inc.
+	All rights reserved.
+	This Trapeze Networks SNMP Management Information Base
+	Specification (Specification) embodies Trapeze Networks'
+	confidential and proprietary intellectual property.
+	Trapeze Networks retains all title and ownership in
+	the Specification, including any revisions.
+
+	This Specification is supplied 'AS IS' and Trapeze Networks
+	makes no warranty, either express or implied, as to the use,
+	operation, condition, or performance of the Specification."
+
+    REVISION "200911160010Z"
+    DESCRIPTION "v3.0.0: Moved TrpzLicenseFeature into its own module
+                         for easier maintenance.
+                         This will be published in 7.1 release."
+
+    REVISION "200607100008Z"
+    DESCRIPTION "v2.0.6: Fixed MAX-ACCESS of trpzMobilityMemberEntryAddr,
+                         an index that was also the only column"
+
+    REVISION "200604140007Z"
+    DESCRIPTION "v2.0.5: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { trpzMibs 2 }
+
+
+-- Textual Conventions
+
+
+-- Object definitions
+
+-- Basic System Information Group
+trpzBasicSystemInfo OBJECT IDENTIFIER ::= { trpzBasic 1 }
+
+trpzSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The serial number of the switch."
+    ::= { trpzBasicSystemInfo 1 }
+
+trpzSwMajorVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The major release version of the running software."
+    ::= { trpzBasicSystemInfo 2 }
+
+trpzSwMinorVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The minor release version of the running software."
+    ::= { trpzBasicSystemInfo 3 }
+
+trpzVersionString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The version string of the running software, including
+	 the major, minor, patch and build numbers, such as
+	 3.0.0.185"
+    ::= { trpzBasicSystemInfo 4 }
+
+-- Mobility Domain Group
+trpzMobilityDomainInfo OBJECT IDENTIFIER ::= { trpzBasic 2 }
+
+trpzMobilityDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The mobility domain containing the switch, or a
+	zero-length string when the mobility domain is
+	unknown."
+    ::= { trpzMobilityDomainInfo 1 }
+
+
+trpzMobilitySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The IPv4 address of the seed switch for this switch's
+	mobility domain, or the IPv4 address 0.0.0.0 if unknown."
+    ::= { trpzMobilityDomainInfo 2 }
+
+trpzMobilityMemberTableSize OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of entries in the mobility member table,
+	trpzMobilityMemberTable."
+    ::= { trpzMobilityDomainInfo 3 }
+
+trpzMobilityMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzMobilityMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table of members of the mobility domain, indexed
+	 by the member IPv4 address."
+    ::= {trpzMobilityDomainInfo 4 }
+
+trpzMobilityMemberEntry OBJECT-TYPE
+    SYNTAX      TrpzMobilityMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"An entry in the trpzMobilityMemberTable table."
+    INDEX   { trpzMobilityMemberEntryAddr }
+    ::= { trpzMobilityMemberTable 1 }
+
+TrpzMobilityMemberEntry ::= SEQUENCE {
+    trpzMobilityMemberEntryAddr     IpAddress
+    }
+
+-- a row can't have _all_ columns with MAX-ACCESS of not-accessible
+-- (would mean there is nothing to retrieve)
+
+trpzMobilityMemberEntryAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"IPv4 address of a member of the mobility domain."
+    ::= { trpzMobilityMemberEntry 1 }
+
+-- License Information Group
+trpzLicenseInfoGroup OBJECT IDENTIFIER ::= { trpzBasic 3 }
+
+trpzLicenseInfoTableSize OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of entries in the license table,
+	trpzLicenseInfoTable."
+    ::= { trpzLicenseInfoGroup 1 }
+
+trpzLicenseInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzLicenseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table of installed licenses on the switch. The
+	licences provide additional capabilities over
+	the default capabilities of the switch."
+	::= { trpzLicenseInfoGroup 2 }
+
+trpzLicenseInfoEntry OBJECT-TYPE
+    SYNTAX  TrpzLicenseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"A license table entry."
+    INDEX { trpzLicenseInfoEntryFeature }
+    ::= { trpzLicenseInfoTable 1 }
+
+TrpzLicenseInfoEntry ::= SEQUENCE {
+    trpzLicenseInfoEntryFeature     TrpzLicenseFeature,
+    trpzLicenseInfoEntryValue       INTEGER,
+    trpzLicenseInfoEntryDescr       DisplayString
+    }
+
+trpzLicenseInfoEntryFeature OBJECT-TYPE
+    SYNTAX TrpzLicenseFeature
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"The feature being reported on"
+    ::= { trpzLicenseInfoEntry 1 }
+
+trpzLicenseInfoEntryValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The value of the feature enabled, for example
+	a feature may have multiple levels of licensing,
+	so the value will very with the license level."
+    ::= { trpzLicenseInfoEntry 2 }
+
+trpzLicenseInfoEntryDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"A human interpretable description of this license,
+	for example, '120 APs or DAPs.'"
+    ::= { trpzLicenseInfoEntry 3 }
+
+
+END

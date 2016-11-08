@@ -1,0 +1,188 @@
+TRAPEZE-NETWORKS-CLUSTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    TrpzApNum
+        FROM TRAPEZE-NETWORKS-AP-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzClusterMib MODULE-IDENTITY
+    LAST-UPDATED "201102240001Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Cluster objects for Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB;
+        PAM = Primary AP Manager;
+        SAM = Secondary AP Manager.
+
+        Copyright 2010-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201102240001Z"
+    DESCRIPTION "v1.0.1: Initial version, for 7.5 release"
+
+    ::= { trpzMibs 21 }
+
+
+-- Textual conventions
+
+
+-- Object definitions
+
+--
+-- The Cluster MIB Tree
+--
+
+trpzClusterMibObjects      OBJECT IDENTIFIER ::= { trpzClusterMib 1 }
+
+
+-- ================
+-- Cluster AP table
+
+trpzClusterApAssignmentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzClusterApAssignmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the AP manager assignments
+        for the APs currently present and managed
+        by the Cluster this AC is part of."
+    ::= { trpzClusterMibObjects 1 }
+
+trpzClusterApAssignmentEntry OBJECT-TYPE
+    SYNTAX      TrpzClusterApAssignmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular AP assignment in this Cluster."
+
+    INDEX   { trpzClusterApAssignApNum }
+
+    ::= { trpzClusterApAssignmentTable 1 }
+
+TrpzClusterApAssignmentEntry ::= SEQUENCE {
+        trpzClusterApAssignApNum  TrpzApNum,
+
+        trpzClusterApAssignPamIp           IpAddress,
+        trpzClusterApAssignSamIp           IpAddress,
+        trpzClusterApAssignConnectedToPam  TruthValue,
+        trpzClusterApAssignConnectedToSam  TruthValue
+    }
+
+trpzClusterApAssignApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The AP Number."
+    ::= { trpzClusterApAssignmentEntry 1 }
+
+trpzClusterApAssignPamIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the assigned Primary AP Manager controller."
+    ::= { trpzClusterApAssignmentEntry 2 }
+
+trpzClusterApAssignSamIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the assigned Secondary AP Manager controller.
+        A value of 0.0.0.0 means this AP does not have an assigned SAM."
+    ::= { trpzClusterApAssignmentEntry 3 }
+
+trpzClusterApAssignConnectedToPam OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this AP is currently connected
+        to its assigned Primary AP Manager controller."
+    ::= { trpzClusterApAssignmentEntry 4 }
+
+trpzClusterApAssignConnectedToSam OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this AP is currently connected
+        to its assigned Secondary AP Manager controller."
+    ::= { trpzClusterApAssignmentEntry 5 }
+
+
+-- ==========================================================================
+--
+-- Conformance
+--
+
+trpzClusterConformance  OBJECT IDENTIFIER ::= { trpzClusterMib 2 }
+trpzClusterCompliances  OBJECT IDENTIFIER ::= { trpzClusterConformance 1 }
+trpzClusterGroups       OBJECT IDENTIFIER ::= { trpzClusterConformance 2 }
+
+
+-- Compliance
+
+
+trpzClusterCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement Cluster MIB.
+
+        This compliance statement is for releases 7.5 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzClusterMib)
+
+    MANDATORY-GROUPS {
+            trpzClusterApAssignmentGroup
+            }
+
+    ::= { trpzClusterCompliances 1 }
+
+
+-- Units of Conformance
+
+
+trpzClusterApAssignmentGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClusterApAssignPamIp,
+                 trpzClusterApAssignSamIp,
+                 trpzClusterApAssignConnectedToPam,
+                 trpzClusterApAssignConnectedToSam
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Cluster AP Assignments info in releases 7.5 and greater."
+        ::= { trpzClusterGroups 1 }
+
+
+END
