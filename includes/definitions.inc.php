@@ -2851,4 +2851,3 @@ if (!isset($config['title_image'])) {
     $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.png';
 }
 
-require_once $config['install_dir'] . '/includes/group-definitions.inc.php';
