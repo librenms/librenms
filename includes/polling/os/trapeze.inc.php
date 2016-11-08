@@ -9,6 +9,6 @@ if ($device['os'] == 'trapeze') {
     $domain = snmp_get($device, 'trpzMobilityDomainName.0', '-OQv', 'TRAPEZE-NETWORKS-BASIC-MIB', 'trapeze');
 
     if ($domain) {
-       $features = "Cluster: $domain";
+        $features = "Cluster: $domain";
     }
 }
