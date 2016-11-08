@@ -37,6 +37,7 @@ $runtime_stats = array('snmpget' => 0, 'snmpwalk' => 0);
 $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 
 require $install_dir . '/includes/common.php';
+require $install_dir . '/html/includes/functions.inc.php';
 if (getenv('SNMPSIM')) {
     require $install_dir . '/includes/functions.php';
 } else {
