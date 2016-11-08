@@ -64,8 +64,8 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     } elseif ($device['os'] == 'unifi') {
         echo 'Checking Unifi Wireless clients... ';
 
-        $clients = snmp_walk($device, '.1.3.6.1.4.1.41112.1.6.1.2.1.8', '-Oqv');
-        $bands = snmp_walk($device, '.1.3.6.1.4.1.41112.1.6.1.2.1.9', '-Oqv');
+        $clients = snmp_walk($device, 'unifiVapNumStations', '-Oqv', 'UBNT-UniFi-MIB');
+        $bands = snmp_walk($device, 'unifiVapRadio', '-Oqv', 'UBNT-UniFi-MIB');
         $clients = explode("\n", $clients);
         $bands = explode("\n", $bands);
         foreach ($bands as $index => $band_index) {
@@ -80,27 +80,19 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
     }
 
-    if (is_numeric($wificlients1)) {
+    // Loop through all $wificlients# and data_update()
+    $i = 1;
+    while (is_numeric(${'wificlients'.$i})) {
         $tags = array(
             'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
-            'rrd_name'  => array('wificlients', 'radio1'),
-            'radio'     => 1,
+            'rrd_name'  => array('wificlients', "radio$i"),
+            'radio'     => $i,
         );
-        data_update($device, 'wificlients', $tags, $wificlients1);
+        data_update($device, 'wificlients', $tags, ${'wificlients'.$i});
         $graphs['wifi_clients'] = true;
+        unset(${'wificlients'.$i});
+        $i++;
     }
-
-    if (is_numeric($wificlients2)) {
-        $tags = array(
-            'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
-            'rrd_name'  => array('wificlients', 'radio2'),
-            'radio'     => 2,
-        );
-        data_update($device, 'wificlients', $tags, $wificlients2);
-        $graphs['wifi_clients'] = true;
-    }
-
-    unset($wificlients2, $wificlients1);
 }//end if
 
 echo "\n";
