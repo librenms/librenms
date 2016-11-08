@@ -11,11 +11,11 @@
  */
 
 if (strstr($device['hardware'], 'Dell')) {
-    $temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', array() , 'MIB-Dell-10892');
+    $temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', array(), 'MIB-Dell-10892');
     $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 
     if (is_array($temp)) {
-        foreach($temp as $index => $entry) {
+        foreach ($temp as $index => $entry) {
             $descr = $temp[$index]['coolingDeviceLocationName'];
             $value = $temp[$index]['coolingDeviceReading'];
             $lowlimit = $temp[$index]['coolingDeviceLowerCriticalThreshold'];

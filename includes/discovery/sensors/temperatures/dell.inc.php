@@ -11,12 +11,12 @@
  */
 
 if (strstr($device['hardware'], 'Dell')) {
-    $temp = snmpwalk_cache_multi_oid($device, 'temperatureProbeTable', array() , 'MIB-Dell-10892');
+    $temp = snmpwalk_cache_multi_oid($device, 'temperatureProbeTable', array(), 'MIB-Dell-10892');
     $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.20.1.6.';
     $divisor = '10';
 
     if (is_array($temp)) {
-        foreach($temp as $index => $entry) {
+        foreach ($temp as $index => $entry) {
             $descr = $temp[$index]['temperatureProbeLocationName'];
             $value = $temp[$index]['temperatureProbeReading'] / $divisor;
             $lowlimit = $temp[$index]['temperatureProbeLowerCriticalThreshold'] / $divisor;
