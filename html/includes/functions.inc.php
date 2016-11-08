@@ -1364,3 +1364,9 @@ function file_download($filename, $content)
     header('Pragma: public');
     echo $content;
 }
+
+function get_rules_from_json()
+{
+    global $config;
+    return json_decode(file_get_contents($config['install_dir'] . '/misc/alert_rules.json'), true);
+}

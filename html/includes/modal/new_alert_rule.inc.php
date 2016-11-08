@@ -31,6 +31,7 @@ if (is_admin() !== false) {
             <input type="hidden" name="device_id" id="device_id" value="">
             <input type="hidden" name="alert_id" id="alert_id" value="">
             <input type="hidden" name="type" id="type" value="create-alert-item">
+            <input type="hidden" name="template_id" id="template_id" value="">
         <div class="form-group">
             <div class="col-sm-12">
                 <span id="ajax_response"></span>
@@ -170,6 +171,25 @@ $('#create-alert').on('show.bs.modal', function (event) {
     var device_id = button.data('device_id');
     var alert_id = button.data('alert_id');
     var modal = $(this)
+    var template_id = $('#template_id').val();
+    $('#template_id').val('');
+    var arr = [];
+    if (template_id >= 0) {
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: { type: "parse-alert-rule", alert_id: null, template_id: template_id },
+            dataType: "json",
+            success: function(output) {
+                $.each ( output['rules'], function( key, value ) {
+                    arr.push(value);
+                });
+                $('#response').data('tagmanager').populate(arr);
+                $('#name').val(output['name']);
+                $('#device_id').val("-1");
+            }
+        });
+    }
     $('#device_id').val(device_id);
     $('#alert_id').val(alert_id);
     $('#tagmanager').tagmanager();
@@ -182,7 +202,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
            tagFieldName: 'maps[]',
            initialCap: false
     });
-    if( $('#alert_id').val() == '' ) {
+    if( $('#alert_id').val() == '' || template_id == '') {
         $('#preseed-maps').show();
     } else {
         $('#preseed-maps').hide();
@@ -193,7 +213,6 @@ $('#create-alert').on('show.bs.modal', function (event) {
         data: { type: "parse-alert-rule", alert_id: alert_id },
         dataType: "json",
         success: function(output) {
-            var arr = [];
             $.each ( output['rules'], function( key, value ) {
                 arr.push(value);
             });
