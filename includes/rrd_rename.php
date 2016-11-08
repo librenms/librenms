@@ -3,6 +3,8 @@
  * rrd_rename.php
  *
  * Renames rrd files in a similar way to schema updates
+ * -d debug
+ * -f force
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,32 +30,39 @@ include 'config.php';
 include 'includes/definitions.inc.php';
 include 'includes/functions.php';
 
+// get current rrd revision
 $insert = false;
-$starting_rrd_rev = @dbFetchCell('SELECT `version` FROM `rrd_rename` ORDER BY `version` DESC LIMIT 1');
-
-if (!$starting_rrd_rev) {
-    $starting_rrd_rev = 0;
+$rrd_rev = @dbFetchCell("SELECT `version` FROM `versions` WHERE `component`='rrd' ORDER BY `version` DESC LIMIT 1");
+$options = getopt('df');
+$debug = isset($options['d']);
+if (!$rrd_rev || isset($options['f'])) {
+    $rrd_rev = 0;
 }
-$current_rrd_rev = $starting_rrd_rev;
+$new_rrd_rev = $rrd_rev;
 
+// get list of rrd rename operations
 $dir = $config['install_dir'] . '/schema/rrd/';
-echo $dir . PHP_EOL;
 $files = array_diff(scandir($dir), array('..', '.'));
 
-foreach ($files as $file) {
-    $file_rev = substr($file, 0, strpos($file, '.'));
+try {
+    foreach ($files as $file) {
+        $file_rev = substr($file, 0, strpos($file, '.'));
 
-    if (intval($file_rev) > intval($starting_rrd_rev)) {
-        echo "Rename operation $file_rev\n";
-        require "$dir/$file";
-        $renamer->run();
-        $current_rrd_rev = $file_rev;
+        if (intval($file_rev) > intval($rrd_rev)) {
+            require "$dir/$file";  // include the operation file, should define $renamer
+            echo "Rename operation $file_rev: " . $renamer->getDesc() . PHP_EOL;
+            $renamer->run();
+            $new_rrd_rev = $file_rev;
+        }
     }
-}
 
-
-if ($starting_rrd_rev == 0) {
-    dbInsert(array('version' => $current_rrd_rev), 'rrd_rename');
-} else {
-    dbUpdate(array('version' => $current_rrd_rev), 'rrd_rename');
+    if ($new_rrd_rev > $rrd_rev) {  // insert/update the rrd rename version, if needed
+        if ($rrd_rev === 0) {
+            dbInsert(array('component' => 'rrd', 'version' => $new_rrd_rev), 'versions');
+        } else {
+            dbUpdate(array('component' => 'rrd', 'version' => $new_rrd_rev), 'versions');
+        }
+    }
+} catch (Exception $e) {
+    c_echo('%rRename failed%n: ' . $e->getMessage() . PHP_EOL);
 }

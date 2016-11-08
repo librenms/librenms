@@ -1,1 +1,1 @@
-CREATE TABLE `rrd_rename` ( `version` TEXT NOT NULL )
+CREATE TABLE `versions` ( `component` TEXT NOT NULL , `version` TEXT NOT NULL , PRIMARY KEY (`component`(255)))

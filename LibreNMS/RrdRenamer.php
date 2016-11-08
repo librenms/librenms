@@ -25,6 +25,11 @@
 
 namespace LibreNMS;
 
+use Exception;
+use LibreNMS\Exceptions\FileExistsException;
+use LibreNMS\Exceptions\FileNotFoundException;
+use LibreNMS\Exceptions\RenameFailedException;
+
 class RrdRenamer
 {
     private $desc;
@@ -37,7 +42,7 @@ class RrdRenamer
     /**
      * RrdRenamer constructor.
      *
-     * The function is passed the arguments $device and the current filename without extension or path
+     * The function is passed the current filename without extension or path and $device
      * and should return the new filename without extension or path
      *
      * @param string $desc string description of this operation for display
@@ -53,31 +58,20 @@ class RrdRenamer
 
     /**
      * Run this rrd file rename operation
-     *
-     * @return bool returns if the operation was successful
      */
     public function run()
     {
-        $files = glob($this->pattern);
-
-        if (!empty($files)) {
-            echo "Running: $this->desc\n";
-        }
+        $files = glob($this->getPattern());
+        d_echo('Found ' . count($files) . " files.\n");
 
         foreach ($files as $file) {
             $device = $this->getDevice($file);
 
             $oldname = basename($file, '.rrd');
-            $newname = call_user_func($this->renameFunction, $device, $oldname);
+            $newname = call_user_func($this->renameFunction, $oldname, $device);
 
-            echo " ${device['hostname']}: $oldname > $newname ";
-
-            $success = rrd_file_rename($device, $oldname, $newname);
-
-            echo $success ? 'Success' : 'Failed', PHP_EOL;
+            $this->renameFile($device, $oldname, $newname);
         }
-
-        return true;
     }
 
     /**
@@ -94,6 +88,49 @@ class RrdRenamer
     }
 
     /**
+     * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
+     *
+     * @param array $device Device object
+     * @param string $oldname RRD name array as used with rrd_name()
+     * @param string $newname RRD name array as used with rrd_name()
+     * @throws FileExistsException Destination file exists
+     * @throws FileNotFoundException Source file does not exist
+     * @throws RenameFailedException Rename operation failed
+     */
+    private function renameFile($device, $oldname, $newname)
+    {
+        $oldrrd = rrd_name($device['hostname'], $oldname);
+        $newrrd = rrd_name($device['hostname'], $newname);
+
+        if (!is_file($oldrrd)) {
+            $msg = "$oldrrd not found";
+            throw new FileNotFoundException($msg);
+        }
+
+        if (is_file($newrrd)) {
+            $msg = "Destination file $newrrd exists";
+            throw new FileExistsException($msg);
+        }
+
+        if (rename($oldrrd, $newrrd)) {
+            echo " ${device['hostname']}: $oldrrd > $newrrd\n";
+            log_event("Renamed $oldrrd to $newrrd", $device, "rrd_rename");
+        } else {
+            $msg = "Failed to rename $oldrrd to $newrrd";
+            log_event($msg, $device, "rrd_rename");
+            throw new RenameFailedException($msg);
+        }
+    }
+
+    /**
+     * @return string the description of this operation
+     */
+    public function getDesc()
+    {
+        return $this->desc;
+    }
+
+    /**
      * Get the glob() pattern that searches for files for this rename operation
      *
      * @param array $device If supplied, will return the pattern under a specific device
@@ -107,4 +144,3 @@ class RrdRenamer
         return "${config['rrd_dir']}/$hostname/$this->pattern.rrd";
     }
 }
-

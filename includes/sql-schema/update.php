@@ -23,11 +23,7 @@ if (!isset($debug)) {
     include 'includes/functions.php';
 
     $options = getopt('d');
-    if (isset($options['d'])) {
-        $debug = true;
-    } else {
-        $debug = false;
-    }
+    $debug = isset($options['d']);
 }
 
 $insert = 0;
