@@ -251,8 +251,8 @@ function poll_device($device, $options)
             d_echo ("Global module enabled: ".$module_status. "\n");
             d_echo ("OS module enabled    : ".$os_module_status. "\n");
             d_echo ("Device module enabled: ". $attribs['discover_' . $module]. "\n");
-            if ($force_module === true || 
-                $attribs['poll_'.$module] || 
+            if ($force_module === true ||
+                $attribs['poll_'.$module] ||
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
                 ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
                 $module_start = 0;

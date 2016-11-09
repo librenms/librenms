@@ -139,11 +139,11 @@ function discover_device($device, $options = null)
         d_echo ("Global module enabled: ".$module_status. "\n");
         d_echo ("OS module enabled    : ".$os_module_status. "\n");
         d_echo ("Device module enabled: ". $attribs['discover_' . $module]. "\n");
-        if ($force_module === true || 
+        if ($force_module === true ||
             $attribs['discover_' . $module] ||
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
             ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
-            $module_start = microtime(true);
+            $module_start = microtime(true)
             echo "#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
