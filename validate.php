@@ -172,7 +172,14 @@ if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
 
 $tz = ini_get('date.timezone');
 if (empty($tz)) {
-    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone');
+    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone.');
+}
+
+$sh_tz = rtrim(shell_exec('date +%Z'));
+$php_tz = date('T');
+
+if ($sh_tz !== $php_tz) {
+    print_fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
 }
 
 // Test transports
