@@ -136,9 +136,9 @@ function discover_device($device, $options = null)
     }
     foreach ($config['discovery_modules'] as $module => $module_status) {
         $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
-        d_echo ("Global module enabled: ".$module_status. "\n");
-        d_echo ("OS module enabled    : ".$os_module_status. "\n");
-        d_echo ("Device module enabled: ". $attribs['discover_' . $module]. "\n");
+        d_echo("Global module enabled: ".$module_status. "\n");
+        d_echo("OS module enabled    : ".$os_module_status. "\n");
+        d_echo("Device module enabled: ". $attribs['discover_' . $module]. "\n");
         if ($force_module === true ||
             $attribs['discover_' . $module] ||
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
