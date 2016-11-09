@@ -13,6 +13,7 @@
       <tr>
         <th>Module</th>
         <th>Global</th>
+        <th>OS</th>
         <th>Device</th>
         <th></th>
       </tr>
@@ -21,6 +22,7 @@
 $poller_modules = $config['poller_modules'];
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
+    $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
     echo('
       <tr>
         <td><strong>'.$module.'</strong></td>
@@ -29,6 +31,18 @@ foreach ($poller_modules as $module => $module_status) {
 
     if ($module_status == 1) {
         echo('<span class="text-success">Enabled</span>');
+    } else {
+        echo('<span class="text-danger">Disabled</span>');
+    }
+
+    echo('
+        </td>
+        <td>');
+
+    if ($os_module_status == 1) {
+        echo('<span class="text-success">Enabled</span>');
+    } elseif (!isset($os_module_status)) {
+        echo('<span>Unset</span>');
     } else {
         echo('<span class="text-danger">Disabled</span>');
     }
@@ -78,6 +92,7 @@ foreach ($poller_modules as $module => $module_status) {
       <tr>
         <th>Module</th>
         <th>Global</th>
+        <th>OS</th>
         <th>Device</th>
         <th></th>
       </tr>
@@ -87,6 +102,7 @@ foreach ($poller_modules as $module => $module_status) {
 $discovery_modules = $config['discovery_modules'];
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
+    $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
     echo('
       <tr>
         <td>
@@ -97,6 +113,18 @@ foreach ($discovery_modules as $module => $module_status) {
 
     if ($module_status == 1) {
         echo('<span class="text-success">Enabled</span>');
+    } else {
+        echo('<span class="text-danger">Disabled</span>');
+    }
+
+    echo('
+        </td>
+        <td>');
+
+    if ($os_module_status == 1) {
+        echo('<span class="text-success">Enabled</span>');
+    } elseif (!isset($os_module_status)) {
+        echo('<span>Unset</span>');
     } else {
         echo('<span class="text-danger">Disabled</span>');
     }
