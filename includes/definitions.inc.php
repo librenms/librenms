@@ -1871,8 +1871,8 @@ $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'pbn';
 
 // PBN CPE, Pacific Broadband Networks
-$os = 'pbn-cpe';
-$config['os'][$os]['text']             = 'PBN CPE';
+$os = 'pbn-cp100';
+$config['os'][$os]['text']             = 'PBN P2P CP100 Series Platform';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
