@@ -1,0 +1,71 @@
+TRAPEZE-NETWORKS-BASIC-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzBasicTc MODULE-IDENTITY
+    LAST-UPDATED "200810230004Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        Copyright 2008 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200810230004Z"
+    DESCRIPTION "v1.0.4: initial version, for 7.1 release"
+
+    ::= { trpzMibs 12 }
+
+
+TrpzIpPort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS      current
+    DESCRIPTION
+        "An UDP or TCP port number."
+    SYNTAX Unsigned32 (1..65535)
+
+TrpzPhysPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS      current
+    DESCRIPTION
+        "Physical port number."
+    SYNTAX  Unsigned32 (1..1024)
+
+TrpzPhysPortNumberOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS      current
+    DESCRIPTION
+        "This textual convention is an extension of the
+        TrpzPhysPortNumber convention.
+        The latter defines a greater than zero value used to identify
+        a physical port.
+        This extension permits the additional value of zero.
+        A zero value means 'none', 'unknown' or 'not applicable'.
+        Each object using this textual convention should document
+        the meaning of physical port number zero."
+    SYNTAX  Unsigned32 (0 | 1..1024)
+
+
+END

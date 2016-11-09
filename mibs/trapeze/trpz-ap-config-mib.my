@@ -1,0 +1,4690 @@
+TRAPEZE-NETWORKS-AP-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    TrpzApNum, TrpzApAttachType, TrpzApSerialNum,
+    TrpzApFingerprint, TrpzApBias,
+    TrpzApRadioIndex, TrpzRadioMode, TrpzRadioType,
+    TrpzPowerLevel, TrpzChannelNum,
+    TrpzRadioChannelWidth, TrpzApPowerMode,
+    TrpzRadioAntennaLocation, TrpzApLedMode
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzSyslogSeverity
+        FROM TRAPEZE-NETWORKS-EXTERNAL-SERVER-TC
+    TrpzPhysPortNumberOrZero
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzApConfigMib MODULE-IDENTITY
+    LAST-UPDATED "201306210324Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "AP Configuration objects for Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2009-2013 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201306210324Z"
+    DESCRIPTION "v3.2.4: Obsoleted two objects (not supported anymore):
+                    trpzApConfRadioConfigAutoTuneMaxTxPower,
+                    trpzApConfApTemRadioConfAutoTuneMaxTxPower.
+                (for 9.0 release)"
+
+    REVISION "201212210323Z"
+    DESCRIPTION "v3.2.3: New backup SSID mode
+                (enum value in TrpzBackupSsidMode):
+                        'always-on(4)'.
+
+                Added seven columnar objects:
+                    trpzApConfApConfigCacheConfigEnabled,
+                    trpzApConfRemoteSiteAcPollingEnabled,
+                    trpzApConfRemoteSiteRadiusServerGroupName,
+                    trpzApConfRemoteSiteRadiusDeadtime,
+                    trpzApConfRemoteSiteRadiusTimeout,
+                    trpzApConfRemoteSiteRadiusRetransmit,
+                    trpzApConfRemoteSiteRadiusNasIdType;
+
+                and one related TC:
+                    TrpzApRadiusNasIdType.
+                (for 9.0 release)"
+
+    REVISION "201210160322Z"
+    DESCRIPTION "v3.2.2: Added three tables:
+                    trpzApConfRadioProfile32Table,
+                    trpzApConfRadioProf32ServiceProfileTable,
+                    trpzApConfRadioProf32SnoopFilterTable;
+                in order to replace:
+                    trpzApConfRadioProfileTable,
+                    trpzApConfRadioProfServiceProfileTable,
+                    trpzApConfRadioProfSnoopFilterTable;
+
+                three columnar objects:
+                    trpzApConfApConfigApName2,
+                    trpzApConfRadioConfigRadioProfileName2,
+                    trpzApConfApTemRadioConfRadioProfileName2;
+                in order to replace:
+                    trpzApConfApConfigApName,
+                    trpzApConfRadioConfigRadioProfileName,
+                    trpzApConfApTemRadioConfRadioProfileName;
+
+                a columnar object in the deprecated Radio Profile table,
+                to indicate the corresponding entry in the new table:
+                    trpzApConfRadioProfRadioProfileFullName;
+
+                and a related TC:
+                    TrpzRadioProfileName32;
+                in order to replace:
+                    TrpzRadioProfileName.
+                (for 9.0 release)"
+
+    REVISION "201208060313Z"
+    DESCRIPTION "v3.1.3: Obsoleted five objects (not supported anymore):
+                    trpzApConfRadioProfAutoTune11aChannelRange,
+                    trpzApConfRadioProfAutoTuneIgnoreClientsEnabled,
+                    trpzApConfRadioProfAutoTuneChannelEnabled,
+                    trpzApConfRadioProfAutoTuneChannelHolddownInterval,
+                    trpzApConfRadioProfAutoTuneChannelChangeInterval;
+                and a related TC:
+                    TrpzRadioProfileAutoTuneChannelRange.
+                (for 8.0 release)"
+
+    REVISION "201208050302Z"
+    DESCRIPTION "v3.0.2: Updated the description of
+                    trpzApConfServProfM2UConversionEnabled
+                to reflect the fact that multicast to unicast conversion
+                is performed for all multicast IPv4 traffic, not just
+                video traffic.
+                This will be published in 7.7 MR2 release."
+
+    REVISION "201203080301Z"
+    DESCRIPTION "v3.0.1: Added three tables:
+                    trpzApConfRadioSnoopFilterTable,
+                    trpzApConfSnoopObserverTable,
+                    trpzApConfRemoteSiteTable;
+
+                ten columnar objects:
+                    trpzApConfApConfigRemoteSiteName,
+                    trpzApConfApConfigPathMtu,
+                    trpzApConfApConfigHighLatencyModeEnabled,
+
+                    trpzApConfServProfBackupSsidMode,
+                    trpzApConfServProfBackupSsidTimeout,
+                    trpzApConfServProfBackupSsidKeepClients,
+
+                    trpzApConfServProfM2UConversionEnabled,
+                    trpzApConfServProfWebPortalLogoutForm,
+
+                    trpzApConfSnoopFilterObserverAddrType,
+                    trpzApConfSnoopFilterObserverAddr;
+
+                and two related TCs:
+                    TrpzBackupSsidMode,
+                    TrpzSnoopObserverTxMode.
+                (for 7.7 release)"
+
+    REVISION "201102030200Z"
+    DESCRIPTION "v2.0.0: Added 11 objects and related TCs:
+                    trpzApConfApConfigLldpMode,
+                    trpzApConfApConfigLldpMedEnabled,
+                    trpzApConfApConfigLldpMedExtPowerViaMdiTlvSelected,
+                    trpzApConfApConfigLldpMedInventoryTlvSelected,
+
+                    trpzApConfApConfigApTunnelEnabled,
+
+                    trpzApConfApConfigDataSecurityEnabled,
+                    trpzApConfApConfigWanOutageModeEnabled,
+                    trpzApConfApConfigWanOutageExtendedTimeout,
+                    trpzApConfApConfigWanOutageEvaluationPeriod,
+
+                    trpzApConfRadioProfRFSpectralScanModeEnabled,
+                    trpzApConfRadioProfRFSpectralScanPriority.
+
+                Obsoleted four objects (not supported anymore):
+                    trpzApConfServProfWpaIeCipherWep40Enabled,
+                    trpzApConfServProfWpaIeCipherWep104Enabled,
+                    trpzApConfServProfRsnIeCipherWep40Enabled,
+                    trpzApConfServProfRsnIeCipherWep104Enabled.
+
+                (for 7.5 release)"
+
+    REVISION "201003050121Z"
+    DESCRIPTION "v1.2.1: made a few objects writable:
+                    trpzApConfRadioProfBeaconInterval,
+                    trpzApConfRadioProfRtsThreshold,
+                    trpzApConfRadioProfFragThreshold
+                (for 7.5 release)"
+
+    REVISION "200911190108Z"
+    DESCRIPTION "v1.0.8: Initial version, for 7.1 release"
+
+    ::= { trpzMibs 14 }
+
+
+-- Textual conventions
+
+
+TrpzApTemplateName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "AP Template Name, consists of printable ASCII characters
+        between 0x21 (!), and 0x7d (}) with no leading, embedded,
+        or trailing space.
+        Cannot be a zero length string."
+    SYNTAX       OCTET STRING (SIZE (1..32))
+
+TrpzRadioProfileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       deprecated
+    DESCRIPTION
+        "Radio Profile Name, consists of printable ASCII characters
+        between 0x21 (!), and 0x7e (~) with no leading, embedded,
+        or trailing space.
+        Cannot be a zero length string.
+        Deprecated by TrpzRadioProfileName32, which allows
+        Radio Profile Names up to 32 characters long.
+        Radio Profile Names longer than 16 characters will be truncated,
+        last four characters will be replaced by tilde (~) and three digits.
+
+        Example:
+        '12345678901234567890' will appear as '123456789012~001'
+        '12345678901234569999' will appear as '123456789012~002'
+        etc.
+        In case of a name collision, for example if '123456789012~002'
+        is the full name of another Radio Profile, the next available
+        three-digit suffix will be used:
+        '12345678901234569999' will appear as '123456789012~003' instead."
+    SYNTAX       OCTET STRING (SIZE (1..16))
+
+TrpzServiceProfileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Service Profile Name, consists of printable ASCII characters
+        between 0x21 (!), and 0x7d (}) with no leading, embedded,
+        or trailing space.
+        Cannot be a zero length string."
+    SYNTAX       OCTET STRING (SIZE (1..32))
+
+TrpzSnoopFilterName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Snoop Filter Name, consists of printable ASCII characters
+        between 0x21 (!), and 0x7d (}) with no leading, embedded,
+        or trailing space.
+        Cannot be a zero length string."
+    SYNTAX       OCTET STRING (SIZE (1..15))
+
+TrpzServiceProfileSsidType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of Service Types provided on a service profile."
+    SYNTAX       INTEGER {
+                     clear   (1),
+                     crypto  (2)
+                 }
+
+TrpzServiceProfile11nMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of 802.11n modes for a service profile."
+    SYNTAX       INTEGER {
+                     enable   (1),
+                     disable  (2),
+                     required (3)
+                 }
+
+TrpzServiceProfile11nFrameAggregationType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of 802.11n frame aggregation types
+        for a service profile."
+    SYNTAX       INTEGER {
+                     msdu    (1),
+                     mpdu    (2),
+                     all     (3),
+                     disable (4)
+                 }
+
+TrpzServiceProfile11nMsduMaxLength ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of 802.11n A-MSDU maximum lengths
+        for a service profile."
+    SYNTAX       INTEGER {
+                     msdu-4k  (1),
+                     msdu-8k  (2)
+                 }
+
+TrpzServiceProfile11nMpduMaxLength ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of 802.11n A-MPDU maximum lengths
+        for a service profile."
+    SYNTAX       INTEGER {
+                     mpdu-8k   (1),
+                     mpdu-16k  (2),
+                     mpdu-32k  (3),
+                     mpdu-64k  (4)
+                 }
+
+TrpzServiceProfileAuthFallthruType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of Authentication Fallthrough types
+        for a service profile."
+    SYNTAX       INTEGER {
+                     none            (1),
+                     web-auth        (2),
+                     web-aaa-portal  (3),
+                     last-resort     (4)
+                 }
+
+TrpzServiceProfileCacMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of Call Admission Control types
+        for a service profile."
+    SYNTAX       INTEGER {
+                     none     (1),
+                     session  (2),
+                     vendor   (3)
+                 }
+
+TrpzRadioProfileCountermeasuresMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of the Countermeasure modes for a radio profile."
+    SYNTAX       INTEGER {
+                     none         (1),
+                     all          (2),
+                     rogue        (3),
+                     configured   (4)
+                 }
+
+TrpzRadioProfileRFScanChannelScope ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of RF scanning channel scopes
+        for a radio profile."
+    SYNTAX       INTEGER {
+                     operating     (1),
+                     regulatory    (2),
+                     all           (3)
+                 }
+
+TrpzRadioProfileAutoTuneChannelRange ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION
+        "Enumeration of Auto-Tune channel ranges
+        for a radio profile.
+        Obsoleted: not supported anymore."
+    SYNTAX       INTEGER {
+                     all-bands    (1),
+                     lower-bands  (2)
+                 }
+
+TrpzRadioProfileRFScanMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of RF scanning modes for a radio profile."
+    SYNTAX       INTEGER {
+                     active   (1),
+                     passive  (2)
+                 }
+
+TrpzApLldpMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of LLDP modes for an AP."
+    SYNTAX       INTEGER {
+                     disabled  (1),
+                     tx        (2)
+                 }
+
+TrpzRadioProfileRFSpectralScanPriority ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of Spectral Scan Priorities for a radio profile."
+    SYNTAX       INTEGER {
+                     data-first  (1),
+                     scan-first  (2)
+                 }
+
+TrpzBackupSsidMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of remote-site backup SSID modes."
+    SYNTAX       INTEGER {
+                     disabled     (1),
+                     outage-only  (2),
+                     dual         (3),
+                     always-on    (4)
+                 }
+
+TrpzSnoopObserverTxMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of transmission modes for snoop packets."
+    SYNTAX       INTEGER {
+                     tzsp           (1),
+                     batched-tzsp   (2)
+                 }
+
+TrpzRadioProfileName32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Radio Profile Name, consists of printable ASCII characters
+        between 0x21 (!), and 0x7e (~) with no leading, embedded,
+        or trailing space.
+        Cannot be a zero length string.
+        Deprecates TrpzRadioProfileName."
+    SYNTAX       OCTET STRING (SIZE (1..32))
+
+TrpzApRadiusNasIdType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration of NAS-ID values for
+        the RADIUS server group of a remote site."
+    SYNTAX       INTEGER {
+                     ap-name        (1),
+                     ap-serial-id   (2)
+                 }
+
+
+--
+-- The AP Config MIB Tree
+--
+
+trpzApConfigMibObjects  OBJECT IDENTIFIER ::= { trpzApConfigMib 1 }
+
+-- Reserved for future scalar objects (high-level configuration info):
+-- trpzApConfigGlobalObjects  OBJECT IDENTIFIER ::= { trpzApConfigMibObjects 1 }
+
+
+-- Object definitions
+
+
+-- ==================================
+-- AP Config table
+
+trpzApConfApConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfApConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently configured
+        on this AC."
+    ::= { trpzApConfigMibObjects 2 }
+
+trpzApConfApConfigEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfApConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration for a particular AP that could be attached to the AC."
+
+    INDEX   { trpzApConfApConfigApNum }
+
+    ::= { trpzApConfApConfigTable 1 }
+
+TrpzApConfApConfigEntry ::= SEQUENCE {
+        trpzApConfApConfigApNum           TrpzApNum,
+
+        trpzApConfApConfigApAttachType    TrpzApAttachType,
+        trpzApConfApConfigPhysPortNum     TrpzPhysPortNumberOrZero,
+        trpzApConfApConfigApSerialNum     TrpzApSerialNum,
+        trpzApConfApConfigApModelName     DisplayString,
+        trpzApConfApConfigFingerprint     TrpzApFingerprint,
+        trpzApConfApConfigBias            TrpzApBias,
+        trpzApConfApConfigApTimeout       Unsigned32,
+
+        trpzApConfApConfigApName          DisplayString,
+        trpzApConfApConfigContact         DisplayString,
+        trpzApConfApConfigLocation        DisplayString,
+
+        trpzApConfApConfigBlinkEnabled               TruthValue,
+        trpzApConfApConfigForceImageDownloadEnabled  TruthValue,
+        trpzApConfApConfigFirmwareUpgradeEnabled     TruthValue,
+        trpzApConfApConfigLocalSwitchingEnabled      TruthValue,
+
+        trpzApConfApConfigPowerMode       TrpzApPowerMode,
+        trpzApConfApConfigLedMode         TrpzApLedMode,
+
+        trpzApConfApConfigDescription     DisplayString,
+
+        trpzApConfApConfigLldpMode                          TrpzApLldpMode,
+        trpzApConfApConfigLldpMedEnabled                    TruthValue,
+        trpzApConfApConfigLldpMedExtPowerViaMdiTlvSelected  TruthValue,
+        trpzApConfApConfigLldpMedInventoryTlvSelected       TruthValue,
+
+        trpzApConfApConfigApTunnelEnabled  TruthValue,
+
+        trpzApConfApConfigDataSecurityEnabled  TruthValue,
+
+        trpzApConfApConfigWanOutageModeEnabled       TruthValue,
+        trpzApConfApConfigWanOutageExtendedTimeout   Unsigned32,
+        trpzApConfApConfigWanOutageEvaluationPeriod  Unsigned32,
+
+        trpzApConfApConfigRemoteSiteName  DisplayString,
+
+        trpzApConfApConfigPathMtu  Unsigned32,
+
+        trpzApConfApConfigHighLatencyModeEnabled  TruthValue,
+
+        trpzApConfApConfigApName2  DisplayString,
+
+        trpzApConfApConfigCacheConfigEnabled  TruthValue
+    }
+
+trpzApConfApConfigApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this AP (administratively assigned)."
+    ::= { trpzApConfApConfigEntry 1 }
+
+trpzApConfApConfigApAttachType OBJECT-TYPE
+    SYNTAX      TrpzApAttachType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How this AP is attached to the AC
+        (directly or via L2/L3 network)."
+    ::= { trpzApConfApConfigEntry 2 }
+
+trpzApConfApConfigPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the physical port used to attach this AP.
+        Only valid for directly attached APs, otherwise will be zero."
+    ::= { trpzApConfApConfigEntry 3 }
+
+trpzApConfApConfigApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number used to identify this AP.
+        Only valid for network attached APs,
+        otherwise will be a zero length string."
+    ::= { trpzApConfApConfigEntry 4 }
+
+trpzApConfApConfigApModelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this AP."
+    ::= { trpzApConfApConfigEntry 5 }
+
+trpzApConfApConfigFingerprint OBJECT-TYPE
+    SYNTAX      TrpzApFingerprint
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RSA key fingerprint configured on this AP (binary value:
+        it is the MD5 hash of the public key of the RSA key pair).
+        For directly attached APs the fingerprint is a zero length string."
+    ::= { trpzApConfApConfigEntry 6 }
+
+trpzApConfApConfigBias OBJECT-TYPE
+    SYNTAX      TrpzApBias
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bias (high/low/sticky)."
+    ::= { trpzApConfApConfigEntry 7 }
+
+trpzApConfApConfigApTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The communication timeout for this AP, in seconds."
+    ::= { trpzApConfApConfigEntry 8 }
+
+trpzApConfApConfigApName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The configured Name for this AP.
+        Names longer than 16 characters will be truncated
+        (example: 'APNamelongerthan16chars' will be shown as
+                  'APNamelongertha~').
+        Deprecated by trpzApConfApConfigApName2, which allows
+        AP Names longer than 16 characters."
+    ::= { trpzApConfApConfigEntry 9 }
+
+trpzApConfApConfigContact OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Contact information for this AP."
+    ::= { trpzApConfApConfigEntry 10 }
+
+trpzApConfApConfigLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Location information for this AP."
+    ::= { trpzApConfApConfigEntry 11 }
+
+trpzApConfApConfigBlinkEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the LED blink mode is enabled on this AP."
+    ::= { trpzApConfApConfigEntry 12 }
+
+trpzApConfApConfigForceImageDownloadEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this AP is forced to always download
+        an image from the AC upon boot."
+    ::= { trpzApConfApConfigEntry 13 }
+
+trpzApConfApConfigFirmwareUpgradeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether automatic boot firmware upgrade
+        is enabled on this AP."
+    ::= { trpzApConfApConfigEntry 14 }
+
+trpzApConfApConfigLocalSwitchingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether local switching is enabled on this AP."
+    ::= { trpzApConfApConfigEntry 15 }
+
+trpzApConfApConfigPowerMode OBJECT-TYPE
+    SYNTAX      TrpzApPowerMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mode in which this AP is supplying power to its radios."
+    ::= { trpzApConfApConfigEntry 16 }
+
+trpzApConfApConfigLedMode OBJECT-TYPE
+    SYNTAX      TrpzApLedMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LED Mode (auto/static/off)."
+    ::= { trpzApConfApConfigEntry 17 }
+
+trpzApConfApConfigDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Description for this AP."
+    ::= { trpzApConfApConfigEntry 18 }
+
+trpzApConfApConfigLldpMode OBJECT-TYPE
+    SYNTAX      TrpzApLldpMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LLDP Mode (tx/disabled)."
+    ::= { trpzApConfApConfigEntry 19 }
+
+trpzApConfApConfigLldpMedEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether LLDP-MED is enabled for this AP."
+    ::= { trpzApConfApConfigEntry 20 }
+
+trpzApConfApConfigLldpMedExtPowerViaMdiTlvSelected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether LLDP-MED Extended Power via MDI TLV
+        is selected for this AP."
+    ::= { trpzApConfApConfigEntry 21 }
+
+trpzApConfApConfigLldpMedInventoryTlvSelected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether LLDP-MED Inventory TLV is selected for this AP."
+    ::= { trpzApConfApConfigEntry 22 }
+
+trpzApConfApConfigApTunnelEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether AP to AP tunnels are enabled for this AP."
+    ::= { trpzApConfApConfigEntry 23 }
+
+trpzApConfApConfigDataSecurityEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Data Security is enabled for this AP."
+    ::= { trpzApConfApConfigEntry 24 }
+
+
+trpzApConfApConfigWanOutageModeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether WAN Outage (remote) Mode is enabled
+        for this AP."
+    ::= { trpzApConfApConfigEntry 25 }
+
+trpzApConfApConfigWanOutageExtendedTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The duration for which the AP can stay in WAN outage mode, in hours.
+        A value of zero means the AP can stay in outage mode indefinitely."
+    ::= { trpzApConfApConfigEntry 26 }
+
+trpzApConfApConfigWanOutageEvaluationPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AC connection Evaluation Period for APs in WAN Outage mode,
+        in seconds."
+    ::= { trpzApConfApConfigEntry 27 }
+
+trpzApConfApConfigRemoteSiteName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the remote site that the AP is part of.
+        An empty string means that the AP is not part of any
+        remote site."
+    ::= { trpzApConfApConfigEntry 28 }
+
+trpzApConfApConfigPathMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Maximum Transmission Unit (in bytes) for
+        communication between AP and AC.
+        The value 0 means that the MTU was not administratively configured."
+    ::= { trpzApConfApConfigEntry 29 }
+
+trpzApConfApConfigHighLatencyModeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the high-latency mode is enabled for the AP."
+    ::= { trpzApConfApConfigEntry 30 }
+
+trpzApConfApConfigApName2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Name for this AP;
+        defaults to AP<Number> (examples: 'AP01', 'AP22', 'AP333', 'AP4444');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73').
+        Deprecates trpzApConfApConfigApName."
+    ::= { trpzApConfApConfigEntry 31 }
+
+trpzApConfApConfigCacheConfigEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the configuration of the AP is
+        saved on the AP itself, so that it won't be lost after reboot.
+        To enable this setting, the AP must have outage mode enabled."
+    ::= { trpzApConfApConfigEntry 32 }
+
+
+-- ==================================
+-- Radio Config table
+
+trpzApConfRadioConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios on all the APs
+        currently configured on this AC."
+    ::= { trpzApConfigMibObjects 3 }
+
+trpzApConfRadioConfigEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration for a particular Radio on a particular AP
+        that could be attached to the AC."
+
+    INDEX   { trpzApConfRadioConfigApNum,
+              trpzApConfRadioConfigRadioIndex }
+
+    ::= { trpzApConfRadioConfigTable 1 }
+
+TrpzApConfRadioConfigEntry ::= SEQUENCE {
+        trpzApConfRadioConfigApNum           TrpzApNum,
+        trpzApConfRadioConfigRadioIndex      TrpzApRadioIndex,
+
+        trpzApConfRadioConfigRadioType       TrpzRadioType,
+        trpzApConfRadioConfigRadioMode       TrpzRadioMode,
+
+        trpzApConfRadioConfigRadioProfileName    TrpzRadioProfileName,
+
+        trpzApConfRadioConfigChannel             TrpzChannelNum,
+        trpzApConfRadioConfigTxPower             TrpzPowerLevel,
+        trpzApConfRadioConfigAutoTuneMaxTxPower  TrpzPowerLevel,
+        trpzApConfRadioConfigAntennaType         DisplayString,
+        trpzApConfRadioConfigAntennaLocation     TrpzRadioAntennaLocation,
+
+        trpzApConfRadioConfigLoadBalancingEnabled    TruthValue,
+        trpzApConfRadioConfigLoadBalancingGroup      DisplayString,
+        trpzApConfRadioConfigLoadRebalancingEnabled  TruthValue,
+
+        trpzApConfRadioConfigRadioProfileName2   DisplayString
+    }
+
+trpzApConfRadioConfigApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of the AP (administratively assigned)."
+    ::= { trpzApConfRadioConfigEntry 1 }
+
+trpzApConfRadioConfigRadioIndex OBJECT-TYPE
+    SYNTAX      TrpzApRadioIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of this Radio on the AP."
+    ::= { trpzApConfRadioConfigEntry 2 }
+
+trpzApConfRadioConfigRadioType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Type of this radio
+        (typeA, typeB, typeG, typeNA, typeNG)"
+    ::= { trpzApConfRadioConfigEntry 3 }
+
+trpzApConfRadioConfigRadioMode OBJECT-TYPE
+    SYNTAX      TrpzRadioMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Mode of this radio (enabled/disabled/sentry)"
+    ::= { trpzApConfRadioConfigEntry 4 }
+
+trpzApConfRadioConfigRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Identifies the Radio Profile to be applied this radio,
+        by short name, as it appears in the legacy Radio Profile table
+        (trpzApConfRadioProfileTable).
+        Deprecated by trpzApConfRadioConfigRadioProfileName2,
+        which allows Radio Profile Names longer than 16 characters."
+    ::= { trpzApConfRadioConfigEntry 5 }
+
+trpzApConfRadioConfigChannel OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Channel Number of this radio."
+    ::= { trpzApConfRadioConfigEntry 6 }
+
+trpzApConfRadioConfigTxPower OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Tx Power level of this radio."
+    ::= { trpzApConfRadioConfigEntry 7 }
+
+trpzApConfRadioConfigAutoTuneMaxTxPower OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Maximum Tx Power that Auto Tune is allowed
+         to set for this radio.
+         Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioConfigEntry 8 }
+
+trpzApConfRadioConfigAntennaType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Antenna Type for this radio."
+    ::= { trpzApConfRadioConfigEntry 9 }
+
+trpzApConfRadioConfigAntennaLocation OBJECT-TYPE
+    SYNTAX      TrpzRadioAntennaLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Antenna Location for this radio."
+    ::= { trpzApConfRadioConfigEntry 10 }
+
+trpzApConfRadioConfigLoadBalancingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether RF Load Balancing is enabled on this radio."
+    ::= { trpzApConfRadioConfigEntry 11 }
+
+trpzApConfRadioConfigLoadBalancingGroup OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the RF Load Balancing group that
+        this radio is assigned to."
+    ::= { trpzApConfRadioConfigEntry 12 }
+
+trpzApConfRadioConfigLoadRebalancingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether RF Load Rebalancing is enabled for this radio."
+    ::= { trpzApConfRadioConfigEntry 13 }
+
+trpzApConfRadioConfigRadioProfileName2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the Radio Profile to be applied to this radio.
+        Deprecates trpzApConfRadioConfigRadioProfileName."
+    ::= { trpzApConfRadioConfigEntry 14 }
+
+
+-- ==========================================================
+-- AP Template main Config table (similar to AP Config table)
+
+trpzApConfApTemplateConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfApTemplateConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the AP Templates currently configured
+        on this AC."
+    ::= { trpzApConfigMibObjects 4 }
+
+trpzApConfApTemplateConfigEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfApTemplateConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Template configuration for APs that could be attached to the AC."
+
+    INDEX   { trpzApConfApTemplConfApTemplateName }
+
+    ::= { trpzApConfApTemplateConfigTable 1 }
+
+TrpzApConfApTemplateConfigEntry ::= SEQUENCE {
+        trpzApConfApTemplConfApTemplateName     TrpzApTemplateName,
+
+        trpzApConfApTemplConfApTemplateEnabled  TruthValue,
+
+        trpzApConfApTemplConfBias               TrpzApBias,
+        trpzApConfApTemplConfApTimeout          Unsigned32,
+
+        trpzApConfApTemplConfBlinkEnabled               TruthValue,
+        trpzApConfApTemplConfForceImageDownloadEnabled  TruthValue,
+        trpzApConfApTemplConfFirmwareUpgradeEnabled     TruthValue,
+        trpzApConfApTemplConfLocalSwitchingEnabled      TruthValue,
+
+        trpzApConfApTemplConfPowerMode         TrpzApPowerMode,
+        trpzApConfApTemplConfLedMode           TrpzApLedMode
+    }
+
+trpzApConfApTemplConfApTemplateName OBJECT-TYPE
+    SYNTAX      TrpzApTemplateName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "AP Template Name."
+    ::= { trpzApConfApTemplateConfigEntry 1 }
+
+trpzApConfApTemplConfApTemplateEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this AP Template is Enabled
+        (can be used for bringing up APs)."
+    ::= { trpzApConfApTemplateConfigEntry 2 }
+
+trpzApConfApTemplConfBias OBJECT-TYPE
+    SYNTAX      TrpzApBias
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bias (high/low/sticky)."
+    ::= { trpzApConfApTemplateConfigEntry 3 }
+
+trpzApConfApTemplConfApTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The communication timeout for this AP Template, in seconds."
+    ::= { trpzApConfApTemplateConfigEntry 4 }
+
+trpzApConfApTemplConfBlinkEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the LED blink mode is enabled
+        on this AP Template."
+    ::= { trpzApConfApTemplateConfigEntry 5 }
+
+trpzApConfApTemplConfForceImageDownloadEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this AP is forced to always download
+        an image from the AC upon boot."
+    ::= { trpzApConfApTemplateConfigEntry 6 }
+
+trpzApConfApTemplConfFirmwareUpgradeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether automatic boot firmware upgrade
+        is enabled on this AP Template."
+    ::= { trpzApConfApTemplateConfigEntry 7 }
+
+trpzApConfApTemplConfLocalSwitchingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether local switching is enabled
+        on this AP Template."
+    ::= { trpzApConfApTemplateConfigEntry 8 }
+
+trpzApConfApTemplConfPowerMode OBJECT-TYPE
+    SYNTAX      TrpzApPowerMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mode in which an AP using this Template
+        will be supplying power to its radios."
+    ::= { trpzApConfApTemplateConfigEntry 9 }
+
+trpzApConfApTemplConfLedMode OBJECT-TYPE
+    SYNTAX      TrpzApLedMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LED Mode (auto/static/off)
+        for an AP using this Template."
+    ::= { trpzApConfApTemplateConfigEntry 10 }
+
+
+-- ==============================================================
+-- AP Template Radio Config table (similar to Radio Config table)
+
+trpzApConfApTemplateRadioConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfApTemplateRadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios for all the AP Templates
+        currently configured on this AC."
+    ::= { trpzApConfigMibObjects 5 }
+
+trpzApConfApTemplateRadioConfigEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfApTemplateRadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Template configuration for a particular Radio index
+        on an AP Template configured on this AC."
+
+    INDEX   { trpzApConfApTemRadioConfApTemplateName,
+              trpzApConfApTemRadioConfRadioIndex }
+
+    ::= { trpzApConfApTemplateRadioConfigTable 1 }
+
+TrpzApConfApTemplateRadioConfigEntry ::= SEQUENCE {
+        trpzApConfApTemRadioConfApTemplateName  TrpzApTemplateName,
+        trpzApConfApTemRadioConfRadioIndex      TrpzApRadioIndex,
+
+        trpzApConfApTemRadioConfRadioMode       TrpzRadioMode,
+
+        trpzApConfApTemRadioConfRadioProfileName    TrpzRadioProfileName,
+
+        trpzApConfApTemRadioConfAutoTuneMaxTxPower  TrpzPowerLevel,
+
+        trpzApConfApTemRadioConfLoadBalancingEnabled    TruthValue,
+        trpzApConfApTemRadioConfLoadBalancingGroup      DisplayString,
+        trpzApConfApTemRadioConfLoadRebalancingEnabled  TruthValue,
+
+        trpzApConfApTemRadioConfRadioProfileName2   DisplayString
+    }
+
+trpzApConfApTemRadioConfApTemplateName OBJECT-TYPE
+    SYNTAX      TrpzApTemplateName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "AP Template Name."
+    ::= { trpzApConfApTemplateRadioConfigEntry 1 }
+
+trpzApConfApTemRadioConfRadioIndex OBJECT-TYPE
+    SYNTAX      TrpzApRadioIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of this Radio on the AP Template."
+    ::= { trpzApConfApTemplateRadioConfigEntry 2 }
+
+trpzApConfApTemRadioConfRadioMode OBJECT-TYPE
+    SYNTAX      TrpzRadioMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured mode of a radio using this Template
+        (enabled/disabled/sentry)"
+    ::= { trpzApConfApTemplateRadioConfigEntry 3 }
+
+trpzApConfApTemRadioConfRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Identifies the Radio Profile to be applied to a radio
+        using this Template, by short name, as it appears in the legacy
+        Radio Profile table (trpzApConfRadioProfileTable).
+        Deprecated by trpzApConfApTemRadioConfRadioProfileName2,
+        which allows Radio Profile Names longer than 16 characters."
+    ::= { trpzApConfApTemplateRadioConfigEntry 4 }
+
+trpzApConfApTemRadioConfAutoTuneMaxTxPower OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Maximum Tx Power that Auto Tune will be allowed
+         to set for a radio using this Template.
+         Obsoleted: not supported anymore."
+    ::= { trpzApConfApTemplateRadioConfigEntry 5 }
+
+trpzApConfApTemRadioConfLoadBalancingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether RF Load Balancing will be enabled
+        on a radio using this Template."
+    ::= { trpzApConfApTemplateRadioConfigEntry 6 }
+
+trpzApConfApTemRadioConfLoadBalancingGroup OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the RF Load Balancing group that
+        a radio using this Template will be assigned to."
+    ::= { trpzApConfApTemplateRadioConfigEntry 7 }
+
+trpzApConfApTemRadioConfLoadRebalancingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether RF Load Rebalancing will be enabled
+        for a radio using this Template."
+    ::= { trpzApConfApTemplateRadioConfigEntry 8 }
+
+trpzApConfApTemRadioConfRadioProfileName2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the Radio Profile to be applied
+        to a radio using this Template.
+        Deprecates trpzApConfApTemRadioConfRadioProfileName."
+    ::= { trpzApConfApTemplateRadioConfigEntry 9 }
+
+
+-- ==========================
+-- Radio Profile table
+
+
+trpzApConfRadioProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table describing the Radio Profiles
+        currently configured on this AC.
+        Deprecated by trpzApConfRadioProfile32Table, whose
+        index may be up to 32 characters long."
+    ::= { trpzApConfigMibObjects 6 }
+
+trpzApConfRadioProfileEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Configuration for a particular Radio Profile.
+         This table (trpzApConfRadioProfileTable) has been deprecated
+         by trpzApConfRadioProfile32Table, whose index
+         may be up to 32 characters long."
+
+    INDEX   { trpzApConfRadioProfRadioProfileName }
+
+    ::= { trpzApConfRadioProfileTable 1 }
+
+TrpzApConfRadioProfileEntry ::= SEQUENCE {
+        trpzApConfRadioProfRadioProfileName  TrpzRadioProfileName,
+
+        trpzApConfRadioProfBeaconInterval    Unsigned32,
+        trpzApConfRadioProfDtimInterval      Unsigned32,
+
+        trpzApConfRadioProfChannelWidth11na  TrpzRadioChannelWidth,
+
+        trpzApConfRadioProfMaxTxLifetime     Unsigned32,
+        trpzApConfRadioProfMaxRxLifetime     Unsigned32,
+        trpzApConfRadioProfRtsThreshold      Unsigned32,
+        trpzApConfRadioProfFragThreshold     Unsigned32,
+
+        trpzApConfRadioProfLongXmitPreambleEnabled  TruthValue,
+
+        trpzApConfRadioProfCountermeasuresMode  TrpzRadioProfileCountermeasuresMode,
+
+        trpzApConfRadioProfRFScanMode          TrpzRadioProfileRFScanMode,
+        trpzApConfRadioProfRFScanChannelScope  TrpzRadioProfileRFScanChannelScope,
+        trpzApConfRadioProfRFScanCTSEnabled    TruthValue,
+
+        trpzApConfRadioProfAutoTune11aChannelRange          TrpzRadioProfileAutoTuneChannelRange,
+        trpzApConfRadioProfAutoTuneIgnoreClientsEnabled     TruthValue,
+        trpzApConfRadioProfAutoTuneChannelEnabled           TruthValue,
+        trpzApConfRadioProfAutoTuneChannelHolddownInterval  Unsigned32,
+        trpzApConfRadioProfAutoTuneChannelChangeInterval    Unsigned32,
+        trpzApConfRadioProfAutoTunePowerEnabled             TruthValue,
+        trpzApConfRadioProfAutoTunePowerRampInterval        Unsigned32,
+        trpzApConfRadioProfAutoTunePowerChangeInterval      Unsigned32,
+
+        trpzApConfRadioProfFairQueuingEnabled   TruthValue,
+
+        trpzApConfRadioProfCacBackgroundACMandatory      TruthValue,
+        trpzApConfRadioProfCacBackgroundMaxUtilization   Unsigned32,
+        trpzApConfRadioProfCacBackgroundPolicingEnabled  TruthValue,
+        trpzApConfRadioProfCacBestEffortACMandatory      TruthValue,
+        trpzApConfRadioProfCacBestEffortMaxUtilization   Unsigned32,
+        trpzApConfRadioProfCacBestEffortPolicingEnabled  TruthValue,
+        trpzApConfRadioProfCacVideoACMandatory           TruthValue,
+        trpzApConfRadioProfCacVideoMaxUtilization        Unsigned32,
+        trpzApConfRadioProfCacVideoPolicingEnabled       TruthValue,
+        trpzApConfRadioProfCacVoiceACMandatory           TruthValue,
+        trpzApConfRadioProfCacVoiceMaxUtilization        Unsigned32,
+        trpzApConfRadioProfCacVoicePolicingEnabled       TruthValue,
+
+        trpzApConfRadioProfRfidTagEnabled          TruthValue,
+
+        trpzApConfRadioProfWmmPowerSaveEnabled     TruthValue,
+
+        trpzApConfRadioProfRateEnforcementEnabled  TruthValue,
+
+        trpzApConfRadioProfDfsChannelsEnabled      TruthValue,
+
+        trpzApConfRadioProfRFSpectralScanModeEnabled  TruthValue,
+        trpzApConfRadioProfRFSpectralScanPriority     TrpzRadioProfileRFSpectralScanPriority,
+
+        trpzApConfRadioProfRadioProfileFullName    DisplayString
+    }
+
+trpzApConfRadioProfRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Name of this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 1 }
+
+trpzApConfRadioProfBeaconInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Beacon Interval, time in thousandths of a second,
+        for this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 2 }
+
+trpzApConfRadioProfDtimInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of times after every beacon
+        that each AP radio in a radio profile sends a
+        delivery traffic indication map (DTIM),
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 3 }
+
+trpzApConfRadioProfChannelWidth11na OBJECT-TYPE
+    SYNTAX      TrpzRadioChannelWidth
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "802.11n Channel Width for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 4 }
+
+trpzApConfRadioProfMaxTxLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The maximum transmit threshold for the
+        AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 5 }
+
+trpzApConfRadioProfMaxRxLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The maximum receive threshold for the
+        AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 6 }
+
+trpzApConfRadioProfRtsThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The RTS threshold for the AP radios using
+        this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 7 }
+
+trpzApConfRadioProfFragThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The fragmentation threshold for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 8 }
+
+trpzApConfRadioProfLongXmitPreambleEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether an 802.11b/g AP radio using
+        this radio profile transmits Long Preamble.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 9 }
+
+trpzApConfRadioProfCountermeasuresMode OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileCountermeasuresMode
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Countermeasures Mode for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 10 }
+
+trpzApConfRadioProfRFScanMode OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFScanMode
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "RF Scanning Mode for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 11 }
+
+trpzApConfRadioProfRFScanChannelScope OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFScanChannelScope
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "RF scanning Channel Scope for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 12 }
+
+trpzApConfRadioProfRFScanCTSEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether the AP radios using this radio profile
+        send CTS To Self packet before going off channel.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 13 }
+
+trpzApConfRadioProfAutoTune11aChannelRange OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileAutoTuneChannelRange
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The allowable 802.11a Channel Range used by Auto-Tune
+        for the AP radios using this radio profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioProfileEntry 14 }
+
+trpzApConfRadioProfAutoTuneIgnoreClientsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether the AP radios using this radio profile
+        Ignore Client connections in Auto-Tune channel selections.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioProfileEntry 15 }
+
+trpzApConfRadioProfAutoTuneChannelEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether Channel Auto-Tuning
+        is enabled for the AP radios using this radio profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioProfileEntry 16 }
+
+trpzApConfRadioProfAutoTuneChannelHolddownInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Minimum Interval (in seconds) between Channel changes
+        due to Auto-Tuning, for the AP radios using this radio profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioProfileEntry 17 }
+
+trpzApConfRadioProfAutoTuneChannelChangeInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The interval (in seconds) at which RF Auto-Tuning
+        decides whether to Change the Channel for the AP radios
+        using this radio profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfRadioProfileEntry 18 }
+
+trpzApConfRadioProfAutoTunePowerEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether Power Auto-Tuning is enabled
+         for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 19 }
+
+trpzApConfRadioProfAutoTunePowerRampInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimum Interval (in seconds) between Power changes
+        due to Auto-Tuning, for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 20 }
+
+trpzApConfRadioProfAutoTunePowerChangeInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The interval (in seconds) at which RF Auto-Tuning
+        decides whether to Change the Power for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 21 }
+
+trpzApConfRadioProfFairQueuingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether weighted Fair Queuing is enabled
+        for this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 22 }
+
+trpzApConfRadioProfCacBackgroundACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether Admission Control for Background traffic
+        is Mandatory for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 23 }
+
+trpzApConfRadioProfCacBackgroundMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum admission control limit for Background traffic,
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 24 }
+
+trpzApConfRadioProfCacBackgroundPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Background traffic is enabled, for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 25 }
+
+trpzApConfRadioProfCacBestEffortACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that Admission Control for Best Effort traffic
+        is Mandatory for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 26 }
+
+trpzApConfRadioProfCacBestEffortMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum admission control limit for Best Effort traffic,
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 27 }
+
+trpzApConfRadioProfCacBestEffortPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Best Effort traffic is enabled, for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 28 }
+
+trpzApConfRadioProfCacVideoACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that Admission Control for Video traffic
+        is Mandatory for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 29 }
+
+trpzApConfRadioProfCacVideoMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum admission control limit for Video traffic,
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 30 }
+
+trpzApConfRadioProfCacVideoPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Video traffic is enabled, for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 31 }
+
+trpzApConfRadioProfCacVoiceACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that Admission Control for Voice traffic
+        is Mandatory for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 32 }
+
+trpzApConfRadioProfCacVoiceMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Maximum admission control limit for Voice traffic,
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 33 }
+
+trpzApConfRadioProfCacVoicePolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Voice traffic is enabled, for the AP radios
+        using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 34 }
+
+trpzApConfRadioProfRfidTagEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether an AP radio using this radio profile
+        is enabled to function as location receivers in an AeroScout
+        Visibility System.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 35 }
+
+trpzApConfRadioProfWmmPowerSaveEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether the AP radios using this radio profile
+        enable power save mode on WMM clients.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 36 }
+
+trpzApConfRadioProfRateEnforcementEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether data rates are enforced for the AP radios
+        using this radio profile, which means
+        that a connecting client must transmit at one of the
+        mandatory or standard rates in order to associate
+        with the AP.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 37 }
+
+trpzApConfRadioProfDfsChannelsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates that the AP radios using this radio profile
+        use DFS channels to meet regulatory requirements.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 38 }
+
+trpzApConfRadioProfRFSpectralScanModeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether Spectral Scanning Mode is enabled
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 39 }
+
+trpzApConfRadioProfRFSpectralScanPriority OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFSpectralScanPriority
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The Priority when a Spectral Scan sample time arrives
+        for the AP radios using this radio profile.
+        This table (trpzApConfRadioProfileTable) has been deprecated
+        by trpzApConfRadioProfile32Table, whose index
+        may be up to 32 characters long."
+    ::= { trpzApConfRadioProfileEntry 40 }
+
+trpzApConfRadioProfRadioProfileFullName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The full name of the Radio Profile.
+        Indicates the entry in the new Radio Profile table
+        (trpzApConfRadioProfile32Table)."
+    ::= { trpzApConfRadioProfileEntry 41 }
+
+
+-- =====================================================
+-- Table for Service Profiles connected to Radio Profile
+
+trpzApConfRadioProfServiceProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProfServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table describing the currently configured connections
+        between Radio Profiles and Service Profiles.
+        Deprecated by trpzApConfRadioProf32ServiceProfileTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfigMibObjects 7 }
+
+trpzApConfRadioProfServiceProfileEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProfServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Connection between a Radio Profile and a Service Profile,
+        currently configured on the AC.
+        This table (trpzApConfRadioProfServiceProfileTable) has been
+        deprecated by trpzApConfRadioProf32ServiceProfileTable,
+        which allows 32 characters long Radio Profile Names in the index."
+
+    INDEX   { trpzApConfRpServpRadioProfileName,
+              trpzApConfRpServpServiceProfileName }
+
+    ::= { trpzApConfRadioProfServiceProfileTable 1 }
+
+TrpzApConfRadioProfServiceProfileEntry ::= SEQUENCE {
+        trpzApConfRpServpRadioProfileName    TrpzRadioProfileName,
+        trpzApConfRpServpServiceProfileName  TrpzServiceProfileName,
+
+        trpzApConfRpServpRowStatus           RowStatus
+    }
+
+trpzApConfRpServpRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Name of this Radio Profile.
+        This table (trpzApConfRadioProfServiceProfileTable) has been
+        deprecated by trpzApConfRadioProf32ServiceProfileTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfServiceProfileEntry 1 }
+
+trpzApConfRpServpServiceProfileName OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Name of a Service Profile connected to
+        this Radio Profile.
+        This table (trpzApConfRadioProfServiceProfileTable) has been
+        deprecated by trpzApConfRadioProf32ServiceProfileTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfServiceProfileEntry 2 }
+
+trpzApConfRpServpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "This object is used to create a new row or
+        delete an existing row in this table.
+
+        To create a row, set this object to 'createAndGo'.
+
+        To delete a row, set this object to 'destroy'.
+
+        Only these two values 'createAndGo' and 'destroy'
+        will be accepted.
+
+        This table (trpzApConfRadioProfServiceProfileTable) has been
+        deprecated by trpzApConfRadioProf32ServiceProfileTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfServiceProfileEntry 3 }
+
+
+-- ==================================================
+-- Table for Snoop Filters connected to Radio Profile
+
+trpzApConfRadioProfSnoopFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProfSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table describing the currently configured connections
+        between Radio Profiles and Snoop Filters.
+        Deprecated by trpzApConfRadioProf32SnoopFilterTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfigMibObjects 8 }
+
+trpzApConfRadioProfSnoopFilterEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProfSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Connection between a Radio Profile and a Snoop Filter,
+        currently configured on the AC.
+        This table (trpzApConfRadioProfSnoopFilterTable) has been
+        deprecated by trpzApConfRadioProf32SnoopFilterTable,
+        which allows 32 characters long Radio Profile Names in the index."
+
+    INDEX   { trpzApConfRpSnoopfRadioProfileName,
+              trpzApConfRpSnoopfSnoopFilterName }
+
+    ::= { trpzApConfRadioProfSnoopFilterTable 1 }
+
+TrpzApConfRadioProfSnoopFilterEntry ::= SEQUENCE {
+        trpzApConfRpSnoopfRadioProfileName  TrpzRadioProfileName,
+        trpzApConfRpSnoopfSnoopFilterName   TrpzSnoopFilterName,
+
+        trpzApConfRpSnoopfRowStatus       RowStatus
+    }
+
+trpzApConfRpSnoopfRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Name of this Radio Profile.
+        This table (trpzApConfRadioProfSnoopFilterTable) has been
+        deprecated by trpzApConfRadioProf32SnoopFilterTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfSnoopFilterEntry 1 }
+
+trpzApConfRpSnoopfSnoopFilterName OBJECT-TYPE
+    SYNTAX      TrpzSnoopFilterName
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Name of a Snoop Filter connected to
+        this Radio Profile.
+        This table (trpzApConfRadioProfSnoopFilterTable) has been
+        deprecated by trpzApConfRadioProf32SnoopFilterTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfSnoopFilterEntry 2 }
+
+trpzApConfRpSnoopfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "This object is used to create a new row or
+        delete an existing row in this table.
+
+        To create a row, set this object to 'createAndGo'.
+
+        To delete a row, set this object to 'destroy'.
+
+        Only these two values 'createAndGo' and 'destroy'
+        will be accepted.
+
+        This table (trpzApConfRadioProfSnoopFilterTable) has been
+        deprecated by trpzApConfRadioProf32SnoopFilterTable,
+        which allows 32 characters long Radio Profile Names in the index."
+    ::= { trpzApConfRadioProfSnoopFilterEntry 3 }
+
+
+-- ==========================
+-- Service Profile table
+
+trpzApConfServiceProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the Service Profiles
+        currently configured on this AC."
+    ::= { trpzApConfigMibObjects 9 }
+
+trpzApConfServiceProfileEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration for a particular Service Profile."
+
+    INDEX   { trpzApConfServProfServiceProfileName }
+
+    ::= { trpzApConfServiceProfileTable 1 }
+
+TrpzApConfServiceProfileEntry ::= SEQUENCE {
+        trpzApConfServProfServiceProfileName  TrpzServiceProfileName,
+
+        trpzApConfServProfSsidType            TrpzServiceProfileSsidType,
+
+        trpzApConfServProfBeaconEnabled          TruthValue,
+
+        trpzApConfServProf11naMode     TrpzServiceProfile11nMode,
+        trpzApConfServProf11ngMode     TrpzServiceProfile11nMode,
+
+        trpzApConfServProf11nShortGuardIntervalEnabled  TruthValue,
+
+        trpzApConfServProf11nFrameAggregation    TrpzServiceProfile11nFrameAggregationType,
+        trpzApConfServProf11nMsduMaxLength       TrpzServiceProfile11nMsduMaxLength,
+        trpzApConfServProf11nMpduMaxLength       TrpzServiceProfile11nMpduMaxLength,
+
+        trpzApConfServProfAuthFallthru             TrpzServiceProfileAuthFallthruType,
+        trpzApConfServProfWebAAAForm               DisplayString,
+        trpzApConfServProfSharedKeyAuthEnabled     TruthValue,
+
+        trpzApConfServProfWpaIeEnabled              TruthValue,
+        trpzApConfServProfWpaIeCipherTkipEnabled    TruthValue,
+        trpzApConfServProfWpaIeCipherCcmpEnabled    TruthValue,
+        trpzApConfServProfWpaIeCipherWep40Enabled   TruthValue,
+        trpzApConfServProfWpaIeCipherWep104Enabled  TruthValue,
+        trpzApConfServProfWpaIeAuthDot1xEnabled     TruthValue,
+        trpzApConfServProfWpaIeAuthPskEnabled       TruthValue,
+
+        trpzApConfServProfRsnIeEnabled              TruthValue,
+        trpzApConfServProfRsnIeCipherTkipEnabled    TruthValue,
+        trpzApConfServProfRsnIeCipherCcmpEnabled    TruthValue,
+        trpzApConfServProfRsnIeCipherWep40Enabled   TruthValue,
+        trpzApConfServProfRsnIeCipherWep104Enabled  TruthValue,
+        trpzApConfServProfRsnIeAuthDot1xEnabled     TruthValue,
+        trpzApConfServProfRsnIeAuthPskEnabled       TruthValue,
+
+        trpzApConfServProfTkipMicCountermeasuresTime  Unsigned32,
+
+        trpzApConfServProfMaxBandwidthKbps      Unsigned32,
+        trpzApConfServProfCacMode               TrpzServiceProfileCacMode,
+        trpzApConfServProfCacSessCount          Unsigned32,
+
+        trpzApConfServProfUserIdleTimeout           Unsigned32,
+        trpzApConfServProfIdleClientProbingEnabled  TruthValue,
+        trpzApConfServProfShortRetryCount           Unsigned32,
+        trpzApConfServProfLongRetryCount            Unsigned32,
+
+        trpzApConfServProfProxyArpEnabled           TruthValue,
+        trpzApConfServProfDhcpRestrictEnabled       TruthValue,
+        trpzApConfServProfNoBroadcastEnabled        TruthValue,
+
+        trpzApConfServProfSygateOnDemandEnabled  TruthValue,
+        trpzApConfServProfEnforceChecksEnabled   TruthValue,
+        trpzApConfServProfSodaRemediationAcl     DisplayString,
+        trpzApConfServProfSodaSuccessPage        DisplayString,
+        trpzApConfServProfSodaFailurePage        DisplayString,
+        trpzApConfServProfSodaLogoutPage         DisplayString,
+        trpzApConfServProfSodaAgentDirectory     DisplayString,
+
+        trpzApConfServProfWebPortalSessionTimeout   Unsigned32,
+        trpzApConfServProfWebPortalAcl              DisplayString,
+        trpzApConfServProfWebPortalLogoutEnabled    TruthValue,
+        trpzApConfServProfWebPortalLogoutUrl        DisplayString,
+
+        trpzApConfServProfKeepInitialVlanEnabled    TruthValue,
+
+        trpzApConfServProfMeshModeEnabled     TruthValue,
+        trpzApConfServProfBridgingEnabled     TruthValue,
+
+        trpzApConfServProfLoadBalanceExemptEnabled  TruthValue,
+
+        trpzApConfServProfM2UConversionEnabled   TruthValue,
+
+        trpzApConfServProfBackupSsidMode         TrpzBackupSsidMode,
+        trpzApConfServProfBackupSsidTimeout      Unsigned32,
+        trpzApConfServProfBackupSsidKeepClients  TruthValue,
+
+        trpzApConfServProfWebPortalLogoutForm    DisplayString
+    }
+
+trpzApConfServProfServiceProfileName OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of this service profile"
+    ::= { trpzApConfServiceProfileEntry 1 }
+
+trpzApConfServProfSsidType OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileSsidType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of this service profile (clear/crypto)."
+    ::= { trpzApConfServiceProfileEntry 2 }
+
+trpzApConfServProfBeaconEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether beacons are enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 3 }
+
+trpzApConfServProf11naMode OBJECT-TYPE
+    SYNTAX      TrpzServiceProfile11nMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 802.11n (na) mode for this service profile."
+    ::= { trpzApConfServiceProfileEntry 4 }
+
+trpzApConfServProf11ngMode OBJECT-TYPE
+    SYNTAX      TrpzServiceProfile11nMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 802.11n (ng) mode for this service profile."
+    ::= { trpzApConfServiceProfileEntry 5 }
+
+trpzApConfServProf11nShortGuardIntervalEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether short guard interval is enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 6 }
+
+trpzApConfServProf11nFrameAggregation OBJECT-TYPE
+    SYNTAX      TrpzServiceProfile11nFrameAggregationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Frame Aggregation mode
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 7 }
+
+trpzApConfServProf11nMsduMaxLength OBJECT-TYPE
+    SYNTAX      TrpzServiceProfile11nMsduMaxLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum MSDU length for this service profile."
+    ::= { trpzApConfServiceProfileEntry 8 }
+
+trpzApConfServProf11nMpduMaxLength OBJECT-TYPE
+    SYNTAX      TrpzServiceProfile11nMpduMaxLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum MPDU length for this service profile."
+    ::= { trpzApConfServiceProfileEntry 9 }
+
+trpzApConfServProfAuthFallthru OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileAuthFallthruType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication type to be attempted for users who
+        do not match a 802.1X or MAC authentication rule,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 10 }
+
+trpzApConfServProfWebAAAForm OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The custom login page that loads for WebAAA users,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 11 }
+
+trpzApConfServProfSharedKeyAuthEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether shared-key authentication is enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 12 }
+
+trpzApConfServProfWpaIeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether WPA IE beaconing is enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 13 }
+
+trpzApConfServProfWpaIeCipherTkipEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether TKIP cipher is advertised in WPA IE,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 14 }
+
+trpzApConfServProfWpaIeCipherCcmpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether CCMP cipher is advertised in WPA IE,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 15 }
+
+trpzApConfServProfWpaIeCipherWep40Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether WEP-40 cipher is advertised in WPA IE,
+        for this service profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfServiceProfileEntry 16 }
+
+trpzApConfServProfWpaIeCipherWep104Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether WEP-104 cipher is advertised in WPA IE,
+        for this service profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfServiceProfileEntry 17 }
+
+trpzApConfServProfWpaIeAuthDot1xEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether 802.1X authentication is advertised
+        in WPA IE, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 18 }
+
+trpzApConfServProfWpaIeAuthPskEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Pre-Shared Key authentication
+        is advertised in WPA IE, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 19 }
+
+trpzApConfServProfRsnIeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether RSN IE beaconing is enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 20 }
+
+trpzApConfServProfRsnIeCipherTkipEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether TKIP cipher is advertised in RSN IE,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 21 }
+
+trpzApConfServProfRsnIeCipherCcmpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether CCMP cipher is advertised in RSN IE,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 22 }
+
+trpzApConfServProfRsnIeCipherWep40Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether WEP-40 cipher is advertised in RSN IE,
+        for this service profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfServiceProfileEntry 23 }
+
+trpzApConfServProfRsnIeCipherWep104Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Indicates whether WEP-104 cipher is advertised in RSN IE,
+        for this service profile.
+        Obsoleted: not supported anymore."
+    ::= { trpzApConfServiceProfileEntry 24 }
+
+trpzApConfServProfRsnIeAuthDot1xEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether 802.1X authentication is advertised
+        in RSN IE, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 25 }
+
+trpzApConfServProfRsnIeAuthPskEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Pre-Shared Key authentication
+        is advertised in RSN IE, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 26 }
+
+trpzApConfServProfTkipMicCountermeasuresTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the TKIP MIC countermeasures time in milliseconds
+        for this service profile.
+        This is the length of time that AP radios use
+        countermeasures if two Message Integrity Code (MIC)
+        failures occur within 60 seconds."
+    ::= { trpzApConfServiceProfileEntry 27 }
+
+trpzApConfServProfMaxBandwidthKbps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bandwidth limit for this service profile,
+        in Kbits/second. A value of zero means unlimited."
+    ::= { trpzApConfServiceProfileEntry 28 }
+
+trpzApConfServProfCacMode OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileCacMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Call Admission Control (CAC) mode,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 29 }
+
+trpzApConfServProfCacSessCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of active sessions a radio can have
+        when session-based CAC is enabled, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 30 }
+
+trpzApConfServProfUserIdleTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds MSS has a session
+        available for a client not sending data and is not
+        responding to keepalives (idle-client probes). If
+        the timer expires, the client session is changed
+        to the Dissociated state, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 31 }
+
+trpzApConfServProfIdleClientProbingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AC radio sends
+        a unicast null-data frame to each client every 10 seconds,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 32 }
+
+trpzApConfServProfShortRetryCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times a radio can send a short unicast frame
+        without receiving an acknowledgment,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 33 }
+
+trpzApConfServProfLongRetryCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times a radio can send a long unicast frame
+        without receiving an acknowledgment,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 34 }
+
+trpzApConfServProfProxyArpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether proxy ARP is enabled
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 35 }
+
+trpzApConfServProfDhcpRestrictEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether only DHCP traffic is allowed until
+        a newly associated client has been authenticated
+        and authorized, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 36 }
+
+trpzApConfServProfNoBroadcastEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether broadcast ARP and DHCP packets
+        are converted to unicast for this service profile."
+    ::= { trpzApConfServiceProfileEntry 37 }
+
+trpzApConfServProfSygateOnDemandEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Sygate On-Demand Manager
+        (SODA Manager) is enabled for this service profile."
+    ::= { trpzApConfServiceProfileEntry 38 }
+
+trpzApConfServProfEnforceChecksEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Enforcement of the SODA security checks
+        is enabled for this service profile."
+    ::= { trpzApConfServiceProfileEntry 39 }
+
+trpzApConfServProfSodaRemediationAcl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remediation page ACL to apply to the client when the 
+        failure page is loaded, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 40 }
+
+trpzApConfServProfSodaSuccessPage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Success page that is displayed on the client when
+        a client successfully runs the checks
+        performed by the SODA agent, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 41 }
+
+trpzApConfServProfSodaFailurePage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Failure page that is displayed on the client when
+        the SODA agent checks fail, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 42 }
+
+trpzApConfServProfSodaLogoutPage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The page to load when a client closes the
+        SODA virtual desktop and logs out of the network,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 43 }
+
+trpzApConfServProfSodaAgentDirectory OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies a different directory for the
+        SODA agent files used for this service profile."
+    ::= { trpzApConfServiceProfileEntry 44 }
+
+trpzApConfServProfWebPortalSessionTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time interval, in seconds, for which a Web Portal
+        WebAAA session remains in the Deassociated state 
+        before being terminated automatically,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 45 }
+
+trpzApConfServProfWebPortalAcl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of ACL used for filtering traffic for Web Portal 
+        users during authentication, for this service profile."
+    ::= { trpzApConfServiceProfileEntry 46 }
+
+trpzApConfServProfWebPortalLogoutEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the Web Portal logout functionality
+        is enabled for this service profile."
+    ::= { trpzApConfServiceProfileEntry 47 }
+
+trpzApConfServProfWebPortalLogoutUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Web Portal Logout URL for this service profile."
+    ::= { trpzApConfServiceProfileEntry 48 }
+
+trpzApConfServProfKeepInitialVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether, after roaming, the user keeps
+        the VLAN assigned from the first connection,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 49 }
+
+trpzApConfServProfMeshModeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether wireless mesh between APs
+        is enabled for this service profile."
+    ::= { trpzApConfServiceProfileEntry 50 }
+
+trpzApConfServProfBridgingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether wireless bridging of traffic
+        between APs is enabled for this service profile."
+    ::= { trpzApConfServiceProfileEntry 51 }
+
+trpzApConfServProfLoadBalanceExemptEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this service profile is
+        exempted from load balancing."
+    ::= { trpzApConfServiceProfileEntry 52 }
+
+trpzApConfServProfM2UConversionEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether multicast IPv4 traffic on the wire
+        is converted to unicast traffic for the wireless clients,
+        for this service profile."
+    ::= { trpzApConfServiceProfileEntry 53 }
+
+trpzApConfServProfBackupSsidMode OBJECT-TYPE
+    SYNTAX      TrpzBackupSsidMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the availability of backup SSIDs
+        at a remote site.
+        Backup SSIDs allow access to new clients
+        when central site outage occurs."
+    ::= { trpzApConfServiceProfileEntry 54 }
+
+trpzApConfServProfBackupSsidTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates how many seconds the backup SSIDs at
+        a remote site will stay up after the outage ends.
+        Value 0 means that the backup SSIDs will stay up
+        indefinitely."
+    ::= { trpzApConfServiceProfileEntry 55 }
+
+trpzApConfServProfBackupSsidKeepClients OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the existing client sessions
+        at a remote site will be kept or not when central site
+        outage occurs."
+    ::= { trpzApConfServiceProfileEntry 56 }
+
+trpzApConfServProfWebPortalLogoutForm OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The custom logout page that will be displayed for
+        Web Portal users, for this service profile.
+        An empty string means that the default page will be displayed."
+    ::= { trpzApConfServiceProfileEntry 57 }
+
+
+-- ==========================
+-- Snoop Filter table
+
+trpzApConfSnoopFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the Snoop Filters
+        currently configured on this AC."
+    ::= { trpzApConfigMibObjects 10 }
+
+trpzApConfSnoopFilterEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration for a particular Snoop Filter."
+
+    INDEX   { trpzApConfSnoopFilterName }
+
+    ::= { trpzApConfSnoopFilterTable 1 }
+
+TrpzApConfSnoopFilterEntry ::= SEQUENCE {
+        trpzApConfSnoopFilterName     TrpzSnoopFilterName,
+
+        trpzApConfSnoopFilterEnabled  TruthValue,
+
+        trpzApConfSnoopFilterObserverAddrType  InetAddressType,
+        trpzApConfSnoopFilterObserverAddr      InetAddress
+    }
+
+trpzApConfSnoopFilterName OBJECT-TYPE
+    SYNTAX      TrpzSnoopFilterName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of this snoop filter."
+    ::= { trpzApConfSnoopFilterEntry 1 }
+
+trpzApConfSnoopFilterEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this snoop filter is enabled."
+    ::= { trpzApConfSnoopFilterEntry 2 }
+
+trpzApConfSnoopFilterObserverAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzApConfSnoopFilterObserverAddr'.
+        If no snoop observer is configured for a particular
+        filter, this object will return 'unknown(0)' for that
+        filter."
+    ::= { trpzApConfSnoopFilterEntry 3 }
+
+trpzApConfSnoopFilterObserverAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the snoop observer.
+        If no observer is configured for a particular snoop filter,
+        this object will return an empty string for that filter.
+
+        The type of this address is specified in
+        'trpzApConfSnoopFilterObserverAddrType'."
+    ::= { trpzApConfSnoopFilterEntry 4 }
+
+
+-- =================================================
+-- Table for Snoop Filters associated with AP Radios
+
+trpzApConfRadioSnoopFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the associations of Snoop Filters
+        with AP radios."
+    ::= { trpzApConfigMibObjects 11 }
+
+trpzApConfRadioSnoopFilterEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioSnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Multiple snoop filters can be associated with one AP radio.
+        A snoop filter can be associated with multiple AP radios.
+
+        A combination of an AP number, a radio number and
+        a filter name uniquely identifies the mapping of
+        a filter to a specific radio."
+
+    INDEX   { trpzApConfRadioConfigApNum,
+              trpzApConfRadioConfigRadioIndex,
+              trpzApConfSnoopFilterName }
+
+    ::= { trpzApConfRadioSnoopFilterTable 1 }
+
+TrpzApConfRadioSnoopFilterEntry ::= SEQUENCE {
+        trpzApConfRadioSnoopFilterRowStatus  RowStatus
+    }
+
+trpzApConfRadioSnoopFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create a new row or
+        delete an existing row in this table.
+
+        To create a row, set this object to 'createAndGo'.
+
+        To delete a row, set this object to 'destroy'.
+
+        Only these two values 'createAndGo' and 'destroy'
+        will be accepted."
+::= { trpzApConfRadioSnoopFilterEntry 1 }
+
+
+-- ==========================
+-- Snoop Observer table
+
+trpzApConfSnoopObserverTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfSnoopObserverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the snoop observers
+        currently configured on the AC.
+        Snoop observers are hosts where snooped packets
+        are sent."
+    ::= { trpzApConfigMibObjects 12 }
+
+trpzApConfSnoopObserverEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfSnoopObserverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration of a particular snoop observer."
+
+    INDEX   { trpzApConfSnoopObserverTargetAddrType,
+              trpzApConfSnoopObserverTargetAddr }
+
+    ::= { trpzApConfSnoopObserverTable 1 }
+
+TrpzApConfSnoopObserverEntry ::= SEQUENCE {
+        trpzApConfSnoopObserverTargetAddrType  InetAddressType,
+        trpzApConfSnoopObserverTargetAddr      InetAddress,
+
+        trpzApConfSnoopObserverSnapLength  Unsigned32,
+        trpzApConfSnoopObserverInterval    Unsigned32,
+        trpzApConfSnoopObserverTxMode      TrpzSnoopObserverTxMode
+    }
+
+trpzApConfSnoopObserverTargetAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzApConfSnoopObserverTargetAddr'."
+    ::= { trpzApConfSnoopObserverEntry 1 }
+
+trpzApConfSnoopObserverTargetAddr OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the snoop observer.
+
+        The type of this address is specified in
+        'trpzApConfSnoopObserverTargetAddrType'."
+    ::= { trpzApConfSnoopObserverEntry 2 }
+
+trpzApConfSnoopObserverSnapLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum number of bytes from a filtered
+        packet to be encapsulated in TZSP and sent to the observer.
+        Value 0 means that the entire packet is copied and
+        sent to the observer."
+    ::= { trpzApConfSnoopObserverEntry 3 }
+
+trpzApConfSnoopObserverInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the snooping interval, in milliseconds,
+        for the packets with the same source.
+        Value 0 means no rate limit."
+    ::= { trpzApConfSnoopObserverEntry 4 }
+
+trpzApConfSnoopObserverTxMode OBJECT-TYPE
+    SYNTAX      TrpzSnoopObserverTxMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mode of transmission of snoop packets
+        to this observer."
+    ::= { trpzApConfSnoopObserverEntry 5 }
+
+
+-- ==========================
+-- Remote Site table
+
+trpzApConfRemoteSiteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRemoteSiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the remote sites
+        currently configured on the AC.
+
+        A remote site is a group of APs situated in the same
+        location (site/branch), other than the location
+        of the controller."
+    ::= { trpzApConfigMibObjects 13 }
+
+trpzApConfRemoteSiteEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRemoteSiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Description of a remote site
+        currently configured on the AC."
+
+    INDEX   { trpzApConfRemoteSiteName }
+
+    ::= { trpzApConfRemoteSiteTable 1 }
+
+TrpzApConfRemoteSiteEntry ::= SEQUENCE {
+        trpzApConfRemoteSiteName                DisplayString,
+
+        trpzApConfRemoteSiteCountryCode         DisplayString,
+        trpzApConfRemoteSitePathMtu             Unsigned32,
+        trpzApConfRemoteSiteBackupSsidsEnabled  TruthValue,
+
+        trpzApConfRemoteSiteLogServerEnabled    TruthValue,
+        trpzApConfRemoteSiteLogServerAddrType   InetAddressType,
+        trpzApConfRemoteSiteLogServerAddr       InetAddress,
+        trpzApConfRemoteSiteLogServerPort       Unsigned32,
+        trpzApConfRemoteSiteLogServerSeverity   TrpzSyslogSeverity,
+
+        trpzApConfRemoteSiteAcPollingEnabled    TruthValue,
+
+        trpzApConfRemoteSiteRadiusServerGroupName   DisplayString,
+        trpzApConfRemoteSiteRadiusDeadtime          Unsigned32,
+        trpzApConfRemoteSiteRadiusTimeout           Unsigned32,
+        trpzApConfRemoteSiteRadiusRetransmit        Unsigned32,
+        trpzApConfRemoteSiteRadiusNasIdType         TrpzApRadiusNasIdType
+    }
+
+trpzApConfRemoteSiteName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the remote site."
+    ::= { trpzApConfRemoteSiteEntry 1 }
+
+trpzApConfRemoteSiteCountryCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (2|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the country code used for the configuration
+        of the APs at the remote site.
+        The system country code is used by default, in which case
+        this object will return the special value 'NONE'."
+    ::= { trpzApConfRemoteSiteEntry 2 }
+
+trpzApConfRemoteSitePathMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured MTU between the APs at the remote site
+        and the ACs at the central site.
+        The value 0 means that the MTU was not administratively configured."
+    ::= { trpzApConfRemoteSiteEntry 3 }
+
+trpzApConfRemoteSiteBackupSsidsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the backup SSIDs at this remote site
+        are enabled or not.
+        Backup SSIDs allow access to new clients
+        when central site outage occurs."
+    ::= { trpzApConfRemoteSiteEntry 4 }
+
+trpzApConfRemoteSiteLogServerEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the APs at the remote site
+        will send syslog messages to a log server."
+    ::= { trpzApConfRemoteSiteEntry 5 }
+
+trpzApConfRemoteSiteLogServerAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzApConfRemoteSiteLogServerAddr'."
+    ::= { trpzApConfRemoteSiteEntry 6 }
+
+trpzApConfRemoteSiteLogServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the log server used by the APs
+        in the remote site.
+        The type of this address is specified in
+        'trpzApConfRemoteSiteLogServerAddrType'."
+    ::= { trpzApConfRemoteSiteEntry 7 }
+
+trpzApConfRemoteSiteLogServerPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the log server used by the APs
+        in the remote site."
+    ::= { trpzApConfRemoteSiteEntry 8 }
+
+trpzApConfRemoteSiteLogServerSeverity OBJECT-TYPE
+    SYNTAX      TrpzSyslogSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum severity of the messages sent
+        by the APs in the remote site to the syslog server."
+    ::= { trpzApConfRemoteSiteEntry 9 }
+
+trpzApConfRemoteSiteAcPollingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AC can poll the APs in this remote site
+        to obtain full information about the AP-managed client sessions.
+        When it is 'false(2)', the AC has limited information
+        about the AP-managed sessions in this remote site."
+    ::= { trpzApConfRemoteSiteEntry 10 }
+
+trpzApConfRemoteSiteRadiusServerGroupName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the name of the group of RADIUS servers
+        used in the remote site.
+        An empty string means that no RADIUS server group
+        has been configured for the remote site."
+    ::= { trpzApConfRemoteSiteEntry 11 }
+
+trpzApConfRemoteSiteRadiusDeadtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The deadtime value configured for the RADIUS server group
+        of this remote site.
+        This value has precedence over the individual deadtime values
+        of each server in the server group.
+        If RADIUS deadtime is not configured for this remote site,
+        this object will not have an instance in the current row."
+    ::= { trpzApConfRemoteSiteEntry 12 }
+
+trpzApConfRemoteSiteRadiusTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The timeout value configured for the RADIUS server group
+        of this remote site.
+        This value has precedence over the individual timeout values
+        of each server in the server group.
+        If RADIUS timeout is not configured for this remote site,
+        this object will not have an instance in the current row."
+    ::= { trpzApConfRemoteSiteEntry 13 }
+
+trpzApConfRemoteSiteRadiusRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The retransmit value configured for the RADIUS server group
+        of this remote site.
+        This value has precedence over the individual retransmit values
+        of each server in the server group.
+        If RADIUS retransmit is not configured for this remote site,
+        this object will not have an instance in the current row."
+    ::= { trpzApConfRemoteSiteEntry 14 }
+
+trpzApConfRemoteSiteRadiusNasIdType OBJECT-TYPE
+    SYNTAX      TrpzApRadiusNasIdType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The NAS-ID type configured for the RADIUS server group
+        of this remote site."
+    ::= { trpzApConfRemoteSiteEntry 15 }
+
+
+-- ==========================
+-- Radio Profile 32 table
+
+
+trpzApConfRadioProfile32Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProfile32Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the Radio Profiles
+        currently configured on this AC.
+        Deprecates trpzApConfRadioProfileTable."
+    ::= { trpzApConfigMibObjects 14 }
+
+trpzApConfRadioProfile32Entry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProfile32Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration for a particular Radio Profile."
+
+    INDEX   { trpzApConfRadioProf32RadioProfileName }
+
+    ::= { trpzApConfRadioProfile32Table 1 }
+
+TrpzApConfRadioProfile32Entry ::= SEQUENCE {
+        trpzApConfRadioProf32RadioProfileName  TrpzRadioProfileName32,
+
+        trpzApConfRadioProf32BeaconInterval    Unsigned32,
+        trpzApConfRadioProf32DtimInterval      Unsigned32,
+
+        trpzApConfRadioProf32ChannelWidth11na  TrpzRadioChannelWidth,
+
+        trpzApConfRadioProf32MaxTxLifetime     Unsigned32,
+        trpzApConfRadioProf32MaxRxLifetime     Unsigned32,
+        trpzApConfRadioProf32RtsThreshold      Unsigned32,
+        trpzApConfRadioProf32FragThreshold     Unsigned32,
+
+        trpzApConfRadioProf32LongXmitPreambleEnabled  TruthValue,
+
+        trpzApConfRadioProf32CountermeasuresMode  TrpzRadioProfileCountermeasuresMode,
+
+        trpzApConfRadioProf32RFScanMode          TrpzRadioProfileRFScanMode,
+        trpzApConfRadioProf32RFScanChannelScope  TrpzRadioProfileRFScanChannelScope,
+        trpzApConfRadioProf32RFScanCTSEnabled    TruthValue,
+
+        trpzApConfRadioProf32AutoTunePowerEnabled             TruthValue,
+        trpzApConfRadioProf32AutoTunePowerRampInterval        Unsigned32,
+        trpzApConfRadioProf32AutoTunePowerChangeInterval      Unsigned32,
+
+        trpzApConfRadioProf32FairQueuingEnabled   TruthValue,
+
+        trpzApConfRadioProf32CacBackgroundACMandatory      TruthValue,
+        trpzApConfRadioProf32CacBackgroundMaxUtilization   Unsigned32,
+        trpzApConfRadioProf32CacBackgroundPolicingEnabled  TruthValue,
+        trpzApConfRadioProf32CacBestEffortACMandatory      TruthValue,
+        trpzApConfRadioProf32CacBestEffortMaxUtilization   Unsigned32,
+        trpzApConfRadioProf32CacBestEffortPolicingEnabled  TruthValue,
+        trpzApConfRadioProf32CacVideoACMandatory           TruthValue,
+        trpzApConfRadioProf32CacVideoMaxUtilization        Unsigned32,
+        trpzApConfRadioProf32CacVideoPolicingEnabled       TruthValue,
+        trpzApConfRadioProf32CacVoiceACMandatory           TruthValue,
+        trpzApConfRadioProf32CacVoiceMaxUtilization        Unsigned32,
+        trpzApConfRadioProf32CacVoicePolicingEnabled       TruthValue,
+
+        trpzApConfRadioProf32RfidTagEnabled          TruthValue,
+
+        trpzApConfRadioProf32WmmPowerSaveEnabled     TruthValue,
+
+        trpzApConfRadioProf32RateEnforcementEnabled  TruthValue,
+
+        trpzApConfRadioProf32DfsChannelsEnabled      TruthValue,
+
+        trpzApConfRadioProf32RFSpectralScanModeEnabled  TruthValue,
+        trpzApConfRadioProf32RFSpectralScanPriority     TrpzRadioProfileRFSpectralScanPriority
+    }
+
+trpzApConfRadioProf32RadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 1 }
+
+trpzApConfRadioProf32BeaconInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Beacon Interval, time in thousandths of a second,
+        for this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 2 }
+
+trpzApConfRadioProf32DtimInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times after every beacon
+        that each AP radio in a radio profile sends a
+        delivery traffic indication map (DTIM),
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 3 }
+
+trpzApConfRadioProf32ChannelWidth11na OBJECT-TYPE
+    SYNTAX      TrpzRadioChannelWidth
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "802.11n Channel Width for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 4 }
+
+trpzApConfRadioProf32MaxTxLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum transmit threshold for the
+        AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 5 }
+
+trpzApConfRadioProf32MaxRxLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum receive threshold for the
+        AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 6 }
+
+trpzApConfRadioProf32RtsThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RTS threshold for the AP radios using
+        this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 7 }
+
+trpzApConfRadioProf32FragThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fragmentation threshold for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 8 }
+
+trpzApConfRadioProf32LongXmitPreambleEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether an 802.11b/g AP radio using
+        this radio profile transmits Long Preamble."
+    ::= { trpzApConfRadioProfile32Entry 9 }
+
+trpzApConfRadioProf32CountermeasuresMode OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileCountermeasuresMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Countermeasures Mode for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 10 }
+
+trpzApConfRadioProf32RFScanMode OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFScanMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RF Scanning Mode for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 11 }
+
+trpzApConfRadioProf32RFScanChannelScope OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFScanChannelScope
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RF scanning Channel Scope for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 12 }
+
+trpzApConfRadioProf32RFScanCTSEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AP radios using this radio profile
+        send CTS To Self packet before going off channel."
+    ::= { trpzApConfRadioProfile32Entry 13 }
+
+trpzApConfRadioProf32AutoTunePowerEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Power Auto-Tuning is enabled
+         for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 14 }
+
+trpzApConfRadioProf32AutoTunePowerRampInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum Interval (in seconds) between Power changes
+        due to Auto-Tuning, for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 15 }
+
+trpzApConfRadioProf32AutoTunePowerChangeInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval (in seconds) at which RF Auto-Tuning
+        decides whether to Change the Power for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 16 }
+
+trpzApConfRadioProf32FairQueuingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether weighted Fair Queuing is enabled
+        for this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 17 }
+
+trpzApConfRadioProf32CacBackgroundACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Admission Control for Background traffic
+        is Mandatory for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 18 }
+
+trpzApConfRadioProf32CacBackgroundMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum admission control limit for Background traffic,
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 19 }
+
+trpzApConfRadioProf32CacBackgroundPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Background traffic is enabled, for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 20 }
+
+trpzApConfRadioProf32CacBestEffortACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that Admission Control for Best Effort traffic
+        is Mandatory for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 21 }
+
+trpzApConfRadioProf32CacBestEffortMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum admission control limit for Best Effort traffic,
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 22 }
+
+trpzApConfRadioProf32CacBestEffortPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Best Effort traffic is enabled, for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 23 }
+
+trpzApConfRadioProf32CacVideoACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that Admission Control for Video traffic
+        is Mandatory for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 24 }
+
+trpzApConfRadioProf32CacVideoMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum admission control limit for Video traffic,
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 25 }
+
+trpzApConfRadioProf32CacVideoPolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Video traffic is enabled, for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 26 }
+
+trpzApConfRadioProf32CacVoiceACMandatory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that Admission Control for Voice traffic
+        is Mandatory for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 27 }
+
+trpzApConfRadioProf32CacVoiceMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum admission control limit for Voice traffic,
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 28 }
+
+trpzApConfRadioProf32CacVoicePolicingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that admission control Policing for
+        Voice traffic is enabled, for the AP radios
+        using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 29 }
+
+trpzApConfRadioProf32RfidTagEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether an AP radio using this radio profile
+        is enabled to function as location receivers in an AeroScout
+        Visibility System."
+    ::= { trpzApConfRadioProfile32Entry 30 }
+
+trpzApConfRadioProf32WmmPowerSaveEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AP radios using this radio profile
+        enable power save mode on WMM clients."
+    ::= { trpzApConfRadioProfile32Entry 31 }
+
+trpzApConfRadioProf32RateEnforcementEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether data rates are enforced for the AP radios
+        using this radio profile, which means
+        that a connecting client must transmit at one of the
+        mandatory or standard rates in order to associate
+        with the AP."
+    ::= { trpzApConfRadioProfile32Entry 32 }
+
+trpzApConfRadioProf32DfsChannelsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the AP radios using this radio profile
+        use DFS channels to meet regulatory requirements."
+    ::= { trpzApConfRadioProfile32Entry 33 }
+
+trpzApConfRadioProf32RFSpectralScanModeEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Spectral Scanning Mode is enabled
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 34 }
+
+trpzApConfRadioProf32RFSpectralScanPriority OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileRFSpectralScanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Priority when a Spectral Scan sample time arrives
+        for the AP radios using this radio profile."
+    ::= { trpzApConfRadioProfile32Entry 35 }
+
+
+-- =====================================================
+-- Table for Service Profiles connected to Radio Profile
+
+trpzApConfRadioProf32ServiceProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProf32ServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the currently configured connections
+        between Radio Profiles and Service Profiles.
+        Deprecates trpzApConfRadioProfServiceProfileTable."
+    ::= { trpzApConfigMibObjects 15 }
+
+trpzApConfRadioProf32ServiceProfileEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProf32ServiceProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Connection between a Radio Profile and a Service Profile,
+        currently configured on the AC."
+
+    INDEX   { trpzApConfRp32ServpRadioProfileName,
+              trpzApConfRp32ServpServiceProfileName }
+
+    ::= { trpzApConfRadioProf32ServiceProfileTable 1 }
+
+TrpzApConfRadioProf32ServiceProfileEntry ::= SEQUENCE {
+        trpzApConfRp32ServpRadioProfileName    TrpzRadioProfileName32,
+        trpzApConfRp32ServpServiceProfileName  TrpzServiceProfileName,
+
+        trpzApConfRp32ServpRowStatus           RowStatus
+    }
+
+trpzApConfRp32ServpRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of this Radio Profile."
+    ::= { trpzApConfRadioProf32ServiceProfileEntry 1 }
+
+trpzApConfRp32ServpServiceProfileName OBJECT-TYPE
+    SYNTAX      TrpzServiceProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of a Service Profile connected to
+        this Radio Profile."
+    ::= { trpzApConfRadioProf32ServiceProfileEntry 2 }
+
+trpzApConfRp32ServpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create a new row or
+        delete an existing row in this table.
+
+        To create a row, set this object to 'createAndGo'.
+
+        To delete a row, set this object to 'destroy'.
+
+        Only these two values 'createAndGo' and 'destroy'
+        will be accepted."
+    ::= { trpzApConfRadioProf32ServiceProfileEntry 3 }
+
+
+-- ==================================================
+-- Table for Snoop Filters connected to Radio Profile
+
+trpzApConfRadioProf32SnoopFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApConfRadioProf32SnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the currently configured connections
+        between Radio Profiles and Snoop Filters.
+        Deprecates trpzApConfRadioProfSnoopFilterTable."
+    ::= { trpzApConfigMibObjects 16 }
+
+trpzApConfRadioProf32SnoopFilterEntry OBJECT-TYPE
+    SYNTAX      TrpzApConfRadioProf32SnoopFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Connection between a Radio Profile and a Snoop Filter,
+        currently configured on the AC."
+
+    INDEX   { trpzApConfRp32SnoopfRadioProfileName,
+              trpzApConfRp32SnoopfSnoopFilterName }
+
+    ::= { trpzApConfRadioProf32SnoopFilterTable 1 }
+
+TrpzApConfRadioProf32SnoopFilterEntry ::= SEQUENCE {
+        trpzApConfRp32SnoopfRadioProfileName  TrpzRadioProfileName32,
+        trpzApConfRp32SnoopfSnoopFilterName   TrpzSnoopFilterName,
+
+        trpzApConfRp32SnoopfRowStatus       RowStatus
+    }
+
+trpzApConfRp32SnoopfRadioProfileName OBJECT-TYPE
+    SYNTAX      TrpzRadioProfileName32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of this Radio Profile."
+    ::= { trpzApConfRadioProf32SnoopFilterEntry 1 }
+
+trpzApConfRp32SnoopfSnoopFilterName OBJECT-TYPE
+    SYNTAX      TrpzSnoopFilterName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of a Snoop Filter connected to
+        this Radio Profile."
+    ::= { trpzApConfRadioProf32SnoopFilterEntry 2 }
+
+trpzApConfRp32SnoopfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create a new row or
+        delete an existing row in this table.
+
+        To create a row, set this object to 'createAndGo'.
+
+        To delete a row, set this object to 'destroy'.
+
+        Only these two values 'createAndGo' and 'destroy'
+        will be accepted."
+    ::= { trpzApConfRadioProf32SnoopFilterEntry 3 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzApConfigConformance  OBJECT IDENTIFIER ::= { trpzApConfigMib 2 }
+
+trpzApConfigCompliances  OBJECT IDENTIFIER ::= { trpzApConfigConformance 1 }
+trpzApConfigGroups       OBJECT IDENTIFIER ::= { trpzApConfigConformance 2 }
+
+
+-- Compliance
+
+
+trpzApConfigCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Config MIB."
+
+    MODULE  -- this module (trpzApConfigMib)
+
+    MANDATORY-GROUPS {
+                  trpzApConfApConfigTableGroup,
+                  trpzApConfRadioConfigTableGroup,
+                  trpzApConfApTemplateConfigTableGroup,
+                  trpzApConfApTemplateRadioConfigTableGroup,
+                  trpzApConfRadioProfileTableGroup,
+                  trpzApConfRadioProfServiceProfileTableGroup,
+                  trpzApConfRadioProfSnoopFilterTableGroup,
+                  trpzApConfServiceProfileTableGroup,
+                  trpzApConfSnoopFilterTableGroup
+                }
+
+        OBJECT trpzApConfRpServpRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfServiceProfileTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             In release 7.1 only read access is implemented."
+
+        OBJECT trpzApConfRpSnoopfRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             In release 7.1 only read access is implemented."
+
+    ::= { trpzApConfigCompliances 1 }
+
+
+trpzApConfigComplianceRev2 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Config MIB.
+
+        This compliance statement is for releases 7.5 to 7.6
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by trpzApConfigComplianceRev3."
+    MODULE  -- this module (trpzApConfigMib)
+
+    MANDATORY-GROUPS {
+                  trpzApConfApConfigTableGroup,
+                  trpzApConfApConfigLldpGroup,
+                  trpzApConfApConfigTunnelGroup,
+                  trpzApConfApConfigRemoteApGroup,
+                  trpzApConfRadioConfigTableGroup,
+                  trpzApConfApTemplateConfigTableGroup,
+                  trpzApConfApTemplateRadioConfigTableGroup,
+                  trpzApConfRadioProfileTableGroup,
+                  trpzApConfRadioProfileRFSpectralScanGroup,
+                  trpzApConfRadioProfServiceProfileTableGroup,
+                  trpzApConfRadioProfSnoopFilterTableGroup,
+                  trpzApConfServiceProfileTableGroupRev2,
+                  trpzApConfSnoopFilterTableGroup
+                }
+
+        OBJECT trpzApConfRpServpRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfServiceProfileTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRpSnoopfRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+    ::= { trpzApConfigCompliances 2 }
+
+
+trpzApConfigComplianceRev3 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Config MIB.
+
+        This compliance statement is for release 7.7
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by trpzApConfigComplianceRev4."
+    MODULE  -- this module (trpzApConfigMib)
+
+    MANDATORY-GROUPS {
+                  trpzApConfApConfigTableGroupRev2,
+                  trpzApConfApConfigLldpGroup,
+                  trpzApConfApConfigTunnelGroup,
+                  trpzApConfApConfigRemoteApGroup,
+                  trpzApConfRadioConfigTableGroup,
+                  trpzApConfApTemplateConfigTableGroup,
+                  trpzApConfApTemplateRadioConfigTableGroup,
+                  trpzApConfRadioProfileTableGroup,
+                  trpzApConfRadioProfileRFSpectralScanGroup,
+                  trpzApConfRadioProfServiceProfileTableGroup,
+                  trpzApConfRadioProfSnoopFilterTableGroup,
+                  trpzApConfSnoopFilterTableGroupRev2,
+                  trpzApConfRadioSnoopFilterTableGroup,
+                  trpzApConfSnoopObserverTableGroup,
+                  trpzApConfServiceProfileTableGroupRev3,
+                  trpzApConfRemoteSiteTableGroup
+                }
+
+        OBJECT trpzApConfRpServpRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfServiceProfileTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRpSnoopfRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRadioSnoopFilterRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+    ::= { trpzApConfigCompliances 3 }
+
+
+trpzApConfigComplianceRev4 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Config MIB.
+
+        This compliance statement is for release 8.0
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by trpzApConfigComplianceRev5."
+    MODULE  -- this module (trpzApConfigMib)
+
+    MANDATORY-GROUPS {
+                  trpzApConfApConfigTableGroupRev2,
+                  trpzApConfApConfigLldpGroup,
+                  trpzApConfApConfigTunnelGroup,
+                  trpzApConfApConfigRemoteApGroup,
+                  trpzApConfRadioConfigTableGroup,
+                  trpzApConfApTemplateConfigTableGroup,
+                  trpzApConfApTemplateRadioConfigTableGroup,
+                  trpzApConfRadioProfileTableGroupRev2,
+                  trpzApConfRadioProfileRFSpectralScanGroup,
+                  trpzApConfRadioProfServiceProfileTableGroup,
+                  trpzApConfRadioProfSnoopFilterTableGroup,
+                  trpzApConfSnoopFilterTableGroupRev2,
+                  trpzApConfRadioSnoopFilterTableGroup,
+                  trpzApConfSnoopObserverTableGroup,
+                  trpzApConfServiceProfileTableGroupRev3,
+                  trpzApConfRemoteSiteTableGroup
+                }
+
+        OBJECT trpzApConfRpServpRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfServiceProfileTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRpSnoopfRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProfSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRadioSnoopFilterRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+    ::= { trpzApConfigCompliances 4 }
+
+
+trpzApConfigComplianceRev5 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Config MIB.
+
+        This compliance statement is for releases 9.0 and greater
+        of AC (wireless switch) software."
+    MODULE  -- this module (trpzApConfigMib)
+
+    MANDATORY-GROUPS {
+                  trpzApConfApConfigLldpGroup,
+                  trpzApConfApConfigTunnelGroup,
+                  trpzApConfApConfigRemoteApGroup,
+                  trpzApConfApTemplateConfigTableGroup,
+                  trpzApConfSnoopFilterTableGroupRev2,
+                  trpzApConfRadioSnoopFilterTableGroup,
+                  trpzApConfSnoopObserverTableGroup,
+                  trpzApConfServiceProfileTableGroupRev3,
+                  trpzApConfApConfigTableGroupRev3,
+                  trpzApConfRadioConfigTableGroupRev2,
+                  trpzApConfApTemplateRadioConfigTableGroupRev2,
+                  trpzApConfRadioProfile32TableGroup,
+                  trpzApConfRadioProfileRFSpectralScanGroupRev2,
+                  trpzApConfRadioProf32ServiceProfileTableGroup,
+                  trpzApConfRadioProf32SnoopFilterTableGroup,
+                  trpzApConfRemoteSiteTableGroupRev2
+                }
+
+        OBJECT trpzApConfRadioSnoopFilterRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioSnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRp32ServpRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProf32ServiceProfileTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+        OBJECT trpzApConfRp32SnoopfRowStatus
+        SYNTAX INTEGER {
+            active(1)
+        }
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Create/delete/modify access to the
+             trpzApConfRadioProf32SnoopFilterTable
+             is not required.
+             Support of the values notInService(2), notReady(3),
+             createAndGo(4), createAndWait(5), and destroy(6)
+             is not required.
+
+             Even if create/delete access is supported, the states
+             notInService(2), notReady(3) and createAndWait(5)
+             need not be supported.
+
+             Only read access is implemented."
+
+    ::= { trpzApConfigCompliances 5 }
+
+
+-- Units of Conformance
+
+
+trpzApConfApConfigTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigApAttachType,
+                  trpzApConfApConfigPhysPortNum,
+                  trpzApConfApConfigApSerialNum,
+                  trpzApConfApConfigApModelName,
+                  trpzApConfApConfigFingerprint,
+                  trpzApConfApConfigBias,
+                  trpzApConfApConfigApTimeout,
+                  trpzApConfApConfigApName,
+                  trpzApConfApConfigContact,
+                  trpzApConfApConfigLocation,
+                  trpzApConfApConfigBlinkEnabled,
+                  trpzApConfApConfigForceImageDownloadEnabled,
+                  trpzApConfApConfigFirmwareUpgradeEnabled,
+                  trpzApConfApConfigLocalSwitchingEnabled,
+                  trpzApConfApConfigPowerMode,
+                  trpzApConfApConfigLedMode,
+                  trpzApConfApConfigDescription
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Configuration info in releases 7.1 to 7.6.
+
+            Replaced by trpzApConfApConfigTableGroupRev2."
+        ::= { trpzApConfigGroups 1 }
+
+
+trpzApConfRadioConfigTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioConfigRadioType,
+                  trpzApConfRadioConfigRadioMode,
+                  trpzApConfRadioConfigRadioProfileName,
+                  trpzApConfRadioConfigChannel,
+                  trpzApConfRadioConfigTxPower,
+                  trpzApConfRadioConfigAutoTuneMaxTxPower,
+                  trpzApConfRadioConfigAntennaType,
+                  trpzApConfRadioConfigAntennaLocation,
+                  trpzApConfRadioConfigLoadBalancingEnabled,
+                  trpzApConfRadioConfigLoadBalancingGroup,
+                  trpzApConfRadioConfigLoadRebalancingEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Configuration info in releases 7.1 to 8.0.
+
+            Replaced by trpzApConfRadioConfigTableGroupRev2."
+        ::= { trpzApConfigGroups 2 }
+
+
+trpzApConfApTemplateConfigTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApTemplConfApTemplateEnabled,
+                  trpzApConfApTemplConfBias,
+                  trpzApConfApTemplConfApTimeout,
+                  trpzApConfApTemplConfBlinkEnabled,
+                  trpzApConfApTemplConfForceImageDownloadEnabled,
+                  trpzApConfApTemplConfFirmwareUpgradeEnabled,
+                  trpzApConfApTemplConfLocalSwitchingEnabled,
+                  trpzApConfApTemplConfPowerMode,
+                  trpzApConfApTemplConfLedMode
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Configuration Template info in releases 7.1 and greater."
+        ::= { trpzApConfigGroups 3 }
+
+
+trpzApConfApTemplateRadioConfigTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApTemRadioConfRadioMode,
+                  trpzApConfApTemRadioConfRadioProfileName,
+                  trpzApConfApTemRadioConfAutoTuneMaxTxPower,
+                  trpzApConfApTemRadioConfLoadBalancingEnabled,
+                  trpzApConfApTemRadioConfLoadBalancingGroup,
+                  trpzApConfApTemRadioConfLoadRebalancingEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Configuration Template info in releases 7.1 to 8.0.
+
+            Replaced by trpzApConfApTemplateRadioConfigTableGroupRev2."
+        ::= { trpzApConfigGroups 4 }
+
+
+trpzApConfRadioProfileTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioProfBeaconInterval,
+                  trpzApConfRadioProfDtimInterval,
+                  trpzApConfRadioProfChannelWidth11na,
+                  trpzApConfRadioProfMaxTxLifetime,
+                  trpzApConfRadioProfMaxRxLifetime,
+                  trpzApConfRadioProfRtsThreshold,
+                  trpzApConfRadioProfFragThreshold,
+                  trpzApConfRadioProfLongXmitPreambleEnabled,
+                  trpzApConfRadioProfCountermeasuresMode,
+                  trpzApConfRadioProfRFScanMode,
+                  trpzApConfRadioProfRFScanChannelScope,
+                  trpzApConfRadioProfRFScanCTSEnabled,
+                  trpzApConfRadioProfAutoTune11aChannelRange,
+                  trpzApConfRadioProfAutoTuneIgnoreClientsEnabled,
+                  trpzApConfRadioProfAutoTuneChannelEnabled,
+                  trpzApConfRadioProfAutoTuneChannelHolddownInterval,
+                  trpzApConfRadioProfAutoTuneChannelChangeInterval,
+                  trpzApConfRadioProfAutoTunePowerEnabled,
+                  trpzApConfRadioProfAutoTunePowerRampInterval,
+                  trpzApConfRadioProfAutoTunePowerChangeInterval,
+                  trpzApConfRadioProfFairQueuingEnabled,
+                  trpzApConfRadioProfCacBackgroundACMandatory,
+                  trpzApConfRadioProfCacBackgroundMaxUtilization,
+                  trpzApConfRadioProfCacBackgroundPolicingEnabled,
+                  trpzApConfRadioProfCacBestEffortACMandatory,
+                  trpzApConfRadioProfCacBestEffortMaxUtilization,
+                  trpzApConfRadioProfCacBestEffortPolicingEnabled,
+                  trpzApConfRadioProfCacVideoACMandatory,
+                  trpzApConfRadioProfCacVideoMaxUtilization,
+                  trpzApConfRadioProfCacVideoPolicingEnabled,
+                  trpzApConfRadioProfCacVoiceACMandatory,
+                  trpzApConfRadioProfCacVoiceMaxUtilization,
+                  trpzApConfRadioProfCacVoicePolicingEnabled,
+                  trpzApConfRadioProfRfidTagEnabled,
+                  trpzApConfRadioProfWmmPowerSaveEnabled,
+                  trpzApConfRadioProfRateEnforcementEnabled,
+                  trpzApConfRadioProfDfsChannelsEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Profile configuration info in releases 7.1 to 7.7.
+
+            Replaced by trpzApConfRadioProfileTableGroupRev2."
+        ::= { trpzApConfigGroups 5 }
+
+
+trpzApConfRadioProfServiceProfileTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRpServpRowStatus
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Service Profiles associated to each Radio Profile
+            in releases 7.1 to 8.0.
+
+            Replaced by trpzApConfRadioProf32ServiceProfileTableGroup."
+        ::= { trpzApConfigGroups 6 }
+
+
+trpzApConfRadioProfSnoopFilterTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRpSnoopfRowStatus
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Snoop Filters associated to each Radio Profile
+            in releases 7.1 to 8.0.
+
+            Replaced by trpzApConfRadioProf32SnoopFilterTableGroup."
+        ::= { trpzApConfigGroups 7 }
+
+
+trpzApConfServiceProfileTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfServProfSsidType,
+                  trpzApConfServProfBeaconEnabled,
+                  trpzApConfServProf11naMode,
+                  trpzApConfServProf11ngMode,
+                  trpzApConfServProf11nShortGuardIntervalEnabled,
+                  trpzApConfServProf11nFrameAggregation,
+                  trpzApConfServProf11nMsduMaxLength,
+                  trpzApConfServProf11nMpduMaxLength,
+                  trpzApConfServProfAuthFallthru,
+                  trpzApConfServProfWebAAAForm,
+                  trpzApConfServProfSharedKeyAuthEnabled,
+                  trpzApConfServProfWpaIeEnabled,
+                  trpzApConfServProfWpaIeCipherTkipEnabled,
+                  trpzApConfServProfWpaIeCipherCcmpEnabled,
+                  trpzApConfServProfWpaIeCipherWep40Enabled,
+                  trpzApConfServProfWpaIeCipherWep104Enabled,
+                  trpzApConfServProfWpaIeAuthDot1xEnabled,
+                  trpzApConfServProfWpaIeAuthPskEnabled,
+                  trpzApConfServProfRsnIeEnabled,
+                  trpzApConfServProfRsnIeCipherTkipEnabled,
+                  trpzApConfServProfRsnIeCipherCcmpEnabled,
+                  trpzApConfServProfRsnIeCipherWep40Enabled,
+                  trpzApConfServProfRsnIeCipherWep104Enabled,
+                  trpzApConfServProfRsnIeAuthDot1xEnabled,
+                  trpzApConfServProfRsnIeAuthPskEnabled,
+                  trpzApConfServProfTkipMicCountermeasuresTime,
+                  trpzApConfServProfMaxBandwidthKbps,
+                  trpzApConfServProfCacMode,
+                  trpzApConfServProfCacSessCount,
+                  trpzApConfServProfUserIdleTimeout,
+                  trpzApConfServProfIdleClientProbingEnabled,
+                  trpzApConfServProfShortRetryCount,
+                  trpzApConfServProfLongRetryCount,
+                  trpzApConfServProfProxyArpEnabled,
+                  trpzApConfServProfDhcpRestrictEnabled,
+                  trpzApConfServProfNoBroadcastEnabled,
+                  trpzApConfServProfSygateOnDemandEnabled,
+                  trpzApConfServProfEnforceChecksEnabled,
+                  trpzApConfServProfSodaRemediationAcl,
+                  trpzApConfServProfSodaSuccessPage,
+                  trpzApConfServProfSodaFailurePage,
+                  trpzApConfServProfSodaLogoutPage,
+                  trpzApConfServProfSodaAgentDirectory,
+                  trpzApConfServProfWebPortalSessionTimeout,
+                  trpzApConfServProfWebPortalAcl,
+                  trpzApConfServProfWebPortalLogoutEnabled,
+                  trpzApConfServProfWebPortalLogoutUrl,
+                  trpzApConfServProfKeepInitialVlanEnabled,
+                  trpzApConfServProfMeshModeEnabled,
+                  trpzApConfServProfBridgingEnabled,
+                  trpzApConfServProfLoadBalanceExemptEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Service Profile configuration info in releases 7.1 and greater."
+        ::= { trpzApConfigGroups 8 }
+
+
+trpzApConfSnoopFilterTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfSnoopFilterEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Snoop Filter configuration info in releases 7.1 to 7.6.
+
+            Replaced by trpzApConfSnoopFilterTableGroupRev2."
+        ::= { trpzApConfigGroups 9 }
+
+
+trpzApConfServiceProfileTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfServProfSsidType,
+                  trpzApConfServProfBeaconEnabled,
+                  trpzApConfServProf11naMode,
+                  trpzApConfServProf11ngMode,
+                  trpzApConfServProf11nShortGuardIntervalEnabled,
+                  trpzApConfServProf11nFrameAggregation,
+                  trpzApConfServProf11nMsduMaxLength,
+                  trpzApConfServProf11nMpduMaxLength,
+                  trpzApConfServProfAuthFallthru,
+                  trpzApConfServProfWebAAAForm,
+                  trpzApConfServProfSharedKeyAuthEnabled,
+                  trpzApConfServProfWpaIeEnabled,
+                  trpzApConfServProfWpaIeCipherTkipEnabled,
+                  trpzApConfServProfWpaIeCipherCcmpEnabled,
+                  trpzApConfServProfWpaIeAuthDot1xEnabled,
+                  trpzApConfServProfWpaIeAuthPskEnabled,
+                  trpzApConfServProfRsnIeEnabled,
+                  trpzApConfServProfRsnIeCipherTkipEnabled,
+                  trpzApConfServProfRsnIeCipherCcmpEnabled,
+                  trpzApConfServProfRsnIeAuthDot1xEnabled,
+                  trpzApConfServProfRsnIeAuthPskEnabled,
+                  trpzApConfServProfTkipMicCountermeasuresTime,
+                  trpzApConfServProfMaxBandwidthKbps,
+                  trpzApConfServProfCacMode,
+                  trpzApConfServProfCacSessCount,
+                  trpzApConfServProfUserIdleTimeout,
+                  trpzApConfServProfIdleClientProbingEnabled,
+                  trpzApConfServProfShortRetryCount,
+                  trpzApConfServProfLongRetryCount,
+                  trpzApConfServProfProxyArpEnabled,
+                  trpzApConfServProfDhcpRestrictEnabled,
+                  trpzApConfServProfNoBroadcastEnabled,
+                  trpzApConfServProfSygateOnDemandEnabled,
+                  trpzApConfServProfEnforceChecksEnabled,
+                  trpzApConfServProfSodaRemediationAcl,
+                  trpzApConfServProfSodaSuccessPage,
+                  trpzApConfServProfSodaFailurePage,
+                  trpzApConfServProfSodaLogoutPage,
+                  trpzApConfServProfSodaAgentDirectory,
+                  trpzApConfServProfWebPortalSessionTimeout,
+                  trpzApConfServProfWebPortalAcl,
+                  trpzApConfServProfWebPortalLogoutEnabled,
+                  trpzApConfServProfWebPortalLogoutUrl,
+                  trpzApConfServProfKeepInitialVlanEnabled,
+                  trpzApConfServProfMeshModeEnabled,
+                  trpzApConfServProfBridgingEnabled,
+                  trpzApConfServProfLoadBalanceExemptEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Service Profile configuration info in releases 7.5 to 7.6.
+
+            Replaced by trpzApConfServiceProfileTableGroupRev3."
+        ::= { trpzApConfigGroups 10 }
+
+
+trpzApConfApConfigLldpGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigLldpMode,
+                  trpzApConfApConfigLldpMedEnabled,
+                  trpzApConfApConfigLldpMedExtPowerViaMdiTlvSelected,
+                  trpzApConfApConfigLldpMedInventoryTlvSelected
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP LLDP Configuration info in releases 7.5 and greater."
+        ::= { trpzApConfigGroups 11 }
+
+
+trpzApConfApConfigTunnelGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigApTunnelEnabled
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP to AP tunnel Configuration info in releases 7.5 and greater."
+        ::= { trpzApConfigGroups 12 }
+
+
+trpzApConfApConfigRemoteApGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigDataSecurityEnabled,
+                  trpzApConfApConfigWanOutageModeEnabled,
+                  trpzApConfApConfigWanOutageExtendedTimeout,
+                  trpzApConfApConfigWanOutageEvaluationPeriod
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            remote AP related Configuration info in releases 7.5 and greater."
+        ::= { trpzApConfigGroups 13 }
+
+
+trpzApConfRadioProfileRFSpectralScanGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioProfRFSpectralScanModeEnabled,
+                  trpzApConfRadioProfRFSpectralScanPriority
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Profile RF Spectral Scanning configuration info
+            in releases 7.5 to 8.0.
+
+            Replaced by trpzApConfRadioProfileRFSpectralScanGroupRev2."
+        ::= { trpzApConfigGroups 14 }
+
+
+trpzApConfApConfigTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigApAttachType,
+                  trpzApConfApConfigPhysPortNum,
+                  trpzApConfApConfigApSerialNum,
+                  trpzApConfApConfigApModelName,
+                  trpzApConfApConfigFingerprint,
+                  trpzApConfApConfigBias,
+                  trpzApConfApConfigApTimeout,
+                  trpzApConfApConfigApName,
+                  trpzApConfApConfigContact,
+                  trpzApConfApConfigLocation,
+                  trpzApConfApConfigBlinkEnabled,
+                  trpzApConfApConfigForceImageDownloadEnabled,
+                  trpzApConfApConfigFirmwareUpgradeEnabled,
+                  trpzApConfApConfigLocalSwitchingEnabled,
+                  trpzApConfApConfigPowerMode,
+                  trpzApConfApConfigLedMode,
+                  trpzApConfApConfigDescription,
+                  trpzApConfApConfigRemoteSiteName,
+                  trpzApConfApConfigPathMtu,
+                  trpzApConfApConfigHighLatencyModeEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Configuration info in releases 7.7 to 8.0.
+
+            Replaced by trpzApConfApConfigTableGroupRev3."
+        ::= { trpzApConfigGroups 15 }
+
+
+trpzApConfSnoopFilterTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfSnoopFilterEnabled,
+                  trpzApConfSnoopFilterObserverAddrType,
+                  trpzApConfSnoopFilterObserverAddr
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Snoop Filter configuration info in releases 7.7 and greater."
+        ::= { trpzApConfigGroups 16 }
+
+
+trpzApConfSnoopObserverTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfSnoopObserverSnapLength,
+                  trpzApConfSnoopObserverInterval,
+                  trpzApConfSnoopObserverTxMode
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Snoop Observer configuration info in releases 7.7 and greater."
+        ::= { trpzApConfigGroups 17 }
+
+
+trpzApConfRadioSnoopFilterTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioSnoopFilterRowStatus
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+             info about the associations of Snoop Filters with
+             AP Radios in releases 7.7 and greater."
+        ::= { trpzApConfigGroups 18 }
+
+
+trpzApConfServiceProfileTableGroupRev3 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfServProfSsidType,
+                  trpzApConfServProfBeaconEnabled,
+                  trpzApConfServProf11naMode,
+                  trpzApConfServProf11ngMode,
+                  trpzApConfServProf11nShortGuardIntervalEnabled,
+                  trpzApConfServProf11nFrameAggregation,
+                  trpzApConfServProf11nMsduMaxLength,
+                  trpzApConfServProf11nMpduMaxLength,
+                  trpzApConfServProfAuthFallthru,
+                  trpzApConfServProfWebAAAForm,
+                  trpzApConfServProfWebPortalLogoutForm,
+                  trpzApConfServProfSharedKeyAuthEnabled,
+                  trpzApConfServProfWpaIeEnabled,
+                  trpzApConfServProfWpaIeCipherTkipEnabled,
+                  trpzApConfServProfWpaIeCipherCcmpEnabled,
+                  trpzApConfServProfWpaIeAuthDot1xEnabled,
+                  trpzApConfServProfWpaIeAuthPskEnabled,
+                  trpzApConfServProfRsnIeEnabled,
+                  trpzApConfServProfRsnIeCipherTkipEnabled,
+                  trpzApConfServProfRsnIeCipherCcmpEnabled,
+                  trpzApConfServProfRsnIeAuthDot1xEnabled,
+                  trpzApConfServProfRsnIeAuthPskEnabled,
+                  trpzApConfServProfTkipMicCountermeasuresTime,
+                  trpzApConfServProfMaxBandwidthKbps,
+                  trpzApConfServProfCacMode,
+                  trpzApConfServProfCacSessCount,
+                  trpzApConfServProfUserIdleTimeout,
+                  trpzApConfServProfIdleClientProbingEnabled,
+                  trpzApConfServProfShortRetryCount,
+                  trpzApConfServProfLongRetryCount,
+                  trpzApConfServProfProxyArpEnabled,
+                  trpzApConfServProfDhcpRestrictEnabled,
+                  trpzApConfServProfNoBroadcastEnabled,
+                  trpzApConfServProfSygateOnDemandEnabled,
+                  trpzApConfServProfEnforceChecksEnabled,
+                  trpzApConfServProfSodaRemediationAcl,
+                  trpzApConfServProfSodaSuccessPage,
+                  trpzApConfServProfSodaFailurePage,
+                  trpzApConfServProfSodaLogoutPage,
+                  trpzApConfServProfSodaAgentDirectory,
+                  trpzApConfServProfWebPortalSessionTimeout,
+                  trpzApConfServProfWebPortalAcl,
+                  trpzApConfServProfWebPortalLogoutEnabled,
+                  trpzApConfServProfWebPortalLogoutUrl,
+                  trpzApConfServProfKeepInitialVlanEnabled,
+                  trpzApConfServProfMeshModeEnabled,
+                  trpzApConfServProfBridgingEnabled,
+                  trpzApConfServProfLoadBalanceExemptEnabled,
+                  trpzApConfServProfM2UConversionEnabled,
+                  trpzApConfServProfBackupSsidMode,
+                  trpzApConfServProfBackupSsidTimeout,
+                  trpzApConfServProfBackupSsidKeepClients
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Service Profile configuration info in releases 7.7 and greater."
+        ::= { trpzApConfigGroups 19 }
+
+
+trpzApConfRemoteSiteTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRemoteSiteCountryCode,
+                  trpzApConfRemoteSitePathMtu,
+                  trpzApConfRemoteSiteBackupSsidsEnabled,
+
+                  trpzApConfRemoteSiteLogServerEnabled,
+                  trpzApConfRemoteSiteLogServerAddrType,
+                  trpzApConfRemoteSiteLogServerAddr,
+                  trpzApConfRemoteSiteLogServerPort,
+                  trpzApConfRemoteSiteLogServerSeverity
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Remote Site configuration info in releases 7.7 to 8.0.
+
+            Replaced by trpzApConfRemoteSiteTableGroupRev2."
+        ::= { trpzApConfigGroups 20 }
+
+
+trpzApConfRadioProfileTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioProfBeaconInterval,
+                  trpzApConfRadioProfDtimInterval,
+                  trpzApConfRadioProfChannelWidth11na,
+                  trpzApConfRadioProfMaxTxLifetime,
+                  trpzApConfRadioProfMaxRxLifetime,
+                  trpzApConfRadioProfRtsThreshold,
+                  trpzApConfRadioProfFragThreshold,
+                  trpzApConfRadioProfLongXmitPreambleEnabled,
+                  trpzApConfRadioProfCountermeasuresMode,
+                  trpzApConfRadioProfRFScanMode,
+                  trpzApConfRadioProfRFScanChannelScope,
+                  trpzApConfRadioProfRFScanCTSEnabled,
+                  trpzApConfRadioProfAutoTunePowerEnabled,
+                  trpzApConfRadioProfAutoTunePowerRampInterval,
+                  trpzApConfRadioProfAutoTunePowerChangeInterval,
+                  trpzApConfRadioProfFairQueuingEnabled,
+                  trpzApConfRadioProfCacBackgroundACMandatory,
+                  trpzApConfRadioProfCacBackgroundMaxUtilization,
+                  trpzApConfRadioProfCacBackgroundPolicingEnabled,
+                  trpzApConfRadioProfCacBestEffortACMandatory,
+                  trpzApConfRadioProfCacBestEffortMaxUtilization,
+                  trpzApConfRadioProfCacBestEffortPolicingEnabled,
+                  trpzApConfRadioProfCacVideoACMandatory,
+                  trpzApConfRadioProfCacVideoMaxUtilization,
+                  trpzApConfRadioProfCacVideoPolicingEnabled,
+                  trpzApConfRadioProfCacVoiceACMandatory,
+                  trpzApConfRadioProfCacVoiceMaxUtilization,
+                  trpzApConfRadioProfCacVoicePolicingEnabled,
+                  trpzApConfRadioProfRfidTagEnabled,
+                  trpzApConfRadioProfWmmPowerSaveEnabled,
+                  trpzApConfRadioProfRateEnforcementEnabled,
+                  trpzApConfRadioProfDfsChannelsEnabled
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Profile configuration info in release 8.0.
+
+            Replaced by trpzApConfRadioProfile32TableGroup."
+        ::= { trpzApConfigGroups 21 }
+
+
+trpzApConfApConfigTableGroupRev3 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApConfigApAttachType,
+                  trpzApConfApConfigPhysPortNum,
+                  trpzApConfApConfigApSerialNum,
+                  trpzApConfApConfigApModelName,
+                  trpzApConfApConfigFingerprint,
+                  trpzApConfApConfigBias,
+                  trpzApConfApConfigApTimeout,
+                  trpzApConfApConfigContact,
+                  trpzApConfApConfigLocation,
+                  trpzApConfApConfigBlinkEnabled,
+                  trpzApConfApConfigForceImageDownloadEnabled,
+                  trpzApConfApConfigFirmwareUpgradeEnabled,
+                  trpzApConfApConfigLocalSwitchingEnabled,
+                  trpzApConfApConfigPowerMode,
+                  trpzApConfApConfigLedMode,
+                  trpzApConfApConfigDescription,
+                  trpzApConfApConfigRemoteSiteName,
+                  trpzApConfApConfigPathMtu,
+                  trpzApConfApConfigHighLatencyModeEnabled,
+                  trpzApConfApConfigApName2,
+                  trpzApConfApConfigCacheConfigEnabled
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Configuration info in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 22 }
+
+
+trpzApConfRadioConfigTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioConfigRadioType,
+                  trpzApConfRadioConfigRadioMode,
+                  trpzApConfRadioConfigChannel,
+                  trpzApConfRadioConfigTxPower,
+                  trpzApConfRadioConfigAntennaType,
+                  trpzApConfRadioConfigAntennaLocation,
+                  trpzApConfRadioConfigLoadBalancingEnabled,
+                  trpzApConfRadioConfigLoadBalancingGroup,
+                  trpzApConfRadioConfigLoadRebalancingEnabled,
+                  trpzApConfRadioConfigRadioProfileName2
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Configuration info in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 23 }
+
+
+trpzApConfApTemplateRadioConfigTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfApTemRadioConfRadioMode,
+                  trpzApConfApTemRadioConfLoadBalancingEnabled,
+                  trpzApConfApTemRadioConfLoadBalancingGroup,
+                  trpzApConfApTemRadioConfLoadRebalancingEnabled,
+                  trpzApConfApTemRadioConfRadioProfileName2
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Configuration Template info in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 24 }
+
+
+trpzApConfRadioProfile32TableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioProf32BeaconInterval,
+                  trpzApConfRadioProf32DtimInterval,
+                  trpzApConfRadioProf32ChannelWidth11na,
+                  trpzApConfRadioProf32MaxTxLifetime,
+                  trpzApConfRadioProf32MaxRxLifetime,
+                  trpzApConfRadioProf32RtsThreshold,
+                  trpzApConfRadioProf32FragThreshold,
+                  trpzApConfRadioProf32LongXmitPreambleEnabled,
+                  trpzApConfRadioProf32CountermeasuresMode,
+                  trpzApConfRadioProf32RFScanMode,
+                  trpzApConfRadioProf32RFScanChannelScope,
+                  trpzApConfRadioProf32RFScanCTSEnabled,
+                  trpzApConfRadioProf32AutoTunePowerEnabled,
+                  trpzApConfRadioProf32AutoTunePowerRampInterval,
+                  trpzApConfRadioProf32AutoTunePowerChangeInterval,
+                  trpzApConfRadioProf32FairQueuingEnabled,
+                  trpzApConfRadioProf32CacBackgroundACMandatory,
+                  trpzApConfRadioProf32CacBackgroundMaxUtilization,
+                  trpzApConfRadioProf32CacBackgroundPolicingEnabled,
+                  trpzApConfRadioProf32CacBestEffortACMandatory,
+                  trpzApConfRadioProf32CacBestEffortMaxUtilization,
+                  trpzApConfRadioProf32CacBestEffortPolicingEnabled,
+                  trpzApConfRadioProf32CacVideoACMandatory,
+                  trpzApConfRadioProf32CacVideoMaxUtilization,
+                  trpzApConfRadioProf32CacVideoPolicingEnabled,
+                  trpzApConfRadioProf32CacVoiceACMandatory,
+                  trpzApConfRadioProf32CacVoiceMaxUtilization,
+                  trpzApConfRadioProf32CacVoicePolicingEnabled,
+                  trpzApConfRadioProf32RfidTagEnabled,
+                  trpzApConfRadioProf32WmmPowerSaveEnabled,
+                  trpzApConfRadioProf32RateEnforcementEnabled,
+                  trpzApConfRadioProf32DfsChannelsEnabled
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Profile configuration info in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 25 }
+
+
+trpzApConfRadioProfileRFSpectralScanGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRadioProf32RFSpectralScanModeEnabled,
+                  trpzApConfRadioProf32RFSpectralScanPriority
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Profile RF Spectral Scanning configuration info
+            in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 26 }
+
+
+trpzApConfRadioProf32ServiceProfileTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRp32ServpRowStatus
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Service Profiles associated to each Radio Profile
+            in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 27 }
+
+
+trpzApConfRadioProf32SnoopFilterTableGroup OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRp32SnoopfRowStatus
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Snoop Filters associated to each Radio Profile
+            in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 28 }
+
+
+trpzApConfRemoteSiteTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                  trpzApConfRemoteSiteCountryCode,
+                  trpzApConfRemoteSitePathMtu,
+                  trpzApConfRemoteSiteBackupSsidsEnabled,
+
+                  trpzApConfRemoteSiteLogServerEnabled,
+                  trpzApConfRemoteSiteLogServerAddrType,
+                  trpzApConfRemoteSiteLogServerAddr,
+                  trpzApConfRemoteSiteLogServerPort,
+                  trpzApConfRemoteSiteLogServerSeverity,
+
+                  trpzApConfRemoteSiteAcPollingEnabled,
+
+                  trpzApConfRemoteSiteRadiusServerGroupName,
+                  trpzApConfRemoteSiteRadiusDeadtime,
+                  trpzApConfRemoteSiteRadiusTimeout,
+                  trpzApConfRemoteSiteRadiusRetransmit,
+                  trpzApConfRemoteSiteRadiusNasIdType
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Remote Site configuration info in releases 9.0 and greater."
+        ::= { trpzApConfigGroups 29 }
+
+
+END

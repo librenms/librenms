@@ -1,0 +1,439 @@
+TRAPEZE-NETWORKS-INFO-RF-DETECT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM SNMPv2-TC
+    TrpzChannelNum, TrpzRssi, TrpzApNum, TrpzApRadioIndex,
+    TrpzRadioRateEx
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzRFDetectNetworkingMode,
+    TrpzRFDetectClassification,
+    TrpzRFDetectClassificationReason,
+    TrpzRFDetectDot11ModulationStandard
+        FROM TRAPEZE-NETWORKS-RF-DETECT-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzInfoRFDetectMib MODULE-IDENTITY
+    LAST-UPDATED "201107270022Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "RF Detect MIB.
+
+        Copyright 2007-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201107270022Z"
+    DESCRIPTION "v1.3.2: Revised for 7.7 release."
+
+    REVISION "200908180021Z"
+    DESCRIPTION "v1.3.1: Added one table: trpzInfoRFDetectClientTable
+                to support detected Clients and RFID tags
+                (for 7.7 release)."
+
+    REVISION "200706270011Z"
+    DESCRIPTION "v1.2.0: Added one scalar:
+        trpzInfoRFDetectCurrentXmtrTableSize
+        (for 6.2 release)"
+
+    REVISION "200704180010Z"
+    DESCRIPTION "v1.1.0: Added three new columnar objects:
+        - trpzInfoRFDetectXmtrNetworkingMode,
+        - trpzInfoRFDetectXmtrClassification,
+        - trpzInfoRFDetectXmtrClassificationReason
+        (for 6.2 release)"
+
+    REVISION "200610110003Z"
+    DESCRIPTION "v1.0.3: Initial version, for 6.0 release"
+
+    ::= { trpzMibs 9 }
+
+
+--
+-- The RF Detect MIB Tree
+--
+
+trpzInfoRFDetectObjects      OBJECT IDENTIFIER ::= { trpzInfoRFDetectMib 1 }
+trpzInfoRFDetectDataObjects  OBJECT IDENTIFIER ::= { trpzInfoRFDetectObjects 1 }
+
+--
+-- Object definitions
+--
+
+-- Transmitter table
+
+trpzInfoRFDetectXmtrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzInfoRFDetectXmtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Transmitter table.
+        May contain tens of thousands of entries
+        (different Transmitter-Listener-Channel combinations)."
+    ::= { trpzInfoRFDetectDataObjects 1 }
+
+trpzInfoRFDetectXmtrEntry OBJECT-TYPE
+    SYNTAX      TrpzInfoRFDetectXmtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Transmitter-Listener-Channel combination."
+    INDEX { trpzInfoRFDetectXmtrTransmitterMacAddress,
+            trpzInfoRFDetectXmtrListenerMacAddress,
+            trpzInfoRFDetectXmtrChannelNum }
+    ::= { trpzInfoRFDetectXmtrTable 1 }
+
+TrpzInfoRFDetectXmtrEntry ::= SEQUENCE {
+    trpzInfoRFDetectXmtrTransmitterMacAddress  MacAddress,
+    trpzInfoRFDetectXmtrListenerMacAddress     MacAddress,
+    trpzInfoRFDetectXmtrChannelNum             TrpzChannelNum,
+
+    trpzInfoRFDetectXmtrRssi        TrpzRssi,
+    trpzInfoRFDetectXmtrSsid        DisplayString,
+
+    trpzInfoRFDetectXmtrNetworkingMode        TrpzRFDetectNetworkingMode,
+    trpzInfoRFDetectXmtrClassification        TrpzRFDetectClassification,
+    trpzInfoRFDetectXmtrClassificationReason  TrpzRFDetectClassificationReason
+    }
+
+trpzInfoRFDetectXmtrTransmitterMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of this Transmitter."
+    ::= { trpzInfoRFDetectXmtrEntry 1 }
+
+trpzInfoRFDetectXmtrListenerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of this Listener."
+    ::= { trpzInfoRFDetectXmtrEntry 2 }
+
+trpzInfoRFDetectXmtrChannelNum OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Channel Number this transmitter was using
+        when this listener detected it."
+    ::= { trpzInfoRFDetectXmtrEntry 3 }
+
+trpzInfoRFDetectXmtrRssi OBJECT-TYPE
+    SYNTAX      TrpzRssi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received Signal Strength Indicator at this listener."
+    ::= { trpzInfoRFDetectXmtrEntry 4 }
+
+trpzInfoRFDetectXmtrSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name this transmitter was using.
+        Zero-length string when unknown or not applicable."
+    ::= { trpzInfoRFDetectXmtrEntry 5 }
+
+trpzInfoRFDetectXmtrNetworkingMode OBJECT-TYPE
+    SYNTAX      TrpzRFDetectNetworkingMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The way this transmitter is doing wireless networking:
+        ad-hoc mode networking or
+        infrastructure mode networking."
+    ::= { trpzInfoRFDetectXmtrEntry 6 }
+
+trpzInfoRFDetectXmtrClassification OBJECT-TYPE
+    SYNTAX      TrpzRFDetectClassification
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RF classification of this transmitter."
+    ::= { trpzInfoRFDetectXmtrEntry 7 }
+
+trpzInfoRFDetectXmtrClassificationReason OBJECT-TYPE
+    SYNTAX      TrpzRFDetectClassificationReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason why this transmitter was classified by
+        RF detection the way it is."
+    ::= { trpzInfoRFDetectXmtrEntry 8 }
+
+
+-- Client table
+
+trpzInfoRFDetectClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzInfoRFDetectClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client table, including RFID tags.
+        Contains Client-Listener combinations."
+    ::= { trpzInfoRFDetectDataObjects 3 }
+
+trpzInfoRFDetectClientEntry OBJECT-TYPE
+    SYNTAX      TrpzInfoRFDetectClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular Client,
+        as it was detected by a particular listener (AP radio)."
+    INDEX { trpzInfoRFDetectClientMacAddress,
+            trpzInfoRFDetectClientListenerMacAddress }
+    ::= { trpzInfoRFDetectClientTable 1 }
+
+TrpzInfoRFDetectClientEntry ::= SEQUENCE {
+        trpzInfoRFDetectClientMacAddress          MacAddress,
+        trpzInfoRFDetectClientListenerMacAddress  MacAddress,
+
+        trpzInfoRFDetectClientConnectedBssid  MacAddress,
+        trpzInfoRFDetectClientApNum           TrpzApNum,
+        trpzInfoRFDetectClientApRadioIndex    TrpzApRadioIndex,
+
+        trpzInfoRFDetectClientModulation      TrpzRFDetectDot11ModulationStandard,
+        trpzInfoRFDetectClientChannelNum      TrpzChannelNum,
+        trpzInfoRFDetectClientRate            TrpzRadioRateEx,
+        trpzInfoRFDetectClientRssi            TrpzRssi,
+
+        trpzInfoRFDetectClientClassification  TrpzRFDetectClassification
+    }
+
+trpzInfoRFDetectClientMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of this Client."
+    ::= { trpzInfoRFDetectClientEntry 1 }
+
+trpzInfoRFDetectClientListenerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of this Listener (AP radio)."
+    ::= { trpzInfoRFDetectClientEntry 2 }
+
+trpzInfoRFDetectClientConnectedBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The service MAC address (a.k.a. BSSID) this Client was Connected to
+        when last detected by this listener.
+        If this information is not available, the value will be
+        0:0:0:0:0:0."
+    ::= { trpzInfoRFDetectClientEntry 3 }
+
+trpzInfoRFDetectClientApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of the AP (listener) that detected this Client."
+    ::= { trpzInfoRFDetectClientEntry 4 }
+
+trpzInfoRFDetectClientApRadioIndex OBJECT-TYPE
+    SYNTAX      TrpzApRadioIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of the AP Radio (listener) that detected this Client."
+    ::= { trpzInfoRFDetectClientEntry 5 }
+
+trpzInfoRFDetectClientModulation OBJECT-TYPE
+    SYNTAX      TrpzRFDetectDot11ModulationStandard
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "802.11 Modulation standard this Client was using
+        when last detected by this listener (a, b, g, n/a, n/g)."
+    ::= { trpzInfoRFDetectClientEntry 6 }
+
+trpzInfoRFDetectClientChannelNum OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel Number this Client was using
+        when last detected by this listener."
+    ::= { trpzInfoRFDetectClientEntry 7 }
+
+trpzInfoRFDetectClientRate OBJECT-TYPE
+    SYNTAX      TrpzRadioRateEx
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Packet data rate this Client was using
+        when last detected by this listener."
+    ::= { trpzInfoRFDetectClientEntry 8 }
+
+trpzInfoRFDetectClientRssi OBJECT-TYPE
+    SYNTAX      TrpzRssi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received Signal Strength Indicator for this Client
+        when last detected by this listener."
+    ::= { trpzInfoRFDetectClientEntry 9 }
+
+trpzInfoRFDetectClientClassification OBJECT-TYPE
+    SYNTAX      TrpzRFDetectClassification
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RF classification of this Client."
+    ::= { trpzInfoRFDetectClientEntry 10 }
+
+
+-- ==================================
+--
+-- Scalars
+--
+
+trpzInfoRFDetectCurrentXmtrTableSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current number of Transmitter-Listener-Channel
+        combinations found and recorded by RF detection."
+    ::= { trpzInfoRFDetectDataObjects 2 }
+
+
+-- =========================================================================
+--
+-- Conformance
+--
+
+trpzInfoRFDetectConformance  OBJECT IDENTIFIER ::= { trpzInfoRFDetectObjects 2 }
+trpzInfoRFDetectCompliances  OBJECT IDENTIFIER ::= { trpzInfoRFDetectConformance 1 }
+trpzInfoRFDetectGroups       OBJECT IDENTIFIER ::= { trpzInfoRFDetectConformance 2 }
+
+-- Compliance
+
+trpzInfoRFDetectCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the RF Detect MIB.
+
+        This compliance statement is for releases 6.0 to 7.6
+        of AC (wireless switch) software."
+    MODULE  -- trpzInfoRFDetectMib
+
+    MANDATORY-GROUPS { trpzInfoRFDetectXmtrGroup }
+
+    GROUP trpzInfoRFDetectXmtrClassificationGroup
+    DESCRIPTION
+        "This group is implemented by systems running 6.2 release or later."
+
+    GROUP trpzInfoRFDetectCurrentXmtrTableSizeGroup
+    DESCRIPTION
+        "This group is implemented by systems running 6.2 release or later."
+
+    ::= { trpzInfoRFDetectCompliances 1 }
+
+trpzInfoRFDetectComplianceRev2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the RF Detect MIB.
+
+        This compliance statement is for releases 7.7 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzInfoRFDetectMib)
+
+    MANDATORY-GROUPS {
+              trpzInfoRFDetectXmtrGroup,
+              trpzInfoRFDetectXmtrClassificationGroup,
+
+              trpzInfoRFDetectCurrentXmtrTableSizeGroup,
+
+              trpzInfoRFDetectClientGroup
+            }
+
+    ::= { trpzInfoRFDetectCompliances 2 }
+
+
+-- Units of Conformance
+
+trpzInfoRFDetectXmtrGroup OBJECT-GROUP
+    OBJECTS {
+             trpzInfoRFDetectXmtrRssi,
+             trpzInfoRFDetectXmtrSsid
+            }
+    STATUS      current
+    DESCRIPTION
+        "Mandatory group of objects implemented to provide
+         RF Detect Transmitter info."
+    ::= { trpzInfoRFDetectGroups 1 }
+
+trpzInfoRFDetectXmtrClassificationGroup OBJECT-GROUP
+    OBJECTS {
+             trpzInfoRFDetectXmtrNetworkingMode,
+             trpzInfoRFDetectXmtrClassification,
+             trpzInfoRFDetectXmtrClassificationReason
+            }
+    STATUS      current
+    DESCRIPTION
+        "Group of objects implemented to provide
+         RF Detect Classification info.
+         Introduced in 6.2 release."
+    ::= { trpzInfoRFDetectGroups 2 }
+
+trpzInfoRFDetectCurrentXmtrTableSizeGroup OBJECT-GROUP
+    OBJECTS { trpzInfoRFDetectCurrentXmtrTableSize }
+    STATUS      current
+    DESCRIPTION
+        "Group for one object that provides the current
+         number of Transmitter-Listener-Channel
+         combinations found and recorded by RF detection.
+         Introduced in 6.2 release."
+    ::= { trpzInfoRFDetectGroups 3 }
+
+trpzInfoRFDetectClientGroup OBJECT-GROUP
+    OBJECTS {
+             trpzInfoRFDetectClientConnectedBssid,
+             trpzInfoRFDetectClientApNum,
+             trpzInfoRFDetectClientApRadioIndex,
+             trpzInfoRFDetectClientModulation,
+             trpzInfoRFDetectClientChannelNum,
+             trpzInfoRFDetectClientRate,
+             trpzInfoRFDetectClientRssi,
+             trpzInfoRFDetectClientClassification
+            }
+    STATUS      current
+    DESCRIPTION
+        "Mandatory group of objects implemented to provide
+         RF Detect Client info in releases 7.7 and greater."
+    ::= { trpzInfoRFDetectGroups 4 }
+
+END

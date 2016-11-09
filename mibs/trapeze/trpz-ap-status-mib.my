@@ -1,0 +1,3492 @@
+TRAPEZE-NETWORKS-AP-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32, Gauge32, Integer32, Counter32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress, TruthValue
+        FROM SNMPv2-TC
+    TrpzApAttachType, TrpzApState, TrpzApSerialNum, TrpzApFingerprint,
+    TrpzRadioNum, TrpzPowerLevel, TrpzChannelNum,
+    TrpzRadioMode, TrpzRadioEnable,
+    TrpzRadioConfigState, TrpzRadioRate, TrpzRadioType,
+    TrpzApNum, TrpzApPortOrDapNum,
+    TrpzRadioChannelWidth, TrpzRadioMimoState, TrpzRadioRateEx
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzPhysPortNumberOrZero
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzApStatusMib MODULE-IDENTITY
+    LAST-UPDATED "201202100230Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "AP Status objects for Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2005-2012 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201202100230Z"
+    DESCRIPTION "v4.2.0: Obsoleted two previously deprecated
+                objects:
+                    trpzApStatRadioStatusRadioMimoState,
+                    trpzApStatRadioStatusMacRadioMimoState.
+                This will be published in 7.7 release."
+
+    REVISION "201101070221Z"
+    DESCRIPTION "v4.1.1: Added
+                    trpzApStatRadioStatusSpectralDataCollect,
+                    trpzApStatRadioStatusMacSpectralDataCollect
+                (for 7.5 release)."
+
+    REVISION "201101050220Z"
+    DESCRIPTION "v4.1.0: Added extended MIMO mode reporting:
+                    trpzApStatRadioStatusRadioMimoRxChains,
+                    trpzApStatRadioStatusRadioMimoTxChains,
+                    trpzApStatRadioStatusMacRadioMimoRxChains,
+                    trpzApStatRadioStatusMacRadioMimoTxChains
+                in order to replace
+                    trpzApStatRadioStatusRadioMimoState,
+                    trpzApStatRadioStatusMacRadioMimoState
+                (for 7.5 release)."
+
+    REVISION "200911020153Z"
+    DESCRIPTION "v3.8.3: Added:
+                    trpzApStatRadioOpStatsRxDataPkt,
+                    trpzApStatRadioOpStatsMacRxDataPkt,
+                    trpzApStatRadioOpStatsRxAuthPkt,
+                    trpzApStatRadioOpStatsMacRxAuthPkt,
+                    trpzApStatRadioOpStatsRxAssocPkt,
+                    trpzApStatRadioOpStatsMacRxAssocPkt,
+                    trpzApStatRadioOpStatsTxDataPkt,
+                    trpzApStatRadioOpStatsMacTxDataPkt,
+                    trpzApStatRadioOpStatsTxAuthRespPkt,
+                    trpzApStatRadioOpStatsMacTxAuthRespPkt,
+                    trpzApStatRadioOpStatsTxAssocRespPkt,
+                    trpzApStatRadioOpStatsMacTxAssocRespPkt
+                (for 7.5 release)."
+
+    REVISION "200909100150Z"
+    DESCRIPTION "v3.8.0: Clarified description.
+                This will be published in 7.1 release."
+
+    REVISION "200902130141Z"
+    DESCRIPTION "v3.7.1: Added:
+                    trpzApStatApStatusIpNetmask,
+                    trpzApStatApStatusMacIpNetmask,
+                    trpzApStatApStatusWiredIfNumber,
+                    trpzApStatApStatusMacWiredIfNumber,
+
+                    trpzApStatRadioStatusMinPowerLevel,
+                    trpzApStatRadioStatusMacMinPowerLevel,
+
+                    trpzApStatRadioOpStatsClientAssociations,
+                    trpzApStatRadioOpStatsMacClientAssociations,
+                    trpzApStatRadioOpStatsClientFailedAssociations,
+                    trpzApStatRadioOpStatsMacClientFailedAssociations,
+                    trpzApStatRadioOpStatsClientReAssociations,
+                    trpzApStatRadioOpStatsMacClientReAssociations;
+
+                    trpzApStatRadioOpStatsSignalingPkt,
+                    trpzApStatRadioOpStatsMacSignalingPkt,
+                    trpzApStatRadioOpStatsReTransmitOctet,
+                    trpzApStatRadioOpStatsMacReTransmitOctet,
+                    trpzApStatRadioOpStatsRefusedConnectionCount,
+                    trpzApStatRadioOpStatsMacRefusedConnectionCount
+                (for 7.1 release)."
+
+    REVISION "200812010115Z"
+    DESCRIPTION "v3.4.5: Added physical port number for directly attached AP:
+                    trpzApStatApStatusPhysPortNum,
+                    trpzApStatApStatusMacPhysPortNum
+                (for 7.1 release)."
+
+    REVISION "200811040111Z"
+    DESCRIPTION "v3.4.1: Added two tables for Operational Statistics
+                detailed per Extended Data Transmission Rate
+                (covering 802.11n MCS rates):
+                    trpzApStatRadioRateExOpStatisticsTable,
+                    trpzApStatRadioRateExOpStatisticsMacTable
+                (for 7.1 release)."
+
+    REVISION "200805220107Z"
+    DESCRIPTION "v3.3.1: Updated conformance section
+                to reflect the history of changes to this MIB:
+                added many compliance statements and groups.
+                This will be published in 7.0 release."
+
+    REVISION "200805090104Z"
+    DESCRIPTION "v3.2.4: Updated description for AP Name objects:
+                    trpzApStatApStatusApName,
+                    trpzApStatApStatusMacApName.
+                This will be published in 7.0 release."
+
+    REVISION "200802140103Z"
+    DESCRIPTION "v3.2.3: In order to support 802.11n, introduced
+                     trpzApStatRadioStatusRadioChannelWidth,
+                     trpzApStatRadioStatusMacRadioChannelWidth,
+                     trpzApStatRadioStatusRadioMimoState,
+                     trpzApStatRadioStatusMacRadioMimoState
+                (for 7.0 release)."
+
+    REVISION "200712070100Z"
+    DESCRIPTION "v3.2.0: Obsoleted four objects:
+                     trpzApStatRadioStatusEnable,
+                     trpzApStatRadioStatusMacEnable,
+                     trpzApStatApStatusPortOrDapNum,
+                     trpzApStatApStatusMacPortOrDapNum
+                (previously deprecated).
+                This will be published in 7.0 release."
+
+    REVISION "200707060051Z"
+    DESCRIPTION "v3.1.1: Introduced
+                     trpzApStatRadioStatusRadioMode,
+                     trpzApStatRadioStatusMacRadioMode
+                 in order to replace
+                     trpzApStatRadioStatusEnable,
+                     trpzApStatRadioStatusMacEnable.
+                 (In 6.2, a new administrative mode 'sentry' was added.)"
+
+    REVISION "200707050050Z"
+    DESCRIPTION "v3.1.0: Introduced
+                     trpzApStatApStatusApNum,
+                     trpzApStatApStatusMacApNum
+                 in order to replace
+                     trpzApStatApStatusPortOrDapNum,
+                     trpzApStatApStatusMacPortOrDapNum.
+                 (In 6.0, direct- and network-attached APs were unified.)"
+
+    REVISION "200609270043Z"
+    DESCRIPTION "v3.0.3: Added 6 tables:
+                2 for Operational Rate Set per Radio Service,
+                2 for Operational Statistics per Radio,
+                2 for the statistics detailed per Data Transmission Rate.
+                Names are:
+                trpzApStatRadioServiceOpRateSet,
+                trpzApStatRadioServiceOpRateSetMac,
+                trpzApStatRadioOpStatistics,
+                trpzApStatRadioOpStatisticsMac,
+                trpzApStatRadioRateOpStatistics,
+                trpzApStatRadioRateOpStatisticsMac.
+                (for 6.0 release)"
+
+    REVISION "200607280035Z"
+    DESCRIPTION "v2.2.2: Removed unused imports"
+
+    REVISION "200607280034Z"
+    DESCRIPTION "v2.2.1: Fixed imports and compliance group"
+
+    REVISION "200606260020Z"
+    DESCRIPTION "v2.1.1: Adding Software Version and Boot Version per AP
+                (for 6.0 release)"
+
+    REVISION "200606210018Z"
+    DESCRIPTION "v2.1.0: Adding Max Power and Phy Type per radio
+                (for 6.0 release)"
+
+    REVISION "200605100017Z"
+    DESCRIPTION "v2.0: Adding number of client sessions per AP, radio
+                (for 5.0 release)"
+
+    REVISION "200603300016Z"
+    DESCRIPTION "v1.0: Initial version, for 4.1 release"
+
+    ::= { trpzMibs 5 }
+
+
+-- Textual conventions
+
+TrpzRadioOpRateSetSingleValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A data rate value at which the radio may transmit data.
+         The octet contains a value representing a rate.
+         The rate shall be within the range from 2 to 127,
+         corresponding to data transmission rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s."
+    SYNTAX OCTET STRING (SIZE(1))
+
+TrpzRadioOpRateSetMandatory ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A set of data rates at which the radio may transmit data.
+         Each octet contains a value representing a rate.
+         Each rate shall be within the range from 2 to 127,
+         corresponding to data rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s.
+         The set must have at least one member at all times."
+    SYNTAX OCTET STRING (SIZE(1..126))
+
+TrpzRadioOpRateSetDisabled ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A set of data rates the radio must NOT use to transmit data.
+         Each octet contains a value representing a rate.
+         Each rate shall be within the range from 2 to 127,
+         corresponding to data rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s.
+         If no such constraint is present in the system configuration,
+         the zero-length OCTET STRING will be reported."
+    SYNTAX OCTET STRING (SIZE(0..126))
+
+
+-- Object definitions
+
+--
+-- The AP Status MIB Tree
+--
+
+trpzApStatusObjects    OBJECT IDENTIFIER ::= { trpzApStatusMib 1 }
+trpzApStatDataObjects  OBJECT IDENTIFIER ::= { trpzApStatusObjects 1 }
+
+
+-- ==================================
+--
+-- Scalars
+--
+
+trpzApStatNumAps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of APs present and seen by AC (AP in ''ALIVE'' state)."
+    ::= { trpzApStatDataObjects 1 }
+
+
+-- ==================================
+-- AP Status table
+
+trpzApStatApStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatApStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by MAC in
+        'trpzApStatApStatusMacTable'."
+    ::= { trpzApStatDataObjects 2 }
+
+trpzApStatApStatusEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatApStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular AP attached to the AC."
+    INDEX   { trpzApStatApStatusSerialNum }
+    ::= { trpzApStatApStatusTable 1 }
+
+TrpzApStatApStatusEntry ::= SEQUENCE {
+        trpzApStatApStatusSerialNum      TrpzApSerialNum,
+
+        trpzApStatApStatusBaseMac        MacAddress,
+
+        trpzApStatApStatusAttachType     TrpzApAttachType,
+        trpzApStatApStatusPortOrDapNum   TrpzApPortOrDapNum,
+
+        trpzApStatApStatusApState        TrpzApState,
+        trpzApStatApStatusModel          DisplayString,
+        trpzApStatApStatusFingerprint    TrpzApFingerprint,
+        trpzApStatApStatusApName         DisplayString,
+
+        trpzApStatApStatusVlan           DisplayString,
+        trpzApStatApStatusIpAddress      IpAddress,
+        trpzApStatApStatusUptimeSecs     Unsigned32,
+
+        trpzApStatApStatusCpuInfo        DisplayString,
+        trpzApStatApStatusManufacturerId DisplayString,
+        trpzApStatApStatusRamBytes       Unsigned32,
+        trpzApStatApStatusHardwareRev    DisplayString,
+
+        trpzApStatApStatusClientSessions Unsigned32,
+
+        trpzApStatApStatusSoftwareVer    DisplayString,
+        trpzApStatApStatusBootVer        DisplayString,
+
+        trpzApStatApStatusApNum          TrpzApNum,
+
+        trpzApStatApStatusPhysPortNum    TrpzPhysPortNumberOrZero,
+
+        trpzApStatApStatusIpNetmask      IpAddress,
+
+        trpzApStatApStatusWiredIfNumber  Unsigned32
+    }
+
+trpzApStatApStatusSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of this AP."
+    ::= { trpzApStatApStatusEntry 1 }
+
+trpzApStatApStatusBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this AP."
+    ::= { trpzApStatApStatusEntry 2 }
+
+trpzApStatApStatusAttachType OBJECT-TYPE
+    SYNTAX      TrpzApAttachType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How this AP is attached to the AC
+        (directly or via L2/L3 network)."
+    ::= { trpzApStatApStatusEntry 3 }
+
+trpzApStatApStatusPortOrDapNum OBJECT-TYPE
+    SYNTAX      TrpzApPortOrDapNum
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Port Number if this AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network.
+        Obsoleted by trpzApStatApStatusApNum."
+    ::= { trpzApStatApStatusEntry 4 }
+
+trpzApStatApStatusApState OBJECT-TYPE
+    SYNTAX      TrpzApState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The State of this AP."
+    ::= { trpzApStatApStatusEntry 5 }
+
+trpzApStatApStatusModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this AP."
+    ::= { trpzApStatApStatusEntry 6 }
+
+trpzApStatApStatusFingerprint OBJECT-TYPE
+    SYNTAX      TrpzApFingerprint
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RSA key fingerprint configured on this AP (binary value:
+        it is the MD5 hash of the public key of the RSA key pair).
+        For directly attached APs the fingerprint is a zero length string."
+    ::= { trpzApStatApStatusEntry 7 }
+
+trpzApStatApStatusApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this AP, as assigned in AC's CLI;
+        defaults to AP<Number> (examples: 'AP01', 'AP22', 'AP333', 'AP4444');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73')."
+    ::= { trpzApStatApStatusEntry 8 }
+
+trpzApStatApStatusVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the VLAN associated with this DAP.
+        Only valid for network attached APs, otherwise zero length string."
+    ::= { trpzApStatApStatusEntry 9 }
+
+trpzApStatApStatusIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of this DAP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { trpzApStatApStatusEntry 10 }
+
+trpzApStatApStatusUptimeSecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds since this AP's last boot."
+    ::= { trpzApStatApStatusEntry 11 }
+
+trpzApStatApStatusCpuInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's CPU."
+    ::= { trpzApStatApStatusEntry 12 }
+
+trpzApStatApStatusManufacturerId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's manufacturer."
+    ::= { trpzApStatApStatusEntry 13 }
+
+trpzApStatApStatusRamBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The memory capacity of this AP (in bytes)."
+    ::= { trpzApStatApStatusEntry 14 }
+
+trpzApStatApStatusHardwareRev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hardware revision of this AP (e.g. 'A3')."
+    ::= { trpzApStatApStatusEntry 15 }
+
+trpzApStatApStatusClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this AP."
+    ::= { trpzApStatApStatusEntry 16 }
+
+trpzApStatApStatusSoftwareVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version for this AP."
+    ::= { trpzApStatApStatusEntry 17 }
+
+trpzApStatApStatusBootVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The boot loader version for this AP."
+    ::= { trpzApStatApStatusEntry 18 }
+
+trpzApStatApStatusApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned AP Number.
+        Obsoletes trpzApStatApStatusPortOrDapNum."
+    ::= { trpzApStatApStatusEntry 19 }
+
+trpzApStatApStatusPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the physical port used to attach this AP.
+        Only valid for directly attached APs, otherwise will be zero."
+    ::= { trpzApStatApStatusEntry 20 }
+
+trpzApStatApStatusIpNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Netmask of this AP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { trpzApStatApStatusEntry 21 }
+
+trpzApStatApStatusWiredIfNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of wired network interfaces (regardless of their
+        current state) present on this AP."
+    ::= { trpzApStatApStatusEntry 22 }
+
+
+-- ===================================
+-- AP Status table indexed by Base MAC
+
+trpzApStatApStatusMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatApStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by Serial Number in
+        'trpzApStatApStatusTable'."
+    ::= { trpzApStatDataObjects 3 }
+
+trpzApStatApStatusMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatApStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular AP attached to the AC."
+    INDEX   { trpzApStatApStatusMacBaseMac }
+    ::= { trpzApStatApStatusMacTable 1 }
+
+TrpzApStatApStatusMacEntry ::= SEQUENCE {
+        trpzApStatApStatusMacBaseMac        MacAddress,
+
+        trpzApStatApStatusMacSerialNum      TrpzApSerialNum,
+
+        trpzApStatApStatusMacAttachType     TrpzApAttachType,
+        trpzApStatApStatusMacPortOrDapNum   TrpzApPortOrDapNum,
+
+        trpzApStatApStatusMacApState        TrpzApState,
+        trpzApStatApStatusMacModel          DisplayString,
+        trpzApStatApStatusMacFingerprint    TrpzApFingerprint,
+        trpzApStatApStatusMacApName         DisplayString,
+
+        trpzApStatApStatusMacVlan           DisplayString,
+        trpzApStatApStatusMacIpAddress      IpAddress,
+        trpzApStatApStatusMacUptimeSecs     Unsigned32,
+
+        trpzApStatApStatusMacCpuInfo        DisplayString,
+        trpzApStatApStatusMacManufacturerId DisplayString,
+        trpzApStatApStatusMacRamBytes       Unsigned32,
+        trpzApStatApStatusMacHardwareRev    DisplayString,
+
+        trpzApStatApStatusMacClientSessions Unsigned32,
+
+        trpzApStatApStatusMacSoftwareVer    DisplayString,
+        trpzApStatApStatusMacBootVer        DisplayString,
+
+        trpzApStatApStatusMacApNum          TrpzApNum,
+
+        trpzApStatApStatusMacPhysPortNum    TrpzPhysPortNumberOrZero,
+
+        trpzApStatApStatusMacIpNetmask      IpAddress,
+
+        trpzApStatApStatusMacWiredIfNumber  Unsigned32
+    }
+
+trpzApStatApStatusMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this AP."
+    ::= { trpzApStatApStatusMacEntry 1 }
+
+trpzApStatApStatusMacSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of this AP."
+    ::= { trpzApStatApStatusMacEntry 2 }
+
+trpzApStatApStatusMacAttachType OBJECT-TYPE
+    SYNTAX      TrpzApAttachType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How this AP is attached to the AC
+        (directly or via L2/L3 network)."
+    ::= { trpzApStatApStatusMacEntry 3 }
+
+trpzApStatApStatusMacPortOrDapNum OBJECT-TYPE
+    SYNTAX      TrpzApPortOrDapNum
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Port Number if this AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network.
+        Obsoleted by trpzApStatApStatusMacApNum."
+    ::= { trpzApStatApStatusMacEntry 4 }
+
+trpzApStatApStatusMacApState OBJECT-TYPE
+    SYNTAX      TrpzApState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The State of this AP."
+    ::= { trpzApStatApStatusMacEntry 5 }
+
+trpzApStatApStatusMacModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this AP."
+    ::= { trpzApStatApStatusMacEntry 6 }
+
+trpzApStatApStatusMacFingerprint OBJECT-TYPE
+    SYNTAX      TrpzApFingerprint
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RSA key fingerprint configured on this AP (binary value:
+        it is the MD5 hash of the public key of the RSA key pair).
+        For directly attached APs the fingerprint is a zero length string."
+    ::= { trpzApStatApStatusMacEntry 7 }
+
+trpzApStatApStatusMacApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this AP, as assigned in AC's CLI;
+        defaults to AP<Number> (examples: 'AP01', 'AP22', 'AP333', 'AP4444');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73')."
+    ::= { trpzApStatApStatusMacEntry 8 }
+
+trpzApStatApStatusMacVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the VLAN associated with this DAP.
+        Only valid for network attached APs, otherwise zero length string."
+    ::= { trpzApStatApStatusMacEntry 9 }
+
+trpzApStatApStatusMacIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of this DAP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { trpzApStatApStatusMacEntry 10 }
+
+trpzApStatApStatusMacUptimeSecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds since this AP's last boot."
+    ::= { trpzApStatApStatusMacEntry 11 }
+
+trpzApStatApStatusMacCpuInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's CPU."
+    ::= { trpzApStatApStatusMacEntry 12 }
+
+trpzApStatApStatusMacManufacturerId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's manufacturer."
+    ::= { trpzApStatApStatusMacEntry 13 }
+
+trpzApStatApStatusMacRamBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The memory capacity of this AP (in bytes)."
+    ::= { trpzApStatApStatusMacEntry 14 }
+
+trpzApStatApStatusMacHardwareRev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hardware revision of this AP (e.g. 'A3')."
+    ::= { trpzApStatApStatusMacEntry 15 }
+
+trpzApStatApStatusMacClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this AP."
+    ::= { trpzApStatApStatusMacEntry 16 }
+
+trpzApStatApStatusMacSoftwareVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version for this AP."
+    ::= { trpzApStatApStatusMacEntry 17 }
+
+trpzApStatApStatusMacBootVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The boot loader version for this AP."
+    ::= { trpzApStatApStatusMacEntry 18 }
+
+trpzApStatApStatusMacApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned AP Number.
+        Obsoletes trpzApStatApStatusMacPortOrDapNum."
+    ::= { trpzApStatApStatusMacEntry 19 }
+
+trpzApStatApStatusMacPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the physical port used to attach this AP.
+        Only valid for directly attached APs, otherwise will be zero."
+    ::= { trpzApStatApStatusMacEntry 20 }
+
+trpzApStatApStatusMacIpNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Netmask of this AP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { trpzApStatApStatusMacEntry 21 }
+
+trpzApStatApStatusMacWiredIfNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of wired network interfaces (regardless of their
+        current state) present on this AP."
+    ::= { trpzApStatApStatusMacEntry 22 }
+
+
+-- ==================================
+-- Radio Status table
+
+trpzApStatRadioStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios on all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by Radio Base MAC in
+        'trpzApStatRadioStatusMacTable'."
+    ::= { trpzApStatDataObjects 4 }
+
+trpzApStatRadioStatusEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular radio on an AP attached to the AC."
+    INDEX   { trpzApStatRadioStatusApSerialNum,
+              trpzApStatRadioStatusRadioNum }
+    ::= { trpzApStatRadioStatusTable 1 }
+
+TrpzApStatRadioStatusEntry ::= SEQUENCE {
+        trpzApStatRadioStatusApSerialNum    TrpzApSerialNum,
+        trpzApStatRadioStatusRadioNum       TrpzRadioNum,
+
+        trpzApStatRadioStatusBaseMac        MacAddress,
+
+        trpzApStatRadioStatusEnable             TrpzRadioEnable,
+        trpzApStatRadioStatusRadioConfigState   TrpzRadioConfigState,
+        trpzApStatRadioStatusCurrentPowerLevel  TrpzPowerLevel,
+        trpzApStatRadioStatusCurrentChannelNum  TrpzChannelNum,
+
+        trpzApStatRadioStatusClientSessions     Unsigned32,
+
+        trpzApStatRadioStatusMaxPowerLevel      TrpzPowerLevel,
+        trpzApStatRadioStatusRadioPhyType       TrpzRadioType,
+
+        trpzApStatRadioStatusRadioMode          TrpzRadioMode,
+
+        trpzApStatRadioStatusRadioChannelWidth  TrpzRadioChannelWidth,
+        trpzApStatRadioStatusRadioMimoState     TrpzRadioMimoState,
+
+        trpzApStatRadioStatusMinPowerLevel      TrpzPowerLevel,
+
+        trpzApStatRadioStatusRadioMimoRxChains  Unsigned32,
+        trpzApStatRadioStatusRadioMimoTxChains  Unsigned32,
+
+        trpzApStatRadioStatusSpectralDataCollect  TruthValue
+    }
+
+trpzApStatRadioStatusApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioStatusEntry 1 }
+
+trpzApStatRadioStatusRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioStatusEntry 2 }
+
+trpzApStatRadioStatusBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { trpzApStatRadioStatusEntry 3 }
+
+trpzApStatRadioStatusEnable OBJECT-TYPE
+    SYNTAX      TrpzRadioEnable
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The configured mode (enabled/disabled) of this radio.
+        Obsoleted by trpzApStatRadioStatusRadioMode."
+    ::= { trpzApStatRadioStatusEntry 4 }
+
+trpzApStatRadioStatusRadioConfigState OBJECT-TYPE
+    SYNTAX      TrpzRadioConfigState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configuration state of this radio (INIT, FAIL, OK)."
+    ::= { trpzApStatRadioStatusEntry 5 }
+
+trpzApStatRadioStatusCurrentPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Power Level of this radio."
+    ::= { trpzApStatRadioStatusEntry 6 }
+
+trpzApStatRadioStatusCurrentChannelNum OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Channel Number of this radio."
+    ::= { trpzApStatRadioStatusEntry 7 }
+
+trpzApStatRadioStatusClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this radio."
+    ::= { trpzApStatRadioStatusEntry 8 }
+
+trpzApStatRadioStatusMaxPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Power Level for this radio, with the current antenna,
+         on the current channel (trpzApStatRadioStatusCurrentChannelNum),
+         as constrained by the current regulatory domain."
+    ::= { trpzApStatRadioStatusEntry 9 }
+
+trpzApStatRadioStatusRadioPhyType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Physical Type of this radio
+        (typeUnknown, typeA, typeB, typeG)."
+    ::= { trpzApStatRadioStatusEntry 10 }
+
+trpzApStatRadioStatusRadioMode OBJECT-TYPE
+    SYNTAX      TrpzRadioMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured mode of this radio (enabled/disabled/sentry).
+        Obsoletes trpzApStatRadioStatusEnable."
+    ::= { trpzApStatRadioStatusEntry 11 }
+
+trpzApStatRadioStatusRadioChannelWidth OBJECT-TYPE
+    SYNTAX      TrpzRadioChannelWidth
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Channel Width for this radio (20MHz/40MHz)."
+    ::= { trpzApStatRadioStatusEntry 12 }
+
+trpzApStatRadioStatusRadioMimoState OBJECT-TYPE
+    SYNTAX      TrpzRadioMimoState
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "MIMO state of this radio (1x1/2x3/3x3).
+        Obsoleted by trpzApStatRadioStatusRadioMimoRxChains
+        and trpzApStatRadioStatusRadioMimoTxChains."
+    ::= { trpzApStatRadioStatusEntry 13 }
+
+trpzApStatRadioStatusMinPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Minimum Power Level for this radio,
+        with the current antenna."
+    ::= { trpzApStatRadioStatusEntry 14 }
+
+trpzApStatRadioStatusRadioMimoRxChains OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MIMO Transmit chains for this radio."
+    ::= { trpzApStatRadioStatusEntry 15 }
+
+trpzApStatRadioStatusRadioMimoTxChains OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MIMO Receive chains for this radio."
+    ::= { trpzApStatRadioStatusEntry 16 }
+
+trpzApStatRadioStatusSpectralDataCollect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this radio is in Spectral Data Collecting mode."
+    ::= { trpzApStatRadioStatusEntry 17 }
+
+
+-- ============================================
+-- Radio Status table indexed by Radio Base MAC
+
+trpzApStatRadioStatusMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios on all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by AP Serial Number and Radio Number in
+        'trpzApStatRadioStatusTable'."
+    ::= { trpzApStatDataObjects 5 }
+
+trpzApStatRadioStatusMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular radio on an AP attached to the AC."
+    INDEX   { trpzApStatRadioStatusMacBaseMac }
+    ::= { trpzApStatRadioStatusMacTable 1 }
+
+TrpzApStatRadioStatusMacEntry ::= SEQUENCE {
+        trpzApStatRadioStatusMacBaseMac        MacAddress,
+
+        trpzApStatRadioStatusMacApSerialNum    TrpzApSerialNum,
+        trpzApStatRadioStatusMacRadioNum       TrpzRadioNum,
+
+        trpzApStatRadioStatusMacEnable             TrpzRadioEnable,
+        trpzApStatRadioStatusMacRadioConfigState   TrpzRadioConfigState,
+        trpzApStatRadioStatusMacCurrentPowerLevel  TrpzPowerLevel,
+        trpzApStatRadioStatusMacCurrentChannelNum  TrpzChannelNum,
+
+        trpzApStatRadioStatusMacClientSessions     Unsigned32,
+
+        trpzApStatRadioStatusMacMaxPowerLevel      TrpzPowerLevel,
+        trpzApStatRadioStatusMacRadioPhyType       TrpzRadioType,
+
+        trpzApStatRadioStatusMacRadioMode          TrpzRadioMode,
+
+        trpzApStatRadioStatusMacRadioChannelWidth  TrpzRadioChannelWidth,
+        trpzApStatRadioStatusMacRadioMimoState     TrpzRadioMimoState,
+
+        trpzApStatRadioStatusMacMinPowerLevel      TrpzPowerLevel,
+
+        trpzApStatRadioStatusMacRadioMimoRxChains  Unsigned32,
+        trpzApStatRadioStatusMacRadioMimoTxChains  Unsigned32,
+
+        trpzApStatRadioStatusMacSpectralDataCollect  TruthValue
+    }
+
+trpzApStatRadioStatusMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { trpzApStatRadioStatusMacEntry 1 }
+
+trpzApStatRadioStatusMacApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioStatusMacEntry 2 }
+
+trpzApStatRadioStatusMacRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioStatusMacEntry 3 }
+
+trpzApStatRadioStatusMacEnable OBJECT-TYPE
+    SYNTAX      TrpzRadioEnable
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The configured mode (enabled/disabled) of this radio.
+        Obsoleted by trpzApStatRadioStatusMacRadioMode."
+    ::= { trpzApStatRadioStatusMacEntry 4 }
+
+trpzApStatRadioStatusMacRadioConfigState OBJECT-TYPE
+    SYNTAX      TrpzRadioConfigState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configuration state of this radio (INIT, FAIL, OK)."
+    ::= { trpzApStatRadioStatusMacEntry 5 }
+
+trpzApStatRadioStatusMacCurrentPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Power Level of this radio."
+    ::= { trpzApStatRadioStatusMacEntry 6 }
+
+trpzApStatRadioStatusMacCurrentChannelNum OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Channel Number of this radio."
+    ::= { trpzApStatRadioStatusMacEntry 7 }
+
+trpzApStatRadioStatusMacClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this radio."
+    ::= { trpzApStatRadioStatusMacEntry 8 }
+
+trpzApStatRadioStatusMacMaxPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Power Level for this radio, with the current antenna,
+         on the current channel (trpzApStatRadioStatusMacCurrentChannelNum),
+         as constrained by the current regulatory domain."
+    ::= { trpzApStatRadioStatusMacEntry 9 }
+
+trpzApStatRadioStatusMacRadioPhyType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Physical Type of this radio
+        (typeUnknown, typeA, typeB, typeG)."
+    ::= { trpzApStatRadioStatusMacEntry 10 }
+
+trpzApStatRadioStatusMacRadioMode OBJECT-TYPE
+    SYNTAX      TrpzRadioMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured mode of this radio (enabled/disabled/sentry).
+        Obsoletes trpzApStatRadioStatusMacEnable."
+    ::= { trpzApStatRadioStatusMacEntry 11 }
+
+trpzApStatRadioStatusMacRadioChannelWidth OBJECT-TYPE
+    SYNTAX      TrpzRadioChannelWidth
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Channel Width for this radio (20MHz/40MHz)."
+    ::= { trpzApStatRadioStatusMacEntry 12 }
+
+trpzApStatRadioStatusMacRadioMimoState OBJECT-TYPE
+    SYNTAX      TrpzRadioMimoState
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "MIMO state of this radio (1x1/2x3/3x3).
+        Obsoleted by trpzApStatRadioStatusMacRadioMimoRxChains
+        and trpzApStatRadioStatusMacRadioMimoTxChains."
+    ::= { trpzApStatRadioStatusMacEntry 13 }
+
+trpzApStatRadioStatusMacMinPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Minimum Power Level for this radio,
+        with the current antenna."
+    ::= { trpzApStatRadioStatusMacEntry 14 }
+
+trpzApStatRadioStatusMacRadioMimoRxChains OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MIMO Transmit chains for this radio."
+    ::= { trpzApStatRadioStatusMacEntry 15 }
+
+trpzApStatRadioStatusMacRadioMimoTxChains OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MIMO Receive chains for this radio."
+    ::= { trpzApStatRadioStatusMacEntry 16 }
+
+trpzApStatRadioStatusMacSpectralDataCollect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this radio is in Spectral Data Collecting mode."
+    ::= { trpzApStatRadioStatusMacEntry 17 }
+
+
+-- ==================================
+-- Radio Service table
+
+trpzApStatRadioServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by BSSID in
+        'trpzApStatRadioServiceMacTable'."
+    ::= { trpzApStatDataObjects 6 }
+
+trpzApStatRadioServiceEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { trpzApStatRadioServApSerialNum,
+              trpzApStatRadioServRadioNum,
+              trpzApStatRadioServSsid }
+    ::= { trpzApStatRadioServiceTable 1 }
+
+TrpzApStatRadioServiceEntry ::= SEQUENCE {
+        trpzApStatRadioServApSerialNum          TrpzApSerialNum,
+        trpzApStatRadioServRadioNum             TrpzRadioNum,
+        trpzApStatRadioServSsid                 DisplayString,
+
+        trpzApStatRadioServBssid                MacAddress,
+        trpzApStatRadioServServiceProfileName   DisplayString
+    }
+
+trpzApStatRadioServApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioServiceEntry 1 }
+
+trpzApStatRadioServRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioServiceEntry 2 }
+
+trpzApStatRadioServSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { trpzApStatRadioServiceEntry 3 }
+
+trpzApStatRadioServBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { trpzApStatRadioServiceEntry 4 }
+
+trpzApStatRadioServServiceProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Name of the Service Profile having this SSID
+        and associated to the (only) radio profile of this radio."
+    ::= { trpzApStatRadioServiceEntry 5 }
+
+
+-- ==========================================
+-- Radio Service table indexed by MAC (BSSID)
+
+trpzApStatRadioServiceMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioServiceMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by AP Serial Number,
+        Radio Number and SSID in 'trpzApStatRadioServiceTable'."
+    ::= { trpzApStatDataObjects 7 }
+
+trpzApStatRadioServiceMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioServiceMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { trpzApStatRadioServMacBssid }
+    ::= { trpzApStatRadioServiceMacTable 1 }
+
+TrpzApStatRadioServiceMacEntry ::= SEQUENCE {
+        trpzApStatRadioServMacBssid                MacAddress,
+
+        trpzApStatRadioServMacApSerialNum          TrpzApSerialNum,
+        trpzApStatRadioServMacRadioNum             TrpzRadioNum,
+        trpzApStatRadioServMacSsid                 DisplayString,
+        trpzApStatRadioServMacServiceProfileName   DisplayString
+    }
+
+trpzApStatRadioServMacBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { trpzApStatRadioServiceMacEntry 1 }
+
+trpzApStatRadioServMacApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioServiceMacEntry 2 }
+
+trpzApStatRadioServMacRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioServiceMacEntry 3 }
+
+trpzApStatRadioServMacSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { trpzApStatRadioServiceMacEntry 4 }
+
+trpzApStatRadioServMacServiceProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Name of the Service Profile that configures this BSSID."
+    ::= { trpzApStatRadioServiceMacEntry 5 }
+
+
+-- ============================================
+-- Operational Rate Set per Radio Service table
+
+trpzApStatRadioServiceOpRateSetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioServiceOpRateSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by BSSID in
+        'trpzApStatRadioServiceOpRateSetMacTable'."
+    ::= { trpzApStatDataObjects 8 }
+
+trpzApStatRadioServiceOpRateSetEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioServiceOpRateSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { trpzApStatRadioSORSetApSerialNum,
+              trpzApStatRadioSORSetRadioNum,
+              trpzApStatRadioSORSetSsid }
+    ::= { trpzApStatRadioServiceOpRateSetTable 1 }
+
+TrpzApStatRadioServiceOpRateSetEntry ::= SEQUENCE {
+        trpzApStatRadioSORSetApSerialNum  TrpzApSerialNum,
+        trpzApStatRadioSORSetRadioNum     TrpzRadioNum,
+        trpzApStatRadioSORSetSsid         DisplayString,
+
+        trpzApStatRadioSORSetMandatory  TrpzRadioOpRateSetMandatory,
+        trpzApStatRadioSORSetDisabled   TrpzRadioOpRateSetDisabled,
+        trpzApStatRadioSORSetBeacon     TrpzRadioOpRateSetSingleValue,
+        trpzApStatRadioSORSetMulticast  TrpzRadioOpRateSetSingleValue
+    }
+
+trpzApStatRadioSORSetApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 1 }
+
+trpzApStatRadioSORSetRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 2 }
+
+trpzApStatRadioSORSetSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 3 }
+
+trpzApStatRadioSORSetMandatory OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetMandatory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mandatory Rate Set configured for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 4 }
+
+trpzApStatRadioSORSetDisabled OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disabled Rate Set configured for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 5 }
+
+trpzApStatRadioSORSetBeacon OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Beacon Rate for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 6 }
+
+trpzApStatRadioSORSetMulticast OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Multicast Rate for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetEntry 7 }
+
+
+-- ============================================
+-- Operational Rate Set per Radio Service table
+-- indexed by MAC (BSSID)
+
+trpzApStatRadioServiceOpRateSetMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioServiceOpRateSetMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by AP Serial Number,
+        Radio Number and SSID in 'trpzApStatRadioServiceOpRateSetTable'."
+    ::= { trpzApStatDataObjects 9 }
+
+trpzApStatRadioServiceOpRateSetMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioServiceOpRateSetMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { trpzApStatRadioSORSetMacBssid }
+    ::= { trpzApStatRadioServiceOpRateSetMacTable 1 }
+
+TrpzApStatRadioServiceOpRateSetMacEntry ::= SEQUENCE {
+        trpzApStatRadioSORSetMacBssid      MacAddress,
+
+        trpzApStatRadioSORSetMacMandatory  TrpzRadioOpRateSetMandatory,
+        trpzApStatRadioSORSetMacDisabled   TrpzRadioOpRateSetDisabled,
+        trpzApStatRadioSORSetMacBeacon     TrpzRadioOpRateSetSingleValue,
+        trpzApStatRadioSORSetMacMulticast  TrpzRadioOpRateSetSingleValue
+    }
+
+trpzApStatRadioSORSetMacBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { trpzApStatRadioServiceOpRateSetMacEntry 1 }
+
+trpzApStatRadioSORSetMacMandatory OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetMandatory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mandatory Rate Set configured for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetMacEntry 2 }
+
+trpzApStatRadioSORSetMacDisabled OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disabled Rate Set configured for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetMacEntry 3 }
+
+trpzApStatRadioSORSetMacBeacon OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Beacon Rate for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetMacEntry 4 }
+
+trpzApStatRadioSORSetMacMulticast OBJECT-TYPE
+    SYNTAX      TrpzRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Multicast Rate for this radio service."
+    ::= { trpzApStatRadioServiceOpRateSetMacEntry 5 }
+
+
+-- ==================================
+-- Radio Operational Statistics table
+
+trpzApStatRadioOpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        for all radios on all APs attached to this switch.
+        Same data is available indexed by Radio Base MAC
+        in 'trpzApStatRadioOpStatisticsMacTable'."
+    ::= { trpzApStatDataObjects 10 }
+
+trpzApStatRadioOpStatisticsEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular radio."
+    INDEX   { trpzApStatRadioOpStatsApSerialNum, 
+              trpzApStatRadioOpStatsRadioNum }
+    ::= { trpzApStatRadioOpStatisticsTable 1 }
+
+TrpzApStatRadioOpStatisticsEntry ::= SEQUENCE {
+        trpzApStatRadioOpStatsApSerialNum    TrpzApSerialNum,
+        trpzApStatRadioOpStatsRadioNum       TrpzRadioNum,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioRateOpStatisticsEntry'
+        -- => for each data rate separately
+
+        trpzApStatRadioOpStatsTxUniPkt       Counter64,
+        trpzApStatRadioOpStatsTxUniOctet     Counter64,
+        trpzApStatRadioOpStatsTxMultiPkt     Counter64,
+        trpzApStatRadioOpStatsTxMultiOctet   Counter64,
+        trpzApStatRadioOpStatsRxPkt          Counter64,
+        trpzApStatRadioOpStatsRxOctet        Counter64,
+        trpzApStatRadioOpStatsUndcrptPkt     Counter64,
+        trpzApStatRadioOpStatsUndcrptOctet   Counter64,
+        trpzApStatRadioOpStatsPhyErr         Counter64,
+
+        -- the following fields are not detailed per data transmission rate
+
+        trpzApStatRadioOpStatsResetCount                  Counter32,
+        trpzApStatRadioOpStatsAutoTuneChannelChangeCount  Counter32,
+        trpzApStatRadioOpStatsTxRetriesCount              Counter32,
+        trpzApStatRadioOpStatsUserSessions                Gauge32,
+        trpzApStatRadioOpStatsNoiseFloor                  Integer32,
+
+        trpzApStatRadioOpStatsClientAssociations          Counter32,
+        trpzApStatRadioOpStatsClientFailedAssociations    Counter32,
+        trpzApStatRadioOpStatsClientReAssociations        Counter32,
+
+        trpzApStatRadioOpStatsSignalingPkt                Counter64,
+        trpzApStatRadioOpStatsReTransmitOctet             Counter64,
+        trpzApStatRadioOpStatsRefusedConnectionCount      Counter32,
+
+        trpzApStatRadioOpStatsRxDataPkt        Counter64,
+        trpzApStatRadioOpStatsRxAuthPkt        Counter64,
+        trpzApStatRadioOpStatsRxAssocPkt       Counter64,
+        trpzApStatRadioOpStatsTxDataPkt        Counter64,
+        trpzApStatRadioOpStatsTxAuthRespPkt    Counter64,
+        trpzApStatRadioOpStatsTxAssocRespPkt   Counter64
+    }
+
+trpzApStatRadioOpStatsApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { trpzApStatRadioOpStatisticsEntry 1 }
+
+trpzApStatRadioOpStatsRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { trpzApStatRadioOpStatisticsEntry 2 }
+    
+trpzApStatRadioOpStatsTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsEntry 3 }
+
+trpzApStatRadioOpStatsTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioOpStatisticsEntry 4 }
+
+trpzApStatRadioOpStatsTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsEntry 5 }
+
+trpzApStatRadioOpStatsTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioOpStatisticsEntry 6 }
+
+trpzApStatRadioOpStatsRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioOpStatisticsEntry 7 }
+
+trpzApStatRadioOpStatsRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioOpStatisticsEntry 8 }
+
+trpzApStatRadioOpStatsUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioOpStatisticsEntry 9 }
+
+trpzApStatRadioOpStatsUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioOpStatisticsEntry 10 }
+
+trpzApStatRadioOpStatsPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioOpStatisticsEntry 11 }
+
+trpzApStatRadioOpStatsResetCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reset operations for this radio."
+    ::= { trpzApStatRadioOpStatisticsEntry 12 }
+
+trpzApStatRadioOpStatsAutoTuneChannelChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Channel Changes, in Auto-Tuning mode only,
+        since the AP containing this radio became operational.
+        Note that manual channel changes are not counted."
+    ::= { trpzApStatRadioOpStatisticsEntry 13 }
+
+trpzApStatRadioOpStatsTxRetriesCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Transmission Retries."
+    ::= { trpzApStatRadioOpStatisticsEntry 14 }
+
+trpzApStatRadioOpStatsUserSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of client sessions using this radio at the current moment."
+    ::= { trpzApStatRadioOpStatisticsEntry 15 }
+
+trpzApStatRadioOpStatsNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise Floor in dBm."
+    ::= { trpzApStatRadioOpStatisticsEntry 16 }
+
+trpzApStatRadioOpStatsClientAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of client association attempts
+        on this radio (including re-association attempts)."
+    ::= { trpzApStatRadioOpStatisticsEntry 17 }
+
+trpzApStatRadioOpStatsClientFailedAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed client association attempts
+        on this radio (including re-association attempts)."
+    ::= { trpzApStatRadioOpStatisticsEntry 18 }
+
+trpzApStatRadioOpStatsClientReAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of client re-association attempts."
+    ::= { trpzApStatRadioOpStatisticsEntry 19 }
+
+trpzApStatRadioOpStatsSignalingPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of 802.11 management frames
+        and 802.11 control frames transmitted and received
+        by this radio."
+    ::= { trpzApStatRadioOpStatisticsEntry 20 }
+
+trpzApStatRadioOpStatsReTransmitOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of re-transmit octets."
+    ::= { trpzApStatRadioOpStatisticsEntry 21 }
+
+trpzApStatRadioOpStatsRefusedConnectionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of refused connections due to not enough resources."
+    ::= { trpzApStatRadioOpStatisticsEntry 22 }
+
+trpzApStatRadioOpStatsRxDataPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Data Packets received."
+    ::= { trpzApStatRadioOpStatisticsEntry 23 }
+
+trpzApStatRadioOpStatsRxAuthPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Authentication Packets received."
+    ::= { trpzApStatRadioOpStatisticsEntry 24 }
+
+trpzApStatRadioOpStatsRxAssocPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Association Packets received."
+    ::= { trpzApStatRadioOpStatisticsEntry 25 }
+
+trpzApStatRadioOpStatsTxDataPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Data Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsEntry 26 }
+
+trpzApStatRadioOpStatsTxAuthRespPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Authentication Response Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsEntry 27 }
+
+trpzApStatRadioOpStatsTxAssocRespPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Association Response Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsEntry 28 }
+
+
+-- ============================================================
+-- Radio Operational Statistics table indexed by Radio Base MAC
+
+trpzApStatRadioOpStatisticsMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        for all radios on all APs attached to this switch.
+        Same data is available indexed by AP Serial Number
+        and Radio Number in 'trpzApStatRadioOpStatisticsTable'."
+    ::= { trpzApStatDataObjects 11 }
+
+trpzApStatRadioOpStatisticsMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular radio."
+    INDEX   { trpzApStatRadioOpStatsMacBaseMac }
+    ::= { trpzApStatRadioOpStatisticsMacTable 1 }
+
+TrpzApStatRadioOpStatisticsMacEntry ::= SEQUENCE {
+        trpzApStatRadioOpStatsMacBaseMac        MacAddress,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioRateOpStatisticsMacEntry'
+        -- => for each data rate separately
+
+        trpzApStatRadioOpStatsMacTxUniPkt       Counter64,
+        trpzApStatRadioOpStatsMacTxUniOctet     Counter64,
+        trpzApStatRadioOpStatsMacTxMultiPkt     Counter64,
+        trpzApStatRadioOpStatsMacTxMultiOctet   Counter64,
+        trpzApStatRadioOpStatsMacRxPkt          Counter64,
+        trpzApStatRadioOpStatsMacRxOctet        Counter64,
+        trpzApStatRadioOpStatsMacUndcrptPkt     Counter64,
+        trpzApStatRadioOpStatsMacUndcrptOctet   Counter64,
+        trpzApStatRadioOpStatsMacPhyErr         Counter64,
+
+        -- the following fields are not detailed per data transmission rate
+
+        trpzApStatRadioOpStatsMacResetCount                  Counter32,
+        trpzApStatRadioOpStatsMacAutoTuneChannelChangeCount  Counter32,
+        trpzApStatRadioOpStatsMacTxRetriesCount              Counter32,
+        trpzApStatRadioOpStatsMacUserSessions                Gauge32,
+        trpzApStatRadioOpStatsMacNoiseFloor                  Integer32,
+
+        trpzApStatRadioOpStatsMacClientAssociations          Counter32,
+        trpzApStatRadioOpStatsMacClientFailedAssociations    Counter32,
+        trpzApStatRadioOpStatsMacClientReAssociations        Counter32,
+
+        trpzApStatRadioOpStatsMacSignalingPkt                Counter64,
+        trpzApStatRadioOpStatsMacReTransmitOctet             Counter64,
+        trpzApStatRadioOpStatsMacRefusedConnectionCount      Counter32,
+
+        trpzApStatRadioOpStatsMacRxDataPkt        Counter64,
+        trpzApStatRadioOpStatsMacRxAuthPkt        Counter64,
+        trpzApStatRadioOpStatsMacRxAssocPkt       Counter64,
+        trpzApStatRadioOpStatsMacTxDataPkt        Counter64,
+        trpzApStatRadioOpStatsMacTxAuthRespPkt    Counter64,
+        trpzApStatRadioOpStatsMacTxAssocRespPkt   Counter64
+    }
+
+trpzApStatRadioOpStatsMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 1 }
+
+trpzApStatRadioOpStatsMacTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 2 }
+
+trpzApStatRadioOpStatsMacTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 3 }
+
+trpzApStatRadioOpStatsMacTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 4 }
+
+trpzApStatRadioOpStatsMacTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 5 }
+
+trpzApStatRadioOpStatsMacRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 6 }
+
+trpzApStatRadioOpStatsMacRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 7 }
+
+trpzApStatRadioOpStatsMacUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 8 }
+
+trpzApStatRadioOpStatsMacUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 9 }
+
+trpzApStatRadioOpStatsMacPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 10 }
+
+trpzApStatRadioOpStatsMacResetCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reset operations for this radio."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 11 }
+
+trpzApStatRadioOpStatsMacAutoTuneChannelChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Channel Changes, in Auto-Tuning mode only,
+        since the AP containing this radio became operational.
+        Note that manual channel changes are not counted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 12 }
+
+trpzApStatRadioOpStatsMacTxRetriesCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Transmission Retries."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 13 }
+
+trpzApStatRadioOpStatsMacUserSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of client sessions using this radio at the current moment."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 14 }
+
+trpzApStatRadioOpStatsMacNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise Floor in dBm."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 15 }
+
+trpzApStatRadioOpStatsMacClientAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of client association attempts
+        on this radio (including re-association attempts)."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 16 }
+
+trpzApStatRadioOpStatsMacClientFailedAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed client association attempts
+        on this radio (including re-association attempts)."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 17 }
+
+trpzApStatRadioOpStatsMacClientReAssociations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of client re-association attempts."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 18 }
+
+trpzApStatRadioOpStatsMacSignalingPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of 802.11 management frames
+        and 802.11 control frames transmitted and received
+        by this radio."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 19 }
+
+trpzApStatRadioOpStatsMacReTransmitOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of re-transmit octets."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 20 }
+
+trpzApStatRadioOpStatsMacRefusedConnectionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of refused connections due to not enough resources."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 21 }
+
+trpzApStatRadioOpStatsMacRxDataPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Data Packets received."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 22 }
+
+trpzApStatRadioOpStatsMacRxAuthPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Authentication Packets received."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 23 }
+
+trpzApStatRadioOpStatsMacRxAssocPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Association Packets received."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 24 }
+
+trpzApStatRadioOpStatsMacTxDataPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Data Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 25 }
+
+trpzApStatRadioOpStatsMacTxAuthRespPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Authentication Response Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 26 }
+
+trpzApStatRadioOpStatsMacTxAssocRespPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Association Response Packets transmitted."
+    ::= { trpzApStatRadioOpStatisticsMacEntry 27 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per data transmission Rate table
+
+trpzApStatRadioRateOpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioRateOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per transmission Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by Radio Base MAC and Data Transmission Rate
+        in 'trpzApStatRadioRateOpStatisticsMacTable'."
+    ::= { trpzApStatDataObjects 12 }
+
+trpzApStatRadioRateOpStatisticsEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioRateOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { trpzApStatRadioRateOpStatsApSerialNum,
+              trpzApStatRadioRateOpStatsRadioNum,
+              trpzApStatRadioRateOpStatsRate }
+    ::= { trpzApStatRadioRateOpStatisticsTable 1 }
+
+TrpzApStatRadioRateOpStatisticsEntry ::= SEQUENCE {
+        trpzApStatRadioRateOpStatsApSerialNum    TrpzApSerialNum,
+        trpzApStatRadioRateOpStatsRadioNum       TrpzRadioNum,
+        trpzApStatRadioRateOpStatsRate           TrpzRadioRate,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioOpStatisticsEntry' => totals for all data rates
+
+        trpzApStatRadioRateOpStatsTxUniPkt       Counter64,
+        trpzApStatRadioRateOpStatsTxUniOctet     Counter64,
+        trpzApStatRadioRateOpStatsTxMultiPkt     Counter64,
+        trpzApStatRadioRateOpStatsTxMultiOctet   Counter64,
+        trpzApStatRadioRateOpStatsRxPkt          Counter64,
+        trpzApStatRadioRateOpStatsRxOctet        Counter64,
+        trpzApStatRadioRateOpStatsUndcrptPkt     Counter64,
+        trpzApStatRadioRateOpStatsUndcrptOctet   Counter64,
+        trpzApStatRadioRateOpStatsPhyErr         Counter64
+    }
+
+trpzApStatRadioRateOpStatsApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 1 }
+
+trpzApStatRadioRateOpStatsRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 2 }
+
+trpzApStatRadioRateOpStatsRate OBJECT-TYPE
+    SYNTAX      TrpzRadioRate
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 3 }
+
+trpzApStatRadioRateOpStatsTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 4 }
+
+trpzApStatRadioRateOpStatsTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 5 }
+
+trpzApStatRadioRateOpStatsTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 6 }
+
+trpzApStatRadioRateOpStatsTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 7 }
+
+trpzApStatRadioRateOpStatsRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 8 }
+
+trpzApStatRadioRateOpStatsRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 9 }
+
+trpzApStatRadioRateOpStatsUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 10 }
+
+trpzApStatRadioRateOpStatsUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 11 }
+
+trpzApStatRadioRateOpStatsPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioRateOpStatisticsEntry 12 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per data transmission Rate table
+-- with radio identified by Radio Base MAC
+
+trpzApStatRadioRateOpStatisticsMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioRateOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per transmission Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by AP Serial Number, Radio Number
+        and Data Transmission Rate in 'trpzApStatRadioRateOpStatisticsTable'."
+    ::= { trpzApStatDataObjects 13 }
+
+trpzApStatRadioRateOpStatisticsMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioRateOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { trpzApStatRadioRateOpStatsMacBaseMac,
+              trpzApStatRadioRateOpStatsMacRate }
+    ::= { trpzApStatRadioRateOpStatisticsMacTable 1 }
+
+TrpzApStatRadioRateOpStatisticsMacEntry ::= SEQUENCE {
+        trpzApStatRadioRateOpStatsMacBaseMac        MacAddress,
+        trpzApStatRadioRateOpStatsMacRate           TrpzRadioRate,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioOpStatisticsMacEntry' => totals for all data rates
+
+        trpzApStatRadioRateOpStatsMacTxUniPkt       Counter64,
+        trpzApStatRadioRateOpStatsMacTxUniOctet     Counter64,
+        trpzApStatRadioRateOpStatsMacTxMultiPkt     Counter64,
+        trpzApStatRadioRateOpStatsMacTxMultiOctet   Counter64,
+        trpzApStatRadioRateOpStatsMacRxPkt          Counter64,
+        trpzApStatRadioRateOpStatsMacRxOctet        Counter64,
+        trpzApStatRadioRateOpStatsMacUndcrptPkt     Counter64,
+        trpzApStatRadioRateOpStatsMacUndcrptOctet   Counter64,
+        trpzApStatRadioRateOpStatsMacPhyErr         Counter64
+    }
+
+trpzApStatRadioRateOpStatsMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 1 }
+
+trpzApStatRadioRateOpStatsMacRate OBJECT-TYPE
+    SYNTAX      TrpzRadioRate
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 2 }
+
+trpzApStatRadioRateOpStatsMacTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 3 }
+
+trpzApStatRadioRateOpStatsMacTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 4 }
+
+trpzApStatRadioRateOpStatsMacTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 5 }
+
+trpzApStatRadioRateOpStatsMacTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 6 }
+
+trpzApStatRadioRateOpStatsMacRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 7 }
+
+trpzApStatRadioRateOpStatsMacRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 8 }
+
+trpzApStatRadioRateOpStatsMacUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 9 }
+
+trpzApStatRadioRateOpStatsMacUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 10 }
+
+trpzApStatRadioRateOpStatsMacPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioRateOpStatisticsMacEntry 11 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per Extended Rate table
+-- (covering 802.11n MCS rates)
+
+trpzApStatRadioRateExOpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioRateExOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per Extended Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by Radio Base MAC and Extended Rate
+        in 'trpzApStatRadioRateExOpStatisticsMacTable'."
+    ::= { trpzApStatDataObjects 14 }
+
+trpzApStatRadioRateExOpStatisticsEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioRateExOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { trpzApStatRadioRateExOpStatsApSerialNum,
+              trpzApStatRadioRateExOpStatsRadioNum,
+              trpzApStatRadioRateExOpStatsRateEx }
+    ::= { trpzApStatRadioRateExOpStatisticsTable 1 }
+
+TrpzApStatRadioRateExOpStatisticsEntry ::= SEQUENCE {
+        trpzApStatRadioRateExOpStatsApSerialNum    TrpzApSerialNum,
+        trpzApStatRadioRateExOpStatsRadioNum       TrpzRadioNum,
+        trpzApStatRadioRateExOpStatsRateEx         TrpzRadioRateEx,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioOpStatisticsEntry' => totals for all data rates
+
+        trpzApStatRadioRateExOpStatsTxUniPkt       Counter64,
+        trpzApStatRadioRateExOpStatsTxUniOctet     Counter64,
+        trpzApStatRadioRateExOpStatsTxMultiPkt     Counter64,
+        trpzApStatRadioRateExOpStatsTxMultiOctet   Counter64,
+        trpzApStatRadioRateExOpStatsRxPkt          Counter64,
+        trpzApStatRadioRateExOpStatsRxOctet        Counter64,
+        trpzApStatRadioRateExOpStatsUndcrptPkt     Counter64,
+        trpzApStatRadioRateExOpStatsUndcrptOctet   Counter64,
+        trpzApStatRadioRateExOpStatsPhyErr         Counter64
+    }
+
+trpzApStatRadioRateExOpStatsApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 1 }
+
+trpzApStatRadioRateExOpStatsRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 2 }
+
+trpzApStatRadioRateExOpStatsRateEx OBJECT-TYPE
+    SYNTAX      TrpzRadioRateEx
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 3 }
+
+trpzApStatRadioRateExOpStatsTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 4 }
+
+trpzApStatRadioRateExOpStatsTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 5 }
+
+trpzApStatRadioRateExOpStatsTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 6 }
+
+trpzApStatRadioRateExOpStatsTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 7 }
+
+trpzApStatRadioRateExOpStatsRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 8 }
+
+trpzApStatRadioRateExOpStatsRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 9 }
+
+trpzApStatRadioRateExOpStatsUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 10 }
+
+trpzApStatRadioRateExOpStatsUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 11 }
+
+trpzApStatRadioRateExOpStatsPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioRateExOpStatisticsEntry 12 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per Extended Rate table
+-- with radio identified by Radio Base MAC
+-- (covering 802.11n MCS rates)
+
+trpzApStatRadioRateExOpStatisticsMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzApStatRadioRateExOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per Extended Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by AP Serial Number, Radio Number
+        and Extended Rate in 'trpzApStatRadioRateExOpStatisticsTable'."
+    ::= { trpzApStatDataObjects 15 }
+
+trpzApStatRadioRateExOpStatisticsMacEntry OBJECT-TYPE
+    SYNTAX      TrpzApStatRadioRateExOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { trpzApStatRadioRateExOpStatsMacBaseMac,
+              trpzApStatRadioRateExOpStatsMacRateEx }
+    ::= { trpzApStatRadioRateExOpStatisticsMacTable 1 }
+
+TrpzApStatRadioRateExOpStatisticsMacEntry ::= SEQUENCE {
+        trpzApStatRadioRateExOpStatsMacBaseMac        MacAddress,
+        trpzApStatRadioRateExOpStatsMacRateEx         TrpzRadioRateEx,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'TrpzApStatRadioOpStatisticsMacEntry' => totals for all data rates
+
+        trpzApStatRadioRateExOpStatsMacTxUniPkt       Counter64,
+        trpzApStatRadioRateExOpStatsMacTxUniOctet     Counter64,
+        trpzApStatRadioRateExOpStatsMacTxMultiPkt     Counter64,
+        trpzApStatRadioRateExOpStatsMacTxMultiOctet   Counter64,
+        trpzApStatRadioRateExOpStatsMacRxPkt          Counter64,
+        trpzApStatRadioRateExOpStatsMacRxOctet        Counter64,
+        trpzApStatRadioRateExOpStatsMacUndcrptPkt     Counter64,
+        trpzApStatRadioRateExOpStatsMacUndcrptOctet   Counter64,
+        trpzApStatRadioRateExOpStatsMacPhyErr         Counter64
+    }
+
+trpzApStatRadioRateExOpStatsMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 1 }
+
+trpzApStatRadioRateExOpStatsMacRateEx OBJECT-TYPE
+    SYNTAX      TrpzRadioRateEx
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 2 }
+
+trpzApStatRadioRateExOpStatsMacTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 3 }
+
+trpzApStatRadioRateExOpStatsMacTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 4 }
+
+trpzApStatRadioRateExOpStatsMacTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 5 }
+
+trpzApStatRadioRateExOpStatsMacTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 6 }
+
+trpzApStatRadioRateExOpStatsMacRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 7 }
+
+trpzApStatRadioRateExOpStatsMacRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 8 }
+
+trpzApStatRadioRateExOpStatsMacUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 9 }
+
+trpzApStatRadioRateExOpStatsMacUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 10 }
+
+trpzApStatRadioRateExOpStatsMacPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { trpzApStatRadioRateExOpStatisticsMacEntry 11 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzApStatusConformance  OBJECT IDENTIFIER ::= { trpzApStatusObjects 2 }
+trpzApStatusCompliances  OBJECT IDENTIFIER ::= { trpzApStatusConformance 1 }
+trpzApStatusGroups       OBJECT IDENTIFIER ::= { trpzApStatusConformance 2 }
+
+
+-- Compliance
+
+
+trpzApStatusCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement was for releases 4.1 and 4.2
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzApStatusComplianceRev2."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+            trpzApStatusCommonGroup
+            }
+
+    ::= { trpzApStatusCompliances 1 }
+
+
+trpzApStatusComplianceRev2 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement was for release 5.0
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzApStatusComplianceRev3."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+              trpzApStatusApStatusTablesGroup,
+              trpzApStatusRadioStatusTablesGroup,
+              trpzApStatusRadioServiceTablesGroup
+            }
+
+    ::= { trpzApStatusCompliances 2 }
+
+
+trpzApStatusComplianceRev3 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement was for release 6.0
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzApStatusComplianceRev4."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+
+              trpzApStatusApStatusTablesGroup,
+              trpzApStatusApStatusVersionsGroup,
+
+              trpzApStatusRadioStatusTablesGroup,
+              trpzApStatusRadioStatusMaxPowerPhyTypeGroup,
+
+              trpzApStatusRadioServiceTablesGroup,
+
+              -- six new tables added in 6.0 release:
+              --
+              trpzApStatusRadioServiceOpRateSetTablesGroup,
+              trpzApStatusRadioOpStatisticsTablesGroup,
+              trpzApStatusRadioOpStatisticsPerRateTablesGroup
+            }
+
+    ::= { trpzApStatusCompliances 3 }
+
+
+trpzApStatusComplianceRev4 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement is for releases 6.2 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+
+              trpzApStatusApStatusTablesGroupRev2,
+              trpzApStatusApStatusVersionsGroup,
+
+              trpzApStatusRadioStatusTablesGroupRev2,
+              trpzApStatusRadioStatusMaxPowerPhyTypeGroup,
+
+              trpzApStatusRadioServiceTablesGroup,
+
+              -- the same six tables added in 6.0 release; no change here:
+              --
+              trpzApStatusRadioServiceOpRateSetTablesGroup,
+              trpzApStatusRadioOpStatisticsTablesGroup,
+              trpzApStatusRadioOpStatisticsPerRateTablesGroup
+            }
+
+    GROUP   trpzApStatusRadioStatusWideMimoGroup
+    DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Status info in releases 7.0 and greater."
+
+    ::= { trpzApStatusCompliances 4 }
+
+
+trpzApStatusComplianceRev5 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement is for releases 7.1 to 7.2
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzApStatusComplianceRev7."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+
+              trpzApStatusApStatusTablesGroupRev2,
+              trpzApStatusApStatusVersionsGroup,
+              trpzApStatusApStatusPhysPortNumGroup,
+              trpzApStatusApStatusConnectivityGroup,
+
+              trpzApStatusRadioStatusTablesGroupRev2,
+              trpzApStatusRadioStatusMaxPowerPhyTypeGroup,
+              trpzApStatusRadioStatusWideMimoGroup,
+              trpzApStatusRadioStatusAntennaGroup,
+
+              trpzApStatusRadioServiceTablesGroup,
+
+              trpzApStatusRadioServiceOpRateSetTablesGroup,
+
+              trpzApStatusRadioOpStatisticsTablesGroup,
+              trpzApStatusRadioOpStatisticsClientAssocGroup,
+              trpzApStatusRadioOpStatisticsSignErrGroup,
+
+              -- Not mandatory anymore:
+              -- trpzApStatusRadioOpStatisticsPerRateTablesGroup;
+              -- replaced by:
+              trpzApStatusRadioOpStatisticsPerRateExTablesGroup
+            }
+
+    ::= { trpzApStatusCompliances 5 }
+
+
+trpzApStatusComplianceRev6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement is for release 7.3
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+
+              trpzApStatusApStatusTablesGroupRev2,
+              trpzApStatusApStatusVersionsGroup,
+              trpzApStatusApStatusPhysPortNumGroup,
+              trpzApStatusApStatusConnectivityGroup,
+
+              trpzApStatusRadioStatusTablesGroupRev2,
+              trpzApStatusRadioStatusMaxPowerPhyTypeGroup,
+              trpzApStatusRadioStatusWideMimoGroupRev2,
+              trpzApStatusRadioStatusAntennaGroup,
+
+              trpzApStatusRadioServiceTablesGroup,
+
+              trpzApStatusRadioServiceOpRateSetTablesGroup,
+
+              trpzApStatusRadioOpStatisticsTablesGroup,
+              trpzApStatusRadioOpStatisticsClientAssocGroup,
+              trpzApStatusRadioOpStatisticsSignErrGroup,
+
+              trpzApStatusRadioOpStatisticsPerRateExTablesGroup
+            }
+
+    ::= { trpzApStatusCompliances 6 }
+
+
+trpzApStatusComplianceRev7 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB.
+
+        This compliance statement is for releases 7.5 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzApStatusMib)
+
+    MANDATORY-GROUPS {
+              trpzApStatusScalarsGroup,
+
+              trpzApStatusApStatusTablesGroupRev2,
+              trpzApStatusApStatusVersionsGroup,
+              trpzApStatusApStatusPhysPortNumGroup,
+              trpzApStatusApStatusConnectivityGroup,
+
+              trpzApStatusRadioStatusTablesGroupRev2,
+              trpzApStatusRadioStatusMaxPowerPhyTypeGroup,
+              trpzApStatusRadioStatusWideMimoGroupRev2,
+              trpzApStatusRadioStatusAntennaGroup,
+              trpzApStatusRadioStatusSpectralDataGroup,
+
+              trpzApStatusRadioServiceTablesGroup,
+
+              trpzApStatusRadioServiceOpRateSetTablesGroup,
+
+              trpzApStatusRadioOpStatisticsTablesGroup,
+              trpzApStatusRadioOpStatisticsClientAssocGroup,
+              trpzApStatusRadioOpStatisticsSignErrGroup,
+
+              trpzApStatusRadioOpStatisticsPerRateExTablesGroup,
+
+              trpzApStatusRadioOpStatisticsPktDetailGroup
+            }
+
+    ::= { trpzApStatusCompliances 7 }
+
+
+-- Units of Conformance
+
+
+trpzApStatusCommonGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzApStatNumAps,
+
+                 -- AP Status indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusBaseMac,
+                 trpzApStatApStatusAttachType,
+                 trpzApStatApStatusPortOrDapNum,
+                 trpzApStatApStatusApState,
+                 trpzApStatApStatusModel,
+                 trpzApStatApStatusFingerprint,
+                 trpzApStatApStatusApName,
+                 trpzApStatApStatusVlan,
+                 trpzApStatApStatusIpAddress,
+                 trpzApStatApStatusUptimeSecs,
+                 trpzApStatApStatusCpuInfo,
+                 trpzApStatApStatusManufacturerId,
+                 trpzApStatApStatusRamBytes,
+                 trpzApStatApStatusHardwareRev,
+
+                 -- AP Status indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacSerialNum,
+                 trpzApStatApStatusMacAttachType,
+                 trpzApStatApStatusMacPortOrDapNum,
+                 trpzApStatApStatusMacApState,
+                 trpzApStatApStatusMacModel,
+                 trpzApStatApStatusMacFingerprint,
+                 trpzApStatApStatusMacApName,
+                 trpzApStatApStatusMacVlan,
+                 trpzApStatApStatusMacIpAddress,
+                 trpzApStatApStatusMacUptimeSecs,
+                 trpzApStatApStatusMacCpuInfo,
+                 trpzApStatApStatusMacManufacturerId,
+                 trpzApStatApStatusMacRamBytes,
+                 trpzApStatApStatusMacHardwareRev,
+
+                 -- Radio Status indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusBaseMac,
+                 trpzApStatRadioStatusEnable,
+                 trpzApStatRadioStatusRadioConfigState,
+                 trpzApStatRadioStatusCurrentPowerLevel,
+                 trpzApStatRadioStatusCurrentChannelNum,
+
+                 -- Radio Status indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacApSerialNum,
+                 trpzApStatRadioStatusMacRadioNum,
+                 trpzApStatRadioStatusMacEnable,
+                 trpzApStatRadioStatusMacRadioConfigState,
+                 trpzApStatRadioStatusMacCurrentPowerLevel,
+                 trpzApStatRadioStatusMacCurrentChannelNum,
+
+                 -- Radio Service indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioServBssid,
+                 trpzApStatRadioServServiceProfileName,
+
+                 -- Radio Service indexed by MAC address:
+                 --
+                 trpzApStatRadioServMacApSerialNum,
+                 trpzApStatRadioServMacRadioNum,
+                 trpzApStatRadioServMacSsid,
+                 trpzApStatRadioServMacServiceProfileName
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Mandatory group of objects implemented to provide AP Status info
+            in releases 4.1 and 4.2 of AC (wireless switch) software.
+
+            Replaced by trpzApStatusScalarsGroup,
+                        trpzApStatusApStatusTablesGroup,
+                        trpzApStatusRadioStatusTablesGroup,
+                        trpzApStatusRadioServiceTablesGroup,
+                        trpzApStatusRadioServiceOpRateSetTablesGroup,
+                        trpzApStatusRadioOpStatisticsTablesGroup,
+                        trpzApStatusRadioOpStatisticsPerRateTablesGroup."
+        ::= { trpzApStatusGroups 1 }
+
+
+trpzApStatusScalarsGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzApStatNumAps
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of scalar objects implemented to provide general AP info."
+        ::= { trpzApStatusGroups 2 }
+
+
+trpzApStatusApStatusTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusBaseMac,
+                 trpzApStatApStatusAttachType,
+                 trpzApStatApStatusPortOrDapNum,
+                 trpzApStatApStatusApState,
+                 trpzApStatApStatusModel,
+                 trpzApStatApStatusFingerprint,
+                 trpzApStatApStatusApName,
+                 trpzApStatApStatusVlan,
+                 trpzApStatApStatusIpAddress,
+                 trpzApStatApStatusUptimeSecs,
+                 trpzApStatApStatusCpuInfo,
+                 trpzApStatApStatusManufacturerId,
+                 trpzApStatApStatusRamBytes,
+                 trpzApStatApStatusHardwareRev,
+                 trpzApStatApStatusClientSessions,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacSerialNum,
+                 trpzApStatApStatusMacAttachType,
+                 trpzApStatApStatusMacPortOrDapNum,
+                 trpzApStatApStatusMacApState,
+                 trpzApStatApStatusMacModel,
+                 trpzApStatApStatusMacFingerprint,
+                 trpzApStatApStatusMacApName,
+                 trpzApStatApStatusMacVlan,
+                 trpzApStatApStatusMacIpAddress,
+                 trpzApStatApStatusMacUptimeSecs,
+                 trpzApStatApStatusMacCpuInfo,
+                 trpzApStatApStatusMacManufacturerId,
+                 trpzApStatApStatusMacRamBytes,
+                 trpzApStatApStatusMacHardwareRev,
+                 trpzApStatApStatusMacClientSessions
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Status info in releases 5.0 and 6.0.
+
+            Replaced by trpzApStatusApStatusTablesGroupRev2."
+        ::= { trpzApStatusGroups 3 }
+
+
+trpzApStatusRadioStatusTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusBaseMac,
+                 trpzApStatRadioStatusEnable,
+                 trpzApStatRadioStatusRadioConfigState,
+                 trpzApStatRadioStatusCurrentPowerLevel,
+                 trpzApStatRadioStatusCurrentChannelNum,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacApSerialNum,
+                 trpzApStatRadioStatusMacRadioNum,
+                 trpzApStatRadioStatusMacEnable,
+                 trpzApStatRadioStatusMacRadioConfigState,
+                 trpzApStatRadioStatusMacCurrentPowerLevel,
+                 trpzApStatRadioStatusMacCurrentChannelNum
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Status info in releases 5.0 and 6.0.
+
+            Replaced by trpzApStatusRadioStatusTablesGroupRev2."
+        ::= { trpzApStatusGroups 4 }
+
+
+trpzApStatusRadioServiceTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioServBssid,
+                 trpzApStatRadioServServiceProfileName,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioServMacApSerialNum,
+                 trpzApStatRadioServMacRadioNum,
+                 trpzApStatRadioServMacSsid,
+                 trpzApStatRadioServMacServiceProfileName
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Service info."
+        ::= { trpzApStatusGroups 5 }
+
+
+trpzApStatusRadioServiceOpRateSetTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioSORSetMandatory,
+                 trpzApStatRadioSORSetDisabled,
+                 trpzApStatRadioSORSetBeacon,
+                 trpzApStatRadioSORSetMulticast,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioSORSetMacMandatory,
+                 trpzApStatRadioSORSetMacDisabled,
+                 trpzApStatRadioSORSetMacBeacon,
+                 trpzApStatRadioSORSetMacMulticast
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            the Operational Rate Set per Radio Service."
+        ::= { trpzApStatusGroups 6 }
+
+
+trpzApStatusRadioOpStatisticsTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioOpStatsTxUniPkt,
+                 trpzApStatRadioOpStatsTxUniOctet,
+                 trpzApStatRadioOpStatsTxMultiPkt,
+                 trpzApStatRadioOpStatsTxMultiOctet,
+                 trpzApStatRadioOpStatsRxPkt,
+                 trpzApStatRadioOpStatsRxOctet,
+                 trpzApStatRadioOpStatsUndcrptPkt,
+                 trpzApStatRadioOpStatsUndcrptOctet,
+                 trpzApStatRadioOpStatsPhyErr,
+                 trpzApStatRadioOpStatsResetCount,
+                 trpzApStatRadioOpStatsAutoTuneChannelChangeCount,
+                 trpzApStatRadioOpStatsTxRetriesCount,
+                 trpzApStatRadioOpStatsUserSessions,
+                 trpzApStatRadioOpStatsNoiseFloor,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioOpStatsMacTxUniPkt,
+                 trpzApStatRadioOpStatsMacTxUniOctet,
+                 trpzApStatRadioOpStatsMacTxMultiPkt,
+                 trpzApStatRadioOpStatsMacTxMultiOctet,
+                 trpzApStatRadioOpStatsMacRxPkt,
+                 trpzApStatRadioOpStatsMacRxOctet,
+                 trpzApStatRadioOpStatsMacUndcrptPkt,
+                 trpzApStatRadioOpStatsMacUndcrptOctet,
+                 trpzApStatRadioOpStatsMacPhyErr,
+                 trpzApStatRadioOpStatsMacResetCount,
+                 trpzApStatRadioOpStatsMacAutoTuneChannelChangeCount,
+                 trpzApStatRadioOpStatsMacTxRetriesCount,
+                 trpzApStatRadioOpStatsMacUserSessions,
+                 trpzApStatRadioOpStatsMacNoiseFloor
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Operational Statistics."
+        ::= { trpzApStatusGroups 7 }
+
+
+trpzApStatusRadioOpStatisticsPerRateTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioRateOpStatsTxUniPkt,
+                 trpzApStatRadioRateOpStatsTxUniOctet,
+                 trpzApStatRadioRateOpStatsTxMultiPkt,
+                 trpzApStatRadioRateOpStatsTxMultiOctet,
+                 trpzApStatRadioRateOpStatsRxPkt,
+                 trpzApStatRadioRateOpStatsRxOctet,
+                 trpzApStatRadioRateOpStatsUndcrptPkt,
+                 trpzApStatRadioRateOpStatsUndcrptOctet,
+                 trpzApStatRadioRateOpStatsPhyErr,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioRateOpStatsMacTxUniPkt,
+                 trpzApStatRadioRateOpStatsMacTxUniOctet,
+                 trpzApStatRadioRateOpStatsMacTxMultiPkt,
+                 trpzApStatRadioRateOpStatsMacTxMultiOctet,
+                 trpzApStatRadioRateOpStatsMacRxPkt,
+                 trpzApStatRadioRateOpStatsMacRxOctet,
+                 trpzApStatRadioRateOpStatsMacUndcrptPkt,
+                 trpzApStatRadioRateOpStatsMacUndcrptOctet,
+                 trpzApStatRadioRateOpStatsMacPhyErr
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Operational Statistics per data transmission Rate."
+        ::= { trpzApStatusGroups 8 }
+
+
+trpzApStatusApStatusVersionsGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusSoftwareVer,
+                 trpzApStatApStatusBootVer,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacSoftwareVer,
+                 trpzApStatApStatusMacBootVer
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of objects implemented to provide AP version info."
+        ::= { trpzApStatusGroups 9 }
+
+
+trpzApStatusApStatusTablesGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusBaseMac,
+                 trpzApStatApStatusAttachType,
+                 trpzApStatApStatusApState,
+                 trpzApStatApStatusModel,
+                 trpzApStatApStatusFingerprint,
+                 trpzApStatApStatusApName,
+                 trpzApStatApStatusVlan,
+                 trpzApStatApStatusIpAddress,
+                 trpzApStatApStatusUptimeSecs,
+                 trpzApStatApStatusCpuInfo,
+                 trpzApStatApStatusManufacturerId,
+                 trpzApStatApStatusRamBytes,
+                 trpzApStatApStatusHardwareRev,
+                 trpzApStatApStatusClientSessions,
+                 trpzApStatApStatusApNum,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacSerialNum,
+                 trpzApStatApStatusMacAttachType,
+                 trpzApStatApStatusMacApState,
+                 trpzApStatApStatusMacModel,
+                 trpzApStatApStatusMacFingerprint,
+                 trpzApStatApStatusMacApName,
+                 trpzApStatApStatusMacVlan,
+                 trpzApStatApStatusMacIpAddress,
+                 trpzApStatApStatusMacUptimeSecs,
+                 trpzApStatApStatusMacCpuInfo,
+                 trpzApStatApStatusMacManufacturerId,
+                 trpzApStatApStatusMacRamBytes,
+                 trpzApStatApStatusMacHardwareRev,
+                 trpzApStatApStatusMacClientSessions,
+                 trpzApStatApStatusMacApNum
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP Status info in releases 6.2 and greater."
+        ::= { trpzApStatusGroups 10 }
+
+
+trpzApStatusRadioStatusMaxPowerPhyTypeGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusMaxPowerLevel,
+                 trpzApStatRadioStatusRadioPhyType,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacMaxPowerLevel,
+                 trpzApStatRadioStatusMacRadioPhyType
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Status info in releases 6.0 and greater."
+        ::= { trpzApStatusGroups 11 }
+
+
+trpzApStatusRadioStatusTablesGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusBaseMac,
+                 trpzApStatRadioStatusRadioConfigState,
+                 trpzApStatRadioStatusCurrentPowerLevel,
+                 trpzApStatRadioStatusCurrentChannelNum,
+                 trpzApStatRadioStatusClientSessions,
+                 trpzApStatRadioStatusRadioMode,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacApSerialNum,
+                 trpzApStatRadioStatusMacRadioNum,
+                 trpzApStatRadioStatusMacRadioConfigState,
+                 trpzApStatRadioStatusMacCurrentPowerLevel,
+                 trpzApStatRadioStatusMacCurrentChannelNum,
+                 trpzApStatRadioStatusMacClientSessions,
+                 trpzApStatRadioStatusMacRadioMode
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Status info in releases 6.2 and greater."
+        ::= { trpzApStatusGroups 12 }
+
+
+trpzApStatusRadioStatusWideMimoGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusRadioChannelWidth,
+                 trpzApStatRadioStatusRadioMimoState,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacRadioChannelWidth,
+                 trpzApStatRadioStatusMacRadioMimoState
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Status info in releases 7.0 to 7.2.
+
+            Replaced by trpzApStatusRadioStatusWideMimoGroupRev2."
+        ::= { trpzApStatusGroups 13 }
+
+
+trpzApStatusRadioOpStatisticsPerRateExTablesGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioRateExOpStatsTxUniPkt,
+                 trpzApStatRadioRateExOpStatsTxUniOctet,
+                 trpzApStatRadioRateExOpStatsTxMultiPkt,
+                 trpzApStatRadioRateExOpStatsTxMultiOctet,
+                 trpzApStatRadioRateExOpStatsRxPkt,
+                 trpzApStatRadioRateExOpStatsRxOctet,
+                 trpzApStatRadioRateExOpStatsUndcrptPkt,
+                 trpzApStatRadioRateExOpStatsUndcrptOctet,
+                 trpzApStatRadioRateExOpStatsPhyErr,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioRateExOpStatsMacTxUniPkt,
+                 trpzApStatRadioRateExOpStatsMacTxUniOctet,
+                 trpzApStatRadioRateExOpStatsMacTxMultiPkt,
+                 trpzApStatRadioRateExOpStatsMacTxMultiOctet,
+                 trpzApStatRadioRateExOpStatsMacRxPkt,
+                 trpzApStatRadioRateExOpStatsMacRxOctet,
+                 trpzApStatRadioRateExOpStatsMacUndcrptPkt,
+                 trpzApStatRadioRateExOpStatsMacUndcrptOctet,
+                 trpzApStatRadioRateExOpStatsMacPhyErr
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Operational Statistics detailed per
+            Extended data transmission Rate (covering 802.11n MCS rates)
+            in releases 7.1 and greater."
+        ::= { trpzApStatusGroups 14 }
+
+
+trpzApStatusApStatusPhysPortNumGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusPhysPortNum,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacPhysPortNum
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            the Physical Port Number for a directly attached AP."
+        ::= { trpzApStatusGroups 15 }
+
+
+trpzApStatusApStatusConnectivityGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number:
+                 --
+                 trpzApStatApStatusIpNetmask,
+                 trpzApStatApStatusWiredIfNumber,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatApStatusMacIpNetmask,
+                 trpzApStatApStatusMacWiredIfNumber
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            AP connectivity info in releases 7.1 and greater."
+        ::= { trpzApStatusGroups 16 }
+
+
+trpzApStatusRadioStatusAntennaGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusMinPowerLevel,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacMinPowerLevel
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Radio Status info depending on AP model and
+            antenna being used in releases 7.1 and greater."
+        ::= { trpzApStatusGroups 17 }
+
+
+trpzApStatusRadioOpStatisticsClientAssocGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioOpStatsClientAssociations,
+                 trpzApStatRadioOpStatsClientFailedAssociations,
+                 trpzApStatRadioOpStatsClientReAssociations,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioOpStatsMacClientAssociations,
+                 trpzApStatRadioOpStatsMacClientFailedAssociations,
+                 trpzApStatRadioOpStatsMacClientReAssociations
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide per-radio
+            client association info in releases 7.1 and greater."
+        ::= { trpzApStatusGroups 18 }
+
+
+trpzApStatusRadioOpStatisticsSignErrGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioOpStatsSignalingPkt,
+                 trpzApStatRadioOpStatsReTransmitOctet,
+                 trpzApStatRadioOpStatsRefusedConnectionCount,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioOpStatsMacSignalingPkt,
+                 trpzApStatRadioOpStatsMacReTransmitOctet,
+                 trpzApStatRadioOpStatsMacRefusedConnectionCount
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Operational Statistics info
+            in releases 7.1 and greater."
+        ::= { trpzApStatusGroups 19 }
+
+
+trpzApStatusRadioStatusWideMimoGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusRadioChannelWidth,
+                 trpzApStatRadioStatusRadioMimoRxChains,
+                 trpzApStatRadioStatusRadioMimoTxChains,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacRadioChannelWidth,
+                 trpzApStatRadioStatusMacRadioMimoRxChains,
+                 trpzApStatRadioStatusMacRadioMimoTxChains
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Status info in releases 7.3 and greater."
+        ::= { trpzApStatusGroups 20 }
+
+
+trpzApStatusRadioOpStatisticsPktDetailGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioOpStatsRxDataPkt,
+                 trpzApStatRadioOpStatsRxAuthPkt,
+                 trpzApStatRadioOpStatsRxAssocPkt,
+                 trpzApStatRadioOpStatsTxDataPkt,
+                 trpzApStatRadioOpStatsTxAuthRespPkt,
+                 trpzApStatRadioOpStatsTxAssocRespPkt,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioOpStatsMacRxDataPkt,
+                 trpzApStatRadioOpStatsMacRxAuthPkt,
+                 trpzApStatRadioOpStatsMacRxAssocPkt,
+                 trpzApStatRadioOpStatsMacTxDataPkt,
+                 trpzApStatRadioOpStatsMacTxAuthRespPkt,
+                 trpzApStatRadioOpStatsMacTxAssocRespPkt
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Operational Statistics info
+            in releases 7.5 and greater."
+        ::= { trpzApStatusGroups 21 }
+
+
+trpzApStatusRadioStatusSpectralDataGroup OBJECT-GROUP
+        OBJECTS {
+                 -- indexed by AP Serial number etc:
+                 --
+                 trpzApStatRadioStatusSpectralDataCollect,
+
+                 -- indexed by MAC address:
+                 --
+                 trpzApStatRadioStatusMacSpectralDataCollect
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            more Radio Status info in releases 7.5 and greater."
+        ::= { trpzApStatusGroups 22 }
+
+
+END

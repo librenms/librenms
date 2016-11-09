@@ -1,0 +1,105 @@
+TRAPEZE-NETWORKS-REGISTRATION-DEVICES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    trpzRegistration
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzRegistrationDevicesMib MODULE-IDENTITY
+    LAST-UPDATED "201212200042Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "The MIB module for Trapeze Networks wireless device
+        OID registrations.
+
+        Copyright 2007-2012 Trapeze Networks, Inc.
+        All rights reserved.
+
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201212200042Z"
+    DESCRIPTION "v1.5.2: added switch model WLC-V.
+                (This will be published in 9.0 release.)"
+
+    REVISION "201210030040Z"
+    DESCRIPTION "v1.5.0: added switch model WLC100.
+                (This will be published in 9.0 release.)"
+
+    REVISION "201108090032Z"
+    DESCRIPTION "v1.4.2: added switch models WLC8, WLC2, WLC800R, WLC2800.
+                (This was first published in 7.3 MR4 release.)"
+
+    REVISION "201103080022Z"
+    DESCRIPTION "v1.3.2: added switch model WLC880R
+                (This will be published in 7.5 release.)"
+
+    REVISION "201012020011Z"
+    DESCRIPTION "v1.2.1: Revision history correction for v1.2:
+                switch model MX-800 was introduced in 7.3 release."
+
+    REVISION "200912180010Z"
+    DESCRIPTION "v1.2: added switch model MX-800."
+
+    REVISION "200711300001Z"
+    DESCRIPTION "v1.1: added switch model MX-2800
+                (This will be published in 7.0 release.)"
+
+    REVISION "200708220000Z"
+    DESCRIPTION "v1.0: initial version, published in 6.2 release"
+
+    ::= { trpzRegistration 6 }
+
+
+-- Wireless Switches:
+
+mobilityExchange        OBJECT IDENTIFIER ::= { trpzRegistration 1 }
+
+mobilityExchange20      OBJECT IDENTIFIER ::= { mobilityExchange 1 }
+mobilityExchange8       OBJECT IDENTIFIER ::= { mobilityExchange 2 }
+mobilityExchange400     OBJECT IDENTIFIER ::= { mobilityExchange 3 }
+mobilityExchangeR2      OBJECT IDENTIFIER ::= { mobilityExchange 4 }
+mobilityExchange216     OBJECT IDENTIFIER ::= { mobilityExchange 6 }
+mobilityExchange200     OBJECT IDENTIFIER ::= { mobilityExchange 7 }
+--
+-- skipping values 8-11 since they were used for experimental models
+--
+mobilityExchange2800    OBJECT IDENTIFIER ::= { mobilityExchange 12 }
+mobilityExchange800     OBJECT IDENTIFIER ::= { mobilityExchange 13 }
+
+-- Access Points:
+
+mobilityPoint           OBJECT IDENTIFIER ::= { trpzRegistration 2 }
+
+mobilityPoint101        OBJECT IDENTIFIER ::= { mobilityPoint 1 }
+mobilityPoint122        OBJECT IDENTIFIER ::= { mobilityPoint 2 }
+mobilityPoint241        OBJECT IDENTIFIER ::= { mobilityPoint 3 }
+mobilityPoint252        OBJECT IDENTIFIER ::= { mobilityPoint 4 }
+
+-- new generation Wireless Switches:
+
+wirelessLANController        OBJECT IDENTIFIER ::= { trpzRegistration 3 }
+
+wirelessLANController880R    OBJECT IDENTIFIER ::= { wirelessLANController 1 }
+wirelessLANController8       OBJECT IDENTIFIER ::= { wirelessLANController 2 } 
+wirelessLANController2       OBJECT IDENTIFIER ::= { wirelessLANController 3 } 
+wirelessLANController800r    OBJECT IDENTIFIER ::= { wirelessLANController 4 } 
+wirelessLANController2800    OBJECT IDENTIFIER ::= { wirelessLANController 5 } 
+wirelessLANController100     OBJECT IDENTIFIER ::= { wirelessLANController 6 } 
+wirelessLANControllerV       OBJECT IDENTIFIER ::= { wirelessLANController 10 }
+
+END

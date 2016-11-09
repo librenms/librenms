@@ -1,0 +1,649 @@
+TRAPEZE-NETWORKS-AP-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Integer32, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzApTc MODULE-IDENTITY
+    LAST-UPDATED "201303040240Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+        www.trapezenetworks.com
+        US:  866.TRPZ.TAC
+        International:  925.474.2400
+        support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent using these TCs.
+
+        Copyright 2006-2013 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201303040240Z"
+    DESCRIPTION "v2.4.0: Updated the description of the TrpzRadioRateEx TC:
+                802.11n/a and 802.11n/g radios support
+                MCS0 to MCS23 transmission rates.
+                This will be published in 9.0 release."
+
+    REVISION "201110050232Z"
+    DESCRIPTION "v2.3.2: New AP state (enum value in TrpzApState):
+                        'redundant(10)'.
+                New AP transitions (enum values in TrpzApTransition):
+                        'setBackupConn(10)',
+                        'startHandoverReconfiguring(11)'.
+                (for 7.6 release)"
+
+    REVISION "201101280220Z"
+    DESCRIPTION "v2.2.0: Added eight new AP Radio 11n transmission rates,
+                MCS 16 to MCS 23 (enum values in TrpzRadioRateEx).
+                (for 7.5 release)"
+
+    REVISION "201101280210Z"
+    DESCRIPTION "v2.1.0: Added fail detail value 'adminRequest(92)'
+                (for 7.5 release)"
+
+    REVISION "201011300201Z"
+    DESCRIPTION "v2.0.1: Extending the AP state machine model for
+                the WAN Outage feature:
+                New AP state (enum value in TrpzApState):
+                        'connOutage(20)'.
+                New AP transitions (enum values in TrpzApTransition):
+                        'connLost(20)',
+                        'connRestored(21)',
+                        'connOutageExtendedTimeout(22)'.
+
+                Renamed AP state (7) from 'configured' to 'operational'
+                to make clear how it is related to the AP Status traps:
+                AP Non-Operational Status (trpzApNonOperStatusTrap) and
+                AP Operational - Radio Status (trpzApOperRadioStatusTrap).
+
+                (for 7.5 release)"
+
+    REVISION "201011290131Z"
+    DESCRIPTION "v1.8.1: Added Crypto Type enum value 'sms4(8)'
+                (for 7.5 release)"
+
+    REVISION "200907210103Z"
+    DESCRIPTION "v1.5.3: Introduced TCs:
+                     TrpzApPowerMode,
+                     TrpzRadioAntennaLocation,
+                     TrpzApLedMode
+                (for 7.1 release)"
+
+    REVISION "200812020101Z"
+    DESCRIPTION "v1.5.1: Added bias value 'sticky(3)'
+                (for 7.1 release)"
+
+    REVISION "200811270100Z"
+    DESCRIPTION "v1.5.0: Introduced a new Radio identifier,
+                not limited to two radios per AP:
+                TrpzApRadioIndex and TrpzApRadioIndexOrZero
+                (for 7.1 release)"
+
+    REVISION "200811260051Z"
+    DESCRIPTION "v1.4.1: Removed range from 'TrpzPowerLevel'
+                (it was wrong already: too small,
+                maximum power is at least 23, not 18).
+                Added format where needed (DISPLAY-HINT).
+                This will be published in 7.1 release."
+
+    REVISION "200810060050Z"
+    DESCRIPTION "v1.4.0: Introduced TrpzRadioRateEx
+                (for 7.1 release)"
+
+    REVISION "200805070041Z"
+    DESCRIPTION "v1.3.1: Introduced TrpzCryptoType
+                (for 7.0 release)"
+
+    REVISION "200802140032Z"
+    DESCRIPTION "v1.2.2: In order to support 802.11n,
+                added radio types NA, NG and introduced
+                     TrpzRadioChannelWidth,
+                     TrpzRadioMimoState
+                (for 7.0 release)"
+
+    REVISION "200712030030Z"
+    DESCRIPTION "v1.2.0: Obsoleted TrpzRadioEnable and TrpzApPortOrDapNum
+                (previously deprecated).
+                This will be published in 7.0 release."
+
+    REVISION "200707060023Z"
+    DESCRIPTION "v1.1.3: Introduced TrpzRadioMode
+                 in order to replace TrpzRadioEnable
+                 (in 6.2, a new administrative mode 'sentry' was added)"
+
+    REVISION "200707050022Z"
+    DESCRIPTION "v1.1.2: Introduced TrpzApNum
+                 in order to replace TrpzApPortOrDapNum.
+                 (In 6.0, direct- and network-attached APs were unified.)"
+
+    REVISION "200607100015Z"
+    DESCRIPTION "v1.0.1: Disallow illegal TrpzRadioRate values 1..9
+                         while keeping zero (that means unknown rate)"
+
+    REVISION "200603300014Z"
+    DESCRIPTION "v1.0: Initial version, for 4.1 release"
+
+    ::= { trpzMibs 3 }
+
+
+TrpzAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the access type used by client or an AP.
+        Value 'ap(1)' indicates access point that is
+        directly attached to the switch.
+        Value 'dap(2)' indicates distributed access point
+        with attachment to the switch through the intermediate
+        network.
+        Value 'wired(3)' indicates a client that is directly
+        attached to the switch (no access point is involved)."
+    SYNTAX      INTEGER {
+            ap                  (1),
+            dap                 (2),
+            wired               (3)
+        }
+
+TrpzApAttachType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Type of AP attachment to AC."
+    SYNTAX       INTEGER {
+                     directAttach(1),  -- informally known as "AP"
+                     networkAttach(2)  -- informally known as "DAP"
+                 }
+
+TrpzApPortOrDapNum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       obsolete
+    DESCRIPTION
+        "AP Port, for directly attached APs, otherwise DAP Number
+        (arbitrary number assigned when configuring the DAP on the AC).
+        A zero value means unknown.
+        Obsoleted by TrpzApNum.
+        (In 6.0, direct- and network-attached APs were unified.)"
+    SYNTAX       Unsigned32 (0..1000)
+
+TrpzApNum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "AP Number: arbitrary number assigned when configuring
+        the AP on the AC. It is unique (on same AC),
+        regardless of the type of AP attachment.
+        A zero value means unknown."
+    SYNTAX       Unsigned32 (0..9999)
+
+TrpzApState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "AP State, as seen by the AC."
+    SYNTAX       INTEGER {
+                     cleared         (1),
+                     init            (2),
+                     bootStarted     (3),
+                     imageDownloaded (4),
+                     connectFailed   (5),
+                     configuring     (6),
+                     operational     (7),
+                     redundant       (10),
+                     connOutage      (20)
+                 }
+
+TrpzApTransition ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "AP state Transition, as seen by the AC.
+        Usually reported via 'trpzApNonOperStatusTrap'.
+
+        Transition to operational state is reported by
+        'trpzApOperRadioStatusTrap' (multiple PDUs may be sent,
+        one for each radio of that AP).
+
+        Another transition to operational state is 'connRestored(21)',
+        which may not be followed by 'trpzApOperRadioStatusTrap'
+        unless radio status also changed."
+    SYNTAX       INTEGER {
+                     clear            (1),
+                     timeout          (2),
+                     reset            (3),
+                     bootSuccess      (4),
+                     startConfiguring (5),
+                     connectFail      (6),
+                     setBackupConn    (10),
+                     startHandoverReconfiguring (11),
+                     connLost         (20),
+                     connRestored     (21),
+                     connOutageExtendedTimeout (22)
+                 }
+
+TrpzApFailDetail ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Detailed failure codes for some of the transitions
+        specified in 'TrpzApTransition'.
+         - 'normalTransition' (91) means
+                the corresponding transition is not a failure;
+                it is a transition towards operational state
+                or it is an internally required transition
+                (for example, a major configuration change occurred,
+                like cluster being enabled).
+         - 'adminRequest' (92) means
+                the corresponding transition is not a failure,
+                it was caused by an administrative request; for example,
+                AP was cleared (removed from the switch configuration).
+         - 'failUnknown' (99) means there are no details available;
+                the transition may be normal or undesirable/unexpected."
+    SYNTAX       INTEGER {
+                    -- Detail code values for 'configFailed' transition.
+                    -- All 3 below cover 'trpzDAPConnectWarningTrap' trap.
+                    secureHandshakeFailure  (2),
+                    fingerprintRequired     (3),
+                    fingerprintMismatch     (4),
+
+                    -- Detail code values for 'timeout' transition.
+                    -- Reports the state of the physical AC port
+                    -- this AP is attached to.
+                    -- For RM, it would cover the information
+                    -- given by the standard "Port Link Up/Down" traps.
+                    portLinkUp              (11),
+                    portLinkDown            (12),
+
+                    normalTransition        (91),
+                    adminRequest            (92),
+                    failUnknown             (99)
+                 }
+
+TrpzApConnectSecurityType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Security level of the connection between AP and AC:
+        secure(1)   - fingerprint matching;
+        insecure(2) - fingerprint not configured,
+                      or optional and not matching;
+        auto(3)     - Auto-DAP is intrinsically insecure:
+                      could not check fingerprint since
+                      no specific DAP is configured."
+    SYNTAX       INTEGER {
+                    secure          (1),
+                    insecure        (2),
+                    auto            (3)
+                 }
+
+TrpzApServiceAvailability ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Level of wireless service availability."
+    SYNTAX       INTEGER {
+                    fullService     (1),
+                    -- All radios operational on the AP.
+                    noService       (2),
+                    -- No radio operational on the AP.
+                    degradedService (3)
+                    -- One radio down, one radio up.
+                 }
+
+TrpzApBias ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Bias of AP attachment to this AC.
+        Setting an APs bias on an AC switch to high causes the switch
+        to be preferred over switches with low bias,
+        for booting and managing the AP.
+        Bias applies only to AC switches that are indirectly attached
+        to the AP through an intermediate Layer 2 or Layer 3 network.
+        An AP always attempts to boot on AP port 1 first,
+        and if an AC switch is directly attached on AP port 1,
+        the AP boots from it regardless of the bias settings."
+    SYNTAX       INTEGER {
+                     high(1),
+                     low(2),
+                     sticky(3)
+                 }
+
+TrpzApSerialNum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "The value is a zero length string if unknown or unavailable.
+        Otherwise the value is a serial number, which consists
+        of printable ASCII characters between 0x21 (!),
+        and 0x7d (}) with no leading, embedded, or trailing space."
+    SYNTAX       OCTET STRING (SIZE (0..32))
+
+TrpzApFingerprint ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+        "Represents a RSA key fingerprint (binary value),
+        which is the MD5 hash of the public key of the RSA key pair.
+        Or a zero length string if not known or unavailable."
+    SYNTAX       OCTET STRING (SIZE (0 | 16))
+
+TrpzRadioNum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration for multi-radio APs."
+    SYNTAX      INTEGER {
+                    radio-1             (1),
+                    radio-2             (2),
+                    not-applicable      (3)
+                }
+
+
+TrpzApRadioIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each Radio on the AP.
+        Intended to replace TrpzRadioNum."
+    SYNTAX       Unsigned32 (1..4294967295)
+
+TrpzApRadioIndexOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "This textual convention is an extension of the
+        TrpzApRadioIndex convention.
+        The latter defines a greater than zero value used to identify
+        each Radio on the AP.
+        This extension permits the additional value of zero.
+        A zero value means 'none', 'unknown radio' or 'not applicable'.
+        Each object using this textual convention should document
+        the meaning of Radio Index zero."
+    SYNTAX       Unsigned32 (0 | 1..4294967295)
+
+
+TrpzPowerLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The current level of transmit power expressed in dbm."
+    SYNTAX      Unsigned32
+
+TrpzRadioPowerChangeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerations for why the power level was changed,
+        which occurs due to auto-tune operation."
+    SYNTAX      INTEGER {
+                    dup-pkts-threshold-exceed            (1),
+                    retransmit-threshold-exceed          (2),
+                    clients-optimal-performance-reached  (3),
+                    def-power-threshold-exceed           (4)
+                }
+
+TrpzChannelChangeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerations for why the channel was changed, which
+        occurs due to auto-tune operation"
+    SYNTAX      INTEGER {
+                    util-index          (1),
+                    rexmit-pkt-offset   (2),
+                    noise-offset        (3),
+                    noise               (4),
+                    utilization         (5),
+                    phy-error-offset    (6),
+                    crc-errors-offset   (7),
+                    radar-detected      (8)
+                }
+
+TrpzChannelNum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Channel Number"
+    SYNTAX      Unsigned32 (1..1024)
+
+TrpzRadioEnable ::= TEXTUAL-CONVENTION
+    STATUS      obsolete
+    DESCRIPTION
+        "Radio mode (administratively enabled or disabled).
+         Obsoleted by TrpzRadioMode."
+    SYNTAX      INTEGER {
+                    enabled  (1),
+                    disabled (2)
+                }
+
+TrpzRadioMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Configured mode of an AP radio.
+         There are three administratively controlled values:
+          - enabled: radio may provide service to clients;
+          - sentry: radio will not provide service,
+                but can be used for RF scanning
+                and can run countermeasures;
+          - disabled: radio will not emit at all
+                (thus cannot run countermeasures),
+                can only be used for RF scanning.
+        Obsoletes TrpzRadioEnable."
+    SYNTAX      INTEGER {
+                    enabled  (1),
+                    disabled (2),
+                    sentry   (3)
+                }
+
+TrpzRadioConfigState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Radio Configuration State, as seen by the AC."
+    SYNTAX      INTEGER {
+                    configInit  (1),
+                    configFail  (2),
+                    configOk    (3)
+                }
+
+TrpzRadioRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION
+        "The possible transmission rates of an AP radio.
+        Both a and b/g rates are covered; a specific radio will report
+        the applicable transmission rates (either a or b/g).
+        Here are the possible rates, in Mbps:
+        - 802.11g radios: 54, 48, 36, 24, 18, 12, 11, 9, 6, 5.5, 2, or 1;
+        - 802.11b radios: 11, 5.5, 2, or 1;
+        - 802.11a radios: 54, 48, 36, 24, 18, 12, 9, or 6.
+        The value in MIB is specified as the rate in Mbps times 10,
+        in order to have only integer values, zero meaning unknown rate."
+    SYNTAX      Unsigned32 (0 | 10..540)
+
+TrpzRadioRateEx ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Radio Rates Extended (covering 11n MCS rates):
+        The possible transmission rates of an AP radio.
+        11a, 11b/g, 11n/a and 11n/g rates are included;
+        a specific radio will report
+        the applicable transmission rates (either a, b/g, n/a, n/g).
+        Here are the possible rates, in Mbps:
+        - 802.11g radios: 54, 48, 36, 24, 18, 12, 11, 9, 6, 5.5, 2, or 1;
+        - 802.11b radios: 11, 5.5, 2, or 1;
+        - 802.11a radios: 54, 48, 36, 24, 18, 12, 9, or 6;
+        - 802.11n/g radios: MCS0-MCS23 and all 11g rates;
+        - 802.11n/a radios: MCS0-MCS23 and all 11a rates."
+    SYNTAX      INTEGER {
+                    rateUnknown     (1),
+
+                    rate1           (2), -- standard 1 Mbps rate
+                    rate2           (3), -- standard 2 Mbps rate
+                    rate5-5         (4), -- standard 5.5 Mbps rate
+                    rate6           (5), -- standard 6 Mbps rate
+                    rate9           (6), -- standard 9 Mbps rate
+                    rate11          (7), -- standard 11 Mbps rate
+                    rate12          (8), -- standard 12 Mbps rate
+                    rate18          (9), -- standard 18 Mbps rate
+                    rate24         (10), -- standard 24 Mbps rate
+                    rate36         (11), -- standard 36 Mbps rate
+                    rate48         (12), -- standard 48 Mbps rate
+                    rate54         (13), -- standard 54 Mbps rate
+
+                    rateMCS0       (20), -- Modulation Coding Scheme 0
+                    rateMCS1       (21), -- Modulation Coding Scheme 1
+                    rateMCS2       (22), -- Modulation Coding Scheme 2
+                    rateMCS3       (23), -- Modulation Coding Scheme 3
+                    rateMCS4       (24), -- Modulation Coding Scheme 4
+                    rateMCS5       (25), -- Modulation Coding Scheme 5
+                    rateMCS6       (26), -- Modulation Coding Scheme 6
+                    rateMCS7       (27), -- Modulation Coding Scheme 7
+                    rateMCS8       (28), -- Modulation Coding Scheme 8
+                    rateMCS9       (29), -- Modulation Coding Scheme 9
+                    rateMCS10      (30), -- Modulation Coding Scheme 10
+                    rateMCS11      (31), -- Modulation Coding Scheme 11
+                    rateMCS12      (32), -- Modulation Coding Scheme 12
+                    rateMCS13      (33), -- Modulation Coding Scheme 13
+                    rateMCS14      (34), -- Modulation Coding Scheme 14
+                    rateMCS15      (35), -- Modulation Coding Scheme 15
+                    rateMCS16      (36), -- Modulation Coding Scheme 16
+                    rateMCS17      (37), -- Modulation Coding Scheme 17
+                    rateMCS18      (38), -- Modulation Coding Scheme 18
+                    rateMCS19      (39), -- Modulation Coding Scheme 19
+                    rateMCS20      (40), -- Modulation Coding Scheme 20
+                    rateMCS21      (41), -- Modulation Coding Scheme 21
+                    rateMCS22      (42), -- Modulation Coding Scheme 22
+                    rateMCS23      (43)  -- Modulation Coding Scheme 23
+                }
+
+TrpzRadioType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the Radio Type, as seen by AC."
+    SYNTAX      INTEGER {
+                    typeUnknown     (1),
+                    typeA           (2), -- 802.11a
+                    typeB           (3), -- 802.11b
+                    typeG           (4), -- 802.11b+g
+                    typeNA          (5), -- 802.11n
+                    typeNG          (6)  -- 802.11n
+                }
+
+TrpzRssi ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "RSSI (Received Signal Strength Indicator) for last packet
+        received, in decibels referred to 1 milliwatt (dBm).
+        A higher value indicates a stronger signal."
+    SYNTAX      Integer32 (-100..0)
+
+TrpzApWasOperational ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate whether the AP was operational
+        before a transition occurred. Normally used in notifications."
+    SYNTAX      INTEGER {
+                    oper    (1),
+                    nonOper (2)
+                }
+
+TrpzRadioChannelWidth ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the administratively controlled
+        Radio Channel Width."
+    SYNTAX      INTEGER {
+                    channelWidth20MHz     (1),
+                    channelWidth40MHz     (2)
+                }
+
+TrpzRadioMimoState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the MIMO state of the Radio
+        (Multiple Input Multiple Output), as seen by the AC.
+        This depends on radio type and power supplied to the radio.
+        mimo1x1:
+                radio uses one transmit chain and one receive chain;
+        mimo2x3:
+                radio uses two transmit chains and three receive chains;
+        mimo3x3:
+                radio uses three transmit chains and three receive chains."
+    SYNTAX      INTEGER {
+                    mimoOther (1),
+                    mimo1x1   (2),
+                    mimo2x3   (3),
+                    mimo3x3   (4)
+                }
+
+TrpzApPowerMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerations of the modes in which power is supplied
+        by the AP to its components (mainly radios).
+        There are two administratively controlled values:
+          - auto: the power is managed automatically by sensing
+                the power level on the AP;
+          - high: all radios operate at the maximum power available."
+    SYNTAX      INTEGER {
+                    auto     (1),
+                    high     (2)
+                }
+
+TrpzApLedMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumeration to indicate the administratively controlled
+        LED mode for an AP."
+    SYNTAX       INTEGER {
+                    auto     (1),
+                    static   (2),
+                    off      (3)
+                 }
+
+TrpzRadioAntennaLocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the administratively controlled
+        Radio Antenna Location."
+    SYNTAX      INTEGER {
+                    indoors      (1),
+                    outdoors     (2)
+                }
+
+TrpzCryptoType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of Crypto Types:
+        - clear:
+            Cleartext (unencrypted communication);
+        - wep: Wired Equivalent Privacy;
+        - wep40:
+            WEP with 40-bit keys;
+        - wep104:
+            WEP with 104-bit keys;
+        - tkip:
+            Temporal Key Integrity Protocol;
+        - aesCcmp:
+            Advanced Encryption Standard, Counter mode with CBC MAC Protocol."
+    SYNTAX      INTEGER {
+                    other    (1),
+                    clear    (2),
+                    wep      (3),
+                    wep40    (4),
+                    wep104   (5),
+                    tkip     (6),
+                    aesCcmp  (7),
+                    sms4     (8)
+                }
+
+END

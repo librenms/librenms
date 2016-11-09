@@ -1,0 +1,109 @@
+TRAPEZE-NETWORKS-RF-DETECT-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzRFDetectTc MODULE-IDENTITY
+    LAST-UPDATED "201107270011Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        Copyright 2007-2011 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201107270011Z"
+    DESCRIPTION "v1.2.1: Revised for 7.7 release."
+
+    REVISION "200908130010Z"
+    DESCRIPTION "v1.2.0: Added RF classification value 'tag(7)'.
+                Introduced TrpzRFDetectDot11ModulationStandard
+                (for 7.7 release)"
+
+    REVISION "200704180002Z"
+    DESCRIPTION "v1.1.0: added two new TCs, for use in trpzInfoRFDetectMib"
+
+    REVISION "200703280001Z"
+    DESCRIPTION "v1.0.0: initial version, for 6.2 release"
+
+    ::= { trpzMibs 11 }
+
+
+TrpzRFDetectClassificationReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why a RF device is classified
+        the way it is."
+    SYNTAX      INTEGER {
+            other                      (1),
+            default-classification     (2),
+            rogue-list                 (3),
+            ap-in-modo                 (4),
+            neighbor-list              (5),
+            ssid-masquerade            (6),
+            seen-in-network            (7),
+            ad-hoc                     (8),
+            ssid-list                  (9),
+            pass-fingerprint           (10),
+            fail-fingerprint           (11)
+        }
+
+TrpzRFDetectClassification ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The classification of an RF device."
+    SYNTAX      INTEGER {
+            other                      (1),
+            not-classified             (2),
+            member                     (3),
+            neighbor                   (4),
+            suspect                    (5),
+            rogue                      (6),
+            tag                        (7)
+        }
+
+TrpzRFDetectNetworkingMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The way an RF device is doing wireless networking."
+    SYNTAX      INTEGER {
+            ad-hoc                     (1),
+            infrastructure             (2)
+        }
+
+TrpzRFDetectDot11ModulationStandard ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the 802.11 Modulation Standard."
+    SYNTAX      INTEGER {
+            dot11Unknown     (1),
+            dot11Other       (2),
+            dot11A           (3), -- 802.11a
+            dot11B           (4), -- 802.11b
+            dot11G           (5), -- 802.11g
+            dot11NA          (6), -- 802.11n/a
+            dot11NG          (7)  -- 802.11n/g
+        }
+
+
+END

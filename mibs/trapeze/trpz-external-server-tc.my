@@ -1,0 +1,61 @@
+TRAPEZE-NETWORKS-EXTERNAL-SERVER-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzExternalServerTc MODULE-IDENTITY
+    LAST-UPDATED "201202160001Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Textual Conventions used by Trapeze Networks wireless switches.
+
+        Copyright 2012 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201202160001Z"
+    DESCRIPTION "v1.0.0: initial version, for 7.7 release"
+
+    ::= { trpzMibs 23 }
+
+
+TrpzSyslogSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The severity levels of syslog messages.
+        The enumeration values are equal to the actual
+        values that syslog uses + 1."
+    REFERENCE   "RFC 5424, section 6.2.1."
+    SYNTAX      INTEGER {
+                    emergency      (1),
+                    alert          (2),
+                    critical       (3),
+                    error          (4),
+                    warning        (5),
+                    notice         (6),
+                    informational  (7),
+                    debug          (8)
+                }
+
+
+END

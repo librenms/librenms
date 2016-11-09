@@ -1,0 +1,56 @@
+TRAPEZE-NETWORKS-REGISTRATION-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    trpzRegistration
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+trpzRegistrationChassisMib MODULE-IDENTITY
+    LAST-UPDATED "200708220000Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "The MIB module for Trapeze Networks wireless switch
+        chassis component OID registrations.
+        These are generic OIDs: they apply to any switch model,
+        if the respective chassis component is present in the switch.
+
+        Copyright 2007 Trapeze Networks, Inc.
+        All rights reserved.
+
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200708220000Z"
+    DESCRIPTION "v1.0: initial version, published in 6.2 release"
+
+    ::= { trpzRegistration 5 }
+
+
+trpzChassisComponents      OBJECT IDENTIFIER ::= { trpzRegistration 4 }
+
+trpzChasCompPowerSupplies  OBJECT IDENTIFIER ::= { trpzChassisComponents 1 }
+
+trpzChasCompFans           OBJECT IDENTIFIER ::= { trpzChassisComponents 2 }
+
+trpzChasCompPowerSupply1   OBJECT IDENTIFIER ::= { trpzChasCompPowerSupplies 1 }
+trpzChasCompPowerSupply2   OBJECT IDENTIFIER ::= { trpzChasCompPowerSupplies 2 }
+
+trpzChasCompFan1           OBJECT IDENTIFIER ::= { trpzChasCompFans 1 }
+trpzChasCompFan2           OBJECT IDENTIFIER ::= { trpzChasCompFans 2 }
+trpzChasCompFan3           OBJECT IDENTIFIER ::= { trpzChasCompFans 3 }
+
+END

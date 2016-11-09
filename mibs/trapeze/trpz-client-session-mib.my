@@ -1,0 +1,1218 @@
+TRAPEZE-NETWORKS-CLIENT-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32, Integer32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress, TimeStamp
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    TrpzAccessType, TrpzRadioNum, TrpzApSerialNum, TrpzRadioRate, TrpzRssi,
+    TrpzApNum
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzClientSessionState, TrpzClientAuthenProtocolType,
+    TrpzUserAccessType, TrpzClientAccessMode,
+    TrpzClientDeviceType, TrpzClientDeviceGroupName,
+    TrpzClientDeviceProfileName
+        FROM TRAPEZE-NETWORKS-CLIENT-SESSION-TC
+    TrpzPhysPortNumberOrZero
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzClientSessionMib MODULE-IDENTITY
+    LAST-UPDATED "201212210120Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Client Session MIB.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2005-2012 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "201212210120Z"
+    DESCRIPTION "v3.2.0: Obsoleted a previously deprecated object:
+                  'trpzClSessClientSessState'
+                and the associated Textual Convention:
+                  'TrpzSessState'.
+                This will be published in 9.0 release."
+
+    REVISION "201204200112Z"
+    DESCRIPTION "v3.1.2: Added three new columnar objects:
+                    trpzClSessClientSessDeviceType,
+                    trpzClSessClientSessDeviceGroup,
+                    trpzClSessClientSessDeviceProfileName.
+                (for 8.0 release)"
+
+    REVISION "201112060110Z"
+    DESCRIPTION "v3.1.0: Added a new table:
+                    trpzClSessClientAddressTable
+                to hold the clients' Internet addresses.
+                (for 8.0 release)"
+
+    REVISION "201105180100Z"
+    DESCRIPTION "v3.0.0: Obsoleted a previously deprecated object:
+                  'trpzClSessClientSessAuthMethod'
+                and the associated Textual Convention:
+                  'TrpzAuthMethod'.
+                This will be published in 7.5 release."
+
+    REVISION "200810230056Z"
+    DESCRIPTION "v2.4.1: Using the new TC TrpzPhysPortNumberOrZero
+                instead of ''Unsigned32 (0..1024)''.
+                This will be published in 7.1 release."
+
+    REVISION "200805230055Z"
+    DESCRIPTION "v2.4.0: Updated conformance section
+                to reflect the history of changes to this MIB:
+                added more compliance statements and groups.
+                This will be published in 7.0 release."
+
+    REVISION "200711010054Z"
+    DESCRIPTION "v2.3.4: Added two new columnar objects:
+        - trpzClSessClientSessPhysPortNum,
+        - trpzClSessRoamHistPhysPortNum,
+        to indicate the port used by wired-auth clients.
+        (for 6.2 release)"
+
+    REVISION "200710090051Z"
+    DESCRIPTION "v2.3.1: Added four new columnar objects:
+        - trpzClSessClientSessAccessMode,
+                obsoleting trpzClSessClientSessAccessType;
+        - trpzClSessClientSessApNum,
+                obsoleting trpzClSessClientSessPortOrNum;
+        - trpzClSessRoamHistAccessMode,
+                obsoleting trpzClSessRoamHistAccessType;
+        - trpzClSessRoamHistApNum,
+                obsoleting trpzClSessRoamHistApNumOrPort.
+        Reason: in 6.0, direct- and network-attached APs were unified.
+        (for 6.2 release)"
+
+    REVISION "200611160043Z"
+    DESCRIPTION "v2.2.1: added one value (21) to TrpzSessState"
+
+    REVISION "200610170042Z"
+    DESCRIPTION "v2.2.0: Described semantics of trpzClSessRoamHistTimeStamp"
+
+    REVISION "200609260032Z"
+    DESCRIPTION "v2.1.1: Added three new columnar objects:
+        - trpzClSessClientSessDot1xAuthMethod,
+                to be used instead of trpzClSessClientSessAuthMethod;
+        - trpzClSessClientSessSessionState,
+                to be used instead of trpzClSessClientSessState;
+        - trpzClSessClientSessLoginType,
+                to provide context for interpreting the values of
+                the above objects (Dot1xAuthMethod, SessionState).
+
+        Changed behaviour for trpzClSessClientSessAuthServer:
+        provides system IP when auth is done via local DB
+        (it used to be 0.0.0.0 in such cases)."
+
+    REVISION "200607290021Z"
+    DESCRIPTION "v2.0.2: Fixed imports and compliance group"
+
+    REVISION "200606060010Z"
+    DESCRIPTION "v2.0.1: Adding scalar for total number of sessions."
+
+    REVISION "200603300008Z"
+    DESCRIPTION "v1.0: Initial version, for 4.1 release"
+
+    ::= { trpzMibs 4 }
+
+
+-- Textual conventions
+
+TrpzEncryptionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Encryption types."
+    SYNTAX INTEGER {
+        none            (1),
+        aesCcm          (2),
+        aesOcb          (3),
+        tkip            (4),
+        wep104          (5),
+        wep40           (6),
+        staticWep       (7)
+    }
+
+TrpzAuthMethod ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION
+        "Authentication methods.
+        Obsolete, use 'TrpzClientAuthenProtocolType' instead."
+    SYNTAX INTEGER {
+        none            (1),
+        identity        (2),
+        notification    (3),
+        nak             (4),
+        md5             (5),
+        otp             (6),
+        tokenCard       (7),
+        tls             (14),
+        leap            (18),
+        ttls            (22),
+        peap            (26),
+        msChapv2        (27),
+        eapExt          (34),
+        passThru        (255)
+    }
+
+TrpzSessState ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION
+        "Session states.
+        Obsolete, use 'TrpzClientSessionState' instead."
+    SYNTAX INTEGER {
+        invalid             (1),
+        initializing        (2),
+        assocReqAndAuth     (3),
+        assocAndAuth        (4),
+        wired               (5),
+        webLoginPh1         (6),
+        webLoginPh1B        (7),
+        webLoginPh1F        (8),
+        webLoginPh2         (9),
+        webPortalLogin      (10),
+        authorizing         (11),
+        authorized          (12),
+        active              (13),
+        activePortal        (14),
+        deassociated        (15),
+        roamingAway         (16),
+        updatedToRoam       (17),
+        roamedAway          (18),
+        killing             (19),
+        free                (20),
+        enforceSoda         (21)
+    }
+
+
+-- Object definitions
+
+--
+-- The ClientSession MIB Tree
+--
+
+trpzClientSessionObjects    OBJECT IDENTIFIER ::= { trpzClientSessionMib 1 }
+trpzClientSessionDataObjects  OBJECT IDENTIFIER ::= { trpzClientSessionObjects 1 }
+
+
+-- Client Session Table
+-- ====================
+
+trpzClSessClientSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzClSessClientSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client Session Table."
+    ::= { trpzClientSessionDataObjects 1 }
+
+trpzClSessClientSessionEntry OBJECT-TYPE
+    SYNTAX      TrpzClSessClientSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular client session."
+    INDEX   { trpzClSessClientSessMacAddress }
+    ::= { trpzClSessClientSessionTable 1 }
+
+TrpzClSessClientSessionEntry ::= SEQUENCE {
+        trpzClSessClientSessMacAddress       MacAddress,
+        trpzClSessClientSessSessionId        DisplayString,
+        trpzClSessClientSessUsername         DisplayString,
+        trpzClSessClientSessIpAddress        IpAddress,
+        trpzClSessClientSessEncryptionType   TrpzEncryptionType,
+        trpzClSessClientSessVlan             DisplayString,
+        trpzClSessClientSessApSerialNum      TrpzApSerialNum,
+        trpzClSessClientSessRadioNum         TrpzRadioNum,
+        trpzClSessClientSessAccessType       TrpzAccessType,
+        trpzClSessClientSessAuthMethod       TrpzAuthMethod,
+        trpzClSessClientSessAuthServer       IpAddress,
+        trpzClSessClientSessPortOrNum        Unsigned32,
+        trpzClSessClientSessVlanTag          Unsigned32,
+        trpzClSessClientSessTimeStamp        TimeStamp,
+        trpzClSessClientSessSsid             DisplayString,
+        trpzClSessClientSessState            TrpzSessState,
+        trpzClSessClientSessLoginType        TrpzUserAccessType,
+        trpzClSessClientSessDot1xAuthMethod  TrpzClientAuthenProtocolType,
+        trpzClSessClientSessSessionState     TrpzClientSessionState,
+        trpzClSessClientSessAccessMode       TrpzClientAccessMode,
+        trpzClSessClientSessApNum            TrpzApNum,
+        trpzClSessClientSessPhysPortNum      TrpzPhysPortNumberOrZero,
+        trpzClSessClientSessDeviceType       TrpzClientDeviceType,
+        trpzClSessClientSessDeviceGroup      TrpzClientDeviceGroupName,
+        trpzClSessClientSessDeviceProfileName  TrpzClientDeviceProfileName
+    }
+
+trpzClSessClientSessMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client MAC address."
+    ::= { trpzClSessClientSessionEntry 1 }
+
+trpzClSessClientSessSessionId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Session ID is a string long enough to be sure
+        we can make it unique over a long time."
+    ::= { trpzClSessClientSessionEntry 2 }
+
+trpzClSessClientSessUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client user name."
+    ::= { trpzClSessClientSessionEntry 3 }
+
+trpzClSessClientSessIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client IP address.
+        If the client has no IP address, the value will be 0.0.0.0."
+    ::= { trpzClSessClientSessionEntry 4 }
+
+trpzClSessClientSessEncryptionType OBJECT-TYPE
+    SYNTAX      TrpzEncryptionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption type."
+    ::= { trpzClSessClientSessionEntry 5 }
+
+trpzClSessClientSessVlan OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the client VLAN."
+    ::= { trpzClSessClientSessionEntry 6 }
+
+trpzClSessClientSessApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial Number of the AP this client is connected to.
+        It is a zero length string when wired access is used."
+    ::= { trpzClSessClientSessionEntry 7 }
+
+trpzClSessClientSessRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of the Radio that provides service to this client.
+        It is 'not-applicable' when wired access is used."
+    ::= { trpzClSessClientSessionEntry 8 }
+
+trpzClSessClientSessAccessType OBJECT-TYPE
+    SYNTAX      TrpzAccessType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Access type this client uses (via AP, DAP or wired).
+        Obsoleted by trpzClSessClientSessAccessMode."
+    ::= { trpzClSessClientSessionEntry 9 }
+
+trpzClSessClientSessAuthMethod OBJECT-TYPE
+    SYNTAX      TrpzAuthMethod
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Authentication Method. Obsolete, use
+        trpzClSessClientSessDot1xAuthMethod instead."
+    ::= { trpzClSessClientSessionEntry 10 }
+
+trpzClSessClientSessAuthServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Authentication Server's IP Address.
+        If the client is authenticated via the local DB,
+        or not authenticated, its value will be the system IP."
+    ::= { trpzClSessClientSessionEntry 11 }
+
+trpzClSessClientSessPortOrNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Port number.
+        Obsoleted by trpzClSessClientSessApNum."
+    ::= { trpzClSessClientSessionEntry 12 }
+    
+trpzClSessClientSessVlanTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN tag."
+    ::= { trpzClSessClientSessionEntry 13 }
+
+trpzClSessClientSessTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Session start time stamp."
+    ::= { trpzClSessClientSessionEntry 14 }
+
+trpzClSessClientSessSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..33))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SSID."
+    ::= { trpzClSessClientSessionEntry 15 }
+
+trpzClSessClientSessState OBJECT-TYPE
+    SYNTAX      TrpzSessState
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Session state. Obsoleted by
+        trpzClSessClientSessSessionState."
+    ::= { trpzClSessClientSessionEntry 16 }
+
+trpzClSessClientSessLoginType OBJECT-TYPE
+    SYNTAX      TrpzUserAccessType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Login type (mac, web, dot1x or last-resort)."
+    ::= { trpzClSessClientSessionEntry 17 }
+
+trpzClSessClientSessDot1xAuthMethod OBJECT-TYPE
+    SYNTAX      TrpzClientAuthenProtocolType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Dot1x Authentication Method."
+    ::= { trpzClSessClientSessionEntry 18 }
+
+trpzClSessClientSessSessionState OBJECT-TYPE
+    SYNTAX      TrpzClientSessionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Session non-intermediate state."
+    ::= { trpzClSessClientSessionEntry 19 }
+
+trpzClSessClientSessAccessMode OBJECT-TYPE
+    SYNTAX      TrpzClientAccessMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Access mode (type) this client uses (via AP or wired).
+        Obsoletes trpzClSessClientSessAccessType since in 6.0
+        directly attached APs and DAPs were unified."
+    ::= { trpzClSessClientSessionEntry 20 }
+
+trpzClSessClientSessApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AP providing wireless service to this client
+        is identified by its administratively assigned AP Number,
+        unique on same AC (switch),
+        regardless of how APs are attached to the AC.
+
+        Meaningful when trpzClSessClientSessAccessMode = 'ap'.
+
+        Obsoletes trpzClSessClientSessPortOrNum since in 6.0
+        directly attached APs and DAPs were unified."
+    ::= { trpzClSessClientSessionEntry 21 }
+
+trpzClSessClientSessPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical port used by this wired-auth client
+        is identified by its port number on the AC (switch).
+
+        Zero means the port is unknown or not applicable
+        (for example, when trpzClSessClientSessAccessMode = 'ap').
+
+        Meaningful when trpzClSessClientSessAccessMode = 'wired'."
+    ::= { trpzClSessClientSessionEntry 22 }
+
+trpzClSessClientSessDeviceType OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the client device.
+        Is a zero length string if unknown or
+        the device detection feature is disabled."
+    ::= { trpzClSessClientSessionEntry 23 }
+
+trpzClSessClientSessDeviceGroup OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceGroupName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The group that the detected client device type
+        belongs to.
+        Is a zero length string if the device type is unknown
+        or the device detection feature is disabled."
+    ::= { trpzClSessClientSessionEntry 24 }
+
+trpzClSessClientSessDeviceProfileName OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceProfileName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the device profile associated with
+        the detected client device.
+        A device profile is a collection of policies that
+        apply to one or more types of client devices.
+        Is a zero length string in 'detect-only' mode,
+        if not set or if the device detection feature is disabled.
+        In 'detect-only' mode policy enforcement is disabled."
+    ::= { trpzClSessClientSessionEntry 25 }
+
+
+-- Roaming History Table
+-- =====================
+
+trpzClSessRoamingHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzClSessRoamingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Roaming History Table.
+        Expansion of Client Session Table."
+    ::= { trpzClientSessionDataObjects 2 }
+
+trpzClSessRoamingHistoryEntry OBJECT-TYPE
+    SYNTAX      TrpzClSessRoamingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Roaming History Entry."
+    INDEX   { trpzClSessRoamHistMacAddress, trpzClSessRoamHistIndex }
+    ::= { trpzClSessRoamingHistoryTable 1 }
+
+TrpzClSessRoamingHistoryEntry ::= SEQUENCE {
+        trpzClSessRoamHistMacAddress      MacAddress,
+        trpzClSessRoamHistIndex           Unsigned32,
+        trpzClSessRoamHistApSerialNum     TrpzApSerialNum,
+        trpzClSessRoamHistRadioNum        TrpzRadioNum,
+        trpzClSessRoamHistAccessType      TrpzAccessType,
+        trpzClSessRoamHistApNumOrPort     Unsigned32,
+        trpzClSessRoamHistIpAddress       IpAddress,
+        trpzClSessRoamHistTimeStamp       TimeStamp,
+        trpzClSessRoamHistAccessMode      TrpzClientAccessMode,
+        trpzClSessRoamHistApNum           TrpzApNum,
+        trpzClSessRoamHistPhysPortNum     TrpzPhysPortNumberOrZero
+    }
+
+trpzClSessRoamHistMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client MAC address."
+    ::= { trpzClSessRoamingHistoryEntry 1 }
+
+trpzClSessRoamHistIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry index."
+    ::= { trpzClSessRoamingHistoryEntry 2 }
+
+trpzClSessRoamHistApSerialNum OBJECT-TYPE
+    SYNTAX      TrpzApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial Number of the AP this client was connected to."
+    ::= { trpzClSessRoamingHistoryEntry 3 }
+
+trpzClSessRoamHistRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of the Radio that provided service to this client."
+    ::= { trpzClSessRoamingHistoryEntry 4 }
+
+trpzClSessRoamHistAccessType OBJECT-TYPE
+    SYNTAX      TrpzAccessType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Access type used by this client (via AP, DAP or wired).
+        Obsoleted by trpzClSessRoamHistAccessMode."
+    ::= { trpzClSessRoamingHistoryEntry 5 }
+
+trpzClSessRoamHistApNumOrPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "AP port number, DAP number, or Port number for wired access.
+        Obsoleted by trpzClSessRoamHistApNum."
+    ::= { trpzClSessRoamingHistoryEntry 6 }
+
+trpzClSessRoamHistIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the AC (wireless switch)
+         the client or AP was connected to."
+    ::= { trpzClSessRoamingHistoryEntry 7 }
+
+trpzClSessRoamHistTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The difference between the time the session was created
+         on the roamed-to switch and the time the last switch,
+         the one where the user is at currently, started.
+         The timestamp unit is in hundredths of seconds."
+    ::= { trpzClSessRoamingHistoryEntry 8 }
+
+trpzClSessRoamHistAccessMode OBJECT-TYPE
+    SYNTAX      TrpzClientAccessMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Access mode (type) used by this client (via AP or wired).
+        Obsoletes trpzClSessRoamHistAccessType since in 6.0
+        directly attached APs and DAPs were unified."
+    ::= { trpzClSessRoamingHistoryEntry 9 }
+
+trpzClSessRoamHistApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned AP Number,
+        unique on same AC (switch),
+        regardless of how APs are attached to the AC.
+        Obsoletes trpzClSessRoamHistApNumOrPort since in 6.0
+        directly attached APs and DAPs were unified."
+    ::= { trpzClSessRoamingHistoryEntry 10 }
+
+trpzClSessRoamHistPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical port used by this wired-auth client
+        is identified by its port number on the AC (switch).
+
+        Zero means the port is unknown or not applicable
+        (for example, when trpzClSessRoamHistAccessMode = 'ap').
+
+        Meaningful when trpzClSessRoamHistAccessMode = 'wired'."
+    ::= { trpzClSessRoamingHistoryEntry 11 }
+
+
+-- Client Session Statistics Table
+-- ===============================
+
+trpzClSessClientSessionStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzClSessClientSessionStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client Session Statistics Table."
+    ::= { trpzClientSessionDataObjects 3 }
+
+trpzClSessClientSessionStatisticsEntry OBJECT-TYPE
+    SYNTAX      TrpzClSessClientSessionStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client Session Statistics Table Entry."
+
+
+    INDEX   { trpzClSessClientSessStatsMacAddress }
+    ::= { trpzClSessClientSessionStatisticsTable 1 }
+
+TrpzClSessClientSessionStatisticsEntry ::= SEQUENCE {
+        trpzClSessClientSessStatsMacAddress     MacAddress,
+        trpzClSessClientSessStatsUniPktIn       Counter64,
+        trpzClSessClientSessStatsUniOctetIn     Counter64,
+        trpzClSessClientSessStatsUniPktOut      Counter64,
+        trpzClSessClientSessStatsUniOctetOut    Counter64,
+        trpzClSessClientSessStatsMultiPktIn     Counter64,
+        trpzClSessClientSessStatsMultiOctetIn   Counter64,
+        trpzClSessClientSessStatsEncErrPkt      Counter64,
+        trpzClSessClientSessStatsEncErrOctet    Counter64,
+        trpzClSessClientSessStatsLastRate       TrpzRadioRate,
+        trpzClSessClientSessStatsLastRssi       TrpzRssi,
+        trpzClSessClientSessStatsLastSNR        Integer32
+    }
+
+trpzClSessClientSessStatsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client MAC address."
+    ::= { trpzClSessClientSessionStatisticsEntry 1 }
+    
+trpzClSessClientSessStatsUniPktIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast packets in."
+    ::= { trpzClSessClientSessionStatisticsEntry 2 }
+
+trpzClSessClientSessStatsUniOctetIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast octets in."
+    ::= { trpzClSessClientSessionStatisticsEntry 3 }
+
+trpzClSessClientSessStatsUniPktOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast packets out."
+    ::= { trpzClSessClientSessionStatisticsEntry 4 }
+
+trpzClSessClientSessStatsUniOctetOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast octets out."
+    ::= { trpzClSessClientSessionStatisticsEntry 5 }
+
+trpzClSessClientSessStatsMultiPktIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast packets in."
+    ::= { trpzClSessClientSessionStatisticsEntry 6 }
+
+trpzClSessClientSessStatsMultiOctetIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast octets in."
+    ::= { trpzClSessClientSessionStatisticsEntry 7 }
+
+trpzClSessClientSessStatsEncErrPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets with encryption errors."
+    ::= { trpzClSessClientSessionStatisticsEntry 8 }
+
+trpzClSessClientSessStatsEncErrOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets with encryption errors."
+    ::= { trpzClSessClientSessionStatisticsEntry 9 }
+
+trpzClSessClientSessStatsLastRate OBJECT-TYPE
+    SYNTAX      TrpzRadioRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last packet data rate."
+    ::= { trpzClSessClientSessionStatisticsEntry 10 }
+
+trpzClSessClientSessStatsLastRssi OBJECT-TYPE
+    SYNTAX      TrpzRssi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI (Received Signal Strength Indicator) for last packet,
+        in decibels referred to 1 milliwatt (dBm).
+        A higher value indicates a stronger signal."
+    ::= { trpzClSessClientSessionStatisticsEntry 11 }
+
+trpzClSessClientSessStatsLastSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last packet data Signal to Noise Ratio."
+    ::= { trpzClSessClientSessionStatisticsEntry 12 }
+
+
+-- Client Session Address Table
+-- ============================
+
+trpzClSessClientAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzClSessClientAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Client Address Table.
+
+        This table contains the clients' Internet addresses.
+        Each client may have one IPv4 address, one IPv6 link-local address and
+        multiple IPv6 global addresses.
+
+        Expansion of the Client Session Table."
+    ::= { trpzClientSessionDataObjects 5 }
+
+trpzClSessClientAddressEntry OBJECT-TYPE
+    SYNTAX      TrpzClSessClientAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Client Address table.
+
+        A client's MAC address together with an unsigned integer
+        uniquely identify one of that client's Internet addresses."
+    INDEX   { trpzClSessClientSessMacAddress, trpzClSessClientAddressIndex }
+    ::= { trpzClSessClientAddressTable 1 }
+
+TrpzClSessClientAddressEntry ::= SEQUENCE {
+        trpzClSessClientAddressIndex    Unsigned32,
+        trpzClSessClientAddressType     InetAddressType,
+        trpzClSessClientAddressValue    InetAddress
+    }
+
+trpzClSessClientAddressIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Last part of the composite index of the Client Address table.
+
+        The client is identified by the first part of the composite index:
+        'trpzClSessClientSessMacAddress'.
+
+        Index 1 corresponds to the IPv4 address of the client.
+        Index 2 corresponds to the IPv6 link-local address of the client.
+
+        Indexes 3-9 are reserved for future use.
+
+        Indexes starting at 10 correspond to IPv6 global addresses of the client;
+        the number of IPv6 addresses per client may vary."
+    ::= { trpzClSessClientAddressEntry 1 }
+
+trpzClSessClientAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzClSessClientAddressValue'."
+    ::= { trpzClSessClientAddressEntry 2 }
+
+trpzClSessClientAddressValue OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client Internet address.
+        The type of this address is specified in 'trpzClSessClientAddressType'."
+    ::= { trpzClSessClientAddressEntry 3 }
+
+-- ==================================
+--
+-- Scalars
+--
+
+trpzClSessTotalSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of sessions."
+    ::= { trpzClientSessionDataObjects 4 }
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+trpzClientSessionConformance  OBJECT IDENTIFIER ::= { trpzClientSessionObjects 2 }
+trpzClientSessionCompliances  OBJECT IDENTIFIER ::= { trpzClientSessionConformance 1 }
+trpzClientSessionGroups       OBJECT IDENTIFIER ::= { trpzClientSessionConformance 2 }
+
+
+-- Compliance
+
+
+trpzClientSessionCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Client Session MIB.
+
+        This compliance statement was for releases 4.1 and 4.2
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzClientSessionComplianceRev2."
+
+    MODULE  -- this module (trpzClientSessionMib)
+
+    MANDATORY-GROUPS { trpzClientSessionCommonGroup }
+
+    ::= { trpzClientSessionCompliances 1 }
+
+
+trpzClientSessionComplianceRev2 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Client Session MIB.
+
+        This compliance statement was for releases 5.0 and 6.0
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzClientSessionComplianceRev3."
+
+    MODULE  -- this module (trpzClientSessionMib)
+
+    MANDATORY-GROUPS {
+                trpzClientSessScalarsGroup,
+
+                trpzClientSessClientSessionTableGroup,
+                trpzClientSessRoamingHistoryTableGroup,
+
+                trpzClientSessClientSessionStatisticsTableGroup
+            }
+
+    ::= { trpzClientSessionCompliances 2 }
+
+
+trpzClientSessionComplianceRev3 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Client Session MIB.
+
+        This compliance statement is for releases 6.2 to 7.7
+        of AC (wireless switch) software.
+
+        This compliance statement is replaced by
+        trpzClientSessionComplianceRev4."
+
+    MODULE  -- this module (trpzClientSessionMib)
+
+    MANDATORY-GROUPS {
+                trpzClientSessScalarsGroup,
+
+                trpzClientSessClientSessionTableGroupRev2,
+                trpzClientSessRoamingHistoryTableGroupRev2,
+
+                trpzClientSessClientSessionStatisticsTableGroup
+            }
+
+    ::= { trpzClientSessionCompliances 3 }
+
+
+trpzClientSessionComplianceRev4 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Client Session MIB.
+
+        This compliance statement is for releases 8.0 and greater
+        of AC (wireless switch) software."
+
+    MODULE  -- this module (trpzClientSessionMib)
+
+    MANDATORY-GROUPS {
+                trpzClientSessScalarsGroup,
+
+                trpzClientSessClientSessionTableGroupRev3,
+                trpzClientSessRoamingHistoryTableGroupRev2,
+                trpzClSessClientAddressTableGroup,
+
+                trpzClientSessClientSessionStatisticsTableGroup
+            }
+
+    ::= { trpzClientSessionCompliances 4 }
+
+
+-- Units of Conformance
+
+
+trpzClientSessionCommonGroup OBJECT-GROUP
+        OBJECTS {
+                 -- trpzClSessClientSessionTable:
+                 --
+                 trpzClSessClientSessSessionId,
+                 trpzClSessClientSessUsername,
+                 trpzClSessClientSessIpAddress,
+                 trpzClSessClientSessEncryptionType,
+                 trpzClSessClientSessVlan,
+                 trpzClSessClientSessApSerialNum,
+                 trpzClSessClientSessRadioNum,
+                 trpzClSessClientSessAccessType,
+                 trpzClSessClientSessAuthMethod,
+                 trpzClSessClientSessAuthServer,
+                 trpzClSessClientSessPortOrNum,
+                 trpzClSessClientSessVlanTag,
+                 trpzClSessClientSessTimeStamp,
+                 trpzClSessClientSessSsid,
+                 trpzClSessClientSessState,
+
+                 -- trpzClSessRoamingHistoryTable:
+                 --
+                 trpzClSessRoamHistApSerialNum,
+                 trpzClSessRoamHistRadioNum,
+                 trpzClSessRoamHistAccessType,
+                 trpzClSessRoamHistApNumOrPort,
+                 trpzClSessRoamHistIpAddress,
+                 trpzClSessRoamHistTimeStamp,
+
+                 -- trpzClSessClientSessionStatisticsTable:
+                 --
+                 trpzClSessClientSessStatsUniPktIn,
+                 trpzClSessClientSessStatsUniOctetIn,
+                 trpzClSessClientSessStatsUniPktOut,
+                 trpzClSessClientSessStatsUniOctetOut,
+                 trpzClSessClientSessStatsMultiPktIn,
+                 trpzClSessClientSessStatsMultiOctetIn,
+                 trpzClSessClientSessStatsEncErrPkt,
+                 trpzClSessClientSessStatsEncErrOctet,
+                 trpzClSessClientSessStatsLastRate,
+                 trpzClSessClientSessStatsLastRssi,
+                 trpzClSessClientSessStatsLastSNR
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Mandatory group of objects implemented to provide Client Session info
+            in releases 4.1 and 4.2 of AC (wireless switch) software.
+
+            Replaced by trpzClientSessClientSessionTableGroup,
+                        trpzClientSessRoamingHistoryTableGroup,
+                        trpzClientSessClientSessionStatisticsTableGroup."
+        ::= { trpzClientSessionGroups 1 }
+
+
+trpzClientSessScalarsGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessTotalSessions
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of scalar objects implemented to provide general Client info
+            in releases 5.0 and greater."
+        ::= { trpzClientSessionGroups 2 }
+
+
+trpzClientSessClientSessionTableGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessClientSessSessionId,
+                 trpzClSessClientSessUsername,
+                 trpzClSessClientSessIpAddress,
+                 trpzClSessClientSessEncryptionType,
+                 trpzClSessClientSessVlan,
+
+                 trpzClSessClientSessApSerialNum,
+                 trpzClSessClientSessRadioNum,
+
+                 trpzClSessClientSessAccessType,
+                 trpzClSessClientSessAuthServer,
+                 trpzClSessClientSessPortOrNum,
+                 trpzClSessClientSessVlanTag,
+                 trpzClSessClientSessTimeStamp,
+                 trpzClSessClientSessSsid,
+
+                 trpzClSessClientSessLoginType,
+                 trpzClSessClientSessDot1xAuthMethod,
+                 trpzClSessClientSessSessionState
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Client Session info in releases 5.0 and 6.0.
+
+            Replaced by trpzClientSessClientSessionTableGroupRev2."
+        ::= { trpzClientSessionGroups 3 }
+
+
+trpzClientSessRoamingHistoryTableGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessRoamHistApSerialNum,
+                 trpzClSessRoamHistRadioNum,
+
+                 trpzClSessRoamHistAccessType,
+                 trpzClSessRoamHistApNumOrPort,
+
+                 trpzClSessRoamHistIpAddress,
+                 trpzClSessRoamHistTimeStamp
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            roaming history per Client Session in releases 5.0 and 6.0.
+
+            Replaced by trpzClientSessRoamingHistoryTableGroupRev2."
+        ::= { trpzClientSessionGroups 4 }
+
+
+trpzClientSessClientSessionStatisticsTableGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessClientSessStatsUniPktIn,
+                 trpzClSessClientSessStatsUniOctetIn,
+                 trpzClSessClientSessStatsUniPktOut,
+                 trpzClSessClientSessStatsUniOctetOut,
+                 trpzClSessClientSessStatsMultiPktIn,
+                 trpzClSessClientSessStatsMultiOctetIn,
+                 trpzClSessClientSessStatsEncErrPkt,
+                 trpzClSessClientSessStatsEncErrOctet,
+
+                 trpzClSessClientSessStatsLastRate,
+                 trpzClSessClientSessStatsLastRssi,
+                 trpzClSessClientSessStatsLastSNR
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            statistics per Client Session in releases 5.0 and greater."
+        ::= { trpzClientSessionGroups 5 }
+
+
+trpzClientSessClientSessionTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessClientSessSessionId,
+                 trpzClSessClientSessUsername,
+                 trpzClSessClientSessIpAddress,
+                 trpzClSessClientSessEncryptionType,
+                 trpzClSessClientSessVlan,
+
+                 trpzClSessClientSessApSerialNum,
+                 trpzClSessClientSessRadioNum,
+
+                 trpzClSessClientSessAuthServer,    
+                 trpzClSessClientSessVlanTag,
+                 trpzClSessClientSessTimeStamp,
+                 trpzClSessClientSessSsid,
+
+                 trpzClSessClientSessLoginType,
+                 trpzClSessClientSessDot1xAuthMethod,
+                 trpzClSessClientSessSessionState,
+
+                 trpzClSessClientSessAccessMode,
+                 trpzClSessClientSessApNum,
+                 trpzClSessClientSessPhysPortNum
+                }
+        STATUS      obsolete
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Client Session info in releases 6.2 to 7.7."
+        ::= { trpzClientSessionGroups 6 }
+
+
+trpzClientSessRoamingHistoryTableGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessRoamHistApSerialNum,
+                 trpzClSessRoamHistRadioNum,
+
+                 trpzClSessRoamHistIpAddress,
+                 trpzClSessRoamHistTimeStamp,
+
+                 trpzClSessRoamHistAccessMode,
+                 trpzClSessRoamHistApNum,
+                 trpzClSessRoamHistPhysPortNum
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            roaming history per Client Session in releases 6.2 and greater."
+        ::= { trpzClientSessionGroups 7 }
+
+
+trpzClSessClientAddressTableGroup OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessClientAddressType,
+                 trpzClSessClientAddressValue
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            a complete listing of the clients' Internet addresses
+            in releases 8.0 and greater."
+        ::= { trpzClientSessionGroups 8 }
+
+
+trpzClientSessClientSessionTableGroupRev3 OBJECT-GROUP
+        OBJECTS {
+                 trpzClSessClientSessSessionId,
+                 trpzClSessClientSessUsername,
+                 trpzClSessClientSessIpAddress,
+                 trpzClSessClientSessEncryptionType,
+                 trpzClSessClientSessVlan,
+
+                 trpzClSessClientSessApSerialNum,
+                 trpzClSessClientSessRadioNum,
+
+                 trpzClSessClientSessAuthServer,
+                 trpzClSessClientSessVlanTag,
+                 trpzClSessClientSessTimeStamp,
+                 trpzClSessClientSessSsid,
+
+                 trpzClSessClientSessLoginType,
+                 trpzClSessClientSessDot1xAuthMethod,
+                 trpzClSessClientSessSessionState,
+
+                 trpzClSessClientSessAccessMode,
+                 trpzClSessClientSessApNum,
+                 trpzClSessClientSessPhysPortNum,
+
+                 trpzClSessClientSessDeviceType,
+                 trpzClSessClientSessDeviceGroup,
+                 trpzClSessClientSessDeviceProfileName
+                }
+        STATUS      current
+        DESCRIPTION
+            "Group of columnar objects implemented to provide
+            Client Session info in releases 8.0 and greater."
+        ::= { trpzClientSessionGroups 9 }
+
+
+END

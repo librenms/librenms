@@ -1,0 +1,4124 @@
+TRAPEZE-NETWORKS-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Unsigned32, TimeTicks, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress, InetAddressIPv4, InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    TrpzApAttachType, TrpzRadioType, TrpzRadioMode,
+    TrpzApNum, TrpzApRadioIndex, TrpzApSerialNum, TrpzApFingerprint,
+    TrpzAccessType, TrpzRadioNum, TrpzPowerLevel,
+    TrpzRadioPowerChangeType, TrpzChannelChangeType,
+    TrpzApTransition, TrpzApFailDetail, TrpzApPortOrDapNum,
+    TrpzRadioConfigState, TrpzApConnectSecurityType,
+    TrpzApServiceAvailability, TrpzApWasOperational,
+    TrpzRadioChannelWidth, TrpzRadioMimoState,
+    TrpzChannelNum, TrpzCryptoType, TrpzRssi
+        FROM TRAPEZE-NETWORKS-AP-TC
+    TrpzClientSessionState, TrpzClientAuthenProtocolType,
+    TrpzClientDot1xState, TrpzUserAccessType,
+    TrpzClientAccessMode, TrpzClientDeviceProfileName,
+    TrpzClientDeviceType, TrpzClientDeviceGroupName
+        FROM TRAPEZE-NETWORKS-CLIENT-SESSION-TC
+    TrpzRFDetectClassificationReason
+        FROM TRAPEZE-NETWORKS-RF-DETECT-TC
+    TrpzRFNoiseSourceID, TrpzRFNoiseSourceType
+        FROM TRAPEZE-NETWORKS-RF-NOISE-TC-MIB
+    TrpzIpPort,
+    TrpzPhysPortNumberOrZero
+        FROM TRAPEZE-NETWORKS-BASIC-TC
+    trpzTraps, trpzTemporary, trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB;
+
+
+trpzTrapMib MODULE-IDENTITY
+    LAST-UPDATED "201412180407Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:  866.TRPZ.TAC
+         International:  925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "Notifications emitted by Trapeze Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2004-2012 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+
+    REVISION "201412180407Z"
+    DESCRIPTION "v4.4.7: Updated the description of the following object:
+                        trpzApNonOperStatusTrap2
+                This will be published in 8.0 release."
+
+    REVISION "201207310406Z"
+    DESCRIPTION "v4.4.6: Updated the descriptions of the following objects:
+                        trpzClientIPv4Addr,
+                        trpzClientIPv6LinkLocalAddr.
+                This will be published in 8.0 release."
+
+    REVISION "201204200405Z"
+    DESCRIPTION "v4.4.5: Added new traps:
+                        trpzClientDeviceTypeChangeTrap,
+                        trpzClientDeviceProfileChangeTrap;
+                related TC:
+                        TrpzClientDeviceProfileChangeReason;
+                and related objects:
+                        trpzClientDeviceType,
+                        trpzClientDeviceTypeOld,
+                        trpzClientDeviceGroup,
+                        trpzClientDeviceProfileName,
+                        trpzClientDeviceProfileNameOld,
+                        trpzClientDeviceProfileChangeReason.
+                (for 8.0 release)"
+
+    REVISION "201204090403Z"
+    DESCRIPTION "v4.4.3: Redesigned client-related traps to include
+                the client's IPv6 link-local address.
+                The revised traps are:
+                        trpzClientDeAssociationTrap2,
+                        trpzClientRoamingTrap2,
+                        trpzClientIpAddrChangeTrap2,
+                        trpzClientDeAuthenticationTrap2,
+                        trpzClientDynAuthorChangeSuccessTrap2,
+                        trpzClientDisconnectTrap2,
+                        trpzClientClearedTrap3,
+                        trpzClientAuthorizationSuccessTrap5;
+                and related objects:
+                        trpzClientAuthServerAddrType,
+                        trpzClientAuthServerAddr,
+                        trpzClientDynAuthorClientAddrType,
+                        trpzClientDynAuthorClientAddr,
+                        trpzClientRoamedFromWsAddrType,
+                        trpzClientRoamedFromWsAddr,
+                        trpzClientIpAddrType,
+                        trpzClientIpAddr,
+                        trpzClientIPv4Addr,
+                        trpzClientIPv6LinkLocalAddr,
+                        trpzApRadioIndex,
+                        trpzClientRoamedFromAccessMode,
+                        trpzClientRoamedFromPhysPortNum,
+                        trpzClientRoamedFromApNum,
+                        trpzClientRoamedFromRadioIndex.
+                They replace the following traps that were obsoleted:
+                        trpzClientDeAssociationTrap,
+                        trpzClientRoamingTrap,
+                        trpzClientIpAddrChangeTrap,
+                        trpzClientDeAuthenticationTrap,
+                        trpzClientDynAuthorChangeSuccessTrap,
+                        trpzClientDisconnectTrap,
+                        trpzClientClearedTrap2,
+                        trpzClientAuthorizationSuccessTrap4;
+                and related objects:
+                        trpzClientIp,
+                        trpzClientRoamedFromWsIp,
+                        trpzClientRoamedFromAccessType,
+                        trpzClientRoamedFromPortNum,
+                        trpzClientRoamedFromDAPNum,
+                        trpzClientRoamedFromRadioNum.
+
+                Added one value (10) to TrpzClientIpAddrChangeReason.
+                Renamed enum value (1) from 'client-connected' to
+                'client-connected-ipv4'.
+                (for 8.0 release)"
+
+    REVISION "201203150310Z"
+    DESCRIPTION "v4.3.0: Added new traps:
+                        trpzAutoTuneSuccessTrap,
+                        trpzAutoTuneFailureTrap;
+                related TCs:
+                        TrpzRadioBand,
+                        TrpzAutoTuneFailureReason;
+                and related objects:
+                        trpzRadioBand,
+                        trpzRadiosTunedCount,
+                        trpzAutoTuneFailureReason.
+                (for 8.0 release)"
+
+    REVISION "201110180300Z"
+    DESCRIPTION "v4.2.0: Added new traps:
+                        trpzM2UConvNotPossibleTrap,
+                        trpzM2UConvAvailabilityRestoredTrap;
+                related TC:
+                        TrpzM2UConvNotPossibleReason;
+                and related objects:
+                        trpzM2UMulticastAddrType,
+                        trpzM2UMulticastAddr,
+                        trpzM2UConvNotPossibleReason.
+                (for 7.7 release)"
+
+    REVISION "201101110250Z"
+    DESCRIPTION "v4.1.0: Added new trap:
+                        trpzRFNoiseSourceTrap
+                and related objects:
+                        trpzRFNoiseSourceID,
+                        trpzRFNoiseSourceType,
+                        trpzRFNoiseChannel,
+                        trpzRFNoiseRssi,
+                        trpzRFNoiseDutyCycle,
+                        trpzRFNoiseChannelInterferenceMeasure,
+                        trpzRFNoiseAge
+                (for 7.5 release)"
+
+    REVISION "201012210240Z"
+    DESCRIPTION "v4.0.0: Added new traps for tunnel limit:
+                        trpzApTunnelLimitExceededTrap,
+                        trpzWsTunnelLimitExceededTrap;
+                related TC:
+                        TrpzWsTunnelLimitType;
+                and related objects:
+                        trpzApTunnelLimit,
+                        trpzWsTunnelLimit,
+                        trpzWsTunnelLimitType.
+                (for 7.5 release)"
+
+    REVISION "201012210228Z"
+    DESCRIPTION "v3.9.8: Corrected MAX-ACCESS for 'trpzMultimediaCallRssi':
+                read-only access was neither intended nor implemented
+                for this or any other object from the Trap MIB.
+                This will be published in 7.3 release."
+
+    REVISION "200812190227Z"
+    DESCRIPTION "v3.9.7: Added new trap: trpzMultimediaCallFailureTrap,
+                related TCs:
+                        TrpzMultimediaCallDirection,
+                        TrpzMultimediaSignalingProtocol,
+                        TrpzMultimediaCallFailureReason,
+                and related objects:
+                        trpzMultimediaCommunicationServerID,
+                        trpzMultimediaCallDirection,
+                        trpzMultimediaLocalStationIp,
+                        trpzMultimediaLocalStationPort,
+                        trpzMultimediaLocalStationEndpointID,
+                        trpzMultimediaRemoteStationIp,
+                        trpzMultimediaRemoteStationPort,
+                        trpzMultimediaRemoteStationEndpointID,
+                        trpzMultimediaSignalingProtocol,
+                        trpzMultimediaCallBandwidthAndCodec,
+                        trpzMultimediaCallDataRate,
+                        trpzMultimediaCallRssi,
+                        trpzMultimediaCallFailureReason.
+                (for 7.1 release)"
+
+    REVISION "200810300225Z"
+    DESCRIPTION "v3.9.5: Using the new TC TrpzPhysPortNumberOrZero
+                instead of ''Unsigned32 (0..1024)''.
+                This will be published in 7.1 release."
+
+    REVISION "200805150215Z"
+    DESCRIPTION "v3.8.5: Clarified description to reflect the actual use
+                and avoid future misuse of trpzDeviceSerNum.
+                Updated description for trpzApName.
+                Documented the meaning of TrpzClientIpAddrChangeReason
+                enumeration values.
+                This will be published in 7.0 release."
+
+    REVISION "200805070212Z"
+    DESCRIPTION "v3.8.2: Added new trap: trpzClusterFailureTrap,
+                related TC and objects:
+                        TrpzClusterFailureReason,
+                        trpzClusterFailureReason,
+                        trpzClusterFailureDescription
+                (for 7.0 release)"
+
+    REVISION "200804220202Z"
+    DESCRIPTION "v3.7.2: Added new traps:
+                    trpzRFDetectRogueDeviceTrap2,
+                    trpzRFDetectSuspectDeviceTrap2
+                and related objects:
+                    trpzRFDetectXmtrRadioType,
+                    trpzRFDetectXmtrCryptoType.
+                Obsoleted trpzRFDetectRogueDeviceTrap,
+                          trpzRFDetectSuspectDeviceTrap.
+                (for 7.0 release)"
+
+    REVISION "200804100201Z"
+    DESCRIPTION "v3.7.1: Added new trap: trpzClientAuthorizationSuccessTrap4,
+                and related object: trpzClientRadioType.
+                Obsoletes trpzClientAuthorizationSuccessTrap,
+                          trpzClientAuthorizationSuccessTrap2,
+                          trpzClientAuthorizationSuccessTrap3.
+                (for 7.0 release)"
+
+    REVISION "200804080158Z"
+    DESCRIPTION "v3.6.8: Obsoleted two traps:
+                     trpzRFDetectSpoofedMacAPTrap,
+                     trpzRFDetectSpoofedSsidAPTrap.
+                (for 7.0 release)"
+
+    REVISION "200802180157Z"
+    DESCRIPTION "v3.6.7: Redesigned the AP Operational - Radio Status trap
+                to support 11n-capable APs.
+                Added varbindings:
+                     trpzRadioChannelWidth,
+                     trpzRadioMimoState.
+                The new trap is trpzApOperRadioStatusTrap3.
+                (for 7.0 release)"
+
+    REVISION "200712030153Z"
+    DESCRIPTION "v3.6.3: Obsoleted one object: trpzApPortOrDapNum
+                (previously deprecated).
+                This will be published in 7.0 release."
+
+    REVISION "200711150152Z"
+    DESCRIPTION "v3.6.2: Added three new traps:
+                     trpzApManagerChangeTrap,
+                     trpzClientClearedTrap2,
+                     trpzMobilityDomainResiliencyStatusTrap,
+                related TCs and objects:
+                     TrpzApMgrChangeReason,
+                     trpzApMgrChangeReason,
+                     trpzApMgrOldIp,
+                     trpzApMgrNewIp,
+                     trpzClientSessionElapsedSeconds,
+                     TrpzClientClearedReason,
+                     trpzClientClearedReason,
+                     TrpzMobilityDomainResiliencyStatus,
+                     trpzMobilityDomainResiliencyStatus.
+                Obsoleted one trap:
+                     trpzClientClearedTrap,
+                and related object:
+                     trpzClientSessionElapsedTime.
+                (for 7.0 release)"
+
+    REVISION "200711010145Z"
+    DESCRIPTION "v3.5.5: Added new trap: trpzClientAuthorizationSuccessTrap3,
+                related TC and objects:
+                     TrpzClientAuthorizationReason
+                     trpzClientAuthorizationReason,
+                     trpzClientAccessMode,
+                     trpzPhysPortNum.
+                Obsoletes trpzClientAuthorizationSuccessTrap,
+                          trpzClientAuthorizationSuccessTrap2.
+                (for 6.2 release)"
+
+    REVISION "200710010141Z"
+    DESCRIPTION "v3.5.1: Cleaned up object (trpzAPAccessType).
+                Marked it as obsolete, because instrumentation code
+                for traps using it was removed long time ago.
+                (This will be published in 6.2 release.)"
+
+    REVISION "200708310140Z"
+    DESCRIPTION "v3.5.0: Corrected trpzClientMACAddress2 SYNTAX:
+                its value was always a MacAddress, not an arbitrary
+                'OCTET STRING (SIZE (6))'. There is no change on the wire,
+                just a more appropriate DISPLAY-HINT."
+
+    REVISION "200708240122Z"
+    DESCRIPTION "v3.3.2: Added new trap: trpzMichaelMICFailure,
+                related TC and object:
+                     TrpzMichaelMICFailureCause,
+                     trpzMichaelMICFailureCause.
+                Obsoletes trpzMpMichaelMICFailure,
+                          trpzMpMichaelMICFailure2.
+                (for 6.2 release)"
+
+    REVISION "200707060110Z"
+    DESCRIPTION "v3.2.0: Redesigned the AP Status traps.
+                  - Replaced trpzApAttachType and trpzApPortOrDapNum
+                    with a single varbinding, trpzApNum.
+                  - Added varbinding trpzRadioMode
+                    to the AP Operational - Radio Status trap.
+                The new traps are
+                    trpzApNonOperStatusTrap2,
+                    trpzApOperRadioStatusTrap2.
+                (for 6.2 release)"
+
+    REVISION "200706050107Z"
+    DESCRIPTION "v3.1.2: Obsoleted one trap: trpzRFDetectUnAuthorizedAPTrap
+                (for 6.2 release)"
+
+    REVISION "200705170106Z"
+    DESCRIPTION "v3.1.1: Added new trap: trpzConfigurationSavedTrap
+                and related objects:
+                     trpzConfigSaveFileName,
+                     trpzConfigSaveInitiatorType,
+                     trpzConfigSaveInitiatorIp,
+                     trpzConfigSaveInitiatorDetails,
+                     trpzConfigSaveGeneration.
+                (for 6.2 release)"
+
+    REVISION "200705040103Z"
+    DESCRIPTION "v3.0.1: added one value (3)
+                to TrpzClientIpAddrChangeReason"
+
+    REVISION "200704190100Z"
+    DESCRIPTION "v3.0.0: Added six new traps:
+                     trpzRFDetectRogueDeviceTrap,
+                     trpzRFDetectRogueDeviceDisappearTrap,
+                     trpzRFDetectSuspectDeviceTrap,
+                     trpzRFDetectSuspectDeviceDisappearTrap,
+                     trpzRFDetectClientViaRogueWiredAPTrap3,
+                     trpzRFDetectClassificationChangeTrap
+                and related object:
+                     trpzRFDetectClassificationReason.
+                Obsoleted seven traps:
+                     trpzRFDetectRogueAPTrap,
+                     trpzRFDetectRogueDisappearTrap,
+                     trpzRFDetectInterferingRogueAPTrap,
+                     trpzRFDetectInterferingRogueDisappearTrap,
+                     trpzRFDetectUnAuthorizedSsidTrap,
+                     trpzRFDetectUnAuthorizedOuiTrap,
+                     trpzRFDetectClientViaRogueWiredAPTrap2.
+                (for 6.2 release)"
+
+    REVISION "200703270054Z"
+    DESCRIPTION "v2.9.2: added three values (13, 14, 15)
+                to TrpzAuthorizationFailureType
+                (for 6.2 release)"
+
+    REVISION "200702150053Z"
+    DESCRIPTION "v2.9.1: Cleaned up trap (trpzClientAuthorizationSuccessTrap)
+                and object (trpzRadioRssi) deprecated long time ago.
+                Marked them as obsolete, because instrumentation code
+                was removed already.
+                (This will be published in 6.2 release.)"
+
+    REVISION "200701090052Z"
+    DESCRIPTION "v2.9.0: Added two textual conventions:
+                             TrpzUserAttributeList,
+                             TrpzSessionDisconnectType
+                three new traps:
+                             trpzClientDynAuthorChangeSuccessTrap,
+                             trpzClientDynAuthorChangeFailureTrap,
+                             trpzClientDisconnectTrap
+                and related objects:
+                             trpzClientDynAuthorClientIp,
+                             trpzChangedUserParamOldValues,
+                             trpzChangedUserParamNewValues,
+                             trpzClientDisconnectSource,
+                             trpzClientDisconnectDescription
+                (for 6.2 release)"
+
+    REVISION "200701090051Z"
+    DESCRIPTION "v2.8.5: added one value (24)
+                to TrpzRFDetectDoSType
+                (for 6.2 release)"
+
+    REVISION "200701090050Z"
+    DESCRIPTION "v2.6.4: Added two new traps:
+                             trpzMobilityDomainFailOverTrap,
+                             trpzMobilityDomainFailBackTrap
+                and related objects:
+                             trpzMobilityDomainSecondarySeedIp,
+                             trpzMobilityDomainPrimarySeedIp
+                (for 6.0 release)"
+
+    REVISION "200609280045Z"
+    DESCRIPTION "v2.6.2: Factored out four textual conventions
+                into a new module, Client Session TC:
+                    TrpzClientSessionState,
+                    TrpzClientAuthenProtocolType,
+                    TrpzClientDot1xState,
+                    TrpzUserAccessType
+                and imported them from there."
+
+    REVISION "200608080042Z"
+    DESCRIPTION "v2.5.2: Added new trap: trpzApRejectLicenseExceededTrap
+                and related object: trpzNumLicensedActiveAPs
+                (for 6.0 release)"
+
+    REVISION "200607310040Z"
+    DESCRIPTION "v2.5.0: Added new trap:
+                trpzRFDetectAdhocUserDisappearTrap
+                (for 6.0 release)"
+
+    REVISION "200607280032Z"
+    DESCRIPTION "v2.4.7: Removed unused imports"
+
+    REVISION "200607230029Z"
+    DESCRIPTION "v2.4.1: Added new trap: trpzRFDetectBlacklistedTrap,
+                related textual convention: TrpzBlacklistingCause
+                and objects: trpzBlacklistingRemainingTime,
+                             trpzBlacklistingCause
+                (for 6.0 release)"
+
+    REVISION "200607120028Z"
+    DESCRIPTION "v2.4.0: Added new trap: RFDetectClientViaRogueWiredAPTrap2
+                and related object: trpzRFDetectRogueAPMacAddr.
+                This trap obsoletes the RFDetectClientViaRogueWiredAPTrap
+                (for 6.0 release)"
+
+    REVISION "200607070026Z"
+    DESCRIPTION "v2.3.1: Added 3 new traps:
+                trpzClientAssociationSuccessTrap,
+                trpzClientAuthenticationSuccessTrap,
+                trpzClientDeAuthenticationTrap
+                (for 6.0 release)"
+
+    REVISION "200607070025Z"
+    DESCRIPTION "v2.3.0: Added new trap: trpzClientIpAddrChangeTrap
+                and related object: TrpzClientIpAddrChangeReason
+                (for 6.0 release)"
+
+    REVISION "200607060023Z"
+    DESCRIPTION "v2.2.0: added two values (13, 14)
+                to TrpzAuthenticationFailureType
+                (for 6.0 release)"
+
+    REVISION "200604190022Z"
+    DESCRIPTION "v2.1.6: Updated client connection failure causes and descriptions
+                (for 5.0 release)"
+
+    REVISION "200604190021Z"
+    DESCRIPTION "v2.0.6: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { trpzMibs 1 }
+
+
+-- Branch for notifications
+trpzTrapsV2 OBJECT IDENTIFIER ::= { trpzTraps 0 }
+
+
+-- Textual Conventions
+TrpzAssociationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for an AP to fail a
+    client's 802.11 association"
+    SYNTAX      INTEGER {
+            other               (1),
+            load-balance        (2),
+            quiet-period        (3),
+            dot1x               (4),
+            no-prev-assoc       (5),
+            glare               (6),
+            cipher-rejected     (7),
+            cipher-mismatch     (8),
+            wep-not-configured  (9),
+            bad-assoc-request   (10),
+            out-of-memory       (11),
+            tkip-cm-active      (12),
+            roam-in-progress    (13)
+        }
+
+TrpzAuthenticationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for AAA authentication to fail
+     user-glob-mismatch - auth rule/user not found for console login
+     user-does-not-exist - login failed because user not found
+     invalid-password - login failed because of invalid password
+     server-timeout - unable to contact a AAA server
+     signature-failed - incorrect password for mschapv2
+     local-certificate-error - certificate error
+     all-servers-down - unable to contact any AAA server in the group
+     authentication-type-mismatch - client and switch are using different
+                                    authentication methods
+     server-rejected - received reject from AAA server
+     fallthru-auth-misconfig - problem with fallthru authentication
+     no-lastresort-auth - problem with last-resort authentication
+     exceeded-max-attempts - local user failed to login within allowed number
+                             of attempts resulting in account lockout
+     password-expired - user's password expired"
+
+    SYNTAX      INTEGER {
+            other               (1),
+            user-glob-mismatch  (2),
+            user-does-not-exist (3),
+            invalid-password    (4),
+            server-timeout      (5),
+            signature-failed    (6),
+            local-certificate-error (7),
+            all-servers-down    (8),
+            authentication-type-mismatch (9),
+            server-rejected     (10),
+            fallthru-auth-misconfig (11),
+            no-lastresort-auth  (12),
+            exceeded-max-attempts (13),
+            password-expired (14)
+        }
+
+TrpzAuthorizationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for AAA authorization failure"
+    SYNTAX      INTEGER {
+            other               (1),
+            user-param          (2),
+            location-policy     (3),
+            vlan-tunnel-failure (4),
+            ssid-mismatch       (5),
+            acl-mismatch        (6),
+            timeofday-mismatch  (7),
+            crypto-type-mismatch(8),
+            mobility-profile-mismatch(9),
+            start-date-mismatch (10),
+            end-date-mismatch   (11),
+            svr-type-mismatch   (12),
+            ssid-defaults       (13),
+            qos-profile-mismatch (14),
+            simultaneous-logins (15)
+        }
+
+TrpzDot1xFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the dot1x failure reasons.
+    quiet-period occurs when client is denied access for a period of
+                 time after a failed connection attempt
+    administrative-kill means that the session was cleared using the
+                        'clear dot1x client' command
+    bad-rsnie means that client sent an invalid IE
+    timeout is when there are excessive retransmissions
+    max-sessions-exceeded means the maximum allowed wired clients
+                          has been exceeded on the switch
+    fourway-hs-failure is for failures occuring the 4-way key handshake
+    user-glob-mismatch means the name received in the dot1x identity
+                       request does not match any configured userglobs
+                       in the system
+    reauth-disabled means that the client is trying to reauthenticate
+                    but reauthentication is disabled
+    gkhs-failure means that either there was no response from the client
+                 during the GKHS or the response did not have an IE
+    force-unauth-configured means that the client is trying to connect
+                            through a port which is configured as
+                            force-unauth
+    cert-not-installed means that there is no certificate installed on
+                       the switch"
+    SYNTAX      INTEGER {
+            other               (1),
+            quiet-period        (2),
+            administrative-kill (3),
+            bad-rsnie           (4),
+            timeout             (5),
+            max-sessions-exceeded(6),
+            fourway-hs-failure  (7),
+            user-glob-mismatch  (8),
+            bonded-auth-failure (9),
+            reauth-disabled     (10),
+            gkhs-failure        (11),
+            force-unauth-configured (12),
+            cert-not-installed  (13)
+         }
+
+TrpzRFDetectDoSType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "The types of denial of service (DoS) attacks"
+    SYNTAX      INTEGER {
+            probe-flood(1),
+            auth-flood(2),
+            null-data-flood(3),
+            mgmt-6-flood(4),
+            mgmt-7-flood(5),
+            mgmt-d-flood(6),
+            mgmt-e-flood(7),
+            mgmt-f-flood(8),
+            fakeap-ssid(9),
+            fakeap-bssid(10),
+            bcast-deauth(11),
+            null-probe-resp(12),
+            disassoc-spoof(13),
+            deauth-spoof(14),
+            decrypt-err(15),
+            weak-wep-iv(16),
+            wireless-bridge(17),
+            netstumbler(18),
+            wellenreiter(19),
+            adhoc-client-frame(20),
+            associate-pkt-flood(21),
+            re-associate-pkt-flood(22),
+            de-associate-pkt-flood(23),
+            bssid-spoof(24)
+        }
+
+TrpzClientIpAddrChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the reasons for client IP address changes:
+            client-connected-ipv4: an IPv4 address was assigned
+                on the initial connection of an IPv4 client,
+                or when an IPv6 client activated the IPv4 stack;
+            other: IPv4 address changed after initial connection;
+            dhcp-to-static: erroneous condition where
+                client IPv4 address is changed to a static address
+                while the dhcp-restrict option is enabled;
+            ipv6-global-addr: a new IPv6 global address was assigned
+                to the client."
+    SYNTAX      INTEGER {
+            client-connected-ipv4(1),
+            other(2),
+            dhcp-to-static(3),
+            ipv6-global-addr(10)
+        }
+
+TrpzBlacklistingCause ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of reasons for blacklisting a transmitter:
+            bl-configured: administrative action
+                           (explicitly added to the Black List),
+            bl-associate-pkt-flood: Association request flood detected,
+            bl-re-associate-pkt-flood: Re-association request flood detected,
+            bl-de-associate-pkt-flood: De-association request flood detected.
+        (The leading 'bl-' stands for 'Black-Listed';
+         reading it as 'Blocked' would also make sense)."
+    SYNTAX      INTEGER {
+            bl-configured(1),
+            bl-associate-pkt-flood(2),
+            bl-re-associate-pkt-flood(3),
+            bl-de-associate-pkt-flood(4)
+        }
+
+TrpzUserAttributeList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Display string listing AAA attributes and their values.
+        These strings can be used, for example,
+        in change of authorization notifications.
+        The syntax is:
+            attribute_name1=value1, attribute_name2=value2, ...
+        where attribute_name can be one of the following:
+            vlan-name,
+            in-acl,
+            out-acl,
+            mobility-prof,
+            time-of-day,
+            end-date,
+            sess-timeout,
+            acct-interval,
+            service-type.
+        Example:
+            vlan-name=red, in-acl=in_acl_1"
+    SYNTAX      DisplayString (SIZE (0..2048))
+
+TrpzSessionDisconnectType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the sources that can initiate
+        the termination of a session:
+        admin-disconnect:
+                session terminated by administrative action
+                (from console, telnet session, WebView, or RingMaster).
+        dyn-auth-disconnect:
+                session terminated by dynamic authorization client;
+                description will have the IP address of
+                the dynamic authorization client which sent the request."
+    SYNTAX      INTEGER {
+            other                      (1),
+            admin-disconnect           (2),
+            dyn-auth-disconnect        (3)
+        }
+
+TrpzConfigSaveInitiatorType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the sources that can initiate
+        a configuration save:
+        cli-console:
+                configuration save requested from
+                serial console administrative session.
+        cli-remote:
+                configuration save requested from
+                telnet or ssh administrative session.
+        https:
+                configuration save requested via
+                HTTPS API (RingMaster or WebView).
+        snmp-set:
+                configuration saved as a result of
+                performing a SNMP SET operation."
+    SYNTAX      INTEGER {
+            other               (1),
+            cli-console         (2),
+            cli-remote          (3),
+            https               (4),
+            snmp-set            (5)
+        }
+
+TrpzMichaelMICFailureCause ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the cause/source of Michael MIC Failure detection."
+    SYNTAX      INTEGER {
+            detected-by-ap     (1),
+            detected-by-client (2)
+        }
+
+TrpzClientAuthorizationReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons for AAA authorization."
+    SYNTAX      INTEGER {
+            other            (1),
+            new-client       (2),
+            re-auth          (3),
+            roam             (4)
+        }
+
+TrpzApMgrChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why AP is switching
+        to its secondary link:
+        failover:
+                AP's primary link failed.
+        load-balancing:
+                AP's primary link is overloaded."
+    SYNTAX      INTEGER {
+            other            (1),
+            failover         (2),
+            load-balancing   (3)
+        }
+
+TrpzClientClearedReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons for clearing a session:
+        normal:
+                Session was cleared from the switch as the last
+                step in the normal session termination process.
+        backup-failure:
+                The backup switch could not activate a session
+                from a failed MX."
+    SYNTAX      INTEGER {
+            other            (1),
+            normal           (2),
+            backup-failure   (3)
+        }
+
+TrpzMobilityDomainResiliencyStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the current resilient capacity status
+        for a mobility domain:
+        resilient:
+                Every AP in the mobility domain has a secondary backup
+                link. If the primary switch of an AP failed, the AP
+                and its sessions would fail over to its backup link.
+        degraded:
+                Some APs only have a primary link. If the primary
+                switch of an AP without a backup link failed, the AP
+                would reboot and its sessions would be lost."
+    SYNTAX      INTEGER {
+            other            (1),
+            resilient        (2),
+            degraded         (3)
+        }
+
+TrpzClusterFailureReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why the AC goes into
+        cluster failure state:
+        validation-error:
+                Cluster configuration rejected due to validation error."
+    SYNTAX      INTEGER {
+            other                (1),
+            validation-error     (2)
+        }
+
+TrpzMultimediaSignalingProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of Multimedia Signaling Protocols:
+        protocols for creating, modifying, terminating sessions.
+        The first signaling protocol supported is:
+          sip = Session Initiation Protocol."
+    SYNTAX      INTEGER {
+            other            (1),
+            sip              (2)
+        }
+
+TrpzMultimediaCallFailureReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why a multimedia call fails."
+    SYNTAX      INTEGER {
+            other                (1),
+            resource-unavailable (2)
+        }
+
+TrpzMultimediaCallDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the multimedia call direction."
+    SYNTAX      INTEGER {
+            incoming         (1),
+            outgoing         (2)
+        }
+
+TrpzWsTunnelLimitType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the type of limit exceeded
+        that caused the AC (wireless switch)
+        to reject a tunnel creation request.
+
+        The value 'platform-tunnel-limit' (2) corresponds to
+        the maximum tunnel capacity of a switch,
+        which depends on the platform.
+
+        Some of the available tunnel capacity for each switch
+        is reserved for switch-to-switch tunnels.
+        The remaining tunnel capacity is used for AP-to-switch tunnels.
+
+        The switch-to-switch tunnel reservations can increase or decrease
+        depending on factors such as:
+          - the current number of members in the mobility domain,
+          - the current number of members in the network domain,
+          - network resiliency status.
+
+        The value 'ap-ws-tunnel-limit' (3) corresponds to
+        the available number of AP-to-switch tunnels,
+        which depends on the current situation of the switch."
+    SYNTAX      INTEGER {
+            other                 (1),
+            platform-tunnel-limit (2),
+            ap-ws-tunnel-limit    (3)
+        }
+
+TrpzM2UConvNotPossibleReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why multicast to unicast conversion
+        cannot be performed.
+        max-conv-limit:
+                    The number of required conversions is higher than
+                    the defined limit."
+    SYNTAX      INTEGER {
+            other           (1),
+            max-conv-limit  (2)
+        }
+
+TrpzRadioBand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the 802.11 radio bands.
+        802.11 a/n use the 5 GHz band.
+        802.11 b/g/n use the 2.4 GHz band."
+    SYNTAX      INTEGER {
+            bandAN   (1),
+            bandBGN  (2)
+        }
+
+TrpzAutoTuneFailureReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons why an auto-tune operation failed:
+        ap-conn-lost:
+                The connection with an AP involved in the auto-tune process
+                was lost.
+        ws-conn-lost:
+                The connection with a wireless switch involved in
+                the auto-tune process was lost."
+    SYNTAX      INTEGER {
+            other         (1),
+            ap-conn-lost  (2),
+            ws-conn-lost  (3)
+        }
+
+TrpzClientDeviceProfileChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons for device profile changes.
+        aaa-policy:
+                The device profile has changed due to an AAA policy,
+                after authentication.
+        device-type-changed:
+                The device type has changed."
+    SYNTAX      INTEGER {
+            other                (1),
+            aaa-policy           (2),
+            device-type-changed  (3)
+        }
+
+
+-- Object definitions
+
+trpzDeviceId OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of devices as indicated in registration MIB.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 1 }
+
+trpzMobilityDomainIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "IP address of the other switch which the send switch is
+    reporting on. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 2 }
+
+trpzAPMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the AP of interest. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 3 }
+
+trpzClientMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the client of interest. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 4 }
+
+trpzRFDetectXmtrMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Describes the transmitter's MAC address. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 5 }
+
+trpzPortNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..22)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Port number on the AC which reported this rogue during a detection
+     sweep. This object is used within notifications and
+     is not accessible."
+    ::= { trpzTemporary 6 }
+
+trpzAPRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Radio number of the AP which reported this rogue during a detection
+     sweep. This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 7 }
+
+trpzRadioRssi OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The received signal strength as measured by the AP radio which reported
+    this rogue during a detection sweep. This object is used
+    within notifications and is not accessible.
+
+    Not used by any notification."
+    ::= { trpzTemporary 8 }
+
+trpzRadioBSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The basic service set identifier of the rogue from the beacon frame
+    reported by the AP during a detection sweep. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 9 }
+
+trpzUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client user name as learned from the AAA process. This object
+    is used within notifications and is not accessible."
+    ::= { trpzTemporary 10 }
+
+trpzClientAuthServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authentication server ip address. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 11 }
+
+trpzClientSessionState OBJECT-TYPE
+    SYNTAX      TrpzClientSessionState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The state for a client session. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 12 }
+
+trpzDAPNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The DAP number on the wireless switch. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 13 }
+
+trpzClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The client ip address. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 14 }
+
+trpzClientSessionId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The unique global id for a client session. This object is used
+    within notifications and is not accessible."
+    ::= { trpzTemporary 15 }
+
+trpzClientAuthenProtocolType OBJECT-TYPE
+    SYNTAX      TrpzClientAuthenProtocolType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The authentication protocol for a client.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 16 }
+
+trpzClientVLANName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The vlan name a client is on. This object is used within
+    notifications and is not accessible."
+    ::= { trpzTemporary 17 }
+
+trpzClientSessionStartTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The start time of a client session, relative to the sysUptime.
+        This object is used within notifications and is not accessible.
+
+        Obsolete. Do not use it because it's not vital information and
+        often *cannot* be implemented to match the declared semantics:
+        a client session might have been created on another wireless switch,
+        *before* the current switch booted (the local zero of sysUptime)."
+    ::= { trpzTemporary 18 }
+
+trpzClientFailureCause OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Display string for possible failure cause for a client session.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 19 }
+
+trpzClientRoamedFromPortNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..20)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The port number on the AC a client has roamed from.
+    This object is used within notifications and is not accessible.
+    Obsoleted by 'trpzClientRoamedFromPhysPortNum'."
+    ::= { trpzTemporary 20 }
+
+trpzClientRoamedFromRadioNum OBJECT-TYPE
+    SYNTAX      TrpzRadioNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The radio number of the AP the client is roamed from. This object is
+    used within notifications and is not accessible.
+    Obsoleted by 'trpzClientRoamedFromRadioIndex'."
+    ::= { trpzTemporary 21 }
+
+trpzClientRoamedFromDAPNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The DAP number on the AC which reported this rogue during roam.
+    This object is used within notifications and is not accessible.
+    Obsoleted by 'trpzClientRoamedFromApNum'."
+    ::= { trpzTemporary 22 }
+
+trpzUserParams OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "A display string of User Parameters for client user authorization
+    attributes learned through AAA and/or used by the system. Note
+    that the syntax will be (name=value, name=value,..) for the
+    parsing purpose. This object is used within notifications and
+    is not accessible."
+    ::= { trpzTemporary 23 }
+
+trpzClientLocationPolicyIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Index of the Location Policy rule applied to a user.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 24 }
+
+trpzClientAssociationFailureCause OBJECT-TYPE
+    SYNTAX      TrpzAssociationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client association failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 25 }
+
+trpzClientAuthenticationFailureCause OBJECT-TYPE
+    SYNTAX      TrpzAuthenticationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authentication failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 26 }
+
+trpzClientAuthorizationFailureCause OBJECT-TYPE
+    SYNTAX      TrpzAuthorizationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authorization failure cause. Note that if it is
+    the user-param, we would additionally expect the failure cause
+    description to list the user attribute value that caused the
+    failure. This object is used within notifications and is
+    not accessible."
+    ::= { trpzTemporary 27 }
+
+trpzClientFailureCauseDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Display string for describing the client failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 28 }
+
+trpzClientRoamedFromWsIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The system IP address of the AC (wireless switch) a client roamed from.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 29 }
+
+trpzClientRoamedFromAccessType OBJECT-TYPE
+    SYNTAX      TrpzAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The client access type (ap, dap, wired) that a client roamed from.
+    This object is used within notifications and is not accessible.
+    Obsoleted by 'trpzClientRoamedFromAccessMode'."
+    ::= { trpzTemporary 30 }
+
+trpzClientAccessType OBJECT-TYPE
+    SYNTAX      TrpzAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client access type (ap, dap, wired).
+    This object is used within notifications and is not accessible.
+    For new traps, use trpzClientAccessMode instead of this object."
+    ::= { trpzTemporary 31 }
+
+trpzRadioMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "AP Radio MAC address.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 32 }
+
+trpzRadioPowerChangeReason OBJECT-TYPE
+    SYNTAX      TrpzRadioPowerChangeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of event that caused an AP radio power change; occurs due
+    to auto-tune operation.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 33 }
+
+trpzNewChannelNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "New channel number of the AP radio used after an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 34 }
+
+trpzOldChannelNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Old channel number of the AP radio used before an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 35 }
+
+trpzChannelChangeReason OBJECT-TYPE
+    SYNTAX      TrpzChannelChangeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of event that caused an AP radio channel change; occurs due
+    to auto-tune operation.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 36 }
+
+trpzRFDetectListenerListInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..571))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The RF Detection Listener list info including a list of
+    (listener mac, rssi, channel, ssid, time).
+    There will be a maximum of 6 entries in the list.
+    Formats:
+        MAC: 18 bytes:          %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X
+        RSSI: 10 bytes:         %10d
+        CHANNEL: 3 bytes:       %3d
+        SSID: 32 bytes:         %s
+        TIME: 26 bytes:         %s
+    Maximum size per entry is 89+4+2 = 95 bytes.
+    Maximum size of the string is 6*95= 571 bytes (include NULL).
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 37 }
+
+trpzRadioSSID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The radio SSID string
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 38 }
+
+trpzNewPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "New power level of the AP radio used after an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 39 }
+
+trpzOldPowerLevel OBJECT-TYPE
+    SYNTAX      TrpzPowerLevel
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Old power level of the AP radio used before an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 40 }
+
+trpzRadioPowerChangeDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The radio power change description. In the case of reason being
+    dup-pkts-threshold-exceed(1), and retransmit-threshold-exceed(2),
+    clientMacAddress will be included in the description.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 41 }
+
+trpzCounterMeasurePerformerListInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "A list of information for APs performing Counter Measures including
+    a list of performer mac addresses. This object is used within
+    notifications and is not accessible.
+
+    Not used by any notification."
+    ::= { trpzTemporary 42 }
+
+trpzClientDot1xState OBJECT-TYPE
+    SYNTAX      TrpzClientDot1xState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The state for a client 802.1X.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 43 }
+
+trpzClientDot1xFailureCause OBJECT-TYPE
+    SYNTAX      TrpzDot1xFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client 802.1X failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 44 }
+
+trpzAPAccessType OBJECT-TYPE
+    SYNTAX      TrpzAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The access point access type (ap, dap,).
+    This object is used within notifications and is not accessible.
+
+    Not used by any notification."
+    ::= { trpzTemporary 45 }
+
+trpzUserAccessType OBJECT-TYPE
+    SYNTAX      TrpzUserAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The user access type (MAC, WEB, DOT1X, LAST-RESORT).
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 46}
+
+trpzClientSessionElapsedTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "The elapsed time for a client session.
+    Obsoleted because session time is usually reported in seconds.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 47 }
+
+trpzLocalId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65000)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Local Id for the session.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 48 }
+
+trpzRFDetectDoSType OBJECT-TYPE
+    SYNTAX      TrpzRFDetectDoSType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of denial of service (DoS) attack.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 49 }
+
+trpzSourceWsIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "IP address of another AC (wireless switch).
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 50 }
+
+trpzClientVLANid OBJECT-TYPE
+    SYNTAX      INTEGER (0..4095)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "VLAN ID used by client traffic.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 51 }
+
+trpzClientVLANtag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4095)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "VLAN tag used by client traffic.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 52 }
+
+trpzDeviceModel OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The model of a device in printable US-ASCII. If unknown
+    (or not available), then the value is a zero length string.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 53 }
+
+--
+-- Notes for MIB designers/maintainers:
+--
+-- Define a new object type for each kind of device (other than AP)
+-- if your new traps need to identify such devices by serial number.
+-- Use 'trpzDeviceSerNum' only to identify APs!
+--
+trpzDeviceSerNum OBJECT-TYPE
+    SYNTAX       TrpzApSerialNum
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The serial number of an AP in printable US-ASCII.
+        If unknown (or not available), then the value is a zero length string.
+
+        Should NOT be used to identify other devices, for example an AC
+        (wireless switch).
+
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 54 }
+
+trpzRsaPubKeyFingerPrint OBJECT-TYPE
+    SYNTAX       TrpzApFingerprint
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The hash of the RSA public key (of a key pair) in binary form
+    that uniquely identifies the public key of an AP.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 55 }
+
+trpzDAPconnectWarningType OBJECT-TYPE
+    SYNTAX       INTEGER {
+            not-configured-fingerprint-connect(1),
+            secure-handshake-failure(2),
+            not-configured-fingerprint-required(3),
+            fingerprint-mismatch(4)
+            }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The type of DAP connect warning. The values are:
+      not-configured-fingerprint-connect(1)...a DAP, which has an RSA keypair
+           but did not have its fingerprint configured on the AC, has connected
+           to the AC when 'dap security' set to 'OPTIONAL'
+      secure-handshake-failure(2).............a DAP tried to connect to the
+           AC with security, but the handshake failed
+      not-configured-fingerprint-required(3)..a DAP tried to connect to the
+           AC with security, but 'dap security' set to 'REQUIRED',
+           and no fingerprint was configured for the DAP
+      fingerprint-mismatch(4).................a DAP tried to connect to the
+           AC with security and its fingerprint was configured, but
+           the fingerprint did not match the computed one
+
+      This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 56 }
+
+trpzClientMACAddress2 OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the second client of interest. This object
+    is used within notifications and is not accessible."
+    ::= { trpzTemporary 57 }
+
+trpzApAttachType OBJECT-TYPE
+    SYNTAX      TrpzApAttachType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "How the AP is attached to the AC
+        (directly or via L2/L3 network).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 58 }
+
+trpzApPortOrDapNum OBJECT-TYPE
+    SYNTAX      TrpzApPortOrDapNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The Port Number if the AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network.
+        This object is used within notifications and is not accessible.
+        Obsoleted by trpzApNum.
+        (In 6.0, direct- and network-attached APs were unified.)"
+    ::= { trpzTemporary 59 }
+
+trpzApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the AP, as assigned in AC's CLI;
+        defaults to AP<Number> (examples: 'AP01', 'AP22', 'AP333', 'AP4444');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73').
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 60 }
+
+trpzApTransition OBJECT-TYPE
+    SYNTAX      TrpzApTransition
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "AP state Transition, as seen by the AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 61 }
+
+trpzApFailDetail OBJECT-TYPE
+    SYNTAX      TrpzApFailDetail
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Detailed failure code for some of the transitions
+        specified in 'trpzApTransition' object.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 62 }
+
+trpzRadioType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the AP Radio Type, as seen by AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 63 }
+
+trpzRadioConfigState OBJECT-TYPE
+    SYNTAX      TrpzRadioConfigState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Radio State, as seen by the AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 64 }
+
+trpzApConnectSecurityType OBJECT-TYPE
+    SYNTAX      TrpzApConnectSecurityType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the security level of the connection between AP and AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 65 }
+
+trpzApServiceAvailability OBJECT-TYPE
+    SYNTAX      TrpzApServiceAvailability
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the level of wireless service availability.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 66 }
+
+trpzApWasOperational OBJECT-TYPE
+    SYNTAX      TrpzApWasOperational
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AP was operational
+        before a transition occurred.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 67 }
+
+trpzClientTimeSinceLastRoam OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds since the most recent roam of a given client.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 68 }
+
+trpzClientIpAddrChangeReason OBJECT-TYPE
+    SYNTAX      TrpzClientIpAddrChangeReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why client IP address changed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 69 }
+
+trpzRFDetectRogueAPMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Describes the MAC address of the Rogue AP the transmitter is connected to.
+    This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 70 }
+
+trpzBlacklistingRemainingTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds remaining until a given transmitter could be
+        removed from the Black List.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 71 }
+
+trpzBlacklistingCause OBJECT-TYPE
+    SYNTAX      TrpzBlacklistingCause
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why a given transmitter is blacklisted.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 72 }
+
+trpzNumLicensedActiveAPs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum (licensed) number of active APs for this AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 73 }
+
+trpzClientDynAuthorClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The dynamic authorization client IP address which caused
+        the change of authorization.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 74 }
+
+trpzChangedUserParamOldValues OBJECT-TYPE
+    SYNTAX      TrpzUserAttributeList
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A display string listing the changed AAA attributes and
+        their values, before the change of authorization was executed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 75 }
+
+trpzChangedUserParamNewValues OBJECT-TYPE
+    SYNTAX      TrpzUserAttributeList
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A display string listing the changed AAA attributes and
+        their values, after the change of authorization was executed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 76 }
+
+trpzClientDisconnectSource OBJECT-TYPE
+    SYNTAX      TrpzSessionDisconnectType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The external source that initiated the termination of a session.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 77 }
+
+trpzClientDisconnectDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Display string for providing available information related to
+        the external source that initiated a session termination.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 78 }
+
+trpzMobilityDomainSecondarySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The secondary seed IP address to which the Mobility Domain
+        has failed over.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 79 }
+
+trpzMobilityDomainPrimarySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The primary seed IP address to which the Mobility Domain
+        has failed back.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 80 }
+
+trpzRFDetectClassificationReason OBJECT-TYPE
+    SYNTAX      TrpzRFDetectClassificationReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why a RF device is classified
+        the way it is.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 81 }
+
+trpzConfigSaveFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Display string listing the name of the file
+        to which the running configuration was saved.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 82 }
+
+trpzConfigSaveInitiatorType OBJECT-TYPE
+    SYNTAX      TrpzConfigSaveInitiatorType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the source that initiated a configuration save.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 83 }
+
+trpzConfigSaveInitiatorIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the source that initiated a configuration save.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 84 }
+
+trpzConfigSaveInitiatorDetails OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Display string listing additional information regarding
+        the source that initiated a configuration save, when available.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 85 }
+
+trpzConfigSaveGeneration OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of configuration changes
+        since the last system boot.
+        The generation count is used to track the number of times
+        the running configuration has been changed due to
+        administrative actions (set/clear), SNMP requests (SET),
+        XML requests (e.g. RingMaster).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 86 }
+
+trpzApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned AP Number,
+        unique on same AC (switch),
+        regardless of how APs are attached to the AC.
+        This object is used within notifications and is not accessible.
+        Obsoletes trpzApPortOrDapNum.
+        For clarity, use this object to identify an AP
+        since in 6.0 directly attached APs and DAPs were unified."
+    ::= { trpzTemporary 87 }
+
+trpzRadioMode OBJECT-TYPE
+    SYNTAX      TrpzRadioMode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the administratively controlled Radio Mode
+        (enabled/disabled/sentry).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 88 }
+
+trpzMichaelMICFailureCause OBJECT-TYPE
+    SYNTAX      TrpzMichaelMICFailureCause
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Michael MIC Failure cause / who detected it.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 89 }
+
+trpzClientAccessMode OBJECT-TYPE
+    SYNTAX      TrpzClientAccessMode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client access mode (ap, wired).
+        This object is used within notifications and is not accessible.
+        Intended to replace trpzClientAccessType.
+        (In 6.0, direct- and network-attached APs were unified.)"
+    ::= { trpzTemporary 90 }
+
+trpzClientAuthorizationReason OBJECT-TYPE
+    SYNTAX      TrpzClientAuthorizationReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why client performed AAA authorization.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 91 }
+
+trpzPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Physical Port Number on the AC.
+        Zero means the port is unknown or not applicable
+        (for example, when trpzClientAccessMode = 'ap').
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 92 }
+
+trpzApMgrOldIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the AP's former primary manager switch.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 93 }
+
+trpzApMgrNewIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the AP's new primary manager switch.
+        This address was formerly the AP's secondary backup link.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 94 }
+
+trpzApMgrChangeReason OBJECT-TYPE
+    SYNTAX      TrpzApMgrChangeReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why the AP's primary manager changed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 95 }
+
+trpzClientClearedReason OBJECT-TYPE
+    SYNTAX      TrpzClientClearedReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why client was cleared.
+        This object is used within notifications and is not accessible."
+     ::= { trpzTemporary 96 }
+
+trpzMobilityDomainResiliencyStatus OBJECT-TYPE
+    SYNTAX      TrpzMobilityDomainResiliencyStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current resilient capacity status
+        for a mobility domain.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 97 }
+
+trpzClientSessionElapsedSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time in seconds elapsed since the start
+        of the Client Session.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 98 }
+
+trpzRadioChannelWidth OBJECT-TYPE
+    SYNTAX      TrpzRadioChannelWidth
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the administratively controlled Channel Width (20MHz/40MHz).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 99 }
+
+trpzRadioMimoState OBJECT-TYPE
+    SYNTAX      TrpzRadioMimoState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Radio MIMO State, as seen by the AC
+        (1x1/2x3/3x3).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 100 }
+
+trpzClientRadioType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Client Radio Type, as detected by an attached AP
+        and reported to the AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 101 }
+
+trpzRFDetectXmtrRadioType OBJECT-TYPE
+    SYNTAX      TrpzRadioType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Radio Type of the Transmitter,
+        as detected by an attached AP and reported to the AC.
+        The Transmitter may be a wireless client or an AP.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 102 }
+
+trpzRFDetectXmtrCryptoType OBJECT-TYPE
+    SYNTAX      TrpzCryptoType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Crypto Type used by the Transmitter,
+        as detected by an attached AP and reported to the AC.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 103 }
+
+trpzClusterFailureReason OBJECT-TYPE
+    SYNTAX      TrpzClusterFailureReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why cluster configuration failed to apply.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 104 }
+
+trpzClusterFailureDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Display string for describing the cluster configuration failure cause.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 105 }
+
+trpzMultimediaCommunicationServerID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The multimedia communication server ID.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 106 }
+
+trpzMultimediaLocalStationIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The local multimedia station IP address.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 107 }
+
+trpzMultimediaLocalStationPort OBJECT-TYPE
+    SYNTAX      TrpzIpPort
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The local multimedia station UDP port.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 108 }
+
+trpzMultimediaLocalStationEndpointID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The local multimedia station endpoint ID.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 109 }
+
+trpzMultimediaRemoteStationIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The remote multimedia station IP address.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 110 }
+
+trpzMultimediaRemoteStationPort OBJECT-TYPE
+    SYNTAX      TrpzIpPort
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The remote multimedia station UDP port.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 111 }
+
+trpzMultimediaRemoteStationEndpointID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The remote multimedia station endpoint ID.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 112 }
+
+trpzMultimediaSignalingProtocol OBJECT-TYPE
+    SYNTAX      TrpzMultimediaSignalingProtocol
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The multimedia signaling protocol that was used for
+        initiating this call (session).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 113 }
+
+trpzMultimediaCallBandwidthAndCodec OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Display string providing information about the multimedia call
+        codec and bandwidth.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 114 }
+
+trpzMultimediaCallDataRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The data rate, in Kbps.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 115 }
+
+trpzMultimediaCallRssi OBJECT-TYPE
+    SYNTAX      TrpzRssi
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client RSSI (Received Signal Strength Indicator),
+        in decibels referred to 1 milliwatt (dBm).
+        A higher value indicates a stronger signal.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 116 }
+
+trpzMultimediaCallFailureReason OBJECT-TYPE
+    SYNTAX      TrpzMultimediaCallFailureReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why the multimedia call has failed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 117 }
+
+trpzMultimediaCallDirection OBJECT-TYPE
+    SYNTAX      TrpzMultimediaCallDirection
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the multimedia call direction (incoming/outgoing).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 118 }
+
+trpzApTunnelLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum number of tunnels supported for an AP.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 119 }
+
+trpzWsTunnelLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum number of tunnels supported for an AC
+        (wireless switch).
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 120 }
+
+trpzWsTunnelLimitType OBJECT-TYPE
+    SYNTAX      TrpzWsTunnelLimitType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of limit exceeded
+        that caused the AC (wireless switch)
+        to reject a tunnel creation request.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 121 }
+
+trpzRFNoiseSourceID OBJECT-TYPE
+    SYNTAX      TrpzRFNoiseSourceID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "RF Noise Source ID.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 122 }
+
+trpzRFNoiseSourceType OBJECT-TYPE
+    SYNTAX      TrpzRFNoiseSourceType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "RF Noise Source Type.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 123 }
+
+trpzRFNoiseChannel OBJECT-TYPE
+    SYNTAX      TrpzChannelNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Channel number.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 124 }
+
+trpzRFNoiseRssi OBJECT-TYPE
+    SYNTAX      TrpzRssi
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The noise RSSI (Received Signal Strength Indicator),
+        in decibels referred to 1 milliwatt (dBm).
+        A higher value indicates stronger noise.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 125 }
+
+trpzRFNoiseDutyCycle OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Estimated Duty Cycle:
+        fraction of time that a noise source is transmitting.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 126 }
+
+trpzRFNoiseChannelInterferenceMeasure OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Severity of channel interference attributed to a noise source.
+        A higher value indicates more severe interference.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 127 }
+
+trpzRFNoiseAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Age of noise in seconds.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 128 }
+
+trpzM2UMulticastAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzM2UMulticastAddr'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 129 }
+
+trpzM2UMulticastAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The multicast address for which conversion to unicast is performed.
+        The type of this address is specified in 'trpzM2UMulticastAddrType'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 130 }
+
+trpzM2UConvNotPossibleReason OBJECT-TYPE
+    SYNTAX      TrpzM2UConvNotPossibleReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why multicast to unicast conversion cannot be
+        performed on an AP with this feature enabled.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 131 }
+
+trpzRadioBand OBJECT-TYPE
+    SYNTAX      TrpzRadioBand
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the radio band used in an auto-tune operation.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 132 }
+
+trpzRadiosTunedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates how many radios had their operational characteristics
+        changed as a result of an auto-tune process.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 133 }
+
+trpzAutoTuneFailureReason OBJECT-TYPE
+    SYNTAX      TrpzAutoTuneFailureReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why an auto-tune operation failed to complete.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 134 }
+
+trpzClientAuthServerAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzClientAuthServerAddr'.
+        Only the value 'ipv4(1)' is reported as of release 8.0.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 135 }
+
+trpzClientAuthServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Internet address of the client authentication server.
+        The type of this address is specified in 'trpzClientAuthServerAddrType'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 136 }
+
+trpzClientRoamedFromWsAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzClientRoamedFromWsAddr'.
+        Only the value 'ipv4(1)' is reported as of release 8.0.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 137 }
+
+trpzClientRoamedFromWsAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The system IP address of the AC (wireless switch) a client roamed from.
+        The type of this address is specified in 'trpzClientRoamedFromWsAddrType'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 138 }
+
+trpzClientDynAuthorClientAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzClientDynAuthorClientAddr'.
+        Only the value 'ipv4(1)' is reported as of release 8.0.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 139 }
+
+trpzClientDynAuthorClientAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The dynamic authorization client IP address which caused
+        the change of authorization.
+        The type of this address is specified in
+        'trpzClientDynAuthorClientAddrType'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 140 }
+
+trpzClientIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of 'trpzClientIpAddr'.
+        Only the values 'ipv4(1)' and 'ipv6(2)' are reported.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 141 }
+
+trpzClientIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates an IP address of the client.
+        The type of this address is specified in 'trpzClientIpAddrType'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 142 }
+
+trpzClientIPv4Addr OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 address of the client.
+        If the client does not use the IPv4 stack, or its IPv4 address
+        has not yet been detected, then all octets will have the value 0.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 143 }
+
+trpzClientIPv6LinkLocalAddr OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 link-local address of the client.
+        If the client does not use the IPv6 stack, or its IPv6 link-local
+        address has not yet been detected, then all octets
+        will have the value 0.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 144 }
+
+trpzApRadioIndex OBJECT-TYPE
+    SYNTAX      TrpzApRadioIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "AP Radio index.
+        Intended to replace 'trpzAPRadioNum'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 145 }
+
+trpzClientRoamedFromAccessMode OBJECT-TYPE
+    SYNTAX      TrpzClientAccessMode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client access mode (ap, wired) that a client roamed from.
+        This object is used within notifications and is not accessible.
+        Obsoletes 'trpzClientRoamedFromAccessType'.
+        (In 6.0, direct- and network-attached APs were unified.)"
+    ::= { trpzTemporary 146 }
+
+trpzClientRoamedFromApNum OBJECT-TYPE
+    SYNTAX      TrpzApNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of the AP the client roamed from.
+        Obsoletes 'trpzClientRoamedFromDAPNum'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 147 }
+
+trpzClientRoamedFromRadioIndex OBJECT-TYPE
+    SYNTAX      TrpzApRadioIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index of the AP Radio the client roamed from.
+        Obsoletes 'trpzClientRoamedFromRadioNum'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 148 }
+
+trpzClientRoamedFromPhysPortNum OBJECT-TYPE
+    SYNTAX      TrpzPhysPortNumberOrZero
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Identifies the physical port on the AC used by the
+        wired-auth client, before roam.
+        Zero means the port is unknown or not applicable
+        (for example, when trpzClientRoamedFromAccessMode = 'ap').
+        Obsoletes 'trpzClientRoamedFromPortNum'.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 149 }
+
+trpzClientDeviceType OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the client device.
+        Is a zero length string if unknown.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 150 }
+
+trpzClientDeviceTypeOld OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the client device, before change.
+        Is a zero length string if unknown.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 151 }
+
+trpzClientDeviceGroup OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceGroupName
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The group that the detected client device type
+        belongs to.
+        Is a zero length string if the device type is unknown.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 152 }
+
+trpzClientDeviceProfileName OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceProfileName
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the device profile associated with
+        the detected client device.
+        A device profile is a collection of policies that
+        apply to one or more types of client devices.
+        Is a zero length string in 'detect-only' mode or if not set.
+        In 'detect-only' mode policy enforcement is disabled.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 153 }
+
+trpzClientDeviceProfileNameOld OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceProfileName
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the device profile associated with
+        the detected client device, before change.
+        A device profile is a collection of policies that
+        apply to one or more types of client devices.
+        Is a zero length string in 'detect-only' mode or if not set.
+        In 'detect-only' mode policy enforcement is disabled.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 154 }
+
+trpzClientDeviceProfileChangeReason OBJECT-TYPE
+    SYNTAX      TrpzClientDeviceProfileChangeReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason why the device profile changed.
+        This object is used within notifications and is not accessible."
+    ::= { trpzTemporary 155 }
+
+
+-- Notification definitions
+
+trpzDeviceFailTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceId }
+    STATUS      current
+    DESCRIPTION
+    "The device has a failure indication"
+    ::= { trpzTrapsV2 1 }
+
+trpzDeviceOkayTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceId }
+    STATUS      current
+    DESCRIPTION
+    "The device has recovered"
+    ::= { trpzTrapsV2 2 }
+
+trpzPoEFailTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzPortNum }
+    STATUS      current
+    DESCRIPTION
+    "PoE has failed on the indicated port"
+    ::= { trpzTrapsV2 3 }
+
+trpzApTimeoutTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzPortNum, trpzAPMACAddress, trpzAPAccessType,
+          trpzDAPNum }
+    STATUS      obsolete
+    DESCRIPTION
+    "The AP entering the AC at port trpzPortNum with MAC
+    trpzRadioMacAddress and of the access type (ap or dap)
+    has not responded.
+
+    Replaced by trpzApNonOperStatusTrap2,
+    with trpzApTransition = 'timeout'."
+    ::= { trpzTrapsV2 4 }
+
+trpzAPBootTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzPortNum, trpzAPMACAddress, trpzAPAccessType,
+          trpzDAPNum }
+    STATUS      obsolete
+    DESCRIPTION
+    "The AP entering the AC at port trpzPortNum with MAC
+    trpzRadioMacAddress and of the access type (ap or dap) has booted.
+
+    Replaced by trpzApNonOperStatusTrap2,
+    with trpzApTransition = 'bootSuccess'."
+    ::= { trpzTrapsV2 5 }
+
+trpzMobilityDomainJoinTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzMobilityDomainIp }
+    STATUS      current
+    DESCRIPTION
+    "The mobility domain member has received an UP notice from the
+    remote address."
+    ::= { trpzTrapsV2 6 }
+
+trpzMobilityDomainTimeoutTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzMobilityDomainIp }
+    STATUS      current
+    DESCRIPTION
+    "The mobility domain member has declared the remote address
+    to be DOWN."
+    ::= { trpzTrapsV2 7 }
+
+trpzMpMichaelMICFailure NOTIFICATION-TYPE
+    OBJECTS     { trpzPortNum,
+          trpzRadioMACAddress,
+          trpzRadioSSID,
+          trpzAPRadioNum,
+          trpzClientMACAddress,
+          trpzClientMACAddress }
+    STATUS      obsolete
+    DESCRIPTION
+    "Two Michael MIC failures were seen within 60 seconds of each other.
+
+    Obsoleted by trpzMichaelMICFailure."
+    ::= { trpzTrapsV2 8 }
+
+trpzRFDetectRogueAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds a rogue AP.
+    XmtrMacAddr is the radio MAC address from the beacon.
+    ListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectRogueDeviceTrap2."
+    ::= { trpzTrapsV2 9 }
+
+trpzRFDetectAdhocUserTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection sweep finds a ad-hoc user.
+    trpzRFDetectXmtrMacAddr is the MAC address of the ad-hoc user.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { trpzTrapsV2 10 }
+
+trpzRFDetectRogueDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a rogue has disappeared.
+    Obsoleted by trpzRFDetectRogueDeviceDisappearTrap."
+    ::= { trpzTrapsV2 11 }
+
+trpzClientAuthenticationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzClientAuthenticationFailureCause,
+          trpzClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client authentication fails."
+    ::= { trpzTrapsV2 12 }
+
+trpzClientAuthorizationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzClientLocationPolicyIndex,
+          trpzUserParams,
+          trpzClientAuthorizationFailureCause,
+          trpzClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client authorization fails."
+    ::= { trpzTrapsV2 13 }
+
+trpzClientAssociationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzClientMACAddress,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzClientAssociationFailureCause,
+          trpzClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client association fails."
+    ::= { trpzTrapsV2 14 }
+
+trpzClientAuthorizationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientSessionStartTime,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzRadioRssi }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a client authorizes.
+    Obsoleted by trpzClientAuthorizationSuccessTrap5."
+    ::= { trpzTrapsV2 15 }
+
+trpzClientDeAssociationTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent if a client de-association occurred.
+    Obsoleted by trpzClientDeAssociationTrap2."
+    ::= { trpzTrapsV2 16 }
+
+trpzClientRoamingTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzClientRoamedFromAccessType,
+          trpzClientRoamedFromPortNum,
+          trpzClientRoamedFromRadioNum,
+          trpzClientRoamedFromDAPNum,
+          trpzClientRoamedFromWsIp,
+          trpzClientTimeSinceLastRoam }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent if a client roams from one location to another.
+    Obsoleted by trpzClientRoamingTrap2."
+    ::= { trpzTrapsV2 17 }
+
+trpzAutoTuneRadioPowerChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRadioMACAddress,
+          trpzNewPowerLevel,
+          trpzOldPowerLevel,
+          trpzRadioPowerChangeReason,
+          trpzRadioPowerChangeDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a radio's power level has changed based
+    on auto-tune."
+    ::= { trpzTrapsV2 18 }
+
+trpzAutoTuneRadioChannelChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRadioMACAddress,
+          trpzNewChannelNum,
+          trpzOldChannelNum,
+          trpzChannelChangeReason }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a radio's channel has changed based on auto-tune."
+    ::= { trpzTrapsV2 19 }
+
+trpzCounterMeasureStartTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRadioMACAddress }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when counter measures are started against a rogue.
+    trpzRFDetectXmtrMacAddr is the mac address of the rogue we
+    are doing counter measures against.
+    trpzRadioMACAddress identifies the radio performing the countermeasures."
+    ::= { trpzTrapsV2 20 }
+
+trpzCounterMeasureStopTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRadioMACAddress }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when counter measures are stopped against a rogue.
+    trpzRFDetectXmtrMacAddr is the mac address of the rogue we
+    were doing counter measures against.
+    trpzRadioMACAddress identifies the radio performing the countermeasures."
+    ::= { trpzTrapsV2 21 }
+
+trpzClientDot1xFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientMACAddress,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzDAPNum,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzRadioSSID,
+          trpzClientDot1xState,
+          trpzClientDot1xFailureCause,
+          trpzClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client failed 802.1X."
+    ::= { trpzTrapsV2 22 }
+
+trpzClientClearedTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzClientSessionElapsedTime,
+          trpzLocalId}
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a client session is cleared.
+    Obsoleted by trpzClientClearedTrap3."
+    ::= { trpzTrapsV2 23 }
+
+trpzClientAuthorizationSuccessTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientSessionStartTime,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a client authorizes.
+    Obsoleted by trpzClientAuthorizationSuccessTrap5."
+    ::= { trpzTrapsV2 24 }
+
+trpzRFDetectSpoofedMacAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds an AP using
+    the MAC of the listener.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectDoSTrap and trpzRFDetectRogueDeviceTrap2.
+    One of the two traps will be sent depending on the type of
+    AP MAC spoofing detected."
+    ::= { trpzTrapsV2 25 }
+
+trpzRFDetectSpoofedSsidAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds an AP using
+    the SSID of the listener, and the AP is not in the
+    mobility domain.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectRogueDeviceTrap2
+             and trpzRFDetectSuspectDeviceTrap2.
+    One of the two traps will be sent,
+    depending on RF detection classification rules."
+    ::= { trpzTrapsV2 26 }
+
+trpzRFDetectDoSTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectDoSType,
+          trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds a denial
+    of service (DoS) occurring.
+    trpzRFDetectDoSType specifies the type of DoS.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { trpzTrapsV2 27 }
+
+trpzRFDetectClientViaRogueWiredAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzSourceWsIp,
+          trpzPortNum,
+          trpzClientVLANid,
+          trpzClientVLANtag,
+          trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a client is detected that connected
+    via a rogue AP that is attached to a wired port.
+    trpzSourceWsIp is the IP address of the AC (switch) with the wired port.
+    trpzPortNum is the port on the AC.
+    trpzClientVLANid is the VLAN ID of the client's traffic.
+    trpzClientVLANtag is the VLAN tag of the client's traffic.
+    trpzRFDetectXmtrMacAddr is the MAC address of the client.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectClientViaRogueWiredAPTrap3."
+    ::= { trpzTrapsV2 28 }
+
+trpzRFDetectInterferingRogueAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds an interfering
+    rogue AP.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectSuspectDeviceTrap2."
+    ::= { trpzTrapsV2 29 }
+
+trpzRFDetectInterferingRogueDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when an interfering rogue has disappeared.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    Obsoleted by trpzRFDetectSuspectDeviceDisappearTrap."
+    ::= { trpzTrapsV2 30 }
+
+trpzRFDetectUnAuthorizedSsidTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds use of
+    an unauthorized SSID.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectRogueDeviceTrap2
+             and trpzRFDetectSuspectDeviceTrap2.
+    One of the two traps will be sent if the device having an
+    unauthorized SSID is classified as rogue or suspect because of this."
+    ::= { trpzTrapsV2 31 }
+
+trpzRFDetectUnAuthorizedOuiTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds use of
+    an unauthorized OUI.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectRogueDeviceTrap2
+             and trpzRFDetectSuspectDeviceTrap2.
+    One of the two traps will be sent if the device having an
+    unauthorized OUI is classified as rogue or suspect because of this."
+    ::= { trpzTrapsV2 32 }
+
+trpzRFDetectUnAuthorizedAPTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when RF detection finds operation
+    of an unauthorized AP.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by trpzRFDetectRogueDeviceTrap2."
+    ::= { trpzTrapsV2 33 }
+
+trpzDAPConnectWarningTrap NOTIFICATION-TYPE
+    OBJECTS { trpzDeviceModel,
+          trpzDeviceSerNum,
+          trpzRsaPubKeyFingerPrint,
+          trpzDAPconnectWarningType }
+    STATUS      obsolete
+    DESCRIPTION
+    "A DAP, tried to connect to the AC.
+    trpzDeviceModel provides the model of the DAP.
+    trpzDeviceSerNum provides the serial number of the DAP.
+    trpzRsaPubKeyFingerPrint provides the computed
+        fingerprint of the DAP.
+    trpzDAPconnectWarningType provides the type
+        of connect warning.
+
+    Replaced by trpzApNonOperStatusTrap2,
+    with trpzApTransition = 'connectFail'."
+    ::= { trpzTrapsV2 34 }
+
+trpzRFDetectDoSPortTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectDoSType,
+          trpzRFDetectXmtrMacAddr,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzDAPNum }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds a denial
+    of service (DoS) occurring. This has port and
+    AP info instead of 'Listener info'.
+    trpzRFDetectDoSType specifies the type of DoS.
+    trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    trpzClientAccessType specifies whether wired, AP, or DAP.
+    trpzPortNum (for wired or AP), the port that is used.
+    trpzDAPNum (for a DAP), the ID of the DAP."
+    ::= { trpzTrapsV2 35 }
+
+trpzMpMichaelMICFailure2 NOTIFICATION-TYPE
+    OBJECTS     { trpzPortNum,
+          trpzAPRadioNum,
+          trpzClientMACAddress,
+          trpzClientMACAddress2 }
+    STATUS      obsolete
+    DESCRIPTION
+    "Two Michael MIC failures were seen within 60 seconds of
+    each other. Object trpzClientMACAddress is the source
+    of the first failure, and object trpzClientMACAddress2
+    source of the second failure.
+
+    Obsoleted by trpzMichaelMICFailure."
+    ::= { trpzTrapsV2 36 }
+
+trpzApNonOperStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzAPMACAddress,
+          trpzApAttachType,
+          trpzApPortOrDapNum,
+          trpzApName,
+          trpzApTransition,
+          trpzApFailDetail,
+          trpzApWasOperational }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when the AP changes state
+        and the new one is a non-operational state.
+        Obsoleted by trpzApNonOperStatusTrap2."
+    ::= { trpzTrapsV2 37 }
+
+trpzApOperRadioStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzApAttachType,
+          trpzApPortOrDapNum,
+          trpzApName,
+          trpzAPRadioNum,
+          trpzRadioMACAddress,
+          trpzRadioType,
+          trpzRadioConfigState,
+          trpzApConnectSecurityType,
+          trpzApServiceAvailability }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when the Radio changes state.
+        It also contains aggregate information about the AP
+        in operational state - security level and service availability.
+        Obsoleted by trpzApOperRadioStatusTrap3."
+    ::= { trpzTrapsV2 38 }
+
+trpzClientIpAddrChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzClientIpAddrChangeReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client's IP address
+        changes. The most likely case for this is when
+        the client first connects to the network.
+        Obsoleted by trpzClientIpAddrChangeTrap2."
+    ::= { trpzTrapsV2 39 }
+
+trpzClientAssociationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzClientMACAddress,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client association succeeds.
+        WARNING: DO NOT enable it in normal use.
+        It may impair switch performance!
+        Only recommended for debugging network issues."
+    ::= { trpzTrapsV2 40 }
+
+trpzClientAuthenticationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzClientMACAddress,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client authentication succeeds."
+    ::= { trpzTrapsV2 41 }
+
+trpzClientDeAuthenticationTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent if a client de-authentication occurred.
+        Obsoleted by trpzClientDeAuthenticationTrap2."
+    ::= { trpzTrapsV2 42 }
+
+trpzRFDetectBlacklistedTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzDAPNum,
+          trpzBlacklistingRemainingTime,
+          trpzBlacklistingCause }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if an association, re-association or de-association
+        request (packet) is detected from a blacklisted transmitter 
+        (identified by MAC: 'trpzRFDetectXmtrMacAddr').
+        If 'trpzBlacklistingCause' is 'configured',
+        then 'trpzBlacklistingRemainingTime' will be zero, meaning indefinite
+        time (depending on administrative actions on the Black List).
+        Otherwise, 'trpzBlacklistingRemainingTime' will indicate the time
+        in seconds until this transmitter's requests could be allowed."
+    ::= { trpzTrapsV2 43 }
+
+trpzRFDetectClientViaRogueWiredAPTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzSourceWsIp,
+          trpzPortNum,
+          trpzClientVLANid,
+          trpzClientVLANtag,
+          trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectRogueAPMacAddr }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client is detected that connected
+        via a rogue AP that is attached to a wired port.
+        trpzSourceWsIp is the IP address of the AC (switch)
+        with the wired port.
+        trpzPortNum is the port on the AC.
+        trpzClientVLANid is the VLAN ID of the client's traffic.
+        trpzClientVLANtag is the VLAN tag of the client's traffic.
+        trpzRFDetectXmtrMacAddr is the MAC address of the client.
+        trpzRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        trpzRFDetectRogueAPMacAddr is the MAC address of the Rogue AP (wired)
+        the client is connected to.
+        Obsoleted by trpzRFDetectClientViaRogueWiredAPTrap3."
+    ::= { trpzTrapsV2 44 }
+
+trpzRFDetectAdhocUserDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when RF detection sweep finds that
+        an ad-hoc user disappeared.
+        trpzRFDetectXmtrMacAddr is the MAC address of the ad-hoc user."
+    ::= { trpzTrapsV2 45 }
+
+trpzApRejectLicenseExceededTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzNumLicensedActiveAPs }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an AC (wireless switch) receives a packet
+        from an inactive AP and attaching that AP would make the AC
+        exceed the maximum (licensed) number of active APs."
+    ::= { trpzTrapsV2 46 }
+
+trpzClientDynAuthorChangeSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientSessionState,
+          trpzClientDynAuthorClientIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzChangedUserParamOldValues,
+          trpzChangedUserParamNewValues }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when the authorization attributes for a user
+        are dynamically changed by an authorized dynamic authorization
+        client.
+        Obsoleted by trpzClientDynAuthorChangeSuccessTrap2."
+    ::= { trpzTrapsV2 47 }
+
+trpzClientDynAuthorChangeFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientDynAuthorClientIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzUserParams,
+          trpzClientAuthorizationFailureCause,
+          trpzClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a change of authorization request sent by
+        an authorized dynamic authorization client is unsuccessful."
+    ::= { trpzTrapsV2 48 }
+
+trpzClientDisconnectTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientAccessType,
+          trpzPortNum,
+          trpzAPRadioNum,
+          trpzDAPNum,
+          trpzRadioSSID,
+          trpzLocalId,
+          trpzClientDisconnectSource,
+          trpzClientDisconnectDescription }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client session is terminated administratively.
+        Obsoleted by trpzClientDisconnectTrap2."
+    ::= { trpzTrapsV2 49 }
+
+trpzMobilityDomainFailOverTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzMobilityDomainSecondarySeedIp }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the Mobility Domain fails over
+        to the secondary seed."
+    ::= { trpzTrapsV2 50 }
+
+trpzMobilityDomainFailBackTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzMobilityDomainPrimarySeedIp }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the Mobility Domain fails back
+        to the primary seed."
+    ::= { trpzTrapsV2 51 }
+
+trpzRFDetectRogueDeviceTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectClassificationReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when RF detection finds a rogue device.
+        XmtrMacAddr is the radio MAC address from the beacon.
+        ListenerListInfo is a display string of a list of
+        listener information.
+        ClassificationReason indicates the reason why the device
+        is classified as rogue.
+        Obsoleted by trpzRFDetectRogueDeviceTrap2."
+    ::= { trpzTrapsV2 52 }
+
+trpzRFDetectRogueDeviceDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a rogue device has disappeared.
+        This trap obsoletes the trpzRFDetectRogueDisappearTrap."
+    ::= { trpzTrapsV2 53 }
+
+trpzRFDetectSuspectDeviceTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectClassificationReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when RF detection finds a suspect device.
+        trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+        trpzRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        ClassificationReason indicates the reason why the device
+        is classified as suspect.
+        Obsoleted by trpzRFDetectSuspectDeviceTrap2."
+    ::= { trpzTrapsV2 54 }
+
+trpzRFDetectSuspectDeviceDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a suspect device has disappeared.
+        trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+        This trap obsoletes the trpzRFDetectInterferingRogueDisappearTrap."
+    ::= { trpzTrapsV2 55 }
+
+trpzRFDetectClientViaRogueWiredAPTrap3 NOTIFICATION-TYPE
+    OBJECTS     { trpzSourceWsIp,
+          trpzPortNum,
+          trpzClientVLANid,
+          trpzClientVLANtag,
+          trpzRFDetectXmtrMacAddr,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectRogueAPMacAddr,
+          trpzRFDetectClassificationReason }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client is detected that connected
+        via a rogue AP that is attached to a wired port.
+        trpzSourceWsIp is the IP address of the AC (switch)
+        with the wired port.
+        trpzPortNum is the port on the AC.
+        trpzClientVLANid is the VLAN ID of the client's traffic.
+        trpzClientVLANtag is the VLAN tag of the client's traffic.
+        trpzRFDetectXmtrMacAddr is the MAC address of the client.
+        trpzRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        trpzRFDetectRogueAPMacAddr is the MAC address of the Rogue AP (wired)
+        the client is connected to.
+        ClassificationReason indicates the reason why the AP
+        is classified as rogue.
+        This trap obsoletes the trpzRFDetectClientViaRogueWiredAPTrap and
+        trpzRFDetectClientViaRogueWiredAPTrap2."
+    ::= { trpzTrapsV2 56 }
+
+trpzRFDetectClassificationChangeTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when RF detection classification rules change."
+    ::= { trpzTrapsV2 57 }
+
+trpzConfigurationSavedTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzConfigSaveFileName,
+          trpzConfigSaveInitiatorType,
+          trpzConfigSaveInitiatorIp,
+          trpzConfigSaveInitiatorDetails,
+          trpzConfigSaveGeneration }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the running configuration of the switch
+        is written to a configuration file."
+    ::= { trpzTrapsV2 58 }
+
+trpzApNonOperStatusTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzAPMACAddress,
+          trpzApNum,
+          trpzApName,
+          trpzApTransition,
+          trpzApFailDetail,
+          trpzApWasOperational }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the AP changes state
+        and the new one is a non-operational or redundant state.
+        Obsoletes trpzApNonOperStatusTrap."
+    ::= { trpzTrapsV2 59 }
+
+trpzApOperRadioStatusTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzApNum,
+          trpzApName,
+          trpzAPRadioNum,
+          trpzRadioMACAddress,
+          trpzRadioType,
+          trpzRadioMode,
+          trpzRadioConfigState,
+          trpzApConnectSecurityType,
+          trpzApServiceAvailability }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when the Radio changes state.
+        It also contains aggregate information about the AP
+        in operational state - security level and service availability.
+        Obsoleted by trpzApOperRadioStatusTrap3."
+    ::= { trpzTrapsV2 60 }
+
+trpzMichaelMICFailure NOTIFICATION-TYPE
+    OBJECTS     { trpzApNum,
+          trpzAPRadioNum,
+          trpzRadioMACAddress,
+          trpzMichaelMICFailureCause,
+          trpzClientMACAddress,
+          trpzClientMACAddress2 }
+    STATUS      current
+    DESCRIPTION
+        "Two Michael MIC failures were seen within 60 seconds of each other.
+        Object trpzClientMACAddress indicates
+        the source of the first failure,
+        and object trpzClientMACAddress2 indicates
+        the source of the second failure.
+
+        Service is interrupted for 60 seconds on the radio
+        due to TKIP countermeasures having commenced.
+
+        The radio is identified by trpzApNum and trpzAPRadioNum.
+        An alternative way to identify the radio is trpzRadioMACAddress.
+
+        Obsoletes trpzMpMichaelMICFailure and trpzMpMichaelMICFailure2."
+    ::= { trpzTrapsV2 61 }
+
+trpzClientAuthorizationSuccessTrap3 NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzAPRadioNum,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzClientAuthorizationReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client authorizes.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzAPRadioNum, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent.
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoleted by trpzClientAuthorizationSuccessTrap5."
+    ::= { trpzTrapsV2 62 }
+
+trpzApManagerChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzAPMACAddress,
+          trpzApNum,
+          trpzApName,
+          trpzApMgrOldIp,
+          trpzApMgrNewIp,
+          trpzApMgrChangeReason }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the AP's secondary link becomes its
+        primary link."
+    ::= { trpzTrapsV2 63 }
+
+trpzClientClearedTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzAPRadioNum,
+          trpzRadioSSID,
+          trpzClientSessionElapsedSeconds,
+          trpzLocalId,
+          trpzClientClearedReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client session is cleared.
+        Obsoleted by trpzClientClearedTrap3."
+    ::= { trpzTrapsV2 64 }
+
+trpzMobilityDomainResiliencyStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { trpzMobilityDomainResiliencyStatus }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent by a mobility domain seed to announce
+        changes in resilient capacity status."
+    ::= { trpzTrapsV2 65 }
+
+trpzApOperRadioStatusTrap3 NOTIFICATION-TYPE
+    OBJECTS     { trpzDeviceSerNum,
+          trpzApNum,
+          trpzApName,
+          trpzAPRadioNum,
+          trpzRadioMACAddress,
+          trpzRadioType,
+          trpzRadioMode,
+          trpzRadioConfigState,
+          trpzRadioChannelWidth,
+          trpzRadioMimoState,
+          trpzApConnectSecurityType,
+          trpzApServiceAvailability }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the Radio changes state.
+        It also contains aggregate information about the AP
+        in operational state - security level and service availability.
+        Obsoletes trpzApOperRadioStatusTrap
+        and trpzApOperRadioStatusTrap2."
+    ::= { trpzTrapsV2 66 }
+
+trpzClientAuthorizationSuccessTrap4 NOTIFICATION-TYPE
+    OBJECTS     { trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIp,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerIp,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzAPRadioNum,
+          trpzRadioSSID,
+          trpzClientRadioType,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzClientAuthorizationReason }
+    STATUS      obsolete
+    DESCRIPTION
+        "This trap is sent when a client authorizes.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzAPRadioNum, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+        trpzClientRadioType gives the type of radio used by this client.
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoleted by trpzClientAuthorizationSuccessTrap5."
+    ::= { trpzTrapsV2 67 }
+
+trpzRFDetectRogueDeviceTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectXmtrRadioType,
+          trpzRFDetectXmtrCryptoType,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectClassificationReason }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when RF detection finds a rogue device.
+        trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+        trpzRFDetectXmtrRadioType indicates the Type of Radio
+        used by the transmitter (rogue device).
+        trpzRFDetectXmtrCryptoType indicates the Type of Crypto
+        used by the transmitter (rogue device).
+        trpzRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        trpzRFDetectClassificationReason indicates the reason
+        why the device is classified as rogue.
+        Obsoletes trpzRFDetectRogueAPTrap,
+                  trpzRFDetectUnAuthorizedAPTrap,
+                  trpzRFDetectRogueDeviceTrap."
+    ::= { trpzTrapsV2 68 }
+
+trpzRFDetectSuspectDeviceTrap2 NOTIFICATION-TYPE
+    OBJECTS     { trpzRFDetectXmtrMacAddr,
+          trpzRFDetectXmtrRadioType,
+          trpzRFDetectXmtrCryptoType,
+          trpzRFDetectListenerListInfo,
+          trpzRFDetectClassificationReason }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when RF detection finds a suspect device.
+        trpzRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+        trpzRFDetectXmtrRadioType indicates the Type of Radio
+        used by the transmitter (suspect device).
+        trpzRFDetectXmtrCryptoType indicates the Type of Crypto
+        used by the transmitter (suspect device).
+        trpzRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        trpzRFDetectClassificationReason indicates the reason
+        why the device is classified as suspect.
+        Obsoletes trpzRFDetectInterferingRogueAPTrap,
+                  trpzRFDetectSuspectDeviceTrap."
+    ::= { trpzTrapsV2 69 }
+
+trpzClusterFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzClusterFailureReason,
+          trpzClusterFailureDescription
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the cluster configuration failed to apply.
+
+        If trpzClusterFailureReason = 'validation-error':
+
+          The validation error is reported by the receiving end
+          of the configuration updates.
+          The receiving end can be any AC (switch) in the mobility domain:
+          member, secondary seed or primary seed.
+
+            - Primary seed will be the receiving end of configuration updates
+                when Primary seed is joining the cluster
+                and Secondary seed has preempt mode enabled.
+            - Both Secondary seed and member will be at the receiving end
+                when Primary seed is active."
+    ::= { trpzTrapsV2 70 }
+
+trpzMultimediaCallFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzClientMACAddress,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzAPRadioNum,
+          trpzRadioSSID,
+          trpzMultimediaCommunicationServerID,
+          trpzMultimediaCallDirection,
+          trpzMultimediaLocalStationIp,
+          trpzMultimediaLocalStationPort,
+          trpzMultimediaLocalStationEndpointID,
+          trpzMultimediaRemoteStationIp,
+          trpzMultimediaRemoteStationPort,
+          trpzMultimediaRemoteStationEndpointID,
+          trpzMultimediaSignalingProtocol,
+          trpzMultimediaCallBandwidthAndCodec,
+          trpzMultimediaCallDataRate,
+          trpzMultimediaCallRssi,
+          trpzMultimediaCallFailureReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a multimedia call fails."
+    ::= { trpzTrapsV2 71 }
+
+trpzApTunnelLimitExceededTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzDeviceSerNum,
+          trpzAPMACAddress,
+          trpzApNum,
+          trpzApTunnelLimit
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent by the AP primary controller (PAM)
+        when an AP rejects a tunnel creation request because
+        it has already created the maximum number of tunnels it can support."
+    ::= { trpzTrapsV2 72 }
+
+trpzWsTunnelLimitExceededTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzWsTunnelLimit,
+          trpzWsTunnelLimitType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the AC (wireless switch)
+        rejects a tunnel creation request because it has reached
+        the maximum number of tunnels supported
+        (indicated by 'trpzWsTunnelLimit').
+
+        When trpzWsTunnelLimitType = 'platform-tunnel-limit' (2)
+        the AC has reached the maximum tunnel capacity,
+        which depends on the platform.
+
+        When trpzWsTunnelLimitType = 'ap-ws-tunnel-limit' (3)
+        the AC has reached the AP-to-switch tunnels limit,
+        which depends on the current situation of the AC
+        (mobility domain, network domain, network resiliency status)."
+    ::= { trpzTrapsV2 73 }
+
+trpzRFNoiseSourceTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzRFNoiseSourceID,
+          trpzRFNoiseSourceType,
+          trpzRadioMACAddress,
+          trpzRFNoiseChannel,
+          trpzRFNoiseRssi,
+          trpzRFNoiseDutyCycle,
+          trpzRFNoiseChannelInterferenceMeasure,
+          trpzRFNoiseAge
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent upon the appearance of a new noise source.
+
+        'trpzRadioMACAddress' indicates the listener
+        (the AP radio reporting the noise).
+
+        A given combination of noise source ID, listener and channel
+        should trigger this trap at most once every 15 minutes."
+    ::= { trpzTrapsV2 74 }
+
+trpzM2UConvNotPossibleTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzRadioSSID,
+          trpzApNum,
+          trpzApName,
+          trpzM2UMulticastAddrType,
+          trpzM2UMulticastAddr,
+          trpzM2UConvNotPossibleReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when multicast to unicast conversion is enabled
+        on the AP, but cannot be performed."
+    ::= { trpzTrapsV2 75 }
+
+trpzM2UConvAvailabilityRestoredTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzRadioSSID,
+          trpzApNum,
+          trpzApName,
+          trpzM2UMulticastAddrType,
+          trpzM2UMulticastAddr
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the multicast to unicast conversion can be
+        resumed on the AP, after disruption."
+    ::= { trpzTrapsV2 76 }
+
+trpzAutoTuneSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzRadioBand,
+          trpzRadiosTunedCount
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an auto-tune operation completed successfully."
+    ::= { trpzTrapsV2 77 }
+
+trpzAutoTuneFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzRadioBand,
+          trpzAutoTuneFailureReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an auto-tune operation failed to complete."
+    ::= { trpzTrapsV2 78 }
+
+trpzClientDeAssociationTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientVLANName,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client de-association occurred.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        before deassociation;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientDeAssociationTrap."
+    ::= { trpzTrapsV2 79 }
+
+trpzClientRoamingTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzClientRoamedFromAccessMode,
+          trpzClientRoamedFromPhysPortNum,
+          trpzClientRoamedFromApNum,
+          trpzClientRoamedFromRadioIndex,
+          trpzClientRoamedFromWsAddrType,
+          trpzClientRoamedFromWsAddr,
+          trpzClientTimeSinceLastRoam
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client roams from one location to another.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client,
+        after roam;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client, after roam.
+
+        Obsoletes trpzClientRoamingTrap."
+    ::= { trpzTrapsV2 80 }
+
+trpzClientIpAddrChangeTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIpAddrType,
+          trpzClientIpAddr,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzClientIpAddrChangeReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an IP address of a client changes.
+        The most likely cases for this are when the client first
+        connects to the network and when a new IPv6 global address is
+        assigned to the client.
+
+        The pair of objects trpzClientIpAddrType/trpzClientIpAddr
+        indicates the type and the value of the new IP address.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientIpAddrChangeTrap."
+    ::= { trpzTrapsV2 81 }
+
+trpzClientDeAuthenticationTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientVLANName,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client de-authentication occurred.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientDeAuthenticationTrap."
+    ::= { trpzTrapsV2 82 }
+
+trpzClientDynAuthorChangeSuccessTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientSessionState,
+          trpzClientDynAuthorClientAddrType,
+          trpzClientDynAuthorClientAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzChangedUserParamOldValues,
+          trpzChangedUserParamNewValues
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the authorization attributes for a user
+        are dynamically changed by an authorized dynamic authorization
+        client.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientDynAuthorChangeSuccessTrap."
+    ::= { trpzTrapsV2 83 }
+
+trpzClientDisconnectTrap2 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzLocalId,
+          trpzClientDisconnectSource,
+          trpzClientDisconnectDescription
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client session is terminated administratively.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientDisconnectTrap."
+    ::= { trpzTrapsV2 84 }
+
+trpzClientClearedTrap3 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzClientSessionElapsedSeconds,
+          trpzLocalId,
+          trpzClientClearedReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client session is cleared.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientClearedTrap,
+                  trpzClientClearedTrap2."
+    ::= { trpzTrapsV2 85 }
+
+trpzClientAuthorizationSuccessTrap5 NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzClientRadioType,
+          trpzUserAccessType,
+          trpzLocalId,
+          trpzClientAuthorizationReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client authorizes.
+
+        If trpzClientAccessMode = 'ap':
+        trpzApNum, trpzApRadioIndex, trpzRadioSSID
+        identify the AP/radio/BSS providing wireless service to this client
+        at the time this trap was sent;
+        trpzClientRadioType gives the type of radio used by this client.
+
+        If trpzClientAccessMode = 'wired':
+        trpzPhysPortNum identifies the physical port on the AC
+        used by this wired-auth client.
+
+        Obsoletes trpzClientAuthorizationSuccessTrap,
+                  trpzClientAuthorizationSuccessTrap2,
+                  trpzClientAuthorizationSuccessTrap3,
+                  trpzClientAuthorizationSuccessTrap4."
+    ::= { trpzTrapsV2 86 }
+
+trpzClientDeviceTypeChangeTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientDeviceType,
+          trpzClientDeviceTypeOld,
+          trpzClientDeviceGroup,
+          trpzClientDeviceProfileName,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the detected device type
+        of a client changes.
+        The new device type is indicated by trpzClientDeviceType.
+
+        trpzClientDeviceGroup indicates the group that
+        the new device type belongs to.
+
+        As of release 8.0, device detection is done only for
+        wireless clients (trpzClientAccessMode = 'ap')."
+    ::= { trpzTrapsV2 87 }
+
+trpzClientDeviceProfileChangeTrap NOTIFICATION-TYPE
+    OBJECTS     {
+          trpzUserName,
+          trpzClientSessionId,
+          trpzClientMACAddress,
+          trpzClientIPv4Addr,
+          trpzClientIPv6LinkLocalAddr,
+          trpzClientDeviceType,
+          trpzClientDeviceGroup,
+          trpzClientDeviceProfileName,
+          trpzClientDeviceProfileNameOld,
+          trpzClientDeviceProfileChangeReason,
+          trpzClientVLANName,
+          trpzClientSessionState,
+          trpzClientAuthServerAddrType,
+          trpzClientAuthServerAddr,
+          trpzClientAuthenProtocolType,
+          trpzClientAccessMode,
+          trpzPhysPortNum,
+          trpzApNum,
+          trpzApRadioIndex,
+          trpzRadioSSID,
+          trpzUserAccessType,
+          trpzLocalId
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the device profile for
+        a client device changes.
+        The new device profile is indicated by trpzClientDeviceProfileName.
+
+        trpzClientDeviceProfileChangeReason indicates the reason
+        why the device profile changed.
+
+        As of release 8.0, device detection is done only for
+        wireless clients (trpzClientAccessMode = 'ap')."
+    ::= { trpzTrapsV2 88 }
+
+
+END
