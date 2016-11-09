@@ -40,6 +40,25 @@ if ($_POST['editing']) {
         } else {
             $update_message = "Device record update error.";
         }
+
+        if ($_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
+            if ($_SESSION['userlevel'] === 10) {
+                $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
+                if ($result == "") {
+                    print_message("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    echo '
+                        <script>
+                            var loc = window.location;
+                            window.location.replace(loc.protocol + "//" + loc.host + loc.pathname + loc.search);
+                        </script>
+                    ';
+                } else {
+                    print_error($result . ".  Does your web server have permission to modify the rrd files?");
+                }
+            } else {
+                print_error('Only administrative users may update the device hostname');
+            }
+        }
     } else {
         include 'includes/error-no-perm.inc.php';
     }
@@ -79,6 +98,12 @@ if ($updated && $update_message) {
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <input type=hidden name="editing" value="yes">
     <div class="form-group">
+        <label for="descr" class="col-sm-2 control-label">Hostname:</label>
+        <div class="col-sm-6">
+            <input type="text" id="hostname" name="hostname" class="form-control" value=<?php echo(display($device['hostname'])); ?> />
+        </div>
+    </div>
+     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
             <textarea id="descr" name="descr" class="form-control"><?php echo(display($device['purpose'])); ?></textarea>
