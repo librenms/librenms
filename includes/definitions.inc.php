@@ -2850,4 +2850,3 @@ if (!isset($config['plugin_dir'])) {
 if (!isset($config['title_image'])) {
     $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.png';
 }
-
