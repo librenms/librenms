@@ -47,7 +47,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa') {
             }
 
             foreach ($temp as $index => $entry) {
-                $descr = ucwords(trim(preg_replace('/\s*\([^)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
+                $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
                 if ($index == 'netInterface') {
                     $index = 4;
                 } elseif ($index == 'primaryUnit') {
