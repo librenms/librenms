@@ -16,6 +16,15 @@
 cd "$(dirname "$0")"
 arg="$1"
 
+# check if the script is run by user librenms
+MYUID=`id -u librenms`
+
+# Make sure only librenms user can run our script
+if [[ $EUID -ne "$MYUID" ]]; then
+   echo "Please run this script as librenms user." 1>&2
+   exit 1
+fi
+
 # Fancy-Print and run commands
 # @arg    Text
 # @arg    Command
