@@ -143,7 +143,7 @@ function discover_device($device, $options = null)
             $attribs['discover_' . $module] ||
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
             ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
-            $module_start = microtime(true)
+            $module_start = microtime(true);
             echo "#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
