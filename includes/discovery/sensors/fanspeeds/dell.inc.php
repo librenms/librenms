@@ -1,29 +1,29 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
-if ($device['os'] == 'linux') {
-    $oids = snmp_walk($device, 'coolingDevicechassisIndex.1', '-OsqnU', 'MIB-Dell-10892');
-    d_echo($oids."\n");
+if (strstr($device['hardware'], 'Dell')) {
+    $temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', array(), 'MIB-Dell-10892');
+    $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 
-    $oids = trim($oids);
-    if ($oids) {
-        echo 'Dell ';
-    }
+    if (is_array($temp)) {
+        foreach ($temp as $index => $entry) {
+            $descr = $temp[$index]['coolingDeviceLocationName'];
+            $value = $temp[$index]['coolingDeviceReading'];
+            $lowlimit = $temp[$index]['coolingDeviceLowerCriticalThreshold'];
+            $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
+            $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'];
+            $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'];
 
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$kind) = explode(' ', $data);
-            $split_oid       = explode('.', $oid);
-            $index           = $split_oid[(count($split_oid) - 1)];
-            $fan_oid         = ".1.3.6.1.4.1.674.10892.1.700.12.1.6.1.$index";
-            $descr_oid       = "coolingDeviceLocationName.1.$index";
-            $limit_oid       = "coolingDeviceLowerCriticalThreshold.1.$index";
-            $descr           = trim(snmp_get($device, $descr_oid, '-Oqv', 'MIB-Dell-10892'), '"');
-            $descr           = preg_replace('/(Board | MOD )/', '', $descr);
-            $current         = snmp_get($device, $fan_oid, '-Oqv', 'MIB-Dell-10892');
-            $low_limit       = snmp_get($device, $limit_oid, '-Oqv', 'MIB-Dell-10892');
-            $divisor         = '1';
-            discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $index, 'dell', $descr, $divisor, '1', $low_limit, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
         }
     }
 }
