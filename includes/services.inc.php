@@ -159,7 +159,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = array();
         foreach ($perf as $k => $v) {
-            if ($v['uom'] == 'c') {
+            if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
                 $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
             } else {
