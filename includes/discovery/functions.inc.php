@@ -135,7 +135,14 @@ function discover_device($device, $options = null)
         }
     }
     foreach ($config['discovery_modules'] as $module => $module_status) {
-        if ($force_module === true || $attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
+        $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
+        echo "Device: ". $attribs['discover_' . $module]. "\n";
+        echo "OS    : ".$os_module_status. "\n";
+        echo "Global: ".$module_status. "\n";
+        if ($force_module === true || 
+            $attribs['discover_' . $module] ||
+            ($os_module_status && !isset($attribs['discover_' . $module])) ||
+            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
             $module_start = microtime(true);
             echo "#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
@@ -145,6 +152,8 @@ function discover_device($device, $options = null)
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
+        } elseif (isset($os_module_status) && $os_module_status == '0') {
+            echo "Module [ $module ] disabled on os.\n\n";
         } else {
             echo "Module [ $module ] disabled globally.\n\n";
         }
