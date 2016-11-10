@@ -1426,6 +1426,7 @@ $config['os'][$os]['over'][2]['text']  = 'Memory';
 
 $os = 'zywall';
 $config['os'][$os]['text']             = 'ZyXEL ZyWALL';
+$config['os'][$os]['group']            = 'zyxel';
 $config['os'][$os]['type']             = 'firewall';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
@@ -1443,24 +1444,28 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'prestige';
-$config['os'][$os]['text'] = 'ZyXEL Prestige';
-$config['os'][$os]['type'] = 'network';
-$config['os'][$os]['icon'] = 'zyxel';
+$config['os'][$os]['text']             = 'ZyXEL Prestige';
+$config['os'][$os]['group']            = 'zyxel';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'zyxel';
 
 $os = 'zynos';
-$config['os'][$os]['text'] = 'ZyXEL Ethernet Switch';
-$config['os'][$os]['type'] = 'network';
-$config['os'][$os]['icon'] = 'zyxel';
+$config['os'][$os]['text']             = 'ZyXEL Ethernet Switch';
+$config['os'][$os]['group']            = 'zyxel';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'zyxel';
 
 $os = 'zyxelnwa';
-$config['os'][$os]['text'] = 'ZyXEL NWA';
-$config['os'][$os]['type'] = 'network';
-$config['os'][$os]['icon'] = 'zyxel';
+$config['os'][$os]['text']             = 'ZyXEL NWA';
+$config['os'][$os]['group']            = 'zyxel';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'zyxel';
 
 $os = 'ies';
-$config['os'][$os]['text'] = 'ZyXEL DSLAM';
-$config['os'][$os]['type'] = 'network';
-$config['os'][$os]['icon'] = 'zyxel';
+$config['os'][$os]['text']             = 'ZyXEL DSLAM';
+$config['os'][$os]['group']            = 'zyxel';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'zyxel';
 
 $os = 'allied';
 $config['os'][$os]['text']             = 'AlliedWare';
