@@ -42,7 +42,7 @@ if ($_POST['editing']) {
         }
 
         if ($_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if ($_SESSION['userlevel'] === 10) {
+            if (is_admin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
                     print_message("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
