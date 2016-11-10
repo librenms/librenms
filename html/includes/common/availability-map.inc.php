@@ -294,7 +294,7 @@ if (defined('SHOW_SETTINGS')) {
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost(ip_to_sysname($device, $device['hostname'])) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
                         </a>';
                     }
