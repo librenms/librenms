@@ -289,13 +289,14 @@ if (defined('SHOW_SETTINGS')) {
                             </div>
                         </a>';
                     } else {
+                        $serviceText = $service['service_type'] . ' - ' . $serviceState;
                         if ($widget_settings['color_only_select'] == 1) {
-                            $serviceState = ' ';
+                            $serviceText = ' ';
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost(ip_to_sysname($device, $device['hostname'])) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                            <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $service['service_type'] . ' - ' . $serviceState . '</span>
+                            <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }
                 } else {
