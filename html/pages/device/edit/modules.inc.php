@@ -22,7 +22,6 @@
 $poller_modules = $config['poller_modules'];
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
-    $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
     echo('
       <tr>
         <td><strong>'.$module.'</strong></td>
@@ -39,12 +38,16 @@ foreach ($poller_modules as $module => $module_status) {
         </td>
         <td>');
 
-    if ($os_module_status == 1) {
+    if (isset($config['os'][$device['os']]['poller_modules'][$module])) {
+      if ($config['os'][$device['os']]['poller_modules'][$module]) {
         echo('<span class="text-success">Enabled</span>');
-    } elseif (!isset($os_module_status)) {
-        echo('<span>Unset</span>');
-    } else {
+        $module_status = 1;
+      } else {
         echo('<span class="text-danger">Disabled</span>');
+        $module_status = 0;
+      }
+    } else {
+      echo('<span>Unset</span>');
     }
 
     echo('
@@ -61,11 +64,10 @@ foreach ($poller_modules as $module => $module_status) {
             $module_checked = '';
         }
     } else {
+        echo('<span id="poller-module-'.$module.'">Unset</span>');
         if ($module_status == 1) {
-            echo('<span id="poller-module-'.$module.'"class="text-success">Enabled</span>');
             $module_checked = 'checked';
         } else {
-            echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
             $module_checked = '';
         }
     }
@@ -102,7 +104,6 @@ foreach ($poller_modules as $module => $module_status) {
 $discovery_modules = $config['discovery_modules'];
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
-    $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
     echo('
       <tr>
         <td>
@@ -121,12 +122,16 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>');
 
-    if ($os_module_status == 1) {
-        echo('<span class="text-success">Enabled</span>');
-    } elseif (!isset($os_module_status)) {
-        echo('<span>Unset</span>');
+    if (isset($config['os'][$device['os']]['discovery_modules'][$module])) {
+        if ($config['os'][$device['os']]['discovery_modules'][$module]) {
+            echo('<span class="text-success">Enabled</span>');
+            $module_status = 1;
+        } else {
+            echo('<span class="text-danger">Disabled</span>');
+            $module_status = 0;
+        }
     } else {
-        echo('<span class="text-danger">Disabled</span>');
+      echo('<span>Unset</span>');
     }
 
     echo('
@@ -142,11 +147,10 @@ foreach ($discovery_modules as $module => $module_status) {
             $module_checked = '';
         }
     } else {
+        echo('<span id="discovery-module-'.$module.'">Unset</span>');
         if ($module_status == 1) {
-            echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
             $module_checked = 'checked';
         } else {
-            echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
             $module_checked = '';
         }
     }
