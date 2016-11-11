@@ -65,7 +65,6 @@ if ($_POST['editing']) {
 }
 
 $descr  = $device['purpose'];
-
 $override_sysLocation = $device['override_sysLocation'];
 $override_sysLocation_string = $device['location'];
 
@@ -97,10 +96,13 @@ if ($updated && $update_message) {
 <br>
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <input type=hidden name="editing" value="yes">
-    <div class="form-group">
-        <label for="descr" class="col-sm-2 control-label">Hostname:</label>
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
+        <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
         <div class="col-sm-6">
-            <input type="text" id="hostname" name="hostname" class="form-control" value=<?php echo(display($device['hostname'])); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo(display($device['hostname'])); ?> />
+        </div>
+        <div class="col-sm-2">
+            <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
         </div>
     </div>
      <div class="form-group">
@@ -189,6 +191,15 @@ if ($updated && $update_message) {
                 toastr.error('An error occured setting this device to be rediscovered');
             }
         });
+    });
+    $('#hostname-edit-button').click(function(e) {
+        e.preventDefault();
+        disabled_state = document.getElementById('edit-hostname-input').disabled;
+        if (disabled_state == true) {
+            document.getElementById('edit-hostname-input').disabled = false;
+        } else {
+            document.getElementById('edit-hostname-input').disabled = true;
+        }
     });
 </script>
 <?php
