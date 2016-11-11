@@ -488,7 +488,6 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
     function dashboard_add(data) {
         datas = $(data).serializeArray();
-        console.log(datas);
         data = [];
         for( var field in datas ) {
             data[datas[field].name] = datas[field].value;
