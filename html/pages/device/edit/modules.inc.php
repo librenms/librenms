@@ -39,15 +39,15 @@ foreach ($poller_modules as $module => $module_status) {
         <td>');
 
     if (isset($config['os'][$device['os']]['poller_modules'][$module])) {
-      if ($config['os'][$device['os']]['poller_modules'][$module]) {
-        echo('<span class="text-success">Enabled</span>');
-        $module_status = 1;
-      } else {
-        echo('<span class="text-danger">Disabled</span>');
-        $module_status = 0;
-      }
+        if ($config['os'][$device['os']]['poller_modules'][$module]) {
+            echo('<span class="text-success">Enabled</span>');
+            $module_status = 1;
+        } else {
+            echo('<span class="text-danger">Disabled</span>');
+            $module_status = 0;
+        }
     } else {
-      echo('<span>Unset</span>');
+        echo('<span>Unset</span>');
     }
 
     echo('
@@ -131,7 +131,7 @@ foreach ($discovery_modules as $module => $module_status) {
             $module_status = 0;
         }
     } else {
-      echo('<span>Unset</span>');
+        echo('<span>Unset</span>');
     }
 
     echo('
