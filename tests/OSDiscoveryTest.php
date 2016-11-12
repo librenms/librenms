@@ -1004,7 +1004,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testPbncpe()
     {
-        $this->checkOS('pbn-cp100');
+        $this->checkOS('pbn-cp');
     }
 
     public function testPcoweb()
