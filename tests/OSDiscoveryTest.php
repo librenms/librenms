@@ -63,6 +63,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
+            'os' => 'generic',
+            'os_group' => '',
         );
     }
 

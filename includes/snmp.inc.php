@@ -37,6 +37,25 @@ function prep_snmp_setting($device, $setting)
     }
 }//end prep_snmp_setting()
 
+/**
+ * @param $device
+ * @return array $extra will contain a list of mib dirs
+ */
+function get_mib_dir($device)
+{
+    global $config;
+    $extra = array();
+
+    if (file_exists($config['mib_dir'] . '/' . $device['os'])) {
+        $extra[] = $config['mib_dir'] . '/' . $device['os'];
+    }
+
+    if (file_exists($config['mib_dir'] . '/' . $device['os_group'])) {
+        $extra[] = $config['mib_dir'] . '/' . $device['os_group'];
+    }
+    
+    return $extra;
+}
 
 /**
  * Generate the mib search directory argument for snmpcmd
@@ -44,15 +63,21 @@ function prep_snmp_setting($device, $setting)
  * If $mibdir is empty '', return an empty string
  *
  * @param string $mibdir should be the name of the directory within $config['mib_dir']
+ * @param string $device
  * @return string The option string starting with -M
  */
-function mibdir($mibdir = null)
+function mibdir($mibdir = null, $device = array())
 {
     global $config;
     // FIXME: prepend + to allow system mibs?
 
+    $extra_dir = implode(':', get_mib_dir($device));
+    if (!empty($extra_dir)) {
+        $extra_dir .= ':';
+    }
+
     if (is_null($mibdir)) {
-        return " -M ${config['mib_dir']}";
+        return " -M $extra_dir${config['mib_dir']}";
     }
 
     if (empty($mibdir)) {
@@ -61,10 +86,10 @@ function mibdir($mibdir = null)
 
     if (str_contains($mibdir, '/')) {
         // pass through mib dir (for legace compatability
-        return " -M $mibdir";
+        return " -M $extra_dir$mibdir";
     } else {
         // automatically set up includes
-        return " -M ${config['mib_dir']}/$mibdir:${config['mib_dir']}";
+        return " -M $extra_dir${config['mib_dir']}/$mibdir:${config['mib_dir']}";
     }
 }//end mibdir()
 
@@ -136,7 +161,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     $cmd .= snmp_gen_auth($device);
     $cmd .= " $options";
     $cmd .= $mib ? " -m $mib" : '';
-    $cmd .= mibdir($mibdir);
+    $cmd .= mibdir($mibdir, $device);
     $cmd .= isset($timeout) ? " -t $timeout" : '';
     $cmd .= isset($retries) ? " -r $retries" : '';
     $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'];
@@ -629,13 +654,13 @@ function snmp_gen_auth(&$device)
  *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1)
  *           ruckusZDSystemStats(15) 30 }
  */
-function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
+function snmp_mib_parse($oid, $mib, $module, $mibdir = null, $device = array())
 {
     $fulloid  = explode('.', $oid);
     $lastpart = end($fulloid);
 
     $cmd  = 'snmptranslate -Td -On';
-    $cmd .= mibdir($mibdir);
+    $cmd .= mibdir($mibdir, $device);
     $cmd .= ' -m '.$module.' '.$module.'::';
     $cmd .= $lastpart;
 
@@ -712,17 +737,17 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
  */
 
 
-function snmp_mib_walk($mib, $module, $mibdir = null)
+function snmp_mib_walk($mib, $module, $mibdir = null, $device = array())
 {
     $cmd    = 'snmptranslate -Ts';
-    $cmd   .= mibdir($mibdir);
+    $cmd   .= mibdir($mibdir, $device);
     $cmd   .= ' -m '.$module;
     $result = array();
     $data   = preg_split('/\n+/', shell_exec($cmd));
     foreach ($data as $oid) {
         // only include oids which are part of this mib
         if (strstr($oid, $mib)) {
-            $obj = snmp_mib_parse($oid, $mib, $module, $mibdir);
+            $obj = snmp_mib_parse($oid, $mib, $module, $mibdir, $device);
             if ($obj) {
                 $result[] = $obj;
             }
@@ -783,10 +808,10 @@ function update_db_table($tablename, $columns, $numkeys, $rows)
  * Load the given MIB into the database.
  * @return count of objects loaded
  */
-function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
+function snmp_mib_load($mib, $module, $included_by, $mibdir = null, $device = array())
 {
     $mibs = array();
-    foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
+    foreach (snmp_mib_walk($mib, $module, $mibdir, $device) as $obj) {
         $mibs[$obj['object_type']] = $obj;
         $mibs[$obj['object_type']]['included_by'] = $included_by;
     }
@@ -805,13 +830,13 @@ function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
  * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
  * NET-SNMP-TC::linux
  */
-function snmp_translate($oid, $module, $mibdir = null)
+function snmp_translate($oid, $module, $mibdir = null, $device = array())
 {
     if ($module !== 'all') {
         $oid = "$module::$oid";
     }
 
-    $cmd  = 'snmptranslate'.mibdir($mibdir);
+    $cmd  = 'snmptranslate'.mibdir($mibdir, $device);
     $cmd .= " -IR -m $module $oid";
     // load all the MIBs looking for our object
     $cmd .= ' 2>/dev/null';
@@ -1055,12 +1080,12 @@ function register_mibs($device, $mibs, $included_by)
     d_echo("MIB: registering\n");
 
     foreach ($mibs as $name => $module) {
-        $translated = snmp_translate($name, $module);
+        $translated = snmp_translate($name, $module, null, $device);
         if ($translated) {
             $mod = $translated[0];
             $nam = $translated[1];
             d_echo("     $mod::$nam\n");
-            if (snmp_mib_load($nam, $mod, $included_by) > 0) {
+            if (snmp_mib_load($nam, $mod, $included_by, null, $device) > 0) {
                 // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
                 $columns = array('device_id', 'module', 'mib', 'included_by');
                 $rows = array();

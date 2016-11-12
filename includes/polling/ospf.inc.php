@@ -75,7 +75,7 @@ $ospf_nbr_oids_db  = array(
 $ospf_nbr_oids_rrd = array();
 $ospf_nbr_oids     = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
 
-if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
+if (key_exists('vrf_lite_cisco', $device) && ($device['vrf_lite_cisco'] != '')) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
     $vrfs_lite_cisco = array(array('context_name' => null));
