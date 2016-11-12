@@ -88,6 +88,21 @@ $config['discovery_modules']['services']                  = 1;
 $config['discovery_modules']['charge']                    = 1;
 ```
 
+#### OS based Discovery config
+
+You can enable or disable modules for a specific OS by add corresponding line in includes/definitions.inc.php
+OS based settings have preference over global. Device based settings have preference over all others
+
+Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
+
+E.g. to deactivate spanning tree but activate unix-agent module for unix OS
+
+```php
+$os_group = 'unix';
+$config['os'][$os]['discovery_modules']['stp']        = 0;
+$config['os'][$os]['discovery_modules']['unix-agent'] = 1;
+```
+
 #### Discovery modules
 
 `os`: Os detection. This module will pick up the OS of the device.

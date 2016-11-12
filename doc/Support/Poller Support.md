@@ -76,6 +76,21 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 $config['poller_modules']['mib']                          = 0;
 ```
 
+#### OS based Poller config
+
+You can enable or disable modules for a specific OS by add corresponding line in includes/definitions.inc.php
+OS based settings have preference over global. Device based settings have preference over all others
+
+Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
+
+E.g. to deactivate spanning tree but activate unix-agent module for unix OS
+
+```php
+$os_group = 'unix';
+$config['os'][$os]['poller_modules']['stp']        = 0;
+$config['os'][$os]['poller_modules']['unix-agent'] = 1;
+```
+
 #### Poller modules
 
 `unix-agent`: Enable the check_mk agent for external support for applications.
