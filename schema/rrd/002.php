@@ -1,7 +1,7 @@
 <?php
 
 // rename old style hr Processor RRD files
-$renamer = new \LibreNMS\RrdRenamer(
+$rrd_operation = new \LibreNMS\RRD\RenameOp(
     'hrProcessor rename',
     'hrProcessor-[0-9]*',
     function ($file) {

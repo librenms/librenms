@@ -1,7 +1,7 @@
 <?php
 
 // new ports all start with port-id old were port-9999
-$renamer = new \LibreNMS\RrdRenamer(
+$rrd_operation = new \LibreNMS\RrdRenamer(
     'ifIndex labeled ports',
     'port-[0-9]*', // not regex, glob()
     function ($file, $device) {

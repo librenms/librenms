@@ -52,8 +52,8 @@ try {
 
         if (intval($file_rev) > intval($rrd_rev)) {
             require "$dir/$file";  // include the operation file, should define $renamer
-            echo "Rename operation $file_rev: " . $renamer->getDesc() . PHP_EOL;
-            $renamer->run();
+            echo "Rename operation $file_rev: " . $rrd_operation->getDesc() . PHP_EOL;
+            $rrd_operation->run();
             $new_rrd_rev = $file_rev;
         }
     }

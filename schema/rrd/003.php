@@ -1,7 +1,7 @@
 <?php
 
 // rename old Cisco cpmCPU files
-$renamer = new \LibreNMS\RrdRenamer(
+$rrd_operation = new \LibreNMS\RRD\RenameOp(
     'Cisco cpmCPU rename',
     'cpmCPU-[0-9]*',
     function ($file) {
