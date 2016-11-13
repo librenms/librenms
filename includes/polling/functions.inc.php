@@ -247,7 +247,14 @@ function poll_device($device, $options)
             }
         }
         foreach ($config['poller_modules'] as $module => $module_status) {
-            if ($force_module === true || $attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
+            $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
+            d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+            d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+            d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
+            if ($force_module === true ||
+                $attribs['poll_'.$module] ||
+                ($os_module_status && !isset($attribs['poll_'.$module])) ||
+                ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
                 $module_start = 0;
                 $module_time  = 0;
                 $module_start = microtime(true);
@@ -274,9 +281,11 @@ function poll_device($device, $options)
                     unlink($oldrrd);
                 }
             } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
-                echo "Module [ $module ] disabled on host.\n";
+                echo "Module [ $module ] disabled on host.\n\n";
+            } elseif (isset($os_module_status) && $os_module_status == '0') {
+                echo "Module [ $module ] disabled on os.\n\n";
             } else {
-                echo "Module [ $module ] disabled globally.\n";
+                echo "Module [ $module ] disabled globally.\n\n";
             }
         }
 
