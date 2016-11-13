@@ -95,11 +95,11 @@ OS based settings have preference over global. Device based settings have prefer
 
 Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
 
-E.g. to deactivate spanning tree but activate discovery-arp module for unix OS
+E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
 
 ```php
-$config['os']['unix']['discovery_modules']['stp'] = 0;
-$config['os']['unix']['discovery_modules']['discovery-arp'] = 1;
+$config['os']['linux']['discovery_modules']['stp'] = 0;
+$config['os']['linux']['discovery_modules']['discovery-arp'] = 1;
 ```
 
 #### Discovery modules
