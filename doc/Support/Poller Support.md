@@ -86,9 +86,8 @@ Poller performance improvement can be achieved by deactivating all modules that 
 E.g. to deactivate spanning tree but activate unix-agent module for unix OS
 
 ```php
-$os_group = 'unix';
-$config['os'][$os]['poller_modules']['stp']        = 0;
-$config['os'][$os]['poller_modules']['unix-agent'] = 1;
+$config['os']['unix']['poller_modules']['stp']  = 0;
+$config['os']['unix']['poller_modules']['unix-agent'] = 1;
 ```
 
 #### Poller modules
