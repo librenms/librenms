@@ -248,9 +248,9 @@ function poll_device($device, $options)
         }
         foreach ($config['poller_modules'] as $module => $module_status) {
             $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
-            d_echo("Modules status: G" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-            d_echo("O" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-            d_echo("D" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
+            d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+            d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+            d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
                 $attribs['poll_'.$module] ||
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
