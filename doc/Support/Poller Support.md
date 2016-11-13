@@ -83,11 +83,11 @@ OS based settings have preference over global. Device based settings have prefer
 
 Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
 
-E.g. to deactivate spanning tree but activate unix-agent module for unix OS
+E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
 ```php
-$config['os']['unix']['poller_modules']['stp']  = 0;
-$config['os']['unix']['poller_modules']['unix-agent'] = 1;
+$config['os']['linux']['poller_modules']['stp']  = 0;
+$config['os']['linux']['poller_modules']['unix-agent'] = 1;
 ```
 
 #### Poller modules
