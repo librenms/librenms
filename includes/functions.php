@@ -212,8 +212,12 @@ function renamehost($id, $new, $source = 'console')
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
         log_event("Hostname changed -> $new ($source)", $id, 'system');
     } else {
-        echo "Renaming of $host failed\n";
         log_event("Renaming of $host failed", $id, 'system');
+        if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
+            echo "Renaming of $host failed\n";
+        } else {
+            return "Renaming of $host failed\n";
+        }
     }
 }
 
