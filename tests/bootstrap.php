@@ -42,12 +42,15 @@ $classLoader->register();
 
 require $install_dir . '/includes/common.php';
 require $install_dir . '/html/includes/functions.inc.php';
+require $install_dir . '/includes/definitions.inc.php';
+require $install_dir . '/includes/rrdtool.inc.php';
+require $install_dir . '/includes/syslog.php';
+require $install_dir . '/includes/dbFacile.php';
+require $install_dir . '/includes/functions.php';
+
 if (getenv('SNMPSIM')) {
-    require $install_dir . '/includes/functions.php';
-    require $install_dir . '/includes/definitions.inc.php';
+    require $install_dir . '/includes/snmp.inc.php';
 } else {
-    require $install_dir . '/includes/rrdtool.inc.php';
-    require $install_dir . '/includes/syslog.php';
     require $install_dir . '/tests/mocks/mock.snmp.inc.php';
 }
 

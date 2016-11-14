@@ -13,7 +13,7 @@
  */
 
 // load graph types from the database
-foreach (dbFetchRows('SELECT * FROM graph_types') as $graph) {
+foreach (dbFetchRows('select * from graph_types') as $graph) {
     foreach ($graph as $k => $v) {
         if (strpos($k, 'graph_') == 0) {
             // remove leading 'graph_' from column name
