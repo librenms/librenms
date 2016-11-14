@@ -22,6 +22,7 @@ source: Support/FAQ.md
  - [Why does a device show as a warning?](#faq22)
  - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
  - [How do I move my LibreNMS install to another server?](#faq24)
+ - [Why is my EdgeRouter device not detected?](#faq25)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -218,6 +219,13 @@ If you are just moving to another server with the same CPU architecture then the
     - Copy the `rrd/` folder to the new server.
     - Copy the `config.php` file to the new server.
     - Renable cron by uncommenting all lines in `/etc/cron.d/librenms`
+
+#### <a name="faq25"> Why is my EdgeRouter device not detected?</a>
+
+If you have `service snmp description` set in your config then this will be why, please remove this. For some reason Ubnt have decided setting this 
+ value should override the sysDescr value returned which breaks our detection.
+ 
+If you don't have that set then this may be then due to an update of EdgeOS or a new device type, please [create an issue](https://github.com/librenms/librenms/issues/new).
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
