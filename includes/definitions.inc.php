@@ -1893,9 +1893,12 @@ $config['os'][$os]['ifname']           = 1;
 
 // Multimatic UPS (Generex CS121 SNMP Adapter)
 $os = 'multimatic';
-$config['os'][$os]['text'] = 'Multimatic UPS';
-$config['os'][$os]['type'] = 'power';
-$config['os'][$os]['icon'] = 'multimatic';
+$config['os'][$os]['text']                        = 'Multimatic UPS';
+$config['os'][$os]['type']                        = 'power';
+$config['os'][$os]['icon']                        = 'multimatic';
+$config['os'][$os]['poller_modules']['ospf']      = 0;
+$config['os'][$os]['poller_modules']['ntp']       = 0;
+$config['os'][$os]['poller_modules']['services']  = 0;
 
 // Huawei UPS
 $os = 'huaweiups';
