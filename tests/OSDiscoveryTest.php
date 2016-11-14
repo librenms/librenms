@@ -1049,6 +1049,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('poweralert');
     }
 
+    public function testPowerconnect()
+    {
+        $this->checkOS('powerconnect');
+    }
+
     public function testPowervault()
     {
         $this->checkOS('powervault');
