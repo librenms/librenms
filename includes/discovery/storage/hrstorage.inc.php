@@ -75,7 +75,7 @@ if (is_array($hrstorage_array)) {
         }
 
         if (!$deny && is_numeric($index)) {
-            //discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $index, $fstype, 'hrstorage', $descr, $size, $units, $used);
         }
 
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
