@@ -1161,6 +1161,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('saf');
     }
 
+    public function testCeragon()
+    {
+        $this->checkOS('ceragon');
+    }
+
     public function testSamsungprinter()
     {
         $this->checkOS('samsungprinter', 'samsungprinter-clx');

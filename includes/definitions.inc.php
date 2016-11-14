@@ -810,6 +810,18 @@ $config['os'][$os]['over'][1]['text']  = 'Rx Level';
 $config['os'][$os]['over'][2]['graph'] = 'device_ping_perf';
 $config['os'][$os]['over'][2]['text']  = 'Ping Times';
 
+// Ceragon
+$os = 'ceragon';
+$config['os'][$os]['text']             = 'Ceragon';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ceragon';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_ceragon_RxLevel';
+$config['os'][$os]['over'][1]['text']  = 'Rx Level';
+$config['os'][$os]['over'][2]['graph'] = 'device_ping_perf';
+$config['os'][$os]['over'][2]['text']  = 'Ping Times';
+
 // Sub10
 $os = 'sub10';
 $config['os'][$os]['text']             = 'Sub10 Systems';
@@ -2383,6 +2395,36 @@ $config['graph_types']['device']['saf_modemRadialMSE']['descr'] = 'Radial MSE';
 $config['graph_types']['device']['saf_modemCapacity']['section'] = 'wireless';
 $config['graph_types']['device']['saf_modemCapacity']['order'] = '3';
 $config['graph_types']['device']['saf_modemCapacity']['descr'] = 'Capacity';
+
+// Ceragon support
+$config['graph_types']['device']['ceragon_RxLevel']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_RxLevel']['order'] = '0';
+$config['graph_types']['device']['ceragon_RxLevel']['descr'] = 'RX Level';
+
+$config['graph_types']['device']['ceragon_TxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_TxPower']['order'] = '1';
+$config['graph_types']['device']['ceragon_TxPower']['descr'] = 'TX Power';
+
+$config['graph_types']['device']['ceragon_MSE']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_MSE']['order'] = '2';
+$config['graph_types']['device']['ceragon_MSE']['descr'] = 'Radial MSE';
+
+$config['graph_types']['device']['ceragon_XPI']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_XPI']['order'] = '3';
+$config['graph_types']['device']['ceragon_XPI']['descr'] = 'Cross Polarisation Interference';
+
+$config['graph_types']['device']['ceragon_DefectedBlocks']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_DefectedBlocks']['order'] = '4';
+$config['graph_types']['device']['ceragon_DefectedBlocks']['descr'] = 'DefectedBlocks';
+
+$config['graph_types']['device']['ceragon_TxBitrate']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_TxBitrate']['order'] = '5';
+$config['graph_types']['device']['ceragon_TxBitrate']['descr'] = 'TxBitrate';
+
+$config['graph_types']['device']['ceragon_RxBitrate']['section'] = 'wireless';
+$config['graph_types']['device']['ceragon_RxBitrate']['order'] = '6';
+$config['graph_types']['device']['ceragon_RxBitrate']['descr'] = 'RxBitrate';
+
 
 // Sub10 support
 $config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';
