@@ -107,7 +107,7 @@ if (is_array($oids)) {
             }
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
-            if ($current == '-127') {
+            if ($current == '-127' || ($device['os'] == 'asa' && str_contains($sysDescr, 'sc'))) {
                 $valid_sensor = false;
             }
 
