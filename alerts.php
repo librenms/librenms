@@ -454,7 +454,7 @@ function DescribeAlert($alert)
     $obj['location']     = $device['location'];
     $obj['uptime']       = $device['uptime'];
     $obj['uptime_short'] = formatUptime($device['uptime'], 'short');
-    $obj['uptime_long'] = formatUptime($device['uptime']);
+    $obj['uptime_long']  = formatUptime($device['uptime']);
     $obj['description']  = $device['purpose'];
     $obj['notes']        = $device['notes'];
     $obj['device_id']    = $alert['device_id'];
