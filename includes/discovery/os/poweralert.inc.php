@@ -1,5 +1,5 @@
 <?php
 
-if (starts_with($sysDescr, 'POWERALERT')) {
+if (starts_with($sysDescr, 'POWERALERT', true)) {
     $os = 'poweralert';
 }
