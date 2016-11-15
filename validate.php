@@ -170,9 +170,14 @@ if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
     print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
 
-$tz = ini_get('date.timezone');
-if (empty($tz)) {
-    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone');
+$ini_tz = ini_get('date.timezone');
+$sh_tz = rtrim(shell_exec('date +%Z'));
+$php_tz = date('T');
+
+if (empty($ini_tz)) {
+    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone.');
+} elseif ($sh_tz !== $php_tz) {
+    print_fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
 }
 
 // Test transports
