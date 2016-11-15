@@ -118,6 +118,9 @@ Placeholders:
 - Hostname of the Device: `%hostname`
 - sysName of the Device: `%sysName`
 - location of the Device: `%location`
+- uptime of the Device (in seconds): `%uptime`
+- short uptime of the Device (28d 22h 30m 7s): `%uptime_short`
+- long uptime of the Device (28 days, 22h 30m 7s): `%uptime_long`
 - description (purpose db field) of the Device: `%description`
 - notes of the Device: `%notes`
 - Title for the Alert: `%title`
