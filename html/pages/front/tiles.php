@@ -114,13 +114,13 @@ if (!empty($shared_dashboards)) {
 <div class="dash-collapse" id="add_dash">
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
-      <form class="form-inline" onsubmit="dashboard_add(this); return false;">
+      <form class="form-inline" onsubmit="dashboard_add(this); return false;" name="add_form" id="add_form">
         <div class="col-sm-3 col-sx-6">
           <div class="input-group">
             <span class="input-group-btn">
               <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
             </span>
-            <input class="form-control" type="text" placeholder="Name" name="dashboard_name" style="min-width:160px;">
+            <input class="form-control" type="text" placeholder="Name" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
             <span class="input-group-btn">
               <button class="btn btn-primary" type="submit">Add</button>
             </span>
@@ -227,27 +227,47 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
     function updatePos(gridster) {
         var s = JSON.stringify(gridster.serialize());
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "update-dashboard-config", data: s, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
+        <?php
+        if ($vars['dashboard']['dashboard_id'] > 0) {
+            echo "var dashboard_id = " . $vars['dashboard']['dashboard_id'] . ";";
+        } else {
+            echo "var dashboard_id = 0;";
+        }
+        ?>
+        if (dashboard_id > 0) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: {
+                    type: "update-dashboard-config",
+                    data: s,
+                    dashboard_id: dashboard_id
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == 'ok') {
+                    }
+                    else {
+                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                    }
+                },
+                error: function () {
+                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
                 }
-                else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
-            }
-        });
+            });
+        }
     }
 
     var gridster_state = 0;
 
     $(function(){
+        <?php
+        if ($vars['dashboard']['dashboard_id'] > 0) {
+            echo "var dashboard_id = " . $vars['dashboard']['dashboard_id'] . ";";
+        } else {
+            echo "var dashboard_id = 0;";
+        }
+        ?>
         $('[data-toggle="tooltip"]').tooltip();
         dashboard_collapse();
         gridster = $(".gridster ul").gridster({
@@ -305,46 +325,59 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
         $(document).on('click','#clear_widgets', function() {
             var widget_id = $(this).data('widget-id');
-            $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'remove-all', dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 'ok') {
-                        gridster.remove_all_widgets();
+            if (dashboard_id > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'ajax_form.php',
+                    data: {
+                        type: "update-dashboard-config",
+                        sub_type: 'remove-all',
+                        dashboard_id: dashboard_id
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            gridster.remove_all_widgets();
+                        }
+                        else {
+                            $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        }
+                    },
+                    error: function () {
+                        $("#message").html('<div class="alert alert-info">An error occurred.</div>');
                     }
-                    else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    }
-                },
-                error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
-                }
-            });
+                });
+            }
         });
 
         $('.place_widget').on('click',  function(event, state) {
             var widget_id = $(this).data('widget_id');
             event.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'add', widget_id: widget_id, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 'ok') {
-                        widget_dom(data.extra);
-                        updatePos(gridster);
+            if (dashboard_id > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'ajax_form.php',
+                    data: {
+                        type: "update-dashboard-config",
+                        sub_type: 'add',
+                        widget_id: widget_id,
+                        dashboard_id: dashboard_id
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            widget_dom(data.extra);
+                            updatePos(gridster);
+                        }
+                        else {
+                            $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        }
+                    },
+                    error: function () {
+                        $("#message").html('<div class="alert alert-info">An error occurred.</div>');
                     }
-                    else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    }
-                },
-                error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
-                }
-            });
+                });
+            }
         });
 
         $(document).on( "click", ".close-widget", function() {
@@ -352,7 +385,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
+                data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id, dashboard_id: dashboard_id},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -417,26 +450,40 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     }
 
     function dashboard_edit(data) {
+        <?php
+        if ($vars['dashboard']['dashboard_id'] > 0) {
+            echo "var dashboard_id = " . $vars['dashboard']['dashboard_id'] . ";";
+        } else {
+            echo "var dashboard_id = 0;";
+        }
+        ?>
         datas = $(data).serializeArray();
         data = [];
         for( var field in datas ) {
             data[datas[field].name] = datas[field].value;
         }
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: 'edit-dashboard', dashboard_name: data['dashboard_name'], dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>, access: data['access']},
-            dataType: "json",
-            success: function (data) {
-                if( data.status == "ok" ) {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
+        if (dashboard_id > 0) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: {
+                    type: 'edit-dashboard',
+                    dashboard_name: data['dashboard_name'],
+                    dashboard_id: dashboard_id,
+                    access: data['access']
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == "ok") {
+                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        window.location.href = "<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard=" + dashboard_id;
+                    }
+                    else {
+                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                    }
                 }
-                else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            }
-        });
+            });
+        }
     }
 
     function dashboard_add(data) {
@@ -555,4 +602,12 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         new_refresh);
     }
     $('#new-widget').popover();
+
+    <?php
+    if (empty($vars['dashboard']['dashboard_id'])) {
+        echo "\$('#dashboard_name').val('Default');\n";
+        echo "dashboard_add(\$('#add_form'));\n";
+    }
+    ?>
+
 </script>
