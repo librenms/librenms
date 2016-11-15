@@ -27,10 +27,7 @@ if (isset($_GET['debug'])) {
     ini_set('error_reporting', 0);
 }
 
-$init_modules = array('web');
-if ($config['allow_unauth_graphs'] != true) {
-    $init_modules[] = 'auth';
-}
+$init_modules = array('web', 'graphs');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 rrdtool_initialize(false);

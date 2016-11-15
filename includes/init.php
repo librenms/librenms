@@ -53,7 +53,7 @@ require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
 
 
 // function only files
-require $install_dir . '/includes/common.php';
+require_once $install_dir . '/includes/common.php';
 require $install_dir . '/includes/dbFacile.php';
 require $install_dir . '/includes/rrdtool.inc.php';
 require $install_dir . '/includes/influxdb.inc.php';
@@ -141,7 +141,13 @@ if (module_selected('web', $init_modules)) {
 
 $console_color = new Console_Color2();
 
-if (module_selected('auth', $init_modules)) {
+if (module_selected('auth', $init_modules) ||
+    (
+        module_selected('graphs', $init_modules) &&
+        isset($config['allow_unauth_graphs']) &&
+        $config['allow_unauth_graphs'] != true
+    )
+) {
     require $install_dir . '/html/includes/authenticate.inc.php';
 }
 

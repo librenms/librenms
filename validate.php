@@ -15,7 +15,6 @@
 
 chdir(__DIR__); // cwd to the directory containing this script
 
-require_once 'includes/defaults.inc.php';
 require_once 'includes/common.php';
 
 $options = getopt('m:h::');
@@ -38,7 +37,6 @@ if (isset($options['h'])) {
     exit;
 }
 
-$console_color = new Console_Color2();
 
 // critical config.php checks
 if (!file_exists('config.php')) {
@@ -68,19 +66,14 @@ if ($config_failed) {
     exit;
 }
 
-// load config.php now
-require_once 'config.php';
+$init_modules = array();
+require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists($config['install_dir'].'/config.php')) {
     print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
     exit;
 }
-
-// continue loading includes
-require_once 'includes/definitions.inc.php';
-require_once 'includes/functions.php';
-require_once 'includes/alerts.inc.php';
 
 $versions = version_info();
 $cur_sha = $versions['local_sha'];
