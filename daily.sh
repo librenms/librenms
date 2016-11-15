@@ -20,11 +20,11 @@
 # CONSTANTS
 #######################################
 # define DIR_LIBRENMS as the directory this script is called from
-DIR_LIBRENMS=$(dirname "$0");
+DIR_LIBRENMS=$(dirname "$(readlink -f "$0")")
 
 # set log_file, using librenms $config['log_dir'], if set
 # otherwise we default to <LibreNMS Install Directory>/logs
-LOG_DIR=$(php -r "include '${DIR_LIBRENMS}/config.php'; isset(\$config['log_dir']) ? print \$config['log_dir'] : print \$config['install_dir'] . '/logs';");
+LOG_DIR=$(php -r "include '${DIR_LIBRENMS}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${DIR_LIBRENMS}/logs';")
 
 
 #######################################
