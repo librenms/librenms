@@ -527,7 +527,6 @@ $config['os'][$os]['poller_modules']['cisco-ace-loadbalancer'] = 0;
 $config['os'][$os]['poller_modules']['cisco-cbqos']            = 0;
 $config['os'][$os]['poller_modules']['cisco-cef']              = 0;
 $config['os'][$os]['poller_modules']['cisco-mac-accounting']   = 0;
-$config['os'][$os]['poller_modules']['cisco-ntp']              = 0;
 $config['os'][$os]['poller_modules']['cisco-voice']            = 0;
 $config['os'][$os]['poller_modules']['hr-mib']                 = 0;
 $config['os'][$os]['poller_modules']['ipmi']                   = 0;
