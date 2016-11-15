@@ -234,7 +234,6 @@ if ($format == "graph") {
                 $link_array['device'] = $device['device_id'];
                 unset($link_array['height'], $link_array['width']);
                 $overlib_link = generate_url($link_array);
-                //$overlib_link = "device/device=" . $device['device_id'] . "/";
 
                 echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
                 echo '<div class="panel panel-default">';
