@@ -33,5 +33,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
-    $common_output[] = stripslashes(nl2br(htmlentities($widget_settings['notes'])));
+    $replace_html = '/\<[\/]*(script|head|html).*\>/';
+    $common_output[] = stripslashes(nl2br(preg_replace($replace_html, '', $widget_settings['notes'])));
 }
