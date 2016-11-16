@@ -70,11 +70,12 @@ require $install_dir . '/includes/functions.php';
 if (module_selected('web', $init_modules)) {
     chdir($install_dir . '/html');
     require $install_dir . '/html/includes/functions.inc.php';
-    require $install_dir . '/includes/rewrites.php';  // FIXME both definitions and functions
+    require_once $install_dir . '/includes/rewrites.php';  // FIXME both definitions and functions
 }
 
 if (module_selected('discovery', $init_modules)) {
     require $install_dir . '/includes/discovery/functions.inc.php';
+    require_once $install_dir . '/includes/rewrites.php';
 }
 
 if (module_selected('polling', $init_modules)) {
