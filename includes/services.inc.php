@@ -159,7 +159,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = array();
         foreach ($perf as $k => $v) {
-            if ($v['uom'] == 'c') {
+            if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
                 $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
             } else {
@@ -246,6 +246,48 @@ function check_service($command)
         }
 
         if ($ds != "") {
+            // Normalize ds for rrd : ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
+            // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+            $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
+            // if ds_name is longer than 19 characters, only use the first 19
+            if (strlen($normalized_ds) > 19) {
+                $normalized_ds = substr($normalized_ds, 0, 19);
+                d_echo($ds . " exceeded 19 characters, renaming to " . $normalized_ds . "\n");
+            }
+            if ($ds != $normalized_ds) {
+                // ds has changed. check if normalized_ds is already in the array
+                if (isset($metrics[$normalized_ds])) {
+                    d_echo($normalized_ds . " collides with an existing index\n");
+                    $perf_unique = 0;
+                    // Try to generate a unique name
+                    for ($i = 0; $i<10; $i++) {
+                        $tmp_ds_name = substr($normalized_ds, 0, 18) . $i;
+                        if (!isset($metrics[$tmp_ds_name])) {
+                            d_echo($normalized_ds . " collides with an existing index\n");
+                            $normalized_ds = $tmp_ds_name;
+                            $perf_unique = 1;
+                            break 1;
+                        }
+                    }
+                    if ($perf_unique == 0) {
+                        // Try harder to generate a unique name
+                        for ($i = 0; $i<10; $i++) {
+                            for ($j = 0; $j<10; $j++) {
+                                $tmp_ds_name = substr($normalized_ds, 0, 17) . $j . $i;
+                                if (!isset($perf[$tmp_ds_name])) {
+                                    $normalized_ds = $tmp_ds_name;
+                                    $perf_unique = 1;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+                    if ($perf_unique == 0) {
+                        d_echo("could not generate a unique ds-name for " . $ds . "\n");
+                    }
+                }
+                $ds = $normalized_ds ;
+            }
             // We have a DS. Add an entry to the array.
             d_echo("Perf Data - DS: ".$ds.", Value: ".$value.", UOM: ".$uom."\n");
             $metrics[$ds] = array ('value'=>$value, 'uom'=>$uom);
