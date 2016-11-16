@@ -26,7 +26,7 @@ header('Content-type: application/json');
 $status    = 'error';
 $message   = 'unknown error';
 if (isset($_REQUEST['dashboard_id']) && isset($_REQUEST['dashboard_name']) && isset($_REQUEST['access'])) {
-    if (dbUpdate(array('dashboard_name'=>$_REQUEST['dashboard_name'],'access'=>$_REQUEST['access']), 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', array($_SESSION['user_id'],$_REQUEST['dashboard_id']))) {
+    if (dbUpdate(array('dashboard_name'=>$_REQUEST['dashboard_name'],'access'=>$_REQUEST['access']), 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', array($_SESSION['user_id'],$_REQUEST['dashboard_id'])) >= 0) {
         $status  = 'ok';
         $message = 'Updated dashboard';
     } else {

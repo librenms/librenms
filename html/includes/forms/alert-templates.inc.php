@@ -43,7 +43,7 @@ if (!empty($name)) {
         if (substr($_REQUEST['rule_id'], -1, 1) != ",") {
             $_REQUEST['rule_id'] .= ",";
         }
-        if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
+        if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
             $ok = "Updated template and rule id mapping";
         } else {
             $error ="Failed to update the template and rule id mapping";
@@ -51,7 +51,7 @@ if (!empty($name)) {
     } elseif ($_REQUEST['template'] && is_numeric($_REQUEST['template_id'])) {
         //Update template-text
 
-        if ($ret = dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
+        if (dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
             $ok = "Updated template";
         } else {
             $error = "Failed to update the template";
