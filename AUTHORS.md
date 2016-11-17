@@ -154,6 +154,7 @@ LibreNMS contributors:
 - Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
 - Andres Rahn <andreser@gmail.com> (Andreser)
 - Christoph Zilian <czilian@hotmail.com> (czilian)
+- Guillem Mateos <bbguillem@gmail.com> (guillemmateos) 
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
