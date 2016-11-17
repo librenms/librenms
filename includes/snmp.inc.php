@@ -50,8 +50,24 @@ function get_mib_dir($device)
         $extra[] = $config['mib_dir'] . '/' . $device['os'];
     }
 
-    if (file_exists($config['mib_dir'] . '/' . $device['os_group'])) {
+    if (isset($device['os_group']) && file_exists($config['mib_dir'] . '/' . $device['os_group'])) {
         $extra[] = $config['mib_dir'] . '/' . $device['os_group'];
+    }
+
+    if (isset($config['os_groups'][$device['os_group']]['mib_dir'])) {
+        if (is_array($config['os_groups'][$device['os_group']]['mib_dir'])) {
+            foreach ($config['os_groups'][$device['os_group']]['mib_dir'] as $k => $dir) {
+                $extra[] = $config['mib_dir'] . '/' . $dir;
+            }
+        }
+    }
+
+    if (isset($config['os'][$device['os']]['mib_dir'])) {
+        if (is_array($config['os'][$device['os']]['mib_dir'])) {
+            foreach ($config['os'][$device['os']]['mib_dir'] as $k => $dir) {
+                $extra[] = $config['mib_dir'] . '/' . $dir;
+            }
+        }
     }
     
     return $extra;
