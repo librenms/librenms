@@ -750,7 +750,6 @@ $config['discovery_modules']['libvirt-vminfo'] = 1;
 $config['discovery_modules']['toner']          = 1;
 $config['discovery_modules']['ucd-diskio']     = 1;
 $config['discovery_modules']['services']       = 1;
-$config['discovery_modules']['charge']         = 1;
 $config['discovery_modules']['cisco-cbqos']    = 0;
 $config['discovery_modules']['stp']            = 1;
 $config['discovery_modules']['cisco-otv']      = 1;
