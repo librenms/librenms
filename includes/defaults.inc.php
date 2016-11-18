@@ -59,6 +59,7 @@ $config['fping_options']['count']   = 3;
 $config['fping_options']['millisec'] = 200;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
+$config['snmpgetnext']               = '/usr/bin/snmpgetnext';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
 $config['whois']          = '/usr/bin/whois';
 $config['ping']           = '/bin/ping';
