@@ -540,8 +540,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testFireware()
     {
-        $this->checkOS('fireware', 'fireware-xtm');
-        $this->checkOS('fireware', 'fireware-fbx');
+        $this->checkOS('fireware', 'fireware-m400');
+        $this->checkOS('fireware', 'fireware-xtm26w');
     }
 
     public function testFlareos()
@@ -1376,12 +1376,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testWaas()
     {
         $this->checkOS('waas');
-    }
-
-    public function testWatchguard()
-    {
-        $this->checkOS('firebox');
-        $this->checkOS('firebox', 'firebox1');
     }
 
     public function testWebpower()
