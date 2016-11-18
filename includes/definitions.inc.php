@@ -154,6 +154,7 @@ $config['os'][$os]['text']             = 'Ubiquiti UniFi';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -166,6 +167,7 @@ $config['os'][$os]['text']             = 'Ubiquiti AirOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 
@@ -174,6 +176,7 @@ $config['os'][$os]['text']             = 'Ubiquiti AirFiber';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 
