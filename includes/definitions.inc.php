@@ -1812,16 +1812,6 @@ $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['text'] = 'Symbol AP';
 $config['os'][$os]['icon'] = 'symbol';
 
-$os = 'firebox';
-$config['os'][$os]['text']             = 'Watchguard Firebox';
-$config['os'][$os]['type']             = 'firewall';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-$config['os'][$os]['icon']             = 'watchguard';
-$config['os'][$os]['group']            = 'watchguard';
-
 $os = 'fireware';
 $config['os'][$os]['text']             = 'Watchguard Fireware';
 $config['os'][$os]['type']             = 'firewall';
