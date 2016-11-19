@@ -996,7 +996,7 @@ echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#msteams_transport_expand"><i class="fa fa-caret-down"></i> Microsoft Teams transport</a> <button name="te
+                    <a data-toggle="collapse" data-parent="#accordion" href="#msteams_transport_expand"><i class="fa fa-caret-down"></i> Microsoft Teams transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="msteams" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="msteams_transport_expand" class="panel-collapse collapse">
