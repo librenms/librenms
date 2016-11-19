@@ -57,7 +57,7 @@ switch ($type) {
         if ($config['alert']['transports']['mail'] === true) {
             $contacts = GetContacts($rules);
             if (count($contacts) > 0) {
-                $output .= 'Found ' . count(contacts) . ' contacts to send alerts to.' . PHP_EOL;
+                $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
             }
             foreach ($contacts as $email => $name) {
                 $output .= $name . '<' . $email . '>' . PHP_EOL;
