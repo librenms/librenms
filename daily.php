@@ -14,7 +14,7 @@ require_once 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require_once 'includes/alerts.inc.php';
 
-$options = getopt('f:d');
+$options = getopt('f:d:o:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
@@ -160,9 +160,18 @@ if ($options['f'] === 'refresh_alert_rules') {
     foreach ($rules as $rule) {
         $data['query'] = GenSQL($rule['rule']);
         if (!empty($data['query'])) {
-            $debug=1;
             dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
             unset($data);
         }
+    }
+}
+
+if ($options['f'] === 'notify') {
+    if (isset($config['alert']['default_mail'])) {
+        send_mail(
+            $config['alert']['default_mail'],
+            '[LibreNMS] Auto update has failed',
+            "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
+        );
     }
 }
