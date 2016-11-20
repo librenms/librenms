@@ -65,8 +65,8 @@ if ($config['warn']['ifdown']) {
                 generate_device_link($interface, shorthost($interface['hostname'])) . "<br />
         <span class=\"interface-updown\">Port Down</span><br />
 <!--      <img src='graph.php?type=bits&amp;if=" . $interface['port_id'] . '&amp;from=' . $config['time']['day'] . '&amp;to=' . $config['time']['now'] . "&amp;width=100&amp;height=32' /> -->
-        " . generate_port_link($interface, truncate(makeshortif($interface['label']), 13, '')) . ' <br />
-        ' . ($interface['ifAlias'] ? '<span class="body-date-1">' . truncate($interface['ifAlias'], 20, '') . '</span>' : '')
+        " . generate_port_link($interface, substr(makeshortif($interface['label']), 0, 13)) . ' <br />
+        ' . ($interface['ifAlias'] ? '<span class="body-date-1">' . substr($interface['ifAlias'], 0, 20) . '</span>' : '')
             );
             ++$count_boxes;
         }
@@ -109,7 +109,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
             generate_device_link($peer, shorthost($peer['hostname'])) . "<br />
     <span class=bgp-down>BGP Down</span>
     <span class='" . (strstr($peer['bgpPeerIdentifier'], ':') ? 'front-page-bgp-small' : 'front-page-bgp-normal') . "'>" . $peer['bgpPeerIdentifier'] . '</span><br />
-    <span class=body-date-1>AS' . truncate($peer['bgpPeerRemoteAs'] . ' ' . $peer['astext'], 14, '') . '</span>'
+    <span class=body-date-1>AS' . substr($peer['bgpPeerRemoteAs'] . ' ' . $peer['astext'], 0, 14) . '</span>'
         );
         ++$count_boxes;
     }

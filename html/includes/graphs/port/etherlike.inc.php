@@ -23,7 +23,7 @@ $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'do
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($oids as $oid) {
         $oid        = str_replace('dot3Stats', '', $oid);
-        $oid_ds = truncate($oid, 19, '');
+        $oid_ds = substr($oid, 0, 19);
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $oid;
         $rrd_list[$i]['ds']       = $oid_ds;

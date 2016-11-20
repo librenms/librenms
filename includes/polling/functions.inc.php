@@ -392,7 +392,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         $oiddsopts = $param[4];
 
         if (strlen($oiddsname) > 19) {
-            $oiddsname = truncate($oiddsname, 19, '');
+            $oiddsname = substr($oiddsname, 0, 19);
         }
 
         if (empty($oiddsopts)) {
