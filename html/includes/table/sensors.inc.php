@@ -93,7 +93,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $graph_array['from'] = $config['time']['day'];
     $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
-    $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+    $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $response[] = array(
         'hostname'       => generate_device_link($sensor),
