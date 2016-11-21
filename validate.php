@@ -243,12 +243,18 @@ if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` IS
     print_fail('The poller has never run, check the cron job');
 } elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
     print_fail("The poller has not run in the last 5 minutes, check the cron job");
-} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+} elseif (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
     print_warn("Some devices have not been polled in the last 5 minutes, check your poll log");
+    foreach ($devices as $device) {
+        echo "\t $device\n";
+    }
 }
 
-if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1') > 0) {
+if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
     print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.\n        Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
+    foreach ($devices as $device) {
+        echo "\t $device\n";
+    }
 }
 
 if ($versions['local_branch'] != 'master') {
