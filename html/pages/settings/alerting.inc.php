@@ -184,6 +184,12 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin() === true) {
+    set_config_name('alert.transports.pagerduty', '');
+    set_config_name('alert.pagerduty.account', '');
+    set_config_name('alert.pagerduty.service', '');
+}
+
 $config_groups = get_config_by_group('alerting');
 
 if (isset($config['base_url'])) {
@@ -359,7 +365,11 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
 } else {
     echo "<i class='fa fa-check-square-o fa-col-danger fa-3x'></i>";
 }
-
+                    echo '</div>
+                        <div class="col-sm-offset-8 col-sm-1">';
+if (empty($config_groups['alert.transports.pagerduty']['config_value']) === false) {
+    echo '<a href = "settings/sub=alerting/?del_pagerduty=true" class="btn btn-xs btn-danger pull-right" > Delete</a >';
+}
                     echo '</div>
                     </div>
                 </div>
@@ -1021,7 +1031,7 @@ echo '
 <script>
 
     <?php
-    if (isset($_GET['service_key'])) {
+    if (isset($_GET['service_key']) || isset($vars['del_pagerduty'])) {
         echo "$('#pagerduty_transport_expand').collapse('show');";
     }
     ?>
