@@ -11,6 +11,6 @@
  * the source code distribution for details.
  */
 
-if (str_contains($sysDescr, 'AMN-') || str_contains($sysDescr, 'AEN-') || str_contains($sysDescr, 'AMO-')) {
+if (str_contains($sysDescr, array('AMN-','AEN-','AMO-'))) {
     $os = 'aen';
 }
