@@ -60,7 +60,8 @@ if ($_POST['hostname']) {
         $port_assoc_mode = $_POST['port_assoc_mode'];
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
-            print_message("Device added ($device_id)");
+            $link = generate_device_url(array('device_id' => $device_id));
+            print_message("Device added <a href='$link'>$hostname ($device_id)</a>");
         } catch (HostUnreachableException $e) {
             print_error($e->getMessage());
             foreach ($e->getReasons() as $reason) {
