@@ -12,10 +12,6 @@
  * the source code distribution for details.
  */
 
-if (isset($config['influxdb']['enable']) && $config['influxdb']['enable'] === true) {
-    include $config['install_dir'].'/lib/influxdb-php/vendor/autoload.php';
-}//end if
-
 function influxdb_connect()
 {
     global $config;

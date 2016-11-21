@@ -22,19 +22,6 @@
 //
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
-// set install_dir
-$config['install_dir'] = realpath(__DIR__ . '/..');
-
-// initialize the class loader and add custom mappings
-require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/lib/console_colour.php');
-$classLoader->registerClass('Console_Table', $config['install_dir'] . '/lib/console_table.php');
-$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/lib/phpmailer/class.phpmailer.php");
-$classLoader->registerClass('SMTP', $config['install_dir'] . "/lib/phpmailer/class.smtp.php");
-$classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
-$classLoader->register();
-
 // Default directories
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
