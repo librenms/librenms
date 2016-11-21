@@ -25,10 +25,10 @@ LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 
 # set log_file, using librenms $config['log_dir'], if set
 # otherwise we default to <LibreNMS Install Directory>/logs
-LOG_DIR=$(php -r "include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
+LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
-LIBRENMS_USER=$(php -r "include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
+LIBRENMS_USER=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
