@@ -19,13 +19,23 @@
 #######################################
 # CONSTANTS
 #######################################
-# define DIR_LIBRENMS as the directory this script is called from
-DIR_LIBRENMS=$(dirname "$(readlink -f "$0")")
+# define DAILY_SCRIPT as the full path to this script and LIBRENMS_DIR as the directory this script is in
+DAILY_SCRIPT=$(readlink -f "$0")
+LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 
 # set log_file, using librenms $config['log_dir'], if set
 # otherwise we default to <LibreNMS Install Directory>/logs
-LOG_DIR=$(php -r "include '${DIR_LIBRENMS}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${DIR_LIBRENMS}/logs';")
+LOG_DIR=$(php -r "include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
+# get the librenms user
+LIBRENMS_USER=$(php -r "include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
+LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
+
+# if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
+if [ "$EUID" -ne "$LIBRENMS_USER_ID" -a "$LIBRENMS_USER" != "root" ]; then
+    su -l $LIBRENMS_USER -c "$DAILY_SCRIPT $@"
+    exit;
+fi
 
 #######################################
 # Fancy-Print and run commands
@@ -70,7 +80,7 @@ status_run() {
 #######################################
 # Call daily.php
 # Globals:
-#   DIR_LIBRENMS
+#   LIBRENMS_DIR
 # Arguments:
 #   args:
 #        Array of arguments to pass to
@@ -82,14 +92,14 @@ call_daily_php() {
     local args=( "$@" );
 
     for arg in "${args[@]}"; do
-        php "${DIR_LIBRENMS}/daily.php" -f "${arg}";
+        php "${LIBRENMS_DIR}/daily.php" -f "${arg}";
     done
 }
 
 #######################################
 # Entry into program
 # Globals:
-#   DIR_LIBRENMS
+#   LIBRENMS_DIR
 # Arguments:
 #   
 # Returns:
@@ -97,12 +107,12 @@ call_daily_php() {
 #######################################
 main () {
     local arg="$1";
-    cd ${DIR_LIBRENMS};
+    cd ${LIBRENMS_DIR};
 
     if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
-            $0 no-code-update
+            $DAILY_SCRIPT no-code-update
             exit
         elif [[ "$up" == "1" ]]; then
             # Update to Master-Branch
@@ -131,7 +141,7 @@ main () {
 
         if [[ -z "$cnf" ]] || [[ "$cnf" == "0" ]] || [[ "$cnf" == "false" ]]; then
             # Call ourself again in case above pull changed or added something to daily.sh
-            $0 post-pull
+            $DAILY_SCRIPT post-pull
         fi
     else
         case $arg in
@@ -139,14 +149,14 @@ main () {
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Cleaning up DB' "$0 cleanup"
+                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Updating submodules' "$0 submodules"
-                status_run 'Cleaning up DB' "$0 cleanup"
-                status_run 'Fetching notifications' "$0 notifications"
+                status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
+                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
             ;;
             cleanup)
                 # Cleanups
