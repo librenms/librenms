@@ -12,12 +12,6 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/functions.php';
-require_once '../includes/device-groups.inc.php';
-if (file_exists('../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-       include '../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-}
-
 function authToken(\Slim\Route $route)
 {
     $app   = \Slim\Slim::getInstance();

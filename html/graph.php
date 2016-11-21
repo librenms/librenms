@@ -13,8 +13,6 @@
 
 $start = microtime(true);
 
-require_once 'Net/IPv4.php';
-
 if (isset($_GET['debug'])) {
     $debug = true;
     ini_set('display_errors', 1);
@@ -29,22 +27,12 @@ if (isset($_GET['debug'])) {
     ini_set('error_reporting', 0);
 }
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/common.php';
-require_once '../includes/definitions.inc.php';
-
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/rrdtool.inc.php';
-if ($config['allow_unauth_graphs'] != true) {
-    require_once 'includes/authenticate.inc.php';
-}
+$init_modules = array('web', 'graphs');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 rrdtool_initialize(false);
 
-require 'includes/graphs/graph.inc.php';
+require $config['install_dir'] . '/html/includes/graphs/graph.inc.php';
 
 rrdtool_close();
 

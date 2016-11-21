@@ -20,12 +20,8 @@ if ($_GET[debug]) {
     ini_set('error_reporting', E_ALL);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require 'includes/functions.inc.php';
-require '../includes/functions.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!$_SESSION['authenticated']) {
     echo 'unauthenticated';
