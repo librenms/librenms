@@ -11,6 +11,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysDescr, array('XTM', 'FBX'), true)) {
+if (starts_with($sysObjectId, array('.1.3.6.1.4.1.3097.1.4', '.1.3.6.1.4.1.3097.1.5'))) {
     $os = 'fireware';
 }
