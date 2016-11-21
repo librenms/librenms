@@ -1,0 +1,47 @@
+---
+engines:
+  markdownlint:
+    enabled: true
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
+engines:
+  phpcodesniffer:
+    enabled: true
+    config:
+        standard: "PSR2"
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+      - python
+      - php
+  shellcheck:
+    enabled: true
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.coffee"
+  - "**.inc"
+  - "**.js"
+  - "**.jsx"
+  - "**.module"
+  - "**.php"
+  - "**.py"
+  - "**.rb"
+exclude_paths:
+- tests/
+- lib/
+- html/js/
+- html/css/
+- html/lib/
