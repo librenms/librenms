@@ -11,13 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
+$init_modules = array('discovery');
+require __DIR__ . '/includes/init.php';
 
 $start         = microtime(true);
 $runtime_stats = array();

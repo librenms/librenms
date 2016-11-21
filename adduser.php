@@ -12,19 +12,11 @@
  *
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-
-if (file_exists('html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    include 'html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-} else {
-    echo "ERROR: no valid auth_mechanism defined.\n";
-    exit();
+$init_modules = array();
+if (php_sapi_name() != 'cli') {
+    $init_modules[] = 'auth';
 }
+require __DIR__ . '/includes/init.php';
 
 if (auth_usermanagement()) {
     if (isset($argv[1]) && isset($argv[2]) && isset($argv[3])) {

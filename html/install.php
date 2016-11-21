@@ -6,87 +6,71 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_SESSION = $_POST;
 }
 
-$stage = $_POST['stage'];
+$stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists('../config.php') && $stage != "6") {
+if (file_exists('../config.php') && $stage != 6) {
     header("Location: /");
     exit;
 }
 
-// List of php modules we expect to see
-// $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
-if (PHP_VERSION_ID < 70000) {
-    $modules = array('gd','mysql','snmp','mcrypt');
-} else {
-    $modules = array('gd','mysqli','snmp','mcrypt');
+// do not use the DB in init, we'll bring it up ourselves
+$init_modules = array('web', 'nodb');
+if ($stage > 3) {
+    $init_modules[] = 'auth';
 }
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+// List of php modules we expect to see
+$modules = array('gd','mysqli','snmp','mcrypt');
+
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
 $dbname = @$_POST['dbname'] ?: 'librenms';
+$config['db_host']=$dbhost;
+$config['db_user']=$dbuser;
+$config['db_pass']=$dbpass;
+$config['db_name']=$dbname;
+
 $add_user = @$_POST['add_user'] ?: '';
 $add_pass = @$_POST['add_pass'] ?: '';
 $add_email = @$_POST['add_email'] ?: '';
 
-if ($stage == "4" || $stage == "3") {
-    // Ok now let's set the db connection up
-    $config['db_host']=$dbhost;
-    $config['db_user']=$dbuser;
-    $config['db_pass']=$dbpass;
-    $config['db_name']=$dbname;
-}
-
-require '../includes/defaults.inc.php';
-
-// Work out the install directory
-$cur_dir = explode('/', __DIR__);
-$check = end($cur_dir);
-if (empty($check)) {
-    $install_dir = array_pop($cur_dir);
-}
-unset($check);
-$install_dir = array_pop($cur_dir);
-$install_dir = implode('/', $cur_dir);
-$config['install_dir'] = $install_dir;
-$config['log_dir'] = $install_dir.'/logs';
-if ($_POST['stage'] == "3" || $_POST['stage'] == "4") {
-    require_once '../includes/definitions.inc.php';
-}
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
-if ($stage == 2 || $stage == 3) {
+if ($stage > 1) {
     $database_link = mysqli_connect('p:'.$dbhost, $dbuser, $dbpass, $dbname);
     if (mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
-    } elseif ($stage != 3) {
+    } elseif ($stage == 2) {
         if ($_SESSION['build-ok'] == true) {
                     $stage = 3;
                     $msg = "It appears that the database is already setup so have moved onto stage $stage";
         }
     }
     $_SESSION['stage'] = $stage;
-} elseif ($stage == "4") {
+}
+
+if ($stage == 4) {
     // Now check we have a username, password and email before adding new user
     if (empty($add_user) || empty($add_pass) || empty($add_email)) {
         $stage = 3;
         $msg = "You haven't entered enough information to add the user account, please check below and re-try";
     }
-} elseif ($stage == "6") {
+} elseif ($stage == 6) {
     session_destroy();
     // If we get here then let's do some final checks.
     if (!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
-        $stage = "5";
+        $stage = 5;
     }
 }
 
 if (empty($stage)) {
-    $stage = '0';
+    $stage = 0;
 }
 
 $total_stages = 6;
@@ -478,7 +462,6 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-    require 'includes/authenticate.inc.php';
 if (auth_usermanagement()) {
     if (!user_exists($add_user)) {
         if (adduser($add_user, $add_pass, '10', $add_email)) {

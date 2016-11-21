@@ -18,13 +18,8 @@ ini_set('error_reporting', E_ALL);
 
 $links = 1;
 
-include_once '../includes/defaults.inc.php';
-include_once '../config.php';
-include_once '../includes/definitions.inc.php';
-include_once '../includes/functions.php';
-include_once '../includes/dbFacile.php';
-include_once 'includes/functions.inc.php';
-include_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (strpos($_SERVER['REQUEST_URI'], 'anon')) {
     $anon = 1;

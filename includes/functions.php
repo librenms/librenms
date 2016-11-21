@@ -18,24 +18,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 
-// Include from PEAR
-
-include_once("Net/IPv4.php");
-include_once("Net/IPv6.php");
-
-// Includes
-include_once($config['install_dir'] . "/includes/dbFacile.php");
-include_once($config['install_dir'] . "/includes/common.php");
-include_once($config['install_dir'] . "/includes/datastore.inc.php");
-include_once($config['install_dir'] . "/includes/billing.php");
-include_once($config['install_dir'] . "/includes/cisco-entities.php");
-include_once($config['install_dir'] . "/includes/syslog.php");
-include_once($config['install_dir'] . "/includes/rewrites.php");
-include_once($config['install_dir'] . "/includes/snmp.inc.php");
-include_once($config['install_dir'] . "/includes/services.inc.php");
-
-$console_color = new Console_Color2();
-
 function set_debug($debug)
 {
     if (isset($debug)) {
