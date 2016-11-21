@@ -1,7 +1,7 @@
 <?php
 
-$num_radios = explode(' ', $device[features])[0];
-
+$features = explode(' ', $device[features]);
+$num_radios = $features[0];
 
 $mib_oids = array();
 

@@ -264,7 +264,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     global $runtime_stats;
 
     if (strstr($oid, ' ')) {
-        echo report_this_text("snmp_get called for multiple OIDs: $oid");
+        d_echo(report_this_text("snmp_get called for multiple OIDs: $oid"));
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
@@ -287,7 +287,7 @@ function snmp_get_next($device, $oid, $options = null, $mib = null, $mibdir = nu
     global $runtime_stats;
 
     if (strstr($oid, ' ')) {
-        echo report_this_text("snmp_get_next called for multiple OIDs: $oid");
+        d_echo(report_this_text("snmp_get_next called for multiple OIDs: $oid"));
     }
 
     $cmd = gen_snmpgetnext_cmd($device, $oid, $options, $mib, $mibdir);

@@ -3,7 +3,8 @@ require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'ceragon-radio');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' COMMENT:"  Now        Min         Max\r" ';
-    $num_radios = explode(' ', $device[features])[0];
+    $features = explode(' ', $device[features]);
+    $num_radios = $features[0];
     $color = array("CC0000", "00CC00", "0000CC", "CCCCCC");
     for ($i=1; $i <= $num_radios; $i++) {
         $rrd_options .= ' DEF:radio'.$i.'MSE='.$rrdfilename.':radio'.$i.'MSE:AVERAGE ';
