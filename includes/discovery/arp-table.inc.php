@@ -21,7 +21,12 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $ipNetToPhysical_data = str_replace('"', '', trim($ipNetToPhysical_data));
     foreach (explode("\n", $ipNetToPhysical_data) as $data) {
         list($oid, $mac) = explode(' ', $data);
-        list($if, $ipv, $first, $second, $third, $fourth) = explode('.', $oid);
+        if ($arp_oid == 'ipNetToPhysicalPhysAddress') {
+            list($if, $ipv, $first, $second, $third, $fourth) = explode('.', $oid);
+        } else {
+            $ipv = 'ipv4';
+            list($if, $first, $second, $third, $fourth) = explode('.', $oid);
+        }
         $ip = $first.'.'.$second.'.'.$third.'.'.$fourth;
         if ($ip != '...' && $ipv === 'ipv4' && $mac != '0:0:0:0:0:0') {
             $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $if));
