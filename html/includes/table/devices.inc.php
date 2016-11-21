@@ -190,7 +190,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     if (extension_loaded('mbstring')) {
         $location = mb_substr($device['location'], 0, 32, 'utf8');
     } else {
-        $location = truncate($device['location'], 32, '');
+        $location = substr($device['location'], 0, 32);
     }
 
     if ($subformat == 'detail') {
