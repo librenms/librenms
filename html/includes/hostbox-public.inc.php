@@ -62,6 +62,6 @@ echo '</td>';
 echo '    <td>'.$device['hardware'].' '.$device['features'].'</td>';
 echo '    <td>'.formatUptime($device['uptime'], 'short').' <br />';
 
-echo '    '.truncate($device['location'], 32, '').'</td>';
+echo '    '.substr($device['location'], 0, 32).'</td>';
 
 echo ' </tr>';

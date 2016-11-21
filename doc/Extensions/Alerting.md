@@ -26,6 +26,7 @@ Table of Content:
     - [VictorOps](#transports-victorops)
     - [Canopsis](#transports-canopsis)
     - [osTicket](#transports-osticket)
+    - [Microsoft Teams](#transports-msteams)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -118,6 +119,9 @@ Placeholders:
 - Hostname of the Device: `%hostname`
 - sysName of the Device: `%sysName`
 - location of the Device: `%location`
+- uptime of the Device (in seconds): `%uptime`
+- short uptime of the Device (28d 22h 30m 7s): `%uptime_short`
+- long uptime of the Device (28 days, 22h 30m 7s): `%uptime_long`
 - description (purpose db field) of the Device: `%description`
 - notes of the Device: `%notes`
 - Title for the Alert: `%title`
@@ -538,6 +542,22 @@ $config['alert']['transports']['osticket']['url'] = 'http://osticket.example.com
 $config['alert']['transports']['osticket']['token'] = '123456789';
 ```
 ~~
+
+## <a name="transports-msteams">Microsoft Teams</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector API which are then posted to a specific channel. To configure the transport, go to:
+
+Global Settings -> Alerting Settings -> Microsoft Teams Transport.
+
+This can also be done manually in config.php :
+
+~
+```php
+$config['alert']['transports']['msteams']['url'] = 'https://outlook.office365.com/webhook/123456789';
+```
+~
 
 # <a name="entities">Entities
 
