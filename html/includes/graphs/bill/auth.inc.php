@@ -1,7 +1,6 @@
 <?php
 
 // Authorises bill viewing and sets $ports as reference to mysql query containing ports for this bill
-require '../includes/billing.php';
 
 if (is_numeric($_GET['id']) && ($auth || bill_permitted($_GET['id']))) {
     $bill = dbFetchRow('SELECT * FROM `bills` WHERE bill_id = ?', array($_GET['id']));

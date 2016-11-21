@@ -33,11 +33,8 @@ chdir(__DIR__); // cwd to the directory containing this script
 
 $ts = microtime(true);
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'includes/discovery/functions.inc.php';
+$init_modules = array('discovery');
+require __DIR__ . '/includes/init.php';
 
 if ($config['autodiscovery']['snmpscan'] === false) {
     echo 'SNMP-Scan disabled.'.PHP_EOL;

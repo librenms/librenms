@@ -254,24 +254,3 @@ function register_mibs()
 {
     // stub
 }
-
-function getHostOS($device)
-{
-    global $config;
-
-    $sysDescr = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
-
-    d_echo("| $sysDescr | $sysObjectId | \n");
-
-    $os = null;
-    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
-    foreach (glob($pattern) as $file) {
-        include $file;
-        if (isset($os)) {
-            return $os;
-        }
-    }
-
-    return "generic";
-}

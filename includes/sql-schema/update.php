@@ -15,12 +15,10 @@
  * See COPYING for more details.
  */
 
-if (!isset($debug)) {
+if (!isset($debug)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    include 'includes/defaults.inc.php';
-    include 'config.php';
-    include 'includes/definitions.inc.php';
-    include 'includes/functions.php';
+    $init_modules = array();
+    require realpath(__DIR__ . '/../..') . '/includes/init.php';
 
     $options = getopt('d');
     if (isset($options['d'])) {

@@ -11,14 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'includes/polling/functions.inc.php';
-require 'includes/alerts.inc.php';
+$init_modules = array('polling', 'alerts');
+require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
 echo $config['project_name_version']." Poller\n";

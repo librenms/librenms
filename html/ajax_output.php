@@ -12,19 +12,17 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
-require_once '../includes/alerts.inc.php';
+$init_modules = array('web', 'auth', 'alerts');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!$_SESSION['authenticated']) {
+    echo "Unauthenticated\n";
+    exit;
+}
 
 set_debug($_REQUEST['debug']);
 $id = mres($_REQUEST['id']);
 
 if (isset($id)) {
-    if (file_exists("includes/output/$id.inc.php")) {
-        include_once "includes/output/$id.inc.php";
-    }
+    require $config['install_dir'] . "/html/includes/output/$id.inc.php";
 }
