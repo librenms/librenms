@@ -1,12 +1,12 @@
 <?php
 
-$modules = array('web');
+$init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
 if (!$_SESSION['authenticated']) {
-    echo 'unauthenticated';
+    echo "Unauthenticated\n";
     exit;
 }
 
