@@ -1,4 +1,7 @@
 <?php
+$scale_min = -75;
+$scale_max = -55;
+
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'ceragon-radio');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
