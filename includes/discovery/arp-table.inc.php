@@ -36,7 +36,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $arp_data = snmpwalk_cache_multi_oid($device, 'ipNetToPhysicalPhysAddress', array(), 'IP-MIB');
     $arp_data = snmpwalk_cache_multi_oid($device, 'ipNetToMediaPhysAddress', $arp_data, 'IP-MIB');
 
-    $sql = "SELECT M.* from ipv4_mac AS M, ports AS I WHERE M.port_id=I.port_id AND I.device_id=? and M.context_name=?";
+    $sql = "SELECT M.* from ipv4_mac AS M, ports AS I WHERE M.port_id=I.port_id AND I.device_id=? AND M.context_name=?";
     $params = array($device['device_id'], $context);
     $existing_data = dbFetchRows($sql, $params);
 
@@ -65,7 +65,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
                     log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($mac), $device, 'interface', $port_id);
-                    dbUpdate(array('mac_address' => $mac, 'context_name' => $context), 'ipv4_mac', 'port_id=? AND ipv4_address=?', array($port_id, $ip));
+                    dbUpdate(array('mac_address' => $mac), 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', array($port_id, $ip, $context));
                 }
                 echo '.';
             } elseif (isset($interface['port_id'])) {
