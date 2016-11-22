@@ -1774,7 +1774,6 @@ function initStats()
             'fetchrows_sec' => 0.0,
         );
     }
-
 }
 
 /**
@@ -1784,13 +1783,15 @@ function printStats()
 {
     global $snmp_stats, $db_stats;
 
-    printf("SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
+    printf(
+        "SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
         $snmp_stats['snmpget'],
         $snmp_stats['snmpget_sec'],
         $snmp_stats['snmpwalk'],
         $snmp_stats['snmpwalk_sec']
     );
-    printf("MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+    printf(
+        "MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
         $db_stats['fetchcell'],
         $db_stats['fetchcell_sec'],
         $db_stats['fetchrow'],
