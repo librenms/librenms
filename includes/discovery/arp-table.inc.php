@@ -91,12 +91,12 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $entry_if  = $entry['port_id'];
         $entry_ip  = $entry['ipv4_address'];
         if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', array($entry_if, $entry_mac, $entry_ip, $device['context_']));
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', array($entry_if, $entry_mac, $entry_ip, $context));
             echo '-';
         }
     }
     echo PHP_EOL;
-    unset($existing_data, $arp_table, $insert_data, $sql, $params);
+    unset($existing_data, $arp_table, $insert_data, $sql, $params, $context);
     unset($device['context_name']);
 }
 unset($vrfs_lite_cisco);
