@@ -126,7 +126,6 @@ if (!module_selected('nodb', $init_modules)) {
 
 require $install_dir . '/includes/definitions.inc.php';
 
-
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     require $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
 } else {
