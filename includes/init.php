@@ -49,8 +49,9 @@ $classLoader->registerClass('SMTP', $config['install_dir'] . "/lib/phpmailer/cla
 $classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
 //    $classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
 $classLoader->register();
-require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
-
+if (version_compare(PHP_VERSION, '5.4', '>=')) {
+    require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
+}
 
 // function only files
 require_once $install_dir . '/includes/common.php';
