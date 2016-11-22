@@ -33,6 +33,7 @@ LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
 if [ "$EUID" -ne "$LIBRENMS_USER_ID" -a "$LIBRENMS_USER" != "root" ]; then
+    echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
     su -l $LIBRENMS_USER -c "$DAILY_SCRIPT $@"
     exit;
 fi
