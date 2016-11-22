@@ -1749,26 +1749,32 @@ function initStats()
 {
     global $snmp_stats, $db_stats;
 
-    $snmp_stats = array(
-        'snmpget' => 0,
-        'snmpget_sec' => 0.0,
-        'snmpwalk' => 0,
-        'snmpwalk_sec' => 0.0,
-    );
-    $db_stats = array(
-        'insert' => 0,
-        'insert_sec' => 0.0,
-        'update' => 0,
-        'update_sec' => 0.0,
-        'fetchcell' => 0,
-        'fetchcell_sec' => 0.0,
-        'fetchcol' => 0,
-        'fetchcol_sec' => 0.0,
-        'fetchrow' => 0,
-        'fetchrow_sec' => 0.0,
-        'fetchrows' => 0,
-        'fetchrows_sec' => 0.0,
-    );
+    if (!isset($snmp_stats)) {
+        $snmp_stats = array(
+            'snmpget' => 0,
+            'snmpget_sec' => 0.0,
+            'snmpwalk' => 0,
+            'snmpwalk_sec' => 0.0,
+        );
+    }
+
+    if (!isset($db_stats)) {
+        $db_stats = array(
+            'insert' => 0,
+            'insert_sec' => 0.0,
+            'update' => 0,
+            'update_sec' => 0.0,
+            'fetchcell' => 0,
+            'fetchcell_sec' => 0.0,
+            'fetchcol' => 0,
+            'fetchcol_sec' => 0.0,
+            'fetchrow' => 0,
+            'fetchrow_sec' => 0.0,
+            'fetchrows' => 0,
+            'fetchrows_sec' => 0.0,
+        );
+    }
+
 }
 
 /**
@@ -1812,6 +1818,8 @@ function printStats()
 function recordDbStatistic($stat, $start_time)
 {
     global $db_stats;
+    initStats();
+
     $runtime = microtime(true) - $start_time;
     $db_stats[$stat]++;
     $db_stats["${stat}_sec"] += $runtime;
@@ -1837,6 +1845,8 @@ function recordDbStatistic($stat, $start_time)
 function recordSnmpStatistic($stat, $start_time)
 {
     global $snmp_stats;
+    initStats();
+
     $runtime = microtime(true) - $start_time;
     $snmp_stats[$stat]++;
     $snmp_stats["${stat}_sec"] += $runtime;

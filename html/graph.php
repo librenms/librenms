@@ -30,7 +30,6 @@ if (isset($_GET['debug'])) {
 $init_modules = array('web', 'graphs');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-initStats();
 rrdtool_initialize(false);
 
 require $config['install_dir'] . '/html/includes/graphs/graph.inc.php';

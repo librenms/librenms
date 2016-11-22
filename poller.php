@@ -15,7 +15,6 @@ $init_modules = array('polling', 'alerts');
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
-initStats();
 echo $config['project_name_version']." Poller\n";
 $versions = version_info(false);
 echo "Version info:\n";

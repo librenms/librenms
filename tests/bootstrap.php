@@ -47,8 +47,6 @@ require $install_dir . '/includes/syslog.php';
 require $install_dir . '/includes/dbFacile.php';
 require $install_dir . '/includes/functions.php';
 
-initStats();
-
 if (getenv('SNMPSIM')) {
     require $install_dir . '/includes/snmp.inc.php';
 } else {

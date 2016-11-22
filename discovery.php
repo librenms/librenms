@@ -15,7 +15,6 @@ $init_modules = array('discovery');
 require __DIR__ . '/includes/init.php';
 
 $start         = microtime(true);
-initStats();
 $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 

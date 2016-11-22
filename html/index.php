@@ -69,7 +69,6 @@ $config['memcached']['ttl'] = $config['time']['now']+300;
 LibreNMS\Plugins::start();
 
 $runtime_start = microtime(true);
-initStats();
 
 ob_start();
 
