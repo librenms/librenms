@@ -57,7 +57,6 @@ if ($config['title_image']) {
               <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
                 <?php
-                echo 'BROKE HERE';
                     require_once '../includes/device-groups.inc.php';
                     $devices_groups = GetDeviceGroups();
                 if (count($devices_groups) > 0) {

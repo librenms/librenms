@@ -27,7 +27,7 @@ $select_modes = array(
 );
 
 if ($config['webui']['availability_map_compact'] == 1) {
-    $compact_tile = $widget_settings['tile_width'];
+    $compact_tile = $widget_settings['tile_size'];
 }
 
 $show_disabled_ignored = $widget_settings['show_disabled_and_ignored'];
@@ -64,10 +64,10 @@ if (defined('SHOW_SETTINGS')) {
         $common_output[] = '
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="tile_width" class="control-label availability-map-widget-header">Tile width</label>
+                <label for="tile_size" class="control-label availability-map-widget-header">Tile size</label>
             </div>      
             <div class="col-sm-6">
-                <input type="text" class="form-control" name="tile_width" value="'.$compact_tile.'">
+                <input type="text" class="form-control" name="tile_size" value="'.$compact_tile.'">
             </div>
         </div>';
     }
@@ -122,10 +122,10 @@ if (defined('SHOW_SETTINGS')) {
         $common_outputp[] = '
         <div class="form-group">
             <div class="col-sm-4">
-                <label for="tile_width" class="control-label availability-map-widget-header">Tile width</label>
+                <label for="tile_size" class="control-label availability-map-widget-header">Tile width</label>
             </div>
             <div class="col-sm-6">
-                <input class="form-control" type="text" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="tile_width" placeholder="Tile width in px" value="'.$current_width.'">
+                <input class="form-control" type="text" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" name="tile_size" placeholder="Tile side in px" value="'.$compact_tile.'">
             </div>
         </div>
         ';
@@ -231,7 +231,7 @@ if (defined('SHOW_SETTINGS')) {
                 if ($directpage == "yes") {
                     $deviceIcon = getImage($device);
                     $temp_output[] = '
-                    <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
@@ -244,12 +244,12 @@ if (defined('SHOW_SETTINGS')) {
                         $deviceLabel .= ' widget-availability-fixed';
                     }
                     $temp_output[] = '
-                    <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
                     </a>';
                 }
             } else {
-                $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'])) . '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '"><div class="' . $deviceLabelOld . '" style="width:' . $compact_tile . 'px;"></div></a>';
+                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device['hostname'] . ' - ' . formatUptime($device['uptime']) . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
             }
         }
     }
@@ -300,7 +300,7 @@ if (defined('SHOW_SETTINGS')) {
                         </a>';
                     }
                 } else {
-                    $temp_output[] = '<a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '"><div class="' . $serviceLabelOld . '" style="width:'.$compact_tile.'px;"></div></a>';
+                    $temp_output[] = "<a href='" . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . "' title='${service['hostname']} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
                 }
             }
         } else {
