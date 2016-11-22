@@ -1747,9 +1747,9 @@ function can_skip_discovery($needles, $haystack, $name)
  */
 function initStats()
 {
-    global $runtime_stats, $db_stats;
+    global $snmp_stats, $db_stats;
 
-    $runtime_stats = array(
+    $snmp_stats = array(
         'snmpget' => 0,
         'snmpget_sec' => 0.0,
         'snmpwalk' => 0,
@@ -1776,13 +1776,13 @@ function initStats()
  */
 function printStats()
 {
-    global $runtime_stats, $db_stats;
+    global $snmp_stats, $db_stats;
 
     printf("SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
-        $runtime_stats['snmpget'],
-        $runtime_stats['snmpget_sec'],
-        $runtime_stats['snmpwalk'],
-        $runtime_stats['snmpwalk_sec']
+        $snmp_stats['snmpget'],
+        $snmp_stats['snmpget_sec'],
+        $snmp_stats['snmpwalk'],
+        $snmp_stats['snmpwalk_sec']
     );
     printf("MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
         $db_stats['fetchcell'],
@@ -1800,4 +1800,45 @@ function printStats()
         $db_stats['delete'],
         $db_stats['delete_sec']
     );
+}
+
+/**
+ * Update statistics for db operations
+ *
+ * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordDbStatistic($stat, $start_time)
+{
+    global $db_stats;
+    $runtime = microtime(true) - $start_time;
+    $db_stats[$stat]++;
+    $db_stats["${stat}_sec"] += $runtime;
+
+    //double accounting corrections
+    if ($stat == 'fetchcolumn') {
+        $db_stats['fetchrows']--;
+        $db_stats['fetchrows_sec'] -= $runtime;
+    }
+    if ($stat == 'fetchcell') {
+        $db_stats['fetchrow']--;
+        $db_stats['fetchrow_sec'] -= $runtime;
+    }
+
+    return $runtime;
+}
+
+/**
+ * @param string $stat snmpget, snmpwalk
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordSnmpStatistic($stat, $start_time)
+{
+    global $snmp_stats;
+    $runtime = microtime(true) - $start_time;
+    $snmp_stats[$stat]++;
+    $snmp_stats["${stat}_sec"] += $runtime;
+    return $runtime;
 }

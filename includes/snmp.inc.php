@@ -192,8 +192,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
 
 function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null)
 {
-    global $runtime_stats;
-    $start = microtime(true);
+    $time_start = microtime(true);
 
     if (is_array($oids)) {
         $oids = implode(' ', $oids);
@@ -214,16 +213,13 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
         }
     }
 
-    $runtime_stats['snmpget']++;
-    $runtime_stats['snmpget_sec'] += (microtime(true) - $start);
-
+    recordSnmpStatistic('snmpget', $time_start);
     return $array;
 }//end snmp_get_multi()
 
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
-    global $runtime_stats;
-    $start = microtime(true);
+    $time_start = microtime(true);
 
     if (is_array($oids)) {
         $oids = implode(' ', $oids);
@@ -242,16 +238,13 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         }
     }
 
-    $runtime_stats['snmpget']++;
-    $runtime_stats['snmpget_sec'] += (microtime(true) - $start);
-
+    recordSnmpStatistic('snmpget', $time_start);
     return $array;
 }//end snmp_get_multi_oid()
 
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    global $runtime_stats;
-    $start = microtime(true);
+    $time_start = microtime(true);
 
     if (strstr($oid, ' ')) {
         echo report_this_text("snmp_get called for multiple OIDs: $oid");
@@ -260,9 +253,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
 
-    $runtime_stats['snmpget']++;
-    $runtime_stats['snmpget_sec'] += (microtime(true) - $start);
-
+    recordSnmpStatistic('snmpget', $time_start);
     if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
         return false;
     } elseif ($data || $data === '0') {
@@ -275,8 +266,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    global $runtime_stats;
-    $start = microtime(true);
+    $time_start = microtime(true);
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
@@ -295,9 +285,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         }
     }
 
-    $runtime_stats['snmpwalk']++;
-    $runtime_stats['snmpwalk_sec'] += (microtime(true) - $start);
-
+    recordSnmpStatistic('snmpwalk', $time_start);
     return $data;
 }//end snmp_walk()
 
