@@ -40,8 +40,8 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths:
-- tests/
-- lib/
-- html/js/
-- html/css/
-- html/lib/
+- "tests/"
+- "lib/"
+- "html/js/"
+- "html/css/"
+- "html/lib/"
