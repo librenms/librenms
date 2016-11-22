@@ -1740,3 +1740,64 @@ function can_skip_discovery($needles, $haystack, $name)
     }
     return false;
 }
+
+
+/**
+ * Intialize global stat arrays
+ */
+function initStats()
+{
+    global $runtime_stats, $db_stats;
+
+    $runtime_stats = array(
+        'snmpget' => 0,
+        'snmpget_sec' => 0.0,
+        'snmpwalk' => 0,
+        'snmpwalk_sec' => 0.0,
+    );
+    $db_stats = array(
+        'insert' => 0,
+        'insert_sec' => 0.0,
+        'update' => 0,
+        'update_sec' => 0.0,
+        'fetchcell' => 0,
+        'fetchcell_sec' => 0.0,
+        'fetchcol' => 0,
+        'fetchcol_sec' => 0.0,
+        'fetchrow' => 0,
+        'fetchrow_sec' => 0.0,
+        'fetchrows' => 0,
+        'fetchrows_sec' => 0.0,
+    );
+}
+
+/**
+ * Print global stat arrays
+ */
+function printStats()
+{
+    global $runtime_stats, $db_stats;
+
+    printf("SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
+        $runtime_stats['snmpget'],
+        $runtime_stats['snmpget_sec'],
+        $runtime_stats['snmpwalk'],
+        $runtime_stats['snmpwalk_sec']
+    );
+    printf("MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        $db_stats['fetchcell'],
+        $db_stats['fetchcell_sec'],
+        $db_stats['fetchrow'],
+        $db_stats['fetchrow_sec'],
+        $db_stats['fetchrows'],
+        $db_stats['fetchrows_sec'],
+        $db_stats['fetchcolumn'],
+        $db_stats['fetchcolumn_sec'],
+        $db_stats['update'],
+        $db_stats['update_sec'],
+        $db_stats['insert'],
+        $db_stats['insert_sec'],
+        $db_stats['delete'],
+        $db_stats['delete_sec']
+    );
+}

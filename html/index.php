@@ -69,6 +69,7 @@ $config['memcached']['ttl'] = $config['time']['now']+300;
 LibreNMS\Plugins::start();
 
 $runtime_start = microtime(true);
+initStats();
 
 ob_start();
 
@@ -260,10 +261,8 @@ $gentime = substr($runtime, 0, 5);
 
 # FIXME - move this
 if ($config['page_gen']) {
-    echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0, 3).'s'.
-        ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0, 3).'s'.
-        ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0, 3).'s'.
-        ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0, 3).'s');
+    echo '<br />';
+    printStats();
 
     $fullsize = memory_get_usage();
     unset($cache);

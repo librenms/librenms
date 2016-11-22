@@ -32,7 +32,6 @@ require $install_dir . '/includes/defaults.inc.php';
 $config['install_dir'] = $install_dir;
 $config['mib_dir'] = $install_dir . '/mibs';
 $config['snmpget'] = 'snmpget';
-$runtime_stats = array('snmpget' => 0, 'snmpwalk' => 0);
 
 // initialize the class loader and add custom mappings
 require $install_dir . '/LibreNMS/ClassLoader.php';
@@ -47,6 +46,8 @@ require $install_dir . '/includes/rrdtool.inc.php';
 require $install_dir . '/includes/syslog.php';
 require $install_dir . '/includes/dbFacile.php';
 require $install_dir . '/includes/functions.php';
+
+initStats();
 
 if (getenv('SNMPSIM')) {
     require $install_dir . '/includes/snmp.inc.php';
