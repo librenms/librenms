@@ -31,12 +31,6 @@ LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['lo
 LIBRENMS_USER=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
-# if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
-if [ "$EUID" -ne "$LIBRENMS_USER_ID" -a "$LIBRENMS_USER" != "root" ]; then
-    echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
-    su -l $LIBRENMS_USER -c "$DAILY_SCRIPT $@"
-    exit;
-fi
 
 #######################################
 # Fancy-Print and run commands
@@ -109,6 +103,20 @@ call_daily_php() {
 main () {
     local arg="$1";
     cd ${LIBRENMS_DIR};
+
+    # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
+    if [[ "$LIBRENMS_USER" != "root" ]]; then
+        # only try to su if we are root (or sudo)
+        if [[ "$EUID" -eq 0 ]]; then
+            echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
+            su -l "$LIBRENMS_USER" -c "$DAILY_SCRIPT $@"
+            exit;
+        fi
+
+        if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
+            printf "\033[0;93mWARNING\033[0m: You should run this script as ${LIBRENMS_USER}\n";
+        fi
+    fi
 
     if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
