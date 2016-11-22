@@ -56,7 +56,6 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     'context_name' => $context,
                 );
             }
-
         }
     }
 
