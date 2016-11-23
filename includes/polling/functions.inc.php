@@ -147,7 +147,7 @@ function poll_sensor($device, $class, $unit)
 
 function poll_device($device, $options)
 {
-    global $config, $device, $polled_devices, $db_stats, $memcache;
+    global $config, $device, $polled_devices, $memcache;
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
@@ -259,7 +259,7 @@ function poll_device($device, $options)
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
+                printf("\n>> Runtime for poller module '%s': %.4f seconds\n", $module, $module_time);
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
