@@ -1498,16 +1498,16 @@ function get_auth_ad_group_filter($groupname)
 function print_list($list, $format, $max = 10)
 {
     $total = count($list);
-    $overflow = '';
-    if ($total > $max) {
-        $extra = $total - $max;
-        $overflow = " and $extra more...";
-        $list = array_slice($list, 0, $max);
-    }
+    $list = array_slice($list, 0, $max);
+
     foreach ($list as $item) {
         printf($format, $item);
     }
-    printf($format, $overflow);
+
+    if ($total > $max) {
+        $extra = $total - $max;
+        printf($format, " and $extra more...");
+    }
 }
 
 /**
