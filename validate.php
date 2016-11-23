@@ -245,8 +245,6 @@ if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` IS
     print_list($devices, "\t %s\n");
 }
 
-
-
 if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
     print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.\n        Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
     print_list($devices, "\t %s\n");
