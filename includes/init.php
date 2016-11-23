@@ -66,6 +66,7 @@ require $install_dir . '/includes/services.inc.php';
 require $install_dir . '/includes/mergecnf.inc.php';
 require $install_dir . '/includes/functions.php';
 require $install_dir . '/includes/rewrites.php';  // FIXME both definitions and functions
+require_once $install_dir . '/lib/htmlpurifier-4.8.0-lite/library/HTMLPurifier.includes.php';
 
 
 if (module_selected('web', $init_modules)) {
