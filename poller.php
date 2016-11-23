@@ -27,7 +27,7 @@ echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
-$options = getopt('h:m:i:n:r::d::v::a::f::');
+$options = getopt('h:m:i:n:r::d::v::a::f::q');
 
 if ($options['h'] == 'odd') {
     $options['n'] = '1';
@@ -149,9 +149,9 @@ if ($polled_devices) {
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs";
 d_echo("$string\n");
 
-echo ("\n".'MySQL: Cell['.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fetchcell_sec'] + 0), 2).'s]'.' Row['.($db_stats['fetchrow'] + 0).'/'.round(($db_stats['fetchrow_sec'] + 0), 2).'s]'.' Rows['.($db_stats['fetchrows'] + 0).'/'.round(($db_stats['fetchrows_sec'] + 0), 2).'s]'.' Column['.($db_stats['fetchcol'] + 0).'/'.round(($db_stats['fetchcol_sec'] + 0), 2).'s]'.' Update['.($db_stats['update'] + 0).'/'.round(($db_stats['update_sec'] + 0), 2).'s]'.' Insert['.($db_stats['insert'] + 0).'/'.round(($db_stats['insert_sec'] + 0), 2).'s]'.' Delete['.($db_stats['delete'] + 0).'/'.round(($db_stats['delete_sec'] + 0), 2).'s]');
-
-echo "\n";
+if (!isset($options['q'])) {
+    printStats();
+}
 
 logfile($string);
 rrdtool_close();

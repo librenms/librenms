@@ -70,8 +70,8 @@ function dbQuery($sql, $parameters = array())
 
 function dbInsert($data, $table)
 {
-    global $database_link, $db_stats;
-    dbInitStats();
+    global $database_link;
+    $time_start = microtime(true);
 
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
@@ -86,7 +86,6 @@ function dbInsert($data, $table)
 
     $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data)).'`)  VALUES ('.implode(',', dbPlaceHolders($data)).')';
 
-    $time_start = microtime(true);
     dbBeginTransaction();
     $result = dbQuery($sql, $data);
     if ($result) {
@@ -99,14 +98,10 @@ function dbInsert($data, $table)
         }
 
         dbRollbackTransaction();
-        // $id = false;
+        $id = null;
     }
 
-    // logfile($fullSql);
-    $time_end                = microtime(true);
-    $db_stats['insert_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['insert']++;
-
+    recordDbStatistic('insert', $time_start);
     return $id;
 }//end dbInsert()
 
@@ -120,9 +115,7 @@ function dbInsert($data, $table)
 
 function dbBulkInsert($data, $table)
 {
-    global $db_stats;
-    dbInitStats();
-
+    $time_start = microtime(true);
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
     // follow closer with SQL convention:
@@ -156,14 +149,9 @@ function dbBulkInsert($data, $table)
         $values .= "(".$rowvalues.")";
     }
 
-    $time_start = microtime(true);
     $result = dbQuery($sql.$values);
 
-    // logfile($fullSql);
-    $time_end                = microtime(true);
-    $db_stats['insert_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['insert']++;
-
+    recordDbStatistic('insert', $time_start);
     return $result;
 }//end dbBulkInsert()
 
@@ -176,8 +164,8 @@ function dbBulkInsert($data, $table)
 
 function dbUpdate($data, $table, $where = null, $parameters = array())
 {
-    global $fullSql, $database_link, $db_stats;
-    dbInitStats();
+    global $fullSql, $database_link;
+    $time_start = microtime(true);
 
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
@@ -204,7 +192,6 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
         $data = array_merge($data, $parameters);
     }
 
-    $time_start = microtime(true);
     if (dbQuery($sql, $data)) {
         $return = mysqli_affected_rows($database_link);
     } else {
@@ -213,10 +200,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
         $return = false;
     }
 
-    $time_end                = microtime(true);
-    $db_stats['update_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['update']++;
-
+    recordDbStatistic('update', $time_start);
     return $return;
 }//end dbUpdate()
 
@@ -224,12 +208,17 @@ function dbUpdate($data, $table, $where = null, $parameters = array())
 function dbDelete($table, $where = null, $parameters = array())
 {
     global $database_link;
+    $time_start = microtime(true);
+
     $sql = 'DELETE FROM `'.$table.'`';
     if ($where) {
         $sql .= ' WHERE '.$where;
     }
 
-    if (dbQuery($sql, $parameters)) {
+    $result = dbQuery($sql, $parameters);
+
+    recordDbStatistic('delete', $time_start);
+    if ($result) {
         return mysqli_affected_rows($database_link);
     } else {
         return false;
@@ -245,8 +234,7 @@ function dbDelete($table, $where = null, $parameters = array())
 
 function dbFetchRows($sql, $parameters = array(), $nocache = false)
 {
-    global $db_stats, $config;
-    dbInitStats();
+    global $config;
 
     if ($config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
@@ -268,17 +256,15 @@ function dbFetchRows($sql, $parameters = array(), $nocache = false)
         if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $rows, $config['memcached']['ttl']);
         }
+        recordDbStatistic('fetchrows', $time_start);
         return $rows;
     }
 
     mysqli_free_result($result);
 
-    $time_end                   = microtime(true);
-    $db_stats['fetchrows_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['fetchrows']++;
-
     // no records, thus return empty array
     // which should evaluate to false, and will prevent foreach notices/warnings
+    recordDbStatistic('fetchrows', $time_start);
     return array();
 }//end dbFetchRows()
 
@@ -313,8 +299,7 @@ function dbFetch($sql, $parameters = array(), $nocache = false)
 
 function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 {
-    global $db_stats, $config;
-    dbInitStats();
+    global $config;
 
     if ($config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
@@ -328,10 +313,8 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
     if ($result) {
         $row = mysqli_fetch_assoc($result);
         mysqli_free_result($result);
-        $time_end = microtime(true);
 
-        $db_stats['fetchrow_sec'] += (float)number_format(($time_end - $time_start), 8);
-        $db_stats['fetchrow']++;
+        recordDbStatistic('fetchrow', $time_start);
 
         if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $row, $config['memcached']['ttl']);
@@ -350,21 +333,14 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 
 function dbFetchCell($sql, $parameters = array(), $nocache = false)
 {
-    global $db_stats, $config;
-    dbInitStats();
-
     $time_start = microtime(true);
-    $row            = dbFetchRow($sql, $parameters, $nocache);
+    $row = dbFetchRow($sql, $parameters, $nocache);
+
+    recordDbStatistic('fetchcell', $time_start);
     if ($row) {
         return array_shift($row);
         // shift first field off first row
     }
-
-    $time_end = microtime(true);
-
-    $db_stats['fetchcell_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['fetchcell']++;
-
     return null;
 }//end dbFetchCell()
 
@@ -377,20 +353,13 @@ function dbFetchCell($sql, $parameters = array(), $nocache = false)
 
 function dbFetchColumn($sql, $parameters = array(), $nocache = false)
 {
-    global $db_stats;
-    dbInitStats();
-
     $time_start = microtime(true);
     $cells          = array();
     foreach (dbFetch($sql, $parameters, $nocache) as $row) {
         $cells[] = array_shift($row);
     }
 
-    $time_end = microtime(true);
-
-    $db_stats['fetchcol_sec'] += (float)number_format(($time_end - $time_start), 8);
-    $db_stats['fetchcol']++;
-
+    recordDbStatistic('fetchcolumn', $time_start);
     return $cells;
 }//end dbFetchColumn()
 
@@ -502,28 +471,6 @@ function dbPrepareData($data)
 
     return $values;
 }//end dbPrepareData()
-
-function dbInitStats()
-{
-    global $db_stats;
-
-    if (!isset($db_stats)) {
-        $db_stats = array(
-            'insert' => 0,
-            'insert_sec' => 0.0,
-            'update' => 0,
-            'update_sec' => 0.0,
-            'fetchcell' => 0,
-            'fetchcell_sec' => 0.0,
-            'fetchcol' => 0,
-            'fetchcol_sec' => 0.0,
-            'fetchrow' => 0,
-            'fetchrow_sec' => 0.0,
-            'fetchrows' => 0,
-            'fetchrows_sec' => 0.0,
-        );
-    }
-}
 
 /**
  * Given a data array, this returns an array of placeholders
