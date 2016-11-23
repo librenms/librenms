@@ -1,16 +1,12 @@
 <?php
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
 if (!$_SESSION['authenticated']) {
-    echo 'unauthenticated';
+    echo "Unauthenticated\n";
     exit;
 }
 
@@ -48,7 +44,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
             if (is_admin() === true || is_read() === true) {
-                $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' OR `sysName` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
+                $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' OR `sysName` LIKE '%".$search."%' OR `purpose` LIKE '%".$search."%' OR `notes` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
             } else {
                 $results = dbFetchRows("SELECT * FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND (`hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array($_SESSION['user_id']));
             }

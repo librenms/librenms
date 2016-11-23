@@ -1055,19 +1055,6 @@ function clean_bootgrid($string)
 }//end clean_bootgrid()
 
 
-// Insert new config items
-function add_config_item($new_conf_name, $new_conf_value, $new_conf_type, $new_conf_desc)
-{
-    if (dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config')) {
-        $db_inserted = 1;
-    } else {
-        $db_inserted = 0;
-    }
-
-    return ($db_inserted);
-}//end add_config_item()
-
-
 function get_config_by_group($group)
 {
     $group = array($group);
@@ -1363,4 +1350,10 @@ function file_download($filename, $content)
     header('Expires: 0');
     header('Pragma: public');
     echo $content;
+}
+
+function get_rules_from_json()
+{
+    global $config;
+    return json_decode(file_get_contents($config['install_dir'] . '/misc/alert_rules.json'), true);
 }

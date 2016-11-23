@@ -12,12 +12,6 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/functions.php';
-require_once '../includes/device-groups.inc.php';
-if (file_exists('../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-       include '../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-}
-
 function authToken(\Slim\Route $route)
 {
     $app   = \Slim\Slim::getInstance();
@@ -94,10 +88,12 @@ function get_port_stats_by_port_hostname()
     $ifName    = urldecode($router['ifname']);
     $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
 
-    $port['in_rate'] = (formatRates($port['ifInOctets_rate'] * 8));
-    $port['out_rate'] = (formatRates($port['ifOutOctets_rate'] * 8));
-    $port['in_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $port['out_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $in_rate = $port['ifInOctets_rate'] * 8;
+    $out_rate = $port['ifOutOctets_rate'] * 8;
+    $port['in_rate'] = formatRates($in_rate);
+    $port['out_rate'] = formatRates($out_rate);
+    $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
+    $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
     $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
     $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
     
@@ -1361,7 +1357,7 @@ function list_services()
             $sql_param[1] = $_GET['type'];
         }
 
-        $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
+        $services[] = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
     }
     $count = count($services);
     $output = array(

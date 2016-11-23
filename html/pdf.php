@@ -26,13 +26,9 @@ if (strpos($_SERVER['PATH_INFO'], 'debug')) {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/authenticate.inc.php';
-require_once 'lib/tcpdf/tcpdf.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+require $config['install_dir'] . '/html/lib/tcpdf/tcpdf.php';
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 

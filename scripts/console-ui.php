@@ -1,15 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require_once 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require 'html/includes/functions.inc.php';
-
-$console_color = new Console_Color2();
+$init_modules = array();
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $long_opts = array(
     'list::',

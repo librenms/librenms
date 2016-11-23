@@ -28,10 +28,8 @@ if (!isset($_SESSION['authenticated'])) {
     die('Unauthorized.');
 }
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/functions.php';
+$init_modules = array('web');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
@@ -121,6 +119,18 @@ if (isset($_GET['term'],$_GET['device_id'])) {
 
             $obj = $ret;
         }
+    }
+} elseif ($vars['type'] === 'alert_rule_collection') {
+    $x=0;
+    foreach (get_rules_from_json() as $rule) {
+        if (str_contains($rule['name'], $vars['term'], true)) {
+            $rule['id'] = $x;
+            $tmp[] = $rule;
+        }
+        $x++;
+    }
+    if (is_array($tmp)) {
+        $obj = $tmp;
     }
 }
 

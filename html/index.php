@@ -61,12 +61,8 @@ if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     exit;
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/vars.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $config['memcached']['ttl'] = $config['time']['now']+300;
 
@@ -78,8 +74,6 @@ ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
-
-require 'includes/authenticate.inc.php';
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) {
     $_SESSION['widescreen'] = 1;
@@ -148,6 +142,13 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
+<?php
+
+foreach ((array)$config['webui']['custom_css'] as $custom_css) {
+    echo '<link href="' . $custom_css . '" rel="stylesheet" type="text/css" />';
+}
+
+?>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -259,10 +260,8 @@ $gentime = substr($runtime, 0, 5);
 
 # FIXME - move this
 if ($config['page_gen']) {
-    echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0, 3).'s'.
-        ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0, 3).'s'.
-        ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0, 3).'s'.
-        ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0, 3).'s');
+    echo '<br />';
+    printStats();
 
     $fullsize = memory_get_usage();
     unset($cache);

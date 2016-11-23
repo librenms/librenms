@@ -15,12 +15,10 @@
  * See COPYING for more details.
  */
 
-if (!isset($debug)) {
+if (!isset($debug)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    include 'includes/defaults.inc.php';
-    include 'config.php';
-    include 'includes/definitions.inc.php';
-    include 'includes/functions.php';
+    $init_modules = array();
+    require realpath(__DIR__ . '/../..') . '/includes/init.php';
 
     $options = getopt('d');
     if (isset($options['d'])) {
@@ -121,19 +119,11 @@ foreach ($filelist as $file) {
                     d_echo("$line \n");
 
                     if ($line[0] != '#') {
-                        if ($config['db']['extension'] == 'mysqli') {
-                            $update = mysqli_query($database_link, $line);
-                        } else {
-                            $update = mysql_query($line);
-                        }
+                        $update = mysqli_query($database_link, $line);
                         if (!$update) {
                             $err++;
                             if ($debug) {
-                                if ($config['db']['extension'] == 'mysqli') {
-                                    echo mysqli_error($database_link)."\n";
-                                } else {
-                                    echo mysql_error()."\n";
-                                }
+                                echo mysqli_error($database_link)."\n";
                             }
                         }
                     }

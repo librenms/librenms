@@ -139,6 +139,7 @@ LibreNMS contributors:
 - Ryan Gibbons <rtgibbons23@gmail.com> (rtgibbons)
 - Layne Breitkreutz <github@thelenon.com> (Gorian)
 - Karl Shea <karl@karlshea.com> (karlshea)
+- Jason Ellison <infotek@gmail.com> (infotek)
 - Justin Settle <jus10@partlycloudy.org> (jquagga)
 - Alexander Kratzsch <klump@devrandom.se> (klump)
 - Barry O'Donovan barry.odonovan@lightnet.ie (barryodonovan)
@@ -146,6 +147,14 @@ LibreNMS contributors:
 - Eric Conroy <eric@conroy.co> (NetworkNub)
 - Timothy Willey <developer@timothywilley.net> (twilley)
 - Jon Ward	<librenms@yonzb.net> (yon2004)
+- Ian Viemeister <github@ian.viemeister.com> (iviemeister)
+- Thane Gill <me@thanegill.com> (thanegill)
+- Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
+- Markus Wigge <markus@cultcom.de> (cultcom)
+- Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
+- Andres Rahn <andreser@gmail.com> (Andreser)
+- Christoph Zilian <czilian@hotmail.com> (czilian)
+- Guillem Mateos <bbguillem@gmail.com> (guillemmateos) 
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

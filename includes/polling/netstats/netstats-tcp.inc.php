@@ -19,7 +19,7 @@ if ($device['os'] != 'Snom') {
     $rrd_def = array();
     $snmpstring = '';
     foreach ($oids as $oid) {
-        $oid_ds      = truncate($oid, 19, '');
+        $oid_ds      = substr($oid, 0, 19);
         $rrd_def[]   = " DS:$oid_ds:COUNTER:600:U:10000000"; // Limit to 10MPPS
         $snmpstring .= ' TCP-MIB::'.$oid.'.0';
     }
@@ -28,23 +28,27 @@ if ($device['os'] != 'Snom') {
     $snmpstring .= ' tcpHCOutSegs.0';
 
     $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'TCP-MIB');
-    $fields = $data[0];
+    $data = $data[0];
 
-    // use HC Segs if we have them.
-    if (isset($fields['tcpHCInSegs'])) {
-        if (!empty($fields['tcpHCInSegs'])) {
-            $fields['tcpInSegs'] = $fields['tcpHCInSegs'];
-            $fields['tcpOutSegs'] = $fields['tcpHCOutSegs'];
+    if (isset($data['tcpInSegs']) && isset($data['tcpOutSegs'])) {
+        $fields = array();
+        foreach ($oids as $oid) {
+            $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
-        unset($fields['tcpHCInSegs'], $fields['tcpHCOutSegs']);
-    }
 
-    if (isset($fields['tcpInSegs']) && isset($fields['tcpOutSegs'])) {
+        // use HC Segs if we have them.
+        if (isset($data['tcpHCInSegs'])) {
+            if (!empty($data['tcpHCInSegs'])) {
+                $fields['tcpInSegs'] = $data['tcpHCInSegs'];
+                $fields['tcpOutSegs'] = $data['tcpHCOutSegs'];
+            }
+        }
+
         $tags = compact('rrd_def');
         data_update($device, 'netstats-tcp', $tags, $fields);
 
         $graphs['netstat_tcp'] = true;
     }
 
-    unset($oids, $data, $fields, $oid, $protos, $snmpstring);
+    unset($oids, $data, $fields, $oid, $snmpstring);
 }//end if

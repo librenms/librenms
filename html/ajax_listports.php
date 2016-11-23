@@ -10,16 +10,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/common.php';
-
-require_once '../includes/rewrites.php';
-require_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 

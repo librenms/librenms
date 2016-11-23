@@ -1,12 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-chdir(realpath(__DIR__ . '/..')); // cwd to the parent directory of this script
+$init_modules = array();
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
 rrdtool_initialize();
 
 $options = getopt('h:p:');

@@ -7,6 +7,7 @@
 !/.travis.yml
 !/.php_cs
 !/.github/
+!/.codeclimate.yml
 
 # Others #
 ##########
@@ -14,8 +15,10 @@
 /composer.lock
 Thumbs.db
 config.php
+html/css/custom/*
 html/plugins/*
 !html/plugins/Test/
+includes/custom/*
 junk
 logs
 nbproject

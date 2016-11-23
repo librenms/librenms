@@ -397,12 +397,8 @@ function truncate($substring, $max = 50, $rep = '...')
 function mres($string)
 {
     // short function wrapper because the real one is stupidly long and ugly. aesthetics.
-    global $config, $database_link;
-    if ($config['db']['extension'] == 'mysqli') {
-        return mysqli_real_escape_string($database_link, $string);
-    } else {
-        return mysql_real_escape_string($string);
-    }
+    global $database_link;
+    return mysqli_real_escape_string($database_link, $string);
 }
 
 function getifhost($id)
@@ -488,6 +484,16 @@ function gethostosbyid($id)
 function safename($name)
 {
     return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+}
+
+/**
+ * Function format the rrdtool description text correctly.
+ * @param $descr
+ * @return mixed
+ */
+function safedescr($descr)
+{
+    return preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
 }
 
 function zeropad($num, $length = 2)

@@ -53,6 +53,8 @@ vendors         OBJECT IDENTIFIER ::= { foundry 2 }
   fdryTacacs	OBJECT IDENTIFIER ::= { switch 9 }
   fdryTrap	    OBJECT IDENTIFIER ::= { switch 10 }
   brcdSysLog    OBJECT IDENTIFIER ::= { switch 11 }
+  brcdMct    OBJECT IDENTIFIER ::= { switch 12 }
+  brcdFabric    OBJECT IDENTIFIER ::= { switch 13 }
 
 router 		OBJECT IDENTIFIER ::= { products 2 }
   snIpx			OBJECT IDENTIFIER ::= { router 1 }
@@ -882,7 +884,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFastIronStackFCXSwitch      OBJECT IDENTIFIER ::= { snFastIronStackFCX 1}        -- FCX switch
   snFastIronStackFCXBaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackFCX 2}   --FCX Base L3 router
   snFastIronStackFCXRouter      OBJECT IDENTIFIER ::= { snFastIronStackFCX 3}           --FCX Premium Router
-  snFastIronStackFCXAdvRouter      OBJECT IDENTIFIER ::= { snFastIronStackFCX 4}           --FCX Advanced Premium Router (BGP)
+  snFastIronStackFCXAdvRouter      OBJECT IDENTIFIER ::= { snFastIronStackFCX 4}           --FCX Advanced Router (BGP)
 
   snFastIronStackICX6610               OBJECT IDENTIFIER ::= { snFastIronStackFamily 3 }
   snFastIronStackICX6610Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 1}        -- ICX6610 switch
@@ -899,6 +901,28 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFastIronStackICX6450BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6450 2}    --ICX6450 Base L3 router
   snFastIronStackICX6450Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6450 3}               -- ICX6450 Router
   snFastIronStackICX6450PRouter     OBJECT IDENTIFIER ::= { snFastIronStackICX6450 4}              -- ICX6450 Premium Router
+
+  snFastIronStackMixedStack     OBJECT IDENTIFIER ::= { snFastIronStackFamily 6 }
+  snFastIronStackMixedStackSwitch      OBJECT IDENTIFIER ::= { snFastIronStackMixedStack     1}               -- FastIron MixedStack switch
+  snFastIronStackMixedStackBaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackMixedStack 2}    --FastIron MixedStack Base L3 router
+  snFastIronStackMixedStackRouter      OBJECT IDENTIFIER ::= { snFastIronStackMixedStack 3}               -- FastIron MixedStack Router
+  snFastIronStackMixedStackPRouter     OBJECT IDENTIFIER ::= { snFastIronStackMixedStack 4}              -- FastIron MixedStack Premium Router
+  snFastIronStackMixedStackARouter      OBJECT IDENTIFIER ::= { snFastIronStackMixedStack 5}           --FastIronMixedStack Advanced Router
+
+  snFastIronStackICX7750     OBJECT IDENTIFIER ::= { snFastIronStackFamily 7 }
+  snFastIronStackICX7750Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX7750 1}          -- ICX7750 switch
+  snFastIronStackICX7750BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7750 2}    -- ICX7750 Base L3 router
+  snFastIronStackICX7750Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7750 3}          -- ICX7750 Router
+
+  snFastIronStackICX7450     OBJECT IDENTIFIER ::= { snFastIronStackFamily 8 }
+  snFastIronStackICX7450Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX7450 1}          -- ICX7450 switch
+  snFastIronStackICX7450BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7450 2}    -- ICX7450 Base L3 router
+  snFastIronStackICX7450Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7450 3}          -- ICX7450 Router
+
+  snFastIronStackICX7250     OBJECT IDENTIFIER ::= { snFastIronStackFamily 9 }
+  snFastIronStackICX7250Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX7250 1}          -- ICX750 switch
+  snFastIronStackICX7250BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7250 2}    -- ICX7250 Base L3 router
+  snFastIronStackICX7250Router      OBJECT IDENTIFIER ::= { snFastIronStackICX7250 3}          -- ICX7250 Router
 
 -- NetIron Carrier Ethernet Switch (CES) product line
 snCes2000Family  OBJECT IDENTIFIER ::= { registration 49 }
@@ -1064,17 +1088,6 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snFCX648Router      OBJECT IDENTIFIER ::= { snFCX648 3 }            -- FCX648 Premium Router
   snFCX648AdvRouter      OBJECT IDENTIFIER ::= { snFCX648 4 }            -- FCX648 Advanced Premium Router (BGP)
 
---Brocade MLXe product family
-  snBrocadeMLXeFamily  OBJECT IDENTIFIER ::= { registration 55 }          -- Brocade MLXe product family
-
-  snBrocadeMLXe16  OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 1 }
-  snBrocadeMLXe16Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe16  2 }
-  snBrocadeMLXe8   OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 2 }
-  snBrocadeMLXe8Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe8 2 }
-  snBrocadeMLXe4   OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 3 }
-  snBrocadeMLXe4Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe4 2 }
-  snBrocadeMLXe32 OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 4 }
-  snBrocadeMLXe32Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe32 2 }
 
 --FastIron CX 6610 (ICX6610) family
   snICX6610Family          OBJECT IDENTIFIER ::= { registration 56}	-- FastIron CX 6610 series family
@@ -1123,7 +1136,7 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snICX661048HPOEPRouter      OBJECT IDENTIFIER ::= { snICX661048HPOE 4 }            -- ICX661048-HPOE Premium Router
   snICX661048HPOEARouter      OBJECT IDENTIFIER ::= { snICX661048HPOE 5 }            -- ICX661048-HPOE Advanced Router
 
-  --FastIron CX 6430 (ICX6430) family
+--FastIron CX 6430 (ICX6430) family
   snICX6430Family          OBJECT IDENTIFIER ::= { registration 57}	-- FastIron CX 6430 series family
 
   snICX643024Family       OBJECT IDENTIFIER ::= { snICX6430Family 1 }
@@ -1131,10 +1144,10 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snICX643024BaseFamily  OBJECT IDENTIFIER ::= { snICX643024Family 1 }
   snICX643024            OBJECT IDENTIFIER ::= { snICX643024BaseFamily 1 }   -- ICX6430 24-port  10/100/1G w/4x1G
   snICX643024Switch      OBJECT IDENTIFIER ::= { snICX643024 1 }                -- ICX643024 switch
-  
+
   snICX643024HPOEFamily  OBJECT IDENTIFIER ::= { snICX643024Family 2 }
   snICX643024HPOE            OBJECT IDENTIFIER ::= { snICX643024HPOEFamily 1 }    -- ICX6430 24-port HPOE 10/100/1G w/4x1G
-  snICX643024HPOESwitch      OBJECT IDENTIFIER ::= { snICX643024HPOE 1 }          -- ICX643024-HPOE switch 
+  snICX643024HPOESwitch      OBJECT IDENTIFIER ::= { snICX643024HPOE 1 }          -- ICX643024-HPOE switch
 
 
   snICX643048Family       OBJECT IDENTIFIER ::= { snICX6430Family 2 }
@@ -1147,6 +1160,14 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snICX643048HPOE            OBJECT IDENTIFIER ::= { snICX643048HPOEFamily 1 }      -- ICX6430 48-port HPOE 10/100/1G w/4x1G
   snICX643048HPOESwitch      OBJECT IDENTIFIER ::= { snICX643048HPOE 1 }            -- ICX643048-HPOE switch
 
+
+  snICX6430C12Family       OBJECT IDENTIFIER ::= { snICX6430Family 3 }
+
+  snICX6430C12BaseFamily  OBJECT IDENTIFIER ::= { snICX6430C12Family 1 }
+  snICX6430C12            OBJECT IDENTIFIER ::= { snICX6430C12BaseFamily 1 }   -- ICX6430C 12-port  10/100/1G
+  snICX6430C12Switch      OBJECT IDENTIFIER ::= { snICX6430C12 1 }                -- ICX6430C12 switch
+
+
 --FastIron CX 6450 (ICX6450) family
   snICX6450Family          OBJECT IDENTIFIER ::= { registration 58}	-- FastIron CX 6450 series family
 
@@ -1157,14 +1178,14 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snICX645024Switch      OBJECT IDENTIFIER ::= { snICX645024 1 }                  -- ICX645024 switch
   snICX645024BaseL3Router      OBJECT IDENTIFIER ::= { snICX645024 2 }      -- ICX645024 Base L3 router
   snICX645024Router      OBJECT IDENTIFIER ::= { snICX645024 3 }                  -- ICX645024 Base Router
-  snICX645024PRouter      OBJECT IDENTIFIER ::= { snICX645024 4 }                -- ICX645024 Premium Router  
-  
+  snICX645024PRouter      OBJECT IDENTIFIER ::= { snICX645024 4 }                -- ICX645024 Premium Router
+
   snICX645024HPOEFamily  OBJECT IDENTIFIER ::= { snICX645024Family 2 }
   snICX645024HPOE            OBJECT IDENTIFIER ::= { snICX645024HPOEFamily 1 }           --ICX6450 24-port HPOE 10/100/1G w/4x1/10G
-  snICX645024HPOESwitch      OBJECT IDENTIFIER ::= { snICX645024HPOE 1 }                 -- ICX645024-HPOE switch 
+  snICX645024HPOESwitch      OBJECT IDENTIFIER ::= { snICX645024HPOE 1 }                 -- ICX645024-HPOE switch
   snICX645024HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX645024HPOE 2 }     -- ICX645024-HPOE Base L3 router
   snICX645024HPOERouter      OBJECT IDENTIFIER ::= { snICX645024HPOE 3 }                 -- ICX645024-HPOE Base Router
-  snICX645024HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645024HPOE 4 }               -- ICX645024-HPOE Premium Router 
+  snICX645024HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645024HPOE 4 }               -- ICX645024-HPOE Premium Router
 
   snICX645048Family       OBJECT IDENTIFIER ::= { snICX6450Family 2 }
 
@@ -1180,8 +1201,131 @@ snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
   snICX645048HPOESwitch      OBJECT IDENTIFIER ::= { snICX645048HPOE 1 }                 -- ICX645048-HPOE switch
   snICX645048HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX645048HPOE 2 }     -- ICX645048-HPOE Base L3 router
   snICX645048HPOERouter      OBJECT IDENTIFIER ::= { snICX645048HPOE 3 }                 -- ICX645048-HPOE Base Router
-  snICX645048HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645048HPOE 4 }               -- ICX645048-HPOE Premium Router 
+  snICX645048HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645048HPOE 4 }               -- ICX645048-HPOE Premium Router
 
+  snICX6450C12PDFamily       OBJECT IDENTIFIER ::= { snICX6450Family 3 }
+
+  snICX6450C12PDBaseFamily  OBJECT IDENTIFIER ::= { snICX6450C12PDFamily 1 }
+  snICX6450C12PD            OBJECT IDENTIFIER ::= { snICX6450C12PDBaseFamily 1 }   -- ICX6450C 12-port PD  10/100/1G
+  snICX6450C12PDSwitch      OBJECT IDENTIFIER ::= { snICX6450C12PD 1 }                -- ICX6450C12-PD switch
+  snICX6450C12PDBaseL3Router      OBJECT IDENTIFIER ::= { snICX6450C12PD 2 }                -- ICX6450C12-PD Base L3 router
+  snICX6450C12PDRouter      OBJECT IDENTIFIER ::= { snICX6450C12PD 3 }                -- ICX6450C12-PD Base router
+  snICX6450C12PDPRouter      OBJECT IDENTIFIER ::= { snICX6450C12PD 4 }                -- ICX6450C12-PD Premium router
+
+
+--FastIron Brocade ICX 6650 (ICX6650) family
+  snICX6650Family          OBJECT IDENTIFIER ::= { registration 59}               -- FastIron Brocade ICX 6650 series family
+
+  snICX665064Family       OBJECT IDENTIFIER ::= { snICX6650Family 1 }
+
+  snICX665064BaseFamily  OBJECT IDENTIFIER ::= { snICX665064Family 1 }
+  snICX665064            OBJECT IDENTIFIER ::= { snICX665064BaseFamily 1 }     -- ICX6650 64-port  10G w/4x40G
+  snICX665064Switch      OBJECT IDENTIFIER ::= { snICX665064 1 }                   -- ICX6650 64-port Switch
+  snICX665064BaseL3Router      OBJECT IDENTIFIER ::= { snICX665064 2 }      -- ICX6650 64-port Base L3 router
+  snICX665064Router      OBJECT IDENTIFIER ::= { snICX665064 3 }                  -- ICX6650 64-port Router
+
+
+--FastIron Brocade ICX 7750 (ICX7750) family
+  snICX7750Family          OBJECT IDENTIFIER ::= { registration 60}               -- FastIron Brocade ICX 7750 series family
+
+  snICX775048CFamily       OBJECT IDENTIFIER ::= { snICX7750Family 1 }
+
+  snICX775048CBaseFamily     OBJECT IDENTIFIER ::= { snICX775048CFamily 1 }
+  snICX775048C               OBJECT IDENTIFIER ::= { snICX775048CBaseFamily 1 }    -- ICX775048C 48-port FE/GE/10GE RJ-45 w/12x40G
+  snICX775048CSwitch         OBJECT IDENTIFIER ::= { snICX775048C 1 }              -- ICX775048C 48-port Switch
+  snICX775048CBaseL3Router   OBJECT IDENTIFIER ::= { snICX775048C 2 }              -- ICX775048C 48-port Base L3 router
+  snICX775048CRouter         OBJECT IDENTIFIER ::= { snICX775048C 3 }              -- ICX775048C 48-port Router
+
+  snICX775048FFamily       OBJECT IDENTIFIER ::= { snICX7750Family 2 }
+
+  snICX775048FBaseFamily     OBJECT IDENTIFIER ::= { snICX775048FFamily 1 }
+  snICX775048F               OBJECT IDENTIFIER ::= { snICX775048FBaseFamily 1 }    -- ICX775048F 48-port GE/10GE SFP+ w/12x40G
+  snICX775048FSwitch         OBJECT IDENTIFIER ::= { snICX775048F 1 }              -- ICX775048F 48-port Switch
+  snICX775048FBaseL3Router   OBJECT IDENTIFIER ::= { snICX775048F 2 }              -- ICX775048F 48-port Base L3 router
+  snICX775048FRouter         OBJECT IDENTIFIER ::= { snICX775048F 3 }              -- ICX775048F 48-port Router
+
+  snICX775026QFamily       OBJECT IDENTIFIER ::= { snICX7750Family 3 }
+
+  snICX775026QBaseFamily     OBJECT IDENTIFIER ::= { snICX775026QFamily 1 }
+  snICX775026Q               OBJECT IDENTIFIER ::= { snICX775026QBaseFamily 1 }    -- ICX775026Q 26-port 40G QSFP w/6x40G
+  snICX775026QSwitch         OBJECT IDENTIFIER ::= { snICX775026Q 1 }              -- ICX775026Q 26-port Switch
+  snICX775026QBaseL3Router   OBJECT IDENTIFIER ::= { snICX775026Q 2 }              -- ICX775026Q 26-port Base L3 router
+  snICX775026QRouter         OBJECT IDENTIFIER ::= { snICX775026Q 3 }              -- ICX775026Q 26-port Router
+
+
+--FastIron Brocade ICX 7450 (ICX7450) family
+  snICX7450Family           OBJECT IDENTIFIER ::= { registration 61}               -- FastIron Brocade ICX 7450 series family
+
+  snICX745024Family         OBJECT IDENTIFIER ::= { snICX7450Family 1 }
+
+  snICX745024BaseFamily     OBJECT IDENTIFIER ::= { snICX745024Family 1 }
+  snICX745024               OBJECT IDENTIFIER ::= { snICX745024BaseFamily 1 }    -- ICX7450 24-port 1G
+  snICX745024Switch         OBJECT IDENTIFIER ::= { snICX745024 1 }              -- ICX745024 switch
+  snICX745024BaseL3Router   OBJECT IDENTIFIER ::= { snICX745024 2 }              -- ICX745024 Base L3 router
+  snICX745024Router         OBJECT IDENTIFIER ::= { snICX745024 3 }              -- ICX745024 Router
+
+  snICX745024HPOEFamily       OBJECT IDENTIFIER ::= { snICX745024Family 2 }
+  snICX745024HPOE             OBJECT IDENTIFIER ::= { snICX745024HPOEFamily 1 }  -- ICX7450-HPOE 24-port POE+ 1G
+  snICX745024HPOESwitch       OBJECT IDENTIFIER ::= { snICX745024HPOE 1 }        -- ICX745024-HPOE switch
+  snICX745024HPOEBaseL3Router OBJECT IDENTIFIER ::= { snICX745024HPOE 2 }        -- ICX745024-HPOE Base L3 router
+  snICX745024HPOERouter       OBJECT IDENTIFIER ::= { snICX745024HPOE 3 }        -- ICX745024-HPOE Base Router
+
+  snICX745048Family       OBJECT IDENTIFIER ::= { snICX7450Family 2 }
+
+  snICX745048BaseFamily    OBJECT IDENTIFIER ::= { snICX745048Family 1 }
+  snICX745048              OBJECT IDENTIFIER ::= { snICX745048BaseFamily 1 }    -- ICX745048 48-port 1G
+  snICX745048Switch        OBJECT IDENTIFIER ::= { snICX745048 1 }              -- ICX745048 48-port Switch
+  snICX745048BaseL3Router  OBJECT IDENTIFIER ::= { snICX745048 2 }              -- ICX745048 48-port Base L3 router
+  snICX745048Router        OBJECT IDENTIFIER ::= { snICX745048 3 }              -- ICX745048 48-port Router
+
+  snICX745048HPOEBaseFamily   OBJECT IDENTIFIER ::= { snICX745048Family 2 }
+  snICX745048HPOE             OBJECT IDENTIFIER ::= { snICX745048HPOEBaseFamily 1 }  -- ICX745048-HPOE 48-port POE+ 1G
+  snICX745048HPOESwitch       OBJECT IDENTIFIER ::= { snICX745048HPOE 1 }            -- ICX745048-HPOE 48-port Switch
+  snICX745048HPOEBaseL3Router OBJECT IDENTIFIER ::= { snICX745048HPOE 2 }            -- ICX745048-HPOE 48-port Base L3 router
+  snICX745048HPOERouter       OBJECT IDENTIFIER ::= { snICX745048HPOE 3 }            -- ICX745048-HPOE 48-port Router
+
+  snICX745048FBaseFamily    OBJECT IDENTIFIER ::= { snICX745048Family 3 }
+  snICX745048F              OBJECT IDENTIFIER ::= { snICX745048FBaseFamily 1 }   -- ICX745048F 48-port SFP+ 1G
+  snICX745048FSwitch        OBJECT IDENTIFIER ::= { snICX745048F 1 }             -- ICX745048F 48-port Switch
+  snICX745048FBaseL3Router  OBJECT IDENTIFIER ::= { snICX745048F 2 }             -- ICX745048F 48-port Base L3 router
+  snICX745048FRouter        OBJECT IDENTIFIER ::= { snICX745048F 3 }             -- ICX745048F 48-port Router
+
+--FastIron Brocade ICX 7250 (ICX7250) family
+  snICX7250Family           OBJECT IDENTIFIER ::= { registration 62}               -- FastIron Brocade ICX 7250 series family
+
+  snICX725024Family         OBJECT IDENTIFIER ::= { snICX7250Family 1 }
+
+  snICX725024BaseFamily     OBJECT IDENTIFIER ::= { snICX725024Family 1 }
+  snICX725024               OBJECT IDENTIFIER ::= { snICX725024BaseFamily 1 }    -- ICX7250 24-port 1G
+  snICX725024Switch         OBJECT IDENTIFIER ::= { snICX725024 1 }              -- ICX725024 switch
+  snICX725024BaseL3Router   OBJECT IDENTIFIER ::= { snICX725024 2 }              -- ICX725024 Base L3 router
+  snICX725024Router         OBJECT IDENTIFIER ::= { snICX725024 3 }              -- ICX725024 Router
+
+  snICX725024HPOEFamily       OBJECT IDENTIFIER ::= { snICX725024Family 2 }
+  snICX725024HPOE             OBJECT IDENTIFIER ::= { snICX725024HPOEFamily 1 }  -- ICX7250-HPOE 24-port POE+ 1G
+  snICX725024HPOESwitch       OBJECT IDENTIFIER ::= { snICX725024HPOE 1 }        -- ICX725024-HPOE switch
+  snICX725024HPOEBaseL3Router OBJECT IDENTIFIER ::= { snICX725024HPOE 2 }        -- ICX725024-HPOE Base L3 router
+  snICX725024HPOERouter       OBJECT IDENTIFIER ::= { snICX725024HPOE 3 }        -- ICX725024-HPOE Base Router
+
+  snICX725024GFamily     OBJECT IDENTIFIER ::= { snICX725024Family 3 }
+  snICX725024G               OBJECT IDENTIFIER ::= { snICX725024GFamily 1 }      -- ICX7250G 24-port 1G
+  snICX725024GSwitch         OBJECT IDENTIFIER ::= { snICX725024G 1 }            -- ICX725024G switch
+  snICX725024GBaseL3Router   OBJECT IDENTIFIER ::= { snICX725024G 2 }            -- ICX725024G Base L3 router
+  snICX725024GRouter         OBJECT IDENTIFIER ::= { snICX725024G 3 }            -- ICX725024G Router
+
+  snICX725048Family       OBJECT IDENTIFIER ::= { snICX7250Family 2 }
+
+  snICX725048BaseFamily    OBJECT IDENTIFIER ::= { snICX725048Family 1 }
+  snICX725048              OBJECT IDENTIFIER ::= { snICX725048BaseFamily 1 }    -- ICX725048 48-port 1G
+  snICX725048Switch        OBJECT IDENTIFIER ::= { snICX725048 1 }              -- ICX725048 48-port Switch
+  snICX725048BaseL3Router  OBJECT IDENTIFIER ::= { snICX725048 2 }              -- ICX725048 48-port Base L3 router
+  snICX725048Router        OBJECT IDENTIFIER ::= { snICX725048 3 }              -- ICX725048 48-port Router
+
+  snICX725048HPOEBaseFamily   OBJECT IDENTIFIER ::= { snICX725048Family 2 }
+  snICX725048HPOE             OBJECT IDENTIFIER ::= { snICX725048HPOEBaseFamily 1 }  -- ICX725048-HPOE 48-port POE+ 1G
+  snICX725048HPOESwitch       OBJECT IDENTIFIER ::= { snICX725048HPOE 1 }            -- ICX725048-HPOE 48-port Switch
+  snICX725048HPOEBaseL3Router OBJECT IDENTIFIER ::= { snICX725048HPOE 2 }            -- ICX725048-HPOE 48-port Base L3 router
+  snICX725048HPOERouter       OBJECT IDENTIFIER ::= { snICX725048HPOE 3 }            -- ICX725048-HPOE 48-port Router
 
 -- EdgeIron Stackable family
   edgeIron          OBJECT IDENTIFIER ::= { products 4 }

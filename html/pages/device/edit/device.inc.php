@@ -40,13 +40,31 @@ if ($_POST['editing']) {
         } else {
             $update_message = "Device record update error.";
         }
+
+        if ($_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
+            if (is_admin()) {
+                $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
+                if ($result == "") {
+                    print_message("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    echo '
+                        <script>
+                            var loc = window.location;
+                            window.location.replace(loc.protocol + "//" + loc.host + loc.pathname + loc.search);
+                        </script>
+                    ';
+                } else {
+                    print_error($result . ".  Does your web server have permission to modify the rrd files?");
+                }
+            } else {
+                print_error('Only administrative users may update the device hostname');
+            }
+        }
     } else {
         include 'includes/error-no-perm.inc.php';
     }
 }
 
 $descr  = $device['purpose'];
-
 $override_sysLocation = $device['override_sysLocation'];
 $override_sysLocation_string = $device['location'];
 
@@ -78,7 +96,16 @@ if ($updated && $update_message) {
 <br>
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <input type=hidden name="editing" value="yes">
-    <div class="form-group">
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
+        <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
+        <div class="col-sm-6">
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo(display($device['hostname'])); ?> />
+        </div>
+        <div class="col-sm-2">
+            <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
             <textarea id="descr" name="descr" class="form-control"><?php echo(display($device['purpose'])); ?></textarea>
@@ -164,6 +191,15 @@ if ($updated && $update_message) {
                 toastr.error('An error occured setting this device to be rediscovered');
             }
         });
+    });
+    $('#hostname-edit-button').click(function(e) {
+        e.preventDefault();
+        disabled_state = document.getElementById('edit-hostname-input').disabled;
+        if (disabled_state == true) {
+            document.getElementById('edit-hostname-input').disabled = false;
+        } else {
+            document.getElementById('edit-hostname-input').disabled = true;
+        }
     });
 </script>
 <?php
