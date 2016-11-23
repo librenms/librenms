@@ -148,7 +148,7 @@ function discover_device($device, $options = null)
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
+            printf("\n>> Runtime for discovery module '%s': %.4f seconds\n", $module, $module_time);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
