@@ -40,7 +40,7 @@ if ($device['os_group'] == 'cisco') {
 
         $rrd_def = array();
         foreach ($oids as $oid) {
-            $oid_ds = truncate(str_replace('cesServerFarm', '', $oid), 19, '');
+            $oid_ds = substr(str_replace('cesServerFarm', '', $oid), 0, 19);
             $rrd_def[] = "DS:$oid_ds:GAUGE:600:-1:100000000";
         }
 

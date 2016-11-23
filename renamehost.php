@@ -11,12 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 // Remove a host and all related data from the system
 if ($argv[1] && $argv[2]) {

@@ -23,6 +23,7 @@ source: Support/FAQ.md
  - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
  - [How do I move my LibreNMS install to another server?](#faq24)
  - [Why is my EdgeRouter device not detected?](#faq25)
+ - [Why are some of my disks not showing?](#faq26)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -226,6 +227,19 @@ If you have `service snmp description` set in your config then this will be why,
  value should override the sysDescr value returned which breaks our detection.
  
 If you don't have that set then this may be then due to an update of EdgeOS or a new device type, please [create an issue](https://github.com/librenms/librenms/issues/new).
+
+#### <a name="faq26"> Why are some of my disks not showing?</a>
+
+If you are monitoring a linux server then net-snmp doesn't always expose all disks via hrStorage (HOST-RESOURCES-MIB). We have additional support which will retrieve disks via dskTable (UCD-SNMP-MIB). 
+To expose these disks you need to add additional config to your snmpd.conf file. For example, to expose `/dev/sda1` which may be mounted as `/storage` you can specify:
+
+`disk /dev/sda1`
+
+Or
+
+`disk /storage`
+
+Restart snmpd and LibreNMS should populate the additional disk after a fresh discovery.
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 

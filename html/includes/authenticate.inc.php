@@ -48,13 +48,6 @@ if (!isset($config['auth_mechanism'])) {
     $config['auth_mechanism'] = 'mysql';
 }
 
-if (file_exists('includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    include_once 'includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-} else {
-    print_error('ERROR: no valid auth_mechanism defined!');
-    exit();
-}
-
 $auth_success = 0;
 
 if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {

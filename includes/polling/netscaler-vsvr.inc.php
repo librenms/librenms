@@ -55,11 +55,11 @@ if ($device['os'] == 'netscaler') {
 
     $rrd_def = array();
     foreach ($oids_gauge as $oid) {
-        $oid_ds    = truncate(str_replace('vsvr', '', $oid), 19, '');
+        $oid_ds    = substr(str_replace('vsvr', '', $oid), 0, 19);
         $rrd_def[] = "DS:$oid_ds:GAUGE:600:U:100000000000";
     }
     foreach ($oids_counter as $oid) {
-        $oid_ds    = truncate(str_replace('vsvr', '', $oid), 19, '');
+        $oid_ds    = substr(str_replace('vsvr', '', $oid), 0, 19);
         $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
     }
 
