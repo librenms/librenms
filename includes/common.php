@@ -1488,6 +1488,29 @@ function get_auth_ad_group_filter($groupname)
 }
 
 /**
+ * Print a list of items up to a max amount
+ * If over that number, a line will print the total items
+ *
+ * @param array $list
+ * @param string $format format as consumed by printf()
+ * @param int $max the max amount of items to print, default 10
+ */
+function print_list($list, $format, $max = 10)
+{
+    $total = count($list);
+    $overflow = '';
+    if ($total > $max) {
+        $extra = $total - $max;
+        $overflow = " and $extra more...";
+        $list = array_slice($list, 0, $max);
+    }
+    foreach ($list as $item) {
+        printf($format, $item);
+    }
+    printf($format, $overflow);
+}
+
+/**
  * @param $value
  * @return string
  */
