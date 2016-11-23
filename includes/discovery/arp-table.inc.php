@@ -67,9 +67,9 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($mac), $device, 'interface', $port_id);
                     dbUpdate(array('mac_address' => $mac), 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', array($port_id, $ip, $context));
                 }
-                echo '.';
+                d_echo(null, '.');
             } elseif (isset($interface['port_id'])) {
-                echo '+';
+                d_echo(null, '+');
                 $insert_data[] = array(
                     'port_id'      => $port_id,
                     'mac_address'  => $mac,
@@ -92,7 +92,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $entry_ip  = $entry['ipv4_address'];
         if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
             dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', array($entry_if, $entry_mac, $entry_ip, $context));
-            echo '-';
+            d_echo(null, '-');
         }
     }
     echo PHP_EOL;
