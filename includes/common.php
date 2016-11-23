@@ -1497,15 +1497,12 @@ function get_auth_ad_group_filter($groupname)
  */
 function print_list($list, $format, $max = 10)
 {
-    $total = count($list);
-    $list = array_slice($list, 0, $max);
-
-    foreach ($list as $item) {
+    foreach (array_slice($list, 0, $max) as $item) {
         printf($format, $item);
     }
 
-    if ($total > $max) {
-        $extra = $total - $max;
+    $extra = count($list) - $max;
+    if ($extra > 0) {
         printf($format, " and $extra more...");
     }
 }
