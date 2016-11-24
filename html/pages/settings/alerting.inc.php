@@ -288,7 +288,7 @@ $mail_conf = array(
     ),
     array('name'               => 'email_smtp_password',
           'descr'              => 'SMTP Authentication Password',
-          'type'               => 'text',
+          'type'               => 'password',
     ),
 );
 
