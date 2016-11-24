@@ -14,7 +14,7 @@
 
 // FUA
 
-$init_modules = array('web', 'auth');
+$init_modules = array('web', 'auth', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
