@@ -743,13 +743,14 @@ $config['discovery_modules']['stp']            = 1;
 $config['discovery_modules']['cisco-otv']      = 1;
 $config['discovery_modules']['ntp']            = 1;
 
-$config['modules_compat']['rfc1628']['liebert']    = 1;
-$config['modules_compat']['rfc1628']['netmanplus'] = 1;
-$config['modules_compat']['rfc1628']['deltaups']   = 1;
-$config['modules_compat']['rfc1628']['poweralert'] = 1;
-$config['modules_compat']['rfc1628']['multimatic'] = 1;
-$config['modules_compat']['rfc1628']['webpower']   = 1;
-$config['modules_compat']['rfc1628']['huaweiups']  = 1;
+$config['modules_compat']['rfc1628']['abbdpaupscale']    = 1;
+$config['modules_compat']['rfc1628']['liebert']          = 1;
+$config['modules_compat']['rfc1628']['netmanplus']       = 1;
+$config['modules_compat']['rfc1628']['deltaups']         = 1;
+$config['modules_compat']['rfc1628']['poweralert']       = 1;
+$config['modules_compat']['rfc1628']['multimatic']       = 1;
+$config['modules_compat']['rfc1628']['webpower']         = 1;
+$config['modules_compat']['rfc1628']['huaweiups']        = 1;
 
 // Enable daily updates
 $config['update'] = 1;
