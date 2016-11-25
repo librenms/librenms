@@ -225,17 +225,12 @@ if ($device['port_association_mode']) {
 $ports_mapped = get_ports_mapped($device['device_id'], true);
 $ports = $ports_mapped['ports'];
 
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (array ('', '-adsl', '-dot3') as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix";
-        $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
-
-        rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
-    }
+// check for ports with ifIndex based rrds
+include $config['install_dir'] . '/schema/rrd/001.php';
+$files = glob($renamer->getPattern($device));
+if (!empty($files)) {
+    $renamer->run();
 }
-
 
 $ports_found = array ();
 // New interface detection

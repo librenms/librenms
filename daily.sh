@@ -144,6 +144,7 @@ main () {
             post-pull)
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
+                status_run 'Renaming RRD files' 'php includes/rrd_rename.php'
                 status_run 'Updating submodules' "$0 submodules"
                 status_run 'Cleaning up DB' "$0 cleanup"
                 status_run 'Fetching notifications' "$0 notifications"
