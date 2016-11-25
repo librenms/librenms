@@ -7,15 +7,10 @@ $mib_oids = array();
 
 $radioNumber = 0;
 $IfIndex = 0;
+$ifIndexesArray = array();
+$ifIndexesArray = explode("\n", snmp_walk($device, "ifIndex", "-mIF-MIB -Oqv", ""));
 
-$IfNumber = snmp_get_next($device, "ifNumber", "-mIF-MIB -Oqv", "");
-
-for ($i=0; $i < $IfNumber; $i++) {
-    if ($IfIndex == "0") {
-        $IfIndex = snmp_get_next($device, "ifIndex", "-mIF-MIB -Oqv", "");
-    } else {
-        $IfIndex = snmp_get_next($device, "ifIndex.$IfIndex", "-mIF-MIB -Oqv", "");
-    }
+foreach ($ifIndexesArray as $IfIndex) {
     $IfDescr = snmp_get($device, "ifDescr.$IfIndex", "-mIF-MIB -Oqv", "");
     $IfName = snmp_get($device, "ifName.$IfIndex", "-mIF-MIB -Oqv", "");
     if (stristr($IfDescr, "Radio")) {

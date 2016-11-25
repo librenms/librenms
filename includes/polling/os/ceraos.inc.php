@@ -17,15 +17,11 @@ $latitude = snmp_walk($device, 'genEquipUnitLatitude', '-mMWRM-RADIO-MIB -Oqv', 
 $longitude = snmp_walk($device, 'genEquipUnitLongitude', '-mMWRM-RADIO-MIB -Oqv', '');
 
 $IfIndex = 0;
+$ifIndexesArray = array();
+$ifIndexesArray = explode("\n", snmp_walk($device, "ifIndex", "-mIF-MIB -Oqv", ""));
 $num_radios = 0;
-$IfNumber = snmp_get_next($device, "ifNumber", "-mIF-MIB -Oqv", "");
 
-for ($i=0; $i < $IfNumber; $i++) {
-    if ($IfIndex == "0") {
-        $IfIndex = snmp_get_next($device, "ifIndex", "-mIF-MIB -Oqv", "");
-    } else {
-        $IfIndex = snmp_get_next($device, "ifIndex.$IfIndex", "-mIF-MIB -Oqv", "");
-    }
+foreach ($ifIndexesArray as $IfIndex) {
     $IfDescr = snmp_get($device, "ifDescr.$IfIndex", "-mIF-MIB -Oqv", "");
     $IfName = snmp_get($device, "ifName.$IfIndex", "-mIF-MIB -Oqv", "");
     if (stristr($IfDescr, "Radio")) {
