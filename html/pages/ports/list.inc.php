@@ -50,7 +50,7 @@ function formatUnits(units,decimals,display,base) {
 
 var grid = $("#ports").bootgrid({
     ajax: true,
-    rowCount: [25, 50, 100, 250, -1],
+    rowCount: [50, 100, 250, -1],
     converters: {
         'duration': {
             to: function (value) { return moment.duration(value, 'seconds').humanize(); }
