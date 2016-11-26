@@ -33,5 +33,5 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
-    $common_output[] = stripslashes(nl2br(htmlentities($widget_settings['notes'])));
+    $common_output[] = nl2br(display($widget_settings['notes']));
 }
