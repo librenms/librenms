@@ -1517,5 +1517,8 @@ function clean($value)
  */
 function display($value)
 {
-    return htmlentities(stripslashes(strip_tags($value)));
+    $purifier = new HTMLPurifier(
+        HTMLPurifier_Config::createDefault()
+    );
+    return $purifier->purify(stripslashes($value));
 }
