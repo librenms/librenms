@@ -159,7 +159,7 @@ include 'includes/modal/new_bill.inc.php';
            header: $('#table-header').html()
        },
        columnSelection: false,
-       rowCount: [10,20,50,100,-1],
+       rowCount: [50,100,250,-1],
        post: function() {
            return {
                id: 'bills',
