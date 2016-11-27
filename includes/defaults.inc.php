@@ -785,7 +785,7 @@ $config['enable_clear_discovery'] = 1;
 $config['force_ip_to_sysname']    = false;// Set to true if you want to use sysName in place of IPs
 
 // Allow duplicate devices by sysName
-$config['allow_duplicate_sysName'] = true;// Set to false if you want to only allow unique sysName's
+$config['allow_duplicate_sysName'] = false;// Set to true if you want to allow duplicate sysName's
 
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
