@@ -1,4 +1,87 @@
 source: General/Changelog.md
+
+## v1.22
+*(2016-11-25)*
+
+#### Features
+* validate list devices that have not been polled in the last 5 minutes or took more than 5 minutes to poll ([#5037](https://github.com/librenms/librenms/issues/5037))
+* Add Microsoft Teams Alert Transport ([#5023](https://github.com/librenms/librenms/issues/5023))
+* Added formatted uptime value for alert templates [#4983](https://github.com/librenms/librenms/issues/4983)
+* Adds support for enabling / disabling modules per OS ([#4963](https://github.com/librenms/librenms/issues/4963))
+* Improve Dell OpenManage Discovery ([#4957](https://github.com/librenms/librenms/issues/4957))
+* Added the option to select alert rules from a collection
+
+#### Bugfixes
+* use password type for SMTP Auth [#5051](https://github.com/librenms/librenms/issues/5051)
+* Added alert init module to ajax_form [#5058](https://github.com/librenms/librenms/issues/5058)
+* eventlog type variable collision ([#5046](https://github.com/librenms/librenms/issues/5046))
+* Fixed loaded modules for ajax search ([#5043](https://github.com/librenms/librenms/issues/5043))
+* timos6-7 snmprec file error ([#5035](https://github.com/librenms/librenms/issues/5035))
+* Strip out " returned from Proxmox application [#4908](https://github.com/librenms/librenms/issues/4908) ([#5003](https://github.com/librenms/librenms/issues/5003))
+* Used correct variable for displaying total email count in alert capture ([#5022](https://github.com/librenms/librenms/issues/5022))
+* Cisco ASA Sensor Discovery, use correct variable ([#5021](https://github.com/librenms/librenms/issues/5021))
+* Stop service modal form disabling services for read-only admin ([#4994](https://github.com/librenms/librenms/issues/4994))
+* dbUpdate calls now check if it is 0 or above ([#4996](https://github.com/librenms/librenms/issues/4996))
+* Links on devices graphs page to take users straight to specific graph page ([#5001](https://github.com/librenms/librenms/issues/5001))
+* Fixed poweralert discovery, check is now case insensitive ([#5000](https://github.com/librenms/librenms/issues/5000))
+* Daily.sh log_dir failed when install_dir and log_dir were not set ([#4992](https://github.com/librenms/librenms/issues/4992))
+* Merge pull request [#4939](https://github.com/librenms/librenms/issues/4939) from laf/issue-4937
+* Remove service type from uniform display ([#4974](https://github.com/librenms/librenms/issues/4974))
+* Fixed check for VRFs, so this runs on routers without any VRFs defined ([#4972](https://github.com/librenms/librenms/issues/4972))
+* Api rate percent calculation incorrect ([#4956](https://github.com/librenms/librenms/issues/4956))
+* Corrects path to proxmox script in docs ([#4949](https://github.com/librenms/librenms/issues/4949))
+* Update debug output in service check ([#4933](https://github.com/librenms/librenms/issues/4933))
+* Fujitsu PRIMERGY 10Gbe switches are now detected correctly ([#4923](https://github.com/librenms/librenms/issues/4923))
+* Toner graphs with invalid chars
+* Updated syslog table to use display() for msg output ([#4859](https://github.com/librenms/librenms/issues/4859))
+* Added support for https links in alerts procedure url ([#4872](https://github.com/librenms/librenms/issues/4872))
+* Updated check to use != in daily.sh ([#4916](https://github.com/librenms/librenms/issues/4916))
+* Remove escape characters for services form / display [#4891](https://github.com/librenms/librenms/issues/4891)
+* Only update components if data exists in cimc entity-physical discovery [#4902](https://github.com/librenms/librenms/issues/4902)
+* Renamed hp3par os polling file to informos ([#4861](https://github.com/librenms/librenms/issues/4861))
+* Updated Cisco ASA state sensors descr to be a bit more verbose
+
+#### Documentation
+* Added FAQ on why EdgeRouters might not be detected ([#4985](https://github.com/librenms/librenms/issues/4985))
+* Update freenode links ([#4935](https://github.com/librenms/librenms/issues/4935))
+* Issue template to ask people to use irc / community for creating issues
+
+#### Refactoring
+* Rewrite arp-table discovery ([#5048](https://github.com/librenms/librenms/issues/5048))
+* Collection and output of db and snmp stats ([#5049](https://github.com/librenms/librenms/issues/5049))
+* Disable modules for pbn-cp and multimatic os
+* Centralize includes and initialization ([#4991](https://github.com/librenms/librenms/issues/4991))
+* Remove inappropriate usages of truncate() ([#5028](https://github.com/librenms/librenms/issues/5028))
+* Watchguard Fireware cleanup ([#5015](https://github.com/librenms/librenms/issues/5015))
+* Tidy up mibs V-Z ([#4979](https://github.com/librenms/librenms/issues/4979))
+* Limit perf array index length to 19 characters due to limitation in ds-name rrdtool ([#4731](https://github.com/librenms/librenms/issues/4731))
+* Daily.sh updated ([#4920](https://github.com/librenms/librenms/issues/4920))
+* Default to only using mysqli ([#4915](https://github.com/librenms/librenms/issues/4915))
+* Start of cleaning up mibs
+* Update wifi clients polling to support more than 2 radios ([#4913](https://github.com/librenms/librenms/issues/4913))
+* Refactored and added support for $config['log_dir'] to daily.sh
+* Improve Cisco ASA Polling Performance ([#4999](https://github.com/librenms/librenms/issues/4999))
+
+#### Devices
+* Updated edge-core to edgecos and added further detection ([#5024](https://github.com/librenms/librenms/issues/5024))
+* Added basic support for Ceragon devices
+* Added support for Dell PowerConnect 6024
+* Added PBN-CP devices.
+* Added support for Edgerouter devices [#4936](https://github.com/librenms/librenms/issues/4936)
+* Added support for Dell Remote consoles [#4881](https://github.com/librenms/librenms/issues/4881)
+* Added support for FortiSwitch [#4852](https://github.com/librenms/librenms/issues/4852) ([#4858](https://github.com/librenms/librenms/issues/4858))
+
+#### WebUI
+* Availability map compact view, use square tiles instead of rectangles ([#5038](https://github.com/librenms/librenms/issues/5038))
+* Add link to recently added device ([#5032](https://github.com/librenms/librenms/issues/5032))
+* Do not show Config tab for devices set to be excluded from oxidized [#4592](https://github.com/librenms/librenms/issues/4592) ([#5029](https://github.com/librenms/librenms/issues/5029))
+* Update Availability-Map Widget to use sysName when IPs used and config enabled ([#4968](https://github.com/librenms/librenms/issues/4968))
+* Added support for skipping snmp check on edit snmp page for devices ([#4896](https://github.com/librenms/librenms/issues/4896))
+* Update wifi_clients graph ([#4846](https://github.com/librenms/librenms/issues/4846))
+* Further decouple the avail-map page from the widget ([#4887](https://github.com/librenms/librenms/issues/4887))
+
+---
+
 ## v1.21
 *(2016-10-30)*
 
