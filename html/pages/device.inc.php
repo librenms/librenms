@@ -334,7 +334,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 } // end if
             }
 
-            if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
+            if ($config['oxidized']['enabled'] === true && !in_array($device['type'], $config['oxidized']['ignore_types']) && isset($config['oxidized']['url'])) {
                 $device_config_file = true;
             }
         }

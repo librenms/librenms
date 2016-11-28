@@ -134,7 +134,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
     }
 
     $cmd = "snmptranslate -IR -On $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mib_dir']);
+    $cmd .= ' -M ' . (isset($mibdir) ? $config['mib_dir'] . ":".$config['mib_dir']."/$mibdir" : $config['mib_dir']);
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -153,7 +153,7 @@ function snmp_translate_type($oid, $mib = null, $mibdir = null)
     global $config;
 
     $cmd = "snmptranslate -IR -Td $oid";
-    $cmd .= ' -M ' . (isset($mibdir) ? $mibdir : $config['mib_dir']);
+    $cmd .= ' -M ' . (isset($mibdir) ? $config['mib_dir'] . ":".$config['mib_dir']."/$mibdir" : $config['mib_dir']);
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";
     }
@@ -253,25 +253,4 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 function register_mibs()
 {
     // stub
-}
-
-function getHostOS($device)
-{
-    global $config;
-
-    $sysDescr = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
-
-    d_echo("| $sysDescr | $sysObjectId | \n");
-
-    $os = null;
-    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
-    foreach (glob($pattern) as $file) {
-        include $file;
-        if (isset($os)) {
-            return $os;
-        }
-    }
-
-    return "generic";
 }

@@ -13,12 +13,8 @@
 
 use LibreNMS\Exceptions\HostUnreachableException;
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $options = getopt('g:p:f::');
 

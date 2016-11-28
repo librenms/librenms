@@ -1306,6 +1306,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos3');
         $this->checkOS('timos', 'timos4');
         $this->checkOS('timos', 'timos5');
+        $this->checkOS('timos', 'timos6');
+        $this->checkOS('timos', 'timos7');
     }
 
     public function testTpconductor()

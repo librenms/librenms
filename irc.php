@@ -19,14 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require_once 'includes/defaults.inc.php';
-require_once 'config.php';
-require_once 'includes/definitions.inc.php';
-require_once 'includes/functions.php';
-require_once 'includes/discovery/functions.inc.php';
-require_once 'html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 error_reporting(E_ERROR);
 
 $irc = new LibreNMS\IRCBot();

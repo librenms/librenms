@@ -12,18 +12,13 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/common.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/rrdtool.inc.php';
-require 'lib/Slim/Slim.php';
+$init_modules = array('web', 'alerts');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+require $config['install_dir'] . '/html/lib/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
-require_once 'includes/api_functions.inc.php';
+require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
 
 $app->group(

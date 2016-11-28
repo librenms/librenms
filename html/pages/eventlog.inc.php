@@ -41,16 +41,16 @@ print_optionbar_start();
         <label>
             <strong>Type: </strong>
         </label>
-        <select name="type" id="type" class="form-control input-sm">
+        <select name="eventtype" id="eventtype" class="form-control input-sm">
             <option value="">All types</option>
 <?php
 
-foreach (dbFetchRows("SELECT `type` FROM `eventlog` GROUP BY `type`") as $types) {
-    echo '<option value="'.$types['type'].'"';
-    if ($types['type'] === $_POST['type']) {
+foreach (dbFetchColumn("SELECT `type` FROM `eventlog` GROUP BY `type`") as $type) {
+    echo "<option value='$type'";
+    if ($type === $_POST['eventtype']) {
         echo ' selected';
     }
-    echo '>'.$types['type'].'</option>';
+    echo ">$type</option>";
 }
 
 ?>

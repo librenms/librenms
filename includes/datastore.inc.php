@@ -18,10 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once $config['install_dir'] . "/includes/rrdtool.inc.php";
-require_once $config['install_dir'] . "/includes/influxdb.inc.php";
-
-
 /**
  * Filter all elements with keys that start with 'rrd_'
  *

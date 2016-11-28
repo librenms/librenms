@@ -11,10 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $handle = fopen('ips.txt', 'w');
 
@@ -39,4 +37,4 @@ foreach (dbFetchRows('SELECT * FROM `ipv4_networks`') as $data) {
 
 fclose($handle);
 
-shell_exec('fping -t 100 -f ips.txt > ips-scanned.txt');
+shell_exec($config['fping'] . ' -t 100 -f ips.txt > ips-scanned.txt');
