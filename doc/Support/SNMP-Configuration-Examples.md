@@ -58,7 +58,7 @@ addsnmpmgr <librenms ip>
 3. Add your SNMP community:
 ```
 setsnmppw <community>
-``
+```
 
 ### Infoblox
 #### NIOS 7.x
