@@ -50,12 +50,12 @@ snmp-server location YOUR-LOCATION
 
 ### HPE 3PAR
 #### Inform OS 3.2.x
-1. Access the CLI
-2. Add an SNMP Manager with your LibreNMS IP address:
+- Access the CLI
+- Add an SNMP Manager with your LibreNMS IP address:
 ```
 addsnmpmgr <librenms ip>
 ```
-3. Add your SNMP community:
+- Add your SNMP community:
 ```
 setsnmppw <community>
 ```
