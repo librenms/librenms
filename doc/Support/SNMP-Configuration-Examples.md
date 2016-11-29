@@ -54,7 +54,7 @@ snmp-server location YOUR-LOCATION
 2. Add an SNMP Manager with your LibreNMS IP address:
 ```
 addsnmpmgr <librenms ip>
-``
+```
 3. Add your SNMP community:
 ```
 setsnmppw <community>
