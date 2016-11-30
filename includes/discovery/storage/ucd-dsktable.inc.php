@@ -12,7 +12,12 @@ if (is_array($dsktable_array)) {
                 $dsk['dskTotal'] = $dsk['dskTotal'] * 1024;
                 $dsk['dskAvail'] = ($entry['dskAvail'] * 1024);
                 $dsk['dskUsed'] = $dsk['dskTotal'] - $dsk['dskAvail'];
-                discover_storage($valid_storage, $device, $dsk['dskIndex'], 'dsk', 'ucd-dsktable', $dsk['dskPath'], $dsk['dskTotal'], 1024, $dsk['dskUsed']);
+
+                $deny = ignore_storage($dsk['dskPath']);
+
+                if ($deny != 1) {
+                    discover_storage($valid_storage, $device, $dsk['dskIndex'], 'dsk', 'ucd-dsktable', $dsk['dskPath'], $dsk['dskTotal'], 1024, $dsk['dskUsed']);
+                }
             }
         }
     }
