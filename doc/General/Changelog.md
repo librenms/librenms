@@ -1,4 +1,11 @@
 source: General/Changelog.md
+## v1.22.01
+*(2016-11-30)*
+
+#### Bugfixes
+* arp-table uses array_column() breaking discovery on php <=5.4 ([#5099](https://github.com/librenms/librenms/issues/5099))
+
+---
 
 ## v1.22
 *(2016-11-25)*
