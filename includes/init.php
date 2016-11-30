@@ -125,6 +125,8 @@ if (!module_selected('nodb', $init_modules)) {
 }
 
 require $install_dir . '/includes/definitions.inc.php';
+// pull in any local variable over-rides of includes/definitions.inc.php
+include $install_dir . '/local-definitions.inc.php';
 
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     require $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
