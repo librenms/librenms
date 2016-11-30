@@ -100,7 +100,7 @@ function get_userlevel($username)
 {
     global $config, $ldap_connection;
 
-    $userlevel = 0;
+    $userlevel = -1;
 
     // Find all defined groups $username is in
     $filter  = '(&(|(cn='.join(')(cn=', array_keys($config['auth_ldap_groups'])).'))('.$config['auth_ldap_groupmemberattr'].'='.get_membername($username).'))';
@@ -110,9 +110,8 @@ function get_userlevel($username)
     // Loop the list and find the highest level
     foreach ($entries as $entry) {
         $groupname = $entry['cn'][0];
-        $userlevel = array();
         if ($config['auth_ldap_groups'][$groupname]['level'] > $userlevel) {
-            $userlevel['level'] = $config['auth_ldap_groups'][$groupname]['level'];
+            $userlevel = $config['auth_ldap_groups'][$groupname]['level'];
         }
     }
 
