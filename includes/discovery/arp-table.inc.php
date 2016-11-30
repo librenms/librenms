@@ -39,6 +39,10 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $sql = "SELECT M.* from ipv4_mac AS M, ports AS I WHERE M.port_id=I.port_id AND I.device_id=? AND M.context_name=?";
     $params = array($device['device_id'], $context);
     $existing_data = dbFetchRows($sql, $params);
+    $ipv4_addresses = array();
+    foreach ($existing_data as $data) {
+        $ipv4_addresses[] = $data['ipv4_address'];
+    }
 
     $arp_table = array();
     $insert_data = array();
@@ -59,7 +63,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
             $arp_table[$port_id][$ip] = $mac;
 
-            $index = array_search($ip, array_column($existing_data, 'ipv4_address'));
+            $index = array_search($ip, $ipv4_addresses);
             if ($index !== false) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {
