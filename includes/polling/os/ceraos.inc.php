@@ -9,23 +9,41 @@
  * the source code distribution for details.
  */
 
-$ceragon_type = snmp_get($device, 'sysObjectID.0', '-mSNMPv2-MIB -Oqv', '');
+$ceragon_type = $poll_device['sysObjectID'];
 $hardware = rewrite_ceraos_hardware($ceragon_type); // function in ./includes/rewrites.php
-$version = snmp_get($device, 'genEquipMngSwIDUVersionsRunningVersion.1', '-mMWRM-RADIO-MIB -Oqv', '');
-$serial = snmp_walk($device, 'genEquipInventorySerialNumber', '-mMWRM-RADIO-MIB -Oqv', '');
-$latitude = snmp_walk($device, 'genEquipUnitLatitude', '-mMWRM-RADIO-MIB -Oqv', '');
-$longitude = snmp_walk($device, 'genEquipUnitLongitude', '-mMWRM-RADIO-MIB -Oqv', '');
+if (stristr('IP10', $hardware)) {
+    $serial = snmp_get($device, 'genEquipUnitIDUSerialNumber.0', '-mMWRM-RADIO-MIB -Oqv', '');
+} else {
+    $serial = snmp_walk($device, 'genEquipInventorySerialNumber.127', '-mMWRM-RADIO-MIB -Oqv', '');
+}
+$multi_get_array = snmp_get_multi($device, 'genEquipMngSwIDUVersionsRunningVersion.1 genEquipUnitLatitude.0 genEquipUnitLongitude.0', '-OQU', 'MWRM-RADIO-MIB', 'mibs/');
+d_echo($multi_get_array);
+$version = $multi_get_array[1]['MWRM-UNIT-MIB::genEquipMngSwIDUVersionsRunningVersion'];
+$latitude = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLatitude'];
+$longitude = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLongitude'];
+echo "\n.\n";
 
-$IfIndex = 0;
-$ifIndexesArray = array();
-$ifIndexesArray = explode("\n", snmp_walk($device, "ifIndex", "-mIF-MIB -Oqv", ""));
+$ifIndex_array = array();
+$ifIndex_array = explode("\n", snmp_walk($device, 'ifIndex', '-Oqv', 'IF-MIB', 'mibs/'));
+d_echo($ifIndex_array);
+$snmp_get_oids = "";
+foreach ($ifIndex_array as $ifIndex) {
+    $snmp_get_oids .= "ifDescr.$ifIndex ";
+}
+echo "\n.\n";
+
 $num_radios = 0;
-
-foreach ($ifIndexesArray as $IfIndex) {
-    $IfDescr = snmp_get($device, "ifDescr.$IfIndex", "-mIF-MIB -Oqv", "");
-    $IfName = snmp_get($device, "ifName.$IfIndex", "-mIF-MIB -Oqv", "");
-    if (stristr($IfDescr, "Radio")) {
+//$ifDescr_array = array();
+$ifDescr_array = snmp_get_multi($device, $snmp_get_oids, '-OQU', 'IF-MIB', 'mibs/');
+print_r($ifDescr_array);
+d_echo("\$ifDescr_array = " . $ifDescr_array);
+foreach ($ifIndex_array as $ifIndex) {
+    d_echo("\$ifDescr_array[\$ifIndex]['IF-MIB::ifDescr'] = " . $ifDescr_array[$ifIndex]['IF-MIB::ifDescr']) . "\n";
+    if (stristr($ifDescr_array[$ifIndex]['IF-MIB::ifDescr'], "Radio")) {
         $num_radios = $num_radios+1;
     }
 }
 $features = $num_radios . " radios in unit";
+echo "\n.\n";
+
+unset($ceragon_type, $multi_get_array, $ifIndexesArray, $ifIndex, $ifDescr_array, $ifDescr, $num_radios);
