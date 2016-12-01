@@ -100,7 +100,7 @@ function get_userlevel($username)
 {
     global $config, $ldap_connection;
 
-    $userlevel = -1;
+    $userlevel = 0;
 
     // Find all defined groups $username is in
     $filter  = '(&(|(cn='.join(')(cn=', array_keys($config['auth_ldap_groups'])).'))('.$config['auth_ldap_groupmemberattr'].'='.get_membername($username).'))';
