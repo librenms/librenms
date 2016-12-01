@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if ($device['os'] != 'Snom' && $device['os'] != 'asa') {
     echo ' TCP';
 
     $oids = array(

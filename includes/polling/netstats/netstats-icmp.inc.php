@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if ($device['os'] != 'Snom' && $device['os'] != 'asa') {
     echo ' ICMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them

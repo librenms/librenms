@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if ($device['os'] != 'Snom' && $device['os'] != 'asa') {
     echo ' UDP';
 
     // These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
