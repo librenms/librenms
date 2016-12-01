@@ -34,3 +34,8 @@ if (isset($data[1]['entPhysicalSerialNum']) && $data[1]['entPhysicalSerialNum'] 
 if (empty($hardware)) {
     $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');
 }
+
+if (empty($version)) {
+    $explodeddata = explode(" ", $poll_device['sysDescr']);
+    $version = $explodeddata['5'];
+}
