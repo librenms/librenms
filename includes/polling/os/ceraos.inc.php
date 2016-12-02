@@ -14,7 +14,7 @@ $hardware = rewrite_ceraos_hardware($ceragon_type); // function in ./includes/re
 if (stristr('IP10', $hardware)) {
     $serial = snmp_get($device, 'genEquipUnitIDUSerialNumber.0', '-mMWRM-RADIO-MIB -Oqv', '');
 } else {
-    $serial = snmp_walk($device, 'genEquipInventorySerialNumber.127', '-mMWRM-RADIO-MIB -Oqv', '');
+    $serial = snmp_get($device, 'genEquipInventorySerialNumber.127', '-mMWRM-RADIO-MIB -Oqv', '');
 }
 $multi_get_array = snmp_get_multi($device, 'genEquipMngSwIDUVersionsRunningVersion.1 genEquipUnitLatitude.0 genEquipUnitLongitude.0', '-OQU', 'MWRM-RADIO-MIB', 'mibs/');
 d_echo($multi_get_array);
