@@ -27,4 +27,3 @@ rrd
 /vendor
 composer.phar
 librenms_theme
-local-definitions.inc.php
