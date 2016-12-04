@@ -156,6 +156,8 @@ LibreNMS contributors:
 - Christoph Zilian <czilian@hotmail.com> (czilian)
 - Guillem Mateos <bbguillem@gmail.com> (guillemmateos) 
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
+- Martin Zatloukal <slezi2@pvfree.net> (erotel)
+
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
