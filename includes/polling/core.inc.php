@@ -43,7 +43,7 @@ if (empty($uptime)) {
     }//end if
 }//end if
 
-if ($device["os"] != "edgeswitch") {
+if ($config['os'][$device['os']]['bad_snmpEngineTime'] !== true) {
     if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
         $uptime = $snmp_uptime;
         d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
