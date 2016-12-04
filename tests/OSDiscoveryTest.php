@@ -473,6 +473,10 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('edgecos', 'edgecos-es3528m');
         $this->checkOS('edgecos', 'edgecos-ecs4120-28f');
+        $this->checkOS('edgecos', 'edgecos-es3528mv2');
+        $this->checkOS('edgecos', 'edgecos-ecs4510-28f');
+        $this->checkOS('edgecos', 'edgecos-ecs4510-52t');
+        $this->checkOS('edgecos', 'edgecos-ecs4210-28t');
     }
 
     public function testEdgeos()
@@ -485,6 +489,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testEdgeswitch()
     {
         $this->checkOS('edgeswitch');
+        $this->checkOS('edgeswitch', 'edgeswitch-ep-s16');
+        $this->checkOS('edgeswitch', 'edgeswitch-es-24-250w');
     }
 
     public function testEndian()

@@ -917,3 +917,35 @@ function get_toner_capacity($raw_capacity)
     }
     return $raw_capacity;
 }
+
+/**
+ * @param $descr
+ * @return int
+ */
+function ignore_storage($descr)
+{
+    global $config;
+    $deny = 0;
+    foreach ($config['ignore_mount'] as $bi) {
+        if ($bi == $descr) {
+            $deny = 1;
+            d_echo("$bi == $descr \n");
+        }
+    }
+
+    foreach ($config['ignore_mount_string'] as $bi) {
+        if (strpos($descr, $bi) !== false) {
+            $deny = 1;
+            d_echo("strpos: $descr, $bi \n");
+        }
+    }
+
+    foreach ($config['ignore_mount_regexp'] as $bi) {
+        if (preg_match($bi, $descr) > '0') {
+            $deny = 1;
+            d_echo("preg_match $bi, $descr \n");
+        }
+    }
+
+    return $deny;
+}

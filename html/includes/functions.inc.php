@@ -1212,6 +1212,11 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
+            } elseif ($item['type'] == 'password') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" type="password" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
+                ';
             } elseif ($item['type'] == 'numeric') {
                 $output .= '
                 <input id="'.$item['name'].'" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
