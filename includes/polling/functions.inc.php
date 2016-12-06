@@ -41,11 +41,12 @@ function poll_sensor($device, $class, $unit)
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
 
+            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
+
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require_once 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
             }
 
-            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
 
             if ($class == 'temperature') {
                 preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
