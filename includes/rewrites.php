@@ -1412,7 +1412,7 @@ function rewrite_ceraos_hardware($ceragon_type)
     } elseif (strstr($ceragon_type, '.2281.1.20.2.2')) {
         $hardware = 'IP-20C';
     } else {
-        $hardware = snmp_walk($device, 'genEquipInventoryCardName', '-mMWRM-RADIO-MIB -Oqv', '');
+        $hardware = snmp_walk($device, 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
     }
     return ($hardware);
 };
