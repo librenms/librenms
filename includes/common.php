@@ -232,11 +232,6 @@ function get_all_devices($device, $type = "")
     return $devices;
 }
 
-function port_by_id_cache($port_id)
-{
-    return get_port_by_id_cache('port', $port_id);
-}
-
 function table_from_entity_type($type)
 {
     // Fuck you, english pluralisation.
@@ -1488,6 +1483,26 @@ function get_auth_ad_group_filter($groupname)
 }
 
 /**
+ * Print a list of items up to a max amount
+ * If over that number, a line will print the total items
+ *
+ * @param array $list
+ * @param string $format format as consumed by printf()
+ * @param int $max the max amount of items to print, default 10
+ */
+function print_list($list, $format, $max = 10)
+{
+    foreach (array_slice($list, 0, $max) as $item) {
+        printf($format, $item);
+    }
+
+    $extra = count($list) - $max;
+    if ($extra > 0) {
+        printf($format, " and $extra more...");
+    }
+}
+
+/**
  * @param $value
  * @return string
  */
@@ -1502,5 +1517,8 @@ function clean($value)
  */
 function display($value)
 {
-    return htmlentities(stripslashes(strip_tags($value)));
+    $purifier = new HTMLPurifier(
+        HTMLPurifier_Config::createDefault()
+    );
+    return $purifier->purify(stripslashes($value));
 }

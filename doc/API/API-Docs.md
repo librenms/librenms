@@ -678,8 +678,8 @@ Route: /api/v0/devices/:hostname
 
 Input (JSON):
 
-  - field: The column name within the database
-  - data: The data to update the column with
+  - field: The column name within the database (can be an array of fields)
+  - data: The data to update the column with (can be an array of data))
 
 Examples:
 ```curl
@@ -693,6 +693,21 @@ Output:
     {
         "status": "ok",
         "message": "Device notes has been updated"
+    }
+]
+```
+
+```curl
+curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+```
+
+Output:
+
+```text
+[
+    {
+        "status": "ok",
+        "message": "Device fields have been updated"
     }
 ]
 ```

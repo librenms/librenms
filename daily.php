@@ -6,13 +6,8 @@
  * (c) 2013 LibreNMS Contributors
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require_once 'includes/definitions.inc.php';
-require 'includes/functions.php';
-require_once 'includes/alerts.inc.php';
+$init_modules = array('alerts');
+require __DIR__ . '/includes/init.php';
 
 $options = getopt('f:d');
 

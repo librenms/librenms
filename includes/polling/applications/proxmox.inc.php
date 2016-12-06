@@ -64,6 +64,7 @@ if ($proxmox) {
         $pmxcache = array();
 
         foreach ($pmxlines as $vm) {
+            $vm = str_replace('"', '', $vm);
             list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode('/', $vm, 5);
             print "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
 

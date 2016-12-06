@@ -11,13 +11,9 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
 // FIXME - implement cli switches, debugging, etc.
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $iter = '0';
 

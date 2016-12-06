@@ -1,7 +1,5 @@
 <?php
 
-require_once $config['install_dir'].'/includes/device-groups.inc.php';
-
 function bulk_sensor_snmpget($device, $sensors)
 {
     $oid_per_pdu = get_device_oid_limit($device);
@@ -149,7 +147,7 @@ function poll_sensor($device, $class, $unit)
 
 function poll_device($device, $options)
 {
-    global $config, $device, $polled_devices, $db_stats, $memcache;
+    global $config, $device, $polled_devices, $memcache;
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
@@ -261,7 +259,7 @@ function poll_device($device, $options)
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
+                printf("\n>> Runtime for poller module '%s': %.4f seconds\n", $module, $module_time);
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
@@ -392,7 +390,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         $oiddsopts = $param[4];
 
         if (strlen($oiddsname) > 19) {
-            $oiddsname = truncate($oiddsname, 19, '');
+            $oiddsname = substr($oiddsname, 0, 19);
         }
 
         if (empty($oiddsopts)) {

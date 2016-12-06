@@ -167,7 +167,7 @@ if ($_SESSION['userlevel'] >= '5') {
                             text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
                             print_port_thumbnail($port);
-                            echo "<div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '').'</div>
+                            echo "<div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 22).'</div>
                                 </div>';
                             break;
 

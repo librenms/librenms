@@ -22,7 +22,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
         return {
             id: "eventlog",
             device: "' .mres($vars['device']) .'",
-            type: "' .mres($vars['type']) .'",
+            eventtype: "' .mres($vars['eventtype']) .'",
         };
     },
     url: "ajax_table.php"

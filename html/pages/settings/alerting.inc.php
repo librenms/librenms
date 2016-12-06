@@ -184,6 +184,12 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin() === true) {
+    set_config_name('alert.transports.pagerduty', '');
+    set_config_name('alert.pagerduty.account', '');
+    set_config_name('alert.pagerduty.service', '');
+}
+
 $config_groups = get_config_by_group('alerting');
 
 if (isset($config['base_url'])) {
@@ -282,7 +288,7 @@ $mail_conf = array(
     ),
     array('name'               => 'email_smtp_password',
           'descr'              => 'SMTP Authentication Password',
-          'type'               => 'text',
+          'type'               => 'password',
     ),
 );
 
@@ -359,7 +365,11 @@ if (empty($config_groups['alert.transports.pagerduty']['config_value']) === fals
 } else {
     echo "<i class='fa fa-check-square-o fa-col-danger fa-3x'></i>";
 }
-
+                    echo '</div>
+                        <div class="col-sm-offset-8 col-sm-1">';
+if (empty($config_groups['alert.transports.pagerduty']['config_value']) === false) {
+    echo '<a href = "settings/sub=alerting/?del_pagerduty=true" class="btn btn-xs btn-danger pull-right" > Delete</a >';
+}
                     echo '</div>
                     </div>
                 </div>
@@ -990,6 +1000,28 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$msteams_url   = get_config_by_name('alert.transports.msteams.url');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#msteams_transport_expand"><i class="fa fa-caret-down"></i> Microsoft Teams transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="msteams" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="msteams_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="msteams_url" class="col-sm-4 control-label">Microsoft Teams Webhook URL</label>
+                        <div class="col-sm-4">
+                            <input id="msteams_url" class="form-control" type="text" name="global-config-input" value="'.$msteams_url['config_value'].'" data-config_id="'.$msteams_url['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -999,7 +1031,7 @@ echo '
 <script>
 
     <?php
-    if (isset($_GET['service_key'])) {
+    if (isset($_GET['service_key']) || isset($vars['del_pagerduty'])) {
         echo "$('#pagerduty_transport_expand').collapse('show');";
     }
     ?>

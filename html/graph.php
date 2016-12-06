@@ -13,8 +13,6 @@
 
 $start = microtime(true);
 
-require_once 'Net/IPv4.php';
-
 if (isset($_GET['debug'])) {
     $debug = true;
     ini_set('display_errors', 1);
@@ -29,28 +27,18 @@ if (isset($_GET['debug'])) {
     ini_set('error_reporting', 0);
 }
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/common.php';
-require_once '../includes/definitions.inc.php';
-
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/rrdtool.inc.php';
-if ($config['allow_unauth_graphs'] != true) {
-    require_once 'includes/authenticate.inc.php';
-}
+$init_modules = array('web', 'graphs');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 rrdtool_initialize(false);
 
-require 'includes/graphs/graph.inc.php';
+require $config['install_dir'] . '/html/includes/graphs/graph.inc.php';
 
 rrdtool_close();
 
-$end = microtime(true);
-$run = ($end - $start);
-
-
-d_echo('<br />Runtime '.$run.' secs');
-d_echo('<br />MySQL: Cell    '.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fetchcell_sec'] + 0), 3).'s'.' Row    '.($db_stats['fetchrow'] + 0).'/'.round(($db_stats['fetchrow_sec'] + 0), 3).'s'.' Rows   '.($db_stats['fetchrows'] + 0).'/'.round(($db_stats['fetchrows_sec'] + 0), 3).'s'.' Column '.($db_stats['fetchcol'] + 0).'/'.round(($db_stats['fetchcol_sec'] + 0), 3).'s');
+if ($debug) {
+    echo '<br />';
+    printf("Runtime %.3fs", microtime(true) - $start);
+    echo '<br />';
+    printStats();
+}

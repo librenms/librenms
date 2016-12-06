@@ -1,49 +1,9 @@
 <?php
-
-require_once $config['install_dir'].'/includes/common.php';
-require_once $config['install_dir'].'/includes/dbFacile.php';
-require_once $config['install_dir'].'/includes/mergecnf.inc.php';
-
-// Connect to database
-$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-
-if (!$database_link) {
-    if (isCli()) {
-        c_echo("[%RFAIL%n]  Could not connect to MySQL\n");
-    } else {
-        echo '<h2>MySQL Error: could not connect</h2>';
-    }
-    echo mysqli_error($database_link);
-    die;
-}
-
-$database_db = mysqli_select_db($database_link, $config['db_name']);
-
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $config['memcached']['ttl']      = 60;
-        $config['memcached']['resource'] = new Memcached();
-        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    } else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
-}
-
-$clone = $config;
-foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
-    $clone = array_replace_recursive($clone, mergecnf($obj));
-}
-
-$config = array_replace_recursive($clone, $config);
-
 //
 // NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
 //
 // YES, THAT MEANS YOU                   #
 //
-umask(0002);
 
 $config['os']['default']['over'][0]['graph'] = 'device_processor';
 $config['os']['default']['over'][0]['text']  = 'Processor Usage';
@@ -154,6 +114,7 @@ $config['os'][$os]['text']             = 'Ubiquiti UniFi';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -166,6 +127,7 @@ $config['os'][$os]['text']             = 'Ubiquiti AirOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 
@@ -174,6 +136,7 @@ $config['os'][$os]['text']             = 'Ubiquiti AirFiber';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['group']            = 'ubnt';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 
@@ -1816,16 +1779,6 @@ $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['text'] = 'Symbol AP';
 $config['os'][$os]['icon'] = 'symbol';
 
-$os = 'firebox';
-$config['os'][$os]['text']             = 'Watchguard Firebox';
-$config['os'][$os]['type']             = 'firewall';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-$config['os'][$os]['icon']             = 'watchguard';
-$config['os'][$os]['group']            = 'watchguard';
-
 $os = 'fireware';
 $config['os'][$os]['text']             = 'Watchguard Fireware';
 $config['os'][$os]['type']             = 'firewall';
@@ -1891,6 +1844,18 @@ $config['os'][$os]['text'] = 'Datacom';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'datacom';
 
+$os = 'edgecos';
+$config['os'][$os]['text']             = 'Edgecore';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'edge-core';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // UBNT EdgeSwitch 750W
 $os = 'edgeswitch';
 $config['os'][$os]['text']             = 'EdgeSwitch';
@@ -1925,11 +1890,19 @@ $config['os'][$os]['icon']             = 'pbn';
 
 // PBN CPE, Pacific Broadband Networks
 $os = 'pbn-cp';
-$config['os'][$os]['text']             = 'PBN P2P CP100 Series Platform';
-$config['os'][$os]['type']             = 'network';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['icon']             = 'pbn';
+$config['os'][$os]['text']                          = 'PBN P2P CP100 Series Platform';
+$config['os'][$os]['type']                          = 'network';
+$config['os'][$os]['over'][0]['graph']              = 'device_bits';
+$config['os'][$os]['over'][0]['text']               = 'Device Traffic';
+$config['os'][$os]['icon']                          = 'pbn';
+$config['os'][$os]['discovery_modules']['ntp']      = 0;
+$config['os'][$os]['discovery_modules']['ospf']     = 0;
+$config['os'][$os]['discovery_modules']['services'] = 0;
+$config['os'][$os]['discovery_modules']['storage']  = 0;
+$config['os'][$os]['poller_modules']['ntp']         = 0;
+$config['os'][$os]['poller_modules']['ospf']        = 0;
+$config['os'][$os]['poller_modules']['services']    = 0;
+$config['os'][$os]['poller_modules']['storage']     = 0;
 
 // Enterasys
 $os = 'enterasys';
@@ -1942,9 +1915,12 @@ $config['os'][$os]['ifname']           = 1;
 
 // Multimatic UPS (Generex CS121 SNMP Adapter)
 $os = 'multimatic';
-$config['os'][$os]['text'] = 'Multimatic UPS';
-$config['os'][$os]['type'] = 'power';
-$config['os'][$os]['icon'] = 'multimatic';
+$config['os'][$os]['text']                        = 'Multimatic UPS';
+$config['os'][$os]['type']                        = 'power';
+$config['os'][$os]['icon']                        = 'multimatic';
+$config['os'][$os]['poller_modules']['ospf']      = 0;
+$config['os'][$os]['poller_modules']['ntp']       = 0;
+$config['os'][$os]['poller_modules']['services']  = 0;
 
 // Huawei UPS
 $os = 'huaweiups';
@@ -2241,19 +2217,6 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
-// Edge-Core
-$os = 'edge-core';
-$config['os'][$os]['text']             = 'Edge-Core';
-$config['os'][$os]['type']             = 'network';
-$config['os'][$os]['ifname']           = 1;
-$config['os'][$os]['icon']             = 'edge-core';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
-$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
-
 // Mimosa 
 $os = 'mimosa';
 $config['os'][$os]['text']             = 'Mimosa';
@@ -2277,12 +2240,6 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
-
-
-
-// Graph Types
-require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
-
 
 // Device - Wireless - AirMAX
 $config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['section'] = 'wireless';
@@ -2950,9 +2907,6 @@ $config['ipmi_unit']['degrees C'] = 'temperature';
 $config['ipmi_unit']['RPM']       = 'fanspeed';
 $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['discrete']  = '';
-
-// INCLUDE THE VMWARE DEFINITION FILE.
-require_once 'vmware_guestid.inc.php';
 
 // Define some variables if they aren't set by user definition in config.php
 if (!isset($config['html_dir'])) {

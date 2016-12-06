@@ -12,15 +12,8 @@
  *
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require_once 'includes/syslog.php';
-require_once 'includes/dbFacile.php';
-require_once 'includes/common.php';
-require_once 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $i = "1";
 
