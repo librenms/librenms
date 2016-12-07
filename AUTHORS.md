@@ -78,6 +78,7 @@ LibreNMS contributors:
 - D. Britz <github@wrind.de> (flatterlight)
 - Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 - Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
+- Dave Hope <dave@hope.mx> (davehope)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
