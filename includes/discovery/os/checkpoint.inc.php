@@ -13,3 +13,13 @@
 if (starts_with($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1.49')) {
     $os = 'gaia';
 }
+/*
+ * Add suport for gaia mgmt 
+ * Copyright (c) 2016 Radoslaw Pozauc <radoslaw@pozauc.pl> 
+ */
+
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1.48')) {
+    $os = 'gaia';
+}
+
+
