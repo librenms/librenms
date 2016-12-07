@@ -23,7 +23,9 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
                 break;
         }
         $value = snmp_get($device, $oid.$volt, '-Oqv');
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+        if (is_numeric($value)) {
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+        }
     }
     /*
      * other linux os
