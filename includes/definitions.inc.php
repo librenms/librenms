@@ -770,7 +770,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_ceraos_RxLevel';
 $config['os'][$os]['over'][1]['text']  = 'Rx Level';
 $config['os'][$os]['over'][2]['graph'] = 'device_ping_perf';
 $config['os'][$os]['over'][2]['text']  = 'Ping Times';
-$config['os'][$os]['mib-dir'][]        = 'ceraos';
+
 // Cisco WAP
 $os = 'ciscowap';
 $config['os'][$os]['text']             = 'Cisco Wireless Acess Point';
