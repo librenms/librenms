@@ -7,6 +7,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     } elseif ($device['os'] == 'airos-af') {
         echo 'It Is AirFIBER' . PHP_EOL;
         include 'includes/polling/mib/ubnt-airfiber-mib.inc.php';
+    } elseif ($device['os'] == 'ceraos') {
+        echo 'It is Ceragon CeroOS' . PHP_EOL;
+        include 'includes/polling/mib/ceraos-mib.inc.php';
     } elseif ($device['os'] == 'siklu') {
         echo 'It is Siklu' . PHP_EOL;
         include 'includes/polling/mib/siklu-mib.inc.php';
