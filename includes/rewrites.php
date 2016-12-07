@@ -1381,9 +1381,12 @@ $ipmiSensorsNames = array(
         ),
 );
 
-
-
-function rewrite_ceraos_hardware($ceragon_type)
+/**
+ * @param $ceragon_type
+ * @param $device
+ * @return bool|mixed|string
+ */
+function rewrite_ceraos_hardware($ceragon_type, $device)
 {
     if (strstr($ceragon_type, '.2281.1.10')) {
         $hardware = 'IP10 Family';
@@ -1412,7 +1415,7 @@ function rewrite_ceraos_hardware($ceragon_type)
     } elseif (strstr($ceragon_type, '.2281.1.20.2.2')) {
         $hardware = 'IP-20C';
     } else {
-        $hardware = snmp_walk($device, 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
+        $hardware = snmp_get($device, 'genEquipInventoryCardName', '-Oqv', 'MWRM-UNIT-NAME');
     }
-    return ($hardware);
+    return $hardware;
 };

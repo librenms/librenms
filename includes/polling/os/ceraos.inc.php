@@ -10,7 +10,7 @@
  */
 
 $ceragon_type = $poll_device['sysObjectID'];
-$hardware = rewrite_ceraos_hardware($ceragon_type); // function in ./includes/rewrites.php
+$hardware = rewrite_ceraos_hardware($ceragon_type, $device); // function in ./includes/rewrites.php
 if (stristr('IP10', $hardware)) {
     $serial = snmp_get($device, 'genEquipUnitIDUSerialNumber.0', '-Oqv', 'MWRM-UNIT-MIB');
 } else {
