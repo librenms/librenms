@@ -79,6 +79,7 @@ LibreNMS contributors:
 - D. Britz <github@wrind.de> (flatterlight)
 - Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 - Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
+- Dave Hope <dave@hope.mx> (davehope)
 - Jurrian van Iersel <jurrian@vaniersel.net> (jviersel)
 - Adam Winberg <adam.winberg@gmail.com> (wiad)
 - Maximilian Wilhelm <max@rfc2324.org> (BarbarossaTM)
