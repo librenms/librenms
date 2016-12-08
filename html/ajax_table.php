@@ -12,13 +12,15 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/defaults.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!$_SESSION['authenticated']) {
+    echo "Unauthenticated\n";
+    exit;
+}
+
 set_debug($_REQUEST['debug']);
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
 
 $current = $_POST['current'];
 settype($current, 'integer');
@@ -36,6 +38,7 @@ $response     = array();
 
 if (isset($id)) {
     if (file_exists("includes/table/$id.inc.php")) {
+        header('Content-type: application/json');
         include_once "includes/table/$id.inc.php";
     }
 }

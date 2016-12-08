@@ -1,3 +1,4 @@
+source: General/Acknowledgement.md
 LibreNMS 3rd party acknowledgements
 -----------------------------------
 
@@ -24,6 +25,9 @@ LibreNMS 3rd party acknowledgements
   - TW Sack (https://code.google.com/p/tw-sack/): GPLv3
   - Gridster (http://gridster.net/): MIT
   - Pure PHP radius class (http://developer.sysco.ch/php/): GPLv3
+  - GeSHi - Generic Syntax Highlighter (http://qbnz.com/highlighter/): GPLv2+
+  - MalaysiaMap.svg - By Exiang [CC BY 3.0 (http://creativecommons.org/licenses/by/3.0)], via Wikimedia Commons
+  - HTML Purifier (http://htmlpurifier.org/): LGPL v2.1
 
 #### 3rd Party GPLv3 Non-compliant
 
@@ -32,7 +36,3 @@ LibreNMS 3rd party acknowledgements
   - html/graph-realtime.php: BSD (original?)
   - html/includes/collectd/: GPLv2 only
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
-  - scripts/*/mysql: GPLv2 only
-  - check_mk (scripts/check_mk*): GPLv2
-
-

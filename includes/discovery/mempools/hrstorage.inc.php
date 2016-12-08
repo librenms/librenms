@@ -14,21 +14,19 @@ if (is_array($storage_array)) {
 
         switch ($fstype) {
             case 'hrStorageVirtualMemory':
-            case 'hrStorageRam';
-            case 'nwhrStorageDOSMemory';
-            case 'nwhrStorageMemoryAlloc';
-            case 'nwhrStorageMemoryPermanent';
-            case 'nwhrStorageMemoryAlloc';
-            case 'nwhrStorageCacheBuffers';
-            case 'nwhrStorageCacheMovable';
-            case 'nwhrStorageCacheNonMovable';
-            case 'nwhrStorageCodeAndDataMemory';
-            case 'nwhrStorageDOSMemory';
-            case 'nwhrStorageIOEngineMemory';
-            case 'nwhrStorageMSEngineMemory';
-            case 'nwhrStorageUnclaimedMemory';
+            case 'hrStorageRam':
+            case 'nwhrStorageDOSMemory':
+            case 'nwhrStorageMemoryAlloc':
+            case 'nwhrStorageMemoryPermanent':
+            case 'nwhrStorageCacheBuffers':
+            case 'nwhrStorageCacheMovable':
+            case 'nwhrStorageCacheNonMovable':
+            case 'nwhrStorageCodeAndDataMemory':
+            case 'nwhrStorageIOEngineMemory':
+            case 'nwhrStorageMSEngineMemory':
+            case 'nwhrStorageUnclaimedMemory':
                 $deny = 0;
-            break;
+                break;
         }
 
         if ($device['os'] == 'vmware' && $descr == 'Real Memory') {

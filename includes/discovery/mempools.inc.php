@@ -1,7 +1,5 @@
 <?php
 
-echo 'Memory : ';
-
 // Include all discovery modules
 $include_dir = 'includes/discovery/mempools';
 require 'includes/include-dir.inc.php';

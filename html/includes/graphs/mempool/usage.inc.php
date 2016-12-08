@@ -11,8 +11,7 @@ $colour_area = 'ffaaaa';
 
 if ($width > '500') {
     $descr_len = 13;
-}
-else {
+} else {
     $descr_len  = 8;
     $descr_len += round(($width - 250) / 8);
 }
@@ -20,8 +19,7 @@ else {
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Total      Used      Free(    Min       Max      Ave)'";
     $rrd_options .= " COMMENT:'\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Total      Used      Free\l'";
 }
 
@@ -44,15 +42,14 @@ if ($width > '500') {
     $rrd_options .= " GPRINT:$mempool[mempool_id]free:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$mempool[mempool_id]free:MIN:%5.2lf%sB";
     $rrd_options .= " GPRINT:$mempool[mempool_id]free:MAX:%5.2lf%sB";
-    $rrd_options .= " GPRINT:$mempool[mempool_id]free:AVERAGE:%5.2lf%sB\\\\n";
+    $rrd_options .= " GPRINT:$mempool[mempool_id]free:AVERAGE:%5.2lf%sB\\n";
     $rrd_options .= " COMMENT:'".substr(str_pad('', ($descr_len + 12)), 0, ($descr_len + 12))." '";
     $rrd_options .= " GPRINT:$mempool[mempool_id]perc:LAST:'%5.2lf%%  '";
     $rrd_options .= " GPRINT:$mempool[mempool_id]percx:LAST:'%5.2lf%% '";
     $rrd_options .= " GPRINT:$mempool[mempool_id]perc:MIN:'%5.2lf%% '";
     $rrd_options .= " GPRINT:$mempool[mempool_id]perc:MAX:'%5.2lf%% '";
-    $rrd_options .= " GPRINT:$mempool[mempool_id]perc:AVERAGE:%5.2lf%%\\\\n";
-}
-else {
+    $rrd_options .= " GPRINT:$mempool[mempool_id]perc:AVERAGE:%5.2lf%%\\n";
+} else {
     $rrd_options .= " LINE1.25:$mempool[mempool_id]perc#".$background['left'].":'$descr'";
     $rrd_options .= " GPRINT:$mempool[mempool_id]size:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$mempool[mempool_id]used:LAST:%6.2lf%sB";

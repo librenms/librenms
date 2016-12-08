@@ -33,6 +33,20 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['powerdns-recursor'] = array(
+    'questions',
+    'answers',
+    'cache_performance',
+    'outqueries'
+);
+
+$graphs['rrdcached'] = array(
+    'queue_length',
+    'events',
+    'tree',
+    'journal'
+);
+
 $graphs['bind']      = array('queries');
 
 $graphs['tinydns']   = array(
@@ -40,6 +54,76 @@ $graphs['tinydns']   = array(
     'errors',
     'dnssec',
     'other',
+);
+
+$graphs['powerdns'] = array(
+    'latency',
+    'fail',
+    'packetcache',
+    'querycache',
+    'recursing',
+    'queries',
+    'queries_udp',
+);
+
+$graphs['ntp-client'] = array(
+    'stats',
+    'freq',
+);
+
+$graphs['ntp-server'] = array(
+    'stats',
+    'freq',
+    'stratum',
+    'buffer',
+    'bits',
+    'packets',
+    'uptime',
+);
+
+$graphs['nfs-v3-stats'] = array(
+    'stats',
+    'io',
+    'fh',
+    'rc',
+    'ra',
+    'net',
+    'rpc',
+);
+
+$graphs['os-updates'] = array(
+    'packages',
+);
+$graphs['dhcp-stats'] = array(
+     'stats',
+);
+
+$graphs['freeswitch'] = array(
+    'peak',
+    'callsIn',
+    'callsOut',
+);
+
+$graphs['ups-nut'] = array(
+    'remaining',
+    'load',
+    'voltage_battery',
+    'charge',
+    'voltage_input',
+);
+
+$graphs['ups-apcups'] = array(
+    'remaining',
+    'load',
+    'voltage_battery',
+    'charge',
+    'voltage_input',
+);
+
+$graphs['gpsd'] = array(
+    'satellites',
+    'dop',
+    'mode',
 );
 
 print_optionbar_start();
@@ -61,8 +145,7 @@ foreach ($app_list as $app) {
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
         // echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
-    }
-    else {
+    } else {
         // echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
     }
 
@@ -79,12 +162,10 @@ print_optionbar_end();
 if ($vars['app']) {
     if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
         include 'pages/apps/'.mres($vars['app']).'.inc.php';
-    }
-    else {
+    } else {
         include 'pages/apps/default.inc.php';
     }
-}
-else {
+} else {
     include 'pages/apps/overview.inc.php';
 }
 

@@ -101,6 +101,6 @@ if ($_POST['action'] == 'update_bill') {
         '`bill_id` = ?',
         array($bill_id)
     )) {
-    print_message('Bill Properties Updated');
+        print_message('Bill Properties Updated');
     }
 }//end if

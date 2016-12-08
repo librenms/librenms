@@ -1,0 +1,75 @@
+--
+-- Accedian Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACCEDIAN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+accedianMIB MODULE-IDENTITY
+    LAST-UPDATED "200608060100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Structure of Management Information for Accedian Networks."
+
+    REVISION "200608060100Z"        -- 6 Aug 2006
+    DESCRIPTION
+            "Initial version of MIB module ACCEDIAN-SMI."
+
+    ::= { enterprises 22420 }
+
+--
+-- Accedian MIB tree structure
+--
+
+acdProducts OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Accedian's Product OIDs."
+    ::= { accedianMIB 1 }
+
+acdMibs OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Accedian's MIB objects."
+    ::= { accedianMIB 2 }
+
+acdTraps OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Accedian's Trap OIDs."
+    ::= { accedianMIB 3 }
+
+--  This is the top-level object identifier registry used by Accedian
+--  products for SNMP modules containing experimental MIB definitions.
+--  In this context, experimental MIBs are defined as:
+--    1) IETF work-in-process MIBs which have not been assigned a permanent
+--       object identifier by the IANA.
+--    2) Accedian work-in-process MIBs that have not achieved final
+--       production quality or field experience.
+--   NOTE: Support for MIBs under the this OID subtree is temporary and
+--         changes to objects may occur without notice."
+
+acdExperiment  OBJECT IDENTIFIER ::= { accedianMIB 4 }
+
+acdServices OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Accedian's Services OIDs."
+    ::= { accedianMIB 5 }
+
+END

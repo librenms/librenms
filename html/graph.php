@@ -1,28 +1,17 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage graphing
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
 
-function utime() {
-    $time = explode(' ', microtime());
-    $usec = (double) $time[0];
-    $sec  = (double) $time[1];
-    return ($sec + $usec);
-
-}
-
-$start = utime();
-
-require_once 'Net/IPv4.php';
+$start = microtime(true);
 
 if (isset($_GET['debug'])) {
     $debug = true;
@@ -30,8 +19,7 @@ if (isset($_GET['debug'])) {
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 0);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -39,24 +27,18 @@ else {
     ini_set('error_reporting', 0);
 }
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/common.php';
-require_once '../includes/console_colour.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/rrdtool.inc.php';
-require_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'graphs');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-require 'includes/graphs/graph.inc.php';
+rrdtool_initialize(false);
 
-$console_color = new Console_Color2();
+require $config['install_dir'] . '/html/includes/graphs/graph.inc.php';
 
-$end = utime();
-$run = ($end - $start);
+rrdtool_close();
 
-
-d_echo('<br />Runtime '.$run.' secs');
-d_echo('<br />MySQL: Cell    '.($db_stats['fetchcell'] + 0).'/'.round(($db_stats['fetchcell_sec'] + 0), 3).'s'.' Row    '.($db_stats['fetchrow'] + 0).'/'.round(($db_stats['fetchrow_sec'] + 0), 3).'s'.' Rows   '.($db_stats['fetchrows'] + 0).'/'.round(($db_stats['fetchrows_sec'] + 0), 3).'s'.' Column '.($db_stats['fetchcol'] + 0).'/'.round(($db_stats['fetchcol_sec'] + 0), 3).'s');
+if ($debug) {
+    echo '<br />';
+    printf("Runtime %.3fs", microtime(true) - $start);
+    echo '<br />';
+    printStats();
+}

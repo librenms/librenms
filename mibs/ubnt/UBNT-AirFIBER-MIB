@@ -1,0 +1,1360 @@
+UBNT-AirFIBER-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, 
+        IpAddress FROM SNMPv2-SMI
+        DisplayString, TruthValue, MacAddress FROM SNMPv2-TC
+        OBJECT-GROUP FROM SNMPv2-CONF
+        ubntMIB FROM UBNT-MIB;
+
+
+    ubntAirFIBER MODULE-IDENTITY
+    LAST-UPDATED "201405270000Z"
+    ORGANIZATION "Ubiquiti Networks, Inc."
+    CONTACT-INFO "support@ubnt.com"
+    DESCRIPTION  "The AirFIBER MIB module for Ubiquiti Networks, Inc. entities"
+    REVISION "201405090000Z"
+    DESCRIPTION "ubntAirFIBER revision"
+    ::= { ubntMIB 3 }
+
+    -- --------------------------------------------------------------------------------
+    --                           AirFiber Config Table
+    -- --------------------------------------------------------------------------------
+
+
+    airFiberConfig OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AirFiberConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "AirFiber Configuration Group"
+        ::= { ubntAirFIBER 1 }
+
+
+    airFiberConfigEntry OBJECT-TYPE
+       SYNTAX     AirFiberConfigEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the airFiberConfig Table"
+       INDEX      { airFiberConfigIndex }
+       ::= { airFiberConfig 1 }
+
+
+    AirFiberConfigEntry ::= SEQUENCE {
+    airFiberConfigIndex Integer32,
+    radioEnable         Integer32,
+    radioLinkMode       Integer32,
+    radioDuplex         Integer32,
+    txFrequency         Integer32,
+    rxFrequency         Integer32,
+    regDomain           Integer32,
+    gpsSync             Integer32,
+    txPower             Integer32,
+    rxGain              Integer32,
+    maxTxModRate        Integer32,
+    modRateControl      Integer32,
+    ethDPortLinkSpeed   Integer32,
+    linkName            DisplayString,
+    encryptKey          DisplayString,
+    ethFlowControl      Integer32,
+    ethMcastFilter      Integer32,
+    ethTrackRFLink      Integer32,
+    ethLinkOffDuration  Integer32,
+    ethLinkOffSpacing   Integer32,
+    txFrequency1        Integer32,
+    rxFrequency1        Integer32,
+    txFrequency2        Integer32,
+    rxFrequency2        Integer32,
+    txFrequency3        Integer32,
+    rxFrequency3        Integer32,
+    channelWidth        Integer32,
+    txChannelWidth      Integer32,
+    rxChannelWidth      Integer32
+    }
+
+
+    airFiberConfigIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Index for the airFiberConfig"
+        ::= { airFiberConfigEntry 1 }
+
+    radioEnable OBJECT-TYPE
+        SYNTAX     Integer32 {
+                enabled   (1),
+                eisabled  (2)
+        } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Enabled State (Enabled/Disabled)"
+        ::= { airFiberConfigEntry 2 }
+
+   radioLinkMode OBJECT-TYPE
+        SYNTAX     Integer32 {
+                master (1),
+                slave  (2),
+                spectral (3)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Operating Mode"
+        ::= { airFiberConfigEntry 3 }
+
+    radioDuplex OBJECT-TYPE
+        SYNTAX     Integer32 {
+                halfDuplex (1),
+                fullDuplex (2)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Duplex Mode"
+        ::= { airFiberConfigEntry 4 }
+
+    txFrequency OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "TX Operating frequency (MHz)"
+        ::= { airFiberConfigEntry 5 }
+
+    rxFrequency OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RX Operating frequency (MHz)"
+        ::= { airFiberConfigEntry 6 }
+
+    regDomain OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Regulatory Domain"
+        ::= { airFiberConfigEntry 7 }
+
+    gpsSync OBJECT-TYPE
+        SYNTAX     Integer32 {
+                off (1),
+                on  (2)
+        } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "GPS Synchronization state (OFF, ON)"
+        ::= { airFiberConfigEntry 8 }
+        
+    txPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Transmit Power Setting (dBm)"
+        ::= { airFiberConfigEntry 9 }
+
+    rxGain OBJECT-TYPE
+        SYNTAX     Integer32 {
+                low  (1),
+                high (2)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Receiver Gain Setting"
+        ::= { airFiberConfigEntry 10 }
+
+    maxTxModRate OBJECT-TYPE
+        SYNTAX     Integer32 {
+            qPSK-SISO-1-4x (0),
+            qPSK-SISO-1x   (1),
+            qPSK-MIMO-2x   (2),
+            qAM16-MIMO-4x  (4),
+            qAM64-MIMO-6x  (6),
+            qAM256-MIMO-8x (8)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Maximum TX Modulation Rate"
+        ::= { airFiberConfigEntry 11 }
+
+    modRateControl OBJECT-TYPE
+        SYNTAX     Integer32 {
+                manual    (1),
+                automatic (2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Transmit Modulation Rate Control"
+        ::= { airFiberConfigEntry 12 }
+
+    ethDPortLinkSpeed OBJECT-TYPE
+        SYNTAX     Integer32 {
+            auto          (1),
+            half-10Mbps   (2),
+            half-100Mbps  (3),
+            full-10Mbps   (4),
+            full-100Mbps  (5),
+            full-1000Mbps (6)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Ethernet Data Port Configuration"
+        ::= { airFiberConfigEntry 13 }
+
+    linkName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Link Name"
+        ::= { airFiberConfigEntry 14 }
+
+    encryptKey OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     obsolete
+        DESCRIPTION "Radio Link Encryption Key"
+        ::= { airFiberConfigEntry 15 }
+
+    ethFlowControl OBJECT-TYPE
+        SYNTAX     Integer32 {
+                off (1),
+                on  (2)
+        }         
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Ethernet DATA port Flow Control (OFF, ON)"
+        ::= { airFiberConfigEntry 16 }
+   
+    ethMcastFilter OBJECT-TYPE
+        SYNTAX     Integer32 {
+                off (1),
+                on  (2)
+        }         
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Ethernet DATA port Multicast Filter.  Enabling Filter prevents all multicast packets from reaching the CPU."
+        ::= { airFiberConfigEntry 17 }
+
+    ethTrackRFLink OBJECT-TYPE
+        SYNTAX     Integer32 {
+                disabled (0),
+                use-Timers (1),
+                enabled  (2)
+        }         
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Enable Ethernet DATA port state to track RF Link.  Enabled forces DATA port to follow RF Link State. Use-Timers drops Data Port for timeout period"
+        ::= { airFiberConfigEntry 18 }
+
+    ethLinkOffDuration OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Duration (seconds) of Ethernet Link Drop when ethTrackRFLink is set to Use-Timers"
+        ::= { airFiberConfigEntry 19 }
+
+    ethLinkOffSpacing OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Spacing (seconds) of consecutive Etherenet Link Drops when ethTrackLink is set to Use-Timers"
+        ::= { airFiberConfigEntry 20 }
+        
+    txFrequency1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "First configured TX Frequency (MHz) of radio."
+        ::= { airFiberConfigEntry 21 }
+
+    rxFrequency1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "First configured RX Frequency (MHz) of radio."
+        ::= { airFiberConfigEntry 22 }
+
+    txFrequency2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Second configured TX Frequency (MHz) of radio. 5 GHz radios only."
+        ::= { airFiberConfigEntry 23 }
+
+    rxFrequency2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Second configured RX Frequency (MHz) of radio.  5 GHz radios only."
+        ::= { airFiberConfigEntry 24 }
+
+    txFrequency3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Third configured TX Frequency (MHz) of radio. 5 GHz radios only."
+        ::= { airFiberConfigEntry 25 }
+
+    rxFrequency3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Third configured RX Frequency (MHz) of radio.  5 GHz radios only."
+        ::= { airFiberConfigEntry 26 }
+
+    channelWidth OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION "Current RF Channel Bandwidth.  5 GHz radios only."
+        ::= { airFiberConfigEntry 27 }
+
+    txChannelWidth OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Current TX RF Channel Bandwidth (MHz).  5 GHz radios only."
+        ::= { airFiberConfigEntry 28 }
+
+    rxChannelWidth OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Current RX RF Channel Bandwidth (MHz).  5 GHz radios only."
+        ::= { airFiberConfigEntry 29 }
+
+    -- --------------------------------------------------------------------------------
+    --                           AirFiber Status Table
+    -- --------------------------------------------------------------------------------
+
+
+    airFiberStatus OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AirFiberStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "AirFiber Status Group"
+        ::= { ubntAirFIBER 2 }
+
+
+    airFiberStatusEntry OBJECT-TYPE
+       SYNTAX     AirFiberStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the airFiberStatus Table"
+       INDEX      { airFiberStatusIndex }
+       ::= { airFiberStatus 1 }
+
+
+    AirFiberStatusEntry ::= SEQUENCE {
+    airFiberStatusIndex     Integer32,
+    curTXModRate            Integer32,
+    radioLinkDistFt         Integer32,
+    radioLinkDistM          Integer32,
+    rxCapacity              Integer32,
+    txCapacity              Integer32,
+    radio0TempC             Integer32,
+    radio0TempF             Integer32,
+    radio1TempC             Integer32,
+    radio1TempF             Integer32,
+    rxPower0                Integer32,
+    rxPower0Valid           TruthValue,
+    rxOverload0             TruthValue,
+    rxPower1                Integer32,
+    rxPower1Valid           TruthValue,
+    rxOverload1             TruthValue,
+    remoteTXPower           Integer32,
+    remoteTXModRate         Integer32,
+    remoteRXPower0          Integer32,
+    remoteRXPower0Valid     TruthValue,
+    remoteRXPower0Overload  TruthValue,
+    remoteRXPower1          Integer32,
+    remoteRXPower1Valid     TruthValue,
+    remoteRXPower1Overload  TruthValue,
+    countryCode             Integer32,
+    radioLinkState          Integer32,
+    ethDataPortState        Integer32,
+    gpsPulse                DisplayString,
+    gpsFix                  DisplayString,
+    gpsLat                  DisplayString,
+    gpsLong                 DisplayString,
+    gpsAltMeters            DisplayString,
+    gpsAltFeet              DisplayString,
+    gpsSatsVisible          Integer32,
+    gpsSatsTracked          Integer32,
+    gpsHDOP                 OCTET STRING,
+    dfsState                DisplayString,
+    upTime                  Integer32,
+    dateTime                DisplayString,  
+    fwVersion               DisplayString,
+    remoteRXGain            DisplayString,
+    radioLinkInfo           DisplayString,
+    ethDataPortInfo         DisplayString,    
+    linkUpTime              Integer32,
+    remoteMAC               DisplayString,
+    remoteIP                DisplayString,
+    dfsDetections           Integer32,
+    dfsDomain               DisplayString,
+    dfsStateTxFreq1         DisplayString,
+    dfsStateTxFreq2         DisplayString,
+    dfsStateTxFreq3         DisplayString,
+    dfsTimerTxFreq1         Integer32,
+    dfsTimerTxFreq2         Integer32,
+    dfsTimerTxFreq3         Integer32    
+    }        
+    
+    airFiberStatusIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Index for the air0 interface"
+        ::= { airFiberStatusEntry 1 }
+
+    curTXModRate OBJECT-TYPE
+       SYNTAX     Integer32 {
+            qPSK-SISO-1-4x (0),
+            qPSK-SISO-1x   (1),
+            qPSK-MIMO-2x   (2),
+            qAM16-MIMO-4x  (4),
+            qAM64-MIMO-6x  (6),
+            qAM256-MIMO-8x (8)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Current Transmit Modulation Rate"
+        ::= { airFiberStatusEntry 2 }
+
+    radioLinkDistFt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Link Distance (Feet)"
+        ::= { airFiberStatusEntry 3 }
+
+    radioLinkDistM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Link Distance (Meters)"
+        ::= { airFiberStatusEntry 4 }
+
+    rxCapacity OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Receive Throughput Capacity (bits/sec)"
+        ::= { airFiberStatusEntry 5 }
+
+    txCapacity OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Transmit Throughput Capacity (bits/sec)"
+        ::= { airFiberStatusEntry 6 }
+
+    radio0TempF OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 DAC Temperature (F)"
+        ::= { airFiberStatusEntry 7 }
+
+    radio0TempC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 DAC Temperature (C)"
+        ::= { airFiberStatusEntry 8 }
+
+    radio1TempF OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 1 DAC Temperature (F)"
+        ::= { airFiberStatusEntry 9 }
+
+    radio1TempC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 DAC Temperature (C)"
+        ::= { airFiberStatusEntry 10 }
+
+    rxPower0 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 RX Power Level (dBm)"
+        ::= { airFiberStatusEntry 11 }
+
+    rxPower0Valid OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 RX Power Valid"
+        ::= { airFiberStatusEntry 12 }
+
+    rxOverload0 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 0 RX Overloaded"
+        ::= { airFiberStatusEntry 13 }
+
+    rxPower1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Chain 1 RX Power Level (dBm)"
+        ::= { airFiberStatusEntry 14 }
+
+    rxPower1Valid OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio  Chain 1 RX Power Valid"
+        ::= { airFiberStatusEntry 15 }
+
+    rxOverload1 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio  Chain 1 RX Overloaded"
+        ::= { airFiberStatusEntry 16 }
+
+    remoteTXPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio Transmit Power Level (dBm)"
+        ::= { airFiberStatusEntry 17 }
+
+    remoteTXModRate OBJECT-TYPE
+       SYNTAX     Integer32 {
+            qPSK-SISO-1-4x (0),
+            qPSK-SISO-1x   (1),
+            qPSK-MIMO-2x   (2),
+            qAM16-MIMO-4x  (4),
+            qAM64-MIMO-6x  (6),
+            qAM256-MIMO-8x (8)
+        } 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Remote Transmit Modulation Rate"
+        ::= { airFiberStatusEntry 18 }
+
+    remoteRXPower0 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio Chain 0 RX Power Level (dBm)"
+        ::= { airFiberStatusEntry 19 }
+
+    remoteRXPower0Valid OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio Chain 0 RX Power Valid"
+        ::= { airFiberStatusEntry 20 }
+
+    remoteRXPower0Overload OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio Chain 0 RX Overloaded"
+        ::= { airFiberStatusEntry 21 }
+
+    remoteRXPower1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio Chain 1 RX Power Level (dBm)"
+        ::= { airFiberStatusEntry 22 }
+
+    remoteRXPower1Valid OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio  Chain 1 RX Power Valid"
+        ::= { airFiberStatusEntry 23 }
+
+    remoteRXPower1Overload OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Remote Radio  Chain 1 RX Overloaded"
+        ::= { airFiberStatusEntry 24 }
+
+    countryCode OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Configured Country Code"
+        ::= { airFiberStatusEntry 25 }
+
+    radioLinkState OBJECT-TYPE
+        SYNTAX     Integer32 {
+                down (0),
+                up   (1)
+        }         
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Link State"
+        ::= { airFiberStatusEntry 26 }
+
+    ethDataPortState OBJECT-TYPE
+        SYNTAX     Integer32 {
+                down (0),
+                up   (1)
+        }         
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Ethernet Data Port State"
+        ::= { airFiberStatusEntry 27 }
+
+    gpsPulse OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Pulse Detected"
+        ::= { airFiberStatusEntry 28 }
+
+    gpsFix OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Fix Obtained"
+        ::= { airFiberStatusEntry 29 }
+
+    gpsLat OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Latitude"
+        ::= { airFiberStatusEntry 30 }
+
+    gpsLong OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Longitude"
+        ::= { airFiberStatusEntry 31 }
+
+    gpsAltMeters OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (m)"
+        ::= { airFiberStatusEntry 32 }
+
+    gpsAltFeet OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (ft)"
+        ::= { airFiberStatusEntry 33 }
+
+    gpsSatsVisible OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "GPS Satellites Visible"
+        ::= { airFiberStatusEntry 34 }
+
+    gpsSatsTracked OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "GPS Satellites Tracked"
+        ::= { airFiberStatusEntry 35 }
+
+    gpsHDOP OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "GPS Horizontal Dilution of Precision"
+        ::= { airFiberStatusEntry 36 }
+
+    dfsState OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio DFS State"
+        ::= { airFiberStatusEntry 37 }
+
+    upTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Board uptime (seconds)"
+        ::= { airFiberStatusEntry 38 }
+
+    dateTime OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Board date and time"
+        ::= { airFiberStatusEntry 39 }
+
+    fwVersion OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Board Firmware Revision"
+        ::= { airFiberStatusEntry 40 }
+
+    remoteRXGain OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Remote radio Receiver Gain"
+        ::= { airFiberStatusEntry 41 }
+
+    radioLinkInfo OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio Link Connection Information"
+        ::= { airFiberStatusEntry 42 }
+
+    ethDataPortInfo OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Ethernet Data Port Link Connection Speed"
+        ::= { airFiberStatusEntry 43 }        
+
+    linkUpTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Radio Link uptime (seconds)"
+        ::= { airFiberStatusEntry 44 }
+
+    remoteMAC OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Remote radio MAC Address"
+        ::= { airFiberStatusEntry 45 }
+
+    remoteIP OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Remote radio IP Address"
+        ::= { airFiberStatusEntry 46 }
+
+    dfsDetections OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Number of DFS Detections since boot.  5 GHz radios only."
+        ::= { airFiberStatusEntry 47 }
+
+    dfsDomain OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "DFS Regulatory Domain for current TX Frequency.  5 GHz radios only."
+        ::= { airFiberStatusEntry 48 }
+
+    dfsStateTxFreq1 OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "State of first TX Frequency.  5 GHz radios only."
+        ::= { airFiberStatusEntry 49 }
+
+    dfsStateTxFreq2 OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "State of second TX Frequency.  5 GHz radios only."
+        ::= { airFiberStatusEntry 50 }
+
+    dfsStateTxFreq3 OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "State of third TX Frequency.  5 GHz radios only."
+        ::= { airFiberStatusEntry 51 }
+
+    dfsTimerTxFreq1 OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Seconds remaining before first TX Frequency can advance to next operating state.  Channel availability check timeout 
+                     is 60 seconds and DFS detection timeout is 30 minutes.  5 GHz radios only."
+        ::= { airFiberStatusEntry 52 }
+
+    dfsTimerTxFreq2 OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Seconds remaining before second TX Frequency can advance to next operating state.  Channel availability check timeout 
+                     is 60 seconds and DFS detection timeout is 30 minutes.  5 GHz radios only."
+        ::= { airFiberStatusEntry 53 }
+
+    dfsTimerTxFreq3 OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+         DESCRIPTION "Seconds remaining before third TX Frequency can advance to next operating state.  Channel availability check timeout 
+                     is 60 seconds and DFS detection timeout is 30 minutes.  5 GHz radios only."
+        ::= { airFiberStatusEntry 54 }
+
+    -- --------------------------------------------------------------------------------
+    --                            AirFiber Statistics Table
+    -- --------------------------------------------------------------------------------
+
+    airFiberStatistics OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AirFiberStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "AirFiber Statistics"
+        ::= { ubntAirFIBER 3 }
+
+
+    airFiberStatisticsEntry OBJECT-TYPE
+       SYNTAX     AirFiberStatisticsEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the AirFiberStatisticsTable"
+       INDEX      { airFiberStatisticsIndex }
+       ::= { airFiberStatistics 1 }
+
+
+    AirFiberStatisticsEntry ::= SEQUENCE {
+    airFiberStatisticsIndex     Integer32,
+    txFramesOK                  Counter64,
+    rxFramesOK                  Counter64,
+    rxFrameCrcErr               Counter64,
+    rxAlignErr                  Counter64,
+    txOctetsOK                  Counter64,
+    rxOctetsOK                  Counter64,
+    txPauseFrames               Counter64,
+    rxPauseFrames               Counter64,
+    rxErroredFrames             Counter64,
+    txErroredFrames             Counter64,
+    rxValidUnicastFrames        Counter64,
+    rxValidMulticastFrames      Counter64,
+    rxValidBroadcastFrames      Counter64,
+    txValidUnicastFrames        Counter64,
+    txValidMulticastFrames      Counter64,
+    txValidBroadcastFrames      Counter64,
+    rxDroppedMacErrFrames       Counter64,
+    rxTotalOctets               Counter64,
+    rxTotalFrames               Counter64,
+    rxLess64ByteFrames          Counter64,
+    rxOverLengthFrames          Counter64,
+    rx64BytePackets             Counter64,
+    rx65-127BytePackets         Counter64,
+    rx128-255BytePackets        Counter64,
+    rx256-511BytePackets        Counter64,
+    rx512-1023BytePackets       Counter64,
+    rx1024-1518BytesPackets     Counter64,
+    rx1519PlusBytePackets       Counter64,
+    rxTooLongFrameCrcErr        Counter64,
+    rxTooShortFrameCrcErr       Counter64,
+    txqosoct0                   Counter64,
+    txqosoct1                   Counter64,
+    txqosoct2                   Counter64,
+    txqosoct3                   Counter64,
+    txqosoct4                   Counter64,
+    txqosoct5                   Counter64,
+    txqosoct6                   Counter64,
+    txqosoct7                   Counter64,
+    txqospkt0                   Counter64,
+    txqospkt1                   Counter64,
+    txqospkt2                   Counter64,
+    txqospkt3                   Counter64,
+    txqospkt4                   Counter64,
+    txqospkt5                   Counter64,
+    txqospkt6                   Counter64,
+    txqospkt7                   Counter64,
+    rxqosoct0                   Counter64,
+    rxqosoct1                   Counter64,
+    rxqosoct2                   Counter64,
+    rxqosoct3                   Counter64,
+    rxqosoct4                   Counter64,
+    rxqosoct5                   Counter64,
+    rxqosoct6                   Counter64,
+    rxqosoct7                   Counter64,
+    rxqospkt0                   Counter64,
+    rxqospkt1                   Counter64,
+    rxqospkt2                   Counter64,
+    rxqospkt3                   Counter64,
+    rxqospkt4                   Counter64,
+    rxqospkt5                   Counter64,
+    rxqospkt6                   Counter64,
+    rxqospkt7                   Counter64,
+    txoctetsAll                 Counter64,
+    txpktsAll                   Counter64,
+    rxoctetsAll                 Counter64,
+    rxpktsAll                   Counter64
+    }
+
+    airFiberStatisticsIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "Index for the airFiberStatus"
+        ::= { airFiberStatisticsEntry 1 }
+
+    txFramesOK OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port  TX Frames"
+        ::= { airFiberStatisticsEntry 2 }
+
+    rxFramesOK OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port RX Frames"
+        ::= { airFiberStatisticsEntry 3 }
+
+    rxFrameCrcErr OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port CRC Errors"
+        ::= { airFiberStatisticsEntry 4 }
+
+    rxAlignErr OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Receive Alignment Errors"
+        ::= { airFiberStatisticsEntry 5 }
+
+    txOctetsOK OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port  TX Octets"
+        ::= { airFiberStatisticsEntry 6 }
+
+    rxOctetsOK OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port RX Octets"
+        ::= { airFiberStatisticsEntry 7 }
+
+    txPauseFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Pause Frames Transmitted"
+        ::= { airFiberStatisticsEntry 8 }
+
+    rxPauseFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Pause Frames Received"
+        ::= { airFiberStatisticsEntry 9 }
+
+    rxErroredFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Bad Frames Received"
+        ::= { airFiberStatisticsEntry 10 }
+
+    txErroredFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Bad Frames Transmitted"
+        ::= { airFiberStatisticsEntry 11 }
+
+    rxValidUnicastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Unicast Frames Received"
+        ::= { airFiberStatisticsEntry 12 }
+
+    rxValidMulticastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Multicast Frames Received"
+        ::= { airFiberStatisticsEntry 13 }
+
+    rxValidBroadcastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Broadcast Frames Received"
+        ::= { airFiberStatisticsEntry 14 }
+
+    txValidUnicastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Unicast Frames Transmitted"
+        ::= { airFiberStatisticsEntry 15 }
+
+    txValidMulticastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Multicast Frames Transmitted"
+        ::= { airFiberStatisticsEntry 16 }
+
+    txValidBroadcastFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Broadcast Frames Transmitted"
+        ::= { airFiberStatisticsEntry 17 }
+
+    rxDroppedMacErrFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Dropped MAC Receive Errors"
+        ::= { airFiberStatisticsEntry 18 }
+
+    rxTotalOctets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Total Octets Received"
+        ::= { airFiberStatisticsEntry 19 }
+
+    rxTotalFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Total Frames Received"
+        ::= { airFiberStatisticsEntry 20 }
+
+    rxLess64ByteFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Undersized Frames Received"
+        ::= { airFiberStatisticsEntry 21 }
+
+    rxOverLengthFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Over Max Length Frames Received"
+        ::= { airFiberStatisticsEntry 22 }
+
+    rx64BytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 64 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 23 }
+
+    rx65-127BytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 65-127 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 24 }
+
+    rx128-255BytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 128-256 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 25 }
+
+    rx256-511BytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 256-511 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 26 }
+
+    rx512-1023BytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 512-1023 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 27 }
+
+    rx1024-1518BytesPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port 1024-1518 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 28 }
+
+    rx1519PlusBytePackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Greater Than 1518 Byte Frames Received"
+        ::= { airFiberStatisticsEntry 29 }
+
+    rxTooLongFrameCrcErr OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Too Long Frame CRC Errors Received"
+        ::= { airFiberStatisticsEntry 30 }
+
+    rxTooShortFrameCrcErr OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Eth Data Port Too Short Frame CRC Errors Received"
+        ::= { airFiberStatisticsEntry 31 }
+
+    txqosoct0 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 0"
+        ::= { airFiberStatisticsEntry 32 }
+
+    txqosoct1 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 1"
+        ::= { airFiberStatisticsEntry 33 }
+
+    txqosoct2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 2"
+        ::= { airFiberStatisticsEntry 34 }
+
+    txqosoct3 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 3"
+        ::= { airFiberStatisticsEntry 35 }
+
+    txqosoct4 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 4"
+        ::= { airFiberStatisticsEntry 36 }
+
+    txqosoct5 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 5"
+        ::= { airFiberStatisticsEntry 37 }
+
+    txqosoct6 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 6"
+        ::= { airFiberStatisticsEntry 38 }
+
+    txqosoct7 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Octets QOS 7"
+        ::= { airFiberStatisticsEntry 39 }
+
+    txqospkt0 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 0"
+        ::= { airFiberStatisticsEntry 40 }
+
+    txqospkt1 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 1"
+        ::= { airFiberStatisticsEntry 41 }
+
+    txqospkt2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 2"
+        ::= { airFiberStatisticsEntry 42 }
+
+    txqospkt3 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 3"
+        ::= { airFiberStatisticsEntry 43 }
+
+    txqospkt4 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 4"
+        ::= { airFiberStatisticsEntry 44 }
+
+    txqospkt5 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 5"
+        ::= { airFiberStatisticsEntry 45 }
+
+    txqospkt6 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 6"
+        ::= { airFiberStatisticsEntry 46 }
+
+    txqospkt7 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF TX Packets QOS 7"
+        ::= { airFiberStatisticsEntry 47 }
+
+    rxqosoct0 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 0"
+        ::= { airFiberStatisticsEntry 48 }
+
+    rxqosoct1 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 1"
+        ::= { airFiberStatisticsEntry 49 }
+
+    rxqosoct2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 2"
+        ::= { airFiberStatisticsEntry 50 }
+
+    rxqosoct3 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 3"
+        ::= { airFiberStatisticsEntry 51 }
+
+    rxqosoct4 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 4"
+        ::= { airFiberStatisticsEntry 52 }
+
+    rxqosoct5 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 5"
+        ::= { airFiberStatisticsEntry 53 }
+
+    rxqosoct6 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 6"
+        ::= { airFiberStatisticsEntry 54 }
+
+    rxqosoct7 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Octets QOS 7"
+        ::= { airFiberStatisticsEntry 55 }
+
+    rxqospkt0 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 0"
+        ::= { airFiberStatisticsEntry 56 }
+
+    rxqospkt1 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 1"
+        ::= { airFiberStatisticsEntry 57 }
+
+    rxqospkt2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 2"
+        ::= { airFiberStatisticsEntry 58 }
+
+    rxqospkt3 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 3"
+        ::= { airFiberStatisticsEntry 59 }
+
+    rxqospkt4 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 4"
+        ::= { airFiberStatisticsEntry 60 }
+
+    rxqospkt5 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 5"
+        ::= { airFiberStatisticsEntry 61 }
+
+    rxqospkt6 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 6"
+        ::= { airFiberStatisticsEntry 62 }
+
+    rxqospkt7 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF RX Packets QOS 7"
+        ::= { airFiberStatisticsEntry 63 }
+
+    txoctetsAll OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF Total Octets Transmitted"
+        ::= { airFiberStatisticsEntry 64 }
+
+    txpktsAll OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF Total Packets Transmitted"
+        ::= { airFiberStatisticsEntry 65 }
+
+    rxoctetsAll OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF Total Octets Received"
+        ::= { airFiberStatisticsEntry 66 }
+
+    rxpktsAll OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "RF Total Packets Received"
+        ::= { airFiberStatisticsEntry 67 }
+
+ END

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('pulse_users.rrd');
+$rrd_filename = rrd_name($device['hostname'], 'pulse_users');
 
 require 'includes/graphs/common.inc.php';
 

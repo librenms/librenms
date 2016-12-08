@@ -4,19 +4,6 @@ global $config;
 
 $total = true;
 
-$rrddir = $config['rrd_dir'].'/'.$device['hostname'];
-$files  = array();
-
-if ($handle = opendir($rrddir)) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != '.' && $file != '..') {
-            if (eregi('app-shoutcast-'.$app['app_id'], $file)) {
-                array_push($files, $file);
-            }
-        }
-    }
-}
-
 if (isset($total) && $total === true) {
     $graphs = array(
         'shoutcast_multi_bits'  => 'Traffic Statistics - Total of all Shoutcast servers',
@@ -30,19 +17,25 @@ if (isset($total) && $total === true) {
         $graph_array['to']     = $config['time']['now'];
         $graph_array['id']     = $app['app_id'];
         $graph_array['type']   = 'application_'.$key;
-        echo '<h3>'.$text.'</h3>';
-        echo "<tr bgcolor='$row_colour'><td colspan=5>";
 
+        echo '<div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">'.$text.'</h3>
+        </div>
+        <div class="panel-body">
+        <div class="row">';
         include 'includes/print-graphrow.inc.php';
-
-        echo '</td></tr>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
     }
 }
 
-foreach ($files as $id => $file) {
-    $hostname          = eregi_replace('app-shoutcast-'.$app['app_id'].'-', '', $file);
-    $hostname          = eregi_replace('.rrd', '', $hostname);
-    list($host, $port) = split('_', $hostname, 2);
+$files = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id']), '*.rrd'));
+foreach ($files as $file) {
+    $pieces = explode('-', basename($file, '.rrd'));
+    $hostname = end($pieces);
+    list($host, $port) = explode('_', $hostname, 2);
     $graphs            = array(
         'shoutcast_bits'  => 'Traffic Statistics - '.$host.' (Port: '.$port.')',
         'shoutcast_stats' => 'Shoutcast Statistics - '.$host.' (Port: '.$port.')',

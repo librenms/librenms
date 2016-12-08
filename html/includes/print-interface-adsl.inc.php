@@ -10,15 +10,13 @@ $port = ifLabel($port);
 
 if (!is_integer($i / 2)) {
     $row_colour = $list_colour_a;
-}
-else {
+} else {
     $row_colour = $list_colour_b;
 }
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", 'port_errors');
-}
-else {
+} else {
     $error_img = '';
 }
 
@@ -40,7 +38,8 @@ if ($port_details) {
         $break = ',';
     }
 
-    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip6) {        ;
+    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip6) {
+        ;
         echo "$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address']).'/'.$ip6['ipv6_prefixlen'].'</a>';
         $break = ',';
     }

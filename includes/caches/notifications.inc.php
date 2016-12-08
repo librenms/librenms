@@ -44,4 +44,3 @@ $data['read'] = array(
     'query'  => 'select notifications.* from notifications inner join notifications_attribs on notifications.notifications_id = notifications_attribs.notifications_id where notifications_attribs.user_id = ? && ( notifications_attribs.key = "read" && notifications_attribs.value = 1) && not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.key = "sticky" && notifications_attribs.value = "1") order by notifications_attribs.attrib_id desc',
     'params' => array( $_SESSION['user_id'] )
 );
-

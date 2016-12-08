@@ -3,12 +3,10 @@
 if (is_file($config['install_dir'].'/includes/polling/os/'.$device['os'].'.inc.php')) {
     // OS Specific
     include $config['install_dir'].'/includes/polling/os/'.$device['os'].'.inc.php';
-}
-else if ($device['os_group'] && is_file($config['install_dir'].'/includes/polling/os/'.$device['os_group'].'.inc.php')) {
+} elseif ($device['os_group'] && is_file($config['install_dir'].'/includes/polling/os/'.$device['os_group'].'.inc.php')) {
     // OS Group Specific
     include $config['install_dir'].'/includes/polling/os/'.$device['os_group'].'.inc.php';
-}
-else {
+} else {
     echo "Generic :(\n";
 }
 
@@ -37,4 +35,7 @@ if ($icon && $icon != $device['icon']) {
     log_event('Icon -> '.$icon, $device, 'system');
 }
 
-echo "\nHardware: ".$hardware.' Version: '.$version.' Features: '.$features.' Serial: '.$serial."\n";
+echo 'Hardware: ' . $hardware . PHP_EOL;
+echo 'Version: ' . $version . PHP_EOL;
+echo 'Features: ' . $features . PHP_EOL;
+echo 'Serial: ' . $serial . PHP_EOL;

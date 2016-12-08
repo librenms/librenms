@@ -1,7 +1,5 @@
 <?php
 
-echo 'Processors : ';
-
 // Include all discovery modules
 $include_dir = 'includes/discovery/processors';
 require 'includes/include-dir.inc.php';

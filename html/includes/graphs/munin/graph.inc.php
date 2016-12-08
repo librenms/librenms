@@ -8,8 +8,7 @@ require 'includes/graphs/common.inc.php';
 
 if ($width > '500') {
     $descr_len = 24;
-}
-else {
+} else {
     $descr_len  = 14;
     $descr_len += round(($width - 230) / 8.2);
 }
@@ -17,15 +16,14 @@ else {
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len)."   Current   Average  Maximum\l'";
     $rrd_options .= " COMMENT:'\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len)."   Current   Average  Maximum\l'";
 }
 
 $c_i = 0;
 $dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', array($mplug['mplug_id']));
 foreach ($dbq as $ds) {
-    $ds_filename = $plugfile.'_'.$ds['ds_name'].'.rrd';
+    $ds_filename = rrd_name($device['hostname'], 'munin/'.$mplug['mplug_type'].'_'.$ds['ds_name']);
     $ds_name     = $ds['ds_name'];
 
     $cmd_def .= ' DEF:'.$ds['ds_name'].'='.$ds_filename.':val:AVERAGE';
@@ -43,8 +41,7 @@ foreach ($dbq as $ds) {
 
             $colour = $config['graph_colours']['mixed'][$c_i];
             $c_i++;
-        }
-        else {
+        } else {
             $colour = $ds['colour'];
         }
 

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS
  *
@@ -12,6 +11,6 @@
  * the source code distribution for details.
  */
 
-if (preg_match('/^(XTM|FBX)/i', $sysDescr)) {
+if (starts_with($sysObjectId, array('.1.3.6.1.4.1.3097.1.4', '.1.3.6.1.4.1.3097.1.5'))) {
     $os = 'fireware';
 }

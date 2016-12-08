@@ -19,7 +19,17 @@ if ($device['os'] == 'pulse') {
     $usage = str_replace('"', "", snmp_get($device, 'PULSESECURE-PSG-MIB::iveCpuUtil.0', '-OvQ'));
 
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, 'PULSESECURE-PSG-MIB::iveCpuUtil.0', '0', 'pulse-cpu', $descr,
- '100', $usage, null, null);
+        discover_processor(
+            $valid['processor'],
+            $device,
+            'PULSESECURE-PSG-MIB::iveCpuUtil.0',
+            '0',
+            'pulse-cpu',
+            $descr,
+            '100',
+            $usage,
+            null,
+            null
+        );
     }
 }

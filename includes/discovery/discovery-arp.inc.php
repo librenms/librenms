@@ -1,6 +1,6 @@
 <?php
 //
-// Observium module to do device discovery by ARP table contents.
+// LibreNMS module to do device discovery by ARP table contents.
 //
 // Needs to be run after the ARP table discovery, because it uses the
 // data gathered by the ARP table discovery module.  Keeps a cache of
@@ -12,8 +12,6 @@
 // Author:  Paul Gear <librenms@libertysys.com.au>
 // License: GPLv3
 //
-
-echo 'ARP Discovery: ';
 
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];

@@ -1,0 +1,5020 @@
+
+--
+-- 		whisp-aps-mib.mib
+--		GENERATED FROM ui_db.xml
+--
+--      *******************************************************************************************************
+--		Copyright 2005 - 2015 (c), Cambium Networks
+--      Cambium Networks Confidential Proprietary
+--      *******************************************************************************************************
+--
+--      Canopy Access Point and Backhaul Timing Master specific MIB definitions.
+--
+--     ********************************************************************************************************
+
+WHISP-APS-MIB   DEFINITIONS ::= BEGIN
+IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Gauge32, IpAddress, NOTIFICATION-TYPE, TimeTicks, Unsigned32
+				FROM SNMPv2-SMI
+		DisplayString, PhysAddress, MacAddress
+				FROM SNMPv2-TC
+		OBJECT-GROUP
+				FROM SNMPv2-CONF
+		WhispLUID, WhispMACAddress, EventString
+				FROM WHISP-TCV2-MIB
+		whispModules, whispBox, whispAps
+				FROM WHISP-GLOBAL-REG-MIB
+		whispBoxEsn, whispBoxRFPhysicalRadioEntry
+				FROM WHISP-BOX-MIBV2-MIB
+				;
+
+whispApsMibModule  MODULE-IDENTITY
+	LAST-UPDATED	"200304150000Z"
+	ORGANIZATION	"Cambium Networks"
+	CONTACT-INFO
+		"Cambium Networks Support
+        email: support@cambiumnetworks.com"
+	DESCRIPTION
+		"This module contains MIB definitions for APs."
+	::= {whispModules 12}
+
+-- -------------------------------------------------------------------------
+-- Top Level Registrations
+
+whispApsConfig		OBJECT IDENTIFIER ::= {whispAps 1}
+whispApsLink		OBJECT IDENTIFIER ::= {whispAps 2}
+whispApsLinkTestConfig		OBJECT IDENTIFIER ::= {whispApsLink 1}
+whispApsLinkTestResult		OBJECT IDENTIFIER ::= {whispApsLink 2}
+whispApsGPS		OBJECT IDENTIFIER ::= {whispAps 3}
+whispApsEvent		OBJECT IDENTIFIER ::= {whispAps 5}
+whispApsRegEvent		OBJECT IDENTIFIER ::= {whispApsEvent 1}
+whispGPSEvent		OBJECT IDENTIFIER ::= {whispApsEvent 2}
+whispApsDfsEvent		OBJECT IDENTIFIER ::= {whispApsEvent 3}
+whispApRegulatoryEvent		OBJECT IDENTIFIER ::= {whispApsEvent 4}
+whispApRFOverloadEvent		OBJECT IDENTIFIER ::= {whispApsEvent 5}
+whispApsGroups		OBJECT IDENTIFIER ::= {whispAps 6}
+whispApsFrUtlStats		OBJECT IDENTIFIER ::= {whispAps 12}
+whispApsFrUtlStatsIntervalLow		OBJECT IDENTIFIER ::= {whispApsFrUtlStats 1}
+whispApsFrUtlStatsIntervalMedium		OBJECT IDENTIFIER ::= {whispApsFrUtlStats 2}
+whispApsFrUtlStatsIntervalHigh		OBJECT IDENTIFIER ::= {whispApsFrUtlStats 3}
+whispApsStatus		OBJECT IDENTIFIER ::= {whispAps 7}
+whispApsDNS		OBJECT IDENTIFIER ::= {whispAps 9}
+whispApsControls		OBJECT IDENTIFIER ::= {whispAps 11}
+whispApsRFConfig		OBJECT IDENTIFIER ::= {whispAps 10}
+
+-- -------------------------------------------------------------------------
+
+
+	gpsInput	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					generateSyncSignal(0),
+					syncToReceivedSignalTimingPort(1),
+					syncToReceivedSignalPowerPort(2)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"The variable is deprecated.  See gpsInput in whispBoxConfig."
+		::={whispApsConfig 1}
+
+	rfFreqCarrier	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					wired(0)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"The primary transmit frequency.
+							Also see radioFreqCarrier."
+		::={whispApsConfig 2}
+
+	apLinkSpeed	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"The variable is deprecated."
+		::={whispApsConfig 3}
+
+	dwnLnkData	OBJECT-TYPE
+		SYNTAX		INTEGER (1..99)
+		UNITS		"%"
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This attribute is deprecated.  Please see radioDownlinkPercent."
+		::={whispApsConfig 4}
+
+	highPriorityUpLnkPct	OBJECT-TYPE
+		SYNTAX		INTEGER (0..99)
+		UNITS		"%"
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Percentage of uplink slots for high priority data."
+		::={whispApsConfig 5}
+
+	numUAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Total number of upstream ack slots."
+		::={whispApsConfig 6}
+
+	uAcksReservHigh	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Total number of upstream high priority ack slots"
+		::={whispApsConfig 7}
+
+	numDAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Total number of downstream ack slots."
+		::={whispApsConfig 8}
+
+	dAcksReservHigh	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Total number of high priority downstream ack slots."
+		::={whispApsConfig 9}
+
+	numCtlSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"This OID is deprecated, please use numCtlSlotsHW."
+		::={whispApsConfig 10}
+
+	numCtlSlotsReserveHigh	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Total number of High priority upstream control (contention) slots."
+		::={whispApsConfig 11}
+
+	upLnkDataRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Sustained uplink bandwidth cap."
+		::={whispApsConfig 12}
+
+	upLnkLimit	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Burst uplink bandwidth cap."
+		::={whispApsConfig 13}
+
+	dwnLnkDataRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Sustained downlink bandwidth cap."
+		::={whispApsConfig 14}
+
+	dwnLnkLimit	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Burst downlink bandwidth cap."
+		::={whispApsConfig 15}
+
+	sectorID	OBJECT-TYPE
+		SYNTAX		INTEGER (0..15)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Advertise sector number for an AP.
+                            Not supported for PMP 450."
+		::={whispApsConfig 16}
+
+	maxRange	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"miles"
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This attribute is deprecated.  Please see radioMaxRange."
+		::={whispApsConfig 17}
+
+	airLinkSecurity	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					standard(0),
+					desEnhanced(1),
+					desEnhancedAndAuthentication(2),
+					authenticationIfAvailable(3)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Air Link Security.
+            desEnhancedAndAuthentication(2) and authenticationIfAvailable(3)
+            are only for APAS."
+		::={whispApsConfig 18}
+
+	berMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					berStream(0),
+					noBerStream(1)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"AP backgroup BER mode."
+		::={whispApsConfig 19}
+
+	asIP1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Configure with whispApsDNS.authServer1."
+		::={whispApsConfig 20}
+
+	asIP2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Configure with whispApsDNS.authServer2."
+		::={whispApsConfig 21}
+
+	asIP3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Configure with whispApsDNS.authServer3."
+		::={whispApsConfig 22}
+
+	lanIpAp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN IP."
+		::={whispApsConfig 23}
+
+	lanMaskAp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN subnet mask."
+		::={whispApsConfig 24}
+
+	defaultGwAp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Default gateway"
+		::={whispApsConfig 25}
+
+	privateIp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Private IP."
+		::={whispApsConfig 26}
+
+	gpsTrap	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					gpsTrapDisabled(0),
+					gpsTrapEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable GPS sync/out-sync traps."
+		::={whispApsConfig 27}
+
+	regTrap	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					regTrapDisabled(0),
+					regTrapEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable registration complete/lost traps."
+		::={whispApsConfig 28}
+
+	txSpreading	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					txSpreadingDisabled(0),
+					txSpreadingEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable Transmit Frame Spreading.  This option is for FSK only."
+		::={whispApsConfig 29}
+
+	apBeaconInfo	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enableApBeaconInfo(0),
+					disableApBeaconInfo(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable displaying AP beacon info through AP eval."
+		::={whispApsConfig 30}
+
+	authMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					authenticationDisabled(0),
+					authenticationRequiredBam(1),
+					authenticationRequiredAP(3),
+					authenticationRequiredAAA(4)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable authentication. The authentication optional mode
+            is for APs only. This variable can only be set when authentication feature
+            is enabled.  Setting it to 1 will use a BAM server for authentication of SMs.  Setting
+            it to 2 will make use of the Authentication Key on the AP for authenticating SMs.  The
+            keys must match on SM and AP in order for the SM to be authenticated in this mode."
+		::={whispApsConfig 31}
+
+	authKeyAp	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication key. It should be 32 character long.  Can be used on MultiPoint AP if AP Authentication mode is selected.
+            Otherwise, it is used on Backhauls."
+		::={whispApsConfig 32}
+
+	encryptionMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					encryptionDisabled(0),
+					encryptionEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable encryption."
+		::={whispApsConfig 33}
+
+	ntpServerIp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Configure with whispApsDNS.ntpServer1, whispApsDNS.ntpServer2, and whispApsDNS.ntpServer3."
+		::={whispApsConfig 34}
+
+	broadcastRetryCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Broadcast Repeat Count : Range 0 -- 2. For APs."
+		::={whispApsConfig 35}
+
+	encryptDwBroadcast	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable Encrypted Downlink Broadcast. For FSK APs."
+		::={whispApsConfig 36}
+
+	updateAppAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Update Application Address."
+		::={whispApsConfig 37}
+
+	dfsConfig	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"To configure proper regions for Dynamic Frequency Shifting. For 5.2/5.4/5.7 GHz radios."
+		::={whispApsConfig 38}
+
+	vlanEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable VLAN."
+		::={whispApsConfig 39}
+
+	configSource	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					bam(0),
+					sm(1),
+					bamsm(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To configure CIR, MIR and VLAN through SM or BAM."
+		::={whispApsConfig 40}
+
+	apRateAdapt	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					onex(0),
+					onextwox(1),
+					onextwoxthreex(2)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"To enable or disable double rate."
+		::={whispApsConfig 41}
+
+	numCtlSlotsHW	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This attribute is deprecated.  Please see radioControlSlots."
+		::={whispApsConfig 42}
+
+	displayAPEval	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(0),
+					disable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If enable, it allows display of AP Eval Data at the SM."
+		::={whispApsConfig 43}
+
+	smIsolation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					smIsolationDisable(0),
+					smIsolationDrop(1),
+					smIsolationFwd(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"(0) -- Disable SM Isolation.
+				            (1) -- Enable SM Isolation by blocking SM destined packets.
+				            (2) -- Enable SM Isolation by forwarding SM packets upstream."
+		::={whispApsConfig 44}
+
+	ipAccessFilterEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable IP access filtering to Management functions.
+            (0) - IP access will be allowed from all addresses.
+            (1) - IP access will be controlled using allowedIPAccess1-3 entries."
+		::={whispApsConfig 45}
+
+	allowedIPAccess1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to AP Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={whispApsConfig 46}
+
+	allowedIPAccess2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to AP Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={whispApsConfig 47}
+
+	allowedIPAccess3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow access to AP Management from this IP.
+            0 is default setting to allow from all IPs."
+		::={whispApsConfig 48}
+
+	tslBridging	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"1 = We are performing Translation Bridging 0 = We are not."
+		::={whispApsConfig 49}
+
+	untranslatedArp	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"1 = We are sending untranslated ARP response. 0 = We are not."
+		::={whispApsConfig 50}
+
+	limitFreqBand900	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"1 = We are limiting the freq band of 900 radios.  0 = We are not."
+		::={whispApsConfig 51}
+
+	txPwrLevel	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Deprecated, use 'transmitterOP' instead."
+		::={whispApsConfig 52}
+
+	rfFreqCaralt1	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					none(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"First DFS Alternate RF Frequency. (Only available for DFS radios)  Used
+            as a backup frequency when Radar is detected on DFS enabled Radios.
+            The frequencies are:
+
+            5.4 radios:(5475,5485,5490 OFDM only),5495,5500,5505,5510,5515,5520,5525,
+                   5530,5535,5540,5545,5550,5555,5560,5565,5570,5575,5580,5585,5590,5595,
+                   5600,5605,5610,5615,5620,5625,5630,5635,5640,5645,5650,5655,5660,5665,
+                   5670,5675,5680,5685,5690,5695,5700,5705,(5710,5715 OFDM Only).
+
+            (5.7 Platform 10 (SAL) radios with non-connectorized antennas do not support DFS)
+
+            5.7 radios:5745,5750,5755,5760,5765,5770,5775,5780,5785,5790,5795,5800,5805.
+            5.7 radios with ISM enabled :5735,5740,5745,5750,5755,5760,5765,5770,5775,
+                   5780,5785,5790,5795,5800,5805,5810,5815,5820,5825,5830,5835,5840.
+            0:  None."
+		::={whispApsConfig 53}
+
+	rfFreqCaralt2	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					none(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Second DFS Alternate RF Frequency. (Only available for DFS radios)  Used
+            as a backup frequency when Radar is detected on DFS enabled Radios.
+            The frequencies are:
+
+            5.4 radios:(5475,5485,5490 OFDM only),5495,5500,5505,5510,5515,5520,5525,
+                   5530,5535,5540,5545,5550,5555,5560,5565,5570,5575,5580,5585,5590,5595,
+                   5600,5605,5610,5615,5620,5625,5630,5635,5640,5645,5650,5655,5660,5665,
+                   5670,5675,5680,5685,5690,5695,5700,5705,(5710,5715 OFDM Only).
+
+            (5.7 Platform 10 (SAL) radios with non-connectorized antennas do not support DFS)
+
+            5.7 radios:5745,5750,5755,5760,5765,5770,5775,5780,5785,5790,5795,5800,5805.
+            5.7 radios with ISM enabled :5735,5740,5745,5750,5755,5760,5765,5770,5775,
+                   5780,5785,5790,5795,5800,5805,5810,5815,5820,5825,5830,5835,5840.
+            0:  None."
+		::={whispApsConfig 54}
+
+	scheduleWhitening	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"1 = Schedule Whitening allowed.  0 = Schedule Whitening not allowed.  This option is for FSK only"
+		::={whispApsConfig 55}
+
+	remoteSpectrumAnalysisDuration	OBJECT-TYPE
+		SYNTAX		INTEGER (10..1000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Value in seconds for a remote spectrum analysis on an SM. Range is 10-1000 seconds."
+		::={whispApsConfig 56}
+
+-- Perform Remote Spectrum Analysis on an LUID
+
+	remoteSpectrumAnalyzerLUID	OBJECT-TYPE
+		SYNTAX		INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Get will return always return 0.
+                            Set will start Remote Spectrum Analyzer on specified LUID.
+                            *Warning* This will cause the SM to disconnect from the AP!
+                            You will lose the session for the specified duration!
+                            If general error was returned then the LUID does not have an active session, or the
+                            SM does not support Remote Spectrum Analysis."
+		::={whispApsConfig 57}
+
+-- Allows BHS re-registration every 24 hours
+
+	bhReReg	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allows BHS re-registration every 24 hours. Enable allows re-registration and Disable does not. 24 Hour Encryption Refresh."
+		::={whispApsConfig 58}
+
+	dlnkBcastCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Broadcast CIR (kbps)"
+		::={whispApsConfig 59}
+
+	verifyGPSChecksum	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					doNotVerifyGPSMessageChecksum(0),
+					verifyGPSMessageChecksum(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable verification of GPS message checksums."
+		::={whispApsConfig 60}
+
+	apVlanOverride	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting this option will cause an AP to retain its VLAN settings when turning it into an SM.  It will be mostly helpful for
+                       		running spectrum analysis on the AP.  Since doing that requires the AP to be turned into an SM, enabling this option will
+                       		allow you to keep the AP's VLAN configuration in place while the AP is running as an SM."
+		::={whispApsConfig 61}
+
+	dhcpRelayAgentEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					fullRelay(1),
+					option82Only(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable or Disable MultiPoint AP acting as DHCP Relay Agent for all SMs and Clients underneath it.
+            (0) - Relay Agent disabled - SM/CPE devices will perform DHCP normally
+            (1) - Relay Agent enabled - AP will intercept DHCP DISCOVER message from SM and CPE, insert Option 82 containing SM's MAC address, and forward request to specified DHCP server."
+		::={whispApsConfig 62}
+
+	dhcpRelayAgentSrvrIP	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Configure with whispApsDNS.dhcprServer."
+		::={whispApsConfig 63}
+
+	colorCodeRescanTimer	OBJECT-TYPE
+		SYNTAX		INTEGER (0..43200)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Time in minutes for the subscriber to begin the idle timer.  This timer
+						will begin as soon as a session is started.
+						This only fires if the device is in session with a non-primary color code.
+						A value of zero (0) disables this timer
+						(MultiPoint system Only)"
+		::={whispApsConfig 64}
+
+	colorCodeRescanIdleTimer	OBJECT-TYPE
+		SYNTAX		INTEGER (0..60)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Time in minutes for the subscriber to check for an idle state.  If an period has pass where no unicast RF traffic has occured (idle),
+                        then the subscriber will begin to rescan.
+                        This timer will wait until the timer set in colorCodeRescanTimer has expired before beginning.
+                        This timer only fires if the device is in session with a non-primary color code.
+                        A value of zero (0) mean to rescan without waiting for idle.
+                        (MultiPoint system Only)"
+		::={whispApsConfig 65}
+
+	authKeyOptionAP	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					useDefault(0),
+					useKeySet(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This option is for Multipoint APs only.  This option will only be used if Authentication Mode is set
+            to AP Pre-Shared Key.
+            0 - Use default key.
+            1 - Use set key."
+		::={whispApsConfig 66}
+
+	asIP4	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Configure with whispApsDNS.authServer4."
+		::={whispApsConfig 67}
+
+	asIP5	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Configure with whispApsDNS.authServer5."
+		::={whispApsConfig 68}
+
+	onlyAllowVer95OrAbove	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					onlyAllowVer95OrAboveDisabled(0),
+					onlyAllowVer95OrAboveEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Only allow subscribers that are running version 9.5 or above.  Any radio that has a version below 9.5 will not be
+                        allowed to register."
+		::={whispApsConfig 69}
+
+	apRxDelay	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This is used for engineering debug and needs to be removed or moved to eng MIB before releasing the MIB."
+		::={whispApsConfig 70}
+
+	qinqEthType	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					x88a8(0),
+					x8100(1),
+					x9100(2),
+					x9200(3),
+					x9300(4)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"EtherType for QinQ (802.1ad) outer tag (S-Tag). 0x88a8 by default."
+		::={whispApsConfig 71}
+
+	fskSMTxPwrCntl	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable AP control of SM TX power.  For FSK AP radios capable of Transmit Power
+                            Control."
+		::={whispApsConfig 72}
+
+	fskSMRcvTargetLvl	OBJECT-TYPE
+		SYNTAX		INTEGER (-80..-40)
+		UNITS		"dBm"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Desired SM Receive Level at AP (dBm, Range -40dBm to -80 dBm)."
+		::={whispApsConfig 73}
+
+	authSharedSecret1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 1 Shared Secret."
+		::={whispApsConfig 74}
+
+	authSharedSecret2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 2 Shared Secret."
+		::={whispApsConfig 75}
+
+	authSharedSecret3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 3 Shared Secret."
+		::={whispApsConfig 76}
+
+	whispUsrAuthSharedSecret1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Use whispApsConfig.authSharedSecret1."
+		::={whispApsConfig 79}
+
+	whispUsrAuthSharedSecret2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Use whispApsConfig.authSharedSecret2."
+		::={whispApsConfig 80}
+
+	whispUsrAuthSharedSecret3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted. Use whispApsConfig.authSharedSecret3."
+		::={whispApsConfig 81}
+
+	whispUsrAcctSvr1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Use whispApsDNS.authServer1."
+		::={whispApsConfig 82}
+
+	whispUsrAcctSvr2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Use whispApsDNS.authServer2."
+		::={whispApsConfig 83}
+
+	whispUsrAcctSvr3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Use whispApsDNS.authServer3."
+		::={whispApsConfig 84}
+
+	whispUsrAuthPhase1	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					md5(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select method for User Authentication"
+		::={whispApsConfig 85}
+
+	whispWebUseAuthServer	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					useRADIUSAccountingSvr(0),
+					useRADIUSAuthenticationSvr(1)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Use whispApsDNS.authServer[1-3]."
+		::={whispApsConfig 86}
+
+	dropSession	OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM/BHS MAC Address to drop session from the AP/BHM."
+		::={whispApsConfig 87}
+
+	uGPSPower	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable or Disable power supply to Universal GPS module (UGPS capable APs only, when GPS_output_enable is NOT set)."
+		::={whispApsConfig 88}
+
+	timeZone	OBJECT-TYPE
+		SYNTAX		INTEGER (0..124)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Set the timezone offset for the radio.  This change takes affect dynamically.
+            The available timezones are:
+             0 : (UTC) UTC - Coordinated Universal Time
+             1 : (UTC) GMT - Greenwich Mean Time
+             2 : (UTC) WET - Western European Time
+             3 : (UTC-12) BIT - Baker Island Time
+             4 : (UTC-11) SST - Samoa Standard Time
+             5 : (UTC-10) CKT - Cook Island Time
+             6 : (UTC-10) HAST - Hawaii-Aleutian Standard Time
+             7 : (UTC-10) HST - Hawaii Standard Time
+             8 : (UTC-10) TAHT - Tahiti Time
+             9 : (UTC-09:30) MIT - Marquesas Islands Time
+             10 : (UTC-09) AKST - Alaska Standard Time
+             11 : (UTC-09) GIT - Gambier Island Time
+             12 : (UTC-09) HADT - Hawaii-Aleutian Daylight Time
+             13 : (UTC-08) AKDT - Alaska Daylight Time
+             14 : (UTC-08) CIST - Clipperton Island Standard Time
+             15 : (UTC-08) PST - Pacific Standard Time (North America)
+             16 : (UTC-07) MST - Mountain Standard Time (North America)
+             17 : (UTC-07) PDT - Pacific Daylight Time (North America)
+             18 : (UTC-06) CST - Central Standard Time (North America)
+             19 : (UTC-06) EAST - Easter Island Standard Time
+             20 : (UTC-06) GALT - Galapagos Time
+             21 : (UTC-06) MDT - Mountain Daylight Time (North America)
+             22 : (UTC-05) CDT - Central Daylight Time (North America)
+             23 : (UTC-05) COT - Colombia Time
+             24 : (UTC-05) ECT - Ecuador Time
+             25 : (UTC-05) EST - Eastern Standard Time (North America)
+             26 : (UTC-04:30) VET - Venezuelan Standard Time
+             27 : (UTC-04) AST - Atlantic Standard Time
+             28 : (UTC-04) BOT - Bolivia Time
+             29 : (UTC-04) CLT - Chile Standard Time
+             30 : (UTC-04) COST - Colombia Summer Time
+             31 : (UTC-04) ECT - Eastern Caribbean Time (does not recognise DST)
+             32 : (UTC-04) EDT - Eastern Daylight Time (North America)
+             33 : (UTC-04) FKT - Falkland Islands Time
+             34 : (UTC-04) GYT - Guyana Time
+             35 : (UTC-03:30) NST - Newfoundland Standard Time
+             36 : (UTC-03:30) NT - Newfoundland Time
+             37 : (UTC-03) ADT - Atlantic Daylight Time
+             38 : (UTC-03) ART - Argentina Time
+             39 : (UTC-03) BRT - Brasilia Time
+             40 : (UTC-03) CLST - Chile Summer Time
+             41 : (UTC-03) FKST - Falkland Islands Summer Time
+             42 : (UTC-03) GFT - French Guiana Time
+             43 : (UTC-03) UYT - Uruguay Standard Time
+             44 : (UTC-02:30) NDT - Newfoundland Daylight Time
+             45 : (UTC-02) GST - South Georgia and the South Sandwich Islands
+             46 : (UTC-02) UYST - Uruguay Summer Time
+             47 : (UTC-01) AZOST - Azores Standard Time
+             48 : (UTC-01) CVT - Cape Verde Time
+             49 : (UTC+01) BST - British Summer Time (British Standard Time from Feb 1968 to Oct 1971)
+             50 : (UTC+01) CET - Central European Time
+             51 : (UTC+01) DFT - AIX specific equivalent of Central European Time
+             52 : (UTC+01) IST - Irish Summer Time
+             53 : (UTC+01) WAT - West Africa Time
+             54 : (UTC+01) WEDT - Western European Daylight Time
+             55 : (UTC+01) WEST - Western European Summer Time
+             56 : (UTC+02) CAT - Central Africa Time
+             57 : (UTC+02) CEDT - Central European Daylight Time
+             58 : (UTC+02) CEST - Central European Summer Time
+             59 : (UTC+02) EET - Eastern European Time
+             60 : (UTC+02) IST - Israel Standard Time
+             61 : (UTC+02) SAST - South African Standard Time
+             62 : (UTC+03) AST - Arab Standard Time (Kuwait, Riyadh)
+             63 : (UTC+03) AST - Arabic Standard Time (Baghdad)
+             64 : (UTC+03) EAT - East Africa Time
+             65 : (UTC+03) EEDT - Eastern European Daylight Time
+             66 : (UTC+03) EEST - Eastern European Summer Time
+             67 : (UTC+03) MSK - Moscow Standard Time
+             68 : (UTC+03:30) IRST - Iran Standard Time
+             69 : (UTC+04) AMT - Armenia Time
+             70 : (UTC+04) AST - Arabian Standard Time (Abu Dhabi, Muscat)
+             71 : (UTC+04) AZT - Azerbaijan Time
+             72 : (UTC+04) GET - Georgia Standard Time
+             73 : (UTC+04) MSD - Moscow Summer Time
+             74 : (UTC+04) MUT - Mauritius Time
+             75 : (UTC+04) RET - Reunion Time
+             76 : (UTC+04) SAMT - Samara Time
+             77 : (UTC+04) SCT - Seychelles Time
+             78 : (UTC+04:30) AFT - Afghanistan Time
+             79 : (UTC+05) AMST - Armenia Summer Time
+             80 : (UTC+05) HMT - Heard and McDonald Islands Time
+             81 : (UTC+05) PKT - Pakistan Standard Time
+             82 : (UTC+05) YEKT - Yekaterinburg Time
+             83 : (UTC+05:30) IST - Indian Standard Time
+             84 : (UTC+05:30) SLT - Sri Lanka Time
+             85 : (UTC+05:45) NPT - Nepal Time
+             86 : (UTC+06) BIOT - British Indian Ocean Time
+             87 : (UTC+06) BST - Bangladesh Standard Time
+             88 : (UTC+06) BTT - Bhutan Time
+             89 : (UTC+06) OMST - Omsk Time
+             90 : (UTC+06:30) CCT - Cocos Islands Time
+             91 : (UTC+06:30) MST - Myanmar Standard Time
+             92 : (UTC+07) CXT - Christmas Island Time
+             93 : (UTC+07) ICT - Indochina Time
+             94 : (UTC+07) KRAT - Krasnoyarsk Time
+             95 : (UTC+07) THA - Thailand Standard Time
+             96 : (UTC+08) ACT - ASEAN Common Time
+             97 : (UTC+08) AWST - Australian Western Standard Time
+             98 : (UTC+08) BDT - Brunei Time
+             99 : (UTC+08) CST - China Standard Time
+             100 : (UTC+08) HKT - Hong Kong Time
+             101 : (UTC+08) IRKT - Irkutsk Time
+             102 : (UTC+08) MST - Malaysian Standard Time
+             103 : (UTC+08) PST - Philippine Standard Time
+             104 : (UTC+08) SST - Singapore Standard Time
+             105 : (UTC+09) AWDT - Australian Western Daylight Time
+             106 : (UTC+09) JST - Japan Standard Time
+             107 : (UTC+09) KST - Korea Standard Time
+             108 : (UTC+09) YAKT - Yakutsk Time
+             109 : (UTC+09:30) ACST - Australian Central Standard Time
+             110 : (UTC+10) AEST - Australian Eastern Standard Time
+             111 : (UTC+10) ChST - Chamorro Standard Time
+             112 : (UTC+10) VLAT - Vladivostok Time
+             113 : (UTC+10:30) ACDT - Australian Central Daylight Time
+             114 : (UTC+10:30) LHST - Lord Howe Standard Time
+             115 : (UTC+11) AEDT - Australian Eastern Daylight Time
+             116 : (UTC+11) MAGT - Magadan Time
+             117 : (UTC+11) SBT - Solomon Islands Time
+             118 : (UTC+11:30) NFT - Norfolk Time[1]
+             119 : (UTC+12) FJT - Fiji Time
+             120 : (UTC+12) GILT - Gilbert Island Time
+             121 : (UTC+12) PETT - Kamchatka Time
+             122 : (UTC+12:45) CHAST - Chatham Standard Time
+             123 : (UTC+13) PHOT - Phoenix Island Time
+             124 : (UTC+14) LINT - Line Islands Time"
+		::={whispApsConfig 89}
+
+	ofdmSMRcvTargetLvl	OBJECT-TYPE
+		SYNTAX		INTEGER (-80..-40)
+		UNITS		"dBm"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Desired SM Receive Level at AP (dBm, Range -40dBm to -80 dBm). As of release 12.1, on MIMO systems this is a combined power level value."
+		::={whispApsConfig 90}
+
+	radiusPort	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port used to connect to the RADIUS server.  Default is 1812."
+		::={whispApsConfig 91}
+
+	radiusAcctPort	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port used to for RADIUS Accounting.  Default is 1813."
+		::={whispApsConfig 92}
+
+	lastSesStatsReset	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Displays the timestamp of last reset of session stats or None otherwise."
+		::={whispApsConfig 93}
+
+	resetSesStats	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noReset(0),
+					reset(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Resets the session stats if true."
+		::={whispApsConfig 94}
+
+	rfOLTrap	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable SNMP Trap for when RF Overload exceeds configured Threshold level."
+		::={whispApsConfig 95}
+
+	rfOLThreshold	OBJECT-TYPE
+		SYNTAX		INTEGER (1..100)
+		UNITS		"%"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Percent of packet overload in the RF Downlink where SNMP is generated and sent to Network Manager."
+		::={whispApsConfig 96}
+
+	rfOLEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable Throughput RF Overload Monitoring monitoring."
+		::={whispApsConfig 97}
+
+	actionListFilename	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Name of the file that contains the Action List for Auto update commands from CNUT"
+		::={whispApsConfig 98}
+
+	enableAutoupdate	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables/Disables auto-update of the SM's under an AP"
+		::={whispApsConfig 99}
+
+	accountingSmReAuthInterval	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select Interval for Reauthentication of SM"
+		::={whispApsConfig 100}
+
+	syslogDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDomain(0),
+					appendDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This attribute is deprecated. Use syslogDomainNameAppend in whispBoxAttributesGroup"
+		::={whispApsConfig 101}
+
+	syslogServerAddr	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This attribute is deprecated. Use syslogServerAddr in whispBoxAttributesGroup"
+		::={whispApsConfig 102}
+
+	syslogServerPort	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This attribute is deprecated. Use syslogServerPort in whispBoxAttributesGroup"
+		::={whispApsConfig 103}
+
+	syslogXmitAP	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables/Disables transmission of Syslogs from AP/BHM"
+		::={whispApsConfig 104}
+
+	syslogXmitSMs	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables/Disables transmission of Syslogs from connected SMs/BHS. This can be over-ridden by the setting on individual SMs/ the BHS."
+		::={whispApsConfig 105}
+
+	accountingInterimUpdateInterval	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select Interval for Interim Updates"
+		::={whispApsConfig 106}
+
+	gpsOutputEn	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable or Disable GPS sync output enable."
+		::={whispApsConfig 107}
+
+	removeIdleSMs	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					stopped(0),
+					start(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting this to a value 1 will remove all SMs which are in Idle state from AP's Session list."
+		::={whispApsConfig 108}
+
+	lastTimeIdleSMsRemoved	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Displays the timestamp of last removal of Idle SMs from AP's Session list"
+		::={whispApsConfig 109}
+
+	radioMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					mimoOnly(2)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"This OID is obsolete."
+		::={whispApsConfig 206}
+
+	rfTelnetAccess	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allows/prohibits uplink Telnet access (SM->AP)."
+		::={whispApsConfig 207}
+
+	upLnkMaxBurstDataRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Maximum burst uplink rate."
+		::={whispApsConfig 208}
+
+	dwnLnkMaxBurstDataRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Kilobits/sec"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Maximum burst downlink rate."
+		::={whispApsConfig 209}
+
+	rfPPPoEPADIForwarding	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables/disables forwarding of PPPoE PADI packets from AP to SM."
+		::={whispApsConfig 210}
+
+	allowedIPAccessNMLength1	OBJECT-TYPE
+		SYNTAX		INTEGER (1..32)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Length of the network mask to apply to the AllowedIPAddress when assessing if access is allowed"
+		::={whispApsConfig 211}
+
+	allowedIPAccessNMLength2	OBJECT-TYPE
+		SYNTAX		INTEGER (1..32)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Length of the network mask to apply to the AllowedIPAddress when assessing if access is allowed"
+		::={whispApsConfig 212}
+
+	allowedIPAccessNMLength3	OBJECT-TYPE
+		SYNTAX		INTEGER (1..32)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Length of the network mask to apply to the AllowedIPAddress when assessing if access is allowed"
+		::={whispApsConfig 213}
+
+	bridgeFloodUnknownsEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable bridge flooding unknown unicast packets.
+				            (0) - Bridge will not forward unknown unicast packets.
+				            (1) - Bridge will flood unknown unicast packets."
+		::={whispApsConfig 214}
+
+	berModSelect	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					qpsk(0),
+					qam-16(1),
+					qam-64(2),
+					qam-256(3)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"The modulation the AP generates BER at. 0 for QPSK, 1 for 16-QAM, 2 for 64-QAM, and 3 for 256-QAM."
+		::={whispApsConfig 215}
+
+	remoteSpectrumAnalyzerScanBandwidth	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					bandwidth5MHz(0),
+					bandwidth10MHz(1),
+					bandwidth20MHz(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Scanning Bandwidth used for the Remote Spectrum Analyzer.  Only available on PMP 450."
+		::={whispApsConfig 216}
+
+	multicastVCDataRate	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					rate2XmimoB(5),
+					rate4XmimoB(7),
+					rate6XmimoB(8),
+					rate8XmimoB(9),
+					rate1XmimoA(4),
+					rate2XmimoA(10),
+					rate4XmimoA(11),
+					rate6XmimoA(12)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"The data rate that is used for the Multicast VC.
+                            8X and MIMO-A are currently for engineering only."
+		::={whispApsConfig 217}
+
+	dlnkMcastCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Multicast CIR (kbps)"
+		::={whispApsConfig 218}
+
+	multicastRetryCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Multicast Repeat Count : Range 0 - 2. For APs."
+		::={whispApsConfig 219}
+
+	apConfigAdjacentChanSupport	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Used to enable or disable adjacent channel support."
+		::={whispApsConfig 220}
+
+	pmp430InteropMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					mimoa(0),
+					siso(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"When the AP talks to a PMP 430 it can do so in either MIMO-A or SISO mode.
+                            0 = MIMO-A
+                            1 = SISO
+                            Only applies to PMP 450 AP at 5 GHz. 
+                            By default in 13.2 the AP talks in MIMO-A to PMP 430 SISO SMs.
+                            Setting this to a 1 will enable SISO mode to PMP 430 SISO SMs, as it was in 13.1.3 and before."
+		::={whispApsConfig 221}
+
+	framePeriod	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					twoPointFiveMs(0),
+					fiveMs(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Changes frame period to 2.5 ms or 5ms.
+                            Note: If set to 5 ms, only SM/BHS from 13.3 and onward will be able to register.
+                            Only on PMP and PTP 450.
+                            Not available in all regions."
+		::={whispApsConfig 223}
+
+	enableRadiusDynAuth	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDynAuth(0),
+					enableDynAuth(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This option can be used to enable Radius Dynamic Authorization Extensions.Both CoA, which change the SM config parameters from the Radius server while an SM is already in session and Disconnect Message are supported. 
+            This option will only be used if Authentication mode is set to Radius AAA.
+            0 - Disable Radius Dynamic Authorization Extension.
+            1 - Enable Radius Dynamic Authorization Extension."
+		::={whispApsConfig 224}
+
+	pmp430SMRegistration	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					deny(0),
+					allow(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Option to allow/disallow 430 SMs to register to this AP.
+                        	When disabled 430 SMs registrations will be rejected.
+                        	This option applies only to PMP 450i/450 5 GHz APs."
+		::={whispApsConfig 225}
+
+	disableAuthForICCSM	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Disable Authentication for SM connected via ICC."
+		::={whispApsConfig 226}
+
+	onlyAllowPMP450iSMRegistration	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					only450i(0),
+					all(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Option to limit SM registration to only allow PMP 450i devices or allow all devices (450i/450/430) to register.
+							PMP 430 SM registration can be further limited by the pmp430SMRegistration OID if desired.
+							Setting this to only450i will force an Auth Fail registration failure when a PMP 450 or PMP 430 SM device
+							tries to register.
+                        	This option only applies to PMP 450i AP devices."
+		::={whispApsConfig 228}
+
+	pmp450430LegacyMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Option to put the PMP 450i into a Legacy mode for communicating with PMP 450 SMs running SW older than 13.3 and PMP 430 SMs running SW older than 13.4.1.
+                        	Enabling this option will have an impact on sector throughput performance so should only be enabled to allow upgrading of the mixed sector.
+                        	This option only applies to PMP 450i AP devices."
+		::={whispApsConfig 229}
+
+	pagerRejectFilterSelect	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable or disable the Pager filter which can filter out Pager signals interfering in the 900 MHz band.
+                            NOTE: Frequencies 920 MHz and above will not work when enabled.
+                            Only applicable to 900 MHz devices."
+		::={whispApsConfig 230}
+
+	whispRegStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		obsolete
+		DESCRIPTION		
+			"This shows the registration status of a link.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLink 4}
+
+-- Link test configuration
+
+	linkTestLUID	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"LUID selection for Link Test. Valid range: 2-255. [This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 1}
+
+	linkTestDuration	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Duration for the Link Test. Valid range: 2-10 seconds. [This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 2}
+
+-- Link test action
+
+	linkTestAction	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					stopped(0),
+					start(1)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Setting value 1 will initiate link test. Note that trying to set 0 will not stop the test.
+            In fact it will return an error message. The value of 0 just indicates the idle state
+            meaning no test is running or the current test is done.
+            That's why the word stopped is used and not the action verb stop.
+			[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 3}
+
+	linkTestPktLength	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Packet length for Link Test. Valid range: 64-1714 bytes. [This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 4}
+
+	linkTestMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					rflinktest(0),
+					linktestwithbridging(1),
+					linktestwithbridgingandmir(2),
+					extrapolatedlinktest(3)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Link Test Mode
+                            0 = RF Link Test (traffic doesn't go through bridge, highest throughput)
+                            1 = Link Test with Bridging
+                            2 = Link Test with Bridging and MIR
+                            3 = Extrapolated Link Test (send only a few packets measuring their quality and extrapolate out the throughput)
+                            This is an estimation of the throughput based upon the modulation, efficiency, and data slots available.
+                            It intended to provide a basic link test test without impacting service for the sector.
+                            Extrapolated Link Test is not available for FSK radios.
+                            [This Variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 5}
+
+	linkTestSNRCalculation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Enable or disable Signal to Noise Ratio (SNR) calculations during a Link Test.
+                            Enabling(1) will calulate SNR on all receiving packets.
+                            Due to load on CPU, will slightly degrade packet per second capabilities.
+                            Only applicable to GenII OFDM products and up.
+							[This Variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 6}
+
+	linkTestWithDualPath	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					lowpriorityvconly(0),
+					highandlowpriorityvcs(1)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Link Test with:
+                            0 = Low Priority VC only
+                            1 = High and Low Priority VCs
+							[This variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 7}
+
+-- Link test configuration
+
+	linkTestNumPkt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of packets to send. Valid range: 0-64 where 0 will
+            flood the link for the duration of the test.
+			[This variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 8}
+
+	linkTestForceModulation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					normalRateAdapt(0),
+					forceMaxModulation(1)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Engineering use only.
+                            Link Test with:
+                            0 = Normal Rate Adapt algorithm
+                            1 = Force to max modultion - No Rate Adapt Algorithm
+							[This variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 9}
+
+	linkTestDirection	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					bidirectional(0),
+					uplinkonly(1),
+					downlinkonly(2)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"Link Test Direction - Engineering Use Only
+                            0 = default (will do bidirectional)
+                            1 = Uplink Only
+                            2 = Downlink Only
+                            3 = Bi-Directional (same as 0, setting to 3 will result in setting it to 0)
+							[This variable is deprecated. Please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestConfig 10}
+
+-- Link test results
+
+	testLUID	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"LUID number of selected unit. [This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 1}
+
+	linkTestStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Status for Link Test.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 2}
+
+	linkTestError	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Error status of Link Test:
+            (1) Failed to recieve handshake from remote device
+            (2) No session is currently active. Please try again after session established.
+            (3) Received a bad transaction ID.  Please try again.
+            (4) We werent able to send the test request to the remote device.
+            (5) We didnt receive any results from the remote device.
+			[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 3}
+
+	testDuration	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Duration of link test.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 4}
+
+	downLinkRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"bps"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Downlink Rate.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 5}
+
+	upLinkRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"bps"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Uplink Rate.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 6}
+
+	downLinkEff	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"%"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Down Link Efficiency."
+		::={whispApsLinkTestResult 7}
+
+	maxDwnLinkIndex	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"For link test results, the maximum possible downlink efficiency percentage (always 100%).[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 8}
+
+	actDwnLinkIndex	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Actual down link index.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 9}
+
+	expDwnFragCount	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Expected Fragment Count.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 10}
+
+	actDwnFragCount	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Actual Fragment Count.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 11}
+
+	upLinkEff	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"%"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Up link efficiency.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 12}
+
+	expUpFragCount	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Uplink expected Fragment Count.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 13}
+
+	actUpFragCount	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Actual uplink Fragment Count.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 14}
+
+	maxUpLinkIndex	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"For link test results, the maximum possible uplink efficiency percentage (always 100%).[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 15}
+
+	actUpLinkIndex	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Actual Up link index.[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 16}
+
+	fragments1xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 1X (QPSK).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 17}
+
+	fragments2xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 2X (16-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 18}
+
+	fragments3xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 3X (64-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 19}
+
+	fragments4xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 4X (256-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 20}
+
+	fragments1xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 1X (QPSK).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 21}
+
+	fragments2xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 2X (16-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 22}
+
+	fragments3xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 3X (64-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 23}
+
+	fragments4xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 4X (256-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 24}
+
+	bitErrorsCorrected1xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 1X (QPSK).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 25}
+
+	bitErrorsCorrected2xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 2X (16-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 26}
+
+	bitErrorsCorrected3xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 3X (64-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 27}
+
+	bitErrorsCorrected4xDwnLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 4X (256-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 28}
+
+	bitErrorsCorrected1xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 1X (QPSK).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 29}
+
+	bitErrorsCorrected2xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 2X (16-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 30}
+
+	bitErrorsCorrected3xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 3X (64-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 31}
+
+	bitErrorsCorrected4xUpLinkVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 4X (256-QAM).
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 32}
+
+	signalToNoiseRatioDownLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Estimated Signal to Noise Ratio in dB for the down link.
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 33}
+
+	signalToNoiseRatioUpLinkVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Estimated Signal to Noise Ratio in dB for the up link.
+                            For Gen II OFDM and forward.
+                            For MIMO this is the vertical path.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 34}
+
+	fragments1xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 1X (QPSK).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 35}
+
+	fragments2xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 2X (16-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 36}
+
+	fragments3xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 3X (64-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 37}
+
+	fragments4xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on down link at 4X (256-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 38}
+
+	fragments1xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 1X (QPSK).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 39}
+
+	fragments2xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 2X (16-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 40}
+
+	fragments3xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 3X (64-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 41}
+
+	fragments4xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of fragments received on up link at 4X (256-QAM).
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 42}
+
+	bitErrorsCorrected1xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 1X (QPSK).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 43}
+
+	bitErrorsCorrected2xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 2X (16-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 44}
+
+	bitErrorsCorrected3xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 3X (64-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 45}
+
+	bitErrorsCorrected4xDwnLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on down link at 4X (256-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 46}
+
+	bitErrorsCorrected1xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 1X (QPSK).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 47}
+
+	bitErrorsCorrected2xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 2X (16-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 48}
+
+	bitErrorsCorrected3xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of bit errors corrected on average per fragment on up link at 3X (64-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 49}
+
+	bitErrorsCorrected4xUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Number of bit errors corrected on average per fragment on up link at 4X (256-QAM).
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            Fragments received in MIMO-A will only be counted on vertical.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 50}
+
+	signalToNoiseRatioDownLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Estimated Signal to Noise Ratio in dB for the down link.
+                            For MIMO and forward.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 51}
+
+	signalToNoiseRatioUpLinkHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Estimated Signal to Noise Ratio in dB for the up link.
+                            For Gen II OFDM and forward.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 52}
+
+	downLinkRateExtrapolated	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"bps"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Extrapolated Downlink Rate from an extrapolated link test.
+                            Extrapolated Link Test sends only a few packets over the link and extrapolates this out to what would happen on a full link test.
+                            This is an estimation of the throughput based upon the modulation, efficiency, and data slots available.
+                            It intended to provide a basic link test test without impacting service for the sector.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 53}
+
+	upLinkRateExtrapolated	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"bps"
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION		
+			"Extrapolated Uplink Rate from an extrapolated link test.
+                            Extrapolated Link Test sends only a few packets over the link and extrapolates this out to what would happen on a full link test.
+                            This is an estimation of the throughput based upon the modulation, efficiency, and data slots available.
+                            It intended to provide a basic link test test without impacting service for the sector.
+							[This variable is deprecated, please refer whispBoxLink OIDs]"
+		::={whispApsLinkTestResult 54}
+
+	whispGPSStats	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					gpsSynchronized(1),
+					gpsLostSync(2),
+					generatingSync(3)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This shows whether the AP is synchrinized
+                        to the GPS timer."
+		::={whispApsGPS 1}
+
+	gpsSyncSource	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Source of GPS Sync Pulse."
+		::={whispApsGPS 2}
+
+	gpsSyncStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Live value of Sync Status."
+		::={whispApsGPS 3}
+
+	gpsTrackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS tracking mode."
+		::={whispApsGPS 4}
+
+	gpsTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS time."
+		::={whispApsGPS 5}
+
+	gpsDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS date."
+		::={whispApsGPS 6}
+
+	gpsSatellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns Current number of satellites GPS is tracking in string format .use gpsSatellitesTrackedInt to get the value in integer"
+		::={whispApsGPS 7}
+
+	gpsSatellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Return Number of satellites GPS is seeing in string format.Use gpsSatellitesVisibleInt to get value in integer"
+		::={whispApsGPS 8}
+
+	gpsHeight	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS height."
+		::={whispApsGPS 9}
+
+	gpsAntennaConnection	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Antenna Connection status."
+		::={whispApsGPS 10}
+
+	gpsLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS Latitude."
+		::={whispApsGPS 11}
+
+	gpsLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS Longitude."
+		::={whispApsGPS 12}
+
+	gpsInvalidMsg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of invalid messages."
+		::={whispApsGPS 13}
+
+	gpsRestartCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of GPS unit restarts."
+		::={whispApsGPS 14}
+
+	gpsReInitCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS ReInit counts.  The number of times we have done a complete re-initialization of the GPS device."
+		::={whispApsGPS 15}
+
+	gpsReceiverInfo	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string contains information on GPS receiver."
+		::={whispApsGPS 16}
+
+	gpsFreeRun	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This variable is deprecated.
+                              Setting this value to false will set AutoSync.
+                              Setting this value to true will set AutoSync plus Free Run."
+		::={whispApsGPS 17}
+
+	autoSyncStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noSync(0),
+					onBoardGPSSync(1),
+					timingPortUGPSSync(2),
+					onBoardGPSAndTimingPortUGPSSync(3),
+					powrPortSync(4),
+					onBoardGPSAndPowrPortSync(5),
+					timingPortUGPSAndPowrPortSync(6),
+					onBoardGPSAndTimingPortUGPSAndPowrPortSync(7)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Live value of Sync Status.
+						Following values represent what sources have sync.
+						(0) No Sync
+						(1) On-board GPS Sync
+						(2) Timing Port/UGPS Sync
+						(3) On-board GPS and Timing Port/UGPS Sync
+						(4) Power Port Sync
+						(5) On-board GPS and Power Port Sync
+						(6) Timing Port/UGPS and Power Port Sync
+						(7) On-board GPS, Timing Port/UGPS and Power Port Sync"
+		::={whispApsGPS 18}
+
+	gpsSatellitesTrackedInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites GPS is tracking in integer format."
+		::={whispApsGPS 19}
+
+	gpsSatellitesVisibleInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS sees in integer format"
+		::={whispApsGPS 20}
+
+-- Registration Events
+
+	whispRegComplete	NOTIFICATION-TYPE
+		OBJECTS {
+					linkLUID,
+					linkPhysAddress}
+		STATUS		current
+		DESCRIPTION		
+			"Signals registration complete."
+		::={whispApsRegEvent 1}
+
+	whispRegLost	NOTIFICATION-TYPE
+		OBJECTS {
+					linkLUID,
+					linkPhysAddress}
+		STATUS		current
+		DESCRIPTION		
+			"Signals registration lost."
+		::={whispApsRegEvent 2}
+
+	whispRegFailure	NOTIFICATION-TYPE
+		OBJECTS {
+					regFailESN,
+					regGrantReason}
+		STATUS		current
+		DESCRIPTION		
+			"Signals a registration failure has occured."
+		::={whispApsRegEvent 3}
+
+	whispDefKeyUsed	NOTIFICATION-TYPE
+		OBJECTS {
+					linkLUID,
+					linkPhysAddress}
+		STATUS		current
+		DESCRIPTION		
+			"Signals Default Key used for encryptiont."
+		::={whispApsRegEvent 4}
+
+-- GPS Events
+
+	whispGPSInSync	NOTIFICATION-TYPE
+		OBJECTS {
+					whispGPSStats,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Signals a transition from not-synchronized to synchronized."
+		::={whispGPSEvent 1}
+
+	whispGPSOutSync	NOTIFICATION-TYPE
+		OBJECTS {
+					gpsStatus,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Signals a transition from synchronized to not-synchronized."
+		::={whispGPSEvent 2}
+
+-- DFS events
+
+	whispRadarDetected	NOTIFICATION-TYPE
+		OBJECTS {
+					dfsStatus,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Radar detected transmit stopped."
+		::={whispApsDfsEvent 1}
+
+	whispRadarEnd	NOTIFICATION-TYPE
+		OBJECTS {
+					dfsStatus,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Radar ended back to normal transmit."
+		::={whispApsDfsEvent 2}
+
+-- Regulatory Failure due to Invalid Channel set for the region.
+
+	regulatoryApCheckInvalidChanFailed	NOTIFICATION-TYPE
+		OBJECTS {
+					regulatoryStatus,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Regulatory Check failed for the unit due to a invalid channel for the configured region.
+                            regulatoryStatus - Text description for the failure.
+                            physAddress - the MAC address of the unit."
+		::={whispApRegulatoryEvent 1}
+
+-- Regulatory Failure due to no region set
+
+	regulatoryCheckFailedNoRegionAp	NOTIFICATION-TYPE
+		OBJECTS {
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Regulatory Check failed because a valid region has not be configured.
+                            physAddress - the MAC address of the unit."
+		::={whispApRegulatoryEvent 2}
+
+-- Regulatory Failure due to Invalid Channel Bandwidth set for the region.
+
+	regulatoryApCheckInvalidChBwFailed	NOTIFICATION-TYPE
+		OBJECTS {
+					regulatoryStatus,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Regulatory Check failed due to an invalid channel bandwidth for the configured region.
+                            regulatoryStatus - Text description for the failure.
+                            physAddress - the MAC address of the unit."
+		::={whispApRegulatoryEvent 3}
+
+-- RF link overload detection in the Downlink Direction.
+
+	rfLinkOverloadCondition	NOTIFICATION-TYPE
+		OBJECTS {
+					rfOutDiscardRate,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"AP has exceeded the preset discard percentage in the RF Downlink Direction.
+                            rfOutDiscardRate - Current discard Rate.
+                            physAddress - the MAC address of the unit."
+		::={whispApRFOverloadEvent 1}
+
+	whispLinkTestGroup	OBJECT-GROUP
+			OBJECTS {
+					linkTestLUID,
+					linkTestDuration,
+					linkTestAction,
+					linkTestPktLength,
+					testLUID,
+					linkTestStatus,
+					linkTestError,
+					testDuration,
+					downLinkRate,
+					upLinkRate,
+					downLinkRateExtrapolated,
+					upLinkRateExtrapolated,
+					downLinkEff,
+					maxDwnLinkIndex,
+					actDwnLinkIndex,
+					expDwnFragCount,
+					actDwnFragCount,
+					upLinkEff,
+					expUpFragCount,
+					actUpFragCount,
+					maxUpLinkIndex,
+					actUpLinkIndex,
+					fragments1xDwnLinkVertical,
+					fragments2xDwnLinkVertical,
+					fragments3xDwnLinkVertical,
+					fragments4xDwnLinkVertical,
+					fragments1xUpLinkVertical,
+					fragments2xUpLinkVertical,
+					fragments3xUpLinkVertical,
+					fragments4xUpLinkVertical,
+					fragments1xDwnLinkHorizontal,
+					fragments2xDwnLinkHorizontal,
+					fragments3xDwnLinkHorizontal,
+					fragments4xDwnLinkHorizontal,
+					fragments1xUpLinkHorizontal,
+					fragments2xUpLinkHorizontal,
+					fragments3xUpLinkHorizontal,
+					fragments4xUpLinkHorizontal,
+					bitErrorsCorrected1xDwnLinkVertical,
+					bitErrorsCorrected2xDwnLinkVertical,
+					bitErrorsCorrected3xDwnLinkVertical,
+					bitErrorsCorrected4xDwnLinkVertical,
+					bitErrorsCorrected1xUpLinkVertical,
+					bitErrorsCorrected2xUpLinkVertical,
+					bitErrorsCorrected3xUpLinkVertical,
+					bitErrorsCorrected4xUpLinkVertical,
+					signalToNoiseRatioDownLinkVertical,
+					signalToNoiseRatioUpLinkVertical,
+					bitErrorsCorrected1xDwnLinkHorizontal,
+					bitErrorsCorrected2xDwnLinkHorizontal,
+					bitErrorsCorrected3xDwnLinkHorizontal,
+					bitErrorsCorrected4xDwnLinkHorizontal,
+					bitErrorsCorrected1xUpLinkHorizontal,
+					bitErrorsCorrected2xUpLinkHorizontal,
+					bitErrorsCorrected3xUpLinkHorizontal,
+					bitErrorsCorrected4xUpLinkHorizontal,
+					signalToNoiseRatioDownLinkHorizontal,
+					signalToNoiseRatioUpLinkHorizontal,
+					linkTestSNRCalculation,
+					linkTestWithDualPath,
+					linkTestForceModulation,
+					linkTestMode,
+					linkTestNumPkt,
+					linkTestDirection}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs link test group."
+		::= {whispApsGroups 1}
+
+	whispApsConfigGroup	OBJECT-GROUP
+			OBJECTS {
+					gpsInput,
+					rfFreqCarrier,
+					dwnLnkData,
+					highPriorityUpLnkPct,
+					numUAckSlots,
+					uAcksReservHigh,
+					numDAckSlots,
+					dAcksReservHigh,
+					numCtlSlots,
+					numCtlSlotsReserveHigh,
+					upLnkMaxBurstDataRate,
+					upLnkDataRate,
+					upLnkLimit,
+					dwnLnkMaxBurstDataRate,
+					dwnLnkDataRate,
+					dwnLnkLimit,
+					sectorID,
+					maxRange,
+					asIP1,
+					asIP2,
+					asIP3,
+					asIP4,
+					asIP5,
+					lanIpAp,
+					lanMaskAp,
+					defaultGwAp,
+					privateIp,
+					gpsTrap,
+					regTrap,
+					txSpreading,
+					apBeaconInfo,
+					authMode,
+					authKeyAp,
+					authKeyOptionAP,
+					enableRadiusDynAuth,
+					disableAuthForICCSM,
+					encryptionMode,
+					ntpServerIp,
+					multicastRetryCount,
+					encryptDwBroadcast,
+					updateAppAddress,
+					dfsConfig,
+					vlanEnable,
+					configSource,
+					apRateAdapt,
+					numCtlSlotsHW,
+					displayAPEval,
+					smIsolation,
+					bridgeFloodUnknownsEnable,
+					ipAccessFilterEnable,
+					allowedIPAccess1,
+					allowedIPAccess2,
+					allowedIPAccess3,
+					allowedIPAccessNMLength1,
+					allowedIPAccessNMLength2,
+					allowedIPAccessNMLength3,
+					rfTelnetAccess,
+					rfPPPoEPADIForwarding,
+					tslBridging,
+					untranslatedArp,
+					limitFreqBand900,
+					txPwrLevel,
+					rfFreqCaralt1,
+					rfFreqCaralt2,
+					scheduleWhitening,
+					remoteSpectrumAnalysisDuration,
+					remoteSpectrumAnalyzerLUID,
+					bhReReg,
+					dlnkBcastCIR,
+					dlnkMcastCIR,
+					verifyGPSChecksum,
+					qinqEthType,
+					multicastVCDataRate,
+					pmp450430LegacyMode,
+					onlyAllowPMP450iSMRegistration,
+					pmp430SMRegistration,
+					colorCodeRescanTimer,
+					colorCodeRescanIdleTimer,
+					fskSMTxPwrCntl,
+					fskSMRcvTargetLvl,
+					berModSelect,
+					lastSesStatsReset,
+					resetSesStats,
+					syslogDomainNameAppend,
+					syslogServerAddr,
+					syslogServerPort,
+					syslogXmitAP,
+					syslogXmitSMs,
+					uGPSPower,
+					gpsOutputEn,
+					radioMode,
+					pagerRejectFilterSelect,
+					authSharedSecret1,
+					authSharedSecret2,
+					authSharedSecret3,
+					radiusPort,
+					radiusAcctPort,
+					rfOLEnable,
+					rfOLTrap,
+					rfOLThreshold,
+					framePeriod,
+					remoteSpectrumAnalyzerScanBandwidth,
+					apConfigAdjacentChanSupport,
+					ofdmSMRcvTargetLvl,
+					pmp430InteropMode,
+					apRxDelay,
+					apVlanOverride,
+					dhcpRelayAgentEnable,
+					dhcpRelayAgentSrvrIP,
+					onlyAllowVer95OrAbove,
+					whispWebUseAuthServer,
+					whispUsrAuthSharedSecret1,
+					whispUsrAuthSharedSecret2,
+					whispUsrAuthSharedSecret3,
+					whispUsrAcctSvr1,
+					whispUsrAcctSvr2,
+					whispUsrAcctSvr3,
+					whispUsrAuthPhase1,
+					accountingInterimUpdateInterval,
+					accountingSmReAuthInterval,
+					dropSession,
+					removeIdleSMs,
+					lastTimeIdleSMsRemoved,
+					timeZone,
+					actionListFilename,
+					enableAutoupdate}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs configuration group."
+		::= {whispApsGroups 2}
+
+	whispApsLinkTableGroup	OBJECT-GROUP
+			OBJECTS {
+					linkLUID,
+					linkDescr,
+					linkPhysAddress,
+					linkManagementIP,
+					linkFragmentsReceived1XVertical,
+					linkFragmentsReceived2XVertical,
+					linkFragmentsReceived3XVertical,
+					linkFragmentsReceived4XVertical,
+					signalToNoiseRatioVertical,
+					linkFragmentsReceived1XHorizontal,
+					linkFragmentsReceived2XHorizontal,
+					linkFragmentsReceived3XHorizontal,
+					linkFragmentsReceived4XHorizontal,
+					signalToNoiseRatioHorizontal,
+					linkSignalStrengthRatio,
+					linkRadioDbmHorizontal,
+					linkRadioDbmVertical,
+					maxSMTxPwr,
+					productType,
+					linkAdaptRateLowPri,
+					linkAdaptRateHighPri,
+					avgPowerLevelInt,
+					mimoPowerLevelVertical,
+					mimoPowerLevelHorizontal,
+					autoUpdateStatus,
+					linkMtu,
+					linkSpeed,
+					linkOperStatus,
+					linkInOctets,
+					linkInUcastPkts,
+					linkInNUcastPkts,
+					linkInDiscards,
+					linkInError,
+					linkInUnknownProtos,
+					linkOutOctets,
+					linkOutUcastPkts,
+					linkOutNUcastPkts,
+					linkOutDiscards,
+					linkOutError,
+					linkOutQLen,
+					linkSessState,
+					linkESN,
+					linkRSSI,
+					linkAveJitter,
+					linkLastJitter,
+					linkAirDelay,
+					linkRegCount,
+					linkReRegCount,
+					linkTimeOut,
+					linkLastRSSI,
+					sessionCount,
+					softwareVersion,
+					linkSwVersion,
+					softwareBootVersion,
+					fpgaVersion,
+					linkSiteName,
+					avgPowerLevel,
+					lastPowerLevel,
+					sesDownLinkRate,
+					sesDownLinkLimit,
+					sesUpLinkRate,
+					sesUpLinkLimit,
+					adaptRate,
+					sesLoUpCIR,
+					sesLoDownCIR,
+					sesHiUpCIR,
+					sesHiDownCIR,
+					platformVer,
+					smSessionTmr,
+					smSessionSeqNumMismatch,
+					dataVCNum,
+					hiPriQEn,
+					dataVCNumHiQ,
+					linkInOctetsHiQ,
+					linkInUcastPktsHiQ,
+					linkInNUcastPktsHiQ,
+					linkInDiscardsHiQ,
+					linkInErrorHiQ,
+					linkInUnknownProtosHiQ,
+					linkOutOctetsHiQ,
+					linkOutUcastPktsHiQ,
+					linkOutNUcastPktsHiQ,
+					linkOutDiscardsHiQ,
+					linkOutErrorHiQ,
+					vcQOverflow,
+					vcQOverflowHiQ,
+					p7p8HiPriQEn,
+					p7p8HiPriQ,
+					linkAirDelayns,
+					linkQualityAPData,
+					radiusReplyMsg,
+					radiusFramedIPAddress,
+					radiusFramedIPNetmask,
+					radiusDefaultGateway}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs Link Table group."
+		::= {whispApsGroups 3}
+
+	whispApsNotifGroup	NOTIFICATION-GROUP
+			NOTIFICATIONS {
+					whispRegComplete,
+					whispRegLost,
+					whispRegFailure,
+					whispDefKeyUsed,
+					whispGPSInSync,
+					whispGPSOutSync,
+					whispRadarDetected,
+					whispRadarEnd,
+					regulatoryApCheckInvalidChanFailed,
+					regulatoryCheckFailedNoRegionAp,
+					regulatoryApCheckInvalidChBwFailed,
+					rfLinkOverloadCondition}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs notification group."
+		::= {whispApsGroups 4}
+
+	whispApsFailedRegTableGroup	OBJECT-GROUP
+			OBJECTS {
+					regGrantReason,
+					regFailESN,
+					regFailTime,
+					regFailSeqNum,
+					regFailReasonText}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs Failed Registration Table group."
+		::= {whispApsGroups 5}
+
+	whispApsFrUtlStatsIntervalLowGroup	OBJECT-GROUP
+			OBJECTS {
+					frUtlLowTotalDownlinkUtilization,
+					frUtlLowTotalUplinkUtilization,
+					frUtlLowTotalDownlinkSlots,
+					frUtlLowDownlinkLowPrioSlots,
+					frUtlLowDownlinkHiPrioSlots,
+					frUtlLowDownlinkBcastSlots,
+					frUtlLowDownlinkAckSlots,
+					frUtlLowDownlinkCntlMsgSlots,
+					frUtlLowTotalUplinkSlots,
+					frUtlLowUplinkLowPrioSlots,
+					frUtlLowUplinkHiPrioSlots,
+					frUtlLowUplinkAckSlots,
+					frUtlLowMaxDownlinkSlots,
+					frUtlLowMaxUplinkSlots,
+					frUtlLowEthInDiscards,
+					frUtlLowEthOutDiscards,
+					frUtlLowRFInDiscards,
+					frUtlLowRFOutDiscards}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs Frame Utilization Statistics group for interval of 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::= {whispApsGroups 7}
+
+	whispApsFrUtlStatsIntervalMediumGroup	OBJECT-GROUP
+			OBJECTS {
+					frUtlMedTotalDownlinkUtilization,
+					frUtlMedTotalUplinkUtilization,
+					frUtlMedTotalDownlinkSlots,
+					frUtlMedDownlinkLowPrioSlots,
+					frUtlMedDownlinkHiPrioSlots,
+					frUtlMedDownlinkBcastSlots,
+					frUtlMedDownlinkAckSlots,
+					frUtlMedDownlinkCntlMsgSlots,
+					frUtlMedTotalUplinkSlots,
+					frUtlMedUplinkLowPrioSlots,
+					frUtlMedUplinkHiPrioSlots,
+					frUtlMedUplinkAckSlots,
+					frUtlMedMaxDownlinkSlots,
+					frUtlMedMaxUplinkSlots,
+					frUtlMedEthInDiscards,
+					frUtlMedEthOutDiscards,
+					frUtlMedRFInDiscards,
+					frUtlMedRFOutDiscards}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs Frame Utilization Statistics group for interval of 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::= {whispApsGroups 8}
+
+	whispApsFrUtlStatsIntervalHighGroup	OBJECT-GROUP
+			OBJECTS {
+					frUtlHighTotalDownlinkUtilization,
+					frUtlHighTotalUplinkUtilization,
+					frUtlHighTotalDownlinkSlots,
+					frUtlHighDownlinkLowPrioSlots,
+					frUtlHighDownlinkHiPrioSlots,
+					frUtlHighDownlinkBcastSlots,
+					frUtlHighDownlinkAckSlots,
+					frUtlHighDownlinkCntlMsgSlots,
+					frUtlHighTotalUplinkSlots,
+					frUtlHighUplinkLowPrioSlots,
+					frUtlHighUplinkHiPrioSlots,
+					frUtlHighUplinkAckSlots,
+					frUtlHighMaxDownlinkSlots,
+					frUtlHighMaxUplinkSlots,
+					frUtlHighEthInDiscards,
+					frUtlHighEthOutDiscards,
+					frUtlHighRFInDiscards,
+					frUtlHighRFOutDiscards}
+		STATUS		current
+		DESCRIPTION
+			"WHiSP APs Frame Utilization Statistics group for interval of 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::= {whispApsGroups 9}
+
+	frUtlLowTotalDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total downlink utilization in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 1}
+
+	frUtlLowTotalUplinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total uplink utilization in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 2}
+
+	frUtlLowTotalDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total downlink data slots in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 3}
+
+	frUtlLowDownlinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink low priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 4}
+
+	frUtlLowDownlinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink high priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 5}
+
+	frUtlLowDownlinkBcastSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink broadcast and multicast traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 6}
+
+	frUtlLowDownlinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Downlink Canopy MAC Acknowledgements in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 7}
+
+	frUtlLowDownlinkCntlMsgSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink registration control messages in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 8}
+
+	frUtlLowTotalUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total uplink data slots in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 9}
+
+	frUtlLowUplinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink low priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 10}
+
+	frUtlLowUplinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink high priority traffic in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 11}
+
+	frUtlLowUplinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 12}
+
+	frUtlLowMaxDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible downlink data slots for a minute. 
+                        This is calculated as ((Downlink slots in a frame) * (Number of frames in a second) * 60). 
+                        Downlink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 13}
+
+	frUtlLowMaxUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible uplink data slots for a minute. 
+                        This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 60). 
+                        Uplink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames).  
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 14}
+
+	frUtlLowEthInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming ethernet packets discarded in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 15}
+
+	frUtlLowEthOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing ethernet packets discarded in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 16}
+
+	frUtlLowRFInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming radio packets discarded in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 17}
+
+	frUtlLowRFOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing radio packets discarded in the last 1 minute. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalLow 18}
+
+	frUtlMedTotalDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total downlink utilization in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 1}
+
+	frUtlMedTotalUplinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total uplink utilization in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 2}
+
+	frUtlMedTotalDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total downlink data slots in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 3}
+
+	frUtlMedDownlinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink low priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 4}
+
+	frUtlMedDownlinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink high priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 5}
+
+	frUtlMedDownlinkBcastSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink broadcast and multicast traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 6}
+
+	frUtlMedDownlinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Downlink Canopy MAC Acknowledgements in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 7}
+
+	frUtlMedDownlinkCntlMsgSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink registration control messages in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 8}
+
+	frUtlMedTotalUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total uplink data slots in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 9}
+
+	frUtlMedUplinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink low priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 10}
+
+	frUtlMedUplinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink high priority traffic in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 11}
+
+	frUtlMedUplinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 12}
+
+	frUtlMedMaxDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible downlink data slots for 5 minutes. 
+                        This is calculated as ((Downlink slots in a frame) * (Number of frames in a second) * 5 * 60 (seconds)). 
+                        Downlink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 13}
+
+	frUtlMedMaxUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible uplink data slots for 5 minutes. 
+                        This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 5 * 60(seconds)). 
+                        Uplink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 14}
+
+	frUtlMedEthInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming ethernet packets discarded in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 15}
+
+	frUtlMedEthOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing ethernet packets discarded in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 16}
+
+	frUtlMedRFInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming radio packets discarded in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 17}
+
+	frUtlMedRFOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing radio packets discarded in the last 5 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalMedium 18}
+
+	frUtlHighTotalDownlinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total downlink utilization in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 1}
+
+	frUtlHighTotalUplinkUtilization	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of total uplink utilization in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 2}
+
+	frUtlHighTotalDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total downlink data slots in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 3}
+
+	frUtlHighDownlinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink low priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 4}
+
+	frUtlHighDownlinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink high priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 5}
+
+	frUtlHighDownlinkBcastSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink broadcast and multicast traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 6}
+
+	frUtlHighDownlinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Downlink Canopy MAC Acknowledgements in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 7}
+
+	frUtlHighDownlinkCntlMsgSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for downlink registration control messages in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 8}
+
+	frUtlHighTotalUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total uplink data slots in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 9}
+
+	frUtlHighUplinkLowPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink low priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 10}
+
+	frUtlHighUplinkHiPrioSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for uplink high priority traffic in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 11}
+
+	frUtlHighUplinkAckSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slots used for Uplink Canopy MAC Acknowledgements in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 12}
+
+	frUtlHighMaxDownlinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible downlink data slots for 15 minutes. 
+                        This is calculated as ((Downlink slots in a frame) * (Number of frames in a second) * 15 * 60(seconds)). 
+                        Downlink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 13}
+
+	frUtlHighMaxUplinkSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum possible uplink data slots for 15 minutes. 
+                        This is calculated as ((Uplink slots in a frame) * (Number of frames in a second) * 15 * 60(seconds)). 
+                        Uplink slots in a frame depends on the frame configuration. 
+                        Number of frames in a second depends on the configured frame period of 5 ms (200 frames) or 2.5 ms (400 frames). 
+                        Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 14}
+
+	frUtlHighEthInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming ethernet packets discarded in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 15}
+
+	frUtlHighEthOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing ethernet packets discarded in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 16}
+
+	frUtlHighRFInDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of incoming radio packets discarded in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 17}
+
+	frUtlHighRFOutDiscards	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of outgoing radio packets discarded in the last 15 minutes. Only supported for PMP and PTP 450 AP and Backhauls."
+		::={whispApsFrUtlStatsIntervalHigh 18}
+
+-- Access Point status page
+
+	regCount	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of registered SMs."
+		::={whispApsStatus 1}
+
+	gpsStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS status."
+		::={whispApsStatus 2}
+
+	radioSlicingAp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		obsolete
+		DESCRIPTION		
+			"The variable is deprecated."
+		::={whispApsStatus 3}
+
+	radioTxGainAp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Radio transmit gain setting."
+		::={whispApsStatus 4}
+
+	dataSlotDwn	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slot down."
+		::={whispApsStatus 5}
+
+	dataSlotUp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of data slot up."
+		::={whispApsStatus 6}
+
+	dataSlotUpHi	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of high priority data slot up."
+		::={whispApsStatus 7}
+
+	upLnkAckSlot	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink ack slots."
+		::={whispApsStatus 8}
+
+	upLnkAckSlotHi	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Hige priority uplink ack slots."
+		::={whispApsStatus 9}
+
+	dwnLnkAckSlot	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink ack slots."
+		::={whispApsStatus 10}
+
+	dwnLnkAckSlotHi	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Hige priority downlink ack slots."
+		::={whispApsStatus 11}
+
+	numCtrSlot	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of contention slots."
+		::={whispApsStatus 12}
+
+	numCtrSlotHi	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"High priority control slot."
+		::={whispApsStatus 13}
+
+	dfsStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Dynamic frequency shifting status."
+		::={whispApsStatus 14}
+
+	dfsStatusPrimary	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Dynamic frequency shifting status for Primary Channel."
+		::={whispApsStatus 15}
+
+	dfsStatusAlt1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Dynamic frequency shifting status for Alternate Channel 1"
+		::={whispApsStatus 16}
+
+	dfsStatusAlt2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Dynamic frequency shifting status for Alternate Channel 2"
+		::={whispApsStatus 17}
+
+	maxRegSMCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum number of unique Subscriber Modules registered with this AP at once"
+		::={whispApsStatus 18}
+
+	systemTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Displays the system time of the unit"
+		::={whispApsStatus 19}
+
+	lastNTPTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Displays the last NTP time acquired by the AP"
+		::={whispApsStatus 20}
+
+	regulatoryStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current status of the regulatory check on the AP."
+		::={whispApsStatus 21}
+
+	dhcpRlyAgntStat-reqRecvd	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Requests received by the DHCP Relay."
+		::={whispApsStatus 22}
+
+	dhcpRlyAgntStat-reqRelayed	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Requests relayed by the DHCP Relay."
+		::={whispApsStatus 23}
+
+	dhcpRlyAgntStat-reqDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Requests discarded by the DHCP Relay."
+		::={whispApsStatus 24}
+
+	dhcpRlyAgntStat-respRecvd	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Replies received by the DHCP Relay."
+		::={whispApsStatus 25}
+
+	dhcpRlyAgntStat-respRelayed	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Replies relayed by the DHCP Relay."
+		::={whispApsStatus 26}
+
+	dhcpRlyAgntStat-respDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of DHCP Replies discarded by the DHCP Relay."
+		::={whispApsStatus 27}
+
+	dhcpRlyAgntStat-untrustedDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of untrusted messages discarded by the DHCP Relay."
+		::={whispApsStatus 28}
+
+	dhcpRlyAgntStat-maxHopDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of messages discarded by the DHCP Relay due to exceeded max hop."
+		::={whispApsStatus 29}
+
+	dhcpRlyAgntStat-pktTooBig	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of messages forwarded without relay information by the DHCP Relay due to relay information exceeding max message size."
+		::={whispApsStatus 30}
+
+	dhcpRlyAgntStat-invalidGiaddrDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of messages discarded by the DHCP Relay due to invalid giaddr in packet."
+		::={whispApsStatus 31}
+
+	regFailureCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The Total number or Registration Grant Failures."
+		::={whispApsStatus 32}
+
+	ntpLogSNMP	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"NTP Log"
+		::={whispApsStatus 33}
+
+	uGPSPowerStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current UGPS Power Status (UGPS capable APs only)."
+		::={whispApsStatus 34}
+
+	rfOutDiscardRate	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Percentage of OutDiscards on the RF link (RF Overload %) in the last minute."
+		::={whispApsStatus 35}
+
+	autoUpdateGlobalStatus	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Status of the Auto-Update Command"
+		::={whispApsStatus 36}
+
+	currentRadioFreqCarrier	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns the current operating frequency of the AP.
+						  Units vary by platform:
+						    FSK 5.2, 5.4, 5.7 GHz: OID returns MHz
+						    FSK 900 MHz, 2.4 GHz: OID returns 100's of KHz
+						    OFDM: OID returns 10's of KHz"
+		::={whispApsStatus 37}
+
+	ntpDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDomain(0),
+					appendDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select whether to append the configured management domain name to
+            the configured trap names.  For example, if dnsMgmtDomainName is
+			set to 'example.com', ntpServer is set to 'ntp', and ntpDomainNameAppend
+            is set to appendDomain, the ntpServer name used would be 'ntp.example.com'."
+		::={whispApsDNS 1}
+
+	ntpServer1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"NTP Server 1 Address.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 2}
+
+	ntpServer2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"NTP Server 2 Address.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 3}
+
+	ntpServer3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"NTP Server 3 Address.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 4}
+
+	dhcprDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDomain(0),
+					appendDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select whether to append the configured management domain name to
+            the configured trap names.  For example, if dnsMgmtDomainName is
+			set to 'example.com', dhcprServer is set to 'dhcpr', and dhcprDomainNameAppend
+            is set to appendDomain, the dhcprServer name used would be 'dhcpr.example.com'."
+		::={whispApsDNS 5}
+
+	dhcprServer	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"DHCP Server IP which will be used for forwarding DHCP messages
+			by the DHCP Relay Agent in the MultiPoint AP.
+              - Format is either an IP address or DNS name.
+              - Default is 255.255.255.255 (broadcast)."
+		::={whispApsDNS 6}
+
+	authDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDNSDomain(0),
+					enableDNSDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Select whether to append the configured management domain name to
+            the configured trap names.  For example, if dnsMgmtDomainName is
+			set to 'example.com', authServer1 is set to 'auth1', and authDomainNameAppend
+            is set to appendDomain, the authServer1 name used would be 'auth1.example.com'."
+		::={whispApsDNS 7}
+
+	authServer1	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 1.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 8}
+
+	authServer2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 2.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 9}
+
+	authServer3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 3.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 10}
+
+	authServer4	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 4.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 11}
+
+	authServer5	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication Server 5.
+            Format is either an IP address or DNS name."
+		::={whispApsDNS 12}
+
+	acctDomainNameAppend	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disableDomain(0),
+					appendDomain(1)}
+		MAX-ACCESS	read-write
+		STATUS		obsolete
+		DESCRIPTION		
+			"Obsoleted.  Use whispApsDNS.authDomainNameAppend."
+		::={whispApsDNS 13}
+
+	clearLinkTableStats	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting this to a nonzero value will clear the link table stats."
+		::={whispApsControls 1}
+
+	whispApsRFConfigRadios OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispApsRFConfigRadioEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Radio configuration table."
+		::= {whispApsRFConfig 1}
+
+	whispApsRFConfigRadioEntry OBJECT-TYPE
+		SYNTAX		WhispApsRFConfigRadioEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Radio configuration entry."
+		AUGMENTS		{whispBoxRFPhysicalRadioEntry}
+		::= {whispApsRFConfigRadios 1}
+
+		WhispApsRFConfigRadioEntry ::= SEQUENCE{
+			radioFreqCarrier		INTEGER,
+			radioDownlinkPercent		INTEGER,
+			radioMaxRange		INTEGER,
+			radioControlSlots		INTEGER,
+			radioTransmitOutputPower		INTEGER,
+			radioColorCode	INTEGER
+			}
+
+	radioFreqCarrier	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					wired(0)}
+		UNITS		"kHz"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"RF Frequency.  Please see the whispBoxRFPhysicalRadioFrequencies SNMP table for a list of available
+            frequencies.
+            0:  wired."
+		::={whispApsRFConfigRadioEntry 1}
+
+	radioDownlinkPercent	OBJECT-TYPE
+		SYNTAX		INTEGER (1..99)
+		UNITS		"%"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This is the percentage of frame data space allocated for downlink."
+		::={whispApsRFConfigRadioEntry 2}
+
+	radioMaxRange	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"miles"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Access point max range."
+		::={whispApsRFConfigRadioEntry 3}
+
+	radioControlSlots	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Total number of contention slots for HW Scheduling Point-to-Mulitpoint mode (Not applicable for PtoP radios).
+                       For PMP 450 the minimum is 1 control slot, others minimum is zero.
+                       Maximum contention slots is 15."
+		::={whispApsRFConfigRadioEntry 4}
+
+	radioTransmitOutputPower	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Transmitter output power."
+		::={whispApsRFConfigRadioEntry 5}
+
+	radioColorCode	OBJECT-TYPE
+		SYNTAX		INTEGER (0..254)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Color code."
+		::={whispApsRFConfigRadioEntry 6}
+
+	whispLinkTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispLinkEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"List of link test results"
+		::= {whispAps 4}
+
+	whispLinkEntry OBJECT-TYPE
+		SYNTAX		WhispLinkEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"List of link test results"
+		INDEX		{linkLUID}
+		::= {whispLinkTable 1}
+
+		WhispLinkEntry ::= SEQUENCE{
+			linkLUID		INTEGER,
+			linkDescr		DisplayString,
+			linkPhysAddress		PhysAddress,
+			linkMtu		INTEGER,
+			linkSpeed		Gauge32,
+			linkOperStatus		INTEGER,
+			linkInOctets		Counter32,
+			linkInUcastPkts		Counter32,
+			linkInNUcastPkts		Counter32,
+			linkInDiscards		Counter32,
+			linkInError		Counter32,
+			linkInUnknownProtos		Counter32,
+			linkOutOctets		Counter32,
+			linkOutUcastPkts		Counter32,
+			linkOutNUcastPkts		Counter32,
+			linkOutDiscards		Counter32,
+			linkOutError		Counter32,
+			linkOutQLen		Gauge32,
+			linkSessState		INTEGER,
+			linkESN		PhysAddress,
+			linkRSSI		INTEGER,
+			linkAveJitter		Gauge32,
+			linkLastJitter		Gauge32,
+			linkAirDelay		INTEGER,
+			linkRegCount		INTEGER,
+			linkReRegCount		INTEGER,
+			linkTimeOut		INTEGER,
+			linkLastRSSI		INTEGER,
+			sessionCount		INTEGER,
+			softwareVersion		DisplayString,
+			softwareBootVersion		DisplayString,
+			fpgaVersion		DisplayString,
+			linkSiteName		DisplayString,
+			avgPowerLevel		DisplayString,
+			lastPowerLevel		DisplayString,
+			sesDownLinkRate		INTEGER,
+			sesDownLinkLimit		INTEGER,
+			sesUpLinkRate		INTEGER,
+			sesUpLinkLimit		INTEGER,
+			adaptRate		DisplayString,
+			sesLoUpCIR		INTEGER,
+			sesLoDownCIR		INTEGER,
+			sesHiUpCIR		INTEGER,
+			sesHiDownCIR		INTEGER,
+			platformVer		INTEGER,
+			smSessionTmr		TimeTicks,
+			smSessionSeqNumMismatch		Counter32,
+			dataVCNum		INTEGER,
+			hiPriQEn		INTEGER,
+			dataVCNumHiQ		INTEGER,
+			linkInOctetsHiQ		Counter32,
+			linkInUcastPktsHiQ		Counter32,
+			linkInNUcastPktsHiQ		Counter32,
+			linkInDiscardsHiQ		Counter32,
+			linkInErrorHiQ		Counter32,
+			linkInUnknownProtosHiQ		Counter32,
+			linkOutOctetsHiQ		Counter32,
+			linkOutUcastPktsHiQ		Counter32,
+			linkOutNUcastPktsHiQ		Counter32,
+			linkOutDiscardsHiQ		Counter32,
+			linkOutErrorHiQ		Counter32,
+			vcQOverflow		Counter32,
+			vcQOverflowHiQ		Counter32,
+			p7p8HiPriQEn		INTEGER,
+			p7p8HiPriQ		Counter32,
+			linkAirDelayns		INTEGER,
+			linkQualityAPData		DisplayString,
+			linkManagementIP		IpAddress,
+			linkFragmentsReceived1XVertical		Counter32,
+			linkFragmentsReceived2XVertical		Counter32,
+			linkFragmentsReceived3XVertical		Counter32,
+			linkFragmentsReceived4XVertical		Counter32,
+			signalToNoiseRatioVertical		INTEGER,
+			radiusReplyMsg		DisplayString,
+			autoUpdateStatus		INTEGER,
+			radiusFramedIPAddress		IpAddress,
+			radiusFramedIPNetmask		IpAddress,
+			radiusDefaultGateway		IpAddress,
+			linkFragmentsReceived1XHorizontal		Counter32,
+			linkFragmentsReceived2XHorizontal		Counter32,
+			linkFragmentsReceived3XHorizontal		Counter32,
+			linkFragmentsReceived4XHorizontal		Counter32,
+			signalToNoiseRatioHorizontal		INTEGER,
+			linkSignalStrengthRatio		DisplayString,
+			linkRadioDbmHorizontal		DisplayString,
+			linkRadioDbmVertical		DisplayString,
+			maxSMTxPwr		INTEGER,
+			productType		INTEGER,
+			linkAdaptRateLowPri		INTEGER,
+			linkAdaptRateHighPri		INTEGER,
+			avgPowerLevelInt		INTEGER,
+			mimoPowerLevelVertical		INTEGER,
+			mimoPowerLevelHorizontal		INTEGER,
+			linkSwVersion	DisplayString
+			}
+
+	linkLUID	OBJECT-TYPE
+		SYNTAX		INTEGER (1..2147483647)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"LUID number."
+		::={whispLinkEntry 1}
+
+	linkDescr	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string containing information about the
+            unit.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+		::={whispLinkEntry 2}
+
+	linkPhysAddress	OBJECT-TYPE
+		SYNTAX		PhysAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Physical Address of the unit."
+		::={whispLinkEntry 3}
+
+	linkMtu	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The size of the largest datagram which can be
+            sent/received on the interface, specified in
+            octets.  For interfaces that are used for
+            transmitting network datagrams, this is the size
+            of the largest network datagram that can be sent
+            on the interface."
+		::={whispLinkEntry 4}
+
+	linkSpeed	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"An estimate of the interface's current bandwidth
+            in bits per second.  For interfaces which do not
+            vary in bandwidth or for those where no accurate
+            estimation can be made, this object should contain
+            the nominal bandwidth."
+		::={whispLinkEntry 5}
+
+	linkOperStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					up(1),
+					down(2),
+					testing(3)}
+		MAX-ACCESS	read-only
+		STATUS		obsolete
+		DESCRIPTION		
+			"This variable is not used."
+		::={whispLinkEntry 6}
+
+	linkInOctets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of octets received on the
+            interface, including framing characters."
+		::={whispLinkEntry 7}
+
+	linkInUcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of subnetwork-unicast packets
+            delivered to a higher-layer protocol."
+		::={whispLinkEntry 8}
+
+	linkInNUcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of non-unicast (i.e., subnetwork-
+            broadcast or subnetwork-multicast) packets
+            delivered to a higher-layer protocol."
+		::={whispLinkEntry 9}
+
+	linkInDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of inbound packets which were chosen
+            to be discarded even though no errors had been
+            detected to prevent their being deliverable to a
+            higher-layer protocol.  One possible reason for
+            discarding such a packet could be to free up
+            buffer space."
+		::={whispLinkEntry 10}
+
+	linkInError	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of inbound packets that contained
+            errors preventing them from being deliverable to a
+            higher-layer protocol."
+		::={whispLinkEntry 11}
+
+	linkInUnknownProtos	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received via the interface
+            which were discarded because of an unknown or
+            unsupported protocol."
+		::={whispLinkEntry 12}
+
+	linkOutOctets	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of octets transmitted out of the
+            interface, including framing characters."
+		::={whispLinkEntry 13}
+
+	linkOutUcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of packets that higher-level
+            protocols requested be transmitted to a
+            subnetwork-unicast address, including those that
+            were discarded or not sent."
+		::={whispLinkEntry 14}
+
+	linkOutNUcastPkts	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of packets that higher-level
+            protocols requested be transmitted to a non-
+            unicast (i.e., a subnetwork-broadcast or
+            subnetwork-multicast) address, including those
+            that were discarded or not sent."
+		::={whispLinkEntry 15}
+
+	linkOutDiscards	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of outbound packets which were chosen
+            to be discarded even though no errors had been
+            detected to prevent their being transmitted.  One
+            possible reason for discarding such a packet could
+            be to free up buffer space."
+		::={whispLinkEntry 16}
+
+	linkOutError	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of outbound packets that could not be
+            transmitted because of errors."
+		::={whispLinkEntry 17}
+
+	linkOutQLen	OBJECT-TYPE
+		SYNTAX		Gauge32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of packets in output packet queue."
+		::={whispLinkEntry 18}
+
+	linkSessState	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					idle(0),
+					inSession(1),
+					clearing(2),
+					reRegDnRst(3),
+					authChal(4),
+					registering(5),
+					notInUse(6)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current operational state of an interface.
+            0 = Idle
+            1 = In Session
+            2 = Clearing
+            3 = Re-registration downlink reset
+            4 = Authentication Challenge
+            5 = Registering
+            6 = Not in use"
+		::={whispLinkEntry 19}
+
+	linkESN	OBJECT-TYPE
+		SYNTAX		PhysAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Link Electronic serial number. It is MAC address."
+		::={whispLinkEntry 20}
+
+	linkRSSI	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average RSSI reading of all packets received from an SM. Applicable to FSK radios only."
+		::={whispLinkEntry 21}
+
+	linkAveJitter	OBJECT-TYPE
+		SYNTAX		Gauge32 (0..15)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average Jitter reading of all packets received from an SM.  Applicable to FSK radios only."
+		::={whispLinkEntry 22}
+
+	linkLastJitter	OBJECT-TYPE
+		SYNTAX		Gauge32 (0..15)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Last jitter value. Applicable to FSK radios only."
+		::={whispLinkEntry 23}
+
+	linkAirDelay	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current round trip air delay in bits measured between the AP and SM."
+		::={whispLinkEntry 24}
+
+	linkRegCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of times an SM has registered to an AP."
+		::={whispLinkEntry 25}
+
+	linkReRegCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of times an SM has tried to register with the AP while it still has
+            an active session with the AP."
+		::={whispLinkEntry 26}
+
+	linkTimeOut	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Link time out."
+		::={whispLinkEntry 27}
+
+	linkLastRSSI	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The last RSSI reading of all packets received from an SM. Applicable to FSK radios only."
+		::={whispLinkEntry 28}
+
+	sessionCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"How many times has this mac been in/out of session."
+		::={whispLinkEntry 29}
+
+	softwareVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The software version of registered SM."
+		::={whispLinkEntry 30}
+
+	softwareBootVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The software boot version of registered SM."
+		::={whispLinkEntry 31}
+
+	fpgaVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The FPGA version of registered SM."
+		::={whispLinkEntry 32}
+
+	linkSiteName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The site name of the registered SM."
+		::={whispLinkEntry 33}
+
+	avgPowerLevel	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average power level of registered SM.
+                            For systems that support power control, this value can read 'NA' when the AP adjusts the transmit power of a SM
+                            until new packets are received from the SM with it transmitting at its new power level.
+                            For MIMO this is the combined receive power."
+		::={whispLinkEntry 34}
+
+	lastPowerLevel	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The last power level of registered SM.
+                            For MIMO radios this is the combined receive power."
+		::={whispLinkEntry 35}
+
+	sesDownLinkRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Down link rate."
+		::={whispLinkEntry 36}
+
+	sesDownLinkLimit	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Down link limit."
+		::={whispLinkEntry 37}
+
+	sesUpLinkRate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink rate."
+		::={whispLinkEntry 38}
+
+	sesUpLinkLimit	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink limit."
+		::={whispLinkEntry 39}
+
+	adaptRate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Adapt rate of registered SM."
+		::={whispLinkEntry 40}
+
+	sesLoUpCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Low priority up link CIR."
+		::={whispLinkEntry 41}
+
+	sesLoDownCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Low priority down link CIR."
+		::={whispLinkEntry 42}
+
+	sesHiUpCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"High priority up link CIR."
+		::={whispLinkEntry 43}
+
+	sesHiDownCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"High priority down link CIR."
+		::={whispLinkEntry 44}
+
+	platformVer	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Platform Version."
+		::={whispLinkEntry 45}
+
+	smSessionTmr	OBJECT-TYPE
+		SYNTAX		TimeTicks
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"SM session uptime"
+		::={whispLinkEntry 46}
+
+	smSessionSeqNumMismatch	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The count of how many sequence number mismatch between the AP/BHM and the SM/BHS during the authentication
+                        challenge and authentication response messages.  This status is only valid in a system where encryption is
+                        enabled and no authentication server is configured."
+		::={whispLinkEntry 47}
+
+	dataVCNum	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The normal priority Data VC number in use for this link."
+		::={whispLinkEntry 48}
+
+	hiPriQEn	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns whether High Priority channel is enabled.  On P7/P8 devices will return 0 always.  Use p7p8HiPriQEn OID for P7/P8 radios."
+		::={whispLinkEntry 49}
+
+	dataVCNumHiQ	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The high priority Data VC number in use for this link, if any.  If 0, no High Priority channel is in place."
+		::={whispLinkEntry 50}
+
+	linkInOctetsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of octets received on High Priority Queue, including framing characters."
+		::={whispLinkEntry 51}
+
+	linkInUcastPktsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of subnetwork-unicast packets on High Priority Queue
+            delivered to a higher-layer protocol."
+		::={whispLinkEntry 52}
+
+	linkInNUcastPktsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of non-unicast (i.e., subnetwork-
+            broadcast or subnetwork-multicast) packets on High Priority Queue
+            delivered to a higher-layer protocol."
+		::={whispLinkEntry 53}
+
+	linkInDiscardsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of inbound packets on High Priority Queue which were chosen
+            to be discarded even though no errors had been
+            detected to prevent their being deliverable to a
+            higher-layer protocol.  One possible reason for
+            discarding such a packet could be to free up
+            buffer space."
+		::={whispLinkEntry 54}
+
+	linkInErrorHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of inbound packets on High Priority Queue that contained
+            errors preventing them from being deliverable to a
+            higher-layer protocol."
+		::={whispLinkEntry 55}
+
+	linkInUnknownProtosHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets received on High Priority Queue via the interface
+            which were discarded because of an unknown or
+            unsupported protocol."
+		::={whispLinkEntry 56}
+
+	linkOutOctetsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of octets on High Priority Queue transmitted out of the
+            interface, including framing characters."
+		::={whispLinkEntry 57}
+
+	linkOutUcastPktsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of packets on High Priority Queue that higher-level
+            protocols requested be transmitted to a
+            subnetwork-unicast address, including those that
+            were discarded or not sent."
+		::={whispLinkEntry 58}
+
+	linkOutNUcastPktsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The total number of packets on High Priority Queue that higher-level
+            protocols requested be transmitted to a non-
+            unicast (i.e., a subnetwork-broadcast or
+            subnetwork-multicast) address, including those
+            that were discarded or not sent."
+		::={whispLinkEntry 59}
+
+	linkOutDiscardsHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of outbound packets on High Priority Queue which were chosen
+            to be discarded even though no errors had been
+            detected to prevent their being transmitted.  One
+            possible reason for discarding such a packet could
+            be to free up buffer space."
+		::={whispLinkEntry 60}
+
+	linkOutErrorHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of outbound packets on High Priority Queue that could not be
+            transmitted because of errors."
+		::={whispLinkEntry 61}
+
+	vcQOverflow	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets dropped due to Queue overflow on VC."
+		::={whispLinkEntry 62}
+
+	vcQOverflowHiQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of packets dropped due to Queue overflow on High Priority VC, if enabled."
+		::={whispLinkEntry 63}
+
+	p7p8HiPriQEn	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled-or-NA(0),
+					enabled(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns whether P7/P8 hi priority channel is enabled.  On non-P7/P8 devices will return 0 always."
+		::={whispLinkEntry 64}
+
+	p7p8HiPriQ	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Hi Priority Queue statistics for P7 or P8 radios, if enabled.  If not enabled, or not a P7 or P8, will return 0."
+		::={whispLinkEntry 65}
+
+	linkAirDelayns	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current round trip air delay in nanoseconds measured between the AP and SM."
+		::={whispLinkEntry 66}
+
+	linkQualityAPData	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                                The current link quality of the SM's data from the AP.
+                                This is relative to the current modulation rate (1X, 2X, 3X, etc)."
+		::={whispLinkEntry 67}
+
+	linkManagementIP	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Management IP Address of the unit.  0 indicates SM is not publically addressable."
+		::={whispLinkEntry 69}
+
+	linkFragmentsReceived1XVertical	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 1x (QPSK) modulation.
+                            For GenII OFDM and forward.
+                            For MIMO this is the vertical path."
+		::={whispLinkEntry 70}
+
+	linkFragmentsReceived2XVertical	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 2x (16-QAM) modulation.
+                            For GenII OFDM and forward.
+                            For MIMO this is the vertical path."
+		::={whispLinkEntry 71}
+
+	linkFragmentsReceived3XVertical	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 3x (64-QAM) modulation.
+                            For GenII OFDM and forward.
+                            For MIMO this is the vertical path."
+		::={whispLinkEntry 72}
+
+	linkFragmentsReceived4XVertical	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 4x (256-QAM) modulation.
+                            For GenII OFDM and forward.
+                            For MIMO this is the vertical path."
+		::={whispLinkEntry 73}
+
+	signalToNoiseRatioVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Estimate of the receive signal to noise ratio in dB.
+                            For GenII OFDM and forward.
+                            For MIMO this is the vertical path."
+		::={whispLinkEntry 74}
+
+	radiusReplyMsg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The RADIUS Reply-Msg populated for the SM.
+                            This is only valid when using a backen AAA server."
+		::={whispLinkEntry 75}
+
+	autoUpdateStatus	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"status of the auto update process"
+		::={whispLinkEntry 76}
+
+	radiusFramedIPAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This Attribute indicates the IP address to be configured for the SM management interface."
+		::={whispLinkEntry 77}
+
+	radiusFramedIPNetmask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This Attribute indicates the netmask to be configured for the SM management interface."
+		::={whispLinkEntry 78}
+
+	radiusDefaultGateway	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This Attribute indicates the default gateway to be configured for the SM management interface."
+		::={whispLinkEntry 79}
+
+	linkFragmentsReceived1XHorizontal	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 1x (QPSK) modulation.
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0."
+		::={whispLinkEntry 80}
+
+	linkFragmentsReceived2XHorizontal	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 2x (16-QAM) modulation.
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0."
+		::={whispLinkEntry 81}
+
+	linkFragmentsReceived3XHorizontal	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 3x (64-QAM) modulation.
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0."
+		::={whispLinkEntry 82}
+
+	linkFragmentsReceived4XHorizontal	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Number of fragments received in 4x (256-QAM) modulation.
+                            For MIMO only.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0."
+		::={whispLinkEntry 83}
+
+	signalToNoiseRatioHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Estimate of the receive signal to noise ratio in dB.
+                            MIMO radios only.
+                            For MIMO this is the horizontal path.
+                            If operating in MIMO-A this will return 0."
+		::={whispLinkEntry 84}
+
+	linkSignalStrengthRatio	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Signal Strength Ratio in dB is the power received by the vertical antenna input (dB) -
+                            power received by the horizontal antenna input (dB).
+                            MIMO radios only."
+		::={whispLinkEntry 86}
+
+	linkRadioDbmHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Receive power level of the horizontal antenna in dBm.
+                            MIMO radios only."
+		::={whispLinkEntry 87}
+
+	linkRadioDbmVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Receive power level of the vertical antenna in dBm.
+                            MIMO radios only."
+		::={whispLinkEntry 88}
+
+	maxSMTxPwr	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns whether SM is transmitting at its configured max power level."
+		::={whispLinkEntry 89}
+
+	productType	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					unknown(0),
+					pmp450MIMOOFDM(1),
+					pmp430SISOOFDM(2),
+					pmp450SISOOFDM(3),
+					ptp450(4)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns which type of product the SM is.
+                            PMP 450 APs only."
+		::={whispLinkEntry 90}
+
+	linkAdaptRateLowPri	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noSession(0),
+					rate1X(1),
+					rate2X(2),
+					rete3X(3),
+					rate4X(4),
+					rate6X(6),
+					rate8X(8)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current transmitting rate of the low priority VC.
+                            0 : SM is not in session
+                            1 : 1X QPSK SISO
+                            2 : 2X 16-QAM SISO or QPSK MIMO
+                            3 : 3X 64-QAM SISO
+                            4 : 4X 256-QAM SISO or 16-QAM MIMO
+                            6 : 6X 64-QAM MIMO
+                            8 : 8X 256-QAM MIMO"
+		::={whispLinkEntry 91}
+
+	linkAdaptRateHighPri	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noHighPriorityChannel(-1),
+					noSession(0),
+					rate1X(1),
+					rate2X(2),
+					rete3X(3),
+					rate4X(4),
+					rate6X(6),
+					rate8X(8)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current transmitting rate of the high priority VC.
+                            -1 : High Priority Channel not configured
+                            0 : SM is not in session
+                            1 : 1X QPSK SISO
+                            2 : 2X 16-QAM SISO or QPSK MIMO
+                            3 : 3X 64-QAM SISO
+                            4 : 4X 256-QAM SISO or 16-QAM MIMO
+                            6 : 6X 64-QAM MIMO
+                            8 : 8X 256-QAM MIMO"
+		::={whispLinkEntry 92}
+
+	avgPowerLevelInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average power level of registered SM as Integer.
+                            For systems that support power control, this value can read '0' when the AP adjusts the transmit power of a SM
+                            until new packets are received from the SM with it transmitting at its new power level.
+                            For MIMO this is the combined receive power."
+		::={whispLinkEntry 93}
+
+	mimoPowerLevelVertical	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"For MIMO radios, the Vertical power level of registered SM as Integer.
+							The Vertical Power (+45) level in case of 2.4GHz Dual slant MIMO"
+		::={whispLinkEntry 94}
+
+	mimoPowerLevelHorizontal	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"For MIMO radios, the Horizontal power level of registered SM as Integer.
+							The Horizontal Power(-45) level in case of 2.4GHz Dual slant MIMO"
+		::={whispLinkEntry 95}
+
+	linkSwVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The swversion of registered SM, to be used internally."
+		::={whispLinkEntry 96}
+
+	whispFailedRegTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispFailedRegEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"List of link test results"
+		::= {whispAps 8}
+
+	whispFailedRegEntry OBJECT-TYPE
+		SYNTAX		WhispFailedRegEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"List of Failed ESNs"
+		INDEX		{regFailSeqNum}
+		::= {whispFailedRegTable 1}
+
+		WhispFailedRegEntry ::= SEQUENCE{
+			regFailSeqNum		Counter32,
+			regFailESN		PhysAddress,
+			regGrantReason		INTEGER,
+			regFailTime		TimeTicks,
+			regFailReasonText	DisplayString
+			}
+
+	regGrantReason	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					reggnt-valid(0),
+					reggnt-outofrange(1),
+					reggnt-nolUIDS(2),
+					reggnt-rerange(3),
+					reggnt-authfail(4),
+					reggnt-encryptfail(5),
+					reggnt-poweradjust(6),
+					reggnt-novcs(7),
+					reggnt-failvcreserve(8),
+					reggnt-failvcactive(9),
+					reggnt-failhivcdata(10),
+					reggnt-failsmlimit(11),
+					reggnt-fail95orabove(12)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The registration failure reason"
+		::={whispFailedRegEntry 1}
+
+	regFailESN	OBJECT-TYPE
+		SYNTAX		PhysAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The ESN that failed to register"
+		::={whispFailedRegEntry 2}
+
+	regFailTime	OBJECT-TYPE
+		SYNTAX		TimeTicks
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of ticks that occurred when the ESN failed to register"
+		::={whispFailedRegEntry 3}
+
+	regFailSeqNum	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The sequence when the register failure was given."
+		::={whispFailedRegEntry 4}
+
+	regFailReasonText	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The text description of the failure."
+		::={whispFailedRegEntry 5}
+
+
+END

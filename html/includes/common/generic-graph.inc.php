@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Daniel Preussker, QuxLabs UG <preussker@quxlabs.com>
+/* Copyright (C) 2015-2016 Daniel Preussker, QuxLabs UG <preussker@quxlabs.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,15 +16,23 @@
 /**
  * Generic Graph Widget
  * @author Daniel Preussker
- * @copyright 2015 Daniel Preussker, QuxLabs UG
+ * @copyright 2015-2016 Daniel Preussker, QuxLabs UG
  * @license GPL
  * @package LibreNMS
  * @subpackage Widgets
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
+  <div class="form-group">
+    <div class="col-sm-2">
+      <label for="title" class="control-label">Title: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="title" placeholder="Automatic Title" value="'.htmlspecialchars($widget_settings['title']).'">
+    </div>
+  </div>
   <div class="form-group">
     <div class="col-sm-2">
       <label for="graph_type" class="control-label">Graph: </label>
@@ -40,14 +48,14 @@ if( defined('show_settings') || empty($widget_settings) ) {
         $common_output[] = '<option disabled>'.nicecase($type).':</option>';
         foreach (get_graph_subtypes($type) as $avail_type) {
             $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
-            if( strstr($display_type,'_') ) {
-                $sub = explode('_',$display_type,2);
+            if (strstr($display_type, '_')) {
+                $sub = explode('_', $display_type, 2);
                 $sub = array_shift($sub);
-                if( $sub != $old ) {
+                if ($sub != $old) {
                     $old = $sub;
                     $common_output[] = '<option disabled>&nbsp;&nbsp;&nbsp;'.nicecase($sub).':</option>';
                 }
-                $display_type = str_replace($sub.'_','',$display_type);
+                $display_type = str_replace($sub.'_', '', $display_type);
                 $space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
             } else {
                 $space = '&nbsp;&nbsp;&nbsp;';
@@ -66,6 +74,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
         <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Peering</option>
         <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Core</option>
         <option value="custom"'.($widget_settings['graph_type'] == 'custom' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Custom Descr</option>
+        <option value="manual"'.($widget_settings['graph_type'] == 'manual' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Manual Descr</option>
         <option disabled></option>
         <option value="bill_bits"'.($widget_settings['graph_type'] == 'bill_bits' ? ' selected' : '').'>Bill</option>
       </select>
@@ -86,7 +95,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
     <div class="col-sm-10">
       <select class="form-control" name="graph_range">';
     $checked = '';
-    foreach( array_diff_key($config['time'],array('now'=>'')) as $k=>$v ) {
+    foreach (array_diff_key($config['time'], array('now'=>'')) as $k => $v) {
         if ($widget_settings['graph_range'] == $k) {
             $checked = ' selected';
         } else {
@@ -142,6 +151,14 @@ if( defined('show_settings') || empty($widget_settings) ) {
     $common_output[] = '      </select>
     </div>
   </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_manual">
+    <div class="col-sm-2">
+      <label for="graph_manual" class="control-label">Manual Port-Desc: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_manual" name="graph_manual" placeholder="Descr String" value="'.htmlspecialchars($widget_settings['graph_manual']).'">';
+    $common_output[] = '    </div>
+  </div>
   <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_bill">
     <div class="col-sm-2">
       <label for="graph_bill" class="control-label">Bill: </label>
@@ -196,6 +213,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_device.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Devices</strong></h5>",
@@ -232,6 +250,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_port.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Ports</strong></h5>",
@@ -267,6 +286,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_application.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Applications</strong></h5>",
@@ -304,6 +324,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_munin.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Munin</strong></h5>",
@@ -338,6 +359,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_bill.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong><i class=\'fa fa-money\'></i>&nbsp;Bill</strong></h5>",
@@ -363,58 +385,39 @@ $(function() {
   '.$unique_id.'();
 });
 </script>';
-}
-else {
-    $widget_settings['title']         = "";
-    $type                             = explode('_',$widget_settings['graph_type'],2);
+} else {
+    $type                             = explode('_', $widget_settings['graph_type'], 2);
     $type                             = array_shift($type);
-    $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type],true)?:$widget_settings['graph_'.$type];
+    $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type], true)?:$widget_settings['graph_'.$type];
     if ($type == 'device') {
-        $widget_settings['title']     = $widget_settings['graph_device']['name']." / ".$widget_settings['graph_type'];
+        if (empty($widget_settings['title'])) {
+            $widget_settings['title'] = $widget_settings['graph_device']['name']." / ".$widget_settings['graph_type'];
+        }
         $param                        = 'device='.$widget_settings['graph_device']['device_id'];
-    }
-    elseif ($type == 'application') {
+    } elseif ($type == 'application') {
         $param                        = 'id='.$widget_settings['graph_'.$type]['app_id'];
-    }
-    elseif ($type == 'munin') {
+    } elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
-    }
-    elseif ($type == 'transit' || $type == 'peering' || $type == 'core') {
-        $type_where = ' (';
-        if (is_array($config[$type.'_descr']) === false) {
-            $config[$type.'_descr'] = array($config[$type.'_descr']);
+    } elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom' || $type == 'manual') {
+        if ($type == 'custom' || $type == 'manual') {
+            $type = $widget_settings['graph_'.$type];
+            $type = explode(',', $type);
         }
-        foreach ($config[$type.'_descr'] as $additional_type) {
-            if (!empty($additional_type)) {
-                $type_where  .= " $or `port_descr_type` = ?";
-                $or           = 'OR';
-                $type_param[] = $additional_type;
-            }
-        }
-        $type_where  .= " $or `port_descr_type` = ?";
-        $or           = 'OR';
-        $type_param[] = $type;
-        $type_where .= ') ';
-        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE $type_where ORDER BY ifAlias", $type_param) as $port) {
+
+        $ports = get_ports_from_type($type);
+        foreach ($ports as $port) {
             $tmp[] = $port['port_id'];
         }
-        $param                        = 'id='.implode(',',$tmp);
-        $widget_settings['graph_type']= 'multiport_bits_separate';
-        $widget_settings['title']     = 'Overall '.ucfirst($type).' Bits ('.$widget_settings['graph_range'].')';
-    }
-    elseif ($type == 'custom') {
-        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE `port_descr_type` = ? ORDER BY ifAlias", array($widget_settings['graph_custom'])) as $port) {
-            $tmp[] = $port['port_id'];
+        $param                         = 'id='.implode(',', $tmp);
+        $widget_settings['graph_type'] = 'multiport_bits_separate';
+        if (empty($widget_settings['title'])) {
+            $widget_settings['title']  = 'Overall '.ucfirst(htmlspecialchars($type)).' Bits ('.$widget_settings['graph_range'].')';
         }
-        $param                        = 'id='.implode(',',$tmp);
-        $widget_settings['graph_type']= 'multiport_bits_separate';
-        $widget_settings['title']     = 'Overall '.ucfirst(htmlspecialchars($widget_settings['graph_custom'])).' Bits ('.$widget_settings['graph_range'].')';
-    }
-    else {
-        $param                        = 'id='.$widget_settings['graph_'.$type][$type.'_id'];
+    } else {
+        $param                         = 'id='.$widget_settings['graph_'.$type][$type.'_id'];
     }
     if (empty($widget_settings['title'])) {
-        $widget_settings['title']     = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
+        $widget_settings['title']      = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
     }
-    $common_output[]                  = '<img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/>';
+    $common_output[]                   = '<a href="graphs/'.$param.'/type='.$widget_settings['graph_type'].'/from='.$config['time'][$widget_settings['graph_range']].'"><img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/></a>';
 }

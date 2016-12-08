@@ -4,8 +4,8 @@
 // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
 require 'includes/graphs/common.inc.php';
 
-$unit_text = str_pad(truncate($unit_text, 18, ''), 18);
-$line_text = str_pad(truncate($line_text, 12, ''), 12);
+$unit_text = str_pad(substr($unit_text, 0, 18), 18);
+$line_text = str_pad(substr($line_text, 0, 12), 12);
 
 if ($multiplier) {
     if (empty($multiplier_action)) {
@@ -14,8 +14,7 @@ if ($multiplier) {
 
     $rrd_options .= ' DEF:'.$ds.'_o='.$rrd_filename.':'.$ds.':AVERAGE';
     $rrd_options .= ' CDEF:'.$ds.'='.$ds."_o,$multiplier,$multiplier_action";
-}
-else {
+} else {
     $rrd_options .= ' DEF:'.$ds.'='.$rrd_filename.':'.$ds.':AVERAGE';
 }
 
@@ -36,8 +35,7 @@ if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' DEF:'.$ds.'_oX='.$rrd_filename.':'.$ds.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' SHIFT:'.$ds."_oX:$period";
         $rrd_options .= ' CDEF:'.$ds.'X='.$ds."_oX,$multiplier,*";
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$ds.'X='.$rrd_filename.':'.$ds.':AVERAGE:start='.$prev_from.':end='.$from;
         $rrd_options .= ' SHIFT:'.$ds."X:$period";
     }

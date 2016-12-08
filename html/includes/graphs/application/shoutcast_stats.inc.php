@@ -1,8 +1,7 @@
 <?php
 
-$rrddir       = $config['rrd_dir'].'/'.$device['hostname'];
 $hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
-$rrd_filename = $rrddir.'/app-shoutcast-'.$app['app_id'].'-'.$hostname.'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
 
 require 'includes/graphs/common.inc.php';
 
@@ -28,8 +27,7 @@ if ($width >= 355) {
     $rrd_options .= ' GPRINT:max:LAST:"from%8.2lf"';
     $rrd_options .= ' GPRINT:bitrate:LAST:"(bitrate\:%8.2lf%s"';
     $rrd_options .= " COMMENT:\")\\n\"";
-}
-else {
+} else {
     $rrd_options .= " GPRINT:cur:LAST:\"\:%8.2lf\\n\"";
 }
 

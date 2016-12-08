@@ -1,0 +1,84 @@
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1, defined on 2007.6.20 by WANGXIJUN
+-- This MIB is defined for management of PON series of equipments. 
+-- 
+-- Copyright(c) 2007-2010 by Raisecom  Ltd. 
+
+-- added raisecomPonCommon, raisecomEponMgt, raisecomGponMgt 	by wangxijun 20070621
+-- =======================================================================
+
+
+RAISECOM-PONSERIES-BASE-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS
+        ponSeries		FROM RAISECOM-BASE-MIB;
+
+
+-- =======================================================================
+--
+--  raisecom  PON type branches
+-- =======================================================================
+
+--  Common management of various types of PON equipments
+	raisecomPonCommon	OBJECT IDENTIFIER ::= { ponSeries 1 }
+
+--  Management of EPON series of equipments
+	raisecomEponMgt		OBJECT IDENTIFIER ::= { ponSeries 2 }
+
+--  Management of GPON series of equipments
+	raisecomGponMgt		OBJECT IDENTIFIER ::= { ponSeries 3 }
+        
+--  Management of PON OID
+	raisecomPonDev		OBJECT IDENTIFIER ::= { ponSeries 4 }
+
+--   Management of switch
+	raisecomSwitchMgt   OBJECT IDENTIFIER ::= { ponSeries 5 }
+
+--   Management of video
+	raisecomVideoMgt    OBJECT IDENTIFIER ::= { ponSeries 6 }
+
+--   Management of switch
+	raisecomCwdmMgt     OBJECT IDENTIFIER ::= { ponSeries 7 }
+	
+--  OID of PON equipments
+	iscom5504B			OBJECT IDENTIFIER ::= { raisecomPonDev 1 }
+	iscom5600-12		OBJECT IDENTIFIER ::= { raisecomPonDev 2 }
+	iscom5800-15		OBJECT IDENTIFIER ::= { raisecomPonDev 3 }
+	iscom5800e-15		OBJECT IDENTIFIER ::= { raisecomPonDev 4 }
+	iscom5508    		OBJECT IDENTIFIER ::= { raisecomPonDev 5 }
+	iscom5800eb-15    	OBJECT IDENTIFIER ::= { raisecomPonDev 6 }
+	iscom6800-18    	OBJECT IDENTIFIER ::= { raisecomPonDev 7 }
+	rcvs3200-15    	    OBJECT IDENTIFIER ::= { raisecomPonDev 8 }
+	iscom5504PI    		OBJECT IDENTIFIER ::= { raisecomPonDev 9 }
+	iscom5508B    		OBJECT IDENTIFIER ::= { raisecomPonDev 10} 
+	iscom5508GP    		OBJECT IDENTIFIER ::= { raisecomPonDev 11}
+	rcvs3100    	    OBJECT IDENTIFIER ::= { raisecomPonDev 13}
+
+
+	iscom5101       			OBJECT IDENTIFIER ::= { raisecomPonDev 101 }
+	iscom5101-FE					OBJECT IDENTIFIER ::= { raisecomPonDev 102 }	
+	iscom5104		       		OBJECT IDENTIFIER ::= { raisecomPonDev 103 }
+	iscom5104-AC60     		OBJECT IDENTIFIER ::= { raisecomPonDev 104 }
+	iscom5104-LM       		OBJECT IDENTIFIER ::= { raisecomPonDev 105 }
+	iscom5104Q	       		OBJECT IDENTIFIER ::= { raisecomPonDev 106 }
+	iscom5104P	       		OBJECT IDENTIFIER ::= { raisecomPonDev 107 }
+	iscom5104-NP       		OBJECT IDENTIFIER ::= { raisecomPonDev 108 }
+	iscom5104-4E1T1    		OBJECT IDENTIFIER ::= { raisecomPonDev 109 }
+	iscom5108       			OBJECT IDENTIFIER ::= { raisecomPonDev 110 }
+	iscom5108-PE       		OBJECT IDENTIFIER ::= { raisecomPonDev 111 }
+	iscom5108-PSE      		OBJECT IDENTIFIER ::= { raisecomPonDev 112 }
+	iscom5116       			OBJECT IDENTIFIER ::= { raisecomPonDev 113 }
+	iscom5116-PE       		OBJECT IDENTIFIER ::= { raisecomPonDev 114 }
+	iscom5116-4E1T1    		OBJECT IDENTIFIER ::= { raisecomPonDev 115 }
+	iscom5124       			OBJECT IDENTIFIER ::= { raisecomPonDev 116 }
+	iscom5124S	       		OBJECT IDENTIFIER ::= { raisecomPonDev 117 }
+	iscom5204       			OBJECT IDENTIFIER ::= { raisecomPonDev 118 }
+	iscom5304       			OBJECT IDENTIFIER ::= { raisecomPonDev 119 }
+	iscom5304D       			OBJECT IDENTIFIER ::= { raisecomPonDev 120 }
+	iscom5208             OBJECT IDENTIFIER ::= { raisecomPonDev 121 }
+	iscom5216       			OBJECT IDENTIFIER ::= { raisecomPonDev 122 }
+	iscom5224		       		OBJECT IDENTIFIER ::= { raisecomPonDev 123 }
+
+END

@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: application/json');
 
 if (is_admin() === false) {
     $response = array(
@@ -30,19 +31,15 @@ $data = mres($_POST['data']);
 
 if (!is_numeric($device_id)) {
     $message = 'Missing device id';
-}
-elseif (!is_numeric($storage_id)) {
+} elseif (!is_numeric($storage_id)) {
     $message = 'Missing storage id';
-}
-elseif (!is_numeric($data)) {
+} elseif (!is_numeric($data)) {
     $message = 'Missing value';
-}
-else {
-    if (dbUpdate(array('storage_perc_warn'=>$data), 'storage', '`storage_id`=? AND `device_id`=?',array($storage_id,$device_id))) {
+} else {
+    if (dbUpdate(array('storage_perc_warn'=>$data), 'storage', '`storage_id`=? AND `device_id`=?', array($storage_id,$device_id)) >= 0) {
         $message = 'Storage information updated';
         $status = 'ok';
-    }
-    else {
+    } else {
         $message = 'Could not update storage information';
     }
 }

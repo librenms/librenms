@@ -11,25 +11,24 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 // FUA
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 if (!is_numeric($_POST['config_id']) || empty($_POST['data'])) {
     echo 'error with data';
     exit;
-}
-else {
+} else {
     $data   = mres($_POST['data']);
     $update = dbUpdate(array('config_value' => "$data"), 'config', '`config_id` = ?', array($_POST['config_id']));
     if (!empty($update) || $update == '0') {
         echo 'success';
         exit;
-    }
-    else {
+    } else {
         echo 'error';
         exit;
     }

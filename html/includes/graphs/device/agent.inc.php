@@ -4,9 +4,9 @@ $scale_min = 0;
 
 require 'includes/graphs/common.inc.php';
 
-$agent_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/agent.rrd';
+$agent_rrd = rrd_name($device['hostname'], 'agent');
 
-if (is_file($agent_rrd)) {
+if (rrdtool_check_rrd_exists($agent_rrd)) {
     $rrd_filename = $agent_rrd;
 }
 

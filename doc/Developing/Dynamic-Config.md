@@ -1,6 +1,7 @@
+source: Developing/Dynamic-Config.md
 # Adding new config options to WebUI
 
-Adding support for users to update a new config option via the WebUI is now a lot easier for general options. This 
+Adding support for users to update a new config option via the WebUI is now a lot easier for general options. This
 document shows you how to add a new config option and even section to the WebUI.
 
 #### Update DB
@@ -15,7 +16,7 @@ This will determine the default config option for `$config['alert']['tolerance_w
 
 #### Update WebUI
 
-If the sub-section you want to add the new config option already exists then update the relevant file within 
+If the sub-section you want to add the new config option already exists then update the relevant file within
 `html/pages/settings/` otherwise you will need to create the new sub-section page. Here's an example of this:
 
 [Commit example](https://github.com/librenms/librenms/commit/c5998f9ee27acdac0c0f7d3092fc830c51ff684c)
@@ -39,7 +40,7 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
-echo generate_dynamic_config_panel('Email transport',true,$config_groups,$mail_conf,'mail');
+echo generate_dynamic_config_panel('Email transport',$config_groups,$mail_conf,'mail');
 
 echo '
     </form>

@@ -43,10 +43,9 @@ print_optionbar_start(28);
 <?php
 print_optionbar_end();
 
-if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
+if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
-}
-else {
+} else {
     $results = 50;
 }
 
@@ -57,14 +56,14 @@ else {
             <td colspan="3"><strong>Packages</strong></td>
             <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">
                 <?php
-$result_options = array('10','50','100','250','500','1000','5000');
-foreach($result_options as $option) {
-    echo "<option value='$option'";
-    if($results == $option) {
-        echo " selected";
-    }
-    echo ">$option</option>";
+                $result_options = array('10','50','100','250','500','1000','5000');
+                foreach ($result_options as $option) {
+                    echo "<option value='$option'";
+                    if ($results == $option) {
+                        echo " selected";
                     }
+                    echo ">$option</option>";
+                }
                 ?>
             </select></td>
         </tr>
@@ -75,7 +74,7 @@ $full_query = "";
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
-if (is_admin() === FALSE && is_read() === FALSE) {
+if (is_admin() === false && is_read() === false) {
     $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
     $sql_where .= " AND `DP`.`user_id`=?";
     $param[] = $_SESSION['user_id'];
@@ -87,12 +86,12 @@ $where = '';
 $ver = "";
 $opt = "";
 
-if( !empty($_POST['arch']) ) {
+if (!empty($_POST['arch'])) {
     $where  .= ' AND packages.arch = ?';
     $param[] = mres($_POST['arch']);
 }
 
-if( is_numeric($_REQUEST['device_id']) ) {
+if (is_numeric($_REQUEST['device_id'])) {
     $where  .= " AND packages.device_id = ?";
     $param[] = $_REQUEST['device_id'];
 }
@@ -100,12 +99,11 @@ if( is_numeric($_REQUEST['device_id']) ) {
 
 $count_query .= $query." ) sub";
 $query .= $where." ORDER BY packages.name, packages.arch, packages.version";
-$count = dbFetchCell($count_query,$param);
+$count = dbFetchCell($count_query, $param);
 
-if( !isset($_POST['page_number']) && $_POST['page_number'] < 1 ) {
+if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
     $page_number = 1;
-}
-else {
+} else {
     $page_number = $_POST['page_number'];
 }
 
@@ -122,54 +120,53 @@ $full_query = $full_query . $query . " LIMIT $start,$results";
 <?php
 
 $ordered = array();
-foreach( dbFetchRows($full_query, $param) as $entry ) {
-    $tmp = dbFetchRows("SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?",array($entry['name']));
-    foreach( $tmp as $entry ) {
-        if( !is_array($ordered[$entry['name']]) ) {
+foreach (dbFetchRows($full_query, $param) as $entry) {
+    $tmp = dbFetchRows("SELECT packages.*,devices.hostname FROM packages,devices WHERE packages.device_id=devices.device_id AND packages.name = ?", array($entry['name']));
+    foreach ($tmp as $entry) {
+        if (!is_array($ordered[$entry['name']])) {
             $ordered[$entry['name']] = array( $entry );
-        }
-        else {
+        } else {
             $ordered[$entry['name']][] = $entry;
         }
     }
 }
 
-if( !empty($_POST['version']) ) {
-    list($opt, $ver) = explode(" ",$_POST['version']);
+if (!empty($_POST['version'])) {
+    list($opt, $ver) = explode(" ", $_POST['version']);
 }
 
-foreach( $ordered as $name=>$entry ) {
+foreach ($ordered as $name => $entry) {
     $vers = array();
     $arch = array();
     $devs = array();
-    foreach( $entry as $variation ) {
-        $variation['version'] = str_replace(":",".",$variation['version']);
-        if( !in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'],$ver,$opt)) ) {
+    foreach ($entry as $variation) {
+        $variation['version'] = str_replace(":", ".", $variation['version']);
+        if (!in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'], $ver, $opt))) {
             $vers[] = $variation['version'];
         }
-        if( !in_array($variation['arch'], $arch) ) {
+        if (!in_array($variation['arch'], $arch)) {
             $arch[] = $variation['arch'];
         }
-        if( !in_array($variation['hostname'], $devs) ) {
+        if (!in_array($variation['hostname'], $devs)) {
             unset($variation['version']);
             $devs[] = generate_device_link($variation);
         }
     }
-    if( sizeof($arch) > 0 && sizeof($vers) > 0 ) {
+    if (sizeof($arch) > 0 && sizeof($vers) > 0) {
 ?>
         <tr>
             <td><a href="<?php echo(generate_url(array('page'=>'packages','name'=>$name))); ?>"><?php echo $name; ?></a></td>
-            <td><?php echo implode('<br/>',$vers); ?></td>
-            <td><?php echo implode('<br/>',$arch); ?></td>
-            <td><?php echo implode('<br/>',$devs); ?></td>
+            <td><?php echo implode('<br/>', $vers); ?></td>
+            <td><?php echo implode('<br/>', $arch); ?></td>
+            <td><?php echo implode('<br/>', $devs); ?></td>
         </tr>
 <?php
     }
 }
-if( (int) ($count / $results) > 0 && $count != $results ) {
+if ((int) ($count / $results) > 0 && $count != $results) {
     ?>
         <tr>
-            <td colspan="6" align="center"><?php echo generate_pagination($count,$results,$page_number); ?></td>
+            <td colspan="6" align="center"><?php echo generate_pagination($count, $results, $page_number); ?></td>
         </tr>
 <?php
 }

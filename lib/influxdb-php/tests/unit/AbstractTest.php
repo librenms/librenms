@@ -10,7 +10,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use InfluxDB\Client;
 use InfluxDB\Database;
-use InfluxDB\Driver\Guzzle;
+use InfluxDB\Driver\Guzzle as GuzzleDriver;
 use InfluxDB\ResultSet;
 use PHPUnit_Framework_MockObject_MockObject;
 use GuzzleHttp\Client as GuzzleClient;
@@ -44,7 +44,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
+        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('getBaseURI')
@@ -52,9 +52,17 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 
         $this->mockClient->expects($this->any())
             ->method('query')
-            ->will($this->returnValue(new ResultSet($this->resultData)));
+            ->will($this->returnCallback(function ($db, $query) {
+                Client::$lastQuery = $query;
 
-        $httpMockClient = new Guzzle($this->buildHttpMockClient(''));
+                return new ResultSet($this->resultData);
+            }));
+
+        $this->mockClient->expects($this->any())
+            ->method('write')
+            ->will($this->returnValue(true));
+
+        $httpMockClient = new GuzzleDriver($this->buildHttpMockClient(''));
 
         // make sure the client has a valid driver
         $this->mockClient->expects($this->any())
@@ -88,7 +96,13 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     public function buildHttpMockClient($body)
     {
         // Create a mock and queue two responses.
-        $mock = new MockHandler([new Response(200, array(), $body)]);
+        $mock = new MockHandler([
+            new Response(200, array(), $body),
+            new Response(200, array(), $body),
+            new Response(400, array(), 'fault{'),
+            new Response(400, array(), $body),
+            new Response(400, array(), $body),
+        ]);
 
         $handler = HandlerStack::create($mock);
         return new GuzzleClient(['handler' => $handler]);
@@ -114,7 +128,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         if ($emptyResult) {
-            $mockClient->expects($this->once())
+            $mockClient->expects($this->any())
                 ->method('query')
                 ->will($this->returnValue(new ResultSet($this->getEmptyResult())));
         }

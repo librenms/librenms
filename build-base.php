@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 // MYSQL Check - FIXME
@@ -29,12 +30,11 @@ if ($select === false) {
 $limit = 0;
 while (!feof($sql_fh)) {
     $line = fgetss($sql_fh);
-    if (isset($_SESSION['stage']) ) {
+    if (isset($_SESSION['stage'])) {
         $limit++;
         if (isset($_SESSION['offset']) && $limit < $_REQUEST['offset']) {
             continue;
-        }
-        elseif ( time()-$_SESSION['last'] > 45 ) {
+        } elseif (time()-$_SESSION['last'] > 45) {
             $_SESSION['offset'] = $limit;
             $GLOBALS['refresh'] = '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
             return;

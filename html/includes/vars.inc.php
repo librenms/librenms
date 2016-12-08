@@ -7,7 +7,7 @@ foreach ($_GET as $key => $get_var) {
             $value = 'yes';
         }
 
-        $vars[$name] = $value;
+        $vars[$name] = clean($value);
     }
 }
 
@@ -15,8 +15,7 @@ $base_url = parse_url($config["base_url"]);
 // don't parse the subdirectory, if there is one in the path
 if (strlen($base_url["path"]) > 1) {
     $segments = explode('/', trim(str_replace($base_url["path"], "", $_SERVER['REQUEST_URI']), '/'));
-}
-else {
+} else {
     $segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
 }
 
@@ -24,22 +23,20 @@ foreach ($segments as $pos => $segment) {
     $segment = urldecode($segment);
     if ($pos == '0') {
         $vars['page'] = $segment;
-    }
-    else {
+    } else {
         list($name, $value) = explode('=', $segment);
         if ($value == '' || !isset($value)) {
-            $vars[$name] = yes;
-        }
-        else {
+            $vars[$name] = 'yes';
+        } else {
             $vars[$name] = $value;
         }
     }
 }
 
 foreach ($_GET as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = clean($value);
 }
 
 foreach ($_POST as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = ($value);
 }

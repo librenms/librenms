@@ -9,19 +9,19 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
 
 $device_id = mres($_POST['device_id']);
 $port_id_notes = mres($_POST['port_id_notes']);
-$attrib_value = mres($_POST['notes']);
+$attrib_value = $_POST['notes'];
 
 if (isset($attrib_value) && set_dev_attrib(array('device_id' => $device_id), $port_id_notes, $attrib_value)) {
     $status  = 'ok';
     $message = 'Updated';
-}
-else {
+} else {
     $status  = 'error';
     $message = 'ERROR: Could not update';
 }

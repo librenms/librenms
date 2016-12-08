@@ -40,7 +40,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "/ajax_table.php",
+        url: "ajax_table.php",
         formatters: {
             "perc_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm storage' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' value='"+row.storage_perc_warn+"'></div>";
@@ -58,7 +58,7 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: '/ajax_form.php',
+                url: 'ajax_form.php',
                 data: {type: "storage-update", device_id: device_id, data: data, storage_id: storage_id},
                 dataType: "json",
                 success: function (data) {

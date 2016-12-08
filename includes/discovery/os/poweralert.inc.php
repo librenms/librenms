@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (preg_match('/^POWERALERT/', $sysDescr)) {
-        $os = 'poweralert';
-    }
+if (starts_with($sysDescr, 'POWERALERT', true)) {
+    $os = 'poweralert';
 }

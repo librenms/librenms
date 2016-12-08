@@ -4,8 +4,7 @@ $pagetitle[] = 'Routing';
 
 if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
     $graphs = 'graphs';
-}
-else {
+} else {
     $graphs = 'nographs';
 }
 
@@ -16,6 +15,7 @@ $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
+$type_text['cisco-otv']  = 'OTV';
 
 print_optionbar_start();
 
@@ -53,10 +53,11 @@ switch ($vars['protocol']) {
     case 'vrf':
     case 'cef':
     case 'ospf':
+    case 'cisco-otv':
         include 'pages/routing/'.$vars['protocol'].'.inc.php';
-    break;
+        break;
 
     default:
         echo report_this('Unknown protocol '.$vars['protocol']);
-    break;
+        break;
 }

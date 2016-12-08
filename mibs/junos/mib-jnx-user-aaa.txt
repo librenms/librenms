@@ -26,7 +26,7 @@
             FROM INET-ADDRESS-MIB;
 
     jnxUserAAAMib  	MODULE-IDENTITY
-        LAST-UPDATED "201303180000Z"
+        LAST-UPDATED "201307100000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -39,6 +39,9 @@
         DESCRIPTION
             "This module defines the objects pertaining to User authentication,
              authorization and accounting"
+        REVISION      "201307100000Z"
+        DESCRIPTION   "Adding jnxUserAAADomainStripUsername and 
+                       jnxUserAAADomainOverridePassword to jnxUserAAADomain"      
         REVISION      "201303180000Z"
         DESCRIPTION   "jnxAccessAuthServerEnabled, corrected description" 
         REVISION      "201212290000Z"
@@ -620,7 +623,9 @@
         jnxUserAAADomainTargetLogicalSystem   DisplayString,
         jnxUserAAADomainTargetRoutingInstance DisplayString,
         jnxUserAAADomainTunnelProfile         DisplayString,
-        jnxUserAAADomainDynamicProfile        DisplayString }
+        jnxUserAAADomainDynamicProfile        DisplayString,
+        jnxUserAAADomainStripUsername         INTEGER,
+        jnxUserAAADomainOverridePassword      TruthValue }
 
     jnxUserAAADomainName OBJECT-TYPE
         SYNTAX      DisplayString (SIZE(1..63))
@@ -716,6 +721,27 @@
             "The configured dynamic-profile to be used for this session."
         DEFVAL    { "" }
         ::= { jnxUserAAADomainEntry 10 }
+
+    jnxUserAAADomainStripUsername OBJECT-TYPE
+        SYNTAX      INTEGER {
+            disabled(0),
+            leftToRight(1),
+            rightToLeft(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Displays the strip-username configuration."
+        DEFVAL    { 0 }
+        ::= { jnxUserAAADomainEntry 11 }
+
+    jnxUserAAADomainOverridePassword OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Displays the override-password configuration."
+        DEFVAL    { false }
+        ::= { jnxUserAAADomainEntry 12 }
 
     jnxUserAAADomainTunnelTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF JnxUserAAADomainTunnelEntry

@@ -12,8 +12,7 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
             if (isset($entry['cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.'.$index;
                 $usage     = $entry['cpmCPUTotal5minRev'];
-            }
-            else if (isset($entry['cpmCPUTotal5min'])) {
+            } elseif (isset($entry['cpmCPUTotal5min'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.'.$index;
                 $usage     = $entry['cpmCPUTotal5min'];
             }
@@ -27,15 +26,10 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
                 $descr = "Processor $index";
             }
 
-            $old_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cpmCPU-'.$index.'.rrd');
-            $new_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-cpm-'.$index.'.rrd');
-
-            if (is_file($old_rrd)) {
-                rename($old_rrd, $new_rrd);
-                d_echo("$old_rrd $new_rrd");
-
-                echo 'Moved RRD ';
-            }
+            // rename old cpmCPU files
+            $old_name = array('cpmCPU', $index);
+            $new_name = array('processor', 'cpm', $index);
+            rrd_file_rename($device, $old_name, $new_name);
 
             if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
                 discover_processor($valid['processor'], $device, $usage_oid, $index, 'cpm', $descr, '1', $usage, $entPhysicalIndex, null);

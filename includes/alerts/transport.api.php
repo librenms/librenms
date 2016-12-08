@@ -31,6 +31,7 @@ foreach( $opts as $method=>$apis ) {
         }
         //		var_dump($api); //FIXME: propper debuging
         $curl = curl_init();
+        set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host."?".$api : $host) );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
@@ -41,7 +42,7 @@ foreach( $opts as $method=>$apis ) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
             var_dump("Params: ".$api); //FIXME: propper debuging
             var_dump("Return: ".$ret); //FIXME: propper debuging
-            return false;
+            return 'HTTP Status code '.$code;
         }
     }
 }

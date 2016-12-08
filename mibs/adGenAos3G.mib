@@ -1,0 +1,642 @@
+        ADTRAN-AOS-3G DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            Unsigned32, Integer32, IpAddress, OBJECT-TYPE, OBJECT-IDENTITY,
+            MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString, TruthValue, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            InterfaceIndex, ifIndex
+                FROM IF-MIB
+            adIdentity
+                FROM ADTRAN-MIB
+            adGenAOSConformance, adGenAOSWan
+                FROM ADTRAN-AOS;
+
+        adGenAOS3GMib    MODULE-IDENTITY
+           LAST-UPDATED "201001050000Z"
+           ORGANIZATION "ADTRAN, Inc."
+           CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                        Tel: +1 800 726-8663
+                        Fax: +1 256 963 6217
+                        E-mail: support@adtran.com"
+           DESCRIPTION
+                 "A MIB module for monitoring 3G module values."
+
+            REVISION "201001050000Z"  -- Jan 5, 2010 / YYYYMMDDHHMMZ
+            DESCRIPTION
+                    "Added TEXTUAL-CONVENTION EcioValue and object identifier
+                    adGenAOS3GECIOIntegerValue.
+                    Changes by Reba Holland."
+
+            REVISION "201001140000Z"  -- Jan 14, 2010 / YYYYMMDDHHMMZ
+            DESCRIPTION
+                    "Changed syntax of object identifier
+                    adGenAOS3GECIOIntegerValue from EcioValue to Integer32.
+                    Removed TEXTUAL CONVENTION EcioValue.
+                    Changes by Reba Holland."
+
+        ::= { adIdentity 10000 53 6 2 }
+
+--  OBJECT IDENTIFIER
+
+    adGenAOS3G         OBJECT IDENTIFIER ::= { adGenAOSWan 2 }
+
+--============================================================================
+
+   adGenAOS3GTraps         OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "The table contains traps/alarms caused by changes in
+        				configuration values and when statistical data reach
+        				certain thresholds."
+        ::= { adGenAOS3G 0 }
+
+-- 3G Profile Details Entry
+
+
+    adGenAOS3GTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AdGenAOS3GEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The table contains 3G cellular statistical data for the cellular
+            interface."
+        ::= { adGenAOS3G 1 }
+
+
+    adGenAOS3GEntry OBJECT-TYPE
+        SYNTAX     AdGenAOS3GEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+            "This is an entry into the 3G table."
+        INDEX { ifIndex }
+        ::= { adGenAOS3GTable 1 }
+
+     AdGenAOS3GEntry ::=
+         SEQUENCE {
+             adGenAOS3GNetworkAccessID      DisplayString,
+             adGenAOS3GHASS                 BITS,
+             adGenAOS3GHASPI                Unsigned32,
+             adGenAOS3GAAASS                BITS,
+             adGenAOS3GAAASPI               Unsigned32,
+             adGenAOS3GReverseTunneling     BITS,
+             adGenAOS3GHomeAddress          IpAddress,
+             adGenAOS3GPrimaryHomeAddress   IpAddress,
+             adGenAOS3GSecHomeAddress       IpAddress,
+             adGenAOS3GRSSI                 Integer32,
+             adGenAOS3GECIO                 DisplayString,
+             adGenAOS3GPnOffset             Integer32,
+             adGenAOS3GServiceType          DisplayString,
+             adGenAOS3GServiceTypePreference INTEGER,
+             adGenAOS3GConnectionState      DisplayString,
+             adGenAOS3GECIOIntegerValue     Integer32
+     }
+
+     -- CID_CELLULAR_NETWORK_IDENTIFIER
+     adGenAOS3GNetworkAccessID OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Network Access ID is the User ID submitted by the 3G
+                Modem during Mobile IP authentication.  For more information,
+                refer to RFC 4282."
+         ::= { adGenAOS3GEntry 1 }
+
+     -- CID_CELLULAR_HA_SS
+     adGenAOS3GHASS OBJECT-TYPE
+         SYNTAX       BITS { unset(0), set(1) }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "This OID displays whether the shared secret for the home
+                agent has been set for Mobile IP authentication."
+         ::= { adGenAOS3GEntry 2 }
+
+     -- CID_CELLULAR_HA_SPI
+     adGenAOS3GHASPI OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Home Agent Security Parameter Index uniquely identifies a
+                security association for the home agent for use during Mobile
+                IP authentication."
+         ::= { adGenAOS3GEntry 3 }
+
+     -- CID_CELLULAR_AAA_SS
+     adGenAOS3GAAASS OBJECT-TYPE
+         SYNTAX       BITS { unset(0), set(1) }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "This OID displays whether the shared secret for AAA
+                has been set for Mobile IP authentication."
+         ::= { adGenAOS3GEntry 4 }
+
+     -- CID_CELLULAR_AAA_SPI
+     adGenAOS3GAAASPI OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The AAA Security Parameter Index uniquely identifies a
+                security association for AAA for use during Mobile IP
+                authentication."
+         ::= { adGenAOS3GEntry 5 }
+
+     -- CID_CELLULAR_REVERSE_TUNNELING
+     adGenAOS3GReverseTunneling OBJECT-TYPE
+         SYNTAX       BITS { unset(0), set(1) }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "This OID describes if a tunnel is setup from the
+                3G module's care of address to the home agent.  A care of
+                address is a temporary IP address for a mobile device."
+         ::= { adGenAOS3GEntry 6 }
+
+     -- CID_CELLULAR_HOME_ADDRESS
+     adGenAOS3GHomeAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The permanent home IP address for the 3G
+                 module in the cellular network."
+         ::= { adGenAOS3GEntry 7 }
+
+     -- CID_CELLULAR_PRIMARY_HOME_ADDRESS
+     adGenAOS3GPrimaryHomeAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The primary IP address of the 3G module's home agent."
+         ::= { adGenAOS3GEntry 8 }
+
+      -- CID_CELLULAR_SECONDARY_HOME_ADDRESS
+     adGenAOS3GSecHomeAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The secondary IP address of the 3G module's home agent."
+         ::= { adGenAOS3GEntry 9 }
+
+     -- CID_CELLULAR_RSSI
+     adGenAOS3GRSSI    OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Receive Signal Strength Indicator for the cellular
+                connection. This value is a measurement of signal strength."
+         ::= { adGenAOS3GEntry 10 }
+
+      -- CID_CELLULAR_ECIO
+     adGenAOS3GECIO   OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Ec/Io for the cellular connection.  This is the ratio of
+                received pilot energy to the total received energy.  The value
+                is similar to signal-to-noise ratio."
+         ::= { adGenAOS3GEntry 11 }
+
+      -- CID_CELLULAR_BASE_STATION_LOCATION
+     adGenAOS3GPnOffset   OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Pn Offset for the cellular connection.  Base stations
+                assigned to a particular frequency carrier operate at the same
+                center frequency.  The PN offset is used to distinguish base
+                stations from one another."
+         ::= { adGenAOS3GEntry 12 }
+
+      -- CID_CELLULAR_SERVICE_TYPE
+     adGenAOS3GServiceType   OBJECT-TYPE
+		 SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The current Cellular Service Type for
+                the cellular connection."
+         ::= { adGenAOS3GEntry 13 }
+
+	-- CID_CELLULAR_CDMA_SERVICE_TYPE
+     adGenAOS3GServiceTypePreference OBJECT-TYPE
+         SYNTAX       INTEGER { modeAUTO(4), mode1xRTT(9), mode1xEVDO(10)  }
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+                "The current Cellular Service Type Preference for the cellular
+                connection.  Cellular Service Type can be forced to 1xRTT mode
+                or 1xEVDO mode.  By default, it is set to Hybrid or AUTO mode
+                 which chooses the best available signal."
+         ::= { adGenAOS3GEntry 14 }
+
+	-- CID_CELLULAR_CONNECT_STATE
+     adGenAOS3GConnectionState OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The current Connection State for the cellular connection."
+         ::= { adGenAOS3GEntry 15 }
+
+     -- CID_CELLULAR_ECIO
+     adGenAOS3GECIOIntegerValue   OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Ec/Io for the cellular connection displayed in integer
+                form. This is the ratio of received pilot energy to the total
+                received energy. The value is similar to signal-to-noise ratio.
+                EC/IO values typically are represented as a value with a
+                decimal place. In this representation the value will be
+                scaled by 10.  Hence a value of 1.5 will be represented as 15."
+         ::= { adGenAOS3GEntry 16 }
+
+--============================================================================
+--                3G Hardware Profile Detail Entries
+--============================================================================
+
+adGenAOS3GHardwareDataTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AdGenAOS3GHardwareDataEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The table contains profile information
+            for the 3G cellular interface."
+        ::= { adGenAOS3G 2 }
+
+
+adGenAOS3GHardwareDataEntry OBJECT-TYPE
+        SYNTAX     AdGenAOS3GHardwareDataEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This is an entry into the 3G hardware data table."
+        INDEX { ifIndex }
+        ::= { adGenAOS3GHardwareDataTable 1 }
+
+     AdGenAOS3GHardwareDataEntry ::=
+         SEQUENCE {
+             adGenAOS3GSystemID             Unsigned32,
+             adGenAOS3GNetworkID            DisplayString,
+             adGenAOS3GPrefferedRoamList    Unsigned32,
+             adGenAOS3GMobileDirNumber      DisplayString,
+             adGenAOS3GESN                  DisplayString,
+             adGenAOS3GMobileStationID      DisplayString,
+			 adGenAOS3GHardwareVersion		DisplayString,
+             adGenAOS3GFirmwareVersion		DisplayString
+     }
+
+     -- CID_CELLULAR_SYSTEM_ID
+     adGenAOS3GSystemID OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The System Identification number is the identifier
+                for a cellular network in a certain area."
+         ::= { adGenAOS3GHardwareDataEntry 1 }
+
+     -- CID_CELLULAR_NETWORK_ID
+     adGenAOS3GNetworkID OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Network Identification number identifies a subset
+                of a particular SID corresponding to different networks."
+         ::= { adGenAOS3GHardwareDataEntry 2 }
+
+     -- CID_CELLULAR_PREFFERED_ROAMING_LIST
+     adGenAOS3GPrefferedRoamList OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The PRL is a database of cell towers that the cellular modem
+                can roam on.  This OID specifies the current version of
+                that database that is programmed onto the cellular modem."
+         ::= { adGenAOS3GHardwareDataEntry 3 }
+
+     -- CID_CELLULAR_MOBILE_DIRECTORY_NUMBER
+     adGenAOS3GMobileDirNumber OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The MDN is the 10 digit phone number assigned to
+                the 3G module."
+         ::= { adGenAOS3GHardwareDataEntry 4 }
+
+     -- CID_CELLULAR_ELECTRONIC_SERIAL_NUMBER
+     adGenAOS3GESN OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The Electronic Serial Number is is a unique
+                number that identifies the 3G module."
+         ::= { adGenAOS3GHardwareDataEntry 5 }
+
+     -- CID_CID_CELLULAR_MOBILE_STATION_ID
+     adGenAOS3GMobileStationID OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The MSID is a 10 digit number that identifies
+                the 3G module in the network."
+         ::= { adGenAOS3GHardwareDataEntry 6 }
+
+	-- CID_CELLULAR_HARDWARE_VERSION
+     adGenAOS3GHardwareVersion	OBJECT-TYPE
+		 SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The hardware version of the 3G modem."
+         ::= { adGenAOS3GHardwareDataEntry 7 }
+
+	-- CID_CELLULAR_FIRMWARE_VERSION
+     adGenAOS3GFirmwareVersion	OBJECT-TYPE
+		 SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                "The firmware version of the 3G modem."
+         ::= { adGenAOS3GHardwareDataEntry 8 }
+
+--============================================================================
+--                3G Threshold Entries
+--============================================================================
+
+adGenAOS3GThresholdDataTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AdGenAOS3GThresholdDataEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The table contains settings regarding whether the trap is enabled
+            and threshold values for certain traps."
+        ::= { adGenAOS3G 3 }
+
+
+adGenAOS3GThresholdDataEntry OBJECT-TYPE
+        SYNTAX     AdGenAOS3GThresholdDataEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This is an entry into the 3G threshold data table."
+        INDEX { ifIndex }
+        ::= { adGenAOS3GThresholdDataTable 1 }
+
+     AdGenAOS3GThresholdDataEntry ::=
+         SEQUENCE {
+             adGenAOS3GEnableTraps          INTEGER,
+             adGenAOS3GRSSIThreshold        Integer32,
+             adGenAOS3GECIOThreshold        Integer32
+     }
+
+     -- CID_THRESHOLD_CROSSED_TRAP_ENA
+     adGenAOS3GEnableTraps OBJECT-TYPE
+         SYNTAX       INTEGER { enabled(1),disabled(2) }
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+                "This OID indicates whether traps
+                are enabled for the interface."
+         ::= { adGenAOS3GThresholdDataEntry 1 }
+
+     -- CID_CELLULAR_RSSI_THRESHOLD
+     adGenAOS3GRSSIThreshold OBJECT-TYPE
+         SYNTAX       Integer32 (-200..200)
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+                "This is a value from (-200..200) that sets the threshold for
+                an RSSI trap to occur.  When the RSSI is below this value, it
+                will cause an RSSI alarm trap.  When the RSSI rises above this
+                value, it will cause an RSSI cleared trap."
+         ::= { adGenAOS3GThresholdDataEntry 2 }
+
+     -- CID_CELLULAR_ECIO_THRESHOLD
+     adGenAOS3GECIOThreshold OBJECT-TYPE
+         SYNTAX       Integer32 (-200..200)
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+                "This is a value from (-200..200) that sets the threshold for
+                an ECIO trap to occur.  When the ECIO is below this value, it
+                will cause an ECIO alarm trap.  When the ECIO rises above this
+                value, it will cause an ECIO cleared trap."
+         ::= { adGenAOS3GThresholdDataEntry 3 }
+
+--============================================================================
+--                    Traps for 3G Interface
+--============================================================================
+
+rssiDataRangeAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, adGenAOS3GRSSI }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the RSSI data value object for
+            the 3G cellular interface has exceeded the range specified by the
+            user."
+    ::= { adGenAOS3GTraps 1 }
+
+ecioDataRangeAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, adGenAOS3GECIO }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the ECIO data value object for
+            the 3G cellular interface has exceeded the range specified by the
+            user."
+    ::= { adGenAOS3GTraps 2 }
+
+rssiDataRangeClear NOTIFICATION-TYPE
+    OBJECTS { ifIndex, adGenAOS3GRSSI }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the RSSI data value object for
+            the 3G cellular interface has returned to the range specified by
+            the user."
+    ::= { adGenAOS3GTraps 3 }
+
+ecioDataRangeClear NOTIFICATION-TYPE
+    OBJECTS { ifIndex, adGenAOS3GECIO }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the ECIO data value object for
+            the 3G cellular interface has returned to the range specified by
+            the user."
+    ::= { adGenAOS3GTraps 4 }
+
+configValueSet NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that a data value object for the 3G
+            cellular interface from the 3G Hardware Table has been modified
+            from the previous state."
+    ::= { adGenAOS3GTraps 5 }
+
+modemResetAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the 3G modem has been reset."
+    ::= { adGenAOS3GTraps 6 }
+
+serviceTypeChangeAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, adGenAOS3GServiceType }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting
+            in an agent role, has detected that the service type for the 3G
+            cellular interface has changed."
+    ::= { adGenAOS3GTraps 7}
+
+connectionStateDownAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            "This trap signifies that the SNMP entity, acting
+            in an agent role, has detected that the connection status of the
+            modem has gone down from either DORMANT or a CONNECTED state."
+    ::= { adGenAOS3GTraps 8}
+
+--
+-- MIB Compliance statements.
+--
+
+     adGenAOS3GConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 9 }
+     adGenAOS3GGroup        OBJECT IDENTIFIER ::= { adGenAOS3GConformance 1 }
+     adGenAOS3GCompliances  OBJECT IDENTIFIER ::= { adGenAOS3GConformance 2 }
+
+
+-- Full compliance statement
+     adGenAOS3GFullCompliance MODULE-COMPLIANCE
+         STATUS  current
+         DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            version 2 of the adGenAOS3G MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS { adGenAOS3GTableGroup }
+
+         GROUP  adGenAOS3GHardwareDataGroup
+         DESCRIPTION
+                "This optional group is used to retrieve hardware profile
+                statistics for a 3G interface module.  Availability of data is
+                dependent upon configuration and interface activity."
+
+         GROUP  adGenAOS3GThresholdDataGroup
+         DESCRIPTION
+                "This optional group is used to retrieve threshold data for
+                the 3g interface. Availability of data is dependent upon
+                configuration and interface activity."
+
+         GROUP  adGenAOS3GTrapGroup
+         DESCRIPTION
+            "This optional group defines the asynchronous
+            notifications generated by the 3G interface."
+         ::= { adGenAOS3GCompliances 1 }
+
+   -- units of conformance
+
+     adGenAOS3GTableGroup    OBJECT-GROUP
+         OBJECTS {
+             adGenAOS3GNetworkAccessID,
+             adGenAOS3GHASS,
+             adGenAOS3GHASPI,
+             adGenAOS3GAAASS,
+             adGenAOS3GAAASPI,
+             adGenAOS3GReverseTunneling,
+             adGenAOS3GHomeAddress,
+             adGenAOS3GPrimaryHomeAddress,
+             adGenAOS3GSecHomeAddress,
+             adGenAOS3GRSSI,
+             adGenAOS3GECIO,
+             adGenAOS3GPnOffset,
+             adGenAOS3GServiceType,
+             adGenAOS3GServiceTypePreference,
+             adGenAOS3GConnectionState,
+             adGenAOS3GECIOIntegerValue
+
+            }
+         STATUS  current
+         DESCRIPTION
+            "This group contains 3G cellular statistical data for profile
+            information."
+         ::= { adGenAOS3GGroup 1 }
+
+     adGenAOS3GHardwareDataGroup    OBJECT-GROUP
+         OBJECTS {
+             adGenAOS3GSystemID,
+             adGenAOS3GNetworkID,
+             adGenAOS3GPrefferedRoamList,
+             adGenAOS3GMobileDirNumber,
+             adGenAOS3GESN,
+             adGenAOS3GMobileStationID,
+             adGenAOS3GHardwareVersion,
+             adGenAOS3GFirmwareVersion
+	        }
+         STATUS  current
+         DESCRIPTION
+            "This group contains 3G cellular statistical data for hardware
+            information."
+         ::= { adGenAOS3GGroup 2 }
+
+     adGenAOS3GThresholdDataGroup    OBJECT-GROUP
+         OBJECTS {
+             adGenAOS3GEnableTraps,
+             adGenAOS3GRSSIThreshold,
+             adGenAOS3GECIOThreshold
+                }
+         STATUS  current
+         DESCRIPTION
+            "This group contains threshold data for enabling 3G interface
+            thresholds."
+         ::= { adGenAOS3GGroup 3 }
+
+     adGenAOS3GTrapGroup NOTIFICATION-GROUP
+         NOTIFICATIONS {
+                        rssiDataRangeAlarm,
+                        ecioDataRangeAlarm,
+                        rssiDataRangeClear,
+                        ecioDataRangeClear,
+                        configValueSet,
+                        modemResetAlarm,
+                        serviceTypeChangeAlarm,
+                        connectionStateDownAlarm
+                      }
+         STATUS  current
+         DESCRIPTION
+            "Traps which may be used to enhance event driven
+            management of the interface."
+         ::= { adGenAOS3GGroup 4 }
+
+END

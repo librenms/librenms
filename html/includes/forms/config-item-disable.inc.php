@@ -11,25 +11,23 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 // FUA
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 if (!is_numeric($_POST['config_id'])) {
     echo 'error with data';
     exit;
-}
-else {
+} else {
     if ($_POST['state'] == 'true') {
         $state = 1;
-    }
-    else if ($_POST['state'] == 'false') {
+    } elseif ($_POST['state'] == 'false') {
         $state = 0;
-    }
-    else {
+    } else {
         $state = 0;
     }
 
@@ -37,8 +35,7 @@ else {
     if (!empty($update) || $update == '0') {
         echo 'success';
         exit;
-    }
-    else {
+    } else {
         echo 'error';
         exit;
     }

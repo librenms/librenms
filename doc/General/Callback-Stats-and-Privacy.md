@@ -1,3 +1,4 @@
+source: General/Callback-Stats-and-Privacy.md
 ## Stats data and your privacy ##
 
 This document has been put together to explain what LibreNMS does when it calls back home to report some anonymous statistics.
@@ -30,4 +31,3 @@ Hopefully this answers the questions you might have on why and what we are doing
 
 #### How do I enable stats submission? ####
 If you're happy with all of this - please consider switching the call back system on, you can do this within the About LibreNMS page within your control panel. In the Statistics section you will find a toggle switch to enable / disable the feature. If you've previously had it switched on and want to opt out and remove your data, click the 'Clear remote stats' button and on the next submission all the data you've sent us will be removed!
-

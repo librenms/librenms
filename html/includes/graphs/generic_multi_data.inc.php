@@ -7,8 +7,7 @@ require 'includes/graphs/common.inc.php';
 if ($format == 'octets' || $format == 'bytes') {
     $units  = 'Bps';
     $format = 'octets';
-}
-else {
+} else {
     $units  = 'bps';
     $format = 'bits';
 }
@@ -19,8 +18,7 @@ foreach ($rrd_filenames as $key => $rrd_filename) {
     if ($rrd_inverted[$key]) {
         $in  = 'out';
         $out = 'in';
-    }
-    else {
+    } else {
         $in  = 'in';
         $out = 'out';
     }
@@ -52,8 +50,7 @@ if ($i) {
     if ($inverse) {
         $in  = 'out';
         $out = 'in';
-    }
-    else {
+    } else {
         $in  = 'in';
         $out = 'out';
     }
@@ -85,16 +82,15 @@ if ($i) {
         // $rrd_options .= " LINE1.25:in".$format."#".$colour_line_in.":";
         $rrd_options .= ' AREA:dout'.$format.'#'.$colour_area_out.':';
         // $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":";
-    }
-    else {
-        $rrd_options .= ' AREA:in'.$format.'#'.$colour_area_in.':';
+    } else {
         $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
+        $rrd_options .= ' AREA:in'.$format.'#'.$colour_area_in.':In ';
         // $rrd_options .= " LINE1.25:in".$format."#".$colour_line_in.":In\ ";
         $rrd_options .= ' GPRINT:in'.$format.':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:in'.$format.':AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:in'.$format.':MAX:%6.2lf%s';
         $rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
-        $rrd_options .= ' AREA:dout'.$format.'#'.$colour_area_out.':';
+        $rrd_options .= ' AREA:dout'.$format.'#'.$colour_area_out.':Out';
         // $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":Out";
         $rrd_options .= ' GPRINT:out'.$format.':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:out'.$format.':AVERAGE:%6.2lf%s';

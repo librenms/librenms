@@ -4,7 +4,7 @@ $scale_max = 0;
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/sub10systems.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'sub10systems');
 
 
 if (file_exists($rrdfilename)) {
@@ -15,6 +15,3 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:sub10RadioLclVectEr:MIN:%3.2lf ';
     $rrd_options .= ' GPRINT:sub10RadioLclVectEr:MAX:%3.2lf\\\l ';
 }
-
-
-

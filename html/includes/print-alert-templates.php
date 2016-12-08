@@ -19,8 +19,7 @@ require_once 'includes/modal/attach_alert_template.inc.php';
 <?php
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
-}
-else {
+} else {
     $results = 50;
 }
 
@@ -68,8 +67,7 @@ $count_query = $count_query.$query;
 $count       = dbFetchCell($count_query, $param);
 if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
     $page_number = 1;
-}
-else {
+} else {
     $page_number = $_POST['page_number'];
 }
 
@@ -81,9 +79,11 @@ foreach (dbFetchRows($full_query, $param) as $template) {
             <td>'.$template['name'].'</td>
             <td>';
     if ($_SESSION['userlevel'] >= '10') {
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#alert-template' data-template_id='".$template['id']."' data-template_action='edit' name='edit-alert-template'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#confirm-delete-alert-template' data-template_id='".$template['id']."' name='delete-alert-template'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button> ";
-        echo "<button type='button' class='btn btn-warning btn-sm' data-toggle='modal' data-target='#attach-alert-template' data-template_id='".$template['id']."' name='attach-alert-template'><span class='glyphicon glyphicon-th-list' aria-hidden='true'></span></button>";
+        echo "<div class='btn-group btn-group-sm' role='group'>";
+        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#alert-template' data-template_id='".$template['id']."' data-template_action='edit' name='edit-alert-template'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#confirm-delete-alert-template' data-template_id='".$template['id']."' name='delete-alert-template'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-warning btn-sm' data-toggle='modal' data-target='#attach-alert-template' data-template_id='".$template['id']."' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+        echo "</div>";
     }
 
     echo '    </td>

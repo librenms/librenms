@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (stristr($sysDescr, 'VRP (R) Software') || stristr($sysDescr, 'VRP Software Version') || stristr($sysDescr, 'Software Version VRP') || stristr($sysDescr, 'Versatile Routing Platform Software')) {
-        $os = 'vrp';
-    }
+if (str_contains($sysDescr, array('VRP (R) Software', 'VRP Software Version', 'Software Version VRP', 'Versatile Routing Platform Software'))) {
+    $os = 'vrp';
 }

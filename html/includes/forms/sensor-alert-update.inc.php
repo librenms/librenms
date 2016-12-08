@@ -11,29 +11,26 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 // FUA
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
     dbUpdate(array('sensor_custom' => 'No'), 'sensors', '`sensor_id` = ?', array($_POST['sensor_id']));
-}
-else {
+} else {
     if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id'])) {
         echo 'error with data';
         exit;
-    }
-    else {
+    } else {
         if ($_POST['state'] == 'true') {
             $state = 1;
-        }
-        else if ($_POST['state'] == 'false') {
+        } elseif ($_POST['state'] == 'false') {
             $state = 0;
-        }
-        else {
+        } else {
             $state = 0;
         }
 
@@ -41,8 +38,7 @@ else {
         if (!empty($update) || $update == '0') {
             echo 'success';
             exit;
-        }
-        else {
+        } else {
             echo 'error';
             exit;
         }

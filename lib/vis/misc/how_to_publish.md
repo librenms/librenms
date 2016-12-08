@@ -5,7 +5,7 @@ This document describes how to publish vis.js.
 
 ## Build
 
-- Change the version number of the library in both `package.json` and `bower.json`.
+- Change the version number of the library in `package.json`.
 - Open `HISTORY.md`, write down the changes, version number, and release date.
 - Build the library by running:
 
@@ -76,7 +76,7 @@ This generates the vis.js library in the folder `./dist`.
 
 - Update the library version number in the index.html page.
 
-- Update the CDN links at the download section of index.html AND the CDN link at the top.
+- Update the CDN links at the download section of index.html AND the CDN link at the top. (replace all)
 
 - Commit the changes in the `gh-pages` branch.
 
@@ -84,5 +84,5 @@ This generates the vis.js library in the folder `./dist`.
 ## Prepare next version
 
 - Switch to the `develop` branch.
-- Change version numbers in `package.json` and `bower.json` to a snapshot
+- Change version numbers in `package.json` to a snapshot
   version like `0.4.0-SNAPSHOT`.

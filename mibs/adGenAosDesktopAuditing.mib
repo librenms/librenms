@@ -1,0 +1,481 @@
+       ADTRAN-AOS-DESKTOP-AUDITING DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           TimeTicks, IpAddress, Integer32, Gauge32, Unsigned32, Counter32,
+           Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, TruthValue, DateAndTime, TimeStamp, TEXTUAL-CONVENTION
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF   
+           adIdentity
+               FROM ADTRAN-MIB
+		   adGenAOSSwitch, adGenAOSConformance
+           	   FROM ADTRAN-AOS;
+
+       adGenAOSDesktopAuditingMib MODULE-IDENTITY
+        LAST-UPDATED "200912140000Z"  -- Dec 14, 2009 / YYYYMMDDHHMMZ
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                "First Draft of ADTRAN-AOS-DESKTOP-AUDITING MIB module."
+
+        ::= { adIdentity 10000 53 4 1 }
+
+		adGenDesktopAuditing         OBJECT IDENTIFIER ::= { adGenAOSSwitch 2 }
+		adGenNapClients              OBJECT IDENTIFIER ::= { adGenDesktopAuditing 0 }
+     -- ========================================================================
+     --
+     -- adGenNapClientsTable
+     --
+     adGenNapClientsTable OBJECT-TYPE
+         SYNTAX         SEQUENCE OF AdGenNapClientsEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The NAP client table displays NAP information of NAP capable clients.  It displays information 
+            such as clients firewall, antivirus, antispyware, and security states.  "
+         ::= { adGenNapClients 1 }
+
+     adGenNapClientsEntry OBJECT-TYPE
+         SYNTAX   AdGenNapClientsEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "NAP information of the client"
+         INDEX { adNapClientMac,  adNapClientVlanId }
+         ::= { adGenNapClientsTable 1 }
+
+
+     AdGenNapClientsEntry ::=
+        SEQUENCE {
+                adNapClientMac               	DisplayString,
+                adNapClientVlanId            	Unsigned32,
+                adNapClientIp                	DisplayString,
+                adNapClientHostname          	DisplayString,
+                adNapClientSrcPortIfId       	Unsigned32,
+                adNapClientSrcPortIfType     	Unsigned32,
+                adNapServerMac               	DisplayString,
+                adNapServerIp                	DisplayString,
+                adNapCollectionMethod        	Unsigned32,
+                adNapCollectionTime          	DisplayString,
+                adNapCapableClient           	TruthValue,
+                adNapCapableServer           	TruthValue,
+                adNapClientOsVersion         	DisplayString,
+                adNapClientOsServicePk       	DisplayString,
+                adNapClientOsProcessorArc    	DisplayString,
+                adNapClientLastSecurityUpdate   DisplayString,
+                adNapClientSecurityUpdateServer DisplayString,
+                adNapClientRequiresRemediation  INTEGER,
+                adNapClientLocalPolicyViolator  TruthValue,
+                adNapClientFirewallState        INTEGER,
+                adNapClientFirewall             DisplayString,
+                adNapClientAntivirusState       INTEGER,
+                adNapClientAntivirus            DisplayString,
+                adNapClientAntispywareState     INTEGER,
+                adNapClientAntispyware          DisplayString,
+                adNapClientAutoupdateState      INTEGER,
+                adNapClientSecurityupdateState  INTEGER,
+                adNapClientSecuritySeverity     INTEGER,
+                adNapClientConnectionState      INTEGER
+     }
+
+     adNapClientMac OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients MAC address. This is unique to the Desktop Auditing MIB."
+         ::= { adGenNapClientsEntry 1 }
+
+     adNapClientVlanId OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients VLAN ID. This ID is unique to the Desktop Auditing MIB."
+         ::= { adGenNapClientsEntry 2 }
+
+     adNapClientIp OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients IP address."
+         ::= { adGenNapClientsEntry 3 }
+
+     adNapClientHostname OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients hostname." 
+         ::= { adGenNapClientsEntry 4 }
+
+     adNapClientSrcPortIfId OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients source port interface ID."
+         ::= { adGenNapClientsEntry 5 }
+
+     adNapClientSrcPortIfType OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients source port interface type."
+         ::= { adGenNapClientsEntry 6 }
+
+     adNapServerMac OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP servers MAC address."
+         ::= { adGenNapClientsEntry 7 }
+
+     adNapServerIp OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP servers IP address."
+         ::= { adGenNapClientsEntry 8 }
+
+     adNapCollectionMethod OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Method by which the NAP information is collected."
+         ::= { adGenNapClientsEntry 9 }
+
+     adNapCollectionTime OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Time when the NAP information was collected."
+         ::= { adGenNapClientsEntry 10 }
+
+     adNapCapableClient OBJECT-TYPE
+         SYNTAX         TruthValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Client is NAP capable."
+         ::= { adGenNapClientsEntry 11 }
+
+     adNapCapableServer OBJECT-TYPE
+         SYNTAX         TruthValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Server is NAP capable."
+         ::= { adGenNapClientsEntry 12 }
+
+     adNapClientOsVersion OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients OS version."
+         ::= { adGenNapClientsEntry 13 }
+
+     adNapClientOsServicePk OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients service pack."
+         ::= { adGenNapClientsEntry 14 }
+
+     adNapClientOsProcessorArc OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients processor architecture."
+         ::= { adGenNapClientsEntry 15 }
+
+     adNapClientLastSecurityUpdate OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Last time the NAP clients security was updated."
+         ::= { adGenNapClientsEntry 16 }
+
+     adNapClientSecurityUpdateServer OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients security update server."
+         ::= { adGenNapClientsEntry 17 }
+
+     adNapClientRequiresRemediation OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown (1),
+                true    (2),
+                false   (3)   
+		 }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients requires remediation."
+         ::= { adGenNapClientsEntry 18 }
+
+     adNapClientLocalPolicyViolator OBJECT-TYPE
+         SYNTAX         TruthValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients violates local policies."
+         ::= { adGenNapClientsEntry 19 }
+
+     adNapClientFirewallState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown              (1),
+                notInstalled         (2),
+                wscServiceDown       (3),   
+                wscNotStarted        (4),   
+                notEnaNotUTD         (5),
+                micsftNotEnaNotUTD   (6),
+                notEnaUTD            (7),
+                micsftNotEnaUTD      (8),
+                enaNotUTDSn          (9),
+                micsftEnaNotUTDSn    (10),
+                enaNotUTDNotSn       (11),
+                micsftEnaNotUTDNotSn (12),
+                enaUTDSn             (13),
+                micsftEnaUTDSn       (14),
+                enaUTDNotSn          (15),
+                micsftEnaUTDNotSn    (16)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients firewall state."
+         ::= { adGenNapClientsEntry 20 }
+
+     adNapClientFirewall OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients firewall."
+         ::= { adGenNapClientsEntry 21 }
+
+     adNapClientAntivirusState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown              (1),
+                notInstalled         (2),
+                wscServiceDown       (3),   
+                wscNotStarted        (4),   
+                notEnaNotUTD         (5),
+                micsftNotEnaNotUTD   (6),
+                notEnaUTD            (7),
+                micsftNotEnaUTD      (8),
+                enaNotUTDSn          (9),
+                micsftEnaNotUTDSn    (10),
+                enaNotUTDNotSn       (11),
+                micsftEnaNotUTDNotSn (12),
+                enaUTDSn             (13),
+                micsftEnaUTDSn       (14),
+                enaUTDNotSn          (15),
+                micsftEnaUTDNotSn    (16)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients antivirus state."
+         ::= { adGenNapClientsEntry 22 }
+
+     adNapClientAntivirus OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients antivirus."
+         ::= { adGenNapClientsEntry 23 }
+
+     adNapClientAntispywareState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown              (1),
+                notInstalled         (2),
+                wscServiceDown       (3),   
+                wscNotStarted        (4),   
+                notEnaNotUTD         (5),
+                micsftNotEnaNotUTD   (6),
+                notEnaUTD            (7),
+                micsftNotEnaUTD      (8),
+                enaNotUTDSn          (9),
+                micsftEnaNotUTDSn    (10),
+                enaNotUTDNotSn       (11),
+                micsftEnaNotUTDNotSn (12),
+                enaUTDSn             (13),
+                micsftEnaUTDSn       (14),
+                enaUTDNotSn          (15),
+                micsftEnaUTDNotSn    (16)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients antispyware state."
+         ::= { adGenNapClientsEntry 24 }
+
+     adNapClientAntispyware OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients antispyware."
+         ::= { adGenNapClientsEntry 25 }
+
+     adNapClientAutoupdateState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown            (1),
+                notInstalled       (2),
+                wscServiceDown     (3),   
+                wscNotStarted      (4),   
+                notEna             (5),
+                enaCkUpdateOnly    (6),
+                enaDownload        (7),
+                enaDownloadInstall (8),
+                neverConfigured    (9)
+		 }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients auto update state."
+         ::= { adGenNapClientsEntry 26 }
+
+     adNapClientSecurityupdateState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown             (1),
+                noMissingUpdate     (2),
+                missingUpdate       (3),   
+                noWUS               (4),   
+                noClientID          (5),
+                wuaServiceDisabled  (6),
+                wuaCommFailed       (7),
+                updateInsNeedReboot (8),
+                wuaNotStarted       (9)
+		 }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients security update state."
+         ::= { adGenNapClientsEntry 27 }
+
+     adNapClientSecuritySeverity OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown     (1),
+                unspecified (2),
+                low         (3),   
+                moderate    (4),   
+                important   (5),
+                critical    (6)
+		 }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients security update severity."
+         ::= { adGenNapClientsEntry 28 }
+
+     adNapClientConnectionState OBJECT-TYPE
+         SYNTAX         INTEGER {
+                unknown          (1),
+                notRestricted    (2),
+                notResMaybeLater (3),   
+                restricted       (4)   
+		 }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "NAP clients network connection state."
+         ::= { adGenNapClientsEntry 29 }
+
+-- conformance information
+
+     adGenAOSDesktopAuditingConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 10 }
+     adGenAOSDesktopAuditingGroups      OBJECT IDENTIFIER ::= { adGenAOSDesktopAuditingConformance 1 }
+     adGenAOSDesktopAuditingCompliances OBJECT IDENTIFIER ::= { adGenAOSDesktopAuditingConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+     adGenAOSDesktopAuditingFullCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 1 of the adGenAosDesktopAuditing MIB. When this MIB is implemented
+        with support for read-only, then such an implementation can claim
+        full compliance. "
+
+         MODULE  -- this module
+
+         GROUP adGenNapClientsGroup
+         DESCRIPTION
+            "A collection of NAP clients discovered in the network."
+
+         ::= { adGenAOSDesktopAuditingCompliances 1 }
+
+     -- units of conformance
+
+     adGenNapClientsGroup    OBJECT-GROUP
+         OBJECTS {  
+                adNapClientMac,
+                adNapClientVlanId,
+                adNapClientIp,
+                adNapClientHostname,
+                adNapClientSrcPortIfId,
+                adNapClientSrcPortIfType,
+                adNapServerMac,
+                adNapServerIp,
+                adNapCollectionMethod,
+                adNapCollectionTime,
+                adNapCapableClient,
+                adNapCapableServer,
+                adNapClientOsVersion,
+                adNapClientOsServicePk,
+                adNapClientOsProcessorArc,
+                adNapClientLastSecurityUpdate,
+                adNapClientSecurityUpdateServer,
+                adNapClientRequiresRemediation,
+                adNapClientLocalPolicyViolator,
+                adNapClientFirewallState,
+                adNapClientFirewall,
+                adNapClientAntivirusState,
+                adNapClientAntivirus,
+                adNapClientAntispywareState,
+                adNapClientAntispyware,
+                adNapClientAutoupdateState,
+                adNapClientSecurityupdateState,
+                adNapClientSecuritySeverity,
+                adNapClientConnectionState
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adGenNapClientGroup group contains read-only NAP information of clients
+            in the network that are NAP capable."
+         ::= { adGenAOSDesktopAuditingGroups 1 }     
+         
+	END 
+
+
+

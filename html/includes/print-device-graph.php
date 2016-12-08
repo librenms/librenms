@@ -8,8 +8,7 @@ if (empty($graph_array['device'])) {
 // FIXME not css alternating yet
 if (!is_integer($g_i / 2)) {
     $row_colour = $list_colour_a;
-}
-else {
+} else {
     $row_colour = $list_colour_b;
 }
 echo '<div class="panel panel-default">

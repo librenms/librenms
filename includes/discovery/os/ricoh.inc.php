@@ -1,7 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'RICOH Aficio')) {
-        $os = 'ricoh';
-    }
+if (str_contains($sysDescr, array('RICOH Aficio', 'RICOH Network Printer'))) {
+    $os = 'ricoh';
 }

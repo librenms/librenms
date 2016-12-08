@@ -10,8 +10,12 @@
     }
   </script>
   <input type="hidden" name="action" value="delete_bill">
-  <h3>Delete Bill</h3>
-  <hr>
+  
+  <div class="row">
+    <div class="col-md-8 col-md-push-2">
+       <div class="alert alert-danger alert-block">
+  
+  <h4>Delete Bill</h4>
   <div class="control-group">
     <label class="control-label" for="confirm"><strong>Confirm</strong></label>
     <div class="controls">
@@ -31,4 +35,8 @@
   <div class="form-actions">
     <button id="deleteBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="fa fa-trash"></i> <strong>Delete Bill</strong></button>
   </div>
+         </div>
+    </div>
+  </div>
+
 </form>

@@ -28,6 +28,7 @@ if (!empty($opts['from'])) {
 $url  = $opts['url'].'&op=pv&'.http_build_query($data);
 $curl = curl_init($url);
 
+set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 

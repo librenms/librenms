@@ -1,7 +1,5 @@
 <?php
-if (!$os) {
-    // Canon Multifunction Printer/Scanner
-    if (strstr($sysDescr, 'Canon MF')) {
-        $os = 'canonprinter';
-    }
+
+if (str_contains($sysDescr, array('Canon MF', 'Canon iR'))) {
+    $os = 'canonprinter';
 }

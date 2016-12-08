@@ -69,6 +69,14 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     }
 
     /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
      * Send the data
      *
      * @param $data
@@ -87,16 +95,9 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function query()
     {
-
         $response = $this->httpClient->get($this->parameters['url'], $this->getRequestParameters());
 
         $raw = (string) $response->getBody();
-
-        $responseJson = json_encode($raw);
-
-        if (isset($responseJson->error)) {
-            throw new Exception($responseJson->error);
-        }
 
         return new ResultSet($raw);
 
@@ -109,7 +110,14 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function isSuccess()
     {
-        return in_array($this->response->getStatusCode(), ['200', '204']);
+        $statuscode = $this->response->getStatusCode();
+
+        if(!in_array($statuscode, ['200', '204']))
+        {
+            throw new Exception('HTTP Code ' . $statuscode . ' ' . $this->response->getBody());
+        }
+
+        return true;
     }
 
     /**

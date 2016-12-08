@@ -3,7 +3,7 @@
 require 'includes/graphs/common.inc.php';
 
 // $rrd_options .= " -l 0 -E ";
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/ubnt-airfiber-mib.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib');
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Packets                Now      Min     Max\\n'";

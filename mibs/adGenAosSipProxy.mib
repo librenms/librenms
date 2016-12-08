@@ -1,0 +1,187 @@
+ADTRAN-AOS-SIP-PROXY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    NOTIFICATION-TYPE                  
+    				FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                 
+    				FROM SNMPv2-TC
+    TimeTicks                          
+    				FROM SNMPv2-SMI
+    InetAddress, InetAddressType       
+    				FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                 
+    				FROM SNMPv2-CONF
+    sysName                            		
+    				FROM SNMPv2-MIB
+    adIdentityShared
+               		FROM ADTRAN-MIB				
+    adGenAOSVoice,  adGenAOSConformance               
+    				FROM ADTRAN-AOS;
+
+adGenAOSSipProxy MODULE-IDENTITY
+    LAST-UPDATED "201305160000Z"  -- May 16, 2013
+    ORGANIZATION "ADTRAN, Inc."
+    CONTACT-INFO
+        "Technical Support Dept.
+        Postal: ADTRAN, Inc.
+        901 Explorer Blvd.
+        Huntsville, AL 35806
+
+        Tel: +1 800 726-8663
+        Fax: +1 256 963 6217
+        E-mail: support@adtran.com"
+
+    DESCRIPTION
+        "This MIB contains information regarding SIP Proxy."
+
+    REVISION    "201305160000Z"  -- May 16, 2013
+    DESCRIPTION
+        "Initial version of this MIB module."
+
+    ::= { adIdentityShared 53 5 5 }
+
+adSipProxy                      OBJECT IDENTIFIER ::= { adGenAOSVoice 5 }     
+adSipProxyTraps                 OBJECT IDENTIFIER ::= { adSipProxy 0 }
+
+--
+--  adSipProxyNotificationUtilityGroup Group
+--
+adProxyTimestamp  OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time (seconds since epoch) that a Proxy event
+         occurred and not necessarily the when the trap was sent."
+    ::= { adSipProxy 1 }
+
+     
+ adProxyRolloverFromServerInetAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of adProxyRolloverFromServerInetAddressType"
+    ::= { adSipProxy 2 }
+
+adProxyRolloverFromServerInetAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of previous active Proxy SIP Server"
+    ::= { adSipProxy 3 }
+         
+adProxyRolloverToServerInetAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of adProxyRolloverToServerInetAddressType"
+    ::= { adSipProxy 4 }
+
+adProxyRolloverToServerInetAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of new active Proxy SIP Server"
+    ::= { adSipProxy 5 }
+
+AdProxyRolloverCauseTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The transactionFailed(1) state indicates that rollover occurred because a SIP transaction failed.
+
+         The pollFailed(2) state indicates that rollover occurred because OPTIONS poll to current server failed.
+
+         The pollSucceeded(3) state indicates that rollback occurred because OPTIONS poll to failed server succeeded."
+    SYNTAX      INTEGER {
+        transactionFailed(1),
+        pollFailed(2),
+        pollSucceeded(3)
+    }
+    
+adProxyRolloverCause OBJECT-TYPE
+    SYNTAX      AdProxyRolloverCauseTC 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This field indicates which specific monitored rollover condition occurred"
+    ::= { adSipProxy 6 }
+    
+-- Traps
+
+adSipProxyRollover     NOTIFICATION-TYPE
+    OBJECTS {
+        sysName,
+        adProxyTimestamp,
+        adProxyRolloverFromServerInetAddressType,
+        adProxyRolloverFromServerInetAddress,
+        adProxyRolloverToServerInetAddressType,
+        adProxyRolloverToServerInetAddress,
+        adProxyRolloverCause        
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that a SIP Proxy Monitored Rollover occured.
+         The information about previous active server, new active server, and
+         rollover cause is included in this trap"
+    ::= { adSipProxyTraps 1 }
+
+-- conformance information
+
+adSipProxyConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 14 }
+adSipProxyGroups      OBJECT IDENTIFIER ::= { adSipProxyConformance 1 }
+adSipProxyCompliances OBJECT IDENTIFIER ::= { adSipProxyConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+adSipProxyFullCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 2 of the adGenAosSipProxy MIB. When this MIB is 
+        fully implemented, then such an implementation can claim
+        full compliance."
+
+    MODULE  -- this module
+
+    GROUP adSipProxyNotificationUtilityGroup
+    DESCRIPTION
+        "A collection of objects accessible only for notifications."
+
+    GROUP adSipProxyNotificationGroup
+    DESCRIPTION
+        "This mandatory group is used for the notification of
+         SIP registration conditions."
+    ::= { adSipProxyCompliances 1 }
+
+
+adSipProxyNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { adSipProxyRollover }
+    STATUS  current
+    DESCRIPTION
+        "This group contains notifications about SIP Proxy Monitored Rollover occurances."
+    ::= { adSipProxyGroups 1 }
+
+adSipProxyNotificationUtilityGroup OBJECT-GROUP
+    OBJECTS {
+        adProxyTimestamp,
+        adProxyRolloverFromServerInetAddressType,
+        adProxyRolloverFromServerInetAddress,
+        adProxyRolloverToServerInetAddressType,
+        adProxyRolloverToServerInetAddress,
+        adProxyRolloverCause  
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects accessible only for notifications."
+    ::= { adSipProxyGroups 2 }
+
+END

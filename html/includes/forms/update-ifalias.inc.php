@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
 */
+header('Content-type: application/json');
 
 $status  = 'error';
 
@@ -18,8 +19,6 @@ $descr = mres($_POST['descr']);
 $device_id = mres($_POST['device_id']);
 $ifName = mres($_POST['ifName']);
 $port_id = mres($_POST['port_id']);
-
-logfile($descr . ','. $device_id . ','. $ifName. ','. $port_id);
 
 if (!empty($ifName) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
@@ -31,13 +30,13 @@ if (!empty($ifName) && is_numeric($port_id)) {
         $device = device_by_id_cache($device_id);
         if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName:'.$ifName);
-        }
-        else {
+            log_event("$ifName Port ifAlias cleared manually", $device, 'interface', $port_id);
+        } else {
             set_dev_attrib($device, 'ifName:'.$ifName, 1);
+            log_event("$ifName Port ifAlias set manually: $descr", $device, 'interface', $port_id);
         }
         $status = 'ok';
-    }
-    else {
+    } else {
         $status = 'na';
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-// Very basic parser to parse classic Observium-type schemes.
 // Parser should populate $port_ifAlias array with type, descr, circuit, speed and notes
 unset($port_ifAlias);
 

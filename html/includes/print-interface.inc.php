@@ -10,12 +10,10 @@ $port = ifLabel($port);
 
 if ($int_colour) {
     $row_colour = $int_colour;
-}
-else {
+} else {
     if (!is_integer($i / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 }
@@ -24,28 +22,25 @@ $port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', array(
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", 'port_errors');
-}
-else {
+} else {
     $error_img = '';
 }
 
 if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', array($port['port_id']))) {
     $mac = "<a href='".generate_port_url($port, array('view' => 'macaccounting'))."'><img src='images/16/chart_curve.png' align='absmiddle'></a>";
-}
-else {
+} else {
     $mac = '';
 }
 
 echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
-    <td valign=top width=350 onclick=\"location.href='".generate_port_url($port)."'\">";
+    <td valign=top width=350>";
 
 // Don't echo out ports ifIndex if it's a NOS device since their ifIndex is, for lack of better words....different
 if ($device['os'] == 'nos') {
     echo '        <span class=list-large>
         '.generate_port_link($port, $port['label'])." $error_img $mac
         </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
-}
-else {
+} else {
     echo '        <span class=list-large>
     '.generate_port_link($port, $port['ifIndex'].'. '.$port['label'])." $error_img $mac
     </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
@@ -104,38 +99,32 @@ echo '<br />';
 
 if ($port[ifDuplex] != 'unknown') {
     echo '<span class=box-desc>'.$port['ifDuplex'].'</span>';
-}
-else {
+} else {
     echo '-';
 }
 
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    if ($port['ifTrunk']) {
-        echo '<p class=box-desc><span class=purple><a title="';
-        $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` ='".$port['port_id']."' and PV.`device_id` = '".$device['device_id']."' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
-        foreach ($vlans as $vlan) {
-            if ($vlan['state'] == 'blocking') {
-                $class = 'red';
-            }
-            else if ($vlan['state'] == 'forwarding') {
-                $class = 'green';
-            }
-            else {
-                $class = 'none';
-            }
+$vlans = dbFetchColumn(
+    'SELECT vlan FROM `ports_vlans` AS PV, vlans AS V ' .
+    'WHERE PV.`port_id`=? AND PV.`device_id`=? AND V.`vlan_vlan`=PV.vlan AND V.device_id = PV.device_id',
+    array($port['port_id'], $device['device_id'])
+);
+$vlan_count = count($vlans);
 
-            echo '<b class='.$class.'>'.$vlan['vlan'].'</b> '.$vlan['vlan_descr'].'<br />';
-        }
-
-        echo '">'.$port['ifTrunk'].'</a></span></p>';
-    }
-    else if ($port['ifVlan']) {
-        echo '<p class=box-desc><span class=blue>VLAN '.$port['ifVlan'].'</span></p>';
-    }
-    else if ($port['ifVrf']) {
-        $vrf = dbFetchRow('SELECT * FROM vrfs WHERE vrf_id = ?', array($port['ifVrf']));
-        echo "<p style='color: green;'>".$vrf['vrf_name'].'</p>';
-    }//end if
+if ($vlan_count > 1) {
+    echo '<p class=box-desc><span class=purple><a href="';
+    echo generate_device_url($device, array('tab' => 'vlans'));
+    echo '" title="';
+    echo implode(', ', $vlans);
+    echo '">VLANs: ';
+    echo $vlan_count;
+    echo '</a></span></p>';
+} elseif ($vlan_count == 1 || $port['ifVlan']) {
+    echo '<p class=box-desc><span class=blue>VLAN: ';
+    echo ($vlans[0] ?: $port['ifVlan']);
+    echo '</span></p>';
+} elseif ($port['ifVrf']) {
+    $vrf = dbFetchRow('SELECT * FROM vrfs WHERE vrf_id = ?', array($port['ifVrf']));
+    echo "<p style='color: green;'>".$vrf['vrf_name'].'</p>';
 }//end if
 
 if ($port_adsl['adslLineCoding']) {
@@ -149,37 +138,32 @@ if ($port_adsl['adslLineCoding']) {
     echo 'Atten:'.$port_adsl['adslAtucCurrAtn'].'dB/'.$port_adsl['adslAturCurrAtn'].'dB';
     echo '<br />';
     echo 'SNR:'.$port_adsl['adslAtucCurrSnrMgn'].'dB/'.$port_adsl['adslAturCurrSnrMgn'].'dB';
-}
-else {
+} else {
     echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
         echo '<span class=box-desc>'.fixiftype($port['ifType']).'</span>';
-    }
-    else {
+    } else {
         echo '-';
     }
 
     echo '<br />';
     if ($ifHardType && $ifHardType != '') {
         echo '<span class=box-desc>'.$ifHardType.'</span>';
-    }
-    else {
+    } else {
         echo '-';
     }
 
     echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != '') {
         echo '<span class=box-desc>'.formatMac($port['ifPhysAddress']).'</span>';
-    }
-    else {
+    } else {
         echo '-';
     }
 
     echo '<br />';
     if ($port['ifMtu'] && $port['ifMtu'] != '') {
         echo '<span class=box-desc>MTU '.$port['ifMtu'].'</span>';
-    }
-    else {
+    } else {
         echo '-';
     }
 }//end if
@@ -195,7 +179,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
         // $br = "<br />";
         $int_links[$link['port_id']]      = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
-	$nbLinks++;
+        $nbLinks++;
     }
 
     unset($br);
@@ -246,29 +230,26 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
         }//end foreach
     }//end if
 
-    if(count($int_links) > 3)
-    {
-       echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
+    if (count($int_links) > 3) {
+        echo '<div class="collapse-neighbors"><i class="neighbors-button fa fa-plus" aria-hidden="true"></i>
                <span class="neighbors-interface-list-firsts" style="display: inline;">';
     }
 
 
-    if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link,$device['device_id'])) {
+    if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link, $device['device_id'])) {
         foreach ($int_links as $int_link) {
             $neighborsCount++;
-            if($neighborsCount == 4)
-	    {
-		echo '<span class="neighbors-list-continued" style="display: inline;"></br>[...]</span>';
-		echo '</span>';
-         	echo '<span class="neighbors-interface-list" style="display: none;">';
+            if ($neighborsCount == 4) {
+                echo '<span class="neighbors-list-continued" style="display: inline;"></br>[...]</span>';
+                echo '</span>';
+                echo '<span class="neighbors-interface-list" style="display: none;">';
             }
             $link_if = dbFetchRow('SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.port_id = ?', array($int_link));
             echo "$br";
 
             if ($int_links_phys[$int_link]) {
                 echo "<img align=absmiddle src='images/16/connect.png'> ";
-            }
-            else {
+            } else {
                 echo "<img align=absmiddle src='images/16/bullet_go.png'> ";
             }
 
@@ -330,18 +311,16 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
-if($nbLinks > 3)
-{
-echo '</span></div>';
+if ($nbLinks > 3) {
+    echo '</span></div>';
 }
 echo '</td></tr>';
 
 // If we're showing graphs, generate the graph and print the img tags
 if ($graph_type == 'etherlike') {
-    $graph_file = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($port['ifIndex']).'-dot3.rrd';
-}
-else {
-    $graph_file = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($port['ifIndex']).'.rrd';
+    $graph_file = get_port_rrdfile_path($device['hostname'], $if_id, 'dot3');
+} else {
+    $graph_file = get_port_rrdfile_path($device['hostname'], $if_id);
 }
 
 if ($graph_type && is_file($graph_file)) {

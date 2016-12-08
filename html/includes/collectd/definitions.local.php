@@ -16,37 +16,40 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-function load_graph_definitions_local($logarithmic = false, $tinylegend = false) {
-	global $GraphDefs, $MetaGraphDefs;
+function load_graph_definitions_local($logarithmic = false, $tinylegend = false)
+{
+    global $GraphDefs, $MetaGraphDefs;
 
-	// Define 1-rrd Graph definitions here
-	$GraphDefs['local_type'] = array(
-		'-v', 'Commits',
-		'DEF:avg={file}:value:AVERAGE',
-		'DEF:min={file}:value:MIN',
-		'DEF:max={file}:value:MAX',
-		"AREA:max#B7B7F7",
-		"AREA:min#FFFFFF",
-		"LINE1:avg#0000FF:Commits",
-		'GPRINT:min:MIN:%6.1lf Min,',
-		'GPRINT:avg:AVERAGE:%6.1lf Avg,',
-		'GPRINT:max:MAX:%6.1lf Max,',
-		'GPRINT:avg:LAST:%6.1lf Last\l');
+    // Define 1-rrd Graph definitions here
+    $GraphDefs['local_type'] = array(
+        '-v', 'Commits',
+        'DEF:avg={file}:value:AVERAGE',
+        'DEF:min={file}:value:MIN',
+        'DEF:max={file}:value:MAX',
+        "AREA:max#B7B7F7",
+        "AREA:min#FFFFFF",
+        "LINE1:avg#0000FF:Commits",
+        'GPRINT:min:MIN:%6.1lf Min,',
+        'GPRINT:avg:AVERAGE:%6.1lf Avg,',
+        'GPRINT:max:MAX:%6.1lf Max,',
+        'GPRINT:avg:LAST:%6.1lf Last\l');
 
-	// Define MetaGraph definition type -> function mappings here
-	$MetaGraphDefs['local_meta'] = 'meta_graph_local';
+    // Define MetaGraph definition type -> function mappings here
+    $MetaGraphDefs['local_meta'] = 'meta_graph_local';
 }
 
-function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instances, $opts = array()) {
-	global $config;
-	$sources = array();
+function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instances, $opts = array())
+{
+    global $config;
+    $sources = array();
 
-	$title = "$host/$plugin".(!is_null($plugin_instance) ? "-$plugin_instance" : '')."/$type";
-	if (!isset($opts['title']))
-		$opts['title'] = $title;
-	$opts['rrd_opts'] = array('-v', 'Events');
+    $title = "$host/$plugin".(!is_null($plugin_instance) ? "-$plugin_instance" : '')."/$type";
+    if (!isset($opts['title'])) {
+        $opts['title'] = $title;
+    }
+    $opts['rrd_opts'] = array('-v', 'Events');
 
-	$files = array();
+    $files = array();
 /*	$opts['colors'] = array(
 		'ham'     => '00e000',
 		'spam'    => '0000ff',
@@ -59,19 +62,21 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
 	);
 
 	$type_instances = array('ham', 'spam', 'malware',  'sent', 'deferred', 'reject', 'bounced'); */
-	foreach ($type_instances as $inst) {
-		$file  = '';
-		foreach ($config['datadirs'] as $datadir)
-			if (is_file($datadir.'/'.$title.'-'.$inst.'.rrd')) {
-				$file = $datadir.'/'.$title.'-'.$inst.'.rrd';
-				break;
-			}
-		if ($file == '')
-			continue;
+    foreach ($type_instances as $inst) {
+        $file  = '';
+        foreach ($config['datadirs'] as $datadir) {
+            if (is_file($datadir.'/'.$title.'-'.$inst.'.rrd')) {
+                $file = $datadir.'/'.$title.'-'.$inst.'.rrd';
+                break;
+            }
+        }
+        if ($file == '') {
+            continue;
+        }
 
-		$sources[] = array('name'=>$inst, 'file'=>$file);
-	}
+        $sources[] = array('name'=>$inst, 'file'=>$file);
+    }
 
 //	return collectd_draw_meta_stack($opts, $sources);
-	return collectd_draw_meta_line($opts, $sources);
+    return collectd_draw_meta_line($opts, $sources);
 }

@@ -47,7 +47,7 @@ if (is_module_enabled('poller', 'mib')) {
                 view: '<?php echo $vars['view']; ?>'
             };
         },
-        url: "/ajax_table.php",
+        url: "ajax_table.php",
         formatters: {
         },
         templates: {
@@ -55,7 +55,6 @@ if (is_module_enabled('poller', 'mib')) {
     });
 </script>
 <?php
-}
-else {
+} else {
     print_mib_poller_disabled();
 }

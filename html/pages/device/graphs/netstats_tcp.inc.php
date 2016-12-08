@@ -1,6 +1,6 @@
 <?php
 
-if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/netstats-tcp.rrd')) {
+if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'netstats-tcp'))) {
     $graph_title = 'TCP Statistics';
     $graph_type  = 'device_tcp';
 

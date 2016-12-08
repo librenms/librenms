@@ -10,8 +10,7 @@ foreach ($rrd_filenames as $key => $rrd_filename) {
     if ($rrd_inverted[$key]) {
         $in  = 'out';
         $out = 'in';
-    }
-    else {
+    } else {
         $in  = 'in';
         $out = 'out';
     }
@@ -43,8 +42,7 @@ if ($i) {
     if ($inverse) {
         $in  = 'out';
         $out = 'in';
-    }
-    else {
+    } else {
         $in  = 'in';
         $out = 'out';
     }
@@ -76,8 +74,7 @@ if ($i) {
         $rrd_options .= ' LINE1.25:inbits#'.$colour_line_in.':';
         $rrd_options .= ' AREA:doutbits#'.$colour_area_out.':';
         $rrd_options .= ' LINE1.25:doutbits#'.$colour_line_out.':';
-    }
-    else {
+    } else {
         $rrd_options .= ' AREA:inbits#'.$colour_area_in.':';
         $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
         $rrd_options .= ' LINE1.25:inbits#'.$colour_line_in.':In\ ';

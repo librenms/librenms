@@ -18,8 +18,7 @@ if (strpos($_SERVER['PATH_INFO'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -27,13 +26,8 @@ else {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/vars.inc.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $report = mres($vars['report']);
 if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
@@ -43,11 +37,10 @@ if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
     }
 
     $csv = array();
-    include_once "includes/reports/$report.csv.inc.php";
+    require $config['install_dir'] . "/html/includes/reports/$report.csv.inc.php";
     foreach ($csv as $line) {
         echo implode(',', $line)."\n";
     }
-}
-else {
+} else {
     echo "Report not found.\n";
 }

@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = true;
+
 $pagetitle[] = 'Search';
 
 $sections = array(
@@ -44,7 +46,6 @@ print_optionbar_end('', '');
 
 if (file_exists('pages/search/'.$vars['search'].'.inc.php')) {
     include 'pages/search/'.$vars['search'].'.inc.php';
-}
-else {
+} else {
     echo report_this('Unknown search type '.$vars['search']);
 }

@@ -2,28 +2,22 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage syslog
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
 
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require_once 'includes/syslog.php';
-require_once 'includes/dbFacile.php';
-require_once 'includes/common.php';
-require_once 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $i = "1";
 
-$s = fopen('php://stdin','r');
+$s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
     #logfile($line);
     list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));

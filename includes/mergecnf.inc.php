@@ -25,7 +25,28 @@
  */
 
 
-function mergecnf($obj) {
+/**
+ * merge the database config with the global config
+ * Global config overrides db
+ */
+function mergedb()
+{
+    global $config;
+
+    $clone = $config;
+    foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
+        $clone = array_replace_recursive($clone, mergecnf($obj));
+    }
+    $config = array_replace_recursive($clone, $config);
+}
+
+
+/**
+ * @param $obj
+ * @return array
+ */
+function mergecnf($obj)
+{
     $pointer = array();
     $val     = $obj['config_value'];
     $obj     = $obj['config_name'];
@@ -33,25 +54,20 @@ function mergecnf($obj) {
     if (!isset($obj[1])) {
         if (filter_var($val, FILTER_VALIDATE_INT)) {
             $val = (int) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
+        } elseif (filter_var($val, FILTER_VALIDATE_FLOAT)) {
             $val = (float) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
+        } elseif (filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
             $val = filter_var($val, FILTER_VALIDATE_BOOLEAN);
         }
 
         if (!empty($obj[0])) {
             return array($obj[0] => $val);
-        }
-        else {
+        } else {
             return array($val);
         }
-    }
-    else {
+    } else {
         $pointer[$obj[0]] = mergecnf(array('config_name' => $obj[1], 'config_value' => $val));
     }
 
     return $pointer;
-
 }//end mergecnf()

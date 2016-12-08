@@ -1,0 +1,2033 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-FILTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, MacAddress, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdFilter MODULE-IDENTITY
+
+    LAST-UPDATED "201110100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Filter database for this Accedian Networks device."
+
+    REVISION "201110100100Z"        -- 10 October 2011
+    DESCRIPTION
+            "Add acdSmapL2FilterTableLastChangeTid and
+             acdSmapIPv4FilterTableLastChangeTid.
+             
+             Deprecated acdL2FilterTable and acdIPv4FilterTable tables."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Add compliance section."
+
+    REVISION "200805010100Z"        -- 1 May 2008
+    DESCRIPTION
+            "Add SMAP filter tables and RowStatus in acdL2FilterTable and
+             acdIPv4FilterTable tables."
+
+    REVISION "200608060100Z"        -- 6 Aug 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-FILTER-MIB."
+
+    ::= { acdMibs 2 }
+
+acdFilterNotifications   OBJECT IDENTIFIER ::= { acdFilter 5 }
+acdFilterMIBObjects      OBJECT IDENTIFIER ::= { acdFilter 6 }
+acdFilterConformance     OBJECT IDENTIFIER ::= { acdFilter 7 }
+
+acdFilterTableTid        OBJECT IDENTIFIER ::= { acdFilterMIBObjects 1 }
+
+---------------------------------------------------------------------------
+-- Textual conventions
+---------------------------------------------------------------------------
+
+AcdFilterOperator ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Operator for field comparaison. Valid operator types are:
+        Greater than, Less than, Equal to or Range (inclusive range)."
+    SYNTAX      INTEGER {
+                    lessThan(1),
+                    greaterThan(2),
+                    equalTo(3),
+                    range(4)
+    }
+
+AcdFilterVlanType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "."
+    SYNTAX      INTEGER {
+                    cvlan(1),
+                    svlan(2),
+                    both(3)
+    }
+---------------------------------------------------------------------------
+ -- The L2 table
+ -- This table contains all Layer 2 Filters.
+---------------------------------------------------------------------------
+
+acdL2FilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdL2FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of all Layer 2 filters"
+    ::= { acdFilter 1 }
+
+acdL2FilterEntry OBJECT-TYPE
+    SYNTAX      AcdL2FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Filter is a pattern matching a definition against packets."
+    INDEX   { acdL2FilterID }
+    ::=  { acdL2FilterTable 1 }
+
+
+AcdL2FilterEntry ::= SEQUENCE {
+    acdL2FilterID               Unsigned32,
+    acdL2FilterName             DisplayString,
+    acdL2FilterMacDstEn         TruthValue,
+    acdL2FilterMacDst           MacAddress,
+    acdL2FilterMacDstMask       Unsigned32,
+    acdL2FilterMacSrcEn         TruthValue,
+    acdL2FilterMacSrc           MacAddress,
+    acdL2FilterMacSrcMask       Unsigned32,
+    acdL2FilterEtypeEn          TruthValue,
+    acdL2FilterEtype            Unsigned32,
+    acdL2FilterVlan1PriorEn     TruthValue,
+    acdL2FilterVlan1Prior       Unsigned32,
+    acdL2FilterVlan1CfiEn       TruthValue,
+    acdL2FilterVlan1Cfi         Unsigned32,
+    acdL2FilterVlan1IdEn        TruthValue,
+    acdL2FilterVlan1Id          Unsigned32,
+    acdL2FilterVlan2PriorEn     TruthValue,
+    acdL2FilterVlan2Prior       Unsigned32,
+    acdL2FilterVlan2CfiEn       TruthValue,
+    acdL2FilterVlan2Cfi         Unsigned32,
+    acdL2FilterVlan2IdEn        TruthValue,
+    acdL2FilterVlan2Id          Unsigned32,
+    acdL2FilterRowStatus        RowStatus
+}
+
+acdL2FilterID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each filter. Its value ranges from 1 to maximum
+         value. This maximum  value depend of the type of platform."
+   ::= { acdL2FilterEntry 1 }
+
+acdL2FilterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the filter."
+    ::= { acdL2FilterEntry 2 }
+
+acdL2FilterMacDstEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the destination MAC address check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 3 }
+
+acdL2FilterMacDst OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used to compare the incoming traffic."
+    DEFVAL { '000000000000'H }
+    ::= { acdL2FilterEntry 4 }
+
+acdL2FilterMacDstMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..48)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of destination MAC address bits to compare. Its value ranges
+         from 0 to 48. Only specific mask are valid per platform."
+    DEFVAL      { 48 }
+    ::= { acdL2FilterEntry 5 }
+
+acdL2FilterMacSrcEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the source MAC address check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 6 }
+
+acdL2FilterMacSrc OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address used to compare the incoming traffic."
+    DEFVAL { '000000000000'H }
+    ::= { acdL2FilterEntry 7 }
+
+acdL2FilterMacSrcMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..48)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of source MAC address bits to compare. Its value ranges
+         from 0 to 48. Only specific mask are valid per platform."
+    DEFVAL      { 48 }
+    ::= { acdL2FilterEntry 8 }
+
+acdL2FilterEtypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Ethernet type check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 9 }
+
+acdL2FilterEtype OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Ethernet type used to compare the incoming traffic."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 10 }
+
+acdL2FilterVlan1PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 11 }
+
+acdL2FilterVlan1Prior OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 12 }
+
+acdL2FilterVlan1CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 13 }
+
+acdL2FilterVlan1Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN CFI used to compare the incoming traffic.
+         Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 14 }
+
+acdL2FilterVlan1IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 15 }
+
+acdL2FilterVlan1Id OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 16 }
+
+acdL2FilterVlan2PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 17 }
+
+acdL2FilterVlan2Prior OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 18 }
+
+acdL2FilterVlan2CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 19 }
+
+acdL2FilterVlan2Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN CFI used to compare the incoming traffic.
+         Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 20 }
+
+acdL2FilterVlan2IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdL2FilterEntry 21 }
+
+acdL2FilterVlan2Id OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4065)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdL2FilterEntry 22 }
+
+acdL2FilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new filter you shall provide the a unique filter name for
+        an empty row with the RowStatus set to Create and Go. To delete the
+        row you need to set the RowStatus to destroy."
+    ::= { acdL2FilterEntry 23 }
+
+---------------------------------------------------------------------------
+ -- The IPv4 table
+ -- This table contains all IPv4 Filters.
+---------------------------------------------------------------------------
+
+acdIPv4FilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdIPv4FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of all IPv4 filters"
+    ::= { acdFilter 2 }
+
+acdIPv4FilterEntry OBJECT-TYPE
+    SYNTAX      AcdIPv4FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Filter is a pattern matching a definition against packets."
+    INDEX   { acdIPv4FilterID }
+    ::=  { acdIPv4FilterTable 1 }
+
+AcdIPv4FilterEntry ::= SEQUENCE {
+    acdIPv4FilterID             Unsigned32,
+    acdIPv4FilterName           DisplayString,
+    acdIPv4FilterSrcEn          TruthValue,
+    acdIPv4FilterSrc            IpAddress,
+    acdIPv4FilterSrcMask        IpAddress,
+    acdIPv4FilterDstEn          TruthValue,
+    acdIPv4FilterDst            IpAddress,
+    acdIPv4FilterDstMask        IpAddress,
+    acdIPv4FilterProtoEn        TruthValue,
+    acdIPv4FilterProto          Unsigned32,
+    acdIPv4FilterTTLEn          TruthValue,
+    acdIPv4FilterTTL            Unsigned32,
+    acdIPv4FilterIHLEn          TruthValue,
+    acdIPv4FilterIHL            Unsigned32,
+    acdIPv4FilterDscpEn         TruthValue,
+    acdIPv4FilterDscp           Unsigned32,
+    acdIPv4FilterECNEn          TruthValue,
+    acdIPv4FilterECN            Unsigned32,
+    acdIPv4FilterSrcPortEn      TruthValue,
+    acdIPv4FilterSrcPort        Unsigned32,
+    acdIPv4FilterDstPortEn      TruthValue,
+    acdIPv4FilterDstPort        Unsigned32,
+    acdIPv4FilterIcmpTypeEn     TruthValue,
+    acdIPv4FilterIcmpType       Unsigned32,
+    acdIPv4FilterIcmpCodeEn     TruthValue,
+    acdIPv4FilterIcmpCode       Unsigned32,
+    acdIPv4FilterRowStatus      RowStatus
+}
+
+acdIPv4FilterID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each filter. Its value ranges from 1 to maximum
+         value. This maximum  value depend of the type of platform."
+   ::= { acdIPv4FilterEntry 1 }
+
+acdIPv4FilterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the filter."
+    ::= { acdIPv4FilterEntry 2 }
+
+acdIPv4FilterSrcEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Source IP address check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 3 }
+
+acdIPv4FilterSrc OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source IP address used to compare the incoming traffic."
+    DEFVAL { '00000000'H }      -- 0.0.0.0
+    ::= { acdIPv4FilterEntry 4 }
+
+acdIPv4FilterSrcMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source IP address mask used to compare the incoming traffic."
+    DEFVAL { 'FFFFFFFF'H }      -- 255.255.255.255
+    ::= { acdIPv4FilterEntry 5 }
+ 
+acdIPv4FilterDstEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Destination IP address check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 6 }
+
+acdIPv4FilterDst OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address used to compare the incoming traffic."
+    DEFVAL { '00000000'H }      -- 0.0.0.0
+    ::= { acdIPv4FilterEntry 7 }
+
+acdIPv4FilterDstMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address mask used to compare the incoming
+         traffic."
+    DEFVAL { 'FFFFFFFF'H }      -- 255.255.255.255
+    ::= { acdIPv4FilterEntry 8 }
+
+acdIPv4FilterProtoEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the IP protocol check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 9 }
+
+acdIPv4FilterProto OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP protocol used to compare the incoming traffic. Its value
+         ranges from 0 to 255."
+    DEFVAL      { 1 }
+    ::= { acdIPv4FilterEntry 10 }
+
+acdIPv4FilterTTLEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the TTL check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 11 }
+
+acdIPv4FilterTTL OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The TTL used to compare the incoming traffic.
+         Its value ranges from 0 to 255."
+    DEFVAL      { 255 }
+    ::= { acdIPv4FilterEntry 12 }
+
+acdIPv4FilterIHLEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the IP Header Length check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 13 }
+
+acdIPv4FilterIHL OBJECT-TYPE
+    SYNTAX      Unsigned32  (5..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP Header Length used to compare the incoming traffic.
+         Its value ranges from 5 to 15."
+    DEFVAL      { 5 }
+    ::= { acdIPv4FilterEntry 14 }
+
+acdIPv4FilterDscpEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the DSCP (Diff-Serv Code Point) check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 15 }
+
+acdIPv4FilterDscp OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value used to compare the incoming traffic.
+         Its value ranges from 0 to 63."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 16 }
+
+acdIPv4FilterECNEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ECN (Explicite Cogestion Notification) check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 17 }
+
+acdIPv4FilterECN OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ECN value used to compare the incoming traffic.
+         Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 18 }
+
+acdIPv4FilterSrcPortEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the UDP/TCP Source port check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 19 }
+
+acdIPv4FilterSrcPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The UDP/TCP Source Port used to compare the incoming traffic.
+         Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 20 }
+
+acdIPv4FilterDstPortEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the UDP/TCP Destination port check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 21 }
+
+acdIPv4FilterDstPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The UDP/TCP Destination Port used to compare the incoming traffic.
+         Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 22 }
+
+acdIPv4FilterIcmpTypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ICMP type check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 23 }
+
+acdIPv4FilterIcmpType OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ICMP type used to compare the incoming traffic.
+         Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 24 }
+
+acdIPv4FilterIcmpCodeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ICMP code check."
+    DEFVAL      { false }
+    ::= { acdIPv4FilterEntry 25 }
+
+acdIPv4FilterIcmpCode OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ICMP code used to compare the incoming traffic.
+         Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdIPv4FilterEntry 26 }
+
+acdIPv4FilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new filter you shall provide the a unique filter name for
+        an empty row with the RowStatus set to Create and Go. To delete the
+        row you need to set the RowStatus to destroy."
+    ::= { acdIPv4FilterEntry 27 }
+
+-----------------------------------------------------------------------
+ -- The service mapping (SMAP) L2 table
+ -- This table contains all SMAP Layer 2 Filters.
+---------------------------------------------------------------------------
+
+acdSmapL2FilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapL2FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of all service mapping (SMAP) Layer 2 filters"
+    ::= { acdFilter 3 }
+
+acdSmapL2FilterEntry OBJECT-TYPE
+    SYNTAX      AcdSmapL2FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Filter is a pattern matching a definition against packets."
+    INDEX   { acdSmapL2FilterID }
+    ::=  { acdSmapL2FilterTable 1 }
+
+
+AcdSmapL2FilterEntry ::= SEQUENCE {
+    acdSmapL2FilterID                Unsigned32,
+    acdSmapL2FilterName              DisplayString,
+    acdSmapL2FilterRowStatus         RowStatus,
+    acdSmapL2FilterVlan1PriorEn      TruthValue,
+    acdSmapL2FilterVlan1Prior        Unsigned32,
+    acdSmapL2FilterVlan1PriorLast    Unsigned32,
+    acdSmapL2FilterVlan1PriorOper    AcdFilterOperator,
+    acdSmapL2FilterVlan1IdEn         TruthValue,
+    acdSmapL2FilterVlan1Id           Unsigned32,
+    acdSmapL2FilterVlan1IdLast       Unsigned32,
+    acdSmapL2FilterVlan1IdOper       AcdFilterOperator,
+    acdSmapL2FilterVlan1CfiEn        TruthValue,
+    acdSmapL2FilterVlan1Cfi          Unsigned32,
+    acdSmapL2FilterVlan1TypeEn       TruthValue,
+    acdSmapL2FilterVlan1Type         AcdFilterVlanType,
+    acdSmapL2FilterVlan2PriorEn      TruthValue,
+    acdSmapL2FilterVlan2Prior        Unsigned32,
+    acdSmapL2FilterVlan2PriorLast    Unsigned32,
+    acdSmapL2FilterVlan2PriorOper    AcdFilterOperator,
+    acdSmapL2FilterVlan2IdEn         TruthValue,
+    acdSmapL2FilterVlan2Id           Unsigned32,
+    acdSmapL2FilterVlan2IdLast       Unsigned32,
+    acdSmapL2FilterVlan2IdOper       AcdFilterOperator,
+    acdSmapL2FilterVlan2CfiEn        TruthValue,
+    acdSmapL2FilterVlan2Cfi          Unsigned32,
+    acdSmapL2FilterVlan2TypeEn       TruthValue,
+    acdSmapL2FilterVlan2Type         AcdFilterVlanType,
+    acdSmapL2FilterMacDstEn          TruthValue,
+    acdSmapL2FilterMacDst            MacAddress,
+    acdSmapL2FilterMacDstMask        Unsigned32,
+    acdSmapL2FilterMacSrcEn          TruthValue,
+    acdSmapL2FilterMacSrc            MacAddress,
+    acdSmapL2FilterMacSrcMask        Unsigned32,
+    acdSmapL2FilterEtypeEn           TruthValue,
+    acdSmapL2FilterEtype             Unsigned32,
+    acdSmapL2FilterIpCosEn           TruthValue,
+    acdSmapL2FilterIpCosMode         INTEGER,
+    acdSmapL2FilterDscp              Unsigned32,
+    acdSmapL2FilterDscpLast          Unsigned32,
+    acdSmapL2FilterDscpOper          AcdFilterOperator,
+    acdSmapL2FilterPre               Unsigned32,
+    acdSmapL2FilterPreLast           Unsigned32,
+    acdSmapL2FilterPreOper           AcdFilterOperator
+}
+
+acdSmapL2FilterID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each filter. Its value ranges from 1 to maximum
+         value. This maximum  value depend of the type of platform."
+   ::= { acdSmapL2FilterEntry 1 }
+
+acdSmapL2FilterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the filter."
+    ::= { acdSmapL2FilterEntry 2 }
+
+acdSmapL2FilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new filter you shall provide the a unique filter name for
+        an empty row with the RowStatus set to Create and Go. To delete the
+        row you need to set the RowStatus to destroy."
+    ::= { acdSmapL2FilterEntry 3 }
+
+acdSmapL2FilterVlan1PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 4 }
+
+acdSmapL2FilterVlan1Prior OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 5 }
+
+acdSmapL2FilterVlan1PriorLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN priority last value, used in range operation.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 6 }
+
+acdSmapL2FilterVlan1PriorOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN Priority operator. Valid operator types are:
+         Greater than, Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 7 }
+
+acdSmapL2FilterVlan1IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 8 }
+
+acdSmapL2FilterVlan1Id OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 9 }
+
+acdSmapL2FilterVlan1IdLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN ID last value, used in range operation.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 10 }
+
+acdSmapL2FilterVlan1IdOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN ID operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 11 }
+
+acdSmapL2FilterVlan1CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 12 }
+
+acdSmapL2FilterVlan1Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN CFI used to compare the incoming traffic.
+         Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 13 }
+
+acdSmapL2FilterVlan1TypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN Ethertype check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 14 }
+
+acdSmapL2FilterVlan1Type OBJECT-TYPE
+    SYNTAX      AcdFilterVlanType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN Ethernet type."
+    DEFVAL      { cvlan }
+    ::= { acdSmapL2FilterEntry 15 }
+
+acdSmapL2FilterVlan2PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 16 }
+
+acdSmapL2FilterVlan2Prior OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 17 }
+
+acdSmapL2FilterVlan2PriorLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second VLAN priority last value, used in range operation.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 18 }
+
+acdSmapL2FilterVlan2PriorOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VLAN Priority operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 19 }
+
+acdSmapL2FilterVlan2IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 20 }
+
+acdSmapL2FilterVlan2Id OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 21 }
+
+acdSmapL2FilterVlan2IdLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second VLAN ID last value, used in range operation.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 22 }
+
+acdSmapL2FilterVlan2IdOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second VLAN ID operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 23 }
+
+acdSmapL2FilterVlan2CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 24 }
+
+acdSmapL2FilterVlan2Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The second VLAN CFI used to compare the incoming traffic.
+             Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 25 }
+
+acdSmapL2FilterVlan2TypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN Ethertype check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 26 }
+
+acdSmapL2FilterVlan2Type OBJECT-TYPE
+    SYNTAX      AcdFilterVlanType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN Ethernet type."
+    DEFVAL      { cvlan }
+    ::= { acdSmapL2FilterEntry 27 }
+
+acdSmapL2FilterMacDstEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the destination MAC address check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 28 }
+
+acdSmapL2FilterMacDst OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used to compare the incoming traffic."
+    DEFVAL { '000000000000'H }
+    ::= { acdSmapL2FilterEntry 29 }
+
+acdSmapL2FilterMacDstMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of destination MAC address bits to compare. Its value ranges
+         from 0 to 48."
+    DEFVAL      { 48 }
+    ::= { acdSmapL2FilterEntry 30 }
+
+acdSmapL2FilterMacSrcEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the source MAC address check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 31 }
+
+acdSmapL2FilterMacSrc OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address used to compare the incoming traffic."
+    DEFVAL { '000000000000'H }
+    ::= { acdSmapL2FilterEntry 32 }
+
+acdSmapL2FilterMacSrcMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of source MAC address bits to compare. Its value ranges
+         from 0 to 48."
+    DEFVAL      { 48 }
+    ::= { acdSmapL2FilterEntry 33 }
+
+acdSmapL2FilterEtypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Ethernet type check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 34 }
+
+acdSmapL2FilterEtype OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The Ethernet type used to compare the incoming traffic."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 35 }
+
+acdSmapL2FilterIpCosEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Ethernet type check."
+    DEFVAL      { false }
+    ::= { acdSmapL2FilterEntry 36 }
+
+acdSmapL2FilterIpCosMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dscp(1),
+                    pre(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN ID operator. Valid operator types are: Greater than, Less than,
+            Equal to or Range (inclusive range)."
+    DEFVAL      { dscp }
+    ::= { acdSmapL2FilterEntry 37 }
+
+acdSmapL2FilterDscp OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The DSCP value used to compare the incoming traffic.
+             Its value ranges from 0 to 63."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 38 }
+
+acdSmapL2FilterDscpLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The last DSCP value, used in range operation.
+             Its value ranges from 0 to 63."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 39 }
+
+acdSmapL2FilterDscpOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "DSCP operator. Valid operator types are: Greater than,
+            Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 40 }
+
+acdSmapL2FilterPre OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The  Precedence value used to compare the incoming traffic.
+             Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 41 }
+
+acdSmapL2FilterPreLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The last Precedence value, used in range operation.
+             Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdSmapL2FilterEntry 42 }
+
+acdSmapL2FilterPreOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Precedence operator. Valid operator types are: Greater than,
+            Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapL2FilterEntry 43 }
+
+---------------------------------------------------------------------------
+ -- The Extended IPv4 table
+ -- This table contains all IPv4 Filters.
+---------------------------------------------------------------------------
+
+acdSmapIPv4FilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapIPv4FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of all Extended IPv4 filters"
+    ::= { acdFilter 4 }
+
+acdSmapIPv4FilterEntry OBJECT-TYPE
+    SYNTAX      AcdSmapIPv4FilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A Filter is a pattern matching a definition against packets."
+    INDEX   { acdSmapIPv4FilterID }
+    ::=  { acdSmapIPv4FilterTable 1 }
+
+AcdSmapIPv4FilterEntry ::= SEQUENCE {
+    acdSmapIPv4FilterID                 Unsigned32,
+    acdSmapIPv4FilterName               DisplayString,
+    acdSmapIPv4FilterRowStatus          RowStatus,
+    acdSmapIPv4FilterVlan1PriorEn       TruthValue,
+    acdSmapIPv4FilterVlan1Prior         Unsigned32,
+    acdSmapIPv4FilterVlan1PriorLast     Unsigned32,
+    acdSmapIPv4FilterVlan1PriorOper     AcdFilterOperator,
+    acdSmapIPv4FilterVlan1IdEn          TruthValue,
+    acdSmapIPv4FilterVlan1Id            Unsigned32,
+    acdSmapIPv4FilterVlan1IdLast        Unsigned32,
+    acdSmapIPv4FilterVlan1IdOper        AcdFilterOperator,
+    acdSmapIPv4FilterVlan1CfiEn         TruthValue,
+    acdSmapIPv4FilterVlan1Cfi           Unsigned32,
+    acdSmapIPv4FilterVlan1TypeEn        TruthValue,
+    acdSmapIPv4FilterVlan1Type          AcdFilterVlanType,
+    acdSmapIPv4FilterVlan2PriorEn       TruthValue,
+    acdSmapIPv4FilterVlan2Prior         Unsigned32,
+    acdSmapIPv4FilterVlan2PriorLast     Unsigned32,
+    acdSmapIPv4FilterVlan2PriorOper     AcdFilterOperator,
+    acdSmapIPv4FilterVlan2IdEn          TruthValue,
+    acdSmapIPv4FilterVlan2Id            Unsigned32,
+    acdSmapIPv4FilterVlan2IdLast        Unsigned32,
+    acdSmapIPv4FilterVlan2IdOper        AcdFilterOperator,
+    acdSmapIPv4FilterVlan2CfiEn         TruthValue,
+    acdSmapIPv4FilterVlan2Cfi           Unsigned32,
+    acdSmapIPv4FilterVlan2TypeEn        TruthValue,
+    acdSmapIPv4FilterVlan2Type          AcdFilterVlanType,
+    acdSmapIPv4FilterSrcEn              TruthValue,
+    acdSmapIPv4FilterSrc                IpAddress,
+    acdSmapIPv4FilterSrcMask            IpAddress,
+    acdSmapIPv4FilterDstEn              TruthValue,
+    acdSmapIPv4FilterDst                IpAddress,
+    acdSmapIPv4FilterDstMask            IpAddress,
+    acdSmapIPv4FilterProtoEn            TruthValue,
+    acdSmapIPv4FilterProto              Unsigned32,
+    acdSmapIPv4FilterTTLEn              TruthValue,
+    acdSmapIPv4FilterTTL                Unsigned32,
+    acdSmapIPv4FilterIHLEn              TruthValue,
+    acdSmapIPv4FilterIHL                Unsigned32,
+    acdSmapIPv4FilterIpCosEn            TruthValue,
+    acdSmapIPv4FilterIpCosMode          INTEGER,
+    acdSmapIPv4FilterDscp               Unsigned32,
+    acdSmapIPv4FilterDscpLast           Unsigned32,
+    acdSmapIPv4FilterDscpOper           AcdFilterOperator,
+    acdSmapIPv4FilterPre                Unsigned32,
+    acdSmapIPv4FilterPreLast            Unsigned32,
+    acdSmapIPv4FilterPreOper            AcdFilterOperator,
+    acdSmapIPv4FilterECNEn              TruthValue,
+    acdSmapIPv4FilterECN                Unsigned32,
+    acdSmapIPv4FilterSrcPortEn          TruthValue,
+    acdSmapIPv4FilterSrcPort            Unsigned32,
+    acdSmapIPv4FilterDstPortEn          TruthValue,
+    acdSmapIPv4FilterDstPort            Unsigned32,
+    acdSmapIPv4FilterIcmpTypeEn         TruthValue,
+    acdSmapIPv4FilterIcmpType           Unsigned32,
+    acdSmapIPv4FilterIcmpCodeEn         TruthValue,
+    acdSmapIPv4FilterIcmpCode           Unsigned32
+}
+
+acdSmapIPv4FilterID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each filter. Its value ranges from 1 to maximum
+         value. This maximum  value depend of the type of platform."
+   ::= { acdSmapIPv4FilterEntry 1 }
+
+acdSmapIPv4FilterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the filter."
+    ::= { acdSmapIPv4FilterEntry 2 }
+
+acdSmapIPv4FilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new filter you shall provide the a unique filter name for
+        an empty row with the RowStatus set to Create and Go. To delete the
+        row you need to set the RowStatus to destroy."
+    ::= { acdSmapIPv4FilterEntry 3 }
+
+acdSmapIPv4FilterVlan1PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 4 }
+
+acdSmapIPv4FilterVlan1Prior OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 5 }
+
+acdSmapIPv4FilterVlan1PriorLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN priority last value, used in range operation.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 6 }
+
+acdSmapIPv4FilterVlan1PriorOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VLAN Priority operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 7 }
+
+acdSmapIPv4FilterVlan1IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 8 }
+
+acdSmapIPv4FilterVlan1Id OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 9 }
+
+acdSmapIPv4FilterVlan1IdLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN ID last value, used in range operation.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 10 }
+
+acdSmapIPv4FilterVlan1IdOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "First VLAN ID operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 11 }
+
+acdSmapIPv4FilterVlan1CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 12 }
+
+acdSmapIPv4FilterVlan1Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first VLAN CFI used to compare the incoming traffic.
+         Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 13 }
+
+acdSmapIPv4FilterVlan1TypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN Ethertype check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 14 }
+
+acdSmapIPv4FilterVlan1Type OBJECT-TYPE
+    SYNTAX      AcdFilterVlanType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN Ethernet type."
+    DEFVAL      { cvlan }
+    ::= { acdSmapIPv4FilterEntry 15 }
+
+acdSmapIPv4FilterVlan2PriorEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN priority check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 16 }
+
+acdSmapIPv4FilterVlan2Prior OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN priority used to compare the incoming traffic.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 17 }
+
+acdSmapIPv4FilterVlan2PriorLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Second VLAN priority last value, used in range operation.
+         Its value ranges from 0 to 7."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 18 }
+
+acdSmapIPv4FilterVlan2PriorOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VLAN Priority operator. Valid operator types are: Greater than,
+         Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 19 }
+
+acdSmapIPv4FilterVlan2IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN ID check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 20 }
+
+acdSmapIPv4FilterVlan2Id OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 21 }
+
+acdSmapIPv4FilterVlan2IdLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second VLAN ID used to compare the incoming traffic.
+         Its value ranges from 0 to 4095."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 22 }
+
+acdSmapIPv4FilterVlan2IdOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID operator. Valid operator types are: Greater than, Less than,
+         Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 23 }
+
+acdSmapIPv4FilterVlan2CfiEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN CFI check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 24 }
+
+acdSmapIPv4FilterVlan2Cfi OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The second VLAN CFI used to compare the incoming traffic.
+             Its value is 0 or 1."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 25 }
+
+acdSmapIPv4FilterVlan2TypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN Ethertype check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 26 }
+
+acdSmapIPv4FilterVlan2Type OBJECT-TYPE
+    SYNTAX      AcdFilterVlanType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN Ethernet type."
+    DEFVAL      { cvlan }
+    ::= { acdSmapIPv4FilterEntry 27 }
+
+
+acdSmapIPv4FilterSrcEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Source IP address check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 28 }
+
+acdSmapIPv4FilterSrc OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The source IP address used to compare the incoming traffic."
+    DEFVAL { '00000000'H }      -- 0.0.0.0
+    ::= { acdSmapIPv4FilterEntry 29 }
+
+acdSmapIPv4FilterSrcMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The source IP address mask used to compare the incoming traffic."
+    DEFVAL { 'FFFFFFFF'H }      -- 255.255.255.255
+    ::= { acdSmapIPv4FilterEntry 30 }
+
+acdSmapIPv4FilterDstEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Destination IP address check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 31 }
+
+acdSmapIPv4FilterDst OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The destination IP address used to compare the incoming traffic."
+    DEFVAL { '00000000'H }      -- 0.0.0.0
+    ::= { acdSmapIPv4FilterEntry 32 }
+
+acdSmapIPv4FilterDstMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The destination IP address mask used to compare the 
+            incoming traffic."
+    DEFVAL { 'FFFFFFFF'H }      -- 255.255.255.255
+    ::= { acdSmapIPv4FilterEntry 33 }
+
+acdSmapIPv4FilterProtoEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the IP protocol check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 34 }
+
+acdSmapIPv4FilterProto OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The IP protocol used to compare the incoming traffic.
+             Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 35 }
+
+acdSmapIPv4FilterTTLEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the TTL check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 36 }
+
+acdSmapIPv4FilterTTL OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The TTL used to compare the incoming traffic.
+             Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 37 }
+
+acdSmapIPv4FilterIHLEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the IP Header Length check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 38 }
+
+acdSmapIPv4FilterIHL OBJECT-TYPE
+    SYNTAX      Unsigned32  (5..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The IP Header Length used to compare the incoming traffic.
+             Its value ranges from 5 to 15."
+    DEFVAL      { 5 }
+    ::= { acdSmapIPv4FilterEntry 39 }
+
+acdSmapIPv4FilterIpCosEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Ethernet type check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 40 }
+
+acdSmapIPv4FilterIpCosMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dscp(1),
+                    pre(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VLAN ID operator. Valid operator types are: Greater than, Less than,
+            Equal to or Range (inclusive range)."
+    DEFVAL      { dscp }
+    ::= { acdSmapIPv4FilterEntry 41 }
+
+acdSmapIPv4FilterDscp OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The DSCP value used to compare the incoming traffic.
+             Its value ranges from 0 to 63."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 42 }
+
+acdSmapIPv4FilterDscpLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The DSCP value used to compare the incoming traffic.
+             Its value ranges from 0 to 63."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 43 }
+
+acdSmapIPv4FilterDscpOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "DSCP operator. Valid operator types are: Greater than,
+            Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 44 }
+
+acdSmapIPv4FilterPre OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The  Precedence value used to compare the incoming traffic.
+             Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 45 }
+
+acdSmapIPv4FilterPreLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The Precedence value used to compare the incoming traffic.
+             Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 46 }
+
+acdSmapIPv4FilterPreOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Precedence operator. Valid operator types are: Greater than,
+            Less than, Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 47 }
+
+acdSmapIPv4FilterECNEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ECN (Explicite Cogestion Notification) check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 48 }
+
+acdSmapIPv4FilterECN OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The ECN value used to compare the incoming traffic.
+             Its value ranges from 0 to 3."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 49 }
+
+acdSmapIPv4FilterSrcPortEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the UDP/TCP Source port check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 50 }
+
+acdSmapIPv4FilterSrcPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Source Port used to compare the incoming traffic.
+             Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 51 }
+
+acdSmapIPv4FilterDstPortEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the UDP/TCP Destination port check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 52 }
+
+acdSmapIPv4FilterDstPort OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Destination Port used to compare the incoming traffic.
+             Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 53 }
+
+acdSmapIPv4FilterIcmpTypeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ICMP type check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 54 }
+
+acdSmapIPv4FilterIcmpType OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The ICMP type used to compare the incoming traffic.
+             Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 55 }
+
+acdSmapIPv4FilterIcmpCodeEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the ICMP code check."
+    DEFVAL      { false }
+    ::= { acdSmapIPv4FilterEntry 56 }
+
+acdSmapIPv4FilterIcmpCode OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The ICMP code used to compare the incoming traffic.
+             Its value ranges from 0 to 255."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 57 }
+
+---------------------------------------------------------------------------
+ -- Filter Transaction ID Information
+---------------------------------------------------------------------------
+
+acdSmapL2FilterTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdSmapL2FilterTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdFilterTableTid 1 }
+
+acdSmapIPv4FilterTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdSmapIPv4FilterTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdFilterTableTid 2 }
+
+---------------------------------------------------------------------------
+ -- ACD-FILTER-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdFilterCompliances  OBJECT IDENTIFIER ::= { acdFilterConformance 1 }
+acdFilterGroups       OBJECT IDENTIFIER ::= { acdFilterConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdL2FilterGroup OBJECT-GROUP
+    OBJECTS {
+        acdL2FilterName,
+        acdL2FilterMacDstEn,
+        acdL2FilterMacDst,
+        acdL2FilterMacDstMask,
+        acdL2FilterMacSrcEn,
+        acdL2FilterMacSrc,
+        acdL2FilterMacSrcMask,
+        acdL2FilterEtypeEn,
+        acdL2FilterEtype,
+        acdL2FilterVlan1PriorEn,
+        acdL2FilterVlan1Prior,
+        acdL2FilterVlan1CfiEn,
+        acdL2FilterVlan1Cfi,
+        acdL2FilterVlan1IdEn,
+        acdL2FilterVlan1Id,
+        acdL2FilterVlan2PriorEn,
+        acdL2FilterVlan2Prior,
+        acdL2FilterVlan2CfiEn,
+        acdL2FilterVlan2Cfi,
+        acdL2FilterVlan2IdEn,
+        acdL2FilterVlan2Id,
+        acdL2FilterRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the L2 filter configuration Group."
+    ::= { acdFilterGroups 1 }
+
+
+acdIPv4FilterGroup OBJECT-GROUP
+    OBJECTS {
+        acdIPv4FilterName,
+        acdIPv4FilterSrcEn,
+        acdIPv4FilterSrc,
+        acdIPv4FilterSrcMask,
+        acdIPv4FilterDstEn,
+        acdIPv4FilterDst,
+        acdIPv4FilterDstMask,
+        acdIPv4FilterProtoEn,
+        acdIPv4FilterProto,
+        acdIPv4FilterTTLEn,
+        acdIPv4FilterTTL,
+        acdIPv4FilterIHLEn,
+        acdIPv4FilterIHL,
+        acdIPv4FilterDscpEn,
+        acdIPv4FilterDscp,
+        acdIPv4FilterECNEn,
+        acdIPv4FilterECN,
+        acdIPv4FilterSrcPortEn,
+        acdIPv4FilterSrcPort,
+        acdIPv4FilterDstPortEn,
+        acdIPv4FilterDstPort,
+        acdIPv4FilterIcmpTypeEn,
+        acdIPv4FilterIcmpType,
+        acdIPv4FilterIcmpCodeEn,
+        acdIPv4FilterIcmpCode,
+        acdIPv4FilterRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the IPv4 filter configuration Group."
+    ::= { acdFilterGroups 2 }
+
+acdSmapL2FilterGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapL2FilterName,
+        acdSmapL2FilterRowStatus,
+        acdSmapL2FilterVlan1PriorEn,
+        acdSmapL2FilterVlan1Prior,
+        acdSmapL2FilterVlan1PriorLast,
+        acdSmapL2FilterVlan1PriorOper,
+        acdSmapL2FilterVlan1IdEn,
+        acdSmapL2FilterVlan1Id,
+        acdSmapL2FilterVlan1IdLast,
+        acdSmapL2FilterVlan1IdOper,
+        acdSmapL2FilterVlan1CfiEn,
+        acdSmapL2FilterVlan1Cfi,
+        acdSmapL2FilterVlan1TypeEn,
+        acdSmapL2FilterVlan1Type,
+        acdSmapL2FilterVlan2PriorEn,
+        acdSmapL2FilterVlan2Prior,
+        acdSmapL2FilterVlan2PriorLast,
+        acdSmapL2FilterVlan2PriorOper,
+        acdSmapL2FilterVlan2IdEn,
+        acdSmapL2FilterVlan2Id,
+        acdSmapL2FilterVlan2IdLast,
+        acdSmapL2FilterVlan2IdOper,
+        acdSmapL2FilterVlan2CfiEn,
+        acdSmapL2FilterVlan2Cfi,
+        acdSmapL2FilterVlan2TypeEn,
+        acdSmapL2FilterVlan2Type,
+        acdSmapL2FilterMacDstEn,
+        acdSmapL2FilterMacDst,
+        acdSmapL2FilterMacDstMask,
+        acdSmapL2FilterMacSrcEn,
+        acdSmapL2FilterMacSrc,
+        acdSmapL2FilterMacSrcMask,
+        acdSmapL2FilterEtypeEn,
+        acdSmapL2FilterEtype,
+        acdSmapL2FilterIpCosEn,
+        acdSmapL2FilterIpCosMode,
+        acdSmapL2FilterDscp,
+        acdSmapL2FilterDscpLast,
+        acdSmapL2FilterDscpOper,
+        acdSmapL2FilterPre,
+        acdSmapL2FilterPreLast,
+        acdSmapL2FilterPreOper
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SMAP L2 filter configuration Group."
+    ::= { acdFilterGroups 3 }
+
+acdSmapIPv4FilterGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapIPv4FilterName,
+        acdSmapIPv4FilterRowStatus,
+        acdSmapIPv4FilterVlan1PriorEn,
+        acdSmapIPv4FilterVlan1Prior,
+        acdSmapIPv4FilterVlan1PriorLast,
+        acdSmapIPv4FilterVlan1PriorOper,
+        acdSmapIPv4FilterVlan1IdEn,
+        acdSmapIPv4FilterVlan1Id,
+        acdSmapIPv4FilterVlan1IdLast,
+        acdSmapIPv4FilterVlan1IdOper,
+        acdSmapIPv4FilterVlan1CfiEn,
+        acdSmapIPv4FilterVlan1Cfi,
+        acdSmapIPv4FilterVlan1TypeEn,
+        acdSmapIPv4FilterVlan1Type,
+        acdSmapIPv4FilterVlan2PriorEn,
+        acdSmapIPv4FilterVlan2Prior,
+        acdSmapIPv4FilterVlan2PriorLast,
+        acdSmapIPv4FilterVlan2PriorOper,
+        acdSmapIPv4FilterVlan2IdEn,
+        acdSmapIPv4FilterVlan2Id,
+        acdSmapIPv4FilterVlan2IdLast,
+        acdSmapIPv4FilterVlan2IdOper,
+        acdSmapIPv4FilterVlan2CfiEn,
+        acdSmapIPv4FilterVlan2Cfi,
+        acdSmapIPv4FilterVlan2TypeEn,
+        acdSmapIPv4FilterVlan2Type,
+        acdSmapIPv4FilterSrcEn,
+        acdSmapIPv4FilterSrc,
+        acdSmapIPv4FilterSrcMask,
+        acdSmapIPv4FilterDstEn,
+        acdSmapIPv4FilterDst,
+        acdSmapIPv4FilterDstMask,
+        acdSmapIPv4FilterProtoEn,
+        acdSmapIPv4FilterProto,
+        acdSmapIPv4FilterTTLEn,
+        acdSmapIPv4FilterTTL,
+        acdSmapIPv4FilterIHLEn,
+        acdSmapIPv4FilterIHL,
+        acdSmapIPv4FilterIpCosEn,
+        acdSmapIPv4FilterIpCosMode,
+        acdSmapIPv4FilterDscp,
+        acdSmapIPv4FilterDscpLast,
+        acdSmapIPv4FilterDscpOper,
+        acdSmapIPv4FilterPre,
+        acdSmapIPv4FilterPreLast,
+        acdSmapIPv4FilterPreOper,
+        acdSmapIPv4FilterECNEn,
+        acdSmapIPv4FilterECN,
+        acdSmapIPv4FilterSrcPortEn,
+        acdSmapIPv4FilterSrcPort,
+        acdSmapIPv4FilterDstPortEn,
+        acdSmapIPv4FilterDstPort,
+        acdSmapIPv4FilterIcmpTypeEn,
+        acdSmapIPv4FilterIcmpType,
+        acdSmapIPv4FilterIcmpCodeEn,
+        acdSmapIPv4FilterIcmpCode
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the SMAP IPv4 filter configuration Group."
+    ::= { acdFilterGroups 4 }
+
+acdFilterTidGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapL2FilterTableLastChangeTid,
+        acdSmapIPv4FilterTableLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in tables."
+    ::= { acdFilterGroups 5 }
+
+acdFilterCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-FILTER-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdL2FilterGroup,
+            acdIPv4FilterGroup,
+            acdSmapL2FilterGroup,
+            acdSmapIPv4FilterGroup,
+            acdFilterTidGroup
+         }
+
+    OBJECT  acdL2FilterRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdIPv4FilterRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdSmapL2FilterRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdSmapIPv4FilterRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { acdFilterCompliances 1 }
+
+END

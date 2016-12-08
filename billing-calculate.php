@@ -2,22 +2,17 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    LibreNMS
  * @subpackage billing
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-chdir(dirname($argv[0]));
-
-require 'includes/defaults.inc.php';
-require 'config.php';
-require 'includes/definitions.inc.php';
-require 'includes/functions.php';
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
 $options = getopt('r');
 
@@ -60,8 +55,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $overuse      = ($used - $allowed);
                 $overuse      = (($overuse <= 0) ? '0' : $overuse);
                 $percent      = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
-            }
-            else if ($bill['bill_type'] == 'quota') {
+            } elseif ($bill['bill_type'] == 'quota') {
                 $type         = 'Quota';
                 $allowed      = $bill['bill_quota'];
                 $used         = $rate_data['total_data'];
@@ -113,8 +107,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
 
                 dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', array($check['bill_hist_id']));
                 echo ' Updated history! ';
-            }
-            else {
+            } else {
                 $update = array(
                     'rate_95th'        => $rate_data['rate_95th'],
                     'rate_95th_in'     => $rate_data['rate_95th_in'],

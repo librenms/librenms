@@ -30,7 +30,8 @@ load_graph_definitions();
  * @items Array of options values to return to browser
  * @method Name of Javascript method that will be called to process data
  */
-function dhtml_response_list(&$items, $method) {
+function dhtml_response_list(&$items, $method)
+{
     header('Content-Type: text/xml');
 
     print ('<?xml version="1.0" encoding="utf-8" ?>'."\n");
@@ -43,7 +44,6 @@ function dhtml_response_list(&$items, $method) {
 
     print (" </result>\n");
     print ('</response>');
-
 }//end dhtml_response_list()
 
 
@@ -95,8 +95,7 @@ foreach ($pinsts as &$instance) {
             $i++;
             if (!is_integer($i / 2)) {
                 $row_colour = $list_colour_a;
-            }
-            else {
+            } else {
                 $row_colour = $list_colour_b;
             }
 
@@ -104,8 +103,7 @@ foreach ($pinsts as &$instance) {
             echo '<div class="graphhead" style="padding:4px 0px 0px 8px;">';
             if ($tinst) {
                 echo $vars['plugin']." $instance - $type - $tinst";
-            }
-            else {
+            } else {
                 echo $vars['plugin']." $instance - $type";
             }
 

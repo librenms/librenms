@@ -2,15 +2,12 @@
 
 if ($_SESSION['userlevel'] < '10') {
     include 'includes/error-no-perm.inc.php';
-}
-else {
-    if ($_POST['addsrv']) {
+} else {
+    if ($vars['addsrv']) {
         if ($_SESSION['userlevel'] >= '10') {
             $updated = '1';
 
-            // FIXME should call add_service (needs more parameters)
-            $service_id = dbInsert(array('device_id' => $_POST['device'], 'service_ip' => $_POST['ip'], 'service_type' => $_POST['type'], 'service_desc' => $_POST['descr'], 'service_param' => $_POST['params'], 'service_ignore' => '0', 'service_status' => '0', 'service_checked' => '0', 'service_changed' => '0', 'service_message' => 'New check', 'service_disabled' => '0'), 'services');
-
+            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
             if ($service_id) {
                 $message       .= $message_break.'Service added ('.$service_id.')!';
                 $message_break .= '<br />';
@@ -18,15 +15,11 @@ else {
         }
     }
 
-    if ($handle = opendir($config['nagios_plugins'])) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && !strstr($file, '.') && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_',$file,2);
-                $servicesform .= "<option value='$check_name'>$check_name</option>";
-            }
+    foreach (scandir($config['nagios_plugins']) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $check_name = substr($file, 6);
+            $servicesform .= "<option value='$check_name'>$check_name</option>";
         }
-
-        closedir($handle);
     }
 
     foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {

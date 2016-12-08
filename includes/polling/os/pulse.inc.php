@@ -10,28 +10,34 @@
  * the source code distribution for details.
 */
 
-$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hostname = trim($poll_device['sysName'], '"');
 
-$usersrrd  = $config['rrd_dir'].'/'.$device['hostname'].'/pulse_users.rrd';
 $users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
 
 if (is_numeric($users)) {
-    if (!is_file($usersrrd)) {
-        rrdtool_create($usersrrd, ' DS:users:GAUGE:600:0:U'.$config['rrd_rra']);
-    }
-    rrdtool_update($usersrrd, "N:$users");
+    $rrd_def = 'DS:users:GAUGE:600:0:U';
+
+    $fields = array(
+        'users' => $users,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_users', $tags, $fields);
     $graphs['pulse_users'] = true;
 }
 
-$sessrrd  = $config['rrd_dir'].'/'.$device['hostname'].'/pulse_sessions.rrd';
 $sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
 
 if (is_numeric($sessions)) {
-    if (!is_file($sessrrd)) {
-        rrdtool_create($sessrrd, ' DS:sessions:GAUGE:600:0:U '.$config['rrd_rra']);
-    }
-    rrdtool_update($sessrrd, "N:$sessions");
+    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+
+    $fields = array(
+        'sessions' => $sessions,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_sessions', $tags, $fields);
     $graphs['pulse_sessions'] = true;
 }

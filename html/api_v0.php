@@ -12,18 +12,13 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once '../includes/common.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/rrdtool.inc.php';
-require 'includes/Slim/Slim.php';
+$init_modules = array('web', 'alerts');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+require $config['install_dir'] . '/html/lib/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
-require_once 'includes/api_functions.inc.php';
+require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
 
 $app->group(
@@ -48,7 +43,12 @@ $app->group(
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
+                        $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
+                        $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
+                        $app->post('/:hostname/components/:type', 'authToken', 'add_components')->name('add_components');
+                        $app->put('/:hostname/components', 'authToken', 'edit_components')->name('edit_components');
+                        $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
                         $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
@@ -123,6 +123,41 @@ $app->group(
                     }
                 );
                 // End Inventory
+                // Routing section
+                $app->group(
+                    '/routing',
+                    function () use ($app) {
+                        $app->group(
+                            '/ipsec',
+                            function () use ($app) {
+                                $app->get('/data/:hostname', 'authToken', 'list_ipsec')->name('list_ipsec');
+                            }
+                        );
+                    }
+                );
+            // End Routing
+                // Resources section
+                $app->group(
+                    '/resources',
+                    function () use ($app) {
+                        $app->group(
+                            '/ip',
+                            function () use ($app) {
+                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp');
+                            }
+                        );
+                    }
+                );
+                // End Resources
+                // Service section
+                $app->group(
+                    '/services',
+                    function () use ($app) {
+                        $app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
+                    }
+                );
+                $app->get('/services', 'authToken', 'list_services')->name('list_services');
+                // End Service
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');

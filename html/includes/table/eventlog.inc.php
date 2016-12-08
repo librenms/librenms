@@ -7,9 +7,9 @@ if (is_numeric($_POST['device'])) {
     $param[] = $_POST['device'];
 }
 
-if (!empty($_POST['type'])) {
+if (!empty($_POST['eventtype'])) {
     $where .= ' AND `E`.`type` = ?';
-    $param[] = $_POST['type'];
+    $param[] = $_POST['eventtype'];
 }
 
 if ($_POST['string']) {
@@ -19,8 +19,7 @@ if ($_POST['string']) {
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM `eventlog` AS E LEFT JOIN `devices` AS `D` ON `E`.`host`=`D`.`device_id` WHERE $where";
-}
-else {
+} else {
     $sql     = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.host = P.device_id AND P.user_id = ?";
     $param[] = $_SESSION['user_id'];
 }
@@ -57,9 +56,8 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     if ($eventlog['type'] == 'interface') {
         $this_if = ifLabel(getifbyid($eventlog['reference']));
         $type    = '<b>'.generate_port_link($this_if, makeshortif(strtolower($this_if['label']))).'</b>';
-    }
-    else {
-        $type = $eventlog['type'];;
+    } else {
+        $type = $eventlog['type'];
     }
 
     $response[] = array(

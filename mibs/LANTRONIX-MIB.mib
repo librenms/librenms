@@ -1,0 +1,42 @@
+LANTRONIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+lantronix MODULE-IDENTITY
+    LAST-UPDATED "200703010000Z"
+    ORGANIZATION "Lantronix, Inc."
+    CONTACT-INFO "Lantronix Technical Support
+                  15353 Barranca Parkway
+                  Irvine, CA 92618 USA
+                  +1 800 422-7044
+                  snmp@lantronix.com"
+    DESCRIPTION  
+        "The structure of Management Information for the Lantronix enterprise"
+    
+    -- revision history
+
+    REVISION     "200703010000Z"  -- March 1, 2007
+    DESCRIPTION  "Added legacy products."
+
+    REVISION     "200611100000Z"  -- November 10, 2006
+    DESCRIPTION  "Added sls product."
+
+    REVISION     "200412130000Z"  -- December 13, 2004
+    DESCRIPTION  "The initial version of the MIB module."
+
+    ::= { enterprises 244 }
+
+products    OBJECT IDENTIFIER ::= { lantronix 1 }
+slc         OBJECT IDENTIFIER ::= { products 1 }
+slk         OBJECT IDENTIFIER ::= { products 8 }
+slp         OBJECT IDENTIFIER ::= { products 9 }
+slm         OBJECT IDENTIFIER ::= { products 10 }
+sls         OBJECT IDENTIFIER ::= { products 11 }
+
+ltxlna      OBJECT IDENTIFIER ::= { lantronix 10 }
+ltxlrp      OBJECT IDENTIFIER ::= { lantronix 11 }
+ltxlsw      OBJECT IDENTIFIER ::= { lantronix 12 }
+    
+END

@@ -1,10 +1,5 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Xerox Phaser')) {
-        $os = 'xerox';
-    }
-    if (strstr($sysDescr, 'Xerox WorkCentre')) {
-        $os = 'xerox';
-    }
+if (str_contains($sysDescr, array('Xerox Phaser', 'Xerox WorkCentre', 'FUJI XEROX DocuPrint'))) {
+    $os = 'xerox';
 }

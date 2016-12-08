@@ -9,9 +9,7 @@ $pagetitle[] = "Delete device";
 
 if ($_SESSION['userlevel'] == 11) {
     demo_account();
-}
-else {
-
+} else {
     if (is_numeric($_REQUEST['id'])) {
         echo('
             <div class="row">
@@ -19,8 +17,7 @@ else {
             ');
         if ($_REQUEST['confirm']) {
             print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
-        }
-        else {
+        } else {
             $device = device_by_id_cache($_REQUEST['id']);
             print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
 ?>
@@ -42,8 +39,7 @@ else {
         echo('
     </div>
   </div>');
-    }
-    else {
+    } else {
 ?>
 
     <form name="form1" method="post" action="" class="form-horizontal" role="form">

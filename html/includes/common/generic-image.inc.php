@@ -22,7 +22,7 @@
  * @subpackage Widgets
  */
 
-if( defined('show_settings') || empty($widget_settings) ) {
+if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'">
@@ -41,14 +41,26 @@ if( defined('show_settings') || empty($widget_settings) ) {
       <input type="text" class="form-control input_'.$unique_id.'" name="image_url" placeholder="Image URL" value="'.htmlspecialchars($widget_settings['image_url']).'">
     </div>
   </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'">
+    <div class="col-sm-2">
+      <label for="image_url" class="control-label">Target URL: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'" name="target_url" placeholder="Target URL" value="'.htmlspecialchars($widget_settings['target_url']).'">
+    </div>
+  </div>
   <div class="form-group">
     <div class="col-sm-2">
       <button type="submit" class="btn btn-default">Set</button>
     </div>
   </div>
 </form>';
-}
-else {
+} else {
     $widget_settings['title'] = $widget_settings['image_title'];
-    $common_output[]          = '<img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="'.$widget_settings['image_url'].'"/>';
+    if (strstr($widget_settings['image_url'], '?')) {
+        $widget_settings['image_url'] .= "&".mt_rand();
+    } else {
+        $widget_settings['image_url'] .= "?".mt_rand();
+    }
+    $common_output[]          = '<a target="_blank" href="'.$widget_settings['target_url'].'"><img class="minigraph-image" style="max-width: '.$widget_dimensions['x'].'px; max-height:'.$widget_dimensions['y'].'px;" src="'.$widget_settings['image_url'].'"/></a>';
 }

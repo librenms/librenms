@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/siklu-interface.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'siklu-interface');
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'bps      Now       Ave      Max     \\n'";

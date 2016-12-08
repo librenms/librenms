@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 """
  poller-wrapper A small tool which wraps around the poller and tries to
                 guide the polling process with a more modern approach with a
@@ -11,14 +11,10 @@
                 that should run simultaneously. If no argument is given it will assume
                 a default of 16 threads.
 
- Read more:     http://postman.memetic.org/pipermail/observium/2012-November/001303.html
-
  Ubuntu Linux:  apt-get install python-mysqldb
  FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
 
  Tested on:     Python 2.7.3 / PHP 5.3.10-1ubuntu3.4 / Ubuntu 12.04 LTS
-
- GitHub:        https://github.com/Atrato/observium-poller-wrapper
 
  License:       To the extent possible under law, Job Snijders has waived all
                 copyright and related or neighboring rights to this script.
@@ -83,16 +79,28 @@ db_username = config['db_user']
 db_password = config['db_pass']
 
 if config['db_host'][:5].lower() == 'unix:':
-	db_server = config['db_host']
-	db_port = 0
+    db_server = config['db_host']
+    db_port = 0
 elif ':' in config['db_host']:
-	db_server = config['db_host'].rsplit(':')[0]
-	db_port = int(config['db_host'].rsplit(':')[1])
+    db_server = config['db_host'].rsplit(':')[0]
+    db_port = int(config['db_host'].rsplit(':')[1])
 else:
-	db_server = config['db_host']
-	db_port =0
+    db_server = config['db_host']
+    db_port = 0
 
 db_dbname = config['db_name']
+
+
+def db_open():
+    try:
+        if db_port == 0:
+            db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+        else:
+            db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
+        return db
+    except:
+        print "ERROR: Could not connect to MySQL database!"
+        sys.exit(2)
 
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
@@ -134,7 +142,7 @@ if ('distributed_poller' in config and
         memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
             str(config['distributed_poller_memcached_port'])])
         if str(memc.get("poller.master")) == config['distributed_poller_name']:
-            print "This sytem is already joined as the poller master."
+            print "This system is already joined as the poller master."
             sys.exit(2)
         if memc_alive():
             if memc.get("poller.master") is None:
@@ -151,6 +159,8 @@ if ('distributed_poller' in config and
             print "Could not connect to memcached, disabling distributed poller."
             distpoll = False
             IsNode = False
+    except SystemExit:
+        raise
     except ImportError:
         print "ERROR: missing memcache python module:"
         print "On deb systems: apt-get install python-memcache"
@@ -180,16 +190,6 @@ except:
 
 devices_list = []
 
-try:
-    if db_port == 0:
-        db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
-    else:
-        db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
-    cursor = db.cursor()
-except:
-    print "ERROR: Could not connect to MySQL database!"
-    sys.exit(2)
-
 """
     This query specificly orders the results depending on the last_polled_timetaken variable
     Because this way, we put the devices likely to be slow, in the top of the queue
@@ -203,6 +203,9 @@ else:
     query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
 # EOC2
 
+
+db = db_open()
+cursor = db.cursor()
 cursor.execute(query)
 devices = cursor.fetchall()
 for row in devices:
@@ -215,6 +218,7 @@ if distpoll and not IsNode:
     maxlocks = devices[0][0]
     minlocks = devices[0][1]
 # EOC3
+db.close()
 
 """
     A seperate queue and a single worker for printing information to the screen prevents
@@ -358,6 +362,8 @@ if distpoll or memc_alive():
 
 show_stopper = False
 
+db = db_open()
+cursor = db.cursor()
 query = "update pollers set last_polled=NOW(), devices='%d', time_taken='%d' where poller_name='%s'" % (polled_devices,
         total_time, config['distributed_poller_name'])
 response = cursor.execute(query)

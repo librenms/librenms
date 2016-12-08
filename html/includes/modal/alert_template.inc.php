@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
@@ -62,25 +62,25 @@ if(is_admin() === false) {
                             <span><strong>Controls:</strong><br />
 <?php
     $controls = array('if','endif','else','foreach', 'endforeach');
-    foreach ($controls as $control) {
-        echo '              <button type="button" class="btn btn-primary btn-sm" data-target="#control-add" id="control-add" name="control-add" data-type="control" data-value="'.$control.'">'.$control.'</button>';
-    }
+foreach ($controls as $control) {
+    echo '              <button type="button" class="btn btn-primary btn-sm" data-target="#control-add" id="control-add" name="control-add" data-type="control" data-value="'.$control.'">'.$control.'</button>';
+}
 ?>
                             </span><br /><br />
                             <span><strong>Placeholders:</strong><br />
 <?php
-    $placeholders = array('hostname','title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
-    foreach ($placeholders as $placeholder) {
-        echo '              <button type="button" class="btn btn-success btn-sm" data-target="#placeholder-add" id="placeholder-add" name="placeholder-add" data-type="placeholder" data-value="'.$placeholder.'">'.$placeholder.'</button>';
-    }
+    $placeholders = array('hostname', 'sysName', 'location', 'uptime', 'description', 'notes', 'title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
+foreach ($placeholders as $placeholder) {
+    echo '              <button type="button" class="btn btn-success btn-sm" data-target="#placeholder-add" id="placeholder-add" name="placeholder-add" data-type="placeholder" data-value="'.$placeholder.'">'.$placeholder.'</button>';
+}
 ?>
                             </span><br /><br />
                             <span><strong>Operator:</strong><br />
 <?php
     $operators = array('==','!=','>=','>','<=','<','&&','||','blank');
-    foreach ($operators as $operator) {
-        echo '              <button type="button" class="btn btn-warning btn-sm" data-target="#operator-add" id="operator-add" name="operator-add" data-type="operator" data-value="'.$operator.'">'.$operator.'</button>';
-    }
+foreach ($operators as $operator) {
+    echo '              <button type="button" class="btn btn-warning btn-sm" data-target="#operator-add" id="operator-add" name="operator-add" data-type="operator" data-value="'.$operator.'">'.$operator.'</button>';
+}
 ?>
 <br /><br />
                             <small><em>Free text - press enter to add</em></small><br />
@@ -102,9 +102,10 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = button.data('template_id');
     var action = button.data('template_action');
-    $('#template').val();
+    $('#template').val('');
     $('#line').val('');
     $('#value').val('');
+    $('#name').val('');
     if(action == 'edit') {
         $('#template_id').val(template_id);
         $.ajax({
@@ -120,6 +121,9 @@ $('#alert-template').on('show.bs.modal', function (event) {
             }
         });
     }
+});
+$('#alert-template').on('hide.bs.modal', function(event) {
+    $('#template_id').val('');
 });
 
 $('#create-template').click('', function(e) {

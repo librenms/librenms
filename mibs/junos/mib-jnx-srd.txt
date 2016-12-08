@@ -1,0 +1,469 @@
+
+-- *******************************************************************
+-- Juniper Service Redundancy Daemon MIB.
+--
+-- Copyright (c) 2014, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+	JUNIPER-SRD-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+
+        Gauge32, Integer32, Unsigned32, Counter64,
+        NOTIFICATION-TYPE,
+    	MODULE-IDENTITY, OBJECT-TYPE,
+        OBJECT-IDENTITY, 
+        Counter32
+        	FROM SNMPv2-SMI
+
+        InterfaceIndex                  
+            FROM IF-MIB
+
+	DateAndTime, DisplayString		        
+            FROM SNMPv2-TC 
+
+    	InetAddressType, InetAddress, InetAddressIPv4 	        
+            FROM INET-ADDRESS-MIB
+
+        SnmpAdminString                                                             
+            FROM SNMP-FRAMEWORK-MIB                                                 
+                                                                                
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF                                                
+                                                                                
+        sysName, sysLocation, sysContact                                            
+            FROM SNMPv2-MIB
+
+	TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+        jnxSRDMibRoot
+            FROM JUNIPER-SMI;
+
+	jnxSRDMIB MODULE-IDENTITY
+
+        LAST-UPDATED  "201411202022Z" -- Nov 20, 2014" 
+    	ORGANIZATION  "Juniper Networks, Inc."
+    	CONTACT-INFO
+	    "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+
+    	DESCRIPTION
+            "This module defines the object that are used to monitor
+             traffic load balancer attributes."
+
+        REVISION  "201411202022Z" -- Nov 20, 2014" 
+    	DESCRIPTION 	"Creation Date"
+
+        ::= { jnxSRDMibRoot 1 }
+
+    jnxSRDNotification           OBJECT IDENTIFIER ::= { jnxSRDMIB 1 }
+    jnxSRDRedundancyGroup        OBJECT IDENTIFIER ::= { jnxSRDMIB 2 }
+
+-- ***************************************************************
+--  jnx SRD Redundancy Group Table
+-- ***************************************************************
+
+    jnxSRDRedundancyGroupTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxSRDGroupEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table list redundancy server daemon statistics. "
+        ::= { jnxSRDRedundancyGroup 1 }
+
+    jnxSRDRedundancyGroupEntry OBJECT-TYPE
+        SYNTAX        JnxSRDGroupEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "redundancy group entries.  
+	     It is indexed by redundancy group name and
+             redundancy set name." 
+        INDEX   { jnxSRDRedundancyGroupID,
+                  jnxSRDRedundancySetID }
+        ::= { jnxSRDRedundancyGroupTable 1 }
+
+    JnxSRDGroupEntry ::= SEQUENCE
+    {
+        jnxSRDRedundancyGroupID                          DisplayString,
+        jnxSRDRedundancySetID                            DisplayString,
+        jnxSRDRedundancyGroupTotalPeer                   Unsigned32,
+        jnxSRDRedundancyGroupConnStatus                  DisplayString,
+        jnxSRDRedundancySRDIccpConnStatus                DisplayString,
+        jnxSRDRedundancySRDRemoteIPAddressType           InetAddressType,
+        jnxSRDRedundancySRDRemoteIPAddress               InetAddress,
+        jnxSRDRedundancySetState                         DisplayString,
+        jnxSRDRedundancySetPeerState                     DisplayString,
+        jnxSRDRedundancySetHealthStatus                  DisplayString,
+        jnxSRDRedundancySetLinkDownEventReceived         Unsigned32,
+        jnxSRDRedundancySetLinkDownEventDropped          Unsigned32,
+        jnxSRDRedundancySetRpdRestartEventReceived       Unsigned32,
+        jnxSRDRedundancySetRpdRestartEventDropped        Unsigned32,
+        jnxSRDRedundancySetRouteUpdateErrorEventReceived Unsigned32,
+        jnxSRDRedundancySetRouteUpdateErrorEventDropped  Unsigned32,
+        jnxSRDRedundancySetAcquireMasterManualReceived   Unsigned32,
+        jnxSRDRedundancySetAcquireMasterManualDropped    Unsigned32,
+        jnxSRDRedundancySetAcquireMasterAutoReceived     Unsigned32,
+        jnxSRDRedundancySetAcquireMasterAutoDropped      Unsigned32,
+        jnxSRDRedundancySetReleaseMasterManualReceived   Unsigned32,
+        jnxSRDRedundancySetReleaseMasterManualDropped    Unsigned32,
+        jnxSRDRedundancySetReleaseMasterAutoReceived     Unsigned32,
+        jnxSRDRedundancySetReleaseMasterAutoDropped      Unsigned32,
+        jnxSRDRedundancySetPeerAcquireMasterReceived     Unsigned32,
+        jnxSRDRedundancySetPeerAcquireMasterDropped      Unsigned32,
+        jnxSRDRedundancySetPeerReleaseMasterReceived     Unsigned32,
+        jnxSRDRedundancySetPeerReleaseMasterDropped      Unsigned32
+    }
+
+    jnxSRDRedundancyGroupID OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current
+        DESCRIPTION
+            "The name of Redundancy Group." 
+        ::= { jnxSRDRedundancyGroupEntry 1 }
+
+    jnxSRDRedundancySetID OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current
+        DESCRIPTION
+            "The name of Redundancy Set." 
+        ::= { jnxSRDRedundancyGroupEntry 2 }
+
+    jnxSRDRedundancyGroupTotalPeer OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Status of Redundancy Group."
+        ::= { jnxSRDRedundancyGroupEntry 3 }           
+
+    jnxSRDRedundancyGroupConnStatus OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Status of Redundancy Group."
+        ::= { jnxSRDRedundancyGroupEntry 4 }           
+
+    jnxSRDRedundancySRDIccpConnStatus OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Status of Redundancy Service Daemon App."
+        ::= { jnxSRDRedundancyGroupEntry 5 }           
+
+    jnxSRDRedundancySRDRemoteIPAddressType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Remote IP address Redundancy Service Daemon."
+        ::= { jnxSRDRedundancyGroupEntry 6 }           
+
+    jnxSRDRedundancySRDRemoteIPAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Remote IP address Redundancy Service Daemon."
+        ::= { jnxSRDRedundancyGroupEntry 7 }           
+
+    jnxSRDRedundancySetState OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The State of Redundancy Set."
+        ::= { jnxSRDRedundancyGroupEntry 8 }           
+
+    jnxSRDRedundancySetPeerState OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Peer State of Redundancy Set."
+        ::= { jnxSRDRedundancyGroupEntry 9 }           
+
+    jnxSRDRedundancySetHealthStatus OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The Health Status of Redundancy Set."
+        ::= { jnxSRDRedundancyGroupEntry 10 }           
+
+
+    jnxSRDRedundancySetLinkDownEventReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of link down event a Redundancy Set received."
+        ::= { jnxSRDRedundancyGroupEntry 11 }           
+
+
+    jnxSRDRedundancySetLinkDownEventDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of link down event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 12 }           
+
+    jnxSRDRedundancySetRpdRestartEventReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of RPD restart event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 13 }           
+
+
+    jnxSRDRedundancySetRpdRestartEventDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of RPD restart event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 14 }           
+
+
+    jnxSRDRedundancySetRouteUpdateErrorEventReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of route update error event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 15 }           
+
+
+    jnxSRDRedundancySetRouteUpdateErrorEventDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of route update error event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 16 }           
+
+
+    jnxSRDRedundancySetAcquireMasterManualReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of acquire master manual event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 17 }           
+
+
+    jnxSRDRedundancySetAcquireMasterManualDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of acquire master manual event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 18 }           
+
+
+    jnxSRDRedundancySetAcquireMasterAutoReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of acquire master automatic event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 19 }           
+
+
+    jnxSRDRedundancySetAcquireMasterAutoDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of acquire master automatic event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 20 }           
+
+
+    jnxSRDRedundancySetReleaseMasterManualReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of release master manual event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 21 }           
+
+
+    jnxSRDRedundancySetReleaseMasterManualDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of release master manual event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 22 }           
+
+
+    jnxSRDRedundancySetReleaseMasterAutoReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of release master automatic event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 23 }           
+
+
+    jnxSRDRedundancySetReleaseMasterAutoDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of release master automatic event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 24 }           
+
+
+    jnxSRDRedundancySetPeerAcquireMasterReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of peer acquire master event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 25 }           
+
+
+    jnxSRDRedundancySetPeerAcquireMasterDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of peer acquire master event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 26 }           
+
+
+    jnxSRDRedundancySetPeerReleaseMasterReceived OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of peer release master event a Redundancy Set receive."
+        ::= { jnxSRDRedundancyGroupEntry 27 }           
+
+
+    jnxSRDRedundancySetPeerReleaseMasterDropped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only                                            
+        STATUS        current                                                   
+        DESCRIPTION                                                             
+            "The number of peer release master event a Redundancy Set dropped."
+        ::= { jnxSRDRedundancyGroupEntry 28 }           
+
+
+-- ***************************************************************
+-- Traps
+-- ***************************************************************
+
+    jnxSRDNotificationType OBJECT IDENTIFIER ::= { jnxSRDNotification 0 }
+
+    jnxSRDNotificationObj OBJECT IDENTIFIER ::= { jnxSRDNotification 1 }
+
+    jnxSRDTrapRedundancySetID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set ID."
+        ::= { jnxSRDNotificationObj 1 }
+
+    jnxSRDTrapRedundancySetOldState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set Old State."
+        ::= { jnxSRDNotificationObj 2 }
+
+    jnxSRDTrapRedundancySetEvent OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set Event."
+        ::= { jnxSRDNotificationObj 3 }
+
+    jnxSRDTrapRedundancySetNewState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set New State."
+        ::= { jnxSRDNotificationObj 4}
+
+    jnxSRDTrapNotificationMessage OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set notification messages."
+        ::= { jnxSRDNotificationObj 5}
+
+    jnxSRDTrapRedundancyPeerIPAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Peer IP address Type of the Redundancy Group."
+        ::= { jnxSRDNotificationObj 6}
+
+    jnxSRDTrapRedundancyPeerIPAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Peer IP address of the Redundancy Group."
+        ::= { jnxSRDNotificationObj 7}
+
+    jnxSRDTrapRedundancyActionErrorCode OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Redundancy Set Old State."
+        ::= { jnxSRDNotificationObj 8 }
+
+    jnxSRDRdeundancySetStateTransition NOTIFICATION-TYPE
+        OBJECTS { jnxSRDTrapRedundancyPeerIPAddressType,
+                  jnxSRDTrapRedundancyPeerIPAddress,
+                  jnxSRDTrapRedundancySetID,
+                  jnxSRDTrapRedundancySetOldState,
+                  jnxSRDTrapRedundancySetEvent,
+                  jnxSRDTrapRedundancySetNewState,
+                  sysName, sysLocation, sysContact
+                 }
+        STATUS  current
+        DESCRIPTION
+            "The trap will be sent when Redundancy Set Status become Master."
+        ::= { jnxSRDNotificationType 1 }             
+
+    jnxSRDRdeundancySetActionError NOTIFICATION-TYPE
+        OBJECTS { jnxSRDTrapRedundancyActionErrorCode,
+		  jnxSRDTrapNotificationMessage,
+                  sysName, sysLocation, sysContact
+                 }
+        STATUS  current
+        DESCRIPTION
+            "The trap will be sent when Redundancy Set gets action error"
+        ::= { jnxSRDNotificationType 2 } 
+
+-- ***************************************************************
+--  END of File 
+-- ***************************************************************
+
+END

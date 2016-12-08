@@ -1,0 +1,474 @@
+-- $Log: E5-110-AS-ATM-MIB.mib $
+-- Revision 1.4  2009/11/23 06:51:48  maverick
+-- Revision 1.3  2009/11/06 02:10:36  maverick
+-- remove cfm, change atmqos to ipqos
+-- Revision 1.2  2009/10/02 08:33:29  John
+-- Revision 1.1  2008/07/11 09:36:15  maverick
+-- Initial revision
+-- Revision 1.1  2007/12/03 01:45:27  niceguy
+-- Initial revision
+-- Initial revision
+
+E5-110-AS-ATM-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE		FROM RFC-1212
+  	    Unsigned32		FROM SNMPv2-SMI
+		Counter         FROM RFC1155-SMI
+		ifIndex, DisplayString	FROM RFC1213-MIB
+		RowStatus		FROM SNMPv2-TC
+		VlanIndex, PortList	FROM Q-BRIDGE-MIB
+		accessSwitchCommonATM 	FROM E5-110-MIB;
+
+
+	-- Channel Table
+
+        asMaxNumOfChannels OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        	"The maximum number of virtual channels which can be created on a port."
+        ::= { accessSwitchCommonATM 1 }
+
+        asChannelTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsChannelEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        	"This table includes the configuration of the virtual channel."
+        ::= { accessSwitchCommonATM 2 }
+
+	asChannelEntry OBJECT-TYPE
+        SYNTAX	AsChannelEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asChannelTable."
+        INDEX   { ifIndex, asChannelVpi, asChannelVci }
+        ::= { asChannelTable 1 }
+
+        AsChannelEntry ::=
+           SEQUENCE {
+		asChannelVpi		INTEGER,
+		asChannelVci		INTEGER,
+		asChannelPvid		VlanIndex,
+	--	asChannelEgressVid	VlanIndex,
+		asChannelPriority	INTEGER,
+		asChannelProfile	DisplayString,
+		asChannelRowStatus	RowStatus
+           }
+
+        asChannelVpi    OBJECT-TYPE
+        SYNTAX	INTEGER (0..255)
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "VPI of the channel."
+         ::= { asChannelEntry 1 }
+
+        asChannelVci    OBJECT-TYPE
+        SYNTAX	INTEGER (1..65535)
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "VCI of the channel."
+         ::= { asChannelEntry 2 }
+
+        asChannelPvid    OBJECT-TYPE
+        SYNTAX	VlanIndex
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "The default VID of the channel."
+         ::= { asChannelEntry 3 }
+
+--        asChannelEgressVid    OBJECT-TYPE
+--        SYNTAX	VlanIndex
+--        ACCESS	read-create
+--        STATUS	mandatory
+--        DESCRIPTION
+--                "The egress VID of the channel."
+--         ::= { asChannelEntry 4 }
+
+        asChannelPriority    OBJECT-TYPE
+        SYNTAX	INTEGER (0..7)
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "The 802.1p default priority of the channel."
+         ::= { asChannelEntry 5 }
+
+        asChannelProfile    OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE (1..31))
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "The value of this object identifies the row in the
+                asChannelProfileTable, which applies for this channel."
+         ::= { asChannelEntry 6 }
+
+        asChannelRowStatus OBJECT-TYPE
+        SYNTAX	RowStatus
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "This object is used to create a new row or
+                delete an existing row in this table."
+         ::= { asChannelEntry 7 }
+
+
+	-- Channel Profile Table
+
+        asMaxNumOfChannelProfiles OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        	"The maximum number of channel profiles which the system supports."
+        ::= { accessSwitchCommonATM 3 }
+
+        asChannelProfileTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsChannelProfileEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains information on the virtual channel
+                configuration. One entry in this table reflects a
+                profile which can be used to configure the virtual channel."
+        ::= { accessSwitchCommonATM 6 }
+
+	asChannelProfileEntry OBJECT-TYPE
+        SYNTAX	AsChannelProfileEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asChannelProfileTable."
+        INDEX   { IMPLIED asChannelProfileName }
+        ::= { asChannelProfileTable 1 }
+
+        AsChannelProfileEntry ::=
+           SEQUENCE {
+		asChannelProfileName		DisplayString,
+		asChannelProfileEncap		INTEGER,
+		asChannelProfileAAL		INTEGER,
+		asChannelProfileClass		INTEGER,
+		asChannelProfilePcr		Unsigned32,
+		asChannelProfileCdvt		INTEGER,
+		asChannelProfileScrMcr		Unsigned32,
+		asChannelProfileBt		INTEGER,
+		asChannelProfileRowStatus	RowStatus
+           }
+
+        asChannelProfileName    OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE (1..31))
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "This object is used by the channel profile table
+                in order to identify a row of this table."
+         ::= { asChannelProfileEntry 1 }
+
+        asChannelProfileEncap    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			llc(1),
+			vc(2)
+	}
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "RFC1483 encapsulation."
+         ::= { asChannelProfileEntry 2 }
+
+        asChannelProfileAAL    OBJECT-TYPE
+        SYNTAX	INTEGER (0..5)
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "ATM Adaptation Layer policy."
+         ::= { asChannelProfileEntry 3 }
+
+        asChannelProfileClass    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			cbr(1),
+			rt-vbr(2),
+			nrt-vbr(3),
+			ubr(4),
+			abr(5)
+	}
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "ATM traffic class, including constant bit rate,
+		real-time variable bit rate, non real-time variable bit rate,
+		unspecified bit rate, and available bit rate."
+         ::= { asChannelProfileEntry 4 }
+
+        asChannelProfilePcr    OBJECT-TYPE
+        SYNTAX	Unsigned32
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "Peak cell rate (cells/sec)."
+         ::= { asChannelProfileEntry 5 }
+
+        asChannelProfileCdvt    OBJECT-TYPE
+        SYNTAX	INTEGER (0..255)
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "Cell delay variation tolerance."
+         ::= { asChannelProfileEntry 6 }
+
+        asChannelProfileScrMcr    OBJECT-TYPE
+        SYNTAX	Unsigned32
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "Sustain cell rate for vbr traffic class, or
+		minimum cell rate for abr traffic class.
+		The unit is the number of cells per second."
+         ::= { asChannelProfileEntry 7 }
+
+        asChannelProfileBt    OBJECT-TYPE
+        SYNTAX	INTEGER (0..255)
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "Burst tolerance for vbr traffic class."
+         ::= { asChannelProfileEntry 8 }
+
+        asChannelProfileRowStatus OBJECT-TYPE
+        SYNTAX	RowStatus
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "This object is used to create a new row or
+                delete an existing row in this table."
+         ::= { asChannelProfileEntry 9 }
+
+
+-- Channel Status Table
+
+        asChannelStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsChannelStatusEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        	"This table includes the status of the virtual channel."
+        ::= { accessSwitchCommonATM 7 }
+
+	asChannelStatusEntry OBJECT-TYPE
+        SYNTAX	AsChannelStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asChannelStatusTable."
+        INDEX   { ifIndex, asChannelVpi, asChannelVci }
+        ::= { asChannelStatusTable 1 }
+
+        AsChannelStatusEntry ::=
+           SEQUENCE {
+		asChannelTxPackets	Counter,
+		asChannelRxPackets	Counter,
+		asChannelTxCells	Counter,
+		asChannelRxCells	Counter
+           }
+
+	asChannelTxPackets OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Count of channel Tx packets."
+	::= { asChannelStatusEntry 1 }
+
+	asChannelRxPackets OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Count of channel Rx packets."
+	::= { asChannelStatusEntry 2 }
+
+	asChannelTxCells OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Count of channel Tx cells."
+	::= { asChannelStatusEntry 3 }
+
+	asChannelRxCells OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Count of channel Rx cells."
+	::= { asChannelStatusEntry 4 }
+
+
+-- Ipqos Profile Table
+
+	asMaxNumOfIpqosProfiles OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        	"The maximum number of ipqos profiles which the system supports."
+        ::= { accessSwitchCommonATM 8 }
+
+	asIpqosProfileTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsIpqosProfileEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains information on the ipqos profile
+                configuration. One entry in this table reflects a
+                profile which can be used to configure the virtual channel."
+        ::= { accessSwitchCommonATM 9 }
+
+	asIpqosProfileEntry OBJECT-TYPE
+        SYNTAX	AsIpqosProfileEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asIpqosProfileTable."
+        INDEX   { IMPLIED asIpqosProfileName }
+        ::= { asIpqosProfileTable 1 }
+
+        AsIpqosProfileEntry ::=
+        	SEQUENCE {
+		asIpqosProfileName			DisplayString,
+		asIpqosProfileEncap			INTEGER,
+		asIpqosProfileQueueNumber	INTEGER,
+		asIpqosProfileRowStatus		RowStatus
+			}
+			
+	asIpqosProfileName    OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE (1..31))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This object is used by the ipqos profile table
+                in order to identify a row of this table."
+         ::= { asIpqosProfileEntry 1 }
+
+	asIpqosProfileEncap    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			llc(1),
+			vc(2)
+		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "RFC1483 encapsulation."
+         ::= { asIpqosProfileEntry 2 }
+    
+    asIpqosProfileQueueNumber    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			one(1),
+			two(2),
+			four(4)
+		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Number of Ipqos profile egress queue."
+         ::= { asIpqosProfileEntry 3 }
+    
+    asIpqosProfileRowStatus OBJECT-TYPE
+        SYNTAX	RowStatus
+        ACCESS	read-create
+        STATUS	mandatory
+        DESCRIPTION
+                "This object is used to create a new row or
+                delete an existing row in this table."
+         ::= { asIpqosProfileEntry 4 }
+
+	asIpqosProfileQueueTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsIpqosProfileQueueEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains information on the ipqos profile queue
+                configuration."
+        ::= { accessSwitchCommonATM 10 }
+
+	asIpqosProfileQueueEntry OBJECT-TYPE
+        SYNTAX	AsIpqosProfileQueueEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asIpqosProfileTable."
+        INDEX   { asIpqosProfileName, IMPLIED asIpqosProfileQueueIndex }
+        ::= { asIpqosProfileQueueTable 1 }
+
+        AsIpqosProfileQueueEntry ::=
+        	SEQUENCE {
+		asIpqosProfileQueueIndex	INTEGER,
+		asIpqosProfileAAL			INTEGER,
+		asIpqosProfileLevel			INTEGER,
+		asIpqosProfileRate			Unsigned32
+           }
+    
+    asIpqosProfileQueueIndex    OBJECT-TYPE
+        SYNTAX	INTEGER (1..4)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The index of a ipqos profile egress queue."
+         ::= { asIpqosProfileQueueEntry 1 }
+
+	asIpqosProfileAAL    OBJECT-TYPE
+        SYNTAX	INTEGER (0..5)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "ATM Adaptation Layer policy."
+         ::= { asIpqosProfileQueueEntry 2 }
+
+	asIpqosProfileLevel    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			ubr(0),
+			nrt-vbr(1),
+			rt-vbr(2),
+			cbr(3)
+		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "ATM traffic class, including constant bit rate,
+		real-time variable bit rate, non real-time variable bit rate,
+		and unspecified bit rate."
+         ::= { asIpqosProfileQueueEntry 3 }
+
+	asIpqosProfileRate    OBJECT-TYPE
+        SYNTAX	Unsigned32
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Peak cell rate (cells/sec)."
+         ::= { asIpqosProfileQueueEntry 4 }
+
+-- Shaping Mode
+
+	asShapingMode    OBJECT-TYPE
+        SYNTAX	INTEGER {
+			atm(1),
+			packet(2)
+		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+        	"The two types of shaping mechanism can not co-exist,
+        	and this variable is used to switch between these 
+        	two types of shaping mechanism.
+        	To change to new shaping mode, E5-11x will remove all 
+        	configured PVC, save current configuration and reboot 
+        	automatically. 
+        	After reboot, the new shaping mode can take effect."
+        ::= { accessSwitchCommonATM 11 }
+
+
+END

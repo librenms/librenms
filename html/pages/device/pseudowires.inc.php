@@ -49,7 +49,9 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
 
     $pw_b = dbFetchRow(
         'SELECT * from `devices` AS D, `ports` AS I, `pseudowires` AS P WHERE D.device_id = ? AND D.device_id = I.device_id
-        AND P.cpwVcID = ? AND P.port_id = I.port_id', array( $pw_a['peer_device_id'], $pw_a['cpwVcID'],));
+        AND P.cpwVcID = ? AND P.port_id = I.port_id',
+        array( $pw_a['peer_device_id'], $pw_a['cpwVcID'],)
+    );
 
     if (!port_permitted($pw_a['port_id'])) {
         $skip = 'yes';
@@ -61,12 +63,10 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
 
     if ($skip) {
         unset($skip);
-    }
-    else {
+    } else {
         if ($bg == 'ffffff') {
             $bg = 'e5e5e5';
-        }
-        else {
+        } else {
             $bg = 'ffffff';
         }
 

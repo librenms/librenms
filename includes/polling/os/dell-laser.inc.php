@@ -21,8 +21,7 @@ list(,$version) = explode('Engine ', $poll_device['sysDescr']);
 
 if ($version) {
     $version = 'Engine '.trim($version, ')');
-}
-else {
+} else {
     $version = trim(snmp_get($device, '1.3.6.1.4.1.674.10898.100.1.1.1.0', '-OQv'), '"');
     if (!$version) {
         $version = trim(snmp_get($device, '1.3.6.1.4.1.641.1.1.1.0', '-OQv'), '"');

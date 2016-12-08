@@ -40,6 +40,7 @@ foreach( $obj['faults'] as $fault=>$data ) {
     $protocol['details'][] = $data['string'];
 }
 $curl = curl_init();
+set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/generic/2010-04-15/create_event.json' );
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type'=> 'application/json'));
@@ -48,6 +49,6 @@ $ret = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 if( $code != 200 ) {
     var_dump("PagerDuty returned Error, retry later"); //FIXME: propper debuging
-    return false;
+    return 'HTTP Status code '.$code;
 }
 return true;

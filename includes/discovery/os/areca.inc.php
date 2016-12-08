@@ -1,7 +1,6 @@
 <?php
 
-if (!$os) {
-    if (strstr($sysDescr, 'Raid Subsystem V')) {
-        $os = 'areca';
-    }
+
+if (str_contains($sysDescr, 'Raid Subsystem V')) {
+    $os = 'areca';
 }

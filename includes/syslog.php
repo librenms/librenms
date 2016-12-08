@@ -5,39 +5,45 @@
 // $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.port_id = A.port_id");
 
 
-function get_cache($host, $value) {
+function get_cache($host, $value)
+{
     global $dev_cache;
 
     if (!isset($dev_cache[$host][$value])) {
         switch ($value) {
-        case 'device_id':
-            // Try by hostname
-            $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
-            // If failed, try by IP
-            if (!is_numeric($dev_cache[$host]['device_id'])) {
-                $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', array($host));
-            }
-            break;
+            case 'device_id':
+                // Try by hostname
+                $ip = inet_pton($host);
+                if (inet_ntop($ip) === false) {
+                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
+                } else {
+                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ? OR `ip` = ?', array($host, $host, $ip));
+                }
+                // If failed, try by IP
+                if (!is_numeric($dev_cache[$host]['device_id'])) {
+                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', array($host));
+                }
+                break;
 
-        case 'os':
-            $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
-            break;
+            case 'os':
+                $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
+                break;
 
-        case 'version':
-            $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', array(get_cache($host, 'device_id')));
-            break;
+            case 'version':
+                $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', array(get_cache($host, 'device_id')));
+                break;
 
-        default:
-            return null;
+            default:
+                return null;
         }//end switch
     }//end if
 
     return $dev_cache[$host][$value];
-
 }//end get_cache()
 
 
-function process_syslog($entry, $update) {
+function process_syslog($entry, $update)
+{
     global $config, $dev_cache;
 
     foreach ($config['syslog_filter'] as $bi) {
@@ -52,41 +58,25 @@ function process_syslog($entry, $update) {
         $os = get_cache($entry['host'], 'os');
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
-            $matches = array();
-            // if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)) {
-            // $entry['msg'] = $matches['msg'];
-            // $entry['program'] = $matches['program'];
-            // }
-            // unset($matches);
-            if (strstr($entry[msg], '%')) {
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
-                list(,$entry[msg]) = split(': %', $entry['msg']);
-                $entry['msg']      = '%'.$entry['msg'];
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
+            // multipart message
+            if (strpos($entry['msg'], ':') !== false) {
+                $matches = array();
+                $timestamp_prefix = '([\*\.]?[A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
+                $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
+                $message_match = '(?<msg>.*)';
+                if (preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', $entry['msg'], $matches)) {
+                    $entry['program'] = $matches['program'];
+                    $entry['msg'] = $matches['msg'];
+                }
+                unset($matches);
+            } else {
+                // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
+                if (!preg_match('/[(a-z)]{2,}/', $entry['msg'])) {
+                    $entry['program'] = $entry['msg'];
+                    unset($entry['msg']);
+                }
             }
-            else {
-                $entry['msg'] = preg_replace('/^.*[0-9]:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^[0-9][0-9]\ [A-Z]{3}:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^(.+?):\ /', '\\1||', $entry['msg']);
-            }
-
-            $entry['msg'] = preg_replace('/^.+\.[0-9]{3}:/', '', $entry['msg']);
-            $entry['msg'] = preg_replace('/^.+-Traceback=/', 'Traceback||', $entry['msg']);
-
-            list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            $entry['msg'] = preg_replace('/^[0-9]+:/', '', $entry['msg']);
-
-            if (!$entry['program']) {
-                $entry['msg'] = preg_replace('/^([0-9A-Z\-]+?):\ /', '\\1||', $entry['msg']);
-                list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            }
-
-            if (!$entry['msg']) {
-                $entry['msg'] = $entry['program'];
-                unset($entry['program']);
-            }
-        }
-        else if ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
+        } elseif ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
             // Cisco WAP200 and similar
             $matches = array();
             if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)) {
@@ -95,19 +85,11 @@ function process_syslog($entry, $update) {
             }
 
             unset($matches);
-        }
-        else if ($os == 'linux') {
+        } elseif ($os == 'linux') {
             $matches = array();
-            // User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
-            if ($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.) {3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)) {2,}:#', $entry['msg'])) {
-                $entry['program'] = 'OpenVPN';
-            } //end if
-            // POP3(username): Disconnected: Logged out top=0/0, retr=0/0, del=0/1, size=2802
-            else if ($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):', $entry['msg'])) {
-                $entry['program'] = 'Dovecot';
-            } // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
+            // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
             // pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            else if (preg_match('#^(?P<program>(.*((\(|\[).*(\)|\])))):(?P<msg>.*)$#', $entry['msg'], $matches)) {
+            if (preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
                 $entry['msg']     = $matches['msg'];
                 $entry['program'] = $matches['program'];
             } // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
@@ -119,10 +101,17 @@ function process_syslog($entry, $update) {
             // $entry['msg'] = substr($entry['msg'], $pos+1);
             // }
             // fallback, better than nothing...
-            else if (empty($entry['program']) and !empty($entry['facility'])) {
+            elseif (empty($entry['program']) and !empty($entry['facility'])) {
                 $entry['program'] = $entry['facility'];
             }
 
+            unset($matches);
+        } elseif ($os == 'procurve') {
+            $matches = array();
+            if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', $entry['msg'], $matches)) {
+                $entry['msg']     = $matches['msg']. " [". $entry['program']. "]";
+                $entry['program'] = $matches['program'];
+            }
             unset($matches);
         }//end if
 
@@ -132,7 +121,7 @@ function process_syslog($entry, $update) {
         }
 
         $entry['program'] = strtoupper($entry['program']);
-        array_walk($entry, 'trim');
+        $entry = array_map('trim', $entry);
 
         if ($update) {
             dbInsert(
@@ -154,5 +143,4 @@ function process_syslog($entry, $update) {
     }//end if
 
     return $entry;
-
 }//end process_syslog()

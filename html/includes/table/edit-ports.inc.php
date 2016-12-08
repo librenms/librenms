@@ -55,7 +55,8 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
     $checked = '';
-    if (get_dev_attrib($device_id, 'ifName_tune:'.$port['ifName']) == "true") {
+    $device['device_id'] = $device_id;
+    if (get_dev_attrib($device, 'ifName_tune:'.$port['ifName']) == "true") {
         $checked = 'checked';
     }
 
@@ -69,9 +70,9 @@ foreach (dbFetchRows($sql, $param) as $port) {
         'ignore'           => '<input type="checkbox" class="ignore-check" name="ignore_'.$port['port_id'].'"'.($port['ignore'] ? 'checked' : '').'>
                                <input type="hidden" name="oldign_'.$port['port_id'].'" value="'.($port['ignore'] ? 1 : 0).'"">',
         'port_tune'        => '<input type="checkbox" id="override_config" name="override_config" data-attrib="ifName_tune:'.$port['ifName'].'" data-device_id="'.$port['device_id'].'" data-size="small" '.$checked.'>',
-        'ifAlias'          => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifAlias'].'"><span class="glyphicon form-control-feedback" aria-hidden="true"></span></div>',
+        'ifAlias'          => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifAlias'].'"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
+        'ifSpeed'          => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" id="if-speed" name="if-speed" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifSpeed'].'"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
     );
-
 }//end foreach
 
 $output = array(

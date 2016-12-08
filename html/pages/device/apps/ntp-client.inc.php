@@ -3,8 +3,8 @@
 global $config;
 
 $graphs = array(
-    'ntpclient_stats' => 'NTP Client - Statistics',
-    'ntpclient_freq'  => 'NTP Client - Frequency',
+    'ntp-client_stats' => 'NTP Client - Statistics',
+    'ntp-client_freq'  => 'NTP Client - Frequency',
 );
 
 foreach ($graphs as $key => $text) {
@@ -14,10 +14,15 @@ foreach ($graphs as $key => $text) {
     $graph_array['to']     = $config['time']['now'];
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
-    echo '<h3>'.$text.'</h3>';
-    echo "<tr bgcolor='$row_colour'><td colspan=5>";
-
+    
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">'.$text.'</h3>
+    </div>
+    <div class="panel-body">
+    <div class="row">';
     include 'includes/print-graphrow.inc.php';
-
-    echo '</td></tr>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }

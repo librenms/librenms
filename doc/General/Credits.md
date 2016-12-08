@@ -1,3 +1,4 @@
+source: General/Credits.md
 LibreNMS is a fork of the last GPL-licensed revision of Observium.
   http://observium.org/
   Copyright 2006-2012 Adam Armstrong <adama@memetic.org>.
@@ -28,11 +29,11 @@ LibreNMS ships with the following software components:
 
 - Code for UBNT Devices
   Mark Gibbons <mgibbons@oemcomp.com>
-  Initial code base submited via PR721
+  Initial code base submitted via PR721
 
 - Jquery LazyLoad
   http://www.appelsiini.net/projects/lazyload
-  Mika Tuupola <tuupola@appelsiini.net> (@tuupola on github)
+  Mika Tuupola <tuupola@appelsiini.net> (@tuupola on GitHub)
   MIT License
 
 - influxdb-php
@@ -49,10 +50,3 @@ Other components (needs details filled in):
 - html/includes/collectd/: GPLv2 only
 
 - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
-
-- scripts/*/mysql: GPLv2 only
-
-- check_mk (scripts/observium_agent*): GPLv2
-
-- qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
-

@@ -10,7 +10,7 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/result.example.json');
+        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
     }
 
@@ -65,7 +65,7 @@ EOD;
      */
     public function testGetPointsFromNameWithoudTags()
     {
-        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/result-no-tags.example.json');
+        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/json/result-no-tags.example.json');
         $this->resultSet = new ResultSet($resultJsonExample);
 
         $measurementName = 'cpu_load_short';
@@ -93,6 +93,11 @@ EOD;
 
         $this->assertCount($expectedNumberOfPoints, $points);
 
+    }
+
+    public function testGetSeries()
+    {
+        $this->assertEquals(['time', 'value'], $this->resultSet->getColumns());
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/cipsec_flow.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'cipsec_flow');
 
 $ds_in  = 'InOctets';
 $ds_out = 'OutOctets';

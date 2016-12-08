@@ -1,0 +1,138 @@
+   ADTRAN-COMMON-AOS DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY
+           FROM SNMPv2-SMI
+       adShared, adIdentityShared
+           FROM ADTRAN-MIB
+       adGenAOS, adGenAOSCommon
+           FROM ADTRAN-AOS;
+
+	adGenAOSCommonMib MODULE-IDENTITY
+		LAST-UPDATED "201409100000Z"  -- September 10, 2014
+		ORGANIZATION "ADTRAN, Inc."
+    	CONTACT-INFO
+           "Technical Support Dept.
+            Postal: ADTRAN, Inc.
+            901 Explorer Blvd.
+            Huntsville, AL 35806
+
+            Tel: +1 800 726-8663
+            Fax: +1 256 963 6217
+            E-mail: support@adtran.com"
+        DESCRIPTION
+		   "This MIB defines the Adtran OS Common enterprise tree node.  It
+		     provides a basis for the definition of all other Adtran OS Common
+		     MIBs."
+
+        REVISION    "201501050000Z"  -- January 5, 2015
+        DESCRIPTION
+            "Added adGenAOSDyingGasp."
+        REVISION    "201411052205Z"  -- November 5, 2014
+        DESCRIPTION
+            "Added adGenAOSOverTempProtection."
+     	REVISION    "201409100000Z"  -- September 10, 2014
+		DESCRIPTION
+		    "Fixed compile error and cleaned up warnings."                    
+    	REVISION    "201308230000Z"  -- August 23, 2013
+       	DESCRIPTION
+			"Added adGenAosIfPerfHistory."                    
+		REVISION    "200708230000Z"  -- August 23, 2007
+		DESCRIPTION
+		    "Initial version of this MIB module."
+       ::= { adGenAOS 1 }
+
+
+      adGenAOSUnit               OBJECT IDENTIFIER ::= { adGenAOSCommon 1 }
+      adGenAOSSnmp               OBJECT IDENTIFIER ::= { adGenAOSCommon 2 }
+      adAOSDownload              OBJECT IDENTIFIER ::= { adGenAOSCommon 3 }
+      adGenAOSCpuUtil            OBJECT IDENTIFIER ::= { adGenAOSCommon 4 }
+      adGenAOSMux                OBJECT IDENTIFIER ::= { adGenAOSCommon 5 }
+      adGenAOSFileSystem         OBJECT IDENTIFIER ::= { adGenAOSCommon 6 }
+      adGenAosIfPerfHistory      OBJECT IDENTIFIER ::= { adGenAOSCommon 7 }
+      adGenAOSFan  			     OBJECT IDENTIFIER ::= { adGenAOSCommon 8 }
+      adGenAOSNetSync            OBJECT IDENTIFIER ::= { adGenAOSCommon 9 }
+      adGenAOSOverTempProtection OBJECT IDENTIFIER ::= { adGenAOSCommon 10 }
+      adGenAOSDyingGasp          OBJECT IDENTIFIER ::= { adGenAOSCommon 11 }
+
+    --
+    -- adGenAOS
+    --
+    -- The features in Adtran OS products that support SNMP
+    -- management appear in a list under the "adGenAOS" node.
+    --
+
+    --
+    -- AOS Common Section - adGenAOSCommon
+    --
+    -- Contains general information and config for AOS products
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1
+    --
+
+    --
+    -- AOS Common Section - adGenAOSUnit
+    --
+    -- Contains device information, contact information, and overall system health information."
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.1
+    --
+    --
+
+    -- AOS Common Section - adGenAOSSnmp
+    --
+    -- defines how the method for configuring an ADTRAN OS
+    -- device for SNMP community names and configuration for TRAP
+    -- manager destinations."
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.2
+    --
+
+    --
+    -- AOS Common Section - adAOSDownload
+    --
+    -- defines how the method for commanding an ADTRAN
+    -- OS device to initiate a download or upload of configuration
+    -- or firmware from a TFTP server.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.3
+    --
+
+    --
+    -- AOS Common Section - adGenAOSCpuUtil
+    --
+    -- Contains information regarding CPU utilization, Memory usage
+    -- and system process status.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.4
+    --
+
+    -- AOS Common Section - adGenAOSMux
+    --
+    -- Contains informaging regarding the management of AOS products with
+    -- TDM multiplexing and/or cross-connects.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.5
+    --
+
+    --
+    -- AOS Common Section - adGenAOSFileSystem
+    --
+    -- Contains device information, contact information, and
+    -- overall system health information.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.6
+    --
+    --
+    -- AOS Common Section - adGenAOSIfPerfHistory
+    --
+    -- Contains performance history information for interfaces.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.7
+    --
+    --
+    -- AOS Common Section - adGenAOSOverTempProtection
+    --
+    -- Contains notifications for over-temperature events.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.10
+    --
+        --
+    -- AOS Common Section - adGenAOSDyingGasp
+    --
+    -- Contains notifications for dying gasp events.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.11
+    --
+       END
+

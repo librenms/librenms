@@ -1,0 +1,280 @@
+-- *****************************************************************
+-- MPLS-LSR-STD-CAPABILITY.mib: Juniper MPLS-LSR-STD-MIB AGENT-CAPABILITIES
+--
+-- Copyright (c) 2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+MPLS-LSR-STD-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+            FROM SNMPv2-CONF
+    jnxAgentCapability
+            FROM JUNIPER-SMI;
+
+jnxmplsLsrStdCapability MODULE-IDENTITY
+    LAST-UPDATED "201410290000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+
+    DESCRIPTION
+       "Agent capabilities for MPLS-LSR-STD-MIB (RFC3813)"
+    ::= { jnxAgentCapability 4 }
+
+
+jnxmplsLsrStdCapJunos AGENT-CAPABILITIES
+
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION     "MPLS-LSR-STD-MIB capabilities"
+
+    SUPPORTS        MPLS-LSR-STD-MIB
+    INCLUDES        { mplsInSegmentGroup,
+                      mplsOutSegmentGroup,
+                      mplsXCGroup,
+                      mplsInterfaceGroup,
+                      mplsLabelStackGroup
+                    }
+
+-- InSegment Group
+    VARIATION   mplsInSegmentIndexNext
+    ACCESS      read-only
+    DESCRIPTION "This object always returns a byte of zero"
+    
+    VARIATION   mplsInSegmentInterface
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+    
+    VARIATION   mplsInSegmentLabel
+    ACCESS	read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsInSegmentLabelPtr
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsInSegmentNPop
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required.  This object
+                is always returns 1."
+    
+    VARIATION   mplsInSegmentAddrFamily                        
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required. Always returns value  
+                other(0) indicates that the family type is either
+                unknown or undefined"
+    
+    VARIATION   mplsInSegmentOwner
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required. "
+                 
+             
+    VARIATION   mplsInSegmentRowStatus
+    ACCESS      read-only
+    DESCRIPTION "Always returns value 1 meaning it is active."
+             
+    VARIATION   mplsInSegmentStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required.Always returns value 2 
+                meaning it is volatile"
+
+    VARIATION   mplsInSegmentTrafficParamPtr
+    ACCESS      read-only
+    DESCRIPTION "This object always returns value 0."
+   
+    VARIATION    mplsInSegmentMapIndex
+    ACCESS       not-implemented
+    DESCRIPTION  "Unsupported"
+
+-- OutSegment Group  
+
+    VARIATION   mplsOutSegmentIndexNext
+    ACCESS      read-only
+    DESCRIPTION "read-only. Always returns a byte of 0."
+
+    VARIATION   mplsOutSegmentInterface
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required"
+
+    VARIATION   mplsOutSegmentPushTopLabel
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsOutSegmentTopLabel
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsOutSegmentTopLabelPtr
+    ACCESS      read-only
+    DESCRIPTION "read-only. This object always returns 0."
+
+    VARIATION   mplsOutSegmentNextHopAddrType
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required.
+                Only unknown(0), ipv4(1) and ipv6(2) supported."
+
+    VARIATION   mplsOutSegmentNextHopAddr
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsOutSegmentXCIndex
+    ACCESS      read-only
+    DESCRIPTION "Write access not required."
+
+    VARIATION   mplsOutSegmentOwner
+    ACCESS      read-only
+    DESCRIPTION "Write access not required.
+                Always retuns value unknown(1)"
+
+    VARIATION   mplsOutSegmentPerfOctets
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+    VARIATION   mplsOutSegmentPerfDiscards
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+
+    VARIATION   mplsOutSegmentPerfErrors
+    ACCESS      not-implemented
+    DESCRIPTION "not supported."
+            
+    VARIATION   mplsOutSegmentRowStatus
+    ACCESS      read-only
+    DESCRIPTION "Write access not required.
+ 		Always returns value active(1)."
+
+    VARIATION   mplsOutSegmentStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write access not required.
+                Always returns value volatile(2)"
+
+    VARIATION   mplsOutSegmentTrafficParamPtr
+    ACCESS      read-only
+    DESCRIPTION "read-only. This object always returns 0"
+
+-- XC Group
+
+    VARIATION   mplsXCIndexNext
+    ACCESS      read-only
+    DESCRIPTION "This object always returns value 0."
+
+    VARIATION   mplsXCLspId
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsXCLabelStackIndex
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required." 
+
+    VARIATION   mplsXCOwner
+    ACCESS      read-only
+    DESCRIPTION "Write access not required."
+
+    VARIATION   mplsXCAdminStatus
+    ACCESS      read-only
+    DESCRIPTION "Write access not required.
+                Always returns value up(1)."
+
+    VARIATION   mplsXCRowStatus
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required.
+                Always retuns value active(1)"
+
+    VARIATION   mplsXCStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write access not needed.
+                Always returns volatile(2)." 
+
+    VARIATION   mplsXCOperStatus
+    ACCESS      read-only
+    DESCRIPTION "Write access not required.
+                Always returns value up(1)."
+   
+    VARIATION   mplsXCNotificationsEnable
+    ACCESS      read-only
+    DESCRIPTION "Write access not needed.
+                Always returns false(2)." 
+
+-- Interface Group
+
+    VARIATION    mplsInterfaceLabelMinIn
+    ACCESS       read-only
+    DESCRIPTION  "Write access not required.
+                 Always returns value 0."
+    
+    VARIATION    mplsInterfaceLabelMaxIn
+    ACCESS       read-only
+    DESCRIPTION  "Write access is not required.
+                 Always returns  MPLS_MAX_LABEL
+                 (0xfffff is the value supported now )."
+
+    VARIATION    mplsInterfaceLabelMinOut
+    ACCESS       read-only
+    DESCRIPTION  "Write access not required.
+                 Always returns 0."
+
+    VARIATION    mplsInterfaceLabelMaxOut
+    ACCESS       read-only
+    DESCRIPTION  "Write access is not required.
+                 Always returns MPLS_MAX_LABEL
+                 (0xfffff is the value supported now)."
+
+    VARIATION    mplsInterfaceTotalBandwidth
+    ACCESS       read-only
+    DESCRIPTION  "Write access not required.
+                 Always returns 0."
+                 
+    VARIATION    mplsInterfaceAvailableBandwidth
+    ACCESS       read-only
+    DESCRIPTION  "Write access not required. 
+                 Always returns 0."
+
+    VARIATION    mplsInterfaceLabelParticipationType
+    ACCESS       read-only
+    DESCRIPTION  "Write access not required."
+
+-- LabelStack Group 
+   
+   VARIATION    mplsLabelStackLabel
+   ACCESS       read-only
+   DESCRIPTION  "Write access not required"
+
+   VARIATION    mplsLabelStackLabelPtr
+   ACCESS       read-only
+   DESCRIPTION  "Write access not required"
+
+   VARIATION    mplsLabelStackRowStatus   
+   ACCESS       read-only 
+   DESCRIPTION  "Write access not required.
+                Always returns active(1)."
+
+   VARIATION    mplsLabelStackStorageType
+   ACCESS       read-only
+   DESCRIPTION  "Write access not required.
+                Always returns volatile(2)."
+   
+   VARIATION    mplsLabelStackIndexNext
+   ACCESS       read-only
+   DESCRIPTION  "Always returna a byte of 0"
+
+-- NOTIFICATION-TYPE
+   VARIATION    mplsXCUp
+   DESCRIPTION  "Not supported"
+
+   VARIATION    mplsXCDown
+   DESCRIPTION  "Not supported"
+
+::= { jnxmplsLsrStdCapability 4 }
+
+END
+
+

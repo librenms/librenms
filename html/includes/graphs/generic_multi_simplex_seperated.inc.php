@@ -5,8 +5,7 @@ require 'includes/graphs/common.inc.php';
 if ($width > '500') {
     $descr_len = 24;
     // FIXME may even be more imo?
-}
-else {
+} else {
     $descr_len  = 12;
     $descr_len += round(($width - 250) / 8);
 }
@@ -25,8 +24,7 @@ if ($width > '500') {
     }
 
     $rrd_options .= " COMMENT:'\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Now      Min      Max     Avg\l'";
 }
 
@@ -42,8 +40,7 @@ $colour_iter = 0;
 foreach ($rrd_list as $i => $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
-    }
-    else {
+    } else {
         if (!$config['graph_colours'][$colours][$colour_iter]) {
             $colour_iter = 0;
         }
@@ -59,8 +56,7 @@ foreach ($rrd_list as $i => $rrd) {
     if ($simple_rrd) {
         $rrd_options .= ' CDEF:'.$rrd['ds'].$i.'min='.$rrd['ds'].$i.' ';
         $rrd_options .= ' CDEF:'.$rrd['ds'].$i.'max='.$rrd['ds'].$i.' ';
-    }
-    else {
+    } else {
         $rrd_options .= ' DEF:'.$rrd['ds'].$i.'min='.$rrd['filename'].':'.$rrd['ds'].':MIN ';
         $rrd_options .= ' DEF:'.$rrd['ds'].$i.'max='.$rrd['filename'].':'.$rrd['ds'].':MAX ';
     }
@@ -93,8 +89,7 @@ foreach ($rrd_list as $i => $rrd) {
         $rrd_options .= ' CDEF:'.$g_defname.$i.'max='.$rrd['ds'].$i.'max,'.$multiplier.',*';
 
         // If we've been passed a divider (divisor!) we make a CDEF for it.
-    }
-    else if (is_numeric($divider)) {
+    } elseif (is_numeric($divider)) {
         $g_defname    = $rrd['ds'].'_cdef';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'='.$rrd['ds'].$i.','.$divider.',/';
         $rrd_options .= ' CDEF:'.$g_defname.$i.'min='.$rrd['ds'].$i.'min,'.$divider.',/';
@@ -104,8 +99,7 @@ foreach ($rrd_list as $i => $rrd) {
     // Are our text values related to te multiplier/divisor or not?
     if (isset($text_orig) && $text_orig) {
         $t_defname = $rrd['ds'];
-    }
-    else {
+    } else {
         $t_defname = $g_defname;
     }
 
@@ -124,11 +118,9 @@ foreach ($rrd_list as $i => $rrd) {
 if ($_GET['previous'] == 'yes') {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX.','.$multiplier.',*';
-    }
-    else if (is_numeric($divider)) {
+    } elseif (is_numeric($divider)) {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX.','.$divider.',/';
-    }
-    else {
+    } else {
         $rrd_options .= ' CDEF:X='.$thingX.$plusesX;
     }
 

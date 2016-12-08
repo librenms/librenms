@@ -1,0 +1,10 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    influxdb_udp_enabled: "true"
+    influxdb_udp_bind_address: "0.0.0.0:8090"
+
+  roles:
+    - { role: mtchavez.influxdb }

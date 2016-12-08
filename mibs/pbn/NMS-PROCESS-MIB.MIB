@@ -1,0 +1,414 @@
+-- *****************************************************************
+-- NMS-PROCESS-MIB.my: MIB for CPU and process statistics
+--
+-- October 2003
+--
+-- Copyright (c) 2003 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+NMS-PROCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Counter32,
+	Gauge32
+		FROM SNMPv2-SMI
+	TimeStamp,
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP
+		FROM SNMPv2-CONF
+	nmsMgmt
+		FROM NMS-SMI
+--	Unsigned32, EntPhysicalIndexOrZero
+--		FROM NMS-TC;   
+     Unsigned32
+        	FROM SNMPv2-SMI
+        EntPhysicalIndexOrZero
+	FROM NMS-TC; 
+
+
+nmsProcessMIB MODULE-IDENTITY
+	LAST-UPDATED "200311060000Z"
+	ORGANIZATION ""
+	CONTACT-INFO
+		""
+	DESCRIPTION
+		"The MIB module to describe active system processes."
+	REVISION        "200310160000Z"
+	DESCRIPTION
+		"Initial version of this MIB."		
+	::= { nmsMgmt 109 }
+
+-- This MIB displays memory and CPU utilization on nms devices. CPU 
+-- utilization will give a general idea of how busy the processor is. 
+-- The numbers are a ratio of the current idle time over the longest 
+-- idle time. Please note that this information should be used as an 
+-- estimate only. 
+
+nmsProcessMIBObjects	OBJECT IDENTIFIER ::= { nmsProcessMIB 1 }
+nmspmCPU		OBJECT IDENTIFIER ::= { nmsProcessMIBObjects 1 }
+nmspmProcess		OBJECT IDENTIFIER ::= { nmsProcessMIBObjects 2 }
+
+
+--NMS CPU Total Table
+
+nmspmCPUTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF NMSpmCPUTotalEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"A table of overall CPU statistics. "
+	::= { nmspmCPU 1 }
+
+nmspmCPUTotalEntry OBJECT-TYPE
+	SYNTAX		NMSpmCPUTotalEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"Overall information about the CPU load. Entries in this
+		table come and go as CPUs are added and removed from the
+		system."
+	INDEX	{ nmspmCPUTotalIndex }
+	::= { nmspmCPUTotalTable 1 }
+
+NMSpmCPUTotalEntry ::=
+	SEQUENCE {
+		nmspmCPUTotalIndex		Unsigned32,
+		nmspmCPUTotalPhysicalIndex	EntPhysicalIndexOrZero,
+		nmspmCPUTotal5sec		Gauge32,
+		nmspmCPUTotal1min		Gauge32,
+		nmspmCPUTotal5min		Gauge32
+	}
+
+nmspmCPUTotalIndex OBJECT-TYPE
+	SYNTAX          Unsigned32 (1.. 4294967295)
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"An index that uniquely represents a CPU (or group of CPUs)
+		whose CPU load information is reported by a row in this table.
+		This index is assigned arbitrarily by the engine
+		and is not saved over reboots."
+	::= { nmspmCPUTotalEntry 1 }
+
+nmspmCPUTotalPhysicalIndex OBJECT-TYPE
+	SYNTAX	        EntPhysicalIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The entPhysicalIndex of the physical entity for which
+		 the CPU statistics in this entry are maintained.
+		 The physical entity can be a CPU chip, a group of CPUs,
+		 a CPU card etc. The exact type of this entity is described by
+		 its entPhysicalVendorType value. If the CPU statistics
+		 in this entry correspond to more than one physical entity
+		 (or to no physical entity), or if the entPhysicalTable is
+		 not supported on the SNMP agent, the value of this object
+		 must be zero."
+	::= { nmspmCPUTotalEntry 2 }
+
+nmspmCPUTotal5sec OBJECT-TYPE
+        SYNTAX          Gauge32 (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 5 second 
+		period. This object is deprecated by nmspmCPUTotal5secRev
+		 which has the changed range of	value (0..100)."
+	::= { nmspmCPUTotalEntry 3 }
+
+nmspmCPUTotal1min OBJECT-TYPE
+        SYNTAX          Gauge32  (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 1 minute
+		period. This object is deprecated by nmspmCPUTotal1minRev
+		which has the changed range of value (0..100)."
+	::= { nmspmCPUTotalEntry 4 }
+
+nmspmCPUTotal5min OBJECT-TYPE
+        SYNTAX          Gauge32 (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 5 minute
+		period. This object is deprecated by nmspmCPUTotal5minRev
+		which has the changed range of value (0..100)."
+	::= { nmspmCPUTotalEntry 5 }
+
+nmspmCPUMaxUtilization OBJECT-TYPE
+        SYNTAX          Gauge32 (1..100)
+		UNITS		"percent"
+		MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The max value of nmspmCPUTotal5sec."
+	::= { nmspmCPU 2 }
+
+nmspmCPUClearMaxUtilization OBJECT-TYPE
+        SYNTAX          INTEGER{clear(1)}
+		UNITS		"percent"
+		MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+		"To clear nmspmCPUMaxUtilization."
+	::= { nmspmCPU 3 }
+
+
+
+-- NMS Processes Common Table
+
+nmspmProcessTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF NMSpmProcessEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"A table of generic information on all active 
+		processes on this device."
+	::= { nmspmProcess 1 }
+
+nmspmProcessEntry OBJECT-TYPE
+	SYNTAX    	NMSpmProcessEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"Generic information about an active process on this 
+		device. Entries in this table come and go as processes are 
+		created and destroyed by the device."
+	INDEX	{ nmspmCPUTotalIndex, nmspmProcessPID }
+	::= { nmspmProcessTable 1 }
+
+NMSpmProcessEntry ::=
+	SEQUENCE {
+		nmspmProcessPID
+			Unsigned32,
+		nmspmProcessName 
+			DisplayString,
+		nmspmProcessPriority
+			INTEGER,
+		nmspmProcessTimeCreated
+			TimeStamp
+	}
+
+nmspmProcessPID OBJECT-TYPE
+	SYNTAX    	Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"This object contains the process ID. nmspmProcessTimeCreated
+		should be checked against the last time it was polled,
+		and if it has changed the PID has been reused and the
+		 entire entry should be polled again. The process IDs
+		are discrete."
+	::= { nmspmProcessEntry 1 }
+
+nmspmProcessName OBJECT-TYPE
+	SYNTAX    	DisplayString(SIZE(1..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The name associated with this process. If the name is
+		longer than 32 characters, it will be truncated to the first
+		31 characters, and a `*' will be appended as the last
+		character to imply this is a truncated process name."
+	::= { nmspmProcessEntry 2 }
+
+nmspmProcessPriority OBJECT-TYPE
+	SYNTAX		INTEGER {
+				critical(0),
+				veryhigh(55),
+				high(60),
+				normal(128),
+				low(180),
+				verylow(255)
+			}
+	MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+		"The priority level at which the process is 
+		running. This object is deprecated by
+		nmspmProcExtPriorityRev."
+	::= { nmspmProcessEntry 3 }
+
+nmspmProcessTimeCreated OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The time when the process was created. The process ID 
+		and the time when the process was created, uniquely 
+		identifies a process."
+	::= { nmspmProcessEntry 4 }
+
+-- notifications
+
+nmsProcessMIBNotifPrefix OBJECT IDENTIFIER ::= { nmsProcessMIB 2 }
+nmsProcessMIBNotifs OBJECT IDENTIFIER ::=
+	{ nmsProcessMIBNotifPrefix 0 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+
+nmsProcessMIBConformance OBJECT IDENTIFIER ::= { nmsProcessMIB 3 }
+nmspmCompliances OBJECT IDENTIFIER ::= { nmsProcessMIBConformance 1 }
+nmspmGroups OBJECT IDENTIFIER ::=      { nmsProcessMIBConformance 2 }
+
+nmsProcessMIBCompliance  MODULE-COMPLIANCE
+	STATUS	deprecated
+	DESCRIPTION
+		"The compliance statement for entities which implement
+		the NMS Process MIB. This is deprecated and new 
+		compliance nmsProcessMIBComplianceRev is added."
+	MODULE	-- this module
+		MANDATORY-GROUPS { nmspmCPUTotalGroup, nmspmProcessGroup }
+
+
+	GROUP nmspmProcessExtGroup
+	DESCRIPTION
+		"The nmspmProcessExtGroup is optional for all entities."
+
+	OBJECT		nmspmProcExtPriority
+	MIN-ACCESS	read-only
+	DESCRIPTION     "Write access is not required."
+
+	::= { nmspmCompliances 1 }
+
+nmsProcessMIBComplianceRev  MODULE-COMPLIANCE
+	STATUS	current
+	DESCRIPTION
+		"The compliance statement for entities which implement
+		the NMS Process MIB. This compliance module
+		deprecates nmsProcessMIBCompliance."
+	MODULE	-- this module
+		MANDATORY-GROUPS { nmspmCPUTotalGroupRev, nmspmProcessGroupRev}	
+
+	GROUP nmspmProcessExtGroupRev
+	DESCRIPTION
+		"The nmspmProcessExtGroupRev is optional for all
+		entities. This object is defined after deprecating
+		nmspmProcessExtGroup."
+	
+	::= { nmspmCompliances 2 }
+
+-- units of conformance
+
+nmspmCPUTotalGroup OBJECT-GROUP
+	OBJECTS {
+		nmspmCPUTotalPhysicalIndex,
+		nmspmCPUTotal5sec,
+		nmspmCPUTotal1min,
+		nmspmCPUTotal5min
+	}
+	STATUS  deprecated
+	DESCRIPTION
+		"A collection of objects providing CPU load monitoring
+		information. This group is mandatory for all nms devices.
+		This group is deprecated since the objects nmspmCPUTotal5sec,
+		nmspmCPUTotal1min and nmspmCPUTotal5min are
+		deprecated. A new object nmspmCPUTotalGroupRev is
+		added in place of it."
+	::= { nmspmGroups 1 }
+
+nmspmProcessGroup OBJECT-GROUP
+	OBJECTS {
+		nmspmProcessPID,
+		nmspmProcessName,
+		nmspmProcessuSecs,
+		nmspmProcessTimeCreated
+	}
+	STATUS	deprecated
+	DESCRIPTION
+		"A collection of objects providing common process 
+		monitoring information. This group is mandatory for 
+		all nms devices. This object is deprecated
+		by nmspmProcessGroupRev."
+	::= { nmspmGroups 2 }
+
+nmspmProcessExtGroup OBJECT-GROUP
+	OBJECTS {
+		nmspmProcExtMemAllocated,
+		nmspmProcExtMemFreed,
+		nmspmProcExtInvoked,
+		nmspmProcExtRuntime,
+		nmspmProcExtUtil5Sec,
+		nmspmProcExtUtil1Min,
+		nmspmProcExtUtil5Min,
+		nmspmProcExtPriority
+	}
+	STATUS	deprecated
+	DESCRIPTION
+		"A collection of objects providing additional and 
+		more detailed process monitoring information. This 
+		group is mandatory for all nms devices that have 
+		the internal capability to keep this information. 
+		This group is deprecated and new group
+		nmspmProcessExtGroupRev is added."
+	::= { nmspmGroups 3 }
+
+nmspmCPUTotalGroupRev OBJECT-GROUP
+	OBJECTS {
+		nmspmCPUTotalPhysicalIndex,
+		nmspmCPUTotal5secRev,
+		nmspmCPUTotal1minRev,
+		nmspmCPUTotal5minRev
+	}
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing CPU load monitoring
+		information. This group is mandatory for all nms
+		devices. This group deprecates nmspmCPUTotalGroup."
+	::= { nmspmGroups 4 }
+
+nmspmProcessExtGroupRev OBJECT-GROUP
+	OBJECTS {
+		nmspmProcExtMemAllocatedRev,
+		nmspmProcExtMemFreedRev,
+		nmspmProcExtInvokedRev,
+		nmspmProcExtRuntimeRev,
+		nmspmProcExtUtil5SecRev,
+		nmspmProcExtUtil1MinRev,
+		nmspmProcExtUtil5MinRev,
+		nmspmProcExtPriorityRev
+	}
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects providing additional and 
+		more detailed process monitoring information. This 
+		group is mandatory for all nms devices that have 
+		the internal capability to keep this information.
+		This group is formed after deprecating nmspmProcessExtGroup.
+		nmspmProcExtMemAllocatedRev, nmspmProcExtMemFreedRev,
+		nmspmProcExtInvokedRev, nmspmProcExtRuntimeRev,
+		nmspmProcExtUtil5SecRev, nmspmProcExtUtil1MinRev and 
+		nmspmProcExtUtil5MinRev are the new objects added."
+	::= { nmspmGroups 5 }
+
+nmspmProcessGroupRev OBJECT-GROUP
+	OBJECTS {
+		nmspmProcessPID,
+		nmspmProcessName,
+		nmspmProcessAverageUSecs,
+		nmspmProcessTimeCreated
+	}
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects providing common process 
+		monitoring information. This group is mandatory for 
+		all nms devices. This object deprecates
+		nmspmProcessGroup."
+	::= { nmspmGroups 6 }
+
+END
+
+

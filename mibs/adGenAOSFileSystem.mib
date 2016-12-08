@@ -1,0 +1,239 @@
+       ADTRAN-AOSFILESYSTEM DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus, TDomain, TAddress, TEXTUAL-CONVENTION
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           adIdentity
+               FROM ADTRAN-MIB
+           adGenAOSCommon, adGenAOSConformance
+               FROM ADTRAN-AOS;
+
+       adGenAOSFileSystemMib MODULE-IDENTITY
+        LAST-UPDATED "200505180000Z"  -- May 18, 2005
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                    	"This MIB contains device information, contact information, and
+			overall system health information."
+
+            REVISION    "200505180000Z"  -- May 18, 2005
+            DESCRIPTION
+                    "Initial version of this MIB module."
+          ::= { adIdentity 10000 53 1 6 }
+
+      adGenAOSFileSystem        OBJECT IDENTIFIER ::= {  adGenAOSCommon 6 }
+
+    adAOSFileSystemRecordTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF AdAOSFileSystemRecordEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table files stored on the unit.
+                   "
+           ::= { adGenAOSFileSystem 1 }
+
+       adAOSFileSystemRecordEntry OBJECT-TYPE
+           SYNTAX     AdAOSFileSystemRecordEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The row in the adAOSFileSystemRecordTable containing the
+                   information about the files stored on the unit."
+           INDEX      { adAOSFileSystemRecordID }
+           ::= { adAOSFileSystemRecordTable 1 }
+
+       AdAOSFileSystemRecordEntry ::=
+           SEQUENCE {
+               adAOSFileSystemRecordID          Unsigned32,
+               adAOSFileSystemRecordSystem      DisplayString,
+               adAOSFileSystemRecordType        INTEGER,
+               adAOSFileSystemRecordPath        DisplayString,
+               adAOSFileSystemRecordName        DisplayString,
+               adAOSFileSystemRecordSize        Unsigned32,
+               adAOSFileSystemRecordStatus      RowStatus
+           }
+
+        adAOSFileSystemRecordID OBJECT-TYPE
+            SYNTAX      Unsigned32
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "Unique identifier for this file system entry."
+           ::= { adAOSFileSystemRecordEntry 1 }
+
+
+        adAOSFileSystemRecordSystem OBJECT-TYPE
+                SYNTAX       DisplayString
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION "The record storage type."
+           ::= { adAOSFileSystemRecordEntry 2 }
+
+        adAOSFileSystemRecordType OBJECT-TYPE
+          SYNTAX  INTEGER {
+                     file (1),
+                     directory (2)
+                 }
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "The type or record entry."
+           ::= { adAOSFileSystemRecordEntry 3 }
+
+        adAOSFileSystemRecordPath OBJECT-TYPE
+                SYNTAX       DisplayString
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION "The directory path."
+           ::= { adAOSFileSystemRecordEntry 4 }
+
+        adAOSFileSystemRecordName OBJECT-TYPE
+                SYNTAX       DisplayString
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION "The entry name."
+           ::= { adAOSFileSystemRecordEntry 5 }
+
+        adAOSFileSystemRecordSize OBJECT-TYPE
+            SYNTAX      Unsigned32
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "The record size."
+           ::= { adAOSFileSystemRecordEntry 6 }
+
+       adAOSFileSystemRecordStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The status of this record entry.  This object
+                   may only be set to 'destroy' to remove a file from
+                   the file system. Directories cannot be removed with
+                   this object."
+           ::= { adAOSFileSystemRecordEntry 7 }
+
+    adAOSFileSystemTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF AdAOSFileSystemEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table containg information about the filesytem storage.
+                   "
+           ::= { adGenAOSFileSystem 2 }
+
+       adAOSFileSystemEntry OBJECT-TYPE
+           SYNTAX     AdAOSFileSystemEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The row in the adAOSFileSystemTable containing information
+                   about the file system."
+           INDEX      { adAOSFileSystemID }
+           ::= { adAOSFileSystemTable 1 }
+
+       AdAOSFileSystemEntry ::=
+           SEQUENCE {
+               adAOSFileSystemID                Unsigned32,
+               adAOSFileSystemType              DisplayString,
+               adAOSFileSystemTotalSize         Unsigned32,
+               adAOSFileSystemFreeSize          Unsigned32
+           }
+
+        adAOSFileSystemID OBJECT-TYPE
+            SYNTAX      Unsigned32
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "Unique identifier for this file system entry."
+           ::= { adAOSFileSystemEntry 1 }
+
+        adAOSFileSystemType OBJECT-TYPE
+                SYNTAX       DisplayString
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION "The file storage type."
+           ::= { adAOSFileSystemEntry 2 }
+
+        adAOSFileSystemTotalSize OBJECT-TYPE
+            SYNTAX      Unsigned32
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "Total storage for this file system."
+           ::= { adAOSFileSystemEntry 3 }
+
+        adAOSFileSystemFreeSize OBJECT-TYPE
+            SYNTAX      Unsigned32
+	    MAX-ACCESS read-only
+	    STATUS current
+            DESCRIPTION "Free storage for this file system."
+           ::= { adAOSFileSystemEntry 4 }
+
+         -- conformance information
+
+        adGenAOSFileSystemConformance
+           OBJECT IDENTIFIER ::= { adGenAOSConformance 5 }
+        adAOSFileSystemCompliances
+           OBJECT IDENTIFIER ::= { adGenAOSFileSystemConformance 1 }
+        adAOSFileSystemRecordGroups
+           OBJECT IDENTIFIER ::= { adGenAOSFileSystemConformance 2 }
+        adAOSFileSystemGroups
+           OBJECT IDENTIFIER ::= { adGenAOSFileSystemConformance 3 }
+
+
+
+       -- compliance statements
+          adAOSFileSystemCompliance MODULE-COMPLIANCE
+	    STATUS  current
+	    DESCRIPTION
+	        "The compliance statement for SNMPv2 entities which
+	        implement the AOS Unit MIB."
+
+	    MODULE
+	    MANDATORY-GROUPS {
+                adGenAOSFileSystemRecordGroup,
+                adGenAOSFileSystemGroup
+            }
+            ::= { adAOSFileSystemCompliances 1 }
+
+       -- units of conformance
+        adGenAOSFileSystemRecordGroup OBJECT-GROUP
+	    OBJECTS {
+               adAOSFileSystemRecordID,
+               adAOSFileSystemRecordSystem,
+               adAOSFileSystemRecordType,
+               adAOSFileSystemRecordPath,
+               adAOSFileSystemRecordName,
+               adAOSFileSystemRecordSize,
+               adAOSFileSystemRecordStatus
+	    }
+	STATUS  current
+    	DESCRIPTION
+        "The File System Record Group."
+        ::= { adAOSFileSystemRecordGroups 1 }
+
+        adGenAOSFileSystemGroup OBJECT-GROUP
+	    OBJECTS {
+               adAOSFileSystemID,
+               adAOSFileSystemType,
+               adAOSFileSystemTotalSize,
+               adAOSFileSystemFreeSize
+	    }
+	STATUS  current
+    	DESCRIPTION
+        "The File System Group."
+        ::= { adAOSFileSystemGroups 1 }
+
+
+
+       END
+

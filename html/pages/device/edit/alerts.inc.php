@@ -10,8 +10,7 @@ if ($_POST['editing']) {
 
         if ($override_sysContact_bool) {
             set_dev_attrib($device, 'override_sysContact_bool', '1');
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'override_sysContact_bool');
         }
 
@@ -20,23 +19,20 @@ if ($_POST['editing']) {
         };
         if ($disable_notify) {
             set_dev_attrib($device, 'disable_notify', '1');
-        }
-        else {
+        } else {
             del_dev_attrib($device, 'disable_notify');
         }
 
         $update_message = 'Device alert settings updated.';
         $updated        = 1;
-    }
-    else {
+    } else {
         include 'includes/error-no-perm.inc.php';
     }//end if
 }//end if
 
 if ($updated && $update_message) {
     print_message($update_message);
-}
-else if ($update_message) {
+} elseif ($update_message) {
     print_error($update_message);
 }
 
@@ -44,6 +40,7 @@ $override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool'
 $override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
 $disable_notify             = get_dev_attrib($device, 'disable_notify');
 ?>
+<h3>Alert settings</h3>
 
 <div class="row">
     <div class="col-md-12">
@@ -51,7 +48,7 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
     </div>
 </div>
 
-<h3>Alert settings</h3>
+
 
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
   <input type="hidden" name="editing" value="yes">

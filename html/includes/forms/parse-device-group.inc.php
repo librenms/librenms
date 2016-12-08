@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+    header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -20,12 +21,11 @@ $group_id = $_POST['group_id'];
 
 if (is_numeric($group_id) && $group_id > 0) {
     $group       = dbFetchRow('SELECT * FROM `device_groups` WHERE `id` = ? LIMIT 1', array($group_id));
-    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\[\]]+[&&\|\|]+)/', $group['pattern'], -1, (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\[\]\^\$]+[&&\|\|]+)/', $group['pattern'], -1, (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
     $count       = (count($group_split) - 1);
     if (preg_match('/\&\&$/', $group_split[$count]) == 1 || preg_match('/\|\|$/', $group_split[$count]) == 1) {
         $group_split[$count] = $group_split[$count];
-    }
-    else {
+    } else {
         $group_split[$count] = $group_split[$count].'  &&';
     }
 
@@ -34,5 +34,6 @@ if (is_numeric($group_id) && $group_id > 0) {
         'desc'    => $group['desc'],
         'pattern' => $group_split,
     );
+    header('Content-type: application/json');
     echo _json_encode($output);
 }

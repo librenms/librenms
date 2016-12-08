@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 if (is_admin() === false) {
     die('ERROR: You need to be admin');
@@ -23,29 +24,24 @@ $group_name = mres($_POST['group_name']);
 $descr      = mres($_POST['descr']);
 if (!empty($group_name)) {
     if (is_numeric($group_id)) {
-        if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id))) {
+        if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id)) >= 0) {
             $ok = 'Updated poller group';
-        }
-        else {
+        } else {
             $error = 'Failed to update the poller group';
         }
-    }
-    else {
+    } else {
         if (dbInsert(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups') >= 0) {
             $ok = 'Added new poller group';
-        }
-        else {
+        } else {
             $error = 'Failed to create new poller group';
         }
     }
-}
-else {
+} else {
     $error = "You haven't given your poller group a name, it feels sad :( - $group_name";
 }
 
 if (!empty($ok)) {
     die("$ok");
-}
-else {
+} else {
     die("ERROR: $error");
 }

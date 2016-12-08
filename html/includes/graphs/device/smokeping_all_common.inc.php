@@ -15,15 +15,13 @@ $colourset = 'mixed';
 
 if ($width > '500') {
     $descr_len = 18;
-}
-else {
+} else {
     $descr_len = (12 + round(($width - 275) / 8));
 }
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev\l'";
-}
-else {
+} else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev\l'";
 }
 
@@ -37,7 +35,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
     $descr = rrdtool_escape($source, $descr_len);
 
-    $filename = generate_smokeping_file($device,$filename);
+    $filename = generate_smokeping_file($device, $filename);
     $rrd_options .= " DEF:median$i=".$filename.':median:AVERAGE ';
     $rrd_options .= " DEF:loss$i=".$filename.':loss:AVERAGE';
     $rrd_options .= " CDEF:ploss$i=loss$i,$pings,/,100,*";
@@ -45,7 +43,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     // $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
     // start emulate Smokeping::calc_stddev
     foreach (range(1, $pings) as $p) {
-    $rrd_options     .= ' DEF:pin'.$i.'p'.$p.'='.$filename.':ping'.$p.':AVERAGE';
+        $rrd_options     .= ' DEF:pin'.$i.'p'.$p.'='.$filename.':ping'.$p.':AVERAGE';
         $rrd_options .= ' CDEF:p'.$i.'p'.$p.'=pin'.$i.'p'.$p.',UN,0,pin'.$i.'p'.$p.',IF';
     }
 

@@ -77,14 +77,21 @@ class Database
      * Create this database
      *
      * @param  RetentionPolicy $retentionPolicy
+     * @param bool             $createIfNotExists Only create the database if it does not yet exist
+     *
      * @return ResultSet
      * @throws DatabaseException
-     * @throws Exception
      */
-    public function create(RetentionPolicy $retentionPolicy = null)
+    public function create(RetentionPolicy $retentionPolicy = null, $createIfNotExists = true)
     {
         try {
-            $this->query(sprintf('CREATE DATABASE %s', $this->name));
+            $query = sprintf(
+                'CREATE DATABASE %s"%s"',
+                ($createIfNotExists ? 'IF NOT EXISTS ' : ''),
+                $this->name
+            );
+
+            $this->query($query);
 
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);
@@ -125,25 +132,13 @@ class Database
         );
 
         try {
-            $driver = $this->client->getDriver();
-
             $parameters = [
                 'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
                 'database' => $this->name,
                 'method' => 'post'
             ];
 
-            // add authentication to the driver if needed
-            if (!empty($this->username) && !empty($this->password)) {
-                $parameters += ['auth' => [$this->username, $this->password]];
-            }
-
-            $driver->setParameters($parameters);
-
-            // send the points to influxDB
-            $driver->write(implode(PHP_EOL, $payload));
-
-            return $driver->isSuccess();
+            return $this->client->write($parameters, $payload);
 
         } catch (\Exception $e) {
             throw new Exception($e->getMessage(), $e->getCode());
@@ -174,7 +169,7 @@ class Database
      */
     public function listRetentionPolicies()
     {
-        return $this->query(sprintf('SHOW RETENTION POLICIES %s', $this->name))->getPoints();
+        return $this->query(sprintf('SHOW RETENTION POLICIES ON "%s"', $this->name))->getPoints();
     }
 
     /**
@@ -182,7 +177,7 @@ class Database
      */
     public function drop()
     {
-        $this->query(sprintf('DROP DATABASE %s', $this->name));
+        $this->query(sprintf('DROP DATABASE "%s"', $this->name));
     }
 
     /**
@@ -210,12 +205,8 @@ class Database
      */
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
-        if (!in_array($method, ['CREATE', 'ALTER'])) {
-            throw new \InvalidArgumentException(sprintf('%s is not a valid method'));
-        }
-
         $query = sprintf(
-            '%s RETENTION POLICY %s ON %s DURATION %s REPLICATION %s',
+            '%s RETENTION POLICY "%s" ON "%s" DURATION %s REPLICATION %s',
             $method,
             $retentionPolicy->name,
             $this->name,

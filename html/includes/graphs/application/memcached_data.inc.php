@@ -21,7 +21,7 @@ $array     = array(
 
 $i = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $vars) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $vars['descr'];
@@ -33,8 +33,7 @@ if (is_file($rrd_filename)) {
 
         $i++;
     }
-}
-else {
+} else {
     echo "file missing: $file";
 }
 

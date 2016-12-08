@@ -1,13 +1,12 @@
 <?php
 
 /*
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage webinterface
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -21,12 +20,8 @@ if ($_GET[debug]) {
     ini_set('error_reporting', E_ALL);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require 'includes/functions.inc.php';
-require '../includes/functions.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!$_SESSION['authenticated']) {
     echo 'unauthenticated';
@@ -35,29 +30,28 @@ if (!$_SESSION['authenticated']) {
 
 $output = '';
 if ($_GET['query'] && $_GET['cmd']) {
-    $host = $_GET['query'];
-    if (Net_IPv6::checkIPv6($host) || Net_IPv4::validateip($host) || preg_match('/^[a-zA-Z0-9.-]*$/', $host)) {
+    $host = clean($_GET['query']);
+    if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
         switch ($_GET['cmd']) {
-        case 'whois':
-            $cmd = $config['whois']." $host | grep -v \%";
-            break;
+            case 'whois':
+                $cmd = $config['whois']." $host | grep -v \%";
+                break;
 
-        case 'ping':
-            $cmd = $config['ping']." -c 5 $host";
-            break;
+            case 'ping':
+                $cmd = $config['ping']." -c 5 $host";
+                break;
 
-        case 'tracert':
-            $cmd = $config['mtr']." -r -c 5 $host";
-            break;
+            case 'tracert':
+                $cmd = $config['mtr']." -r -c 5 $host";
+                break;
 
-        case 'nmap':
-            if ($_SESSION['userlevel'] != '10') {
-                echo 'insufficient privileges';
-            }
-            else {
-                $cmd = $config['nmap']." $host";
-            }
-            break;
+            case 'nmap':
+                if ($_SESSION['userlevel'] != '10') {
+                    echo 'insufficient privileges';
+                } else {
+                    $cmd = $config['nmap']." $host";
+                }
+                break;
         }//end switch
 
         if (!empty($cmd)) {
@@ -66,5 +60,5 @@ if ($_GET['query'] && $_GET['cmd']) {
     }//end if
 }//end if
 
-$output = trim($output);
+$output = htmlentities(trim($output), ENT_QUOTES);
 echo "<pre>$output</pre>";

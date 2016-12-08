@@ -1,0 +1,278 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2009, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-SHAPER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Gauge32, Counter64
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdShaper MODULE-IDENTITY
+
+    LAST-UPDATED "200911010100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "."
+
+    REVISION "200911010100Z"        -- 1 Nov 2009
+    DESCRIPTION
+            "Initial version of MIB module ACD-SHAPER-MIB."
+
+    ::= { acdMibs 10 }
+
+acdShaper1             OBJECT IDENTIFIER ::= { acdShaper 1 }
+acdShaper1MIBObjects   OBJECT IDENTIFIER ::= { acdShaper1 1 }
+acdShaper1Conformance  OBJECT IDENTIFIER ::= { acdShaper1 2 }
+
+acdShaper1Config       OBJECT IDENTIFIER ::= { acdShaper1MIBObjects 1 }
+acdShaper1Stats        OBJECT IDENTIFIER ::= { acdShaper1MIBObjects 2 }
+
+---------------------------------------------------------------------------
+ -- The Shaper Code Point statistics table
+ -- This table contains all Code Point statistics.
+---------------------------------------------------------------------------
+
+acdShaper1CodePointStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdShaper1CodePointStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains statistics for all Code Point in the system.
+         Each Code Point are define by tuple PCP, color, incoming port
+         and outgoing port."
+    ::= { acdShaper1Stats 1 }
+
+acdShaper1CodePointStatsEntry OBJECT-TYPE
+    SYNTAX      AcdShaper1CodePointStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "."
+    INDEX   { acdShaper1CodePointStatsDstID, acdShaper1CodePointStatsSrcID,
+              acdShaper1CodePointStatsColorID, acdShaper1CodePointStatsPcpID }
+    ::=  { acdShaper1CodePointStatsTable 1 }
+
+AcdShaper1CodePointStatsEntry ::= SEQUENCE {
+    acdShaper1CodePointStatsDstID               Unsigned32,
+    acdShaper1CodePointStatsSrcID               Unsigned32,
+    acdShaper1CodePointStatsColorID             INTEGER,
+    acdShaper1CodePointStatsPcpID               Unsigned32,
+    acdShaper1CodePointStatsFwdOctets           Counter64,
+    acdShaper1CodePointStatsFwdPkts             Counter64,
+    acdShaper1CodePointStatsFwdRate             Gauge32,
+    acdShaper1CodePointStatsDelayedOctets       Counter64,
+    acdShaper1CodePointStatsDelayedPkts         Counter64,
+    acdShaper1CodePointStatsDelayedRate         Gauge32,
+    acdShaper1CodePointStatsOverflowOctets      Counter64,
+    acdShaper1CodePointStatsOverflowPkts        Counter64,
+    acdShaper1CodePointStatsOverflowRate        Gauge32,
+    acdShaper1CodePointStatsQMgmtDropOctets     Counter64,
+    acdShaper1CodePointStatsQMgmtDropPkts       Counter64,
+    acdShaper1CodePointStatsQMgmtDropRate       Gauge32
+}
+
+acdShaper1CodePointStatsDstID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Destination port ID."
+    ::= { acdShaper1CodePointStatsEntry 1 }
+
+acdShaper1CodePointStatsSrcID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Source port ID."
+    ::= { acdShaper1CodePointStatsEntry 2 }
+
+acdShaper1CodePointStatsColorID  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    green(1),
+                    yellow(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Color value."
+    ::= { acdShaper1CodePointStatsEntry 3 }
+
+acdShaper1CodePointStatsPcpID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PCP value."
+    ::= { acdShaper1CodePointStatsEntry 4 }
+
+acdShaper1CodePointStatsFwdOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets forwarded without delay."
+    ::= { acdShaper1CodePointStatsEntry 5 }
+
+acdShaper1CodePointStatsFwdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets forwarded without delay."
+    ::= { acdShaper1CodePointStatsEntry 6 }
+
+acdShaper1CodePointStatsFwdRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit rate in Mbps forwarded without delay."
+    ::= { acdShaper1CodePointStatsEntry 7 }
+
+acdShaper1CodePointStatsDelayedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets enqueued."
+    ::= { acdShaper1CodePointStatsEntry 8 }
+
+acdShaper1CodePointStatsDelayedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets enqueued."
+    ::= { acdShaper1CodePointStatsEntry 9 }
+
+acdShaper1CodePointStatsDelayedRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit rate in Mbps enqueued."
+    ::= { acdShaper1CodePointStatsEntry 10 }
+
+acdShaper1CodePointStatsOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets dropped due to the queue overflow."
+    ::= { acdShaper1CodePointStatsEntry 11 }
+
+acdShaper1CodePointStatsOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets dropped due to the queue overflow."
+    ::= { acdShaper1CodePointStatsEntry 12 }
+
+acdShaper1CodePointStatsOverflowRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit rate in Mbps dropped due to the queue overflow."
+    ::= { acdShaper1CodePointStatsEntry 13 }
+
+acdShaper1CodePointStatsQMgmtDropOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets dropped by the queue management algorithm."
+    ::= { acdShaper1CodePointStatsEntry 14 }
+
+acdShaper1CodePointStatsQMgmtDropPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets dropped by the queue management algorithm."
+    ::= { acdShaper1CodePointStatsEntry 15 }
+
+acdShaper1CodePointStatsQMgmtDropRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit rate in Mbps dropped by the queue management algorithm."
+    ::= { acdShaper1CodePointStatsEntry 16 }
+
+---------------------------------------------------------------------------
+ -- ACD-SMAP-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdShaper1Compliances  OBJECT IDENTIFIER ::= { acdShaper1Conformance 1 }
+acdShaper1Groups       OBJECT IDENTIFIER ::= { acdShaper1Conformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdShaper1CodePointStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdShaper1CodePointStatsFwdOctets,
+        acdShaper1CodePointStatsFwdPkts,
+        acdShaper1CodePointStatsFwdRate,
+        acdShaper1CodePointStatsDelayedOctets,
+        acdShaper1CodePointStatsDelayedPkts,
+        acdShaper1CodePointStatsDelayedRate,
+        acdShaper1CodePointStatsOverflowOctets,
+        acdShaper1CodePointStatsOverflowPkts,
+        acdShaper1CodePointStatsOverflowRate,
+        acdShaper1CodePointStatsQMgmtDropOctets,
+        acdShaper1CodePointStatsQMgmtDropPkts,
+        acdShaper1CodePointStatsQMgmtDropRate
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdShaper1Groups 1 }
+
+acdShaper1Compliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-SHAPER-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdShaper1CodePointStatsGroup
+         }
+
+    ::= { acdShaper1Compliances 1 }
+
+END

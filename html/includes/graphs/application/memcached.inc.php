@@ -1,5 +1,5 @@
 <?php
-$rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-memcached-'.$app['app_id'].'.rrd';
-if (is_file($rrd)) {
+$rrd = rrd_name($device['hostname'], array('app', 'memcached', $app['app_id']));
+if (rrdtool_check_rrd_exists($rrd)) {
     $rrd_filename = $rrd;
 }

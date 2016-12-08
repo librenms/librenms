@@ -4,11 +4,9 @@ $no_refresh = true;
 
 if ($_SESSION['userlevel'] < '10') {
     include 'includes/error-no-perm.inc.php';
-}
-else if ($_SESSION['userlevel'] == 11) {
+} elseif ($_SESSION['userlevel'] == 11) {
     demo_account();
-}
-else {
+} else {
     echo '<h3>Add User</h3>';
     echo '<hr>';
 
@@ -20,8 +18,7 @@ else {
                 if (!user_exists($_POST['new_username'])) {
                     if (isset($_POST['can_modify_passwd'])) {
                         $_POST['can_modify_passwd'] = 1;
-                    }
-                    else {
+                    } else {
                         $_POST['can_modify_passwd'] = 0;
                     }
 
@@ -29,12 +26,10 @@ else {
                     if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
                         echo '<span class=info>User '.$_POST['username'].' added!</span>';
                     }
-                }
-                else {
+                } else {
                     echo '<div class="red">User with this name already exists!</div>';
                 }
-            }
-            else {
+            } else {
                 echo '<div class="red">Please enter a username!</div>';
             }//end if
         }//end if
@@ -109,8 +104,7 @@ else {
   </div>";
     
     echo '</form>';
-    }
-    else {
+    } else {
         echo '<span class="red">Auth module does not allow user management!</span><br />';
     }//end if
 }//end if

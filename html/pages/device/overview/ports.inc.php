@@ -10,13 +10,12 @@ if ($ports['total']) {
             </div>
             <table class="table table-hover table-condensed table-striped">';
 
-    if($_SESSION['screen_width']) {
-        if($_SESSION['screen_width'] > 970) {
-            $graph_array['width'] = round(($_SESSION['screen_width'] - 390 )/2,0);
+    if ($_SESSION['screen_width']) {
+        if ($_SESSION['screen_width'] > 970) {
+            $graph_array['width'] = round(($_SESSION['screen_width'] - 390 )/2, 0);
             $graph_array['height'] = round($graph_array['width'] /3);
             $graph_array['lazy_w'] = $graph_array['width'] + 80;
-        }
-        else {
+        } else {
             $graph_array['width'] = $_SESSION['screen_width'] - 190;
             $graph_array['height'] = round($graph_array['width'] /3);
             $graph_array['lazy_w'] = $graph_array['width'] + 80;

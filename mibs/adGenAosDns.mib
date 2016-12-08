@@ -1,0 +1,281 @@
+   ADTRAN-AOS-DNS-MIB   DEFINITIONS ::= BEGIN
+   
+IMPORTS    
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32                         FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION  FROM SNMPv2-TC
+    InetAddress, InetAddressType       FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                 FROM SNMPv2-CONF
+    sysName                            FROM SNMPv2-MIB
+    adGenAOSApplications,
+    adGenAOSConformance                FROM ADTRAN-AOS;
+    
+
+adGenAOSDns MODULE-IDENTITY
+        LAST-UPDATED "201204300000Z"
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "        Technical Support Dept.
+                        Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                   Tel: +1 800 923 8726
+                   Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+        DESCRIPTION
+            "The MIB module for AdtranOS Dns statistics."
+            
+	    	REVISION "201204300000Z"  -- April 30, 2012 / YYYYMMDDHHMMZ
+            DESCRIPTION
+                    "Created the adGenAosDns MIB.
+                    Changes by Stefan Hammer."
+       ::= { adGenAOSApplications 1 }
+       
+       adDnsTraps    OBJECT IDENTIFIER ::= { adGenAOSDns 0 }
+       
+
+---
+--- Dns Resolution Data
+---
+
+adDnsTimestamp  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time (seconds since epoch) that DNS event occured"
+    ::= { adGenAOSDns 1 }
+
+adDnsNameserverInetAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The address type of adDnsNameserverInetAddress"
+    ::= { adGenAOSDns 2 }
+
+adDnsNameserverInetAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the nameserver for the DNS Resolution"
+    ::= { adGenAOSDns 3 }
+      
+AdDnsRequestErrorConditionTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates which specific error condition occurred. Error codes 0-15 are
+        the RCODE error codes, while 16-n are Adtran proprietary DNS Request
+        error conditions.
+        
+        The noError(0) state indicates that there is no error condition.
+        
+        The formatError(1) state indicates that name server was unable to interpret the
+        query.
+        
+        The serverFailure(2) state indicates that  name server was unable to process this
+         query due to a problem with the name server.
+        
+        The nameError(3) state indicates that the domain name referenced in the query does 
+        not exist.  Meaningful only for responses from an authoritative name server.
+        
+        The notImplemented(4) state indicates that the  name server does not support
+        the requested kind of query.
+        
+        The refused(5) state indicates the name server refuses to perform the specified 
+        operation for policy reasons. For example, a name server may not wish to 
+        provide the information to the particular requester, or a name server may
+        not wish to perform a particular operation (e.g., zone transfer) for 
+        particular data.
+        
+        The 6-15 states are reserved for future use.
+        
+        The unsuportedRCode(16) state indicates that the AOS unit does not support the
+        RCODE (error condition) returned by the DNS sever.
+        
+        The malformedResponse(17) state indicates that AOS unit received an improperly
+        formated data packet from the DNS server.
+        
+        The parseError(18) state indicates that AOS unit could not parse the data from
+        the DNS server correctly.
+        
+        The timeoutWaitingForResponse(19) state indicates that AOS unit did not receive
+        a response from DNS server in the predetermined waiting period.
+        
+        The emptyResponse(20) state indicates that the AOS unit received an empty
+        response from the DNS server.  Many DNS servers send responses without any 
+        answers as a form of failure.
+        
+        The unsupportedType(21) state indicates that the AOS unit does not support the
+        qtype indicated in the DNS server's answer.
+        
+        The onlyRootAnswer(22) state indicates that the DNS server responded only with
+        a '.' answer, the root domain. Per RFC2782 page 6, this is a failure.
+        
+        The portDeficiency(23) state indicates that the AOS unit failed to allocate
+        an open port to send the DNS question to the DNS sever.
+        
+        The noServerConfigured(24) state indicates that the AOS unit does not have a
+        DNS lookup server configured.
+        
+        The updSendError(25) state indicates that the AOS unit could not send the
+        DNS question packet (maybe a routing issue with the configured name-server)."
+    SYNTAX      INTEGER {
+        noError(0),
+        formatError(1),
+        serverFailure(2),
+        nameError(3),
+        notImplemented(4),
+        refused(5),
+        unsuportedRCode(16),
+        malformedResponse(17),
+        parseError(18),
+        timeoutWaitingForResponse(19),
+        emptyResponse(20),
+        unsupportedType(21),
+        onlyRootAnswer(22),
+        portDeficiency(23),
+        noServerCOnfigured(24),
+        udpSendError(25)
+    }
+    
+adDnsRequestErrorCondition OBJECT-TYPE
+    SYNTAX      AdDnsRequestErrorConditionTC 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This field indicates which specific error condition occurred"
+    ::= { adGenAOSDns 4 }
+        
+adDnsDomainName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The FQDN sent in the QNAME field of the question section of the DNS request"
+    ::= { adGenAOSDns 5 }
+    
+AdDnsResourceRecordTypeTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "       A       =       1,  // a host address RFC1035
+            NS      =       2,  // an authoritative name server RFC1035
+            MD      =       3,  // a mail destination (Obsolete - use MX) RFC1035
+            MF      =       4,  // a mail forwarder (Obsolete - use MX) RFC1035
+            CNAME   =       5,  // the canonical name for an alias RFC1035
+            SOA     =       6,  // marks the start of a zone of authority RFC1035
+            MB      =       7,  // a mailbox domain name (EXPERIMENTAL) RFC1035
+            MG      =       8,  // a mail group member (EXPERIMENTAL) RFC1035
+            MR      =       9,  // a mail rename domain name (EXPERIMENTAL) RFC1035
+            NULL    =       10, // a null RR (EXPERIMENTAL) RFC1035
+            WKS     =       11, // a well known service description RFC1035
+            PTR     =       12, // a domain name pointer RFC1035
+            HINFO   =       13, // host information RFC1035
+            MINFO   =       14, // mailbox or mail list information RFC1035
+            MX      =       15, // mail exchange RFC1035
+            TXT     =       16, // text strings RFC1035
+            AAAA    =       28, // Ipv6 quad A addresses RFC3596
+            SRV     =       33, // service record RFC2782
+            A_PLUS_AAAA  =  65537 // Beyond 16 bit range. 
+            Not a record. An A query's and AAAA query's results bound together"
+    SYNTAX      INTEGER {
+        a(1),
+        ns(2),
+        md(3),
+        mf(4),
+        cname(5),
+        soa(6),
+        mb(7),
+        mg(8),
+        mr(9),
+        null(10),
+        wks(11),
+        ptr(12),
+        hinfo(13),
+        minfo(14),
+        mx(15),
+        txt(16),
+        aaaa(28),
+        srv(33),
+        aplusaaaa(65537)
+   }
+   
+adDnsResourceRecordType OBJECT-TYPE
+    SYNTAX      AdDnsResourceRecordTypeTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This field indicates which record type the request was querying."
+    ::= { adGenAOSDns 6 }
+
+---
+--- Notifications
+---
+adDnsIndividualResolutionFailure NOTIFICATION-TYPE
+    OBJECTS {
+        sysName,
+        adDnsTimestamp,
+        adDnsNameserverInetAddressType,
+        adDnsNameserverInetAddress,
+        adDnsRequestErrorCondition,
+        adDnsDomainName,
+        adDnsResourceRecordType
+    }
+    STATUS  current
+    DESCRIPTION
+        "This trap indicates that a DNS resolution failure has occured for a single,
+        particular lookup.  Information about the lookup and the failure are contained
+        within this trap."
+    ::= { adDnsTraps 1 }
+        
+
+---
+--- Conformance Information
+---  
+ adGenAOSDnsConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 13 }
+ adGenAOSDnsGroup       OBJECT IDENTIFIER ::= { adGenAOSDnsConformance 1 }
+ adGenAOSDnsCompliances OBJECT IDENTIFIER ::= { adGenAOSDnsConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+     adGenAOSDnsFullCompliance MODULE-COMPLIANCE
+         STATUS  current
+         DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            version 2 of the adGenAOSDns MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS { adGenAOSDnsInfoGroup , adGenAOSDnsNotificationGroup }
+         ::= { adGenAOSDnsCompliances 1 }
+     -- units of conformance
+
+     adGenAOSDnsInfoGroup    OBJECT-GROUP
+         OBJECTS {
+                 adDnsTimestamp,
+                 adDnsNameserverInetAddressType,
+                 adDnsNameserverInetAddress,
+                 adDnsRequestErrorCondition,
+                 adDnsDomainName,
+                 adDnsResourceRecordType
+                }
+         STATUS  current
+         DESCRIPTION
+            "Objects designed to assist in providing information about DNS Client."
+         ::= { adGenAOSDnsGroup 1 }
+
+     adGenAOSDnsNotificationGroup    NOTIFICATION-GROUP
+         NOTIFICATIONS {
+                 adDnsIndividualResolutionFailure 
+                }
+         STATUS  current
+         DESCRIPTION
+            "Objects designed to assist in sending DNS notifications."
+         ::= { adGenAOSDnsGroup 2 }
+        
+END     

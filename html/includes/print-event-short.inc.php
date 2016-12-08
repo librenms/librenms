@@ -2,8 +2,7 @@
 
 if ($bg == $list_colour_a) {
     $bg = $list_colour_b;
-}
-else {
+} else {
     $bg = $list_colour_a;
 }
 

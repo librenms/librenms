@@ -4,7 +4,7 @@
 // 1 UNKNOWN
 
 /*
- * Observium Network Management and Monitoring System
+ * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,18 +15,15 @@
  * See COPYING for more details.
  */
 
-if (!isset($debug)) {
+if (!isset($debug)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    include 'includes/defaults.inc.php';
-    include 'config.php';
-    include 'includes/definitions.inc.php';
-    include 'includes/functions.php';
+    $init_modules = array();
+    require realpath(__DIR__ . '/../..') . '/includes/init.php';
 
     $options = getopt('d');
     if (isset($options['d'])) {
         $debug = true;
-    }
-    else {
+    } else {
         $debug = false;
     }
 }
@@ -34,8 +31,7 @@ if (!isset($debug)) {
 $insert = 0;
 
 if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
-}
-else {
+} else {
     $db_rev = 0;
     $insert = 1;
 }
@@ -95,10 +91,9 @@ $limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
-
-        if (isset($_SESSION['stage']) ) {
+        if (isset($_SESSION['stage'])) {
             $limit++;
-            if ( time()-$_SESSION['last'] > 45 ) {
+            if (time()-$_SESSION['last'] > 45) {
                 $_SESSION['offset'] = $limit;
                 $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
                 return;
@@ -124,21 +119,11 @@ foreach ($filelist as $file) {
                     d_echo("$line \n");
 
                     if ($line[0] != '#') {
-                        if ($config['db']['extension'] == 'mysqli') {
-                            $update = mysqli_query($database_link, $line);
-                        }
-                        else {
-                            $update = mysql_query($line);
-                        }
+                        $update = mysqli_query($database_link, $line);
                         if (!$update) {
                             $err++;
                             if ($debug) {
-                                if ($config['db']['extension'] == 'mysqli') {
-                                    echo mysqli_error($database_link)."\n";
-                                }
-                                else {
-                                    echo mysql_error()."\n";
-                                }
+                                echo mysqli_error($database_link)."\n";
                             }
                         }
                     }
@@ -147,12 +132,10 @@ foreach ($filelist as $file) {
 
             if ($db_rev < 5) {
                 echo " done.\n";
-            }
-            else {
+            } else {
                 echo " done ($err errors).\n";
             }
-        }
-        else {
+        } else {
             echo " Could not open file!\n";
         }//end if
 
@@ -160,8 +143,10 @@ foreach ($filelist as $file) {
         $db_rev = $filename;
         if ($insert) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
-        }
-        else {
+            if ($db_rev >= 6) {
+                $insert = 0;
+            }
+        } else {
             dbUpdate(array('version' => $db_rev), 'dbSchema');
         }
     }//end if
@@ -169,8 +154,7 @@ foreach ($filelist as $file) {
 
 if ($updating) {
     echo "-- Done\n";
-    if( isset($_SESSION['stage']) ) {
+    if (isset($_SESSION['stage'])) {
         $_SESSION['build-ok'] = true;
     }
 }
-

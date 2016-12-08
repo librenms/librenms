@@ -30,6 +30,13 @@ echo '<tr>
         <td>'.$device['sysName'].' </td>
       </tr>';
 
+if (!empty($device['ip'])) {
+    echo '<tr>
+             <td>Resolved IP</td>
+             <td>'.$device['ip'].'</td>
+         </tr>';
+}
+
 if ($device['hardware']) {
     echo '<tr>
         <td>Hardware</td>

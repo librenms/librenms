@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Exceptions\HostUnreachableException;
+
 $no_refresh = true;
 
 if ($_SESSION['userlevel'] < 10) {
@@ -18,15 +20,13 @@ if ($_POST['hostname']) {
         $hostname = mres($_POST['hostname']);
         if ($_POST['port']) {
             $port = mres($_POST['port']);
-        }
-        else {
+        } else {
             $port = $config['snmp']['port'];
         }
 
         if ($_POST['transport']) {
             $transport = mres($_POST['transport']);
-        }
-        else {
+        } else {
             $transport = 'udp';
         }
 
@@ -37,8 +37,7 @@ if ($_POST['hostname']) {
 
             $snmpver = mres($_POST['snmpver']);
             print_message("Adding host $hostname communit".(count($config['snmp']['community']) == 1 ? 'y' : 'ies').' '.implode(', ', $config['snmp']['community'])." port $port using $transport");
-        }
-        else if ($_POST['snmpver'] === 'v3') {
+        } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
                    'authlevel'  => mres($_POST['authlevel']),
                    'authname'   => mres($_POST['authname']),
@@ -52,25 +51,26 @@ if ($_POST['hostname']) {
 
             $snmpver = 'v3';
             print_message("Adding SNMPv3 host $hostname port $port");
-        }
-        else {
+        } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
         $poller_group = $_POST['poller_group'];
-        $force_add    = $_POST['force_add'];
-        if ($force_add == 'on') {
-            $force_add = 1;
-        }
-        else {
-            $force_add = 0;
-        }
+        $force_add    = ($_POST['force_add'] == 'on');
 
-        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add);
-        if ($result) {
-            print_message("Device added ($result)");
+        $port_assoc_mode = $_POST['port_assoc_mode'];
+        try {
+            $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
+            $link = generate_device_url(array('device_id' => $device_id));
+            print_message("Device added <a href='$link'>$hostname ($device_id)</a>");
+        } catch (HostUnreachableException $e) {
+            print_error($e->getMessage());
+            foreach ($e->getReasons() as $reason) {
+                print_error($reason);
+            }
+        } catch (Exception $e) {
+            print_error($e->getMessage());
         }
-    }
-    else {
+    } else {
         print_error("You don't have the necessary privileges to add hosts.");
     }//end if
     echo '    </div>
@@ -119,6 +119,25 @@ foreach ($config['snmp']['transports'] as $transport) {
     }
 
     echo '>'.$transport.'</option>';
+}
+?>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="port_association_mode" class="col-sm-3 control-label">Port Association Mode</label>
+      <div class="col-sm-3">
+        <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
+<?php
+
+
+foreach (get_port_assoc_modes() as $mode) {
+    $selected = "";
+    if ($mode == $config['default_port_association_mode']) {
+        $selected = "selected";
+    }
+
+    echo "          <option value=\"$mode\" $selected>$mode</option>\n";
 }
 ?>
         </select>
@@ -208,19 +227,18 @@ if ($config['distributed_poller'] === true) {
               </select>
           </div>
       </div>
+    ';
+}//endif
+?>
       <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
               <div class="checkbox">
                   <label>
-                      <input type="checkbox" name="force_add" id="force_add"> Force add
+                      <input type="checkbox" name="force_add" id="force_add"> Force add - No ICMP or SNMP checks performed
                   </label>
               </div>
           </div>
       </div>
-    ';
-}//end if
-
-?>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>

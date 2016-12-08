@@ -13,8 +13,7 @@ foreach (dbFetchRows('SELECT alert_map.target,alert_map.id,alert_rules.name FROM
     if ($link['target'][0] == 'g') {
         $link['target'] = substr($link['target'], 1);
         $link['target'] = '<a href="'.generate_url(array('page' => 'devices', 'group' => $link['target'])).'">'.ucfirst(dbFetchCell('SELECT name FROM device_groups WHERE id = ?', array($link['target']))).'</a>';
-    }
-    else if (is_numeric($link['target'])) {
+    } elseif (is_numeric($link['target'])) {
         $link['target'] = '<a href="'.generate_url(array('page' => 'device', 'device' => $link['target'])).'">'.dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', array($link['target'])).'</a>';
     }
 
@@ -22,8 +21,8 @@ foreach (dbFetchRows('SELECT alert_map.target,alert_map.id,alert_rules.name FROM
     echo '<td>'.$link['name'].'</td>';
     echo '<td>'.$link['target'].'</td>';
     echo '<td>';
-        echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-map' data-map_id='".$link['id']."' name='edit-alert-map'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-map_id='".$link['id']."' name='delete-alert-map'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
+        echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-map' data-map_id='".$link['id']."' name='edit-alert-map'><i class='fa fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-map_id='".$link['id']."' name='delete-alert-map'><span class='fa fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
     echo '</tr>';
 }

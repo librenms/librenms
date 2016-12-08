@@ -1,0 +1,1102 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdPolicy MODULE-IDENTITY
+
+    LAST-UPDATED "201110100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Policies database for this Accedian Networks device."
+
+    REVISION "201110100100Z"        -- 10 October 2011
+    DESCRIPTION
+            "Add acdPolicyTableLastChangeTid."
+
+    REVISION "201102280100Z"        -- 28 Feb 2011
+    DESCRIPTION
+            "Add acdPolicyListTable and acdPolicyPortTable tables."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Add compliance section."
+
+    REVISION "200806150100Z"        -- 15 June 2008
+    DESCRIPTION
+            "Add new service mapping values."
+
+    REVISION "200805010100Z"        -- 1 May 2008
+    DESCRIPTION
+            "Add service mapping support."
+
+    REVISION "200802060100Z"        -- 6 Feb 2008
+    DESCRIPTION
+            "Add support for history table."
+
+    REVISION "200705150100Z"        -- 15 may 2007
+    DESCRIPTION
+            "Add bad packets counters."
+
+    REVISION "200703280100Z"        -- 28 March 2007
+    DESCRIPTION
+            "Add Regulator functionalities."
+
+    REVISION "200608060100Z"        -- 6 August 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-POLICY-MIB."
+
+    ::= { acdMibs 3 }
+
+acdPolicyNotifications   OBJECT IDENTIFIER ::= { acdPolicy 4 }
+acdPolicyMIBObjects      OBJECT IDENTIFIER ::= { acdPolicy 5 }
+acdPolicyConformance     OBJECT IDENTIFIER ::= { acdPolicy 6 }
+
+acdPolicyList            OBJECT IDENTIFIER ::= { acdPolicyMIBObjects 1 }
+acdPolicyPort            OBJECT IDENTIFIER ::= { acdPolicyMIBObjects 2 }
+acdPolicyTableTid        OBJECT IDENTIFIER ::= { acdPolicyMIBObjects 3 }
+
+---------------------------------------------------------------------------
+ -- The Policies table
+ -- This table contains all Policies.
+---------------------------------------------------------------------------
+
+acdPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Policies"
+    ::= { acdPolicy 1 }
+
+acdPolicyEntry OBJECT-TYPE
+    SYNTAX      AcdPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A Policy is a Filter applied to a specific MAC to block, permit or
+             only count a specific traffic."
+    INDEX   { acdPolicyID }
+    ::=  { acdPolicyTable 1 }
+
+
+AcdPolicyEntry ::= SEQUENCE {
+    acdPolicyID                         Unsigned32,
+    acdPolicyListID                     Unsigned32,
+    acdPolicyEntryID                    Unsigned32,
+    acdPolicyEnable                     TruthValue,
+    acdPolicyFilterType                 INTEGER,
+    acdPolicyFilterIndex                Unsigned32,
+    acdPolicyDropEnable                 TruthValue,
+    acdPolicyMonitorEnable              TruthValue,
+    acdPolicyMonitorIndex               INTEGER,
+    acdPolicyRegulatorEnable            TruthValue,
+    acdPolicyRegulatorIndex             Unsigned32,
+    acdPolicyRegulatorMarking           INTEGER,
+    acdPolicyAction                     INTEGER,
+    acdPolicyEvcMappingEncaps           INTEGER,
+    acdPolicyEvcMappingEtype            INTEGER,
+    acdPolicyEvcMappingVlanId           Unsigned32,
+    acdPolicyCosMappingPcpAction        INTEGER,
+    acdPolicyCosMappingChoice1En        TruthValue,
+    acdPolicyCosMappingChoice1Type      INTEGER,
+    acdPolicyCosMappingChoice1Profile   Unsigned32,
+    acdPolicyCosMappingChoice1RegSet    Unsigned32,
+    acdPolicyCosMappingChoice2En        TruthValue,
+    acdPolicyCosMappingChoice2Type      INTEGER,
+    acdPolicyCosMappingChoice2Profile   Unsigned32,
+    acdPolicyCosMappingChoice2RegSet    Unsigned32,
+    acdPolicyDefaultMappingGreenCfi     Unsigned32,
+    acdPolicyDefaultMappingGreenPrior   Unsigned32,
+    acdPolicyDefaultMappingYellowCfi    Unsigned32,
+    acdPolicyDefaultMappingYellowPrior  Unsigned32,
+    acdPolicyOutgoingPort               OBJECT IDENTIFIER
+}
+
+acdPolicyID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each policy entry. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdPolicyEntry 1 }
+
+acdPolicyListID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies in wich List the entry is."
+   ::= { acdPolicyEntry 2 }
+
+acdPolicyEntryID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the order in the List."
+   ::= { acdPolicyEntry 3 }
+
+acdPolicyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the Policy in the packet processing Engine."
+    ::= { acdPolicyEntry 4 }
+
+acdPolicyFilterType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    layer2filter(0),
+                    ipv4filter(1),
+                    ipv6filter(2),
+                    vlist(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates which filter type is programmed in this entry. With 
+         the filter index we can retrieve the specific filter in the filter
+         database."
+    ::= { acdPolicyEntry 5 }
+
+acdPolicyFilterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates which filter index is programmed in this entry. With 
+         the filter type we can retrieve the specific filter in the filter
+         database."
+    ::= { acdPolicyEntry 6 }
+
+acdPolicyDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "********* THIS OBJECT IS DEPRECATED **********
+
+         This object has been deprecated in favour of acdPolicyAction.
+
+         This indicates if this policy is programmed to drop or let the traffic 
+         pass the processing engine."
+    ::= { acdPolicyEntry 7 }
+
+acdPolicyMonitorEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates if this policy is programmed to send the traffic to
+         one of the monitoring port."
+    ::= { acdPolicyEntry 8 }
+
+acdPolicyMonitorIndex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitor1(1),
+                    monitor2(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates which monitor port is programmed to send the traffic
+         matching this policy entry."
+    ::= { acdPolicyEntry 9 }
+
+acdPolicyRegulatorEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates if this policy use or not a bandwidth regulator."
+    ::= { acdPolicyEntry 10 }
+
+acdPolicyRegulatorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates which bandwidth regulator index is programmed in 
+         this policy entry."
+    ::= { acdPolicyEntry 11 }
+
+acdPolicyRegulatorMarking OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    green(1),
+                    yellow(2),
+                    red(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates the pre-marking color associated with this policy."
+    ::= { acdPolicyEntry 12 }
+
+acdPolicyAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    drop(1),
+                    permit(2),
+                    mgmtOAM(3),
+                    mgmtOAMandDrop(4),
+                    mgmtOAMandForward(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action that will be applied to traffic that matches the filter."
+    ::= { acdPolicyEntry 13 }
+
+acdPolicyEvcMappingEncaps OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    push(2),
+                    pop(3),
+                    replace(4),
+                    popAndReplace(5),
+                    pushAndPreserve(6)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action that will be applied to traffic that matches the filter."
+    ::= { acdPolicyEntry 14 }
+
+acdPolicyEvcMappingEtype OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    cvlan(1),
+                    svlan(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ethertype of the VLAN to be added if the encapsulation is set to 
+         push. Possible values are customer VLAN (cvlan) and service VLAN
+         (svlan)."
+    ::= { acdPolicyEntry 15 }
+
+acdPolicyEvcMappingVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID to be added if the encapsulation is set to push. Its
+         value ranges from 0 to 4095."
+    ::= { acdPolicyEntry 16 }
+
+acdPolicyCosMappingPcpAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    preserve(1),
+                    direct(2),
+                    map(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This section selects the PCP (Priority Code Points) action to perform.
+         Possible values are:
+
+             Preserve: Keep the PCP bits if the packet is already tagged
+             Direct: Add the default PCP value
+             Map: Use a CoS profile for PCP selection
+
+         For each PCP action there is one or two traffic mapping choices and
+         the default PCP bits to use if the packet does not match the first
+         and the second choices."
+    ::= { acdPolicyEntry 17 }
+
+acdPolicyCosMappingChoice1En OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates if this choice is used."
+    ::= { acdPolicyEntry 18 }
+
+acdPolicyCosMappingChoice1Type OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pcpVlan(1),
+                    pcpVlanInVlan(2),
+                    pre(3),
+                    dscp(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The traffic mapping is accomplished using the selected field in the
+         incoming traffic. This field can be p-bits in 802.1Q, 802.1Q-in-Q tags
+         IP precedence bits in IPv4 TOS byte or DSCP bits in IPv4 DSCP byte."
+    ::= { acdPolicyEntry 19 }
+
+acdPolicyCosMappingChoice1Profile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "CoS profile used to map the input traffic to an L2 class of service."
+    ::= { acdPolicyEntry 20 }
+
+acdPolicyCosMappingChoice1RegSet OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bandwidth regulator apply to regulate traffic."
+    ::= { acdPolicyEntry 21 }
+
+acdPolicyCosMappingChoice2En OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This indicates if this choice is used."
+    ::= { acdPolicyEntry 22 }
+
+acdPolicyCosMappingChoice2Type OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pcpVlan(1),
+                    pcpVlanInVlan(2),
+                    pre(3),
+                    dscp(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The traffic mapping is accomplished using the selected field in the
+         incoming traffic. This field can be p-bits in 802.1Q, 802.1Q-in-Q tags
+         IP precedence bits in IPv4 TOS byte or DSCP bits in IPv4 DSCP byte."
+    ::= { acdPolicyEntry 23 }
+
+acdPolicyCosMappingChoice2Profile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "CoS profile used to map the input traffic to an L2 class of service."
+    ::= { acdPolicyEntry 24 }
+
+acdPolicyCosMappingChoice2RegSet OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bandwidth regulator apply to regulate traffic."
+    ::= { acdPolicyEntry 25 }
+
+acdPolicyDefaultMappingGreenCfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default CFI value to be applied if the Encapsulation is Push.
+         This would only be applied if the traffic does not match the first
+         and second choices and if the result color is green."
+    ::= { acdPolicyEntry 26 }
+
+acdPolicyDefaultMappingGreenPrior OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default PCP values to be applied if the Encapsulation is Push.
+         This would only be applied if the traffic does not match the first
+         and second choices and if the result color is green."
+    ::= { acdPolicyEntry 27 }
+
+acdPolicyDefaultMappingYellowCfi OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default CFI value to be applied if the Encapsulation is Push.
+         This would only be applied if the traffic does not match the first
+         and second choices and if the result color is green."
+    ::= { acdPolicyEntry 28 }
+
+acdPolicyDefaultMappingYellowPrior OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default PCP values to be applied if the Encapsulation is Push.
+         This would only be applied if the traffic does not match the first
+         and second choices and if the result color is green."
+    ::= { acdPolicyEntry 29 }
+
+acdPolicyOutgoingPort  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The OID value used to identify the outgoing port for this policy.
+             In order to identify a particular port, this object shall
+             identify the instance of the acdPortConfigIndex object, defined
+             in ACD-PORT-MIB, for the desired port. For example, if an entry
+             is set to port 4, this object would be set to acdPortConfigIndex.4
+             and by querying the acdPortConfigName.4 the user can retrieve the
+             name of this port."
+    ::= { acdPolicyEntry 30 }
+
+-----------------------------------------------------------------------
+ -- The Policies Counters table
+ -- This table contains all counters associated with each policy.
+---------------------------------------------------------------------------
+
+acdPolicyStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all counters associated with each policy."
+    ::= { acdPolicy 2 }
+
+acdPolicyStatsEntry OBJECT-TYPE
+    SYNTAX      AcdPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An Entry consists in a bytes and a packets counters."
+    INDEX   { acdPolicyStatsID }
+    ::=  { acdPolicyStatsTable 1 }
+
+
+AcdPolicyStatsEntry ::= SEQUENCE {
+    acdPolicyStatsID                Unsigned32,
+    acdPolicyStatsListID            Unsigned32,
+    acdPolicyStatsEntryID           Unsigned32,
+    acdPolicyStatsInPkts            Counter32,
+    acdPolicyStatsInOverflowPkts    Counter32,
+    acdPolicyStatsInHCPkts          Counter64,
+    acdPolicyStatsInOctets          Counter32,
+    acdPolicyStatsInOverflowOctets  Counter32,
+    acdPolicyStatsInHCOctets        Counter64,
+    acdPolicyStatsInPktsErr         Counter32,
+    acdPolicyStatsInOverflowPktsErr Counter32,
+    acdPolicyStatsInHCPktsErr       Counter64
+}
+
+acdPolicyStatsID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each policy counter. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdPolicyStatsEntry 1 }
+
+acdPolicyStatsListID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies in wich List the entry is."
+   ::= { acdPolicyStatsEntry 2 }
+
+acdPolicyStatsEntryID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the order in the List."
+   ::= { acdPolicyStatsEntry 3 }
+
+acdPolicyStatsInPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received on this MAC and matching this
+         policy. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInOverflowPkts, it provides the equivalent of the 64 
+         bits counter acdPolicyStatsInHCPkts."
+    ::= { acdPolicyStatsEntry 4 }
+
+acdPolicyStatsInOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyStatsInPkts counter
+         has overflowed. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInPkts, it provides the equivalent of the 64 bits 
+         counter acdPolicyStatsInHCPkts."
+    ::= { acdPolicyStatsEntry 5 }
+
+acdPolicyStatsInHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received on this MAC and matching this
+         policy."
+    ::= { acdPolicyStatsEntry 6 }
+
+acdPolicyStatsInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Octets received on this MAC and matching this
+         policy. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInOverflowOctets, it provides the equivalent of the 
+         64 bits counter acdPolicyStatsInHCOctets."
+    ::= { acdPolicyStatsEntry 7 }
+
+acdPolicyStatsInOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyStatsInOctets counter
+         has overflowed. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInOctets, it provides the equivalent of the 64 bits 
+         counter acdPolicyStatsInHCOctets."
+    ::= { acdPolicyStatsEntry 8 }
+
+acdPolicyStatsInHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Octets received on this MAC and matching this
+         policy."
+    ::= { acdPolicyStatsEntry 9 }
+
+acdPolicyStatsInPktsErr OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of errored packets received on this MAC and matching this
+         policy. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInOverflowPktsErr, it provides the equivalent of the 64 
+         bits counter acdPolicyStatsInHCPktsErr."
+    ::= { acdPolicyStatsEntry 10 }
+
+acdPolicyStatsInOverflowPktsErr OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyStatsInPktsErr counter
+         has overflowed. This is a 32 bits counter. Combined with 
+         acdPolicyStatsInPktsErr, it provides the equivalent of the 64 bits 
+         counter acdPolicyStatsInHCPktsErr."
+    ::= { acdPolicyStatsEntry 11 }
+
+acdPolicyStatsInHCPktsErr OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of errored packets received on this MAC and matching this
+         policy."
+    ::= { acdPolicyStatsEntry 12 }
+
+
+---------------------------------------------------------------------------
+ -- The Policies History group
+
+ -- The Policies History group records periodic statistical samples
+ -- from a Policy and stores them for later retrieval.
+
+---------------------------------------------------------------------------
+
+acdPolicyHistStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPolicyHistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all counters associated with each policy."
+    ::= { acdPolicy 3 }
+
+acdPolicyHistStatsEntry OBJECT-TYPE
+    SYNTAX      AcdPolicyHistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An Entry consists in a bytes and a packets counters."
+    INDEX   { acdPolicyHistStatsID, acdPolicyHistStatsSampleIndex }
+    ::=  { acdPolicyHistStatsTable 1 }
+
+
+AcdPolicyHistStatsEntry ::= SEQUENCE {
+    acdPolicyHistStatsID                Unsigned32,
+    acdPolicyHistStatsListID            Unsigned32,
+    acdPolicyHistStatsEntryID           Unsigned32,
+    acdPolicyHistStatsSampleIndex       Unsigned32,
+    acdPolicyHistStatsStatus            INTEGER,
+    acdPolicyHistStatsDuration          Unsigned32,
+    acdPolicyHistStatsIntervalEnd       DateAndTime,
+    acdPolicyHistStatsInPkts            Counter32,
+    acdPolicyHistStatsInOverflowPkts    Counter32,
+    acdPolicyHistStatsInHCPkts          Counter64,
+    acdPolicyHistStatsInOctets          Counter32,
+    acdPolicyHistStatsInOverflowOctets  Counter32,
+    acdPolicyHistStatsInHCOctets        Counter64,
+    acdPolicyHistStatsInPktsErr         Counter32,
+    acdPolicyHistStatsInOverflowPktsErr Counter32,
+    acdPolicyHistStatsInHCPktsErr       Counter64
+
+}
+
+acdPolicyHistStatsID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each policy counter. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdPolicyHistStatsEntry 1 }
+
+acdPolicyHistStatsListID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies in wich List the entry is."
+   ::= { acdPolicyHistStatsEntry 2 }
+
+acdPolicyHistStatsEntryID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the order in the List."
+   ::= { acdPolicyHistStatsEntry 3 }
+
+acdPolicyHistStatsSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same policy
+         instance. This index starts at 1 and increases by one as each new
+         sample."
+    ::= { acdPolicyHistStatsEntry 4 }
+
+acdPolicyHistStatsStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this acdPolicyHistStats entry."
+    ::= { acdPolicyHistStatsEntry 5 }
+
+acdPolicyHistStatsDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdPolicyHistStatsEntry 6 }
+
+acdPolicyHistStatsIntervalEnd OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdPolicyHistStatsEntry 7 }
+
+acdPolicyHistStatsInPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received on this MAC and matching this
+         policy during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInOverflowPkts, it provides the
+         equivalent of the 64 bits counter acdPolicyHistStatsInHCPkts."
+    ::= { acdPolicyHistStatsEntry 8 }
+
+acdPolicyHistStatsInOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyStatsInPkts counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInPkts, it provides the equivalent of
+         the 64 bits counter acdPolicyHistStatsInHCPkts."
+    ::= { acdPolicyHistStatsEntry 9 }
+
+acdPolicyHistStatsInHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received on this MAC and matching this
+         policy during this sampling interval."
+    ::= { acdPolicyHistStatsEntry 10 }
+
+acdPolicyHistStatsInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Octets received on this MAC and matching this
+         policy during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInOverflowOctets, it provides the
+         equivalent of the 64 bits counter acdPolicyHistStatsInHCOctets."
+    ::= { acdPolicyHistStatsEntry 11 }
+
+acdPolicyHistStatsInOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyHistStatsInOctets counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInOctets, it provides the equivalent
+         of the 64 bits counter acdPolicyHistStatsInHCOctets."
+    ::= { acdPolicyHistStatsEntry 12 }
+
+acdPolicyHistStatsInHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Octets received on this MAC and matching this
+         policy during this sampling interval."
+    ::= { acdPolicyHistStatsEntry 13 }
+
+acdPolicyHistStatsInPktsErr OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of errored packets received on this MAC and matching
+         this policy during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInOverflowPktsErr, it provides the
+         equivalent of the 64 bits counter acdPolicyHistStatsInHCPktsErr."
+    ::= { acdPolicyHistStatsEntry 14 }
+
+acdPolicyHistStatsInOverflowPktsErr OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdPolicyStatsInPktsErr counter
+         has overflowed during this sampling interval. This is a 32 bits counter.
+         Combined with acdPolicyHistStatsInPktsErr, it provides the equivalent
+         of the 64 bits counter acdPolicyHistStatsInHCPktsErr."
+    ::= { acdPolicyHistStatsEntry 15 }
+
+acdPolicyHistStatsInHCPktsErr OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of errored packets received on this MAC and matching
+         this policy during this sampling interval."
+    ::= { acdPolicyHistStatsEntry 16 }
+
+
+---------------------------------------------------------------------------
+ -- The Policy lists table
+ -- This table contains all Policy list for this unit.
+---------------------------------------------------------------------------
+
+acdPolicyListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Policy list contains in this unit."
+    ::= { acdPolicyList 1 }
+
+acdPolicyListEntry OBJECT-TYPE
+    SYNTAX      AcdPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry in this table describe a policy list contains in this unit."
+    INDEX   { acdPolicyListEntryID }
+    ::=  { acdPolicyListTable 1 }
+
+
+AcdPolicyListEntry ::= SEQUENCE {
+    acdPolicyListEntryID            Unsigned32,
+    acdPolicyListName               DisplayString,
+    acdPolicyListNbrEntries         Unsigned32
+}
+
+
+acdPolicyListEntryID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each list. This value is the same than acdPolicyListID
+        for each entry in acdPolicyTable."
+   ::= { acdPolicyListEntry 1 }
+
+                                    
+acdPolicyListName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the policy list."
+    ::= { acdPolicyListEntry 2 }
+
+acdPolicyListNbrEntries  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries currently in this list."
+    ::= { acdPolicyListEntry 3 }
+
+
+---------------------------------------------------------------------------
+ -- The Policy port table
+ -- This table contains the one to one relation between port and policy list.
+---------------------------------------------------------------------------
+
+acdPolicyPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPolicyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Port and the correspondant policy list."
+    ::= { acdPolicyPort 1 }
+
+acdPolicyPortEntry OBJECT-TYPE
+    SYNTAX      AcdPolicyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A Policy port entry is the mapping between this port and a policy list."
+    INDEX   { acdPolicyPortEntryID }
+    ::=  { acdPolicyPortTable 1 }
+
+
+AcdPolicyPortEntry ::= SEQUENCE {
+    acdPolicyPortEntryID            Unsigned32,
+    acdPolicyPortListID             Unsigned32
+}
+                   
+acdPolicyPortEntryID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each port. This value is the same than acdPortConfigIndex
+        used in ACD-PORT-MIB."
+   ::= { acdPolicyPortEntry 1 }
+
+acdPolicyPortListID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numerical value coresponding to acdPolicyListEntryID."
+    ::= { acdPolicyPortEntry 2 }
+
+---------------------------------------------------------------------------
+ -- Transaction ID Information
+---------------------------------------------------------------------------
+
+acdPolicyTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdPolicyTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdPolicyTableTid 1 }
+
+---------------------------------------------------------------------------
+ -- ACD-POLICY-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdPolicyCompliances  OBJECT IDENTIFIER ::= { acdPolicyConformance 1 }
+acdPolicyGroups       OBJECT IDENTIFIER ::= { acdPolicyConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdPolicyGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyListID,
+        acdPolicyEntryID,
+        acdPolicyEnable,
+        acdPolicyFilterType,
+        acdPolicyFilterIndex,
+        acdPolicyMonitorEnable,
+        acdPolicyMonitorIndex,
+        acdPolicyRegulatorEnable,
+        acdPolicyRegulatorIndex,
+        acdPolicyRegulatorMarking,
+        acdPolicyAction,
+        acdPolicyEvcMappingEncaps,
+        acdPolicyEvcMappingEtype,
+        acdPolicyEvcMappingVlanId,
+        acdPolicyCosMappingPcpAction,
+        acdPolicyCosMappingChoice1En,
+        acdPolicyCosMappingChoice1Type,
+        acdPolicyCosMappingChoice1Profile,
+        acdPolicyCosMappingChoice1RegSet,
+        acdPolicyCosMappingChoice2En,
+        acdPolicyCosMappingChoice2Type,
+        acdPolicyCosMappingChoice2Profile,
+        acdPolicyCosMappingChoice2RegSet,
+        acdPolicyDefaultMappingGreenCfi,
+        acdPolicyDefaultMappingGreenPrior,
+        acdPolicyDefaultMappingYellowCfi,
+        acdPolicyDefaultMappingYellowPrior,
+        acdPolicyOutgoingPort
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the policy configuration Group."
+    ::= { acdPolicyGroups 1 }
+
+acdPolicyStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyStatsListID,
+        acdPolicyStatsEntryID,
+        acdPolicyStatsInPkts,
+        acdPolicyStatsInOverflowPkts,
+        acdPolicyStatsInHCPkts,
+        acdPolicyStatsInOctets,
+        acdPolicyStatsInOverflowOctets,
+        acdPolicyStatsInHCOctets,
+        acdPolicyStatsInPktsErr,
+        acdPolicyStatsInOverflowPktsErr,
+        acdPolicyStatsInHCPktsErr
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the policy statistics Group."
+    ::= { acdPolicyGroups 2 }
+
+acdPolicyHistStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyHistStatsListID,
+        acdPolicyHistStatsEntryID,
+        acdPolicyHistStatsStatus,
+        acdPolicyHistStatsDuration,
+        acdPolicyHistStatsIntervalEnd,
+        acdPolicyHistStatsInPkts,
+        acdPolicyHistStatsInOverflowPkts,
+        acdPolicyHistStatsInHCPkts,
+        acdPolicyHistStatsInOctets,
+        acdPolicyHistStatsInOverflowOctets,
+        acdPolicyHistStatsInHCOctets,
+        acdPolicyHistStatsInPktsErr,
+        acdPolicyHistStatsInOverflowPktsErr,
+        acdPolicyHistStatsInHCPktsErr
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the policy historical tatistics Group."
+    ::= { acdPolicyGroups 3 }
+
+acdPolicyDeprecatedGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyDropEnable
+    }
+    STATUS      deprecated
+    DESCRIPTION
+       "Objects for the policy deprecated Group."
+    ::= { acdPolicyGroups 4}
+
+acdPolicyListGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyListName,
+        acdPolicyListNbrEntries
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the policy list information Group."
+    ::= { acdPolicyGroups 5 }
+
+acdPolicyPortGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyPortListID
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the policy port mapping Group."
+    ::= { acdPolicyGroups 6 }
+
+acdPolicyTidGroup OBJECT-GROUP
+    OBJECTS {
+        acdPolicyTableLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in tables."
+    ::= { acdPolicyGroups 7 }
+
+acdPolicyCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-POLICY-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdPolicyGroup,
+            acdPolicyStatsGroup,
+            acdPolicyHistStatsGroup,
+            acdPolicyListGroup,
+            acdPolicyPortGroup,
+            acdPolicyTidGroup
+         }
+
+    ::= { acdPolicyCompliances 1 }
+
+
+END

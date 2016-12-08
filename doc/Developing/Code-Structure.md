@@ -1,9 +1,13 @@
+source: Developing/Code-Structure.md
 # Code structure.
 
 This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.
 
 ### doc/
-This is the location of all the documentation for LibreNMS, this is in GitHub markdown format and can be viewed (online)[http://docs.librenms.org/]
+This is the location of all the documentation for LibreNMS, this is in GitHub markdown format and can be viewed [online](http://docs.librenms.org/)
+
+### LibreNMS/
+Any classes should be under this directory, with a directory structure that matches the namespace.  One class per file. See [PSR-0](http://www.php-fig.org/psr/psr-0/) for details.
 
 ### html/
 All web accessible files are located here.
@@ -13,8 +17,10 @@ This is the API routing file which directs users to the correct API function bas
 This is the main file which all links within LibreNMS are parsed through. It loads the majority of the relevant includes needed for the control panel to function. CSS and JS files are also loaded here.
 ### html/css
 All used css files are located here. Apart from legacy files, anything in here is now a symlink.
+### html/css/custom
+This is a folder you can put custom css files into that won't interfere with auto updates
 ### html/forms
-This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php. 
+This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php.
 ### html/includes
 This is where the majority of the website core files are located. These tend to be files that contain functions or often used code segments that can be included where needed rather than duplicating code.
 ### html/includes/api_functions.inc.php
@@ -41,7 +47,7 @@ All the discovery and polling code. The format is usually quite similar between 
 This is for all of the libraries used by LibreNMS. If you are including a 3rd party module, you would add the files in here either via git subtree if it's hosted on GitHub or just by copying the folder. Please ensure you maintain any copyright notices. You will then need to either reference the files in this folder directly from where you need them or alternatively as is the case with css and js libraries then symlink the needed files.
 
 ### logs/
-Usually contains your web servers logs but can also contrain poller logs and other items,
+Usually contains your web servers logs but can also contain poller logs and other items,
 
 ### mibs/
 Here is where all of the mibs are located, traditionally this has meant having all mibs in one directory but for certain vendors this has changed and these are now located in sub folders.
@@ -51,5 +57,3 @@ Simple enough, this is where all of the rrd files are created. They are stored i
 
 ### sql-schema/
 In here are all of the SQL schema files. These are used to setup a new instance of LibreNMS automatically when build-base.php is called or when an update is done and includes/sql-schema/update.php is called.
-
-

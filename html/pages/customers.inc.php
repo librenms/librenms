@@ -29,6 +29,6 @@ $pagetitle[] = 'Customers';
                 id: "customers",
             };
         },
-        url: "/ajax_table.php"
+        url: "ajax_table.php"
     });
 </script>

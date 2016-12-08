@@ -29,12 +29,10 @@ $hardware = rewrite_ftos_hardware($poll_device['sysObjectID']);
 if (strstr($poll_device['sysObjectID'], '.1.3.6.1.4.1.6027.1.3.')) {
     echo 'S-Series ';
     $version = snmp_get($device, 'chStackUnitCodeVersion.1', '-Oqvn', 'F10-S-SERIES-CHASSIS-MIB');
-}
-else if (strstr($poll_device['sysObjectID'], '.1.3.6.1.4.1.6027.1.2.')) {
+} elseif (strstr($poll_device['sysObjectID'], '.1.3.6.1.4.1.6027.1.2.')) {
     echo 'C-Series ';
     $version = snmp_get($device, 'chSwVersion.0', '-Oqvn', 'F10-C-SERIES-CHASSIS-MIB');
-}
-else {
+} else {
     echo 'E-Series ';
     $version = snmp_get($device, 'chSysSwRuntimeImgVersion.1.1', '-Oqvn', 'F10-CHASSIS-MIB');
 }

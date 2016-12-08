@@ -1,3 +1,4 @@
+source: Extensions/MIB-based-polling.md
 ## WARNING ##
 
 MIB-based polling is experimental.  It might overload your LibreNMS server,
@@ -69,8 +70,9 @@ The components involved in MIB-based polling are:
 
   - During discovery, relevant MIBs are parsed using `snmptranslate`, and the
     data returned is used to populate a database which guides the poller in
-    what to store.  At the moment, only OIDs with Unsigned32 and Counter64
-    data types are parsed.
+    what to store.  At the moment, only OIDs of INTEGER, Integer32, Gauge32,
+    Unsigned32, Counter32, and Counter64 data types are parsed, and negative
+    values are untested.
 
   - Devices may be excluded from MIB polling by changing the setting in the
     device edit screen:
@@ -143,6 +145,34 @@ graph.
     can follow the above process, then use the resultant data collected by
     LibreNMS in the RRD files or the database tables `device_oids`
 
+## Configuration
+### Main Configuration
+In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = 1;`
+
+### Discovery
+
+You need to add your desired MIBs to `/opt/librenms/mibs` folder. Afterwards you need to register your MIBs to the discovery function. 
+
+#### Example
+`/opt/librenms/includes/discovery/os/f5.inc.php`
+
+```
+<?php
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.3375.2.1')) {
+    $os = 'f5';
+}
+
+### MIB definition as an array 
+$f5_mibs = array(
+    'ltmVirtualServStatEntry' => 'F5-BIGIP-LOCAL-MIB',
+);
+
+### Actual registering of the MIB
+register_mibs($device, $f5_mibs, "includes/discovery/os/f5.inc.php");
+
+```
+
+The important thing is the array $f5_mibs where you define which parts (ltmVirtualServStatEntry) of the MIB (F5-BIGIP-LOCAL-MIB) you are going to add. The registering is also important, otherwise poller cannot make use of the MIB.
 
 ## TODO ##
 

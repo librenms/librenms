@@ -1,0 +1,802 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-REGULATOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Gauge32, Counter32, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, DateAndTime, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdRegulator MODULE-IDENTITY
+
+    LAST-UPDATED "201110100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Regulators database for this Accedian Networks device."
+
+    REVISION "201110100100Z"        -- 10 October 2011
+    DESCRIPTION
+            "Add acdRegulatorTableLastChangeTid."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Add compliance section."
+
+    REVISION "200805010100Z"        -- 1 May 2008
+    DESCRIPTION
+            "Add RowStatus in acdRegulatorTable table."
+
+    REVISION "200802060100Z"        -- 6 Feb 2008
+    DESCRIPTION
+            "Add support for history table."
+
+    REVISION "200703280100Z"        -- 28 March 2007
+    DESCRIPTION
+            "Initial version of MIB module ACD-REGULATOR-MIB."
+
+    ::= { acdMibs 6 }
+
+acdRegulatorNotifications   OBJECT IDENTIFIER ::= { acdRegulator 4 }
+acdRegulatorMIBObjects      OBJECT IDENTIFIER ::= { acdRegulator 5 }
+acdRegulatorConformance     OBJECT IDENTIFIER ::= { acdRegulator 6 }
+
+acdRegulatorTableTid        OBJECT IDENTIFIER ::= { acdRegulatorMIBObjects 1 }
+
+-----------------------------------------------------------------------
+ -- The Regulators table
+ -- This table contains all Regulators.
+---------------------------------------------------------------------------
+
+acdRegulatorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdRegulatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Regulators"
+    ::= { acdRegulator 1 }
+
+acdRegulatorEntry OBJECT-TYPE
+    SYNTAX      AcdRegulatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A Regulator is a two rates three colors engine to regulate a
+             given traffic."
+    INDEX   { acdRegulatorID }
+    ::=  { acdRegulatorTable 1 }
+
+
+AcdRegulatorEntry ::= SEQUENCE {
+    acdRegulatorID              Unsigned32,
+    acdRegulatorName            DisplayString,
+    acdRegulatorCir             Unsigned32,
+    acdRegulatorCbs             Unsigned32,
+    acdRegulatorEir             Unsigned32,
+    acdRegulatorEbs             Unsigned32,
+    acdRegulatorIsBlind         TruthValue,
+    acdRegulatorIsCouple        TruthValue,
+    acdRegulatorRowStatus       RowStatus
+
+}
+
+acdRegulatorID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each regulator entry. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+   ::= { acdRegulatorEntry 1 }
+
+acdRegulatorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the regulator."
+    ::= { acdRegulatorEntry 2 }
+
+acdRegulatorCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The committed information rate."
+    DEFVAL      { 20000 }
+   ::= { acdRegulatorEntry 3 }
+
+acdRegulatorCbs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The committed burst size."
+    DEFVAL      { 8 }
+   ::= { acdRegulatorEntry 4 }
+
+acdRegulatorEir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The excess information rate."
+    DEFVAL      { 1000 }
+   ::= { acdRegulatorEntry 5 }
+
+acdRegulatorEbs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The excess burst size."
+    DEFVAL      { 8 }
+   ::= { acdRegulatorEntry 6 }
+
+acdRegulatorIsBlind OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the pre-marking color processing."
+    DEFVAL      { false }
+    ::= { acdRegulatorEntry 7 }
+
+acdRegulatorIsCouple OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the coupling flag in this regulator."
+    DEFVAL      { false }
+    ::= { acdRegulatorEntry 8 }
+
+acdRegulatorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new regulator you shall provide the a unique name for
+        an empty row with the RowStatus set to Create and Go. To delete the
+        row you need to set the RowStatus to destroy."
+    ::= { acdRegulatorEntry 9 }
+
+---------------------------------------------------------------------------
+ -- The Regulator Counters table
+ -- This table contains all counters associated with each regulator.
+---------------------------------------------------------------------------
+
+acdRegulatorStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdRegulatorStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all counters associated with each regulator."
+    ::= { acdRegulator 2 }
+
+acdRegulatorStatsEntry OBJECT-TYPE
+    SYNTAX      AcdRegulatorStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An Entry consists of statitics related to a regulator entry."
+    INDEX   { acdRegulatorStatsID }
+    ::=  { acdRegulatorStatsTable 1 }
+
+
+AcdRegulatorStatsEntry ::= SEQUENCE {
+    acdRegulatorStatsID                     Unsigned32,
+    acdRegulatorStatsAcceptOctets           Counter32,
+    acdRegulatorStatsAcceptOverflowOctets   Counter32,
+    acdRegulatorStatsAcceptHCOctets         Counter64,
+    acdRegulatorStatsAcceptPkts             Counter32,
+    acdRegulatorStatsAcceptOverflowPkts     Counter32,
+    acdRegulatorStatsAcceptHCPkts           Counter64,
+    acdRegulatorStatsAcceptRate             Gauge32,
+    acdRegulatorStatsDropOctets             Counter32,
+    acdRegulatorStatsDropOverflowOctets     Counter32,
+    acdRegulatorStatsDropHCOctets           Counter64,
+    acdRegulatorStatsDropPkts               Counter32,
+    acdRegulatorStatsDropOverflowPkts       Counter32,
+    acdRegulatorStatsDropHCPkts             Counter64,
+    acdRegulatorStatsDropRate               Gauge32
+}
+
+acdRegulatorStatsID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each regulator entry. Its value ranges from 1 to
+        MAXINT (4 bytes)."
+   ::= { acdRegulatorStatsEntry 1 }
+
+acdRegulatorStatsAcceptOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator. This is a
+         32 bits counter. Combined with acdRegulatorStatsAcceptOverflowOctets,
+         it provides the equivalent of the 64 bits counter
+         acdRegulatorStatsAcceptHCOctets."
+    ::= { acdRegulatorStatsEntry 2 }
+
+acdRegulatorStatsAcceptOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorStatsAcceptOctets
+         counter has overflowed. This is a 32 bits counter. Combined with 
+         acdRegulatorStatsAcceptOctets, it provides the equivalent of the
+         64 bits counter acdRegulatorStatsAccpetHCOctets."
+    ::= { acdRegulatorStatsEntry 3 }
+
+acdRegulatorStatsAcceptHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator."
+    ::= { acdRegulatorStatsEntry 4 }
+
+acdRegulatorStatsAcceptPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator. This is a
+         32 bits counter. Combined with acdRegulatorStatsAcceptOverflowPkts,
+         it provides the equivalent of the 64 bits counter
+         acdRegulatorStatsAcceptHCPkts."
+    ::= { acdRegulatorStatsEntry 5 }
+
+acdRegulatorStatsAcceptOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorStatsAcceptPkts
+         counter has overflowed. This is a 32 bits counter. Combined with 
+         acdRegulatorStatsAcceptPkts, it provides the equivalent of the
+         64 bits counter acdRegulatorStatsAcceptHCPkts."
+    ::= { acdRegulatorStatsEntry 6 }
+
+acdRegulatorStatsAcceptHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator."
+    ::= { acdRegulatorStatsEntry 7 }
+
+acdRegulatorStatsAcceptRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The accept rate."
+    ::= { acdRegulatorStatsEntry 8 }
+
+acdRegulatorStatsDropOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator. This is a
+         32 bits counter. Combined with acdRegulatorStatsDropOverflowOctets,
+         it provides the equivalent of the 64 bits counter
+         acdRegulatorStatsDropHCOctets."
+    ::= { acdRegulatorStatsEntry 9 }
+
+acdRegulatorStatsDropOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorStatsDropOctets
+         counter has overflowed. This is a 32 bits counter. Combined with 
+         acdRegulatorStatsDropOctets, it provides the equivalent of the
+         64 bits counter acdRegulatorStatsDropHCOctets."
+    ::= { acdRegulatorStatsEntry 10 }
+
+acdRegulatorStatsDropHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator."
+    ::= { acdRegulatorStatsEntry 11 }
+
+acdRegulatorStatsDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator. This is a
+         32 bits counter. Combined with acdRegulatorStatsDropOverflowPkts,
+         it provides the equivalent of the 64 bits counter
+         acdRegulatorStatsDropHCPkts."
+    ::= { acdRegulatorStatsEntry 12 }
+
+acdRegulatorStatsDropOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorStatsDropPkts
+         counter has overflowed. This is a 32 bits counter. Combined with 
+         acdRegulatorStatsDropPkts, it provides the equivalent of the
+         64 bits counter acdRegulatorStatsDropHCPkts."
+    ::= { acdRegulatorStatsEntry 13 }
+
+acdRegulatorStatsDropHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator."
+    ::= { acdRegulatorStatsEntry 14 }
+
+acdRegulatorStatsDropRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The drop rate."
+    ::= { acdRegulatorStatsEntry 15 }
+
+---------------------------------------------------------------------------
+ -- The Regulator History group
+
+ -- The Regulator History group records periodic statistical samples
+ -- from a regulator and stores them for later retrieval.
+
+---------------------------------------------------------------------------
+
+acdRegulatorHistStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdRegulatorHistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all counters associated with each regulator."
+    ::= { acdRegulator 3 }
+
+acdRegulatorHistStatsEntry OBJECT-TYPE
+    SYNTAX      AcdRegulatorHistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An Entry consists of statitics related to a regulator entry."
+    INDEX   { acdRegulatorHistStatsID , acdRegulatorHistStatsSampleIndex }
+    ::=  { acdRegulatorHistStatsTable 1 }
+
+
+AcdRegulatorHistStatsEntry ::= SEQUENCE {
+    acdRegulatorHistStatsID                     Unsigned32,
+    acdRegulatorHistStatsSampleIndex            Unsigned32,
+    acdRegulatorHistStatsStatus                 INTEGER,
+    acdRegulatorHistStatsDuration               Unsigned32,
+    acdRegulatorHistStatsIntervalEnd            DateAndTime,
+    acdRegulatorHistStatsAcceptOctets           Counter32,
+    acdRegulatorHistStatsAcceptOverflowOctets   Counter32,
+    acdRegulatorHistStatsAcceptHCOctets         Counter64,
+    acdRegulatorHistStatsAcceptPkts             Counter32,
+    acdRegulatorHistStatsAcceptOverflowPkts     Counter32,
+    acdRegulatorHistStatsAcceptHCPkts           Counter64,
+    acdRegulatorHistStatsAcceptAvgRate          Gauge32,
+    acdRegulatorHistStatsAcceptMinRate          Gauge32,
+    acdRegulatorHistStatsAcceptMaxRate          Gauge32,
+    acdRegulatorHistStatsDropOctets             Counter32,
+    acdRegulatorHistStatsDropOverflowOctets     Counter32,
+    acdRegulatorHistStatsDropHCOctets           Counter64,
+    acdRegulatorHistStatsDropPkts               Counter32,
+    acdRegulatorHistStatsDropOverflowPkts       Counter32,
+    acdRegulatorHistStatsDropHCPkts             Counter64,
+    acdRegulatorHistStatsDropAvgRate            Gauge32,
+    acdRegulatorHistStatsDropMinRate            Gauge32,
+    acdRegulatorHistStatsDropMaxRate            Gauge32
+}
+
+acdRegulatorHistStatsID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each regulator entry. Its value ranges from 1 to
+        MAXINT (4 bytes)."
+    ::= { acdRegulatorHistStatsEntry 1 }
+
+acdRegulatorHistStatsSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same regulator
+         instance. This index starts at 1 and increases by one as each new
+         sample."
+    ::= { acdRegulatorHistStatsEntry 2 }
+
+acdRegulatorHistStatsStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this acdRegulatorHistStats entry."
+    ::= { acdRegulatorHistStatsEntry 3 }
+
+acdRegulatorHistStatsDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdRegulatorHistStatsEntry 4 }
+
+acdRegulatorHistStatsIntervalEnd OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdRegulatorHistStatsEntry 5 }
+
+acdRegulatorHistStatsAcceptOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator during this
+         sampling interval. This is a 32 bits counter. Combined with
+         acdRegulatorHistStatsAcceptOverflowOctets, it provides the equivalent
+         of the 64 bits counter acdRegulatorHistStatsAcceptHCOctets."
+    ::= { acdRegulatorHistStatsEntry 6 }
+
+acdRegulatorHistStatsAcceptOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorHistStatsAcceptOctets
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdRegulatorHistStatsAcceptOctets,
+         it provides the equivalent of the 64 bits counter
+         acdRegulatorHistStatsAcceptHCOctets."
+    ::= { acdRegulatorHistStatsEntry 7 }
+
+acdRegulatorHistStatsAcceptHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 8 }
+
+acdRegulatorHistStatsAcceptPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator during this
+         sampling interval. This is a 32 bits counter. Combined with
+         acdRegulatorHistStatsAcceptOverflowPkts, it provides the equivalent
+         of the 64 bits counter acdRegulatorHistStatsAcceptHCPkts."
+    ::= { acdRegulatorHistStatsEntry 9 }
+
+acdRegulatorHistStatsAcceptOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorHistStatsAcceptPkts
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdRegulatorHistStatsAcceptPkts, it
+         provides the equivalent of the 64 bits counter
+         acdRegulatorHistStatsAcceptHCPkts."
+    ::= { acdRegulatorHistStatsEntry 10 }
+
+acdRegulatorHistStatsAcceptHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 11 }
+
+acdRegulatorHistStatsAcceptAvgRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average accept rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 12 }
+
+acdRegulatorHistStatsAcceptMinRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum accept rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 13 }
+
+acdRegulatorHistStatsAcceptMaxRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum accept rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 14 }
+
+acdRegulatorHistStatsDropOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator during this
+         sampling interval. This is a 32 bits counter. Combined the overflow,
+         counter it provides the equivalent of the 64 bits counter
+         acdRegulatorHistStatsDropHCOctets."
+    ::= { acdRegulatorHistStatsEntry 15 }
+
+acdRegulatorHistStatsDropOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorHistStatsDropOctets
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdRegulatorHistStatsDropOctets, it
+         provides the equivalent of the 64 bits counter
+         acdRegulatorHistStatsDropHCOctets."
+    ::= { acdRegulatorHistStatsEntry 16 }
+
+acdRegulatorHistStatsDropHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 17 }
+
+acdRegulatorHistStatsDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator during this
+         sampling interval. This is a 32 bits counter. Combined with
+         acdRegulatorHistStatsDropOverflowPkts, it provides the equivalent of
+         the 64 bits counter acdRegulatorHistStatsDropHCPkts."
+    ::= { acdRegulatorHistStatsEntry 18 }
+
+acdRegulatorHistStatsDropOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated acdRegulatorHistStatsDropPkts
+         counter has overflowed during this sampling interval. This is a
+         32 bits counter. Combined with acdRegulatorHistStatsDropPkts, it
+         provides the equivalent of the 64 bits counter
+         acdRegulatorHistStatsDropHCPkts."
+    ::= { acdRegulatorHistStatsEntry 19 }
+
+acdRegulatorHistStatsDropHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 20 }
+
+acdRegulatorHistStatsDropAvgRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average drop rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 21 }
+
+acdRegulatorHistStatsDropMinRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum drop rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 22 }
+
+acdRegulatorHistStatsDropMaxRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum drop rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 23 }
+
+---------------------------------------------------------------------------
+ -- Transaction ID Information
+---------------------------------------------------------------------------
+
+acdRegulatorTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdRegulatorTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdRegulatorTableTid 1 }
+
+---------------------------------------------------------------------------
+ -- ACD-REGULATOR-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdRegulatorCompliances  OBJECT IDENTIFIER ::= { acdRegulatorConformance 1 }
+acdRegulatorGroups       OBJECT IDENTIFIER ::= { acdRegulatorConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdRegulatorGroup OBJECT-GROUP
+    OBJECTS {
+        acdRegulatorName,
+        acdRegulatorCir,
+        acdRegulatorCbs,
+        acdRegulatorEir,
+        acdRegulatorEbs,
+        acdRegulatorIsBlind,
+        acdRegulatorIsCouple,
+        acdRegulatorRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Regulator configurtion Group."
+    ::= { acdRegulatorGroups 1 }
+
+acdRegulatorStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdRegulatorStatsAcceptOctets,
+        acdRegulatorStatsAcceptOverflowOctets,
+        acdRegulatorStatsAcceptHCOctets,
+        acdRegulatorStatsAcceptPkts,
+        acdRegulatorStatsAcceptOverflowPkts,
+        acdRegulatorStatsAcceptHCPkts,
+        acdRegulatorStatsAcceptRate,
+        acdRegulatorStatsDropOctets,
+        acdRegulatorStatsDropOverflowOctets,
+        acdRegulatorStatsDropHCOctets,
+        acdRegulatorStatsDropPkts,
+        acdRegulatorStatsDropOverflowPkts,
+        acdRegulatorStatsDropHCPkts,
+        acdRegulatorStatsDropRate
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Regulator statistics Group."
+    ::= { acdRegulatorGroups 2 }
+
+acdRegulatorHistStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdRegulatorHistStatsStatus,
+        acdRegulatorHistStatsDuration,
+        acdRegulatorHistStatsIntervalEnd,
+        acdRegulatorHistStatsAcceptOctets,
+        acdRegulatorHistStatsAcceptOverflowOctets,
+        acdRegulatorHistStatsAcceptHCOctets,
+        acdRegulatorHistStatsAcceptPkts,
+        acdRegulatorHistStatsAcceptOverflowPkts,
+        acdRegulatorHistStatsAcceptHCPkts,
+        acdRegulatorHistStatsAcceptAvgRate,
+        acdRegulatorHistStatsAcceptMinRate,
+        acdRegulatorHistStatsAcceptMaxRate,
+        acdRegulatorHistStatsDropOctets,
+        acdRegulatorHistStatsDropOverflowOctets,
+        acdRegulatorHistStatsDropHCOctets,
+        acdRegulatorHistStatsDropPkts,
+        acdRegulatorHistStatsDropOverflowPkts,
+        acdRegulatorHistStatsDropHCPkts,
+        acdRegulatorHistStatsDropAvgRate,
+        acdRegulatorHistStatsDropMinRate,
+        acdRegulatorHistStatsDropMaxRate
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Regulator history statistics Group."
+    ::= { acdRegulatorGroups 3 }
+
+acdRegulatorTidGroup OBJECT-GROUP
+    OBJECTS {
+        acdRegulatorTableLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in tables."
+    ::= { acdRegulatorGroups 4 }
+
+acdPaaCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-REGULATOR-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdRegulatorGroup,
+            acdRegulatorStatsGroup,
+            acdRegulatorHistStatsGroup,
+            acdRegulatorTidGroup
+         }
+
+    OBJECT  acdRegulatorRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { acdRegulatorCompliances 1 }
+
+
+END

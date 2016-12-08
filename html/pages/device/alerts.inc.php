@@ -12,4 +12,4 @@
  * the source code distribution for details.
  */
 require_once 'includes/common/alerts.inc.php';
-echo implode('',$common_output);
+echo implode('', $common_output);

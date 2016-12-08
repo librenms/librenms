@@ -1,0 +1,2912 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2009, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-PAA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, MacAddress, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdPaa MODULE-IDENTITY
+
+    LAST-UPDATED "201011100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "PAA database for this Accedian Networks device."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Add compliance section."
+
+    REVISION "200902230100Z"        -- 23 Feb 2009
+    DESCRIPTION
+            "Add support for extended packet loss ratio."
+
+    REVISION "200802060100Z"        -- 6 Feb 2008
+    DESCRIPTION
+            "Add support for history table."
+
+    REVISION "200710120100Z"        -- 12 Oct 2007
+    DESCRIPTION
+            "Add support for one-way delay and L2 address discovery."
+
+    REVISION "200612180100Z"        -- 18 Dec 2006
+    DESCRIPTION
+            "Change the loss ration to in hundredths of a percent."
+
+    REVISION "200611110100Z"        -- 11 Nov 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-PAA-MIB."
+
+    ::= { acdMibs 5 }
+    
+acdPaaNotifications   OBJECT IDENTIFIER ::= { acdPaa 7 }
+acdPaaMIBObjects      OBJECT IDENTIFIER ::= { acdPaa 8 }
+acdPaaConformance     OBJECT IDENTIFIER ::= { acdPaa 9 }
+
+---------------------------------------------------------------------------
+ -- The PAA Results table
+ -- This table contains all PAA entry results.
+---------------------------------------------------------------------------
+
+acdPaaResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPaaResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Result table of all Paa entries"
+    ::= { acdPaa 1 }
+
+acdPaaResultEntry OBJECT-TYPE
+    SYNTAX      AcdPaaResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of results for a PAA instance."
+    INDEX   { acdPaaResultID }
+    ::=  { acdPaaResultTable 1 }
+
+
+AcdPaaResultEntry ::= SEQUENCE {
+    acdPaaResultID                      Unsigned32,
+    acdPaaResultState                   INTEGER,
+    acdPaaResultPktLossNeCurrValid      TruthValue,
+    acdPaaResultPktLossNeCurrValue      Unsigned32,
+    acdPaaResultPktLossNePrevValid      TruthValue,
+    acdPaaResultPktLossNePrevValue      Unsigned32,
+    acdPaaResultPktLossFeCurrValid      TruthValue,
+    acdPaaResultPktLossFeCurrValue      Unsigned32,
+    acdPaaResultPktLossFePrevValid      TruthValue,
+    acdPaaResultPktLossFePrevValue      Unsigned32,
+    acdPaaResultOneWayDvInstValue       Integer32,
+    acdPaaResultOneWayDvCurrValid       TruthValue,
+    acdPaaResultOneWayDvCurrMinValue    Integer32,
+    acdPaaResultOneWayDvCurrMaxValue    Integer32,
+    acdPaaResultOneWayDvCurrAvgValue    Integer32,
+    acdPaaResultOneWayDvCurrThreshExc   Unsigned32,
+    acdPaaResultOneWayDvPrevValid       TruthValue,
+    acdPaaResultOneWayDvPrevMinValue    Integer32,
+    acdPaaResultOneWayDvPrevMaxValue    Integer32,
+    acdPaaResultOneWayDvPrevAvgValue    Integer32,
+    acdPaaResultOneWayDvPrevThreshEx    Unsigned32,
+    acdPaaResultTwoWayDelayInstValue    Integer32,
+    acdPaaResultTwoWayDelayCurrValid    TruthValue,
+    acdPaaResultTwoWayDelayCurrMinValue Integer32,
+    acdPaaResultTwoWayDelayCurrMaxValue Integer32,
+    acdPaaResultTwoWayDelayCurrAvgValue Integer32,
+    acdPaaResultTwoWayDelayCurrThreshEx Unsigned32,
+    acdPaaResultTwoWayDelayPrevValid    TruthValue,
+    acdPaaResultTwoWayDelayPrevMinValue Integer32,
+    acdPaaResultTwoWayDelayPrevMaxValue Integer32,
+    acdPaaResultTwoWayDelayPrevAvgValue Integer32,
+    acdPaaResultTwoWayDelayPrevThreshEx Unsigned32,
+    acdPaaResultTwoWayDvInstValue       Integer32,
+    acdPaaResultTwoWayDvCurrValid       TruthValue,
+    acdPaaResultTwoWayDvCurrMinValue    Integer32,
+    acdPaaResultTwoWayDvCurrMaxValue    Integer32,
+    acdPaaResultTwoWayDvCurrAvgValue    Integer32,
+    acdPaaResultTwoWayDvCurrThreshEx    Unsigned32,
+    acdPaaResultTwoWayDvPrevValid       TruthValue,
+    acdPaaResultTwoWayDvPrevMinValue    Integer32,
+    acdPaaResultTwoWayDvPrevMaxValue    Integer32,
+    acdPaaResultTwoWayDvPrevAvgValue    Integer32,
+    acdPaaResultTwoWayDvPrevThreshEx    Unsigned32,
+    acdPaaResultOneWayDelayInstValue    Integer32,
+    acdPaaResultOneWayDelayCurrValid    TruthValue,
+    acdPaaResultOneWayDelayCurrMinValue Integer32,
+    acdPaaResultOneWayDelayCurrMaxValue Integer32,
+    acdPaaResultOneWayDelayCurrAvgValue Integer32,
+    acdPaaResultOneWayDelayCurrThreshEx Unsigned32,
+    acdPaaResultOneWayDelayPrevValid    TruthValue,
+    acdPaaResultOneWayDelayPrevMinValue Integer32,
+    acdPaaResultOneWayDelayPrevMaxValue Integer32,
+    acdPaaResultOneWayDelayPrevAvgValue Integer32,
+    acdPaaResultOneWayDelayPrevThreshEx Unsigned32,
+    acdPaaResultPktLossTime             DateAndTime,
+    acdPaaResultOneWayTime              DateAndTime,
+    acdPaaResultTwoWayTime              DateAndTime,
+    acdPaaResultPktLossNeCurrSamples    Unsigned32,
+    acdPaaResultPktLossNePrevSamples    Unsigned32,
+    acdPaaResultPktLossFeCurrSamples    Unsigned32,
+    acdPaaResultPktLossFePrevSamples    Unsigned32,
+    acdPaaResultOneWayDelayCurrSamples  Unsigned32,
+    acdPaaResultOneWayDelayPrevSamples  Unsigned32,
+    acdPaaResultOneWayDvCurrSamples     Unsigned32,
+    acdPaaResultOneWayDvPrevSamples     Unsigned32,
+    acdPaaResultTwoWayDelayCurrSamples  Unsigned32,
+    acdPaaResultTwoWayDelayPrevSamples  Unsigned32,
+    acdPaaResultTwoWayDvCurrSamples     Unsigned32,
+    acdPaaResultTwoWayDvPrevSamples     Unsigned32,
+    acdPaaResultIgmpJoinDelayInstValue     Integer32,
+    acdPaaResultIgmpJoinDelayCurrValid     TruthValue,
+    acdPaaResultIgmpJoinDelayCurrMinValue  Integer32,
+    acdPaaResultIgmpJoinDelayCurrMaxValue  Integer32,
+    acdPaaResultIgmpJoinDelayCurrAvgValue  Integer32,
+    acdPaaResultIgmpJoinDelayCurrThreshEx  Unsigned32,
+    acdPaaResultIgmpJoinDelayPrevValid     TruthValue,
+    acdPaaResultIgmpJoinDelayPrevMinValue  Integer32,
+    acdPaaResultIgmpJoinDelayPrevMaxValue  Integer32,
+    acdPaaResultIgmpJoinDelayPrevAvgValue  Integer32,
+    acdPaaResultIgmpJoinDelayPrevThreshEx  Unsigned32,
+    acdPaaResultIgmpLeaveDelayInstValue    Integer32,
+    acdPaaResultIgmpLeaveDelayCurrValid    TruthValue,
+    acdPaaResultIgmpLeaveDelayCurrMinValue Integer32,
+    acdPaaResultIgmpLeaveDelayCurrMaxValue Integer32,
+    acdPaaResultIgmpLeaveDelayCurrAvgValue Integer32,
+    acdPaaResultIgmpLeaveDelayCurrThreshEx Unsigned32,
+    acdPaaResultIgmpLeaveDelayPrevValid    TruthValue,
+    acdPaaResultIgmpLeaveDelayPrevMinValue Integer32,
+    acdPaaResultIgmpLeaveDelayPrevMaxValue Integer32,
+    acdPaaResultIgmpLeaveDelayPrevAvgValue Integer32,
+    acdPaaResultIgmpLeaveDelayPrevThreshEx Unsigned32,
+    acdPaaResultIgmpJoinDelayTime          DateAndTime,
+    acdPaaResultIgmpLeaveDelayTime         DateAndTime,
+    acdPaaResultIgmpJoinDelayCurrSamples   Unsigned32,
+    acdPaaResultIgmpJoinDelayPrevSamples   Unsigned32,
+    acdPaaResultIgmpLeaveDelayCurrSamples  Unsigned32,
+    acdPaaResultIgmpLeaveDelayPrevSamples  Unsigned32,
+    acdPaaResultPktLossCurrGaps            Unsigned32,
+    acdPaaResultPktLossPrevGaps            Unsigned32,
+    acdPaaResultPktLossCurrLargestGap      Unsigned32,
+    acdPaaResultPktLossPrevLargestGap      Unsigned32,
+    acdPaaResultPktLossNeCurrValueExt      Unsigned32,
+    acdPaaResultPktLossNePrevValueExt      Unsigned32,
+    acdPaaResultPktLossFeCurrValueExt      Unsigned32,
+    acdPaaResultPktLossFePrevValueExt      Unsigned32,
+    acdPaaResultPktLossNeCurrNbrLoss       Unsigned32,
+    acdPaaResultPktLossNePrevNbrLoss       Unsigned32,
+    acdPaaResultPktLossFeCurrNbrLoss       Unsigned32,
+    acdPaaResultPktLossFePrevNbrLoss       Unsigned32
+}
+
+acdPaaResultID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each PAA instance. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+    ::= { acdPaaResultEntry 1 }
+
+acdPaaResultState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    associating(1),
+                    associated(2),
+                    running(3),
+                    idle(4),
+                    lockedIS(5),
+                    lockedOOS(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the state of the instance."
+    ::= { acdPaaResultEntry 2 }
+
+acdPaaResultPktLossNeCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Near-end current packet loss results."
+    ::= { acdPaaResultEntry 3 }
+
+acdPaaResultPktLossNeCurrValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Near-end current packet loss. The packet loss is the
+         percent of packets transmitted but not received of the Ethernet segment
+         in hundredths of a percent (100 is 1%)."
+    ::= { acdPaaResultEntry 4 }
+
+acdPaaResultPktLossNePrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Near-end previous packet loss results."
+    ::= { acdPaaResultEntry 5 }
+
+acdPaaResultPktLossNePrevValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Near-end previous packet loss. The packet loss is the
+         percent of packets transmitted but not received of the Ethernet segment
+         in hundredths of a percent (100 is 1%)."
+    ::= { acdPaaResultEntry 6 }
+
+acdPaaResultPktLossFeCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Far-end current packet loss results."
+    ::= { acdPaaResultEntry 7 }
+
+acdPaaResultPktLossFeCurrValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Far-end current packet loss. The packet loss is the
+         percent of packets transmitted but not received of the Ethernet segment
+         in hundredths of a percent (100 is 1%)."
+    ::= { acdPaaResultEntry 8 }
+
+acdPaaResultPktLossFePrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Far-end previous packet loss results."
+    ::= { acdPaaResultEntry 9 }
+
+acdPaaResultPktLossFePrevValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Far-end previous packet loss. The packet loss is the
+         percent of packets transmitted but not received of the Ethernet segment
+         in hundredths of a percent (100 is 1%)."
+    ::= { acdPaaResultEntry 10 }
+
+acdPaaResultOneWayDvInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation instantaneous value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 11 }
+
+acdPaaResultOneWayDvCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the current One-way delay variation results."
+    ::= { acdPaaResultEntry 12 }
+
+acdPaaResultOneWayDvCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current One-way delay variation minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 13 }
+
+acdPaaResultOneWayDvCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current One-way delay variation maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 14 }
+
+acdPaaResultOneWayDvCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current One-way delay variation average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 15 }
+
+acdPaaResultOneWayDvCurrThreshExc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 16 }
+
+acdPaaResultOneWayDvPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the previous One-way delay variation results."
+    ::= { acdPaaResultEntry 17 }
+
+acdPaaResultOneWayDvPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous One-way delay variation minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 18 }
+
+acdPaaResultOneWayDvPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous One-way delay variation maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 19 }
+
+acdPaaResultOneWayDvPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous One-way delay variation average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 20 }
+
+acdPaaResultOneWayDvPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 21 }
+
+acdPaaResultTwoWayDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay instantaneous value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 22 }
+
+acdPaaResultTwoWayDelayCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the current Two-way delay results."
+    ::= { acdPaaResultEntry 23 }
+
+acdPaaResultTwoWayDelayCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 24 }
+
+acdPaaResultTwoWayDelayCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 25 }
+
+acdPaaResultTwoWayDelayCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 26 }
+
+acdPaaResultTwoWayDelayCurrThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 27 }
+
+acdPaaResultTwoWayDelayPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the previous Two-way delay results."
+    ::= { acdPaaResultEntry 28 }
+
+acdPaaResultTwoWayDelayPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 29 }
+
+acdPaaResultTwoWayDelayPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 30 }
+
+acdPaaResultTwoWayDelayPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 31 }
+
+acdPaaResultTwoWayDelayPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 32 }
+
+acdPaaResultTwoWayDvInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay variation instantaneous value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 33 }
+
+acdPaaResultTwoWayDvCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the current Two-way delay variation results."
+    ::= { acdPaaResultEntry 34 }
+
+acdPaaResultTwoWayDvCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay variation minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 35 }
+
+acdPaaResultTwoWayDvCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay variation maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 36 }
+
+acdPaaResultTwoWayDvCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current Two-way delay variation average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 37 }
+
+acdPaaResultTwoWayDvCurrThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 38 }
+
+acdPaaResultTwoWayDvPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the previous Two-way delay variation results."
+    ::= { acdPaaResultEntry 39 }
+
+acdPaaResultTwoWayDvPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay variation minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 40 }
+
+acdPaaResultTwoWayDvPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay variation maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 41 }
+
+acdPaaResultTwoWayDvPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous Two-way delay variation average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 42 }
+
+acdPaaResultTwoWayDvPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous number of samples exceeding the limit."
+    ::= { acdPaaResultEntry 43 }
+
+acdPaaResultOneWayDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the One-way delay instantaneous value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 44 }
+
+acdPaaResultOneWayDelayCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the validity of the current One-way delay results."
+    ::= { acdPaaResultEntry 45 }
+
+acdPaaResultOneWayDelayCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the current One-way delay minimum value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 46 }
+
+acdPaaResultOneWayDelayCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the current One-way delay maximum value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 47 }
+
+acdPaaResultOneWayDelayCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the current One-way delay average value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 48 }
+
+acdPaaResultOneWayDelayCurrThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the current number of sample exceeding the limit."
+    ::= { acdPaaResultEntry 49 }
+
+acdPaaResultOneWayDelayPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the validity of the previous One-way delay results."
+    ::= { acdPaaResultEntry 50 }
+
+acdPaaResultOneWayDelayPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the previous One-way delay minimum value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 51 }
+
+acdPaaResultOneWayDelayPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the previous One-way delay maximum value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 52 }
+
+acdPaaResultOneWayDelayPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the previous One-way delay average value. The value
+         is express in micro-seconds."
+    ::= { acdPaaResultEntry 53 }
+
+acdPaaResultOneWayDelayPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the previous number of sample exceeding the limit."
+    ::= { acdPaaResultEntry 54 }
+
+acdPaaResultPktLossTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time when the current packet loss results
+         were moved to the previous packet loss results."
+    ::= { acdPaaResultEntry 55 }
+
+acdPaaResultOneWayTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time when the current one-way results
+         were moved to the previous one-way results."
+    ::= { acdPaaResultEntry 56 }
+
+acdPaaResultTwoWayTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time when the current two-way results
+         were moved to the previous two-way results."
+    ::= { acdPaaResultEntry 57 }
+
+acdPaaResultPktLossNeCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period near-end packet loss results."
+    ::= { acdPaaResultEntry 58 }
+
+acdPaaResultPktLossNePrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period near-end packet loss results."
+    ::= { acdPaaResultEntry 59 }
+
+acdPaaResultPktLossFeCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period far-end packet loss results."
+    ::= { acdPaaResultEntry 60 }
+
+acdPaaResultPktLossFePrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period far-end packet loss results."
+    ::= { acdPaaResultEntry 61 }
+
+acdPaaResultOneWayDelayCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period one-way delay results."
+    ::= { acdPaaResultEntry 62 }
+
+acdPaaResultOneWayDelayPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period one-way delay results."
+    ::= { acdPaaResultEntry 63 }
+
+acdPaaResultOneWayDvCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period one-way delay variation results."
+    ::= { acdPaaResultEntry 64 }
+
+acdPaaResultOneWayDvPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period one-way delay variation results."
+    ::= { acdPaaResultEntry 65 }
+
+acdPaaResultTwoWayDelayCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period two-way delay results."
+    ::= { acdPaaResultEntry 66 }
+
+acdPaaResultTwoWayDelayPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period two-way delay results."
+    ::= { acdPaaResultEntry 67 }
+
+acdPaaResultTwoWayDvCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the current period two-way delay variation results."
+    ::= { acdPaaResultEntry 68 }
+
+acdPaaResultTwoWayDvPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered to calculate
+         the previous period two-way delay variation results."
+    ::= { acdPaaResultEntry 69 }
+
+acdPaaResultIgmpJoinDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Join delay instantaneous value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 70 }
+
+acdPaaResultIgmpJoinDelayCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the current IGMP Join delay results."
+    ::= { acdPaaResultEntry 71 }
+
+acdPaaResultIgmpJoinDelayCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Join delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 72 }
+
+acdPaaResultIgmpJoinDelayCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Join delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 73 }
+
+acdPaaResultIgmpJoinDelayCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Join delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 74 }
+
+acdPaaResultIgmpJoinDelayCurrThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current number of IGMP Join samples exceeding the limit."
+    ::= { acdPaaResultEntry 75 }
+
+acdPaaResultIgmpJoinDelayPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the previous IGMP Join delay results."
+    ::= { acdPaaResultEntry 76 }
+
+acdPaaResultIgmpJoinDelayPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Join delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 77 }
+
+acdPaaResultIgmpJoinDelayPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Join delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 78 }
+
+acdPaaResultIgmpJoinDelayPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Join delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 79 }
+
+acdPaaResultIgmpJoinDelayPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous number of IGMP Join samples exceeding the limit."
+    ::= { acdPaaResultEntry 80 }
+
+acdPaaResultIgmpLeaveDelayInstValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Leave delay instantaneous value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 81 }
+
+acdPaaResultIgmpLeaveDelayCurrValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the current IGMP Leave delay results."
+    ::= { acdPaaResultEntry 82 }
+
+acdPaaResultIgmpLeaveDelayCurrMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Leave delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 83 }
+
+acdPaaResultIgmpLeaveDelayCurrMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Leave delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 84 }
+
+acdPaaResultIgmpLeaveDelayCurrAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current IGMP Leave delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 85 }
+
+acdPaaResultIgmpLeaveDelayCurrThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current number of IGMP Leave samples exceeding the limit."
+    ::= { acdPaaResultEntry 86 }
+
+acdPaaResultIgmpLeaveDelayPrevValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the previous IGMP Leave delay results."
+    ::= { acdPaaResultEntry 87 }
+
+acdPaaResultIgmpLeaveDelayPrevMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Leave delay minimum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 88 }
+
+acdPaaResultIgmpLeaveDelayPrevMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Leave delay maximum value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 89 }
+
+acdPaaResultIgmpLeaveDelayPrevAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous IGMP Leave delay average value. The value
+         is expressed in micro-seconds."
+    ::= { acdPaaResultEntry 90 }
+
+acdPaaResultIgmpLeaveDelayPrevThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous number of IGMP Leave samples exceeding the limit."
+    ::= { acdPaaResultEntry 91 }
+
+acdPaaResultIgmpJoinDelayTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time when the current IGMP Join delay results
+         were moved to the previous IGMP join delay results."
+    ::= { acdPaaResultEntry 92 }
+
+acdPaaResultIgmpLeaveDelayTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the time when the current IGMP Leave results
+         were moved to the previous IGMP Leave results."
+    ::= { acdPaaResultEntry 93 }
+
+acdPaaResultIgmpJoinDelayCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Join samples gathered to calculate
+         the current period IGMP Join delay results."
+    ::= { acdPaaResultEntry 94 }
+
+acdPaaResultIgmpJoinDelayPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Join samples gathered to calculate
+         the previous period IGMP Join delay results."
+    ::= { acdPaaResultEntry 95 }
+
+acdPaaResultIgmpLeaveDelayCurrSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Leave samples gathered to calculate
+         the current period IGMP Leave delay results."
+    ::= { acdPaaResultEntry 96 }
+
+acdPaaResultIgmpLeaveDelayPrevSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Leave samples gathered to calculate
+         the previous period IGMP Leave delay results."
+    ::= { acdPaaResultEntry 97 }
+
+acdPaaResultPktLossCurrGaps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of gaps that occured in
+         the current period."
+    ::= { acdPaaResultEntry 98 }
+
+acdPaaResultPktLossPrevGaps  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of gaps that occured in
+         the previous period."
+    ::= { acdPaaResultEntry 99 }
+
+acdPaaResultPktLossCurrLargestGap  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the size of the largest gap that occured in
+         the current period."
+    ::= { acdPaaResultEntry 100 }
+
+acdPaaResultPktLossPrevLargestGap  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the size of the largest gap that occured in
+         the previous period."
+    ::= { acdPaaResultEntry 101 }
+
+acdPaaResultPktLossNeCurrValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended near-end current packet loss. The packet loss is
+         the percent of packets transmitted but not received in
+         millionth of a percent (1,000,000 is 1%)."
+    ::= { acdPaaResultEntry 102 }
+
+acdPaaResultPktLossNePrevValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended near-end previous packet loss. The packet loss is
+         the percent of packets transmitted but not received in
+         millionth of a percent (1,000,000 is 1%)."
+    ::= { acdPaaResultEntry 103 }
+
+acdPaaResultPktLossFeCurrValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended far-end current packet loss. The packet loss is
+         the percent of packets transmitted but not received in
+         millionth of a percent (1,000,000 is 1%)."
+    ::= { acdPaaResultEntry 104 }
+
+acdPaaResultPktLossFePrevValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended far-end previous packet loss. The packet loss is
+         the percent of packets transmitted but not received in
+         millionth of a percent (1,000,000 is 1%)."
+    ::= { acdPaaResultEntry 105 }
+
+acdPaaResultPktLossNeCurrNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current period number of near-end packet lost.
+         This should be less or equal to acdPaaResultPktLossNeCurrSamples. "
+    ::= { acdPaaResultEntry 106 }
+
+acdPaaResultPktLossNePrevNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous period number of near-end packet lost.
+         This should be less or equal to acdPaaResultPktLossNePrevSamples."
+    ::= { acdPaaResultEntry 107 }
+
+acdPaaResultPktLossFeCurrNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current period number of far-end packet lost.
+         This should be less or equal to acdPaaResultPktLossFeCurrSamples. "
+    ::= { acdPaaResultEntry 108 }
+
+acdPaaResultPktLossFePrevNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the previous period number of far-end packet lost.
+         This should be less or equal to acdPaaResultPktLossFePrevSamples."
+    ::= { acdPaaResultEntry 109 }
+
+
+---------------------------------------------------------------------------
+ -- The PAA status table
+ -- This table contains all PAA entry statuses.
+---------------------------------------------------------------------------
+
+acdPaaStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPaaStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status table of all Paa entries"
+    ::= { acdPaa 2 }
+
+acdPaaStatusEntry OBJECT-TYPE
+    SYNTAX      AcdPaaStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of the status for a PAA instance."
+    INDEX   { acdPaaStatusID }
+    ::=  { acdPaaStatusTable 1 }
+
+AcdPaaStatusEntry ::= SEQUENCE {
+    acdPaaStatusID                      Unsigned32,
+    acdPaaStatusCcAlert                 TruthValue,
+    acdPaaStatusPktLossAlert            TruthValue,
+    acdPaaStatusOneWayDvAlert           TruthValue,
+    acdPaaStatusOneWayAvgDvAlert        TruthValue,
+    acdPaaStatusTwoWayDelayAlert        TruthValue,
+    acdPaaStatusTwoWayAvgDelayAlert     TruthValue,
+    acdPaaStatusTwoWayDvAlert           TruthValue,
+    acdPaaStatusTwoWayAvgDvAlert        TruthValue,
+    acdPaaStatusOneWayDelayAlert        TruthValue,
+    acdPaaStatusOneWayAvgDelayAlert     TruthValue,
+    acdPaaStatusState                   INTEGER,
+    acdPaaStatusPeerAddress             DisplayString
+}
+
+acdPaaStatusID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each PAA instance. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+    ::= { acdPaaStatusEntry 1 }
+
+acdPaaStatusCcAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Connectivity Check alert."
+    ::= { acdPaaStatusEntry 2 }
+
+acdPaaStatusPktLossAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Packet Loss alert."
+    ::= { acdPaaStatusEntry 3 }
+
+acdPaaStatusOneWayDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the One-way Delay Variation alert."
+    ::= { acdPaaStatusEntry 4 }
+
+acdPaaStatusOneWayAvgDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the One-way Average Delay Variation alert."
+    ::= { acdPaaStatusEntry 5 }
+
+acdPaaStatusTwoWayDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Two-way Delay alert."
+    ::= { acdPaaStatusEntry 6 }
+
+acdPaaStatusTwoWayAvgDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Two-way Average Delay alert."
+    ::= { acdPaaStatusEntry 7 }
+
+acdPaaStatusTwoWayDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Two-way Delay Variation alert."
+    ::= { acdPaaStatusEntry 8 }
+
+acdPaaStatusTwoWayAvgDvAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the presence of the Two-way Average Delay Variation alert."
+    ::= { acdPaaStatusEntry 9 }
+
+acdPaaStatusOneWayDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Delay alert."
+    ::= { acdPaaStatusEntry 10 }
+
+acdPaaStatusOneWayAvgDelayAlert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the presence of the One Way Average Delay alert."
+    ::= { acdPaaStatusEntry 11 }
+
+acdPaaStatusState  OBJECT-TYPE
+   SYNTAX       INTEGER {
+                    disabled(0),
+                    associating(1),
+                    associated(2),
+                    running(3),
+                    idle(4),
+                    lockedIS(5),
+                    lockedOOS(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Paa instance state."
+    ::= { acdPaaStatusEntry 12 }
+
+acdPaaStatusPeerAddress  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer address. Dynamically resolved or statically configured."
+    ::= { acdPaaStatusEntry 13 }
+
+
+---------------------------------------------------------------------------
+ -- The UDP PAA configuration table
+ -- This table contains all UDP PAA entry configurations.
+---------------------------------------------------------------------------
+
+acdPaaUdpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPaaUdpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all UDP PAA entries."
+    ::= { acdPaa 3 }
+
+acdPaaUdpCfgEntry OBJECT-TYPE
+    SYNTAX      AcdPaaUdpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a PAA instance."
+    INDEX   { acdPaaUdpCfgID }
+    ::=  { acdPaaUdpCfgTable 1 }
+
+
+AcdPaaUdpCfgEntry ::= SEQUENCE {
+    acdPaaUdpCfgID                      Unsigned32,
+    acdPaaUdpCfgName                    DisplayString,
+    acdPaaUdpCfgState                   INTEGER,
+    acdPaaUdpCfgPktSize                 Unsigned32,
+    acdPaaUdpCfgSamplingPeriod          Unsigned32,
+    acdPaaUdpCfgCcLossThresh            Unsigned32,
+    acdPaaUdpCfgPktLossRefPeriod        Unsigned32,
+    acdPaaUdpCfgPktLossThresh           Unsigned32,
+    acdPaaUdpCfgOneWayRefPeriod         Unsigned32,
+    acdPaaUdpCfgOneWayDvMax             Unsigned32,
+    acdPaaUdpCfgOneWayDvThresh          Unsigned32,
+    acdPaaUdpCfgOneWayAvgDvThresh       Unsigned32,
+    acdPaaUdpCfgTwoWayRefPeriod         Unsigned32,
+    acdPaaUdpCfgTwoWayDelayMax          Unsigned32,
+    acdPaaUdpCfgTwoWayDelayThresh       Unsigned32,
+    acdPaaUdpCfgTwoWayAvgDelayThresh    Unsigned32,
+    acdPaaUdpCfgTwoWayDvMax             Unsigned32,
+    acdPaaUdpCfgTwoWayDvThresh          Unsigned32,
+    acdPaaUdpCfgTwoWayAvgDvThresh       Unsigned32,
+    acdPaaUdpCfgIPv4DstAddr             IpAddress,
+    acdPaaUdpCfgPortNumber              Unsigned32,
+    acdPaaUdpCfgDscpValue               Unsigned32,
+    acdPaaUdpCfgVlan1PbitsValue         Unsigned32,
+    acdPaaUdpCfgVlan2PbitsValue         Unsigned32,
+    acdPaaUdpCfgOneWayDelayMax          Unsigned32,
+    acdPaaUdpCfgOneWayDelayThresh       Unsigned32,
+    acdPaaUdpCfgOneWayAvgDelayThresh    Unsigned32,
+    acdPaaUdpCfgDestinationPortNumber   Unsigned32,
+    acdPaaUdpCfgPeerID                  Unsigned32,
+    acdPaaUdpCfgOperationMode           Unsigned32,
+    acdPaaUdpCfgIgmpOneWayJoinPeriod    Unsigned32,
+    acdPaaUdpCfgIgmpRefPeriod           Unsigned32,
+    acdPaaUdpCfgIgmpMaxJoinDly          Unsigned32,
+    acdPaaUdpCfgIgmpJoinDlyThres        Unsigned32,
+    acdPaaUdpCfgIgmpJoinAvgDlyThres     Unsigned32,
+    acdPaaUdpCfgIgmpMaxLvDly            Unsigned32,
+    acdPaaUdpCfgIgmpLvDlyThresh         Unsigned32,
+    acdPaaUdpCfgIgmpLvAvgDlyThresh      Unsigned32,
+    acdPaaUdpCfgPktLossThreshExt        Unsigned32
+}
+
+acdPaaUdpCfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each PAA instance. This value follows the ordering
+         of the status and the results table. Its value ranges from 1 to
+         MAXINT (4 bytes)."
+    ::= { acdPaaUdpCfgEntry 1 }
+
+acdPaaUdpCfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify this PAA instance."
+    ::= { acdPaaUdpCfgEntry 2 }
+
+acdPaaUdpCfgState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(0),
+                    disable(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configuration state of this PAA entry."
+    ::= { acdPaaUdpCfgEntry 3 }
+
+acdPaaUdpCfgPktSize  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transmit packet size."
+    ::= { acdPaaUdpCfgEntry 4 }
+
+acdPaaUdpCfgSamplingPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interval in milliseconds at which PAA issues PAA measurement packets."
+    ::= { acdPaaUdpCfgEntry 5 }
+
+acdPaaUdpCfgCcLossThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS   current
+    DESCRIPTION
+        "Maximum number of lost CCM (Connectivity Check Messages) for declaring a connectvity loss."
+    ::= { acdPaaUdpCfgEntry 6 }
+
+acdPaaUdpCfgPktLossRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for packet loss measurement."
+    ::= { acdPaaUdpCfgEntry 7 }
+
+acdPaaUdpCfgPktLossThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allowed packet loss, in pecentage (%)."
+    ::= { acdPaaUdpCfgEntry 8 }
+
+acdPaaUdpCfgOneWayRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for one-way measurement."
+    ::= { acdPaaUdpCfgEntry 9 }
+
+acdPaaUdpCfgOneWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation."
+    ::= { acdPaaUdpCfgEntry 10 }
+
+acdPaaUdpCfgOneWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variations greater than the threshold."
+    ::= { acdPaaUdpCfgEntry 11 }
+
+acdPaaUdpCfgOneWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "One-way average delay variation threshold."
+    ::= { acdPaaUdpCfgEntry 12 }
+
+acdPaaUdpCfgTwoWayRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for two-way measurement."
+    ::= { acdPaaUdpCfgEntry 13 }
+
+acdPaaUdpCfgTwoWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay."
+    ::= { acdPaaUdpCfgEntry 14 }
+
+acdPaaUdpCfgTwoWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delays greater than the threshold."
+    ::= { acdPaaUdpCfgEntry 15 }
+
+acdPaaUdpCfgTwoWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay threshold."
+    ::= { acdPaaUdpCfgEntry 16 }
+
+acdPaaUdpCfgTwoWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation."
+    ::= { acdPaaUdpCfgEntry 17 }
+
+acdPaaUdpCfgTwoWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variations greater than the threshold."
+    ::= { acdPaaUdpCfgEntry 18 }
+
+acdPaaUdpCfgTwoWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay variation threshold."
+    ::= { acdPaaUdpCfgEntry 19 }
+
+acdPaaUdpCfgIPv4DstAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address used to reach the peer PAA instance."
+    ::= { acdPaaUdpCfgEntry 20 }
+
+acdPaaUdpCfgPortNumber  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source UDP port number on which to listen for peer PAA samples."
+    ::= { acdPaaUdpCfgEntry 21 }
+
+acdPaaUdpCfgDscpValue  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The DSCP value used to reach the peer PAA instance. Its value ranges
+            from 0 to 64."
+    ::= { acdPaaUdpCfgEntry 22 }
+
+acdPaaUdpCfgVlan1PbitsValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The first VLAN priority used to tag the outgoing traffic.
+             Its value ranges from 0 to 7."
+    ::= { acdPaaUdpCfgEntry 23 }
+
+acdPaaUdpCfgVlan2PbitsValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The second VLAN priority used to tag the outgoing traffic.
+             Its value ranges from 0 to 7."
+    ::= { acdPaaUdpCfgEntry 24 }
+
+acdPaaUdpCfgOneWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay."
+    ::= { acdPaaUdpCfgEntry 25 }
+
+acdPaaUdpCfgOneWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Nbr consecutive delay > max before alert."
+    ::= { acdPaaUdpCfgEntry 26 }
+
+acdPaaUdpCfgOneWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay threshold."
+    ::= { acdPaaUdpCfgEntry 27 }
+
+acdPaaUdpCfgDestinationPortNumber  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination UDP port number used to reach the peer PAA instance."
+    ::= { acdPaaUdpCfgEntry 28 }
+
+acdPaaUdpCfgPeerID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unique value for the peer PAA instance. This value follows the ordering
+         of the status and the results table. Its value ranges from 1 to
+         MAXINT (4 bytes)."
+    ::= { acdPaaUdpCfgEntry 29 }
+
+acdPaaUdpCfgOperationMode  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PAA Operation Mode. Its values are: 1 = Bi-Dir, 2 = Source, 3 = Sink"
+    ::= { acdPaaUdpCfgEntry 30 }
+
+acdPaaUdpCfgIgmpOneWayJoinPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IGMP One-way join period is the amount of time to wait from the
+         beginning of the period before an IGMP join request is sent out."
+    ::= { acdPaaUdpCfgEntry 31 }
+
+acdPaaUdpCfgIgmpRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IGMP reference period is the total amount of time in which we
+         sample IGMP join and leave requests. It must be a minimum of (10 * One-way ref. period)."
+    ::= { acdPaaUdpCfgEntry 32 }
+
+acdPaaUdpCfgIgmpMaxJoinDly  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum join delay objective."
+    ::= { acdPaaUdpCfgEntry 33 }
+
+acdPaaUdpCfgIgmpJoinDlyThres  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum consecutive join delay samples allowed greater than the maximum join delay."
+    ::= { acdPaaUdpCfgEntry 34 }
+
+acdPaaUdpCfgIgmpJoinAvgDlyThres  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum join average delay."
+    ::= { acdPaaUdpCfgEntry 35 }
+
+acdPaaUdpCfgIgmpMaxLvDly  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum join delay objective."
+    ::= { acdPaaUdpCfgEntry 36 }
+
+acdPaaUdpCfgIgmpLvDlyThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum consecutive leave delay samples allowed greater than the maximum leave delay."
+    ::= { acdPaaUdpCfgEntry 37 }
+
+
+acdPaaUdpCfgIgmpLvAvgDlyThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum leave delay average."
+    ::= { acdPaaUdpCfgEntry 38 }
+
+acdPaaUdpCfgPktLossThreshExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Extended packet loss ratio threshold allowed without issuing an alarm
+         expressed in millionth of percent (1,000,000 is 1%)."
+     DEFVAL      { 0 }
+    ::= { acdPaaUdpCfgEntry 39 }
+
+
+---------------------------------------------------------------------------
+ -- The L2 PAA configuration table
+ -- This table contains all L2 PAA entry configurations.
+---------------------------------------------------------------------------
+
+acdPaaL2CfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPaaL2CfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all L2 PAA entries"
+    ::= { acdPaa 4 }
+
+acdPaaL2CfgEntry OBJECT-TYPE
+    SYNTAX      AcdPaaL2CfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a PAA instance."
+    INDEX   { acdPaaL2CfgID }
+    ::=  { acdPaaL2CfgTable 1 }
+
+
+AcdPaaL2CfgEntry ::= SEQUENCE {
+    acdPaaL2CfgID                      Unsigned32,
+    acdPaaL2CfgName                    DisplayString,
+    acdPaaL2CfgState                   INTEGER,
+    acdPaaL2CfgPktSize                 Unsigned32,
+    acdPaaL2CfgSamplingPeriod          Unsigned32,
+    acdPaaL2CfgCcLossThresh            Unsigned32,
+    acdPaaL2CfgPktLossRefPeriod        Unsigned32,
+    acdPaaL2CfgPktLossThresh           Unsigned32,
+    acdPaaL2CfgOneWayRefPeriod         Unsigned32,
+    acdPaaL2CfgOneWayDvMax             Unsigned32,
+    acdPaaL2CfgOneWayDvThresh          Unsigned32,
+    acdPaaL2CfgOneWayAvgDvThresh       Unsigned32,
+    acdPaaL2CfgTwoWayRefPeriod         Unsigned32,
+    acdPaaL2CfgTwoWayDelayMax          Unsigned32,
+    acdPaaL2CfgTwoWayDelayThresh       Unsigned32,
+    acdPaaL2CfgTwoWayAvgDelayThresh    Unsigned32,
+    acdPaaL2CfgTwoWayDvMax             Unsigned32,
+    acdPaaL2CfgTwoWayDvThresh          Unsigned32,
+    acdPaaL2CfgTwoWayAvgDvThresh       Unsigned32,
+    acdPaaL2CfgPortName                DisplayString,
+    acdPaaL2CfgMacDst                  MacAddress,
+    acdPaaL2CfgEtype                   Unsigned32,
+    acdPaaL2CfgVlan1IdEn               TruthValue,
+    acdPaaL2CfgVlan1Id                 Unsigned32,
+    acdPaaL2CfgVlan2IdEn               TruthValue,
+    acdPaaL2CfgVlan2Id                 Unsigned32,
+    acdPaaL2CfgVlan1PbitsValue         Unsigned32,
+    acdPaaL2CfgVlan2PbitsValue         Unsigned32,
+    acdPaaL2CfgOneWayDelayMax          Unsigned32,
+    acdPaaL2CfgOneWayDelayThresh       Unsigned32,
+    acdPaaL2CfgOneWayAvgDelayThresh    Unsigned32,
+    acdPaaL2CfgPeerID                  Unsigned32,
+    acdPaaL2CfgOperationMode           Unsigned32,
+    acdPaaL2CfgPktLossThreshExt        Unsigned32
+}
+
+acdPaaL2CfgID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each PAA instance. This value follows the ordering
+         of the status and the results table. Its value ranges from 1 to
+         MAXINT (4 bytes)."
+    ::= { acdPaaL2CfgEntry 1 }
+
+acdPaaL2CfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify this PAA instance."
+    ::= { acdPaaL2CfgEntry 2 }
+
+acdPaaL2CfgState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(0),
+                    disable(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configuration state of this PAA entry."
+    ::= { acdPaaL2CfgEntry 3 }
+
+acdPaaL2CfgPktSize  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transmit packet size."
+    ::= { acdPaaL2CfgEntry 4 }
+
+acdPaaL2CfgSamplingPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interval in milliseconds at which PAA issues PAA measurement packets."
+    ::= { acdPaaL2CfgEntry 5 }
+
+acdPaaL2CfgCcLossThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of lost CCM (Connectivity Check Messages) for declaring a connectvity loss."
+    ::= { acdPaaL2CfgEntry 6 }
+
+acdPaaL2CfgPktLossRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for packet loss measurement."
+    ::= { acdPaaL2CfgEntry 7 }
+
+acdPaaL2CfgPktLossThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allowed packet loss, in percentage (%)."
+    ::= { acdPaaL2CfgEntry 8 }
+
+acdPaaL2CfgOneWayRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for one-way measurement."
+    ::= { acdPaaL2CfgEntry 9 }
+
+acdPaaL2CfgOneWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation."
+    ::= { acdPaaL2CfgEntry 10 }
+
+acdPaaL2CfgOneWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variations greater than the threshold."
+    ::= { acdPaaL2CfgEntry 11 }
+
+acdPaaL2CfgOneWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "One-way average delay variation threshold."
+    ::= { acdPaaL2CfgEntry 12 }
+
+acdPaaL2CfgTwoWayRefPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reference period in milliseconds for two-way measurement."
+    ::= { acdPaaL2CfgEntry 13 }
+
+acdPaaL2CfgTwoWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay."
+    ::= { acdPaaL2CfgEntry 14 }
+
+acdPaaL2CfgTwoWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delays greater than the threshold."
+    ::= { acdPaaL2CfgEntry 15 }
+
+acdPaaL2CfgTwoWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay threshold."
+    ::= { acdPaaL2CfgEntry 16 }
+
+acdPaaL2CfgTwoWayDvMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay variation."
+    ::= { acdPaaL2CfgEntry 17 }
+
+acdPaaL2CfgTwoWayDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of consecutive delay variations greater than the threshold."
+    ::= { acdPaaL2CfgEntry 18 }
+
+acdPaaL2CfgTwoWayAvgDvThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Two-way average delay variation threshold."
+    ::= { acdPaaL2CfgEntry 19 }
+
+acdPaaL2CfgPortName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32)) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Port Name used to reach the peer PAA instance."
+    ::= { acdPaaL2CfgEntry 20 }
+
+acdPaaL2CfgMacDst OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address used to reach the peer PAA instance."
+    ::= { acdPaaL2CfgEntry 21 }
+
+acdPaaL2CfgEtype  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Ethernet type used for this PAA instance."
+    ::= { acdPaaL2CfgEntry 22 }
+
+acdPaaL2CfgVlan1IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the first VLAN ID check"
+    ::= { acdPaaL2CfgEntry 23 }
+
+acdPaaL2CfgVlan1Id OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The first VLAN ID used to compare the incoming PAA traffic.
+             Its value ranges from 0 to 4095."
+    ::= { acdPaaL2CfgEntry 24 }
+
+acdPaaL2CfgVlan2IdEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the second VLAN ID check"
+    ::= { acdPaaL2CfgEntry 25 }
+
+acdPaaL2CfgVlan2Id OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The second VLAN ID used to compare the incoming PAA traffic.
+             Its value ranges from 0 to 4095."
+    ::= { acdPaaL2CfgEntry 26 }
+
+acdPaaL2CfgVlan1PbitsValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The first VLAN priority used to tag the outgoing traffic.
+             Its value ranges from 0 to 7."
+    ::= { acdPaaL2CfgEntry 27 }
+
+acdPaaL2CfgVlan2PbitsValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The second VLAN priority used to tag the outgoing traffic.
+             Its value ranges from 0 to 7."
+    ::= { acdPaaL2CfgEntry 28 }
+
+acdPaaL2CfgOneWayDelayMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed instantaneous delay."
+    ::= { acdPaaL2CfgEntry 29 }
+
+acdPaaL2CfgOneWayDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Nbr consecutive delay > max before alert."
+    ::= { acdPaaL2CfgEntry 30 }
+
+acdPaaL2CfgOneWayAvgDelayThresh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "One-way average delay threshold."
+    ::= { acdPaaL2CfgEntry 31 }
+
+acdPaaL2CfgPeerID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unique value for the peer PAA instance. This value follows the ordering
+         of the status and the results table. Its value ranges from 1 to
+         MAXINT (4 bytes)."
+    ::= { acdPaaL2CfgEntry 32 }
+
+acdPaaL2CfgOperationMode  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PAA Operation Mode. Its values are: 1 = Bi-Dir, 2 = Source, 3 = Sink"
+    ::= { acdPaaL2CfgEntry 33 }
+
+acdPaaL2CfgPktLossThreshExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Extended packet loss ratio threshold allowed without issuing an alarm
+         expressed in millionth of percent (1,000,000 is 1%)."
+     DEFVAL      { 0 }
+    ::= { acdPaaL2CfgEntry 34 }
+
+------------------------------------------------------------------------
+ -- The PAA history Results table
+ -- This table contains all PAA entry results.
+---------------------------------------------------------------------------
+
+acdPaaHistResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPaaHistResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Result table of all Paa entries"
+    ::= { acdPaa 5 }
+
+acdPaaHistResultEntry OBJECT-TYPE
+    SYNTAX      AcdPaaHistResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of results for a PAA instance for a specific
+         periodin time."
+    INDEX   { acdPaaHistResultID , acdPaaHistResultSampleIndex }
+    ::=  { acdPaaHistResultTable 1 }
+
+
+AcdPaaHistResultEntry ::= SEQUENCE {
+    acdPaaHistResultID                  Unsigned32,
+    acdPaaHistResultSampleIndex         Unsigned32,
+    acdPaaHistResultStatus              INTEGER,
+    acdPaaHistResultDuration            Unsigned32,
+    acdPaaHistResultIntervalEnd         DateAndTime,
+    acdPaaHistResultPktLossNeValid      TruthValue,
+    acdPaaHistResultPktLossNeSamples    Unsigned32,
+    acdPaaHistResultPktLossNeValue      Unsigned32,
+    acdPaaHistResultPktLossFeValid      TruthValue,
+    acdPaaHistResultPktLossFeSamples    Unsigned32,
+    acdPaaHistResultPktLossFeValue      Unsigned32,
+    acdPaaHistResultOneWayDelayValid    TruthValue,
+    acdPaaHistResultOneWayDelaySamples  Unsigned32,
+    acdPaaHistResultOneWayDelayMinValue Integer32,
+    acdPaaHistResultOneWayDelayMaxValue Integer32,
+    acdPaaHistResultOneWayDelayAvgValue Integer32,
+    acdPaaHistResultOneWayDelayThreshEx Unsigned32,
+    acdPaaHistResultOneWayDvValid       TruthValue,
+    acdPaaHistResultOneWayDvSamples     Unsigned32,
+    acdPaaHistResultOneWayDvMinValue    Integer32,
+    acdPaaHistResultOneWayDvMaxValue    Integer32,
+    acdPaaHistResultOneWayDvAvgValue    Integer32,
+    acdPaaHistResultOneWayDvThreshEx    Unsigned32,
+    acdPaaHistResultTwoWayDelayValid    TruthValue,
+    acdPaaHistResultTwoWayDelaySamples  Unsigned32,
+    acdPaaHistResultTwoWayDelayMinValue Integer32,
+    acdPaaHistResultTwoWayDelayMaxValue Integer32,
+    acdPaaHistResultTwoWayDelayAvgValue Integer32,
+    acdPaaHistResultTwoWayDelayThreshEx Unsigned32,
+    acdPaaHistResultTwoWayDvValid       TruthValue,
+    acdPaaHistResultTwoWayDvSamples     Unsigned32,
+    acdPaaHistResultTwoWayDvMinValue    Integer32,
+    acdPaaHistResultTwoWayDvMaxValue    Integer32,
+    acdPaaHistResultTwoWayDvAvgValue    Integer32,
+    acdPaaHistResultTwoWayDvThreshEx    Unsigned32,
+    acdPaaHistResultIgmpJoinDelayValid     TruthValue,
+    acdPaaHistResultIgmpJoinDelaySamples   Unsigned32,
+    acdPaaHistResultIgmpJoinDelayMinValue  Integer32,
+    acdPaaHistResultIgmpJoinDelayMaxValue  Integer32,
+    acdPaaHistResultIgmpJoinDelayAvgValue  Integer32,
+    acdPaaHistResultIgmpJoinDelayThreshEx  Unsigned32,
+    acdPaaHistResultIgmpLeaveDelayValid    TruthValue,
+    acdPaaHistResultIgmpLeaveDelaySamples  Unsigned32,
+    acdPaaHistResultIgmpLeaveDelayMinValue Integer32,
+    acdPaaHistResultIgmpLeaveDelayMaxValue Integer32,
+    acdPaaHistResultIgmpLeaveDelayAvgValue Integer32,
+    acdPaaHistResultIgmpLeaveDelayThreshEx Unsigned32,
+    acdPaaHistResultPktLossNeValueExt      Unsigned32,
+    acdPaaHistResultPktLossFeValueExt      Unsigned32,
+    acdPaaHistResultPktLossNeNbrLoss       Unsigned32,
+    acdPaaHistResultPktLossFeNbrLoss       Unsigned32
+}
+
+acdPaaHistResultID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each PAA instance. Its value ranges from 1 to
+        MAXINT (4 bytes). "
+    ::= { acdPaaHistResultEntry 1 }
+
+acdPaaHistResultSampleIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index that uniquely identifies the particular sample this entry
+         represents among all samples associated with the same PAA instance.
+         This index starts at 1 and increases by one as each new sample."
+    ::= { acdPaaHistResultEntry 2 }
+
+acdPaaHistResultStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this acdPaaHistResult entry."
+    ::= { acdPaaHistResultEntry 3 }
+
+acdPaaHistResultDuration  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interval in seconds over which the data is sampled for this entry."
+    ::= { acdPaaHistResultEntry 4 }
+
+acdPaaHistResultIntervalEnd OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the time of the end of this entry."
+    ::= { acdPaaHistResultEntry 5 }
+
+acdPaaHistResultPktLossNeValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Near-end packet loss results during
+         this sampling interval."
+    ::= { acdPaaHistResultEntry 6 }
+
+acdPaaHistResultPktLossNeSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate the Near-end packet loss."
+    ::= { acdPaaHistResultEntry 7 }
+
+acdPaaHistResultPktLossNeValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Near-end packet loss during this sampling interval.
+         The packet loss is the percent of packets transmitted but not
+         received of the Ethernet segment in hundredths of a percent."
+    ::= { acdPaaHistResultEntry 8 }
+
+acdPaaHistResultPktLossFeValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Far-end packet loss results during
+         this sampling interval."
+    ::= { acdPaaHistResultEntry 9 }
+
+acdPaaHistResultPktLossFeSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate the Far-end packet loss."
+    ::= { acdPaaHistResultEntry 10 }
+
+acdPaaHistResultPktLossFeValue  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Far-end packet loss during this sampling interval.
+         The packet loss is the percent of packets transmitted but not
+         received of the Ethernet segment in hundredths of a percent."
+    ::= { acdPaaHistResultEntry 11 }
+
+acdPaaHistResultOneWayDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the validity of the One-way delay results during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 12 }
+
+acdPaaHistResultOneWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay results."
+    ::= { acdPaaHistResultEntry 13 }
+
+acdPaaHistResultOneWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the One-way delay minimum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 14 }
+
+acdPaaHistResultOneWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the One-way delay maximum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 15 }
+
+acdPaaHistResultOneWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the One-way delay average value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 16 }
+
+acdPaaHistResultOneWayDelayThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the number of sample exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 17 }
+
+acdPaaHistResultOneWayDvValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the One-way delay variation results
+         during this sampling interval."
+    ::= { acdPaaHistResultEntry 18 }
+
+acdPaaHistResultOneWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate One-way delay variation results."
+    ::= { acdPaaHistResultEntry 19 }
+
+acdPaaHistResultOneWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation minimum value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 20 }
+
+acdPaaHistResultOneWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation maximum value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 21 }
+
+acdPaaHistResultOneWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the One-way delay variation average value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 22 }
+
+acdPaaHistResultOneWayDvThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 23 }
+
+acdPaaHistResultTwoWayDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Two-way delay results during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 24 }
+
+acdPaaHistResultTwoWayDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay results."
+    ::= { acdPaaHistResultEntry 25 }
+
+acdPaaHistResultTwoWayDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay minimum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 26 }
+
+acdPaaHistResultTwoWayDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay maximum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 27 }
+
+acdPaaHistResultTwoWayDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay average value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 28 }
+
+acdPaaHistResultTwoWayDelayThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 29 }
+
+acdPaaHistResultTwoWayDvValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the Two-way delay variation results during
+         this sampling interval."
+    ::= { acdPaaHistResultEntry 30 }
+
+acdPaaHistResultTwoWayDvSamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate Two-way delay variation results."
+    ::= { acdPaaHistResultEntry 31 }
+
+acdPaaHistResultTwoWayDvMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay variation minimum value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 32 }
+
+acdPaaHistResultTwoWayDvMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay variation maximum value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 33 }
+
+acdPaaHistResultTwoWayDvAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Two-way delay variation average value during this
+         sampling interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 34 }
+
+acdPaaHistResultTwoWayDvThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 35 }
+
+acdPaaHistResultIgmpJoinDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the IGMP Join delay results during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 36 }
+
+acdPaaHistResultIgmpJoinDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate IGMP Join delay results."
+    ::= { acdPaaHistResultEntry 37 }
+
+acdPaaHistResultIgmpJoinDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Join delay minimum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 38 }
+
+acdPaaHistResultIgmpJoinDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Join delay maximum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 39 }
+
+acdPaaHistResultIgmpJoinDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Join delay average value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 40 }
+
+acdPaaHistResultIgmpJoinDelayThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Join samples exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 41 }
+
+acdPaaHistResultIgmpLeaveDelayValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the IGMP Leave delay results during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 42 }
+
+acdPaaHistResultIgmpLeaveDelaySamples  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of samples gathered during the sampling
+         interval to calculate IGMP Leave delay results."
+    ::= { acdPaaHistResultEntry 43 }
+
+acdPaaHistResultIgmpLeaveDelayMinValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Leave delay minimum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 44 }
+
+acdPaaHistResultIgmpLeaveDelayMaxValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Leave delay maximum value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 45 }
+
+acdPaaHistResultIgmpLeaveDelayAvgValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the IGMP Leave delay average value during this sampling
+         interval. The value is expressed in micro-seconds."
+    ::= { acdPaaHistResultEntry 46 }
+
+acdPaaHistResultIgmpLeaveDelayThreshEx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of IGMP Leave samples exceeding the limit during this
+         sampling interval."
+    ::= { acdPaaHistResultEntry 47 }
+
+acdPaaHistResultPktLossNeValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended near-end packet loss ratio. The packet loss is the percent
+         of packets transmitted but not received in millionth of a percent
+         (1,000,000 is 1%)."
+
+    ::= { acdPaaHistResultEntry 48 }
+
+acdPaaHistResultPktLossFeValueExt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended far-end packet loss ratio. The packet loss is the percent
+         of packets transmitted but not received in millionth of a percent
+         (1,000,000 is 1%)."
+
+    ::= { acdPaaHistResultEntry 49 }
+
+acdPaaHistResultPktLossNeNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of near-end packet lost for the period.
+         This should be less or equal to acdPaaHistResultPktLossNeSamples."
+    ::= { acdPaaHistResultEntry 50 }
+
+acdPaaHistResultPktLossFeNbrLoss  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of far-end packet lost for the period.
+         This should be less or equal to acdPaaHistResultPktLossNeSamples."
+    ::= { acdPaaHistResultEntry 51 }
+
+---------------------------------------------------------------------------
+ -- ACD-PAA-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdPaaCompliances  OBJECT IDENTIFIER ::= { acdPaaConformance 1 }
+acdPaaGroups       OBJECT IDENTIFIER ::= { acdPaaConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdPaaResultGroup OBJECT-GROUP
+    OBJECTS {
+        acdPaaResultState,
+        acdPaaResultPktLossNeCurrValid,
+        acdPaaResultPktLossNeCurrValue,
+        acdPaaResultPktLossNePrevValid,
+        acdPaaResultPktLossNePrevValue,
+        acdPaaResultPktLossFeCurrValid,
+        acdPaaResultPktLossFeCurrValue,
+        acdPaaResultPktLossFePrevValid,
+        acdPaaResultPktLossFePrevValue,
+        acdPaaResultOneWayDvInstValue,
+        acdPaaResultOneWayDvCurrValid,
+        acdPaaResultOneWayDvCurrMinValue,
+        acdPaaResultOneWayDvCurrMaxValue,
+        acdPaaResultOneWayDvCurrAvgValue,
+        acdPaaResultOneWayDvCurrThreshExc,
+        acdPaaResultOneWayDvPrevValid,
+        acdPaaResultOneWayDvPrevMinValue,
+        acdPaaResultOneWayDvPrevMaxValue,
+        acdPaaResultOneWayDvPrevAvgValue,
+        acdPaaResultOneWayDvPrevThreshEx,
+        acdPaaResultTwoWayDelayInstValue,
+        acdPaaResultTwoWayDelayCurrValid,
+        acdPaaResultTwoWayDelayCurrMinValue,
+        acdPaaResultTwoWayDelayCurrMaxValue,
+        acdPaaResultTwoWayDelayCurrAvgValue,
+        acdPaaResultTwoWayDelayCurrThreshEx,
+        acdPaaResultTwoWayDelayPrevValid,
+        acdPaaResultTwoWayDelayPrevMinValue,
+        acdPaaResultTwoWayDelayPrevMaxValue,
+        acdPaaResultTwoWayDelayPrevAvgValue,
+        acdPaaResultTwoWayDelayPrevThreshEx,
+        acdPaaResultTwoWayDvInstValue,
+        acdPaaResultTwoWayDvCurrValid,
+        acdPaaResultTwoWayDvCurrMinValue,
+        acdPaaResultTwoWayDvCurrMaxValue,
+        acdPaaResultTwoWayDvCurrAvgValue,
+        acdPaaResultTwoWayDvCurrThreshEx,
+        acdPaaResultTwoWayDvPrevValid,
+        acdPaaResultTwoWayDvPrevMinValue,
+        acdPaaResultTwoWayDvPrevMaxValue,
+        acdPaaResultTwoWayDvPrevAvgValue,
+        acdPaaResultTwoWayDvPrevThreshEx,
+        acdPaaResultOneWayDelayInstValue,
+        acdPaaResultOneWayDelayCurrValid,
+        acdPaaResultOneWayDelayCurrMinValue,
+        acdPaaResultOneWayDelayCurrMaxValue,
+        acdPaaResultOneWayDelayCurrAvgValue,
+        acdPaaResultOneWayDelayCurrThreshEx,
+        acdPaaResultOneWayDelayPrevValid,
+        acdPaaResultOneWayDelayPrevMinValue,
+        acdPaaResultOneWayDelayPrevMaxValue,
+        acdPaaResultOneWayDelayPrevAvgValue,
+        acdPaaResultOneWayDelayPrevThreshEx,
+        acdPaaResultPktLossTime,
+        acdPaaResultOneWayTime,
+        acdPaaResultTwoWayTime,
+        acdPaaResultPktLossNeCurrSamples,
+        acdPaaResultPktLossNePrevSamples,
+        acdPaaResultPktLossFeCurrSamples,
+        acdPaaResultPktLossFePrevSamples,
+        acdPaaResultOneWayDelayCurrSamples,
+        acdPaaResultOneWayDelayPrevSamples,
+        acdPaaResultOneWayDvCurrSamples,
+        acdPaaResultOneWayDvPrevSamples,
+        acdPaaResultTwoWayDelayCurrSamples,
+        acdPaaResultTwoWayDelayPrevSamples,
+        acdPaaResultTwoWayDvCurrSamples,
+        acdPaaResultTwoWayDvPrevSamples,
+        acdPaaResultIgmpJoinDelayInstValue,
+        acdPaaResultIgmpJoinDelayCurrValid,
+        acdPaaResultIgmpJoinDelayCurrMinValue,
+        acdPaaResultIgmpJoinDelayCurrMaxValue,
+        acdPaaResultIgmpJoinDelayCurrAvgValue,
+        acdPaaResultIgmpJoinDelayCurrThreshEx,
+        acdPaaResultIgmpJoinDelayPrevValid,
+        acdPaaResultIgmpJoinDelayPrevMinValue,
+        acdPaaResultIgmpJoinDelayPrevMaxValue,
+        acdPaaResultIgmpJoinDelayPrevAvgValue,
+        acdPaaResultIgmpJoinDelayPrevThreshEx,
+        acdPaaResultIgmpLeaveDelayInstValue,
+        acdPaaResultIgmpLeaveDelayCurrValid,
+        acdPaaResultIgmpLeaveDelayCurrMinValue,
+        acdPaaResultIgmpLeaveDelayCurrMaxValue,
+        acdPaaResultIgmpLeaveDelayCurrAvgValue,
+        acdPaaResultIgmpLeaveDelayCurrThreshEx,
+        acdPaaResultIgmpLeaveDelayPrevValid,
+        acdPaaResultIgmpLeaveDelayPrevMinValue,
+        acdPaaResultIgmpLeaveDelayPrevMaxValue,
+        acdPaaResultIgmpLeaveDelayPrevAvgValue,
+        acdPaaResultIgmpLeaveDelayPrevThreshEx,
+        acdPaaResultIgmpJoinDelayTime,
+        acdPaaResultIgmpLeaveDelayTime,
+        acdPaaResultIgmpJoinDelayCurrSamples,
+        acdPaaResultIgmpJoinDelayPrevSamples,
+        acdPaaResultIgmpLeaveDelayCurrSamples,
+        acdPaaResultIgmpLeaveDelayPrevSamples,
+        acdPaaResultPktLossCurrGaps,
+        acdPaaResultPktLossPrevGaps,
+        acdPaaResultPktLossCurrLargestGap,
+        acdPaaResultPktLossPrevLargestGap,
+        acdPaaResultPktLossNeCurrValueExt,
+        acdPaaResultPktLossNePrevValueExt,
+        acdPaaResultPktLossFeCurrValueExt,
+        acdPaaResultPktLossFePrevValueExt,
+        acdPaaResultPktLossNeCurrNbrLoss,
+        acdPaaResultPktLossNePrevNbrLoss,
+        acdPaaResultPktLossFeCurrNbrLoss,
+        acdPaaResultPktLossFePrevNbrLoss
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the PAA result Group."
+    ::= { acdPaaGroups 1 }
+
+acdPaaStatusGroup OBJECT-GROUP
+    OBJECTS {
+        acdPaaStatusCcAlert,
+        acdPaaStatusPktLossAlert,
+        acdPaaStatusOneWayDelayAlert,
+        acdPaaStatusOneWayAvgDelayAlert,
+        acdPaaStatusOneWayDvAlert,
+        acdPaaStatusOneWayAvgDvAlert,
+        acdPaaStatusTwoWayDelayAlert,
+        acdPaaStatusTwoWayAvgDelayAlert,
+        acdPaaStatusTwoWayDvAlert,
+        acdPaaStatusTwoWayAvgDvAlert,
+        acdPaaStatusState,
+        acdPaaStatusPeerAddress
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the PAA status Group."
+    ::= { acdPaaGroups 2 }
+
+acdPaaUdpCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdPaaUdpCfgName,
+        acdPaaUdpCfgState,
+        acdPaaUdpCfgPktSize,
+        acdPaaUdpCfgSamplingPeriod,
+        acdPaaUdpCfgCcLossThresh,
+        acdPaaUdpCfgPktLossRefPeriod,
+        acdPaaUdpCfgPktLossThresh,
+        acdPaaUdpCfgOneWayRefPeriod,
+        acdPaaUdpCfgOneWayDvMax,
+        acdPaaUdpCfgOneWayDvThresh,
+        acdPaaUdpCfgOneWayAvgDvThresh,
+        acdPaaUdpCfgTwoWayRefPeriod,
+        acdPaaUdpCfgTwoWayDelayMax,
+        acdPaaUdpCfgTwoWayDelayThresh,
+        acdPaaUdpCfgTwoWayAvgDelayThresh,
+        acdPaaUdpCfgTwoWayDvMax,
+        acdPaaUdpCfgTwoWayDvThresh,
+        acdPaaUdpCfgTwoWayAvgDvThresh,
+        acdPaaUdpCfgIPv4DstAddr,
+        acdPaaUdpCfgPortNumber,
+        acdPaaUdpCfgDscpValue,
+        acdPaaUdpCfgVlan1PbitsValue,
+        acdPaaUdpCfgVlan2PbitsValue,
+        acdPaaUdpCfgOneWayDelayMax,
+        acdPaaUdpCfgOneWayDelayThresh,
+        acdPaaUdpCfgOneWayAvgDelayThresh,
+        acdPaaUdpCfgDestinationPortNumber,
+        acdPaaUdpCfgPeerID,
+        acdPaaUdpCfgOperationMode,
+        acdPaaUdpCfgIgmpOneWayJoinPeriod,
+        acdPaaUdpCfgIgmpRefPeriod,
+        acdPaaUdpCfgIgmpMaxJoinDly,
+        acdPaaUdpCfgIgmpJoinDlyThres,
+        acdPaaUdpCfgIgmpJoinAvgDlyThres,
+        acdPaaUdpCfgIgmpMaxLvDly,
+        acdPaaUdpCfgIgmpLvDlyThresh,
+        acdPaaUdpCfgIgmpLvAvgDlyThresh,
+        acdPaaUdpCfgPktLossThreshExt
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the PAA UDP configuration Group."
+    ::= { acdPaaGroups 3 }
+
+acdPaaL2CfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdPaaL2CfgName,
+        acdPaaL2CfgState,
+        acdPaaL2CfgPktSize,
+        acdPaaL2CfgSamplingPeriod,
+        acdPaaL2CfgCcLossThresh,
+        acdPaaL2CfgPktLossRefPeriod,
+        acdPaaL2CfgPktLossThresh,
+        acdPaaL2CfgOneWayRefPeriod,
+        acdPaaL2CfgOneWayDvMax,
+        acdPaaL2CfgOneWayDvThresh,
+        acdPaaL2CfgOneWayAvgDvThresh,
+        acdPaaL2CfgTwoWayRefPeriod,
+        acdPaaL2CfgTwoWayDelayMax,
+        acdPaaL2CfgTwoWayDelayThresh,
+        acdPaaL2CfgTwoWayAvgDelayThresh,
+        acdPaaL2CfgTwoWayDvMax,
+        acdPaaL2CfgTwoWayDvThresh,
+        acdPaaL2CfgTwoWayAvgDvThresh,
+        acdPaaL2CfgPortName,
+        acdPaaL2CfgMacDst,
+        acdPaaL2CfgEtype,
+        acdPaaL2CfgVlan1IdEn,
+        acdPaaL2CfgVlan1Id,
+        acdPaaL2CfgVlan2IdEn,
+        acdPaaL2CfgVlan2Id,
+        acdPaaL2CfgVlan1PbitsValue,
+        acdPaaL2CfgVlan2PbitsValue,
+        acdPaaL2CfgOneWayDelayMax,
+        acdPaaL2CfgOneWayDelayThresh,
+        acdPaaL2CfgOneWayAvgDelayThresh,
+        acdPaaL2CfgPeerID,
+        acdPaaL2CfgOperationMode,
+        acdPaaL2CfgPktLossThreshExt
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the PAA L2 configuration Group."
+    ::= { acdPaaGroups 4 }
+
+acdPaaHistResultGroup OBJECT-GROUP
+    OBJECTS {
+        acdPaaHistResultStatus,
+        acdPaaHistResultDuration,
+        acdPaaHistResultIntervalEnd,
+        acdPaaHistResultPktLossNeValid,
+        acdPaaHistResultPktLossNeSamples,
+        acdPaaHistResultPktLossNeValue,
+        acdPaaHistResultPktLossFeValid,
+        acdPaaHistResultPktLossFeSamples,
+        acdPaaHistResultPktLossFeValue,
+        acdPaaHistResultOneWayDelayValid,
+        acdPaaHistResultOneWayDelaySamples,
+        acdPaaHistResultOneWayDelayMinValue,
+        acdPaaHistResultOneWayDelayMaxValue,
+        acdPaaHistResultOneWayDelayAvgValue,
+        acdPaaHistResultOneWayDelayThreshEx,
+        acdPaaHistResultOneWayDvValid,
+        acdPaaHistResultOneWayDvSamples,
+        acdPaaHistResultOneWayDvMinValue,
+        acdPaaHistResultOneWayDvMaxValue,
+        acdPaaHistResultOneWayDvAvgValue,
+        acdPaaHistResultOneWayDvThreshEx,
+        acdPaaHistResultTwoWayDelayValid,
+        acdPaaHistResultTwoWayDelaySamples,
+        acdPaaHistResultTwoWayDelayMinValue,
+        acdPaaHistResultTwoWayDelayMaxValue,
+        acdPaaHistResultTwoWayDelayAvgValue,
+        acdPaaHistResultTwoWayDelayThreshEx,
+        acdPaaHistResultTwoWayDvValid,
+        acdPaaHistResultTwoWayDvSamples,
+        acdPaaHistResultTwoWayDvMinValue,
+        acdPaaHistResultTwoWayDvMaxValue,
+        acdPaaHistResultTwoWayDvAvgValue,
+        acdPaaHistResultTwoWayDvThreshEx,
+        acdPaaHistResultIgmpJoinDelayValid,
+        acdPaaHistResultIgmpJoinDelaySamples,
+        acdPaaHistResultIgmpJoinDelayMinValue,
+        acdPaaHistResultIgmpJoinDelayMaxValue,
+        acdPaaHistResultIgmpJoinDelayAvgValue,
+        acdPaaHistResultIgmpJoinDelayThreshEx,
+        acdPaaHistResultIgmpLeaveDelayValid,
+        acdPaaHistResultIgmpLeaveDelaySamples,
+        acdPaaHistResultIgmpLeaveDelayMinValue,
+        acdPaaHistResultIgmpLeaveDelayMaxValue,
+        acdPaaHistResultIgmpLeaveDelayAvgValue,
+        acdPaaHistResultIgmpLeaveDelayThreshEx,
+        acdPaaHistResultPktLossNeValueExt,
+        acdPaaHistResultPktLossFeValueExt,
+        acdPaaHistResultPktLossNeNbrLoss,
+        acdPaaHistResultPktLossFeNbrLoss
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the PAA history result Group."
+    ::= { acdPaaGroups 5 }
+
+acdPaaCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-PAA-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdPaaResultGroup,
+            acdPaaStatusGroup,
+            acdPaaUdpCfgGroup,
+            acdPaaL2CfgGroup,
+            acdPaaHistResultGroup
+         }
+
+    ::= { acdPaaCompliances 1 }
+
+
+END

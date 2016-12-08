@@ -20,15 +20,13 @@ $ret = array();
 $brk = false;
 if (!is_numeric($_POST['map_id'])) {
     array_unshift($ret, 'ERROR: No map selected');
-}
-else {
+} else {
     if (dbFetchCell('SELECT COUNT(B.id) FROM alert_map,alert_map AS B WHERE alert_map.rule=B.rule && alert_map.id = ?', array($_POST['map_id'])) <= 1) {
         $rule              = dbFetchRow('SELECT alert_rules.id,alert_rules.device_id FROM alert_map,alert_rules WHERE alert_map.rule=alert_rules.id && alert_map.id = ?', array($_POST['map_id']));
         $rule['device_id'] = str_replace(':', '', $rule['device_id']);
         if (dbUpdate(array('device_id' => $rule['device_id']), 'alert_rules', 'id = ?', array($rule['id'])) >= 0) {
             $ret[] = 'Restored Rule: <i>'.$rule['id'].": device_id = '".$rule['device_id']."'</i>";
-        }
-        else {
+        } else {
             array_unshift($ret, 'ERROR: Rule '.$rule['id'].' has not been restored.');
             $brk = true;
         }
@@ -36,8 +34,7 @@ else {
 
     if ($brk === false && dbDelete('alert_map', '`id` =  ?', array($_POST['map_id']))) {
         $ret[] = 'Map has been deleted.';
-    }
-    else {
+    } else {
         array_unshift($ret, 'ERROR: Map has not been deleted.');
     }
 }

@@ -22,7 +22,9 @@
  * @subpackage Notifications
  */
 
-$notifications = new ObjCache('notifications');
+use LibreNMS\ObjectCache;
+
+$notifications = new ObjectCache('notifications');
 ?>
 <div class="container">
   <div class="row">
@@ -61,34 +63,34 @@ $notifications = new ObjCache('notifications');
 <?php if (!isset($vars['archive'])) { ?>
 <div class="container">
 <?php
-    foreach ($notifications['sticky'] as $notif) {
-        if (is_numeric($notif['source'])) {
-            $notif['source'] = dbFetchCell('select username from users where user_id =?',array($notif['source']));
-        } ?>
+foreach ($notifications['sticky'] as $notif) {
+    if (is_numeric($notif['source'])) {
+        $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
+    } ?>
   <div class="well">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="text-warning" id="<?php echo $notif['notifications_id']; ?>"><strong><i class="fa fa-bell-o"></i>&nbsp;&nbsp;&nbsp;<?php echo $notif['title']; ?></strong>&nbsp;<span class="pull-right"><?php echo ($notif['user_id'] != $_SESSION['user_id'] ? '<code>Sticky by '.dbFetchCell('select username from users where user_id = ?',array($notif['user_id'])).'</code>' : '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>'); ?></span></h4>
+        <h4 class="text-warning" id="<?php echo $notif['notifications_id']; ?>"><strong><i class="fa fa-bell-o"></i>&nbsp;&nbsp;&nbsp;<?php echo $notif['title']; ?></strong>&nbsp;<span class="pull-right"><?php echo ($notif['user_id'] != $_SESSION['user_id'] ? '<code>Sticky by '.dbFetchCell('select username from users where user_id = ?', array($notif['user_id'])).'</code>' : '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>'); ?></span></h4>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <blockquote>
           <p><?php echo $notif['body']; ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
-<?php    } ?>
+<?php        } ?>
 <?php    if ($notifications['sticky_count'] != 0) { ?>
 <hr/>
 <?php    } ?>
 <?php
-    foreach ($notifications['unread'] as $notif) {
-        if (is_numeric($notif['source'])) {
-            $notif['source'] = dbFetchCell('select username from users where user_id =?',array($notif['source']));
-        } ?>
+foreach ($notifications['unread'] as $notif) {
+    if (is_numeric($notif['source'])) {
+        $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
+    } ?>
   <div class="well">
     <div class="row">
       <div class="col-md-12">
@@ -103,20 +105,20 @@ $notifications = new ObjCache('notifications');
     <div class="row">
       <div class="col-md-12">
         <blockquote>
-          <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
-<?php    } ?>
+<?php        } ?>
   <div class="row">
     <div class="col-md-12">
-      <h3><a class="btn btn-default" href="<?php echo $config['base_url']; ?>notifications/archive">Show Archive</a></h3>
+      <h3><a class="btn btn-default" href="notifications/archive/">Show Archive</a></h3>
     </div>
   </div>
 </div>
-<?php } else if (isset($vars['archive'])) { ?>
+<?php } elseif (isset($vars['archive'])) { ?>
 <div class="container">
   <div class="row">
     <div class="col-md-12">
@@ -127,14 +129,15 @@ $notifications = new ObjCache('notifications');
   <div class="well">
     <div class="row">
       <div class="col-md-12">
-        <h4 id="<?php echo $notif['notifications_id']; ?>"><?php echo $notif['title']; echo ($_SESSION['userlevel'] == 10 ? '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>' : ''); ?>
+        <h4 id="<?php echo $notif['notifications_id']; ?>"><?php echo $notif['title'];
+        echo ($_SESSION['userlevel'] == 10 ? '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>' : ''); ?>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <blockquote>
-          <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -164,7 +167,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="<?php echo $config['base_url']; ?>notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -208,7 +211,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="<?php echo $config['base_url']; ?>notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -227,7 +230,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="<?php echo $config['base_url']; ?>notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');

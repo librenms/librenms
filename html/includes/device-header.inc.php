@@ -2,8 +2,7 @@
 
 if ($device['status'] == '0') {
     $class = 'alert-danger';
-}
-else {
+} else {
     $class = '';
 }
 
@@ -21,21 +20,28 @@ if ($device['disabled'] == '1') {
 $type = strtolower($device['os']);
 
 $image = getImage($device);
+$host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 
 echo '
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td width="40" align=center valign=middle style="padding: 21px;"><span class="device_icon">'.$image.'</span></td>
-             <td valign=middle style="padding: 0 15px;"><span style="font-size: 20px;">'.generate_device_link($device).'</span>
+             <td><span class="device_icon">'.$image.'</span></td>
+             <td>';
+if ($host_id > 0) {
+    echo '
+             <a href="'.generate_url(array('page'=>'device','device'=>$host_id)).'"><i class="fa fa-server fa-fw fa-lg"></i></a>
+         ';
+}
+             
+echo '
+             <span style="font-size: 20px;">'.generate_device_link($device).'</span>
              <br />'.generate_link($device['location'], array('page' => 'devices', 'location' => $device['location'])).'</td>
              <td>';
 
 if (isset($config['os'][$device['os']]['over'])) {
     $graphs = $config['os'][$device['os']]['over'];
-}
-else if (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
+} elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
     $graphs = $config['os'][$device['os_group']]['over'];
-}
-else {
+} else {
     $graphs = $config['os']['default']['over'];
 }
 

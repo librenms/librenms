@@ -1,7 +1,7 @@
 <?php
 
-$rrd_filename_in  = $config['rrd_dir'].'/'.$device['hostname'].'/ucd_ssIORawReceived.rrd';
-$rrd_filename_out = $config['rrd_dir'].'/'.$device['hostname'].'/ucd_ssIORawSent.rrd';
+$rrd_filename_in  = rrd_name($device['hostname'], 'ucd_ssIORawReceived');
+$rrd_filename_out = rrd_name($device['hostname'], 'ucd_ssIORawSent');
 $ds_in            = 'value';
 $ds_out           = 'value';
 

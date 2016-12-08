@@ -11,8 +11,7 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
-
+if (is_admin() !== false) {
 ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-alert" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -32,6 +31,7 @@ if(is_admin() !== false) {
             <input type="hidden" name="device_id" id="device_id" value="">
             <input type="hidden" name="alert_id" id="alert_id" value="">
             <input type="hidden" name="type" id="type" value="create-alert-item">
+            <input type="hidden" name="template_id" id="template_id" value="">
         <div class="form-group">
             <div class="col-sm-12">
                 <span id="ajax_response"></span>
@@ -54,8 +54,8 @@ if(is_admin() !== false) {
                         <select id='condition' name='condition' placeholder='Condition' class='form-control'>
                                 <option value='='>Equals</option>
                                 <option value='!='>Not Equals</option>
-				<option value='~'>Like</option>
-				<option value='!~'>Not Like</option>
+                                <option value='~'>Like</option>
+                                <option value='!~'>Not Like</option>
                                 <option value='>'>Larger than</option>
                                 <option value='>='>Larger than or Equals</option>
                                 <option value='<'>Smaller than</option>
@@ -134,6 +134,12 @@ if(is_admin() !== false) {
                 </div>
             </div>
         </div>
+        <div class='form-group'>
+            <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
+            <div class='col-sm-9'>
+                <input type='text' id='proc' name='proc' class='form-control' maxlength='80'>
+            </div>
+        </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
                         <button class="btn btn-success btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
@@ -156,8 +162,8 @@ $('#create-alert').on('hide.bs.modal', function (event) {
 });
 
 $('#add-map').click('',function (event) {
-	$('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
-	$('#map-stub').val('');
+    $('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
+    $('#map-stub').val('');
 });
 
 $('#create-alert').on('show.bs.modal', function (event) {
@@ -165,6 +171,25 @@ $('#create-alert').on('show.bs.modal', function (event) {
     var device_id = button.data('device_id');
     var alert_id = button.data('alert_id');
     var modal = $(this)
+    var template_id = $('#template_id').val();
+    $('#template_id').val('');
+    var arr = [];
+    if (template_id >= 0) {
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: { type: "parse-alert-rule", alert_id: null, template_id: template_id },
+            dataType: "json",
+            success: function(output) {
+                $.each ( output['rules'], function( key, value ) {
+                    arr.push(value);
+                });
+                $('#response').data('tagmanager').populate(arr);
+                $('#name').val(output['name']);
+                $('#device_id').val("-1");
+            }
+        });
+    }
     $('#device_id').val(device_id);
     $('#alert_id').val(alert_id);
     $('#tagmanager').tagmanager();
@@ -177,7 +202,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
            tagFieldName: 'maps[]',
            initialCap: false
     });
-    if( $('#alert_id').val() == '' ) {
+    if( $('#alert_id').val() == '' || template_id == '') {
         $('#preseed-maps').show();
     } else {
         $('#preseed-maps').hide();
@@ -188,7 +213,6 @@ $('#create-alert').on('show.bs.modal', function (event) {
         data: { type: "parse-alert-rule", alert_id: alert_id },
         dataType: "json",
         success: function(output) {
-            var arr = [];
             $.each ( output['rules'], function( key, value ) {
                 arr.push(value);
             });
@@ -219,6 +243,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
             $("[name='mute']").bootstrapSwitch('state',extra['mute']);
             $("[name='invert']").bootstrapSwitch('state',extra['invert']);
             $('#name').val(output['name']);
+            $('#proc').val(output['proc']);
         }
     });
 });
@@ -255,9 +280,10 @@ $('#suggest').typeahead({
   async: true,
   displayKey: 'name',
   valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-    }
+  templates: {
+      suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+  },
+  limit: 20
 });
 
 var map_devices = new Bloodhound({
@@ -389,5 +415,4 @@ $( "#suggest, #value" ).blur(function() {
 </script>
 
 <?php
-
 }

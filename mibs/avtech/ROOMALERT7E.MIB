@@ -1,0 +1,362 @@
+--
+--defines ROOMALERT7E-MIB for SNMP agent extension of Room Alert 7E
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	2.0.3 
+--Date:		11 September 2007
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2007 AVTECH Software, Inc.
+--
+
+ROOMALERT7E-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+avtech      OBJECT IDENTIFIER ::= { enterprises 20916 }
+products      OBJECT IDENTIFIER ::= { avtech 1 }
+roomalert7e      OBJECT IDENTIFIER ::= { products 2 }
+sensors       OBJECT IDENTIFIER ::= { roomalert7e 1 }
+traps	      OBJECT IDENTIFIER ::= { roomalert7e 2 }
+thresholds    OBJECT IDENTIFIER ::= { roomalert7e 3 }
+temperature   OBJECT IDENTIFIER ::= { sensors 1 }
+switch	      OBJECT IDENTIFIER ::= { sensors 2 }
+ 
+-- Room Alert 7E MIB
+-- Parameters 
+
+tempreading1c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 1 (Celsius)"
+::= { temperature 1 }
+
+tempreading2c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 2 (Celsius)"
+::= { temperature 2 }
+
+tempreading3c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 3 (Celsius)"
+::= { temperature 3 }
+
+
+tempreading4c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 4 (Celsius)"
+::= { temperature 4 }
+
+tempreading1f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 1 (Fahrenheit)"
+::= { temperature 5 }
+
+tempreading2f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 2 (Fahrenheit)"
+::= { temperature 6 }
+
+tempreading3f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 3 (Fahrenheit)"
+::= { temperature 7 }
+
+
+tempreading4f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 4 (Fahrenheit)"
+::= { temperature 8 }
+
+switch1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Switch Sensor 1 (0 = OFF, 1 = ON)"
+::= { switch 1 }
+
+switch2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Switch Sensor 2 (0 = OFF, 1 = ON)"
+::= { switch 2 }
+
+switch3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Switch Sensor 3 (0 = OFF, 1 = ON)"
+::= { switch 3 }
+
+alarmtemp1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 1
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 1 }
+	
+alarmtemp2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 2
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 2 }
+	
+alarmtemp3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 3
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 3 }
+	
+alarmtemp4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 4
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 4 }	
+	
+alarmswitch1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for switch sensor 1
+			0 = Switch Open
+			1 = Switch Closed"
+::= { traps 5 }	
+	
+alarmswitch2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for switch sensor 2
+			0 = Switch Open
+			1 = Switch Closed"
+::= { traps 6 }	
+	
+alarmswitch3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for switch sensor 3
+			0 = Switch Open
+			1 = Switch Closed"
+::= { traps 7 }	
+	
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Message string to send with trap messages"
+::= { traps 8 }		
+	
+upperlimit1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 1"
+::= { thresholds 1 }		
+	
+lowerlimit1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 1"
+::= { thresholds 2 }
+	
+upperlimit2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 2"
+::= { thresholds 3 }		
+	
+lowerlimit2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 2"
+::= { thresholds 4 }
+	
+upperlimit3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 3"
+::= { thresholds 5 }		
+	
+lowerlimit3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 3"
+::= { thresholds 6 }
+	
+upperlimit4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 4"
+::= { thresholds 7 }		
+	
+lowerlimit4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 4"
+::= { thresholds 8 }	
+	
+-- ROOMALERT7E TRAPS
+
+alarmstart1-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading1c, tempreading1f }
+	DESCRIPTION	"A alarmstart1 trap signifies that the current
+			temperature on sensor 1 is outside the 
+			defined high or low threshold."
+::= 1
+	
+room-alert-7e-snmp-trap TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A room-alert-7e-snmp-trap indicates that an alarm
+			condition has occurred on the sensor inidcated
+			by the alarmmessage variable."
+::= 2
+	
+alarmstart2-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading2c, tempreading2f }
+	DESCRIPTION	"A alarmstart2 trap signifies that the current
+			temperature on sensor 2 is outside the 
+			defined high or low threshold."
+::= 3
+	
+alarmclear2-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading2c, tempreading2f }
+	DESCRIPTION	"A alarmclear2 trap signifies that the current
+			temperature on sensor 2 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 4
+	
+alarmstart3-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading3c, tempreading3f }
+	DESCRIPTION	"A alarmstart3 trap signifies that the current
+			temperature on sensor 3 is outside the 
+			defined high or low threshold."
+::= 5
+	
+alarmclear3-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading3c, tempreading3f }
+	DESCRIPTION	"A alarmclear3 trap signifies that the current
+			temperature on sensor 3 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 6
+	
+alarmstart4-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading4c, tempreading4f }
+	DESCRIPTION	"A alarmstart4 trap signifies that the current
+			temperature on sensor 4 is outside the 
+			defined high or low threshold."
+::= 7
+	
+alarmclear4-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, tempreading4c, tempreading4f }
+	DESCRIPTION	"A alarmclear4 trap signifies that the current
+			temperature on sensor 4 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 8
+	
+alarmstart5-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch1, switch1 }
+	DESCRIPTION	"A alarmstart5 trap signifies that the current
+			status of switch sensor 1 is outside the 
+			defined threshold."
+::= 9
+	
+alarmclear5-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch1, switch1 }
+	DESCRIPTION	"A alarmclear5 trap signifies that the current
+			status of switch sensor 1 is outside the 
+			defined threshold."
+::= 10
+	
+alarmstart6-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch2, switch2 }
+	DESCRIPTION	"A alarmstart6 trap signifies that the current
+			status of switch sensor 2 is outside the 
+			defined threshold."
+::= 11
+	
+alarmclear6-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch2, switch2 }
+	DESCRIPTION	"A alarmclear6 trap signifies that the current
+			status of switch sensor 2 is outside the 
+			defined threshold."
+::= 12
+	
+alarmstart7-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch3, switch3 }
+	DESCRIPTION	"A alarmstart7 trap signifies that the current
+			status of switch sensor 3 is outside the 
+			defined threshold."
+::= 13
+	
+alarmclear7-7e TRAP-TYPE
+	ENTERPRISE	roomalert7e
+	VARIABLES	{ alarmmessage, switch3, switch3 }
+	DESCRIPTION	"A alarmclear7 trap signifies that the current
+			status of switch sensor 3 is outside the 
+			defined threshold."
+::= 14
+END

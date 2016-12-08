@@ -1,0 +1,714 @@
+-- $Log: E5-111-TRAPS-MIB.mib $
+-- Revision 1.9  2010/10/18 06:23:53  cylien
+-- Revision 1.8  2010/09/01 06:56:02  cylien
+-- Revision 1.7  2010/04/23 10:46:26  maverick
+-- Revision 1.6  2010/03/24 09:03:16  maverick
+-- Revision 1.5  2009/11/06 02:10:39  maverick
+-- remove cfm, change atmqos to ipqos
+-- Revision 1.4  2009/10/30 13:33:33  John
+-- Revision 1.3  2009/09/16 02:55:32  niceguy
+-- Revision 1.2  2009/06/22 03:24:03  niceguy
+-- Revision 1.1  2009/06/03 08:42:39  niceguy
+-- Initial revision
+
+
+E5-111-TRAPS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, ifIndex
+	  	FROM RFC1213-MIB
+	iesChassisId,iesSlotId
+		FROM E5-111-IESCOMMON-MIB
+	e5x111
+		FROM E5-111-MIB;
+
+	trap		OBJECT IDENTIFIER ::= { e5x111 12 }
+
+----------------------------------------
+-- trap
+----------------------------------------
+
+	object			OBJECT IDENTIFIER ::= { trap 1 }
+	equipment		OBJECT IDENTIFIER ::= { trap 3 }
+	systrap			OBJECT IDENTIFIER ::= { trap 4 }
+	voiptrap		OBJECT IDENTIFIER ::= { trap 7 }
+	interface		OBJECT IDENTIFIER ::= { trap 8 }
+	e5Alarm			OBJECT IDENTIFIER ::= { trap 9 }
+--------------------
+-- object
+--------------------
+
+	eqptAlarmInputIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The index of alarm input."
+	::= { object 2 }
+
+	eqptAlarmInputName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Name of alarm input."
+	::= { object 8 }
+
+	sysMacAntiSpoofOrig OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Original port of Mac-AntiSpoofing."
+	::= { object 9 }
+
+	sysMacAntiSpoofNew OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The New port of Mac-AntiSpoofing."
+	::= { object 10 }
+
+	sysMacAntiSpoofMAC OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The MAC of Mac-AntiSpoofing."
+	::= { object 11 }
+
+	sysAlarmOrigSeverity OBJECT-TYPE
+    SYNTAX 	INTEGER {
+    		critical(1),
+    		major(2),
+    		minor(3),
+    		info(4)
+    	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The original severity of alarm."
+	::= { object 12 }
+
+	sysAlarmNewSeverity OBJECT-TYPE
+    SYNTAX 	INTEGER {
+    		critical(1),
+    		major(2),
+    		minor(3),
+    		info(4)
+    	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The new severity of alarm."
+	::= { object 13 }
+
+	sysAlarmConfId OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The changed severity of alarm condition ID.
+ 			5000:adslLine_up
+ 			5001:adslLine_down
+ 			5002:adslPerf_lol_thresh
+ 			5003:adslPerf_lof_thresh
+ 			5004:adslPerf_los_thresh
+ 			5005:adslPerf_lop_thresh
+ 			5006:adslPerf_es_thresh
+ 			5007:adslPerf_ses_thresh
+ 			5008:adslPerf_uas_thresh
+ 			5009:adslAtuc_loftrap
+ 			5010:adslAtuc_lostrap
+ 			5011:adslAtur_loftrap
+ 			5012:adslAtur_lostrap
+ 			5013:adslAtur_lprtrap
+ 			5014:ad_dhcp_rt_full
+ 			5015:ad_dhcp_dm_conflict
+ 			5016:ad_dhcp_entry_full
+ 			5017:ad_dhcp_ip_dup
+ 			5018:ad_dhcp_mac_dup
+			10000:eqptVol_err
+			10001:eqptEqpttemp_err
+			10002:eqptFan_err
+			10003:eqptHw_rtc_fail
+			10004:eqptHw_mon_fail
+			10005:eqptCold_start
+			10006:eqptWarm_start
+			10007:eqptAlm_input
+			10008:voip_battery_fail
+			10009:voip_clock_fail
+			10010:voip_ringer_fault
+			10011:eqptI2c_err
+			10012:eqptAlm_input2
+			10013:eqptAlm_input3
+			15000:sysReboot
+			15001:sysAco
+			15002:sysAlm_clear
+			15003:sysLogin_fail
+			15004:sysAnti_spoofing
+			15005:sysAlm_svrty_change
+			20000:enetUp
+			20001:enetDown
+			25000:voip_temp_error
+			25001:voip_dc_power_fail
+			25002:voip_ac_power_fail
+			25003:voip_ring_timer_fail
+			25004:voip_ring_rsrce_fail
+			25006:voip_call_setup_failed
+			25007:voip_call_threshold_violate
+		"
+	::= { object 14 }
+
+	voipDevId OBJECT-TYPE
+	SYNTAX INTEGER{
+        		p25-p48(0),
+        		p1-p24(1)
+        		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The device ID of the DUT. 0 means port 25 to 48, 1 means port 1 to 24."
+	::= { object 51 }
+
+
+	voipCount OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of ringer fault"
+	::= { object 52 }
+
+	voipPhoneState OBJECT-TYPE
+	SYNTAX INTEGER {
+        		disable(1),
+        		onHook(2),
+        		offHook(3),
+        		ringing(4),
+        		powerCutDown(5),
+        		testing(6),
+        		fault(7),
+        		bad(8),
+        		uninitialized(9)
+        	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Phone status of the line."
+	::= { object 53 }
+	
+	voipBatType OBJECT-TYPE
+	SYNTAX INTEGER{
+        		batteryLow(0),
+        		batteryHigh(1)
+        		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of ringer fault"
+	::= { object 54 }
+
+--	intfCfmCcmErrorCause OBJECT-TYPE
+--	SYNTAX INTEGER {
+--			noDefect(1),
+--			rdiReceived(2),
+--			macDownReceivedFromDownMEP(3),
+--			lostConnectionToRemoteMEP(4),
+--			configurationError(5),
+--			maintenanceDomainCrossConnect(6)
+--		}
+--	MAX-ACCESS read-only
+--	STATUS current
+--	DESCRIPTION
+--		""
+--	::= { object 55 }
+	
+--------------------
+-- equipment
+--------------------
+
+	eqptHWMonitorFailure NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Hardware monitor diagnosis is failed."
+	::= { equipment 1 }
+
+--------------------
+-- systrap
+--------------------
+
+	sysMacAntiSpoofing NOTIFICATION-TYPE
+	OBJECTS {
+			sysMacAntiSpoofOrig,
+			sysMacAntiSpoofNew,
+			sysMacAntiSpoofMAC
+	}
+	STATUS current
+	DESCRIPTION
+		"MAC Anti-spoofing."
+	::= { systrap 1 }
+
+	sysAlarmCutoffEnable NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Alarm cutoff is activated."
+	::= { systrap 2 }
+
+	sysAlarmClearEnable NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Alarm clear is activated."
+	::= { systrap 3 }
+
+	sysLoginFailure NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"User login is failed."
+	::= { systrap 4 }
+
+	sysAlarmSvrtyChange NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Alarm severity is changed."
+	::= { systrap 5 }
+
+--------------------
+-- interface
+--------------------
+
+--	cfmCcmError NOTIFICATION-TYPE
+--	OBJECTS {
+--			dot1agCfmMdMdLevel,
+--			dot1agCfmVlanPrimaryVid,
+--			dot1agCfmMepIdentifier,
+--			intfCfmCcmErrorCause
+--		}
+--	STATUS current
+--	DESCRIPTION
+--		""
+--	::= { interface 1 }
+	
+--------------------
+-- voip
+--------------------
+	voipBatteryFail NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipDevId,
+			voipBatType
+	}
+	STATUS current
+	DESCRIPTION
+		"Battery fault trigger."
+	::= { voiptrap 1 }
+	
+	voipBatteryClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipDevId,
+			voipBatType
+	}
+	STATUS current
+	DESCRIPTION
+		"Battery fault release."
+	::= { voiptrap 2 }
+	
+	voipClockFail NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipDevId
+	}
+	STATUS current
+	DESCRIPTION
+		"Clock fault trigger."
+	::= { voiptrap 3 }
+	
+	voipClockClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipDevId
+	}
+	STATUS current
+	DESCRIPTION
+		"Clock fault release."
+	::= { voiptrap 4 }
+	
+	voipRingerFault NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipCount
+	}
+	STATUS current
+	DESCRIPTION
+		"Ringer fault trigger."
+	::= { voiptrap 5 }
+	
+	voipRingerClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			voipCount
+	}
+	STATUS current
+	DESCRIPTION
+		"Ringer fault release."
+	::= { voiptrap 6 }
+	
+	voipTempError NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"Temperature error trigger."
+	::= { voiptrap 7 }
+	
+	voipTempClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"Temperature error release."
+	::= { voiptrap 8 }
+
+	voipDcPowerFail NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"DC power error trigger."
+	::= { voiptrap 9 }
+	
+	voipDcPowerClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"DC power error release."
+	::= { voiptrap 10 }
+	
+	voipAcPowerFail NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"DC power error trigger."
+	::= { voiptrap 11 }
+	
+	voipAcPowerClear NOTIFICATION-TYPE
+	OBJECTS {
+      iesChassisId,
+      iesSlotId,
+			ifIndex,
+			voipPhoneState
+	}
+	STATUS current
+	DESCRIPTION
+		"DC power error release."
+	::= { voiptrap 12 }
+	
+--------------------
+-- e5Alarm
+--------------------
+
+e5AlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E5AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table holds all the active alarms"
+    ::= { e5Alarm 1 }
+     
+     
+e5AlarmNotify NOTIFICATION-TYPE
+	OBJECTS {
+			e5AlarmObjectClass,
+			e5AlarmObjectInstance1,
+			e5AlarmObjectInstance2,  
+			e5AlarmObjectInstance3,
+			e5AlarmObjectInstance4,                       
+			e5AlarmType,
+			e5AlarmSeverity,
+			e5AlarmTimeStamp,
+			e5AlarmServiceAffecting,
+			e5AlarmText,
+			e5AlarmTime
+		}
+	STATUS current
+	DESCRIPTION
+		"E5 device alarm notification."
+	::= { e5Alarm 2 }
+
+     
+e5AlarmEntry OBJECT-TYPE
+    SYNTAX      E5AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes regarding alarm table"
+    INDEX { e5AlarmObjectClass, e5AlarmObjectInstance1, e5AlarmObjectInstance2,
+            e5AlarmObjectInstance3, e5AlarmObjectInstance4,
+            e5AlarmObjectInstance5, e5AlarmObjectInstance6,
+            e5AlarmObjectInstance7, e5AlarmObjectInstance8, e5AlarmType }
+    ::= { e5AlarmTable 1 }
+
+E5AlarmEntry ::= SEQUENCE {
+    e5AlarmObjectClass        INTEGER,
+    e5AlarmObjectInstance1    INTEGER,
+    e5AlarmObjectInstance2    INTEGER,
+    e5AlarmObjectInstance3    INTEGER,
+    e5AlarmObjectInstance4    INTEGER,
+    e5AlarmObjectInstance5    INTEGER,
+    e5AlarmObjectInstance6    INTEGER,
+    e5AlarmObjectInstance7    INTEGER,
+    e5AlarmObjectInstance8    INTEGER,
+    e5AlarmType               INTEGER,
+    e5AlarmSeverity           INTEGER,
+    e5AlarmTimeStamp          OCTET STRING,
+    e5AlarmServiceAffecting   INTEGER,
+    e5AlarmLocationInfo       INTEGER,
+    e5AlarmText               OCTET STRING,
+    e5AlarmTime               INTEGER,
+    e5AlarmCliObject          OCTET STRING,
+    e5AlarmSecObjectClass     INTEGER,
+    e5AlarmSecObjectInstance1 INTEGER,
+    e5AlarmSecObjectInstance2 INTEGER,
+    e5AlarmSecObjectInstance3 INTEGER,
+    e5AlarmSecObjectInstance4 INTEGER,
+    e5AlarmSecObjectInstance5 INTEGER,
+    e5AlarmSecObjectInstance6 INTEGER,
+    e5AlarmSecObjectInstance7 INTEGER,
+    e5AlarmSecObjectInstance8 INTEGER
+    }
+ 
+e5AlarmObjectClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dsl(1),
+                    eqpt(2),
+                    sys(3),
+                    enet(4),
+                    vop(5),
+                    intf(6),
+                    unknown(7)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object Class for an alarm"
+    ::= { e5AlarmEntry 1 }
+
+e5AlarmObjectInstance1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 1"
+    ::= { e5AlarmEntry 2 }
+
+e5AlarmObjectInstance2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 2"
+    ::= { e5AlarmEntry 3 }
+
+e5AlarmObjectInstance3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 3"
+    ::= { e5AlarmEntry 4 }
+
+e5AlarmObjectInstance4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 4"
+    ::= { e5AlarmEntry 5 }
+
+e5AlarmObjectInstance5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 5"
+    ::= { e5AlarmEntry 6 }
+
+e5AlarmObjectInstance6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 6"
+    ::= { e5AlarmEntry 7 }
+
+e5AlarmObjectInstance7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 7"
+    ::= { e5AlarmEntry 8 }
+
+e5AlarmObjectInstance8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object instance for an alarm, level 8"
+    ::= { e5AlarmEntry 9 }
+
+e5AlarmType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unique type for an alarm"
+    ::= { e5AlarmEntry 10 }
+
+e5AlarmSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+    				clear(0),
+                    critical(1),
+                    major(2),
+                    minor(3),
+                    warning(4),
+                    unknown(5)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity of the alarm"
+    ::= { e5AlarmEntry 11 }
+
+e5AlarmTimeStamp OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timestamp indicating the set/clear time of the alarm"
+    ::= { e5AlarmEntry 12 }
+
+e5AlarmServiceAffecting OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    yes(1),
+                    no(2)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicated the nature of the alarm i.e. service
+                 affecting or not"
+    ::= { e5AlarmEntry 13 }
+ 
+e5AlarmLocationInfo OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { e5AlarmEntry 14 }
+
+e5AlarmText OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Alarm description"
+   ::= { e5AlarmEntry 15 } 
+
+e5AlarmTime OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "UTC time"
+   ::= { e5AlarmEntry 16 } 
+
+e5AlarmCliObject OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "The short CLI name for the object class and instance"
+   ::= { e5AlarmEntry 17 } 
+
+e5AlarmSecObjectClass OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary Object Class for an alarm"
+    ::= { e5AlarmEntry 18 }
+
+e5AlarmSecObjectInstance1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 1"
+    ::= { e5AlarmEntry 19 }
+
+e5AlarmSecObjectInstance2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 2"
+    ::= { e5AlarmEntry 20 }
+
+e5AlarmSecObjectInstance3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 3"
+    ::= { e5AlarmEntry 21 }
+
+e5AlarmSecObjectInstance4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 4"
+    ::= { e5AlarmEntry 22 }
+
+e5AlarmSecObjectInstance5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 5"
+    ::= { e5AlarmEntry 23 }
+
+e5AlarmSecObjectInstance6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 6"
+    ::= { e5AlarmEntry 24 }
+
+e5AlarmSecObjectInstance7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 7"
+    ::= { e5AlarmEntry 25 }
+
+e5AlarmSecObjectInstance8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary object instance for an alarm, level 8"
+    ::= { e5AlarmEntry 26 }
+
+	END

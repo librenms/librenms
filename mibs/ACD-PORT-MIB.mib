@@ -1,0 +1,1522 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2010, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdPort MODULE-IDENTITY
+
+    LAST-UPDATED "201110100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Port statistics for this Accedian Networks device."
+
+    REVISION "201110100100Z"        -- 10 October 2011
+    DESCRIPTION
+            "Add acdPortConfigTableLastChangeTid."
+
+    REVISION "201010010100Z"        -- 1 October 2010
+    DESCRIPTION
+            "..."
+
+    REVISION "200805010100Z"        -- 1 May 2008
+    DESCRIPTION
+            "Initial version of MIB module ACD-PORT-MIB."
+
+    ::= { acdMibs 9 }
+
+acdPortMIBObjects       OBJECT IDENTIFIER ::= { acdPort 1 }
+acdPortConformance      OBJECT IDENTIFIER ::= { acdPort 2 }
+
+acdPortConfig           OBJECT IDENTIFIER ::= { acdPortMIBObjects 1 }
+acdPortStatus           OBJECT IDENTIFIER ::= { acdPortMIBObjects 2 }
+acdPortStats            OBJECT IDENTIFIER ::= { acdPortMIBObjects 3 }
+
+acdPortTableTid         OBJECT IDENTIFIER ::= { acdPortMIBObjects 4 }
+
+-------------------------------------------------------------------------------
+ -- The port configuration table.
+ -- This table contains all port configuration parameters
+-------------------------------------------------------------------------------
+
+acdPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of port configuration attributes"
+    ::= { acdPortConfig 1 }
+
+acdPortConfigEntry OBJECT-TYPE
+    SYNTAX      AcdPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port configuration."
+    INDEX   { acdPortConfigIndex }
+    ::=  { acdPortConfigTable 1 }
+
+
+AcdPortConfigEntry ::= SEQUENCE {
+    acdPortConfigIndex                  Unsigned32,
+    acdPortConfigName                   DisplayString,
+    acdPortConfigAlias                  DisplayString,
+    acdPortConfigMacAddress             MacAddress,
+    acdPortConfigConnectorId            OBJECT IDENTIFIER,
+    acdPortConfigState                  TruthValue,
+    acdPortConfigMtu                    Unsigned32,
+    acdPortConfigAutoNegoState          TruthValue,
+    acdPortConfigSpeed                  Unsigned32,
+    acdPortConfigDuplex                 INTEGER,
+    acdPortConfigMdi                    INTEGER,
+    acdPortConfigPauseMode              INTEGER,
+    acdPortConfigAdvertisement          BITS
+}
+
+acdPortConfigIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of this object uniquely identifies this acdPortConfig
+        entry."
+    ::= { acdPortConfigEntry 1 }
+
+acdPortConfigName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a string to identify the port."
+    ::= { acdPortConfigEntry 2 }
+
+acdPortConfigAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a string to give the port an alias."
+    ::= { acdPortConfigEntry 3 }
+
+acdPortConfigMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the port."
+    ::= { acdPortConfigEntry 4 }
+
+acdPortConfigConnectorId OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object identifies the connector ID of the port. This object
+         shall identify the acdDescConnectorID object, defined in the
+         ACD-DESC-MIB."
+    ::= { acdPortConfigEntry 5 }
+
+acdPortConfigState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the port."
+    ::= { acdPortConfigEntry 6 }
+
+acdPortConfigMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured MTU of the port. The value ranges from 1518 to 10240."
+    ::= { acdPortConfigEntry 7 }
+
+acdPortConfigAutoNegoState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable the auto negociation on the port."
+    ::= { acdPortConfigEntry 8 }
+
+acdPortConfigSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured speed of the port in Mbps. The valid values are 10, 100,
+         1000 and 10000."
+    ::= { acdPortConfigEntry 9 }
+
+acdPortConfigDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    halfDuplex(1),
+                    fullDuplex(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured duplex mode for this port."
+    ::= { acdPortConfigEntry 10 }
+
+acdPortConfigMdi OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    autoMdi(1),
+                    mdi(2),
+                    mdix(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured MDI mode for this port."
+    ::= { acdPortConfigEntry 11 }
+
+acdPortConfigPauseMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(1),
+                    local(2),
+                    forward(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured pause mode for this port."
+    ::= { acdPortConfigEntry 12 }
+
+acdPortConfigAdvertisement OBJECT-TYPE
+   SYNTAX      BITS {
+       bHalfDuplex10Mbps(0),    -- Capable of Half Duplex 10Mbps
+       bFullDuplex10Mbps(1),    -- Capable of Full Duplex 10Mbps
+       bHalfDuplex100Mbps(2),   -- Capable of Half Duplex 100Mbps
+       bFullDuplex100Mbps(3),   -- Capable of Full Duplex 100Mbps
+       bHalfDuplex1Gbps(4),     -- Capable of Half Duplex 1Gbps
+       bFullDuplex1Gbps(5),     -- Capable of Full Duplex 1Gbps
+       bPauseSymmetric(6),      -- Capable of full-duplex pause
+       bPauseAsymmetric(7)      -- Capable of asymetric pause
+   }
+
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "A value that identifies the set of port capabilities 
+                to advertise during auto-negociation. Each bit indicates whether
+                or not the specific capability is valid on the system."
+
+   ::= { acdPortConfigEntry 13 }
+
+-------------------------------------------------------------------------------
+ -- The port status table.
+-------------------------------------------------------------------------------
+
+acdPortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table for port status"
+    ::= { acdPortStatus 1 }
+
+acdPortStatusEntry OBJECT-TYPE
+    SYNTAX      AcdPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port status."
+    INDEX   { acdPortStatusIndex }
+    ::=  { acdPortStatusTable 1 }
+
+
+AcdPortStatusEntry ::= SEQUENCE {
+    acdPortStatusIndex                  Unsigned32,
+    acdPortStatusSpeed                  Unsigned32,
+    acdPortStatusDuplex                 INTEGER,
+    acdPortStatusMdi                    INTEGER,
+    acdPortStatusTxPause                TruthValue,
+    acdPortStatusRxPause                TruthValue,
+    acdPortStatusLinkPartnerAbility     BITS,
+    acdPortStatusLinkStatus             TruthValue,
+    acdPortStatusMedia                  BITS,
+    acdPortStatusIsMonitor              TruthValue,
+    acdPortStatusIsManagement           TruthValue,
+    acdPortStatusIsSFP                  TruthValue,
+    acdPortStatusIsFiber                TruthValue
+}
+
+acdPortStatusIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of this object uniquely identifies this acdPortStatus
+        entry."
+    ::= { acdPortStatusEntry 1 }
+
+acdPortStatusSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current speed of the port in Mbps. The valid values are 10, 100
+         1000 and 10000."
+    ::= { acdPortStatusEntry 2 }
+
+acdPortStatusDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    halfDuplex(1),
+                    fullDuplex(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current duplex mode of the port."
+    ::= { acdPortStatusEntry 3 }
+
+acdPortStatusMdi OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    mdi(1),
+                    mdix(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current MDI mode of the port."
+    ::= { acdPortStatusEntry 4 }
+
+acdPortStatusTxPause OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether or not the port is transmitting pause frames."
+    ::= { acdPortStatusEntry 5 }
+
+acdPortStatusRxPause OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether or not the port is receiving pause frames."
+    ::= { acdPortStatusEntry 6 }
+
+acdPortStatusLinkPartnerAbility OBJECT-TYPE
+   SYNTAX      BITS {
+       bHalfDuplex10Mbps(0),    -- Capable of Half Duplex 10Mbps
+       bFullDuplex10Mbps(1),    -- Capable of Full Duplex 10Mbps
+       bHalfDuplex100Mbps(2),   -- Capable of Half Duplex 100Mbps
+       bFullDuplex100Mbps(3),   -- Capable of Full Duplex 100Mbps
+       bHalfDuplex1Gbps(4),     -- Capable of Half Duplex 1Gbps
+       bFullDuplex1Gbps(5),     -- Capable of Full Duplex 1Gbps
+       bPauseSymmetric(6),      -- Capable of full-duplex pause
+       bPauseAsymmetric(7)      -- Capable of asymetric pause
+   }
+
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A value that identifies the set of port capabilities 
+                advertised by the link partner. Each bit indicates whether
+                or not the specific capability is valid on the link partner
+                system."
+
+   ::= { acdPortStatusEntry 7 }
+
+acdPortStatusLinkStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the port link is Up or Down.
+        Down(FALSE),
+        Up(TRUE)"
+    ::= { acdPortStatusEntry 8 }
+
+acdPortStatusMedia OBJECT-TYPE
+   SYNTAX      BITS {
+       bOther(0),         -- other or unknown
+       bAUI(1),           -- AUI
+       b10base5(2),       -- 10BASE-5
+       bFoirl(3),         -- FOIRL
+
+       b10base2(4),       -- 10BASE-2
+       b10baseT(5),       -- 10BASE-T duplex mode unknown
+       b10baseFP(6),      -- 10BASE-FP
+       b10baseFB(7),      -- 10BASE-FB
+       b10baseFL(8),      -- 10BASE-FL duplex mode unknown
+       b10broad36(9),     -- 10BROAD36
+       b10baseTHD(10),    -- 10BASE-T  half duplex mode
+       b10baseTFD(11),    -- 10BASE-T  full duplex mode (Supported)
+       b10baseFLHD(12),   -- 10BASE-FL half duplex mode
+       b10baseFLFD(13),   -- 10BASE-FL full duplex mode
+
+       b100baseT4(14),    -- 100BASE-T4
+       b100baseTXHD(15),  -- 100BASE-TX half duplex mode
+       b100baseTXFD(16),  -- 100BASE-TX full duplex mode (Supported)
+       b100baseFXHD(17),  -- 100BASE-FX half duplex mode
+       b100baseFXFD(18),  -- 100BASE-FX full duplex mode (Supported)
+       b100baseT2HD(19),  -- 100BASE-T2 half duplex mode
+       b100baseT2FD(20),  -- 100BASE-T2 full duplex mode
+
+       b1000baseXHD(21),  -- 1000BASE-X half duplex mode 
+       b1000baseXFD(22),  -- 1000BASE-X full duplex mode (Supported)
+       b1000baseLXHD(23), -- 1000BASE-LX half duplex mode 
+       b1000baseLXFD(24), -- 1000BASE-LX full duplex mode (Supported)
+       b1000baseSXHD(25), -- 1000BASE-SX half duplex mode 
+       b1000baseSXFD(26), -- 1000BASE-SX full duplex mode (Supported)
+       b1000baseCXHD(27), -- 1000BASE-CX half duplex mode 
+       b1000baseCXFD(28), -- 1000BASE-CX full duplex mode (Supported)
+       b1000baseTHD(29),  -- 1000BASE-T half duplex mode 
+       b1000baseTFD(30)   -- 1000BASE-T full duplex mode (Supported - Copper SFP)
+   }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A value that uniquely identifies the selected media type."
+   ::= { acdPortStatusEntry 9 }
+
+acdPortStatusIsMonitor OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the port is a monitor port.
+        No(FALSE),
+        Yes(TRUE)"
+    ::= { acdPortStatusEntry 10 }
+
+acdPortStatusIsManagement OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the port is a management port.
+        No(FALSE),
+        Yes(TRUE)"
+    ::= { acdPortStatusEntry 11 }
+
+acdPortStatusIsSFP OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the port has an SFP.
+        No(FALSE),
+        Yes(TRUE)"
+    ::= { acdPortStatusEntry 12 }
+
+acdPortStatusIsFiber OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the port is connected to fiber.
+        No(FALSE),
+        Yes(TRUE)"
+    ::= { acdPortStatusEntry 13 }
+
+-------------------------------------------------------------------------------
+ -- The port transmit statistics table.
+ -- This table contains all port transmit statistics.
+-------------------------------------------------------------------------------
+
+acdPortTxStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPortTxStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of port transmit statistics"
+    ::= { acdPortStats 1 }
+
+acdPortTxStatsEntry OBJECT-TYPE
+    SYNTAX      AcdPortTxStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "port transmit statistics."
+    INDEX   { acdPortTxStatsIndex }
+    ::=  { acdPortTxStatsTable 1 }
+
+
+AcdPortTxStatsEntry ::= SEQUENCE {
+    acdPortTxStatsIndex                     Unsigned32,
+    acdPortTxStatsSupportBits               BITS,
+    acdPortTxStatsBytesGood                 Counter64,
+    acdPortTxStatsBytesTotal                Counter64,
+    acdPortTxStatsUnicastPkts               Counter64,
+    acdPortTxStatsMulticastPkts             Counter64,
+    acdPortTxStatsBroadcastPkts             Counter64,
+    acdPortTxStatsPauseFrames               Counter64,
+    acdPortTxStatsTaggedFrames              Counter64,
+    acdPortTxStatsCRCErrors                 Counter64,
+    acdPortTxStatsDeferred                  Counter64,
+    acdPortTxStatsExcessiveDeferrals        Counter64,
+    acdPortTxStatsSingleCollisions          Counter64,
+    acdPortTxStatsMultipleCollisions        Counter64,
+    acdPortTxStatsExcessiveCollisions       Counter64,
+    acdPortTxStatsLateCollisions            Counter64,
+    acdPortTxStatsNormalCollisions          Counter64,
+    acdPortTxStatsFifoErrors                Counter64,
+    acdPortTxStatsPkts64                    Counter64,
+    acdPortTxStatsPkts65to127               Counter64,
+    acdPortTxStatsPkts128to255              Counter64,
+    acdPortTxStatsPkts256to511              Counter64,
+    acdPortTxStatsPkts512to1023             Counter64,
+    acdPortTxStatsPkts1024to1518            Counter64,
+    acdPortTxStatsPkts1519to2047            Counter64,
+    acdPortTxStatsPkts2048to4095            Counter64,
+    acdPortTxStatsPkts4096to8191            Counter64,
+    acdPortTxStatsPkts8192andMore           Counter64,
+    acdPortTxStatsPktsLarge                 Counter64
+}
+
+acdPortTxStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of this object uniquely identifies this acdPortTxStats
+        entry."
+    ::= { acdPortTxStatsEntry 1 }
+
+acdPortTxStatsSupportBits OBJECT-TYPE
+   SYNTAX      BITS {
+       bBytesGood(0),           -- acdPortTxStatsBytesGood validity flag
+       bBytesTotal(1),          -- acdPortTxStatsBytesTotal validity flag
+       bUnicastPkts(2),         -- acdPortTxStatsUnicastPkts validity flag
+       bMulticastPkts(3),       -- acdPortTxStatsMulticastPkts validity flag
+       bBroadcastPkts(4),       -- acdPortTxStatsBroadcastPkts validity flag
+       bPauseFrames(5),         -- acdPortTxStatsPauseFrames validity flag
+       bTaggedFrames(6),        -- acdPortTxStatsTaggedFrames validity flag
+       bCRCErrors(7),           -- acdPortTxStatsCRCErrors validity flag
+       bDeferred(8),            -- acdPortTxStatsDeferred validity flag
+       bExcessiveDeferrals(9),  -- acdPortTxStatsExcessiveDeferrals validity flag
+       bSingleCollisions(10),   -- acdPortTxStatsSingleCollisions validity flag
+       bMultipleCollisions(11), -- acdPortTxStatsMultipleCollisions validity flag
+       bExcessiveCollisions(12),-- acdPortTxStatsExcessiveCollisions validity flag
+       bLateCollisions(13),     -- acdPortTxStatsLateCollisions validity flag
+       bNormalCollisions(14),   -- acdPortTxStatsNormalCollisions validity flag
+       bFifoErrors(15),         -- acdPortTxStatsFifoErrors validity flag
+       bPkts64(16),             -- acdPortTxStatsPkts64 validity flag
+       bPkts65to127(17),        -- acdPortTxStatsPkts65to127 validity flag
+       bPkts128to255(18),       -- acdPortTxStatsPkts128to255 validity flag
+       bPkts256to511(19),       -- acdPortTxStatsPkts256to511 validity flag
+       bPkts512to1023(20),      -- acdPortTxStatsPkts512to1023 validity flag
+       bPkts1024to1518(21),     -- acdPortTxStatsPkts1024to1518 validity flag
+       bPkts1519to2047(22),     -- acdPortTxStatsPkts1519to2047 validity flag
+       bPkts2048to4095(23),     -- acdPortTxStatsPkts2048to4095 validity flag
+       bPkts4096to8191(24),     -- acdPortTxStatsPkts4096to8191 validity flag
+       bPkts8192andMore(25),    -- acdPortTxStatsPkts8192andMore validity flag
+       bPktsLarge(26)           -- acdPortTxStatsPktsLarge validity flag
+   }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A value that identifies the set of TX statistics
+               supported by the device. Each bit indicates whether
+               or not the specific statistic value is valid on the
+               system."
+
+   ::= { acdPortTxStatsEntry 2 }
+
+acdPortTxStatsBytesGood OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of bytes transmitted by the port
+        in good packets. The count includes the 4 CRC bytes but does not 
+        include the preamble or SFD bytes. A good packet is one that has been
+        transmitted successfully (not aborted) with a good CRC. It is assumed
+        that all transmit packets are properly sized, 64 bytes (after any 
+        padding) to maxsize bytes long."
+    ::= { acdPortTxStatsEntry 3 }
+
+acdPortTxStatsBytesTotal OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of bytes transmitted by the port
+        in good and bad packets. The count includes the 4 CRC bytes but does
+        not include the preamble or SFD bytes. Bad packets include normal 
+        collisions, late collisions, and FIFO underflows. For collisions, 
+        all bytes transmitted before the start of the collision as well as
+        the colliding and jam bytes are counted. For FIFO underflows, all
+        bytes actually transmitted are counted."
+    ::= { acdPortTxStatsEntry 4 }
+
+acdPortTxStatsUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good unicast packets transmitted by this port.
+        Good unicast packets are packets that are not dropped and have a good
+        CRC. Unicast packets are identified by having a 0 in the least
+        significant bit of the first byte of the destination address (i.e.
+        the first bit transmitted is a 0)."
+    ::= { acdPortTxStatsEntry 5 }
+
+acdPortTxStatsMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good multicast packets transmitted by this
+        port (good means not dropped and valid CRC). Multicast packets are
+        identified by having a 1 in the least significant bit of the first
+        byte of the destination address (i.e. the first bit transmitted is
+        a 1). Broadcast packets are not included in this count."
+    ::= { acdPortTxStatsEntry 6 }
+
+acdPortTxStatsBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good broadcast packets transmitted by this
+        port (good means not dropped and valid CRC). Broadcast packets are
+        identified by a destination address of all 1."
+    ::= { acdPortTxStatsEntry 7 }
+
+acdPortTxStatsPauseFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good flow control pause packets transmitted
+        by this port (good means not dropped and valid CRC). Flow control
+        pause packets are identified by a type of 0x8808 and an opcode field
+        of 0x0001."
+    ::= { acdPortTxStatsEntry 8 }
+
+acdPortTxStatsTaggedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good VLAN packets transmitted by this port
+        (good means not dropped and valid CRC). VLAN packets are identified
+        by a type field equal to 0x8100 in the outer VLAN tag."
+    ::= { acdPortTxStatsEntry 9 }
+
+acdPortTxStatsCRCErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the transmitted packets with a bad non-appended
+         CRC field. This count doesn't include any packets with a bad CRC due
+         to a FIFO underflow."
+    ::= { acdPortTxStatsEntry 10 }
+
+acdPortTxStatsDeferred OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets that were deferred on the
+        first transmit attempt due to the medium being busy. Packets with
+        subsequent deferrals (for instance, after a collision back off) are
+        not counted. Whether the packet is eventually transmitted successfully
+        or not is irrelevant to this counter. Packets dropped due to excess
+        deferral that occur during the initial transmit attempt are not
+        counted."
+    ::= { acdPortTxStatsEntry 11 }
+
+acdPortTxStatsExcessiveDeferrals OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets dropped by this port due to
+        excessive deferral. The deferral time starts at the beginning of each
+        transmission attempt and ends when the transmission starts (regardless
+        of collisions). The deferral is excessive if more than 3036 byte times
+        have passed without the transmission starting."
+    ::= { acdPortTxStatsEntry 12 }
+
+acdPortTxStatsSingleCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of times a packet is successfully
+        transmitted from this port after experiencing a single collision.
+        This count does not include erroneous (dropped) packets."
+    ::= { acdPortTxStatsEntry 13 }
+
+acdPortTxStatsMultipleCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of times a packet is successfully
+        transmitted from this port after experiencing multiple collisions.
+        This count does not include erroneous (dropped) packets and also does
+        not include packets dropped due to excess collisions."
+    ::= { acdPortTxStatsEntry 14 }
+
+acdPortTxStatsExcessiveCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets dropped by this port due
+        to excess collisions (number of collisions equals MaxRetry+1). This
+        count does not include packets dropped due to FIFO underflow or
+        late collisions (even if the late collision is also an excessive
+        collision)."
+    ::= { acdPortTxStatsEntry 15 }
+
+acdPortTxStatsLateCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets dropped by this port due
+        to late collisions. A late collision is a collision that occurs
+        after the collision window time (normally 512-bit times). This count
+        does not include packets dropped due to FIFO underflow. Late
+        collisions are not retried."
+    ::= { acdPortTxStatsEntry 16 }
+
+acdPortTxStatsNormalCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of normal collisions that have
+        occurred on this port during all transmission attempts. FIFO
+        underflows, late collisions and collisions that occur while this
+        port is not trying to transmit are not counted. This count does not
+        include collisions during half-duplex back pressure."
+    ::= { acdPortTxStatsEntry 17 }
+
+acdPortTxStatsFifoErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets dropped by this port due to
+        an underflow in the transmit FIFO. When an underflow is detected,
+        transmission is immediately aborted after sending a known bad 
+        (inverted) CRC sequence. The FIFO underflow error takes precedence
+        over all other errors if this counter is incremented, then none of
+        the other packet type counters are incremented."
+    ::= { acdPortTxStatsEntry 18 }
+
+acdPortTxStatsPkts64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were exactly 64 bytes in length (excluding preamble and SFD but
+        including CRC)."
+    ::= { acdPortTxStatsEntry 19 }
+
+acdPortTxStatsPkts65to127 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 65 to 127 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 20 }
+
+acdPortTxStatsPkts128to255 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 128 to 255 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 21 }
+
+acdPortTxStatsPkts256to511 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 256 to 511 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 22 }
+
+acdPortTxStatsPkts512to1023 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 512 to 1023 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 23 }
+
+acdPortTxStatsPkts1024to1518 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 1024 to 1518 bytes in length (excluding preamble and SFD
+        but including CRC)."
+    ::= { acdPortTxStatsEntry 24 }
+
+acdPortTxStatsPkts1519to2047 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 1519 to 2047 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 25 }
+
+acdPortTxStatsPkts2048to4095 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 2048 to 4095 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 26 }
+
+acdPortTxStatsPkts4096to8191 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were 4096 to 8191 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 27 }
+
+acdPortTxStatsPkts8192andMore OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, transmitted by this port
+        that were greater than 8192 bytes in length (excluding preamble and
+        SFD but including CRC)."
+    ::= { acdPortTxStatsEntry 28 }
+
+acdPortTxStatsPktsLarge OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of large packets transmitted by this port. Define
+        the size of large packets on the Port configuration."
+    ::= { acdPortTxStatsEntry 29 }
+
+
+-------------------------------------------------------------------------------
+ -- The port receive statistics table.
+ -- This table contains all port receive statistics.
+-------------------------------------------------------------------------------
+
+acdPortRxStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdPortRxStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of port receive statistics"
+    ::= { acdPortStats 2 }
+
+acdPortRxStatsEntry OBJECT-TYPE
+    SYNTAX      AcdPortRxStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "port receive statistics."
+    INDEX   { acdPortRxStatsIndex }
+    ::=  { acdPortRxStatsTable 1 }
+
+
+AcdPortRxStatsEntry ::= SEQUENCE {
+    acdPortRxStatsIndex                     Unsigned32,
+    acdPortRxStatsSupportBits               BITS,
+    acdPortRxStatsBytesGood                 Counter64,
+    acdPortRxStatsBytesTotal                Counter64,
+    acdPortRxStatsShortOk                   Counter64,
+    acdPortRxStatsShortBad                  Counter64,
+    acdPortRxStatsLongOk                    Counter64,
+    acdPortRxStatsLongBad                   Counter64,
+    acdPortRxStatsUnicastPkts               Counter64,
+    acdPortRxStatsMulticastPkts             Counter64,
+    acdPortRxStatsBroadcastPkts             Counter64,
+    acdPortRxStatsPauseFrames               Counter64,
+    acdPortRxStatsTaggedFrames              Counter64,
+    acdPortRxStatsCRCErrors                 Counter64,
+    acdPortRxStatsAlignErrors               Counter64,
+    acdPortRxStatsRuntFrames                Counter64,
+    acdPortRxStatsLengthErrors              Counter64,
+    acdPortRxStatsFalseCRS                  Counter64,
+    acdPortRxStatsPhyErrors                 Counter64,
+    acdPortRxStatsFifoErrors                Counter64,
+    acdPortRxStatsIgnored                   Counter64,
+    acdPortRxStatsBadOpcode                 Counter64,
+    acdPortRxStatsPkts64                    Counter64,
+    acdPortRxStatsPkts65to127               Counter64,
+    acdPortRxStatsPkts128to255              Counter64,
+    acdPortRxStatsPkts256to511              Counter64,
+    acdPortRxStatsPkts512to1023             Counter64,
+    acdPortRxStatsPkts1024to1518            Counter64,
+    acdPortRxStatsPkts1519to2047            Counter64,
+    acdPortRxStatsPkts2048to4095            Counter64,
+    acdPortRxStatsPkts4096to8191            Counter64,
+    acdPortRxStatsPkts8192andMore           Counter64,
+    acdPortRxStatsPktsLarge                 Counter64
+}
+
+acdPortRxStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of this object uniquely identifies this acdPortRxStats
+        entry."
+    ::= { acdPortRxStatsEntry 1 }
+
+acdPortRxStatsSupportBits OBJECT-TYPE
+   SYNTAX      BITS {
+       bBytesGood(0),           -- acdPortRxStatsBytesGood validity flag
+       bBytesTotal(1),          -- acdPortRxStatsBytesTotal validity flag
+       bRxStatsShortOk(2),      -- acdPortRxStatsShortOkPkts validity flag
+       bRxStatsShortBad(3),     -- acdPortRxStatsShortBadPkts validity flag
+       bRxStatsLongOk(4),       -- acdPortRxStatsLongOkPkts validity flag
+       bRxStatsLongBad(5),      -- acdPortRxStatsLongBadPkts validity flag
+       bUnicastPkts(6),         -- acdPortRxStatsUnicastPkts validity flag
+       bMulticastPkts(7),       -- acdPortRxStatsMulticastPkts validity flag
+       bBroadcastPkts(8),       -- acdPortRxStatsBroadcastPkts validity flag
+       bPauseFrames(9),         -- acdPortRxStatsPauseFrames validity flag
+       bTaggedFrames(10),       -- acdPortRxStatsTaggedFrames validity flag
+       bCRCErrors(11),          -- acdPortRxStatsCRCErrors validity flag
+       bAlignErrors(12),        -- acdPortRxStatsAlignErrors validity flag
+       bRuntFrames(13),         -- acdPortRxStatsRuntFrames validity flag
+       bLengthErrors(14),       -- acdPortRxStatsLengthErrors validity flag
+       bFalseCRS(15),           -- acdPortRxStatsFalseCRS validity flag
+       bPhyErrors(16),          -- acdPortRxStatsPhyErrors validity flag
+       bFifoErrors(17),         -- acdPortRxStatsFifoErrors validity flag
+       bIgnored(18),            -- acdPortRxStatsIgnored validity flag
+       bBadOpcode(19),          -- acdPortRxStatsBadOpCode validity flag
+       bPkts64(20),             -- acdPortRxStatsPkts64 validity flag
+       bPkts65to127(21),        -- acdPortRxStatsPkts65to127 validity flag
+       bPkts128to255(22),       -- acdPortRxStatsPkts128to255 validity flag
+       bPkts256to511(23),       -- acdPortRxStatsPkts256to511 validity flag
+       bPkts512to1023(24),      -- acdPortRxStatsPkts512to1023 validity flag
+       bPkts1024to1518(25),     -- acdPortRxStatsPkts1024to1518 validity flag
+       bPkts1519to2047(26),     -- acdPortRxStatsPkts1519to2047 validity flag
+       bPkts2048to4095(27),     -- acdPortRxStatsPkts2048to4095 validity flag
+       bPkts4096to8191(28),     -- acdPortRxStatsPkts4096to8191 validity flag
+       bPkts8192andMore(29),    -- acdPortRxStatsPkts8192andMore validity flag
+       bPktsLarge(30)           -- acdPortRxStatsPktsLarge validity flag
+   }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A value that identifies the set of RX statistics
+               supported by the device. Each bit indicates whether
+               or not the specific statistic value is valid on the
+               system."
+
+   ::= { acdPortRxStatsEntry 2 }
+
+acdPortRxStatsBytesGood OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of bytes received by the port in
+        good packets. The count includes the 4 CRC bytes but does not include
+        the preamble or SFD bytes. A good packet is a well-formed normally 
+        sized packet (64 to maxsize bytes) with good CRC and no PHY or FIFO
+        errors."
+    ::= { acdPortRxStatsEntry 3 }
+
+acdPortRxStatsBytesTotal OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of bytes received by the port in
+        good and bad packets. The count includes the 4 CRC bytes (if present)
+        but does not include the preamble or SFD bytes. Good packets are 
+        described above. Bad packets include short packets (less than 64 
+        bytes), long packets (greater than maxsize bytes), packets with bad
+        CRC, packets with PHY errors, and packets with receive FIFO errors.
+        Bytes in bad  packets resulting from a collision are counted if the
+        SFD is detected."
+    ::= { acdPortRxStatsEntry 4 }
+
+acdPortRxStatsShortOk OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of error-free packets received on this port that are
+        shorter than 64 bytes. A packet is error-free if it has a valid CRC,
+        no PHY errorsand no FIFO errors."
+    ::= { acdPortRxStatsEntry 5 }
+
+acdPortRxStatsShortBad OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of packets received on this port that are shorter
+        than 64 bytes and have a bad CRC. Packets with PHY or FIFO errors 
+        are not counted."
+    ::= { acdPortRxStatsEntry 6 }
+
+acdPortRxStatsLongOk OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of error-free packets received on this port that
+        are longer than maxsize bytes. A packet is error-free if it has a
+        valid CRC, no PHY errors and no FIFO errors."
+    ::= { acdPortRxStatsEntry 7 }
+
+acdPortRxStatsLongBad OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of packets received on this port that are longer
+        than 64 bytes and have a bad CRC. Packets with PHY or FIFO errors
+        are not counted."
+    ::= { acdPortRxStatsEntry 8 }
+
+acdPortRxStatsUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good unicast packets received by this port.
+        A good unicast packet is a normally sized packet (64 to maxsize
+        bytes) that is received without error a good CRC, no PHY or FIFO
+        errors. Unicast packets are identified by having a 0 in the least
+        significant bit of the first byte of the destination address (i.e.
+        the first bit received is a 0)."
+    ::= { acdPortRxStatsEntry 9 }
+
+acdPortRxStatsMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good multicast packets received by this port.
+        A good multicast packet is a normally sized packet (64 to maxsize
+        bytes) that is received without error, a good CRC, no PHY or FIFO
+        errors. Multicast packets are identified by having a 1 in the least
+        significant bit of the first byte of the destination address (i.e.
+        the first bit received is a 1). Broadcast packets are not included
+        in this count."
+    ::= { acdPortRxStatsEntry 10 }
+
+acdPortRxStatsBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good broadcast packets received by this port.
+        A good broadcast packet is a normally sized packet (64 to maxsize
+        bytes) that is received without error, a good CRC, no PHY or FIFO
+        errors. Broadcast packets are identified by a destination address
+        of all 1's."
+    ::= { acdPortRxStatsEntry 11 }
+
+acdPortRxStatsPauseFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good flow control pause packets received by
+        this port (good CRC, no PHY or FIFO errors, normally sized). Flow
+        control pause packets are identified by a type of 0x8808, and an
+        opcode field of 0x0001."
+    ::= { acdPortRxStatsEntry 12 }
+
+acdPortRxStatsTaggedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good VLAN packets receive by this port
+        (good CRC, no PHY or FIFO errors, normally sized). VLAN packets
+        are identified by a type field equal to 0x8100 in the outer VLAN tag."
+    ::= { acdPortRxStatsEntry 13 }
+
+acdPortRxStatsCRCErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of normally sized packets (64 to maxsize bytes)
+        received by this port with a CRC error but not a dribbling nibble
+        (packet is an integral number of bytes long). Packets with FIFO or
+        PHY errors are not counted."
+    ::= { acdPortRxStatsEntry 14 }
+
+acdPortRxStatsAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of normally sized packets (64 to maxsize bytes)
+        received by this port with a CRC error and a dribbling nibble (packet
+        is not an integral number of bytes long). Packets with PHY or FIFO
+        errors are not counted."
+    ::= { acdPortRxStatsEntry 15 }
+
+acdPortRxStatsRuntFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of receive packets (or events)
+        detected by this port without SDF detection but with carrier
+        assertion. Packets with valid SFD but no data bytes are also
+        counted as runts. After detecting a runt packet, the update of
+        the RxRunts counter is held off until the next valid packet is
+        received. If multiple runt packets occur between valid packets,
+        the RxRunts counter is incremented only once."
+    ::= { acdPortRxStatsEntry 16 }
+
+acdPortRxStatsLengthErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of good packets received by this
+        port with a length field check error. A length check error occurs
+        when the value in the length field is within the valid range for
+        data length (3-1500 bytes) but does not match the actual data
+        length of the packet. Length field values less than 46 bytes 
+        (which corresponds to the minimum legal packet size of 64 bytes)
+        are not checked due to padding."
+    ::= { acdPortRxStatsEntry 17 }
+
+acdPortRxStatsFalseCRS OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of receive packets (or events)
+        detected by this port with a false carrier (SSD1 not followed by
+        SSD2). After detecting a false carrier, update of the RxFalseCRS
+        counter is held off until the next valid packet is received. If
+        multiple false carrier events occur between valid packets, the
+        RxFalseCRS counter is incremented only once."
+    ::= { acdPortRxStatsEntry 18 }
+
+acdPortRxStatsPhyErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of packets received by this port with
+        RX_ER asserted during reception (while RX_DV asserted). Packets with
+        a FIFO error are not counted."
+    ::= { acdPortRxStatsEntry 19 }
+
+acdPortRxStatsFifoErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of receive packets dropped or aborted
+        due to receive FIFO overflow. The FIFO overflow error takes precedence
+        over all other errors - if this counter is incremented, then none of
+        the other packet type counters is incremented."
+    ::= { acdPortRxStatsEntry 20 }
+
+acdPortRxStatsIgnored OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the number of received packets that have been
+        ignored by this port. A packet is ignored if it violates the
+        programmed preamble rules or it violates the minimum data gap. The
+        preamble rules include long preamble enforcement (greater than 23
+        nibbles) and pure preamble enforcement (only 55h bytes). The minimum
+        data gap is the time between packet data transfers and is measured
+        from immediately after the last CRC byte of the previous packet
+        through the SFD field of the current packet. The normal data gap
+        is 20 bytes long (12 bytes of IPG and 8 bytes of preamble/SFD).
+        The enforcement limit is set to 10 bytes (half the normal gap
+        length)."
+    ::= { acdPortRxStatsEntry 21 }
+
+acdPortRxStatsBadOpcode OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the good control packets received by this port
+        (good CRC, no PHY or FIFO errors, normally sized) with an unknown
+        opcode. Unknown control packets are identified by a type field of
+        88-08 and an opcode field not equal to 00-01."
+    ::= { acdPortRxStatsEntry 22 }
+
+acdPortRxStatsPkts64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were exactly 64 bytes in length (excluding preamble and SFD
+        but including CRC)."
+    ::= { acdPortRxStatsEntry 23 }
+
+acdPortRxStatsPkts65to127 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port that
+        were 65 to 127 bytes in length inclusive (excluding preamble and SFD
+        but including CRC)."
+    ::= { acdPortRxStatsEntry 24 }
+
+acdPortRxStatsPkts128to255 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 128 to 255 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 25 }
+
+acdPortRxStatsPkts256to511 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 256 to 511 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 26 }
+
+acdPortRxStatsPkts512to1023 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 512 to 1023 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 27 }
+
+acdPortRxStatsPkts1024to1518 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 1024 to 1518 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 28 }
+
+acdPortRxStatsPkts1519to2047 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 1519 to 2047 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 29 }
+
+acdPortRxStatsPkts2048to4095 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 2048 to 4095 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 30 }
+
+acdPortRxStatsPkts4096to8191 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port
+        that were 4096 to 8191 bytes in length inclusive (excluding preamble
+        and SFD but including CRC)."
+    ::= { acdPortRxStatsEntry 31 }
+
+acdPortRxStatsPkts8192andMore OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets, good or bad, received by this port that
+        were greater than 8192 bytes in length (excluding preamble and SFD
+        but including CRC)."
+    ::= { acdPortRxStatsEntry 32 }
+
+acdPortRxStatsPktsLarge OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of large packets received by this port. Define the
+        size of large packets on the Port configuration page."
+    ::= { acdPortRxStatsEntry 33 }
+
+---------------------------------------------------------------------------
+ -- Port Transaction ID Information
+---------------------------------------------------------------------------
+
+acdPortConfigTableLastChangeTid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the transaction ID of the last change of the acdPortConfigTable
+        table.  If this value is different since the last read this is indicate 
+        a table change."
+    ::= { acdPortTableTid 1 }
+
+---------------------------------------------------------------------------
+ -- ACD-PORT-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdPortCompliances  OBJECT IDENTIFIER ::= { acdPortConformance 1 }
+acdPortGroups       OBJECT IDENTIFIER ::= { acdPortConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdPortConfigGroup OBJECT-GROUP
+    OBJECTS {
+        acdPortConfigName,
+        acdPortConfigAlias,
+        acdPortConfigMacAddress,
+        acdPortConfigConnectorId,
+        acdPortConfigState,
+        acdPortConfigMtu,
+        acdPortConfigAutoNegoState,
+        acdPortConfigSpeed,
+        acdPortConfigDuplex,
+        acdPortConfigMdi,
+        acdPortConfigPauseMode,
+        acdPortConfigAdvertisement
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdPortGroups 1 }
+
+acdPortStatusGroup OBJECT-GROUP
+    OBJECTS {
+        acdPortStatusSpeed,
+        acdPortStatusDuplex,
+        acdPortStatusMdi,
+        acdPortStatusTxPause,
+        acdPortStatusRxPause,
+        acdPortStatusLinkPartnerAbility,
+        acdPortStatusLinkStatus,
+        acdPortStatusMedia,
+        acdPortStatusIsMonitor,
+        acdPortStatusIsManagement,
+        acdPortStatusIsSFP,
+        acdPortStatusIsFiber
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdPortGroups 2 }
+
+acdPortTxStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdPortTxStatsSupportBits,
+        acdPortTxStatsBytesGood,
+        acdPortTxStatsBytesTotal,
+        acdPortTxStatsUnicastPkts,
+        acdPortTxStatsMulticastPkts,
+        acdPortTxStatsBroadcastPkts,
+        acdPortTxStatsPauseFrames,
+        acdPortTxStatsTaggedFrames,
+        acdPortTxStatsCRCErrors,
+        acdPortTxStatsDeferred,
+        acdPortTxStatsExcessiveDeferrals,
+        acdPortTxStatsSingleCollisions,
+        acdPortTxStatsMultipleCollisions,
+        acdPortTxStatsExcessiveCollisions,
+        acdPortTxStatsLateCollisions,
+        acdPortTxStatsNormalCollisions,
+        acdPortTxStatsFifoErrors,
+        acdPortTxStatsPkts64,
+        acdPortTxStatsPkts65to127,
+        acdPortTxStatsPkts128to255,
+        acdPortTxStatsPkts256to511,
+        acdPortTxStatsPkts512to1023,
+        acdPortTxStatsPkts1024to1518,
+        acdPortTxStatsPkts1519to2047,
+        acdPortTxStatsPkts2048to4095,
+        acdPortTxStatsPkts4096to8191,
+        acdPortTxStatsPkts8192andMore,
+        acdPortTxStatsPktsLarge
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdPortGroups 3 }
+
+acdPortRxStatsGroup OBJECT-GROUP
+    OBJECTS {
+        acdPortRxStatsSupportBits,
+        acdPortRxStatsBytesGood,
+        acdPortRxStatsBytesTotal,
+        acdPortRxStatsShortOk,
+        acdPortRxStatsShortBad,
+        acdPortRxStatsLongOk,
+        acdPortRxStatsLongBad,
+        acdPortRxStatsUnicastPkts,
+        acdPortRxStatsMulticastPkts,
+        acdPortRxStatsBroadcastPkts,
+        acdPortRxStatsPauseFrames,
+        acdPortRxStatsTaggedFrames,
+        acdPortRxStatsCRCErrors,
+        acdPortRxStatsAlignErrors,
+        acdPortRxStatsRuntFrames,
+        acdPortRxStatsLengthErrors,
+        acdPortRxStatsFalseCRS,
+        acdPortRxStatsPhyErrors,
+        acdPortRxStatsFifoErrors,
+        acdPortRxStatsIgnored,
+        acdPortRxStatsBadOpcode,
+        acdPortRxStatsPkts64,
+        acdPortRxStatsPkts65to127,
+        acdPortRxStatsPkts128to255,
+        acdPortRxStatsPkts256to511,
+        acdPortRxStatsPkts512to1023,
+        acdPortRxStatsPkts1024to1518,
+        acdPortRxStatsPkts1519to2047,
+        acdPortRxStatsPkts2048to4095,
+        acdPortRxStatsPkts4096to8191,
+        acdPortRxStatsPkts8192andMore,
+        acdPortRxStatsPktsLarge
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdPortGroups 4 }
+
+acdPortTidGroup OBJECT-GROUP
+    OBJECTS {
+        acdPortConfigTableLastChangeTid
+    }
+    STATUS      current
+    DESCRIPTION
+       "List of scalars to monitior changes in tables."
+    ::= { acdPortGroups 5 }
+
+acdPortCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-PORT-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdPortConfigGroup,
+            acdPortStatusGroup,
+            acdPortTxStatsGroup,
+            acdPortRxStatsGroup,
+            acdPortTidGroup
+         }
+
+    ::= { acdPortCompliances 1 }
+
+END
+

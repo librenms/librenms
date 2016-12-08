@@ -11,30 +11,29 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 $alert_id = mres($_POST['alert_id']);
 $state    = mres($_POST['state']);
 if (!is_numeric($alert_id)) {
     echo 'ERROR: No alert selected';
     exit;
-}
-else if (!is_numeric($state)) {
+} elseif (!is_numeric($state)) {
     echo 'ERROR: No state passed';
     exit;
-}
-else {
+} else {
     if ($state == 2) {
         $state = dbFetchCell('SELECT alerted FROM alerts WHERE id = ?', array($alert_id));
-    }
-    else if ($state >= 1) {
+        $open  = 1;
+    } elseif ($state >= 1) {
         $state = 2;
+        $open  = 1;
     }
 
-    if (dbUpdate(array('state' => $state), 'alerts', 'id=?', array($alert_id)) >= 0) {
+    if (dbUpdate(array('state' => $state, 'open' => $open), 'alerts', 'id=?', array($alert_id)) >= 0) {
         echo 'Alert acknowledged status changed.';
         exit;
-    }
-    else {
+    } else {
         echo 'ERROR: Alert has not been acknowledged.';
         exit;
     }

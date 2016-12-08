@@ -1,3 +1,4 @@
+source: Extensions/Network-Map.md
 # Network Map
 
 ## LibreNMS has the ability to show you a network map based on:
@@ -13,10 +14,10 @@ $config['network_map_items'] = array('mac','xdp');
 
 Either remove mac or xdp depending on which you want.
 
-A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map. 
+A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map.
 Network maps for individual devices are available showing the relationship with other devices.
 
-One can also specicify the parameters to be used for drawing and updating the network map.  
+One can also specify the parameters to be used for drawing and updating the network map.
 Please see http://visjs.org/docs/network/ for details on the configuration parameters.
 ```php
 $config['network_map_vis_options'] = '{

@@ -1,5 +1,3 @@
-These are local plugin scripts for the LibreNMS Unix Agent.
+Scripts for the LibreNMS Agent have been moved.
 
-*DO NOT* put all of these files into your local folder, only use the scripts you want.
-
-Make sure that you configure any scripts that require configuration. (MySQL!)
+https://github.com/librenms/librenms-agent

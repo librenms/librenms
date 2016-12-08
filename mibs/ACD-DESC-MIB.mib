@@ -1,0 +1,499 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document is subject to change without notice.
+--
+
+ACD-DESC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    acdProducts
+        FROM ACCEDIAN-SMI;
+
+acdDesc MODULE-IDENTITY
+
+    LAST-UPDATED "201011100100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Accedian Networks device Description MIB."
+
+    REVISION "201011100100Z"        -- 10 November 2010
+    DESCRIPTION
+            "Fix compliance statement."
+
+    REVISION "201006300100Z"        -- 30 june 2010
+    DESCRIPTION
+            "Revision for 10GE product introduction."
+
+    REVISION "200902040100Z"        -- 4 Feb 2009
+    DESCRIPTION
+            "Add sysName in power lost (Dying gasp) notification."
+
+    REVISION "200812010100Z"        -- 1 Dec 2008
+    DESCRIPTION
+            "Add power lost (Dying gasp) notification."
+
+    REVISION "200608060100Z"        -- 6 Aug 2006
+    DESCRIPTION
+            "Initial version of MIB module ACD-DESC-MIB."
+
+    ::= { acdProducts 1 }
+
+acdDescNotifications    OBJECT IDENTIFIER ::= { acdDesc 0 }
+acdDescMIBObjects       OBJECT IDENTIFIER ::= { acdDesc 15 }
+acdDescConformance      OBJECT IDENTIFIER ::= { acdDescMIBObjects 1 }
+
+---------------------------------------------------------------------------
+ -- EtherNID General information
+---------------------------------------------------------------------------
+
+acdDescCommercialName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This string is to describe the type of device."
+    ::= { acdDesc 1 }
+
+acdDescMacBaseAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Base of the EtherNID MAC addresses."
+    ::= { acdDesc 2 }
+
+acdDescIdentifier  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the EtherNID on your network."
+    ::= { acdDesc 3 }
+
+acdDescFirmwareVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the version of the firmware currently loaded."
+    ::= { acdDesc 4 }
+
+acdDescHardwareVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the assembly ID of the hardware."
+    ::= { acdDesc 5 }
+
+acdDescSerialNumber  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the serial number."
+    ::= { acdDesc 6 }
+
+acdDescCpuUsageCurrent  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current percentage of CPU usage."
+    ::= { acdDesc 20 }
+
+acdDescCpuUsageAverage15  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the average percentage of CPU usage over the last 15 seconds.
+         This object range from (0..100)."
+    ::= { acdDesc 21 }
+
+acdDescCpuUsageAverage30  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the average percentage of CPU usage over the last 30 seconds.
+         This object range from (0..100)."
+    ::= { acdDesc 22 }
+
+acdDescCpuUsageAverage60  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the average percentage of CPU usage over the last 60 seconds.
+         This object range from (0..100)."
+    ::= { acdDesc 23 }
+
+acdDescCpuUsageAverage900  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the average percentage of CPU usage over the last 900
+         seconds. This object range from (0..100)."
+    ::= { acdDesc 24 }
+
+
+---------------------------------------------------------------------------
+ -- The connector table
+ -- This table contains all the information related to the connector.
+---------------------------------------------------------------------------
+
+acdDescConnectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDescConnectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all connectors info"
+    ::= { acdDesc 10 }
+
+acdDescConnectorEntry OBJECT-TYPE
+    SYNTAX      AcdDescConnectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This is the product connector definition."
+    INDEX   { acdDescConnectorID }
+    ::=  { acdDescConnectorTable 1 }
+
+
+AcdDescConnectorEntry ::= SEQUENCE {
+    acdDescConnectorID          Unsigned32,
+    acdDescConnectorName        DisplayString,
+    acdDescConnectorType        INTEGER,
+    acdDescConnectorPoESupport  TruthValue
+}
+
+acdDescConnectorID  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each connector. Starting to one from left to right."
+    ::= { acdDescConnectorEntry 1 }
+
+acdDescConnectorName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the connector on the silkscreen."
+    ::= { acdDescConnectorEntry 2 }
+
+acdDescConnectorType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    rj45(2),
+                    rj45S(3), -- rj45 shielded
+                    db9(4),
+                    bnc(5),
+                    fAUI(6),  -- female aui
+                    mAUI(7),  -- male aui
+                    fiberSC(8),
+                    fiberMIC(9),
+                    fiberST(10),
+                    telco(11),
+                    mtrj(12),  -- fiber MT-RJ
+                    hssdc(13), -- fiber channel style-2
+                    fiberLC(14)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describe the connector type, for instance an RJ-45 or an SFP."
+    ::= { acdDescConnectorEntry 3 }
+
+acdDescConnectorPoESupport  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the port support PoE or not."
+    ::= { acdDescConnectorEntry 4 }
+
+---------------------------------------------------------------------------
+ -- The Power Supply table
+ -- This table contains all the information related to the Power supplies.
+---------------------------------------------------------------------------
+
+acdDescPwrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDescPwrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Power Supplies"
+    ::= { acdDesc 11 }
+
+acdDescPwrEntry OBJECT-TYPE
+    SYNTAX      AcdDescPwrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This is the product available power supplies information."
+    INDEX   { acdDescPwrID }
+    ::=  { acdDescPwrTable 1 }
+
+
+AcdDescPwrEntry ::= SEQUENCE {
+    acdDescPwrID                Unsigned32,
+    acdDescPwrName              DisplayString,
+    acdDescPwrType              INTEGER,
+    acdDescPwrPresent           TruthValue
+}
+
+acdDescPwrID  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each power supply."
+    ::= { acdDescPwrEntry 1 }
+
+acdDescPwrName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        "Identifies the power supply."
+    ::= { acdDescPwrEntry 2 }
+
+acdDescPwrType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pwrplus5volts(1),
+                    pwrminus48volts(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describe the Power Supply type."
+    ::= { acdDescPwrEntry 3 }
+
+acdDescPwrPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the power supply is present or not."
+    ::= { acdDescPwrEntry 4 }
+
+---------------------------------------------------------------------------
+ -- The Temperature sensor table
+ -- This table contains all the information for the Temperature sensors.
+---------------------------------------------------------------------------
+
+acdDescTsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdDescTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of all Teperature Sensors."
+    ::= { acdDesc 12 }
+
+acdDescTsEntry OBJECT-TYPE
+    SYNTAX      AcdDescTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This is the product available Temperature sensor information."
+    INDEX   { acdDescTsID }
+    ::=  { acdDescTsTable 1 }
+
+
+AcdDescTsEntry ::= SEQUENCE {
+    acdDescTsID                 Unsigned32,
+    acdDescTsCurrentTemp        Integer32,
+    acdDescTsFirstThres         Integer32,
+    acdDescTsFisrtThresPass     TruthValue,
+    acdDescTsSecondThres        Integer32,
+    acdDescTsSecondThresPass    TruthValue
+}
+
+acdDescTsID  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Temperature Sensor."
+    ::= { acdDescTsEntry 1 }
+
+acdDescTsCurrentTemp  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current temperature in Celsius around the temperature sensor."
+    ::= { acdDescTsEntry 2 }
+
+acdDescTsFirstThres  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature value in Celsius to declare this threshold crossed."
+    ::= { acdDescTsEntry 3 }
+
+acdDescTsFisrtThresPass  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature cross the first threshold."
+    ::= { acdDescTsEntry 4 }
+
+acdDescTsSecondThres  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature value in Celsius to declare this second threshold crossed."
+   ::= { acdDescTsEntry 5 }
+
+acdDescTsSecondThresPass  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate if the temperature cross the second threshold."
+    ::= { acdDescTsEntry 6 }
+
+
+-- ****************************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- ****************************************************************************
+
+acdPowerLost NOTIFICATION-TYPE
+    OBJECTS  {  acdDescCommercialName,
+                acdDescMacBaseAddr,
+                acdDescIdentifier,
+                acdDescSerialNumber,
+                sysName }
+    STATUS      current
+    DESCRIPTION
+        "The SNMP trap that is generated by a unit when it detect a power lost.
+         It's the equivalent of the 802.3ah dying gasp."
+
+    ::= { acdDescNotifications 1 }
+
+
+---------------------------------------------------------------------------
+ -- ACD-DESC-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdDescCompliances  OBJECT IDENTIFIER ::= { acdDescConformance 1 }
+acdDescGroups       OBJECT IDENTIFIER ::= { acdDescConformance 2 }
+
+---------------------------------------------------------------------------
+-- Units of conformance
+---------------------------------------------------------------------------
+
+acdDescGenGroup OBJECT-GROUP
+    OBJECTS {
+        acdDescCommercialName,
+        acdDescMacBaseAddr,
+        acdDescIdentifier,
+        acdDescFirmwareVersion,
+        acdDescHardwareVersion,
+        acdDescSerialNumber,
+        acdDescCpuUsageCurrent,
+        acdDescCpuUsageAverage15,
+        acdDescCpuUsageAverage30,
+        acdDescCpuUsageAverage60,
+        acdDescCpuUsageAverage900
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDescGroups 1 }
+
+acdDescConnectorGroup OBJECT-GROUP
+    OBJECTS {
+        acdDescConnectorName,
+        acdDescConnectorType,
+        acdDescConnectorPoESupport
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDescGroups 2 }
+
+acdDescPwrGroup OBJECT-GROUP
+    OBJECTS {
+        acdDescPwrName,
+        acdDescPwrType,
+        acdDescPwrPresent
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDescGroups 3 }
+
+acdDescTsGroup OBJECT-GROUP
+    OBJECTS {
+        acdDescTsCurrentTemp,
+        acdDescTsFirstThres,
+        acdDescTsFisrtThresPass,
+        acdDescTsSecondThres,
+        acdDescTsSecondThresPass
+    }
+    STATUS      current
+    DESCRIPTION
+       "."
+    ::= { acdDescGroups 4 }
+
+acdDescNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        acdPowerLost
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Notifications group."
+    ::= { acdDescGroups 5 }
+
+---------------------------------------------------------------------------
+-- MIB Module Compliance statements
+---------------------------------------------------------------------------
+acdAlarmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-DESC-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdDescGenGroup,
+            acdDescConnectorGroup,
+            acdDescPwrGroup,
+            acdDescTsGroup,
+            acdDescNotificationsGroup
+        }
+
+    ::= { acdDescCompliances 1 }
+
+END

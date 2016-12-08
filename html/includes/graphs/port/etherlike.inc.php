@@ -18,12 +18,12 @@ $oids = array(
         );
 
 $i            = 0;
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('port-'.$port['ifIndex'].'-dot3.rrd');
+$rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3');
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($oids as $oid) {
         $oid        = str_replace('dot3Stats', '', $oid);
-        $oid_ds = truncate($oid, 19, '');
+        $oid_ds = substr($oid, 0, 19);
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $oid;
         $rrd_list[$i]['ds']       = $oid_ds;

@@ -7,8 +7,7 @@ $row = 1;
 foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY storage_descr', array($device['device_id'])) as $drive) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
-    }
-    else {
+    } else {
         $row_colour = $list_colour_b;
     }
 

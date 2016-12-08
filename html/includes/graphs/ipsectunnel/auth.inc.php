@@ -6,7 +6,7 @@ if (is_numeric($vars['id'])) {
     if (is_numeric($tunnel['device_id']) && ($auth || device_permitted($tunnel['device_id']))) {
         $device = device_by_id_cache($tunnel['device_id']);
 
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ipsectunnel-'.$tunnel['peer_addr'].'.rrd');
+        $rrd_filename = rrd_name($device['hostname'], array('ipsectunnel', $tunnel['peer_addr']));
 
         $title  = generate_device_link($device);
         $title .= ' :: IPSEC Tunnel :: '.htmlentities($tunnel['peer_addr']);

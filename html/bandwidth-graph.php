@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage webinterface
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -20,8 +19,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -29,12 +27,8 @@ else {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     if (!$_SESSION['authenticated']) {
@@ -43,33 +37,41 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require_once 'includes/jpgraph/src/jpgraph.php';
-require_once 'includes/jpgraph/src/jpgraph_line.php';
-require_once 'includes/jpgraph/src/jpgraph_bar.php';
-require_once 'includes/jpgraph/src/jpgraph_utils.inc.php';
-require_once 'includes/jpgraph/src/jpgraph_date.php';
+require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph.php';
+require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_line.php';
+require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_bar.php';
+require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_utils.inc.php';
+require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_date.php';
 
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
             $bill_id = $_GET['bill_id'];
-        }
-        else {
+        } else {
             echo 'Unauthorised Access Prohibited.';
             exit;
         }
-    }
-    else {
+    } else {
         $bill_id = $_GET['bill_id'];
     }
-}
-else {
+} else {
     echo 'Unauthorised Access Prohibited.';
     exit;
 }
 
-$start = $_GET['from'];
-$end   = $_GET['to'];
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+    $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to` FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
+    if (is_null($histrow)) {
+        header("HTTP/1.0 404 Not Found");
+        exit();
+    }
+    $start        = $histrow['from'];
+    $end          = $histrow['to'];
+} else {
+    $start        = $_GET[from];
+    $end          = $_GET[to];
+}
+
 $xsize = (is_numeric($_GET['x']) ? $_GET['x'] : '800' );
 $ysize = (is_numeric($_GET['y']) ? $_GET['y'] : '250' );
 // $count        = (is_numeric($_GET['count']) ? $_GET['count'] : "0" );
@@ -93,7 +95,7 @@ if ($imgtype == 'historical') {
     $i = '0';
 
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', array($bill_id)) as $data) {
-    $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
+        $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
         $dateto        = strftime('%e %b %Y', strtotime($data['bill_dateto']));
         $datelabel     = $datefrom."\n".$dateto;
         $traf['in']    = $data['traf_in'];
@@ -103,8 +105,7 @@ if ($imgtype == 'historical') {
         if ($data['bill_type'] == 'Quota') {
             $traf['allowed'] = $data['bill_allowed'];
             $traf['overuse'] = $data['bill_overuse'];
-        }
-        else {
+        } else {
             $traf['allowed'] = '0';
             $traf['overuse'] = '0';
         }
@@ -134,8 +135,7 @@ if ($imgtype == 'historical') {
 
     $yaxistitle = 'Gigabytes';
     $graph_name = 'Historical bandwidth over the last 12 billing periods';
-}
-else {
+} else {
     $data    = array();
     $average = 0;
     if ($imgtype == 'day') {
@@ -161,8 +161,7 @@ else {
                 array_push($tot_data, 0);
             }
         }
-    }
-    else if ($imgtype == 'hour') {
+    } elseif ($imgtype == 'hour') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC', array($bill_id, $start, $end)) as $data) {
             $traf['in']    = (isset($data['traf_in']) ? $data['traf_in'] : 0);
             $traf['out']   = (isset($data['traf_out']) ? $data['traf_out'] : 0);
@@ -249,8 +248,7 @@ if ($imgtype == 'historical') {
     $lineplot_allow->SetWeight(1);
 
     $gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
-}
-else {
+} else {
     $lineplot_allow = new LinePlot($ave_data);
     // $lineplot_allow->SetLegend("Average per ".$imgtype);
     $lineplot_allow->SetLegend('Average');

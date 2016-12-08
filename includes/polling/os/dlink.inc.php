@@ -1,6 +1,6 @@
 <?php
 
-$Descr_string  = snmp_get($device, 'sysDescr.0', '-Oqv', 'SNMPv2-MIB');
+$Descr_string  = $poll_device['sysDescr'];
 $Descr_chopper = preg_split('/[ ]+/', "$Descr_string");
 
 $version  = 'Firmware '.$Descr_chopper[1];

@@ -4,7 +4,7 @@ $scale_max = 100;
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/sub10systems.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'sub10systems');
 
 
 if (file_exists($rrdfilename)) {

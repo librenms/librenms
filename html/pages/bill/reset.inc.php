@@ -12,8 +12,10 @@
     }
   </script>
   <input type="hidden" name="action" value="reset_bill">
-  <h3>Reset Bill</h3>
-  <hr>
+  <div class="row">
+  <div class="col-md-8 col-md-push-2">
+  <div class="alert alert-danger alert-block">
+  <h4>Reset Bill</h4>
   <div class="control-group">
     <label class="control-label" for="confirm"><strong>Confirm</strong></label>
     <div class="controls">
@@ -38,5 +40,8 @@
   </div>
   <div class="form-actions">
     <button id="resetBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="fa fa-refresh"></i> <strong>Reset Bill</strong></button>
+  </div>
+  </div>
+  </div>
   </div>
 </form>

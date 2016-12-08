@@ -1,3 +1,4 @@
+source: Support/FAQ.md
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)
@@ -13,9 +14,20 @@
  - [How do I debug the poller process?](#faq12)
  - [Why do I get a lot apache or rrdtool zombies in my process list?](#faq14)
  - [Why do I see traffic spikes in my graphs?](#faq15)
+ - [Why do I see gaps in my graphs?](#faq17)
+ - [How do I change the IP / hostname of a device?](#faq16)
+ - [My device doesn't finish polling within 300 seconds](#faq19)
+ - [Things aren't working correctly?](#faq18)
+ - [What do the values mean in my graphs?](#faq21)
+ - [Why does a device show as a warning?](#faq22)
+ - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
+ - [How do I move my LibreNMS install to another server?](#faq24)
+ - [Why is my EdgeRouter device not detected?](#faq25)
+ - [Why are some of my disks not showing?](#faq26)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
+ - [What information do you need to add a new OS?](#faq20)
  - [What can I do to help?](#faq9)
  - [How can I test another users branch?](#faq13)
 
@@ -23,9 +35,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-For Debian / Ubuntu installs follow [Debian / Ubuntu](http://docs.librenms.org/Installation/Installation-(Debian-Ubuntu))
-
-For RedHat / CentOS installs follow [RedHat / CentOS](http://docs.librenms.org/Installation/Installation-(RHEL-CentOS))
+Please see the following [doc](http://docs.librenms.org/Installation/Installing-LibreNMS/)
 
 #### <a name="faq2"> How do I add a device?</a>
 
@@ -36,6 +46,8 @@ You have two options for adding a new device into LibreNMS.
 ```ssh
 ./addhost.php [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
 ```
+
+> Please note that if the community contains special characters such as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
 
  2. Using the web interface, go to Devices and then Add Device. Enter the details required for the device that you want to add and then click 'Add Host'.
 
@@ -71,8 +83,10 @@ If the page you are trying to load has a substantial amount of data in it then i
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
-This is usually due to there being blank spaces outside of the `<?php ?>` php tags within config.php. Remove these and retry. 
-It's also worth removing the final `?>` at the end of config.php as this is not required. 
+The easiest way to check if all is well is to run `./validate.php` as root from within your install directory. This should give you info on why things aren't working.
+
+One other reason could be a restricted snmpd.conf file or snmp view which limits the data sent back. If you use net-snmp then we suggest using 
+the (included snmpd.conf)[https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example] file.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
@@ -92,15 +106,140 @@ Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support)
 
 #### <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
 
-If this is related to your web service for LibreNMS then this has been tracked down to an issue within php which the developers aren't fixing. We have implemented a work around which means you 
+If this is related to your web service for LibreNMS then this has been tracked down to an issue within php which the developers aren't fixing. We have implemented a work around which means you
 shouldn't be seeing this. If you are, please report this in [issue 443](https://github.com/librenms/librenms/issues/443).
 
 #### <a name="faq15"> Why do I see traffic spikes in my graphs?</a>
 
-This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports. 
+This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports.
 Before this all rrd files were set to 100G max values, now you can enable support to limit this to the actual port speed.
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (scripts/tune_port.php).
+
+#### <a name="faq17"> Why do I see gaps in my graphs?</a>
+
+This is most commonly due to the poller not being able to complete it's run within 300 seconds. Check which devices are causing this by going to /poll-log/ within the Web interface.
+
+When you find the device(s) which are taking the longest you can then look at the Polling module graph under Graphs -> Poller -> Poller Modules Performance. Take a look at what modules are taking the longest and disabled un used modules.
+
+If you poll a large number of devices / ports then it's recommended to run a local recurisve dns server such as pdns-recursor.
+
+Running RRDCached is also highly advised in larger installs but has benefits no matter the size.
+
+#### <a name="faq16"> How do I change the IP / hostname of a device?</a>
+
+There is a host rename tool called renamehost.php in your librenms root directory. When renaming you are also changing the device's IP / hostname address for monitoring.
+Usage:
+```bash
+./renamehost.php <old hostname> <new hostname>
+```
+
+#### <a name="faq19"> My device doesn't finish polling within 300 seconds</a>
+
+We have a few things you can try:
+
+  - Disable unnecessary polling modules under edit device.
+  - Set a max repeater value within the snmp settings for a device.
+    What to set this to is tricky, you really should run an snmpbulkwalk with -Cr10 through -Cr50 to see what works best. 50 is usually a good choice if the device can cope.
+
+#### <a name="faq18"> Things aren't working correctly?</a>
+
+Run `./validate.php` as root from within your install.
+
+Re-run `./validate.php` once you've resolved any issues raised.
+
+You have an odd issue - we'd suggest you join our irc channel to discuss.
+
+#### <a name="faq21"> What do the values mean in my graphs?</a>
+
+The values you see are reported as metric values. Thanks to a post on [Reddit](https://www.reddit.com/r/networking/comments/4xzpfj/rrd_graph_interface_error_label_what_is_the_m/) 
+here are those values:
+
+```
+10^-18  a - atto
+10^-15  f - femto
+10^-12  p - pico
+10^-9   n - nano
+10^-6   u - micro
+10^-3   m - milli
+0    (no unit)
+10^3    k - kilo
+10^6    M - mega
+10^9    G - giga
+10^12   T - tera
+10^15   P - peta
+```
+
+#### <a name="faq22"> Why does a device show as a warning?</a>
+
+This is indicating that the device has rebooted within the last 24 hours (by default). If you want to adjust this 
+threshold then you can do so by setting `$config['uptime_warning']` in config.php. The value must be in seconds.
+
+#### <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
+
+By default numerous interface types and interface descriptions are excluded from this graph. The excluded defailts are:
+
+```php
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/l2vlan/';
+$config['device_traffic_iftype'][] = '/ppp/';
+
+$config['device_traffic_descr'][] = '/loopback/';
+$config['device_traffic_descr'][] = '/vlan/';
+$config['device_traffic_descr'][] = '/tunnel/';
+$config['device_traffic_descr'][] = '/bond/';
+$config['device_traffic_descr'][] = '/null/';
+$config['device_traffic_descr'][] = '/dummy/';
+```
+
+If you would like to re-include l2vlan interfaces for instance, you first need to `unset` the config array and set your options:
+
+```php
+unset($config['device_traffic_iftype']);
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/ppp/';
+```
+#### <a name="faq24"> How do I move my LibreNMS install to another server?</a>
+
+If you are moving from one CPU architecture to another then you will need to dump the rrd files and re-create them. If you are in 		
+this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).		
+		
+If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:		
+		
+    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.		
+    - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
+    - Dump the MySQL database `librenms` and import this into your new server.
+    - Copy the `rrd/` folder to the new server.
+    - Copy the `config.php` file to the new server.
+    - Renable cron by uncommenting all lines in `/etc/cron.d/librenms`
+
+#### <a name="faq25"> Why is my EdgeRouter device not detected?</a>
+
+If you have `service snmp description` set in your config then this will be why, please remove this. For some reason Ubnt have decided setting this 
+ value should override the sysDescr value returned which breaks our detection.
+ 
+If you don't have that set then this may be then due to an update of EdgeOS or a new device type, please [create an issue](https://github.com/librenms/librenms/issues/new).
+
+#### <a name="faq26"> Why are some of my disks not showing?</a>
+
+If you are monitoring a linux server then net-snmp doesn't always expose all disks via hrStorage (HOST-RESOURCES-MIB). We have additional support which will retrieve disks via dskTable (UCD-SNMP-MIB). 
+To expose these disks you need to add additional config to your snmpd.conf file. For example, to expose `/dev/sda1` which may be mounted as `/storage` you can specify:
+
+`disk /dev/sda1`
+
+Or
+
+`disk /storage`
+
+Restart snmpd and LibreNMS should populate the additional disk after a fresh discovery.
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
@@ -117,6 +256,24 @@ sysObjectID or sysDescr, or the existence of a particular enterprise tree.
 This file will usually set the variables for $version and $hardware gained from an snmp lookup.
 **html/images/os/$os.png**
 This is a 32x32 png format image of the OS you are adding support for.
+
+You will also need to supply a test unit within `tests/OSDiscoveryTest.php`. Please see [Support-New-OS](Support-New-OS.md) for further information.
+
+#### <a name="faq20"> What information do you need to add a new OS?</a>
+
+Under the device, click the gear and select Capture. 
+Please provide the output of Discovery, Poller, and Snmpwalk as separate non-expiring pastebin.com links.
+
+You can also use the command line to obtain the information.  Especially, if snmpwalk results in a large amount of data.
+Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
+
+```bash
+./discovery.php -h HOSTNAME -d -m os
+./poller.php -h HOSTNAME -r -f -d -m os
+snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .
+```
+
+If possible please also provide what the OS name should be if it doesn't exist already.
 
 #### <a name="faq9"> What can I do to help?</a>
 
@@ -136,7 +293,7 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
 
 #### <a name="faq13"> How can I test another users branch?</a>
 
-LibreNMS can and is developed by anyone, this means someone may be working on a new feature or support for a device that you want. 
+LibreNMS can and is developed by anyone, this means someone may be working on a new feature or support for a device that you want.
 It can be helpful for others to test these new features, using Git, this is made easy.
 
 ```bash
@@ -151,9 +308,9 @@ git status
 If you see `nothing to commit, working directory clean` then let's go for it :)
 
 Let's say that you want to test a users (f0o) new development branch (issue-1337) then you can do the following:
- 
+
 ```bash
-git remote add f0o https://github.com/librenms/librenms.git
+git remote add f0o https://github.com/f0o/librenms.git
 git remote update f0o
 git checkout issue-1337
 ```

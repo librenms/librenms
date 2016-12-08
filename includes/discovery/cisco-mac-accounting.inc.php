@@ -1,8 +1,6 @@
 <?php
 
 if ($device['os_group'] == 'cisco') {
-    echo 'Cisco MAC Accounting : ';
-
     $datas = shell_exec($config['snmpbulkwalk'].' -M '.$config['mibdir'].' -m CISCO-IP-STAT-MIB -Oqn '.snmp_gen_auth($device).' '.$device['hostname'].' cipMacSwitchedBytes');
     // echo("$datas\n");
     // echo("done\n");
@@ -33,8 +31,7 @@ if ($device['os_group'] == 'cisco') {
                 // if (mysql_affected_rows()) { echo("      UPDATED!"); }
                 // echo($sql);
                 echo '.';
-            }
-            else {
+            } else {
                 // echo("      Not Exists!");
                 dbInsert(array('port_id' => $interface['port_id'], 'mac' => $clean_mac), 'mac_accounting');
                 echo '+';

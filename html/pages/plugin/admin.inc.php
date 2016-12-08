@@ -11,11 +11,9 @@ if ($_SESSION['userlevel'] >= '10') {
     if (is_numeric($plugin_id) && is_numeric($plugin_active)) {
         if ($plugin_active == '0') {
             $plugin_active = 1;
-        }
-        else if ($plugin_active == '1') {
+        } elseif ($plugin_active == '1') {
             $plugin_active = 0;
-        }
-        else {
+        } else {
             $plugin_active = 0;
         }
 
@@ -61,8 +59,7 @@ foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
         $plugin_colour = 'bg-success';
         $plugin_button = 'danger';
         $plugin_label  = 'Disable';
-    }
-    else {
+    } else {
         $plugin_colour = 'bg-danger';
         $plugin_button = 'success';
         $plugin_label  = 'Enable';
@@ -86,7 +83,6 @@ foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
 </div>
 
 <?php
-}
-else {
+} else {
     include 'includes/error-no-perm.inc.php';
 }//end if

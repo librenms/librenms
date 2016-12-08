@@ -1,0 +1,60 @@
+-- *********************************************************************
+-- BROCADE-IEEE8021-PAE-CAPABILITY-MIB.mib:
+--     IEEE8021-PAE-MIB AGENT-CAPABILITIES
+--
+-- June 2012, Balachandar Mani
+--
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+-- *********************************************************************
+BROCADE-IEEE8021-PAE-CAPABILITY-MIB    DEFINITIONS ::= BEGIN
+IMPORTS
+    brocadeAgentCapability
+        FROM Brocade-REG-MIB
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+brocadeIeee8021PaeCapability    MODULE-IDENTITY
+    LAST-UPDATED       "201206010000Z"
+    ORGANIZATION       "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO
+            "Customer Support Group
+             Brocade Communications Systems, Inc.
+             Postal: 130 Holger Way
+             San Jose, CA 95134
+             U.S.A
+             Tel: +1-408-333-8000
+             E-mail: support@Brocade.com
+             web: www.brocade.com."
+
+    DESCRIPTION
+        "Agent capabilities for IEEE8021-PAE-MIB implementation."
+
+    REVISION           "201206010000Z"
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::=  {  brocadeAgentCapability  1  }
+
+--
+-- Agent capability for NOS 3.0.0 (VDX Platform)
+--
+brocadeIeee8021PaeVdx300R1    AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "NOS3.0.0"
+    STATUS             current
+    DESCRIPTION        "IEEE8021-PAE-MIB capabilities."
+
+    SUPPORTS        IEEE8021-PAE-MIB
+    INCLUDES        {
+                        dot1xPaeSystemGroup,
+                        dot1xPaeAuthConfigGroup,
+                        dot1xPaeAuthStatsGroup,
+                        dot1xPaeAuthDiagGroup,
+                        dot1xPaeAuthSessionStatsGroup,
+                        dot1xPaeAuthConfigGroup2
+                    }
+
+    ::=  {  brocadeIeee8021PaeCapability  1  }
+
+END

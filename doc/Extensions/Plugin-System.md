@@ -1,8 +1,11 @@
+source: Extensions/Plugin-System.md
 # Developing for the Plugin System
+
+> This will most likely be deprecated in favour of adding the possible extensions to the core code base.
 
 This documentation will hopefully give you a basis for how to write a plugin for LibreNMS.
 
-A test plugin is available on GitHib: https://github.com/laf/Test
+A test plugin is available on GitHub: https://github.com/laf/Test
 
 Plugins need to be installed into html/plugins
 
@@ -45,7 +48,7 @@ PluginName.inc.php - This file is the main included file when browsing to the pl
 
 ### System Hooks ###
 
-System hooks are called as functions within your plugin class, so for example to create a menu entry within the PLugin dropdown you would do:
+System hooks are called as functions within your plugin class, so for example to create a menu entry within the Plugin dropdown you would do:
 
 ```
   public function menu() {

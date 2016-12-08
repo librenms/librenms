@@ -21,6 +21,7 @@
  * @subpackage Alerts
  */
 
+// loop through each room
 foreach($opts as $option) {
     $url = $option['url'];
     foreach($obj as $key=>$value) {
@@ -28,24 +29,33 @@ foreach($opts as $option) {
     }
     $curl = curl_init();
 
+    if (empty($obj["msg"])) {
+        return "Empty Message";
+    }
+
     if (empty($option["message_format"])) {
         $option["message_format"] = 'text';
+    }
+
+    // Sane default of making the message color green if the message indicates
+    // that the alert recovered.   If it rebooted, make it yellow.
+    if(stripos($obj["msg"], "recovered")) {
+        $color = "green";
+    } elseif(stripos($obj["msg"], "rebooted")) {
+        $color = "yellow";
+    } else {
+	      $color = $option["color"];
     }
 
     $data[] = "message=".urlencode($obj["msg"]);
     $data[] = "room_id=".urlencode($option["room_id"]);
     $data[] = "from=".urlencode($option["from"]);
-    $data[] = "color=".urlencode($option["color"]);
+    $data[] = "color=".urlencode($color);
     $data[] = "notify=".urlencode($option["notify"]);
     $data[] = "message_format=".urlencode($option["message_format"]);
 
     $data = implode('&', $data);
-
-    // Sane default of making the message color green if the message indicates
-    // that the alert recovered.
-    if(strstr($data["message"], "recovered")) {
-        $data["color"] = "green";
-    }
+    set_curl_proxy($curl);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, true);
@@ -60,7 +70,7 @@ foreach($opts as $option) {
         var_dump("API '$url' returned Error");
         var_dump("Params: " . $message);
         var_dump("Return: " . $ret);
-        return false;
+        return 'HTTP Status code '.$code;
     }
 }
 return true;

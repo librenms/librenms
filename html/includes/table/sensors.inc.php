@@ -47,14 +47,12 @@ if ($rowCount != -1) {
 $sql = "SELECT * $sql";
 
 foreach (dbFetchRows($sql, $param) as $sensor) {
-    if (empty($sensor['sensor_current'])) {
+    if (!isset($sensor['sensor_current'])) {
         $sensor['sensor_current'] = 'NaN';
-    }
-    else {
+    } else {
         if ($sensor['sensor_current'] >= $sensor['sensor_limit']) {
             $alert = '<img src="images/16/flag_red.png" alt="alert" />';
-        }
-        else {
+        } else {
             $alert = '';
         }
     }
@@ -80,7 +78,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor['sensor_class']));
 
-    $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
+    $overlib_content = '<div style="width: 580px;"><h2>'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
     foreach (array('day', 'week', 'month', 'year') as $period) {
         $graph_array['from'] = $config['time'][$period];
         $overlib_content    .= str_replace('"', "\'", generate_graph_tag($graph_array));
@@ -95,7 +93,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $graph_array['from'] = $config['time']['day'];
     $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
-    $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+    $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $response[] = array(
         'hostname'       => generate_device_link($sensor),
@@ -107,7 +105,6 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     );
 
     if ($_POST['view'] == 'graphs') {
-
         $daily_graph = 'graph.php?id='.$sensor['sensor_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=211&amp;height=100';
         $daily_url   = 'graph.php?id='.$sensor['sensor_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=400&amp;height=150';
 

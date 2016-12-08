@@ -1,13 +1,12 @@
 <?php
 
 /*
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS.
  *
- * @package    observium
+ * @package    librenms
  * @subpackage billing
- * @author     Adam Armstrong <adama@memetic.org>
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -20,8 +19,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-}
-else {
+} else {
     $debug = false;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -29,12 +27,8 @@ else {
     ini_set('error_reporting', 0);
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     if (!$_SESSION['authenticated']) {
@@ -43,32 +37,47 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require 'includes/jpgraph/src/jpgraph.php';
-require 'includes/jpgraph/src/jpgraph_line.php';
-require 'includes/jpgraph/src/jpgraph_utils.inc.php';
-require 'includes/jpgraph/src/jpgraph_date.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_line.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_utils.inc.php';
+require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_date.php';
 
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
             $bill_id = $_GET['bill_id'];
-        }
-        else {
+        } else {
             echo 'Unauthorised Access Prohibited.';
             exit;
         }
-    }
-    else {
+    } else {
         $bill_id = $_GET['bill_id'];
     }
-}
-else {
+} else {
     echo 'Unauthorised Access Prohibited.';
     exit;
 }
 
-$start = $_GET[from];
-$end   = $_GET[to];
+$rate_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
+$bill_name = $rate_data['bill_name'];
+
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+    $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
+    if (is_null($histrow)) {
+        header("HTTP/1.0 404 Not Found");
+        exit();
+    }
+    $start        = $histrow['from'];
+    $end          = $histrow['to'];
+    $rate_95th    = $histrow['rate_95th'];
+    $rate_average = $histrow['rate_average'];
+} else {
+    $start        = $_GET[from];
+    $end          = $_GET[to];
+    $rate_95th    = $rate_data['rate_95th'];
+    $rate_average = $rate_data['rate_average'];
+}
+
 $xsize = $_GET[x];
 $ysize = $_GET[y];
 $count = $_GET[count];
@@ -77,8 +86,7 @@ $iter  = 1;
 
 if ($_GET[type]) {
     $type = $_GET[type];
-}
-else {
+} else {
     $type = 'date';
 }
 
@@ -86,15 +94,6 @@ $dur = ($end - $start);
 
 $datefrom = date('Ymthis', $start);
 $dateto   = date('Ymthis', $end);
-
-// $rate_data = getRates($bill_id,$datefrom,$dateto);
-$rate_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
-$rate_95th    = $rate_data['rate_95th'];
-$rate_average = $rate_data['rate_average'];
-
-// $bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
-// $bill_name = $bi_a['bill_name'];
-$bill_name = $rate_data['bill_name'];
 
 $dur = ($end - $start);
 
@@ -121,8 +120,8 @@ foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
     $period    = $row['period'];
     $in_delta  = $row['in_delta'];
     $out_delta = $row['out_delta'];
-    $in_value  = round(($in_delta * 8 / $period), 2);
-    $out_value = round(($out_delta * 8 / $period), 2);
+    $in_value  = delta_to_bits($in_delta, $period);
+    $out_value = delta_to_bits($out_delta, $period);
 
     $last = $timestamp;
 
@@ -188,19 +187,17 @@ $graph->yaxis->title->Set('Bits per second');
 $graph->yaxis->SetLabelFormatCallback('format_si');
 
 
-function TimeCallback($aVal) {
+function TimeCallback($aVal)
+{
     global $dur;
 
     if ($dur < 172800) {
         return date('H:i', $aVal);
-    }
-    else if ($dur < 604800) {
+    } elseif ($dur < 604800) {
         return date('D', $aVal);
-    }
-    else {
+    } else {
         return date('j M', $aVal);
     }
-
 }//end TimeCallback()
 
 

@@ -22,20 +22,12 @@ if (!empty($agent_data['munin'])) {
         echo "Created directory : $plugins_rrd_dir\n";
     }
 
-    $plugin = array();
     foreach ($agent_data['munin'] as $plugin_type => $plugin_data) {
         $plugin = array();
-        // list($plugin_type, $instance) = explode("_", $plugin_type);
-        // if (!empty($instance))
-        // {
-        // echo("\nPlugin: $plugin_type ($instance)");
-        // $plugin_rrd = $plugins_rrd_dir . "/" . $plugin_type."_".$instance;
-        // $plugin_uniq = $plugin_type."_".$instance;
-        // } else {
+
         echo "\nPlugin: $plugin_type";
-        $plugin_rrd  = $plugins_rrd_dir.'/'.$plugin_type;
-        $plugin_uniq = $plugin_type.'_';
-        // }
+        $base_rrd_name = 'munin/'.$plugin_type;
+
         d_echo("\n[$plugin_data]\n");
 
         foreach (explode("\n", $plugin_data) as $line) {
@@ -43,8 +35,7 @@ if (!empty($agent_data['munin'])) {
             if (preg_match('/^graph_/', $key)) {
                 list(,$key)            = explode('_', $key);
                 $plugin['graph'][$key] = $value;
-            }
-            else {
+            } else {
                 list($metric,$key)               = explode('.', $key);
                 $plugin['values'][$metric][$key] = $value;
             }
@@ -62,8 +53,7 @@ if (!empty($agent_data['munin'])) {
                 'mplug_info'     => ($plugin['graph']['info'] == null ? array('NULL') : $plugin['graph']['info']),
             );
             $mplug_id = dbInsert($insert, 'munin_plugins');
-        }
-        else {
+        } else {
             $mplug_id = $plugins_db[$plugin_type]['id'];
         }
 
@@ -75,9 +65,6 @@ if (!empty($agent_data['munin'])) {
                 $vu           = $v['mplug_id'].'_'.$v['ds_name'];
                 $ds_list[$vu] = 1;
             }
-
-            unset($dbq);
-            unset($v);
 
             foreach ($plugin['values'] as $name => $data) {
                 echo " $name";
@@ -97,22 +84,18 @@ if (!empty($agent_data['munin'])) {
                     $data['draw'] = 'LINE1.5';
                 }
 
-                $cmd      = '--step 300 DS:val:'.$data['type'].':600:U:U ';
-                $cmd     .= $config['rrd_rra'];
                 $ds_uniq  = $mplug_id.'_'.$name;
-                $filename = $plugin_rrd.'_'.$name.'.rrd';
-                if (!is_file($filename)) {
-                    rrdtool_create($filename, $cmd);
-                }
 
                 $fields = array(
                     'val' => $data['value'],
                 );
 
-                rrdtool_update($filename, $fields);
-
-                $tags = array('plugin' => $plugin_type);
-                influx_update($device,'munin-plugins',$tags,$fields);
+                $tags = array(
+                    'plugin'   => $plugin_type,
+                    'rrd_def'  => 'DS:val:' . $data['type'] . ':600:U:U',
+                    'rrd_name' => $base_rrd_name . '_' . $name
+                );
+                data_update($device, 'munin-plugins', $tags, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = array(
@@ -138,8 +121,7 @@ if (!empty($agent_data['munin'])) {
                     $ds_id  = dbInsert($insert, 'munin_plugins_ds');
                 }//end if
             }//end foreach
-        }
-        else {
+        } else {
             echo "No ID!\n";
         }//end if
     }//end foreach

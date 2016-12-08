@@ -16,36 +16,36 @@ if ($device['os_group'] == "cisco") {
 
     // Total
     $total = 0;
-    foreach ( snmpwalk_cache_oid_num ($device, "1.3.6.1.2.1.2.2.1.3", NULL) as $key => $value) {
-        // 81 is the ifType for DS0's
-        if ($value[''] == "81") {
-            $total++;
-        }
-    }
-
-    // Active
-    $active = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", NULL);
-    $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'][''];
-
-    if (isset($active) && ($active != "") && ($total != 0)) {
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iospri.rrd");
-
-        if (!file_exists ($rrd_filename)) {
-            rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
+    $output = snmpwalk_cache_oid_num($device, "1.3.6.1.2.1.2.2.1.3", null);
+    if (is_array($output)) {
+        foreach ($output as $key => $value) {
+            // 81 is the ifType for DS0's
+            if ($value[''] == "81") {
+                $total++;
+            }
         }
 
-        $fields = array(
-            'total'  => $total,
-            'active' => $active,
-        );
+        // Active
+        $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
+        $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'];
 
-        rrdtool_update ($rrd_filename, $fields);
+        if (isset($active) && $active > 0) {
+            $rrd_def = array(
+                'DS:total:GAUGE:600:0:U',
+                'DS:active:GAUGE:600:0:U'
+            );
 
-        $tags = array();
-        influx_update($device,'cisco-iospri',$tags,$fields);
+            $fields = array(
+                'total' => $total,
+                'active' => $active,
+            );
 
-        $graphs['cisco-iospri'] = TRUE;
-        echo (" Cisco IOS PRI ");
+            $tags = compact('rrd_def');
+            data_update($device, 'cisco-iospri', $tags, $fields);
+
+            $graphs['cisco-iospri'] = true;
+            echo(" Cisco IOS PRI ");
+        }
+        unset($rrd_def, $total, $active, $fields, $tags);
     }
-    unset($rrd_filename, $total, $active);
 }

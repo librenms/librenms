@@ -7,8 +7,7 @@ $param = array();
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
-}
-else {
+} else {
     $sql     = " FROM entPhysical AS E, devices AS D, devices_perms AS P WHERE $where AND D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
     $param[] = $_SESSION['user_id'];
 }
