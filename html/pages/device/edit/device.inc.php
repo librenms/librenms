@@ -40,8 +40,7 @@ if ($_POST['editing']) {
         } else {
             $update_message = "Device record update error.";
         }
-
-        if ($_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
+        if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (is_admin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
