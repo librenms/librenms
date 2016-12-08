@@ -46,7 +46,7 @@ On the monitoring server we will just fill in the subnet and not define its exte
 * It's time to use tinc to create our key-pair: `tincd -n myvpn -K`
 * Now the file `/etc/tinc/myvpn/hosts/monitoring` should have an RSA public key appended to it and your private key should reside in `/etc/tinc/myvpn/rsa_key.priv`.
 * To make sure that the connection will be restored after each reboot, you can add your VPN name to `/etc/tinc/nets.boot`.
-* Now you can start tinc with `tincd -n myvpn` and it will listen for your remote sites to connect to it.
+* Now you can start tinc with `# tincd -n myvpn` and it will listen for your remote sites to connect to it.
 
 ## Remote site configuration
 
@@ -96,7 +96,7 @@ VeDyaqhKd4o2Fz...
 * Generate this device's keys: `# tincd -n myvpn -K`
 * Copy over this devices host file including the embedded public key to your monitoring server.
 * Add the name for the VPN to`/etc/tinc/nets.boot` if you want to autostart the connection upon reboot.
-* Start tinc: `tincd -n myvpn`
+* Start tinc: `# tincd -n myvpn`
 
 
 These steps can basically be repeated for every remote site just choosing different names and other internal IP addresses. In my case I connected 3 remote sites running behind Ubiquiti EdgeRouters. Since those devices let me install software through Debian's package management it was very easy to set up. Just create the necessary configuration files and network scripts on each device and distribute the host configurations including the public keys to each device that will actively connect back.
