@@ -816,11 +816,12 @@ $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
 // Supermicro Switch
 $os = 'supermicro-switch';
-$config['os'][$os]['group']  = 'supermicro';
-$config['os'][$os]['text']   = 'Supermicro Switch';
-$config['os'][$os]['type']   = 'network';
-$config['os'][$os]['icon']   = 'supermicro';
-$config['os'][$os]['ifname'] = 1;
+$config['os'][$os]['group']     = 'supermicro';
+$config['os'][$os]['text']      = 'Supermicro Switch';
+$config['os'][$os]['type']      = 'network';
+$config['os'][$os]['icon']      = 'supermicro';
+$config['os'][$os]['ifname']    = 1;
+$config['os'][$os]['mib_dir'][] = 'supermicro';
 
 // Netgear ProSafe switches
 $os = 'netgear';
@@ -1084,6 +1085,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 $os = 'dell-rcs';
 $config['os'][$os]['text']             = 'Dell Remote Console';
@@ -1091,6 +1093,7 @@ $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 $os = 'avaya-ers';
 $config['os'][$os]['text']             = 'ERS Firmware';
@@ -1174,6 +1177,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 $os = 'radlan';
 $config['os'][$os]['text']             = 'Radlan';
@@ -1188,6 +1192,7 @@ $os = 'powervault';
 $config['os'][$os]['text']             = 'Dell PowerVault';
 $config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 // Data domain
 $os = 'datadomain';
@@ -1233,11 +1238,13 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_storage';
 $config['os'][$os]['over'][1]['text']  = 'Storage Usage';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 $os = 'drac';
-$config['os'][$os]['text'] = 'Dell DRAC';
-$config['os'][$os]['icon'] = 'dell';
-$config['os'][$os]['type'] = 'server';
+$config['os'][$os]['text']      = 'Dell DRAC';
+$config['os'][$os]['icon']      = 'dell';
+$config['os'][$os]['type']      = 'server';
+$config['os'][$os]['mib_dir'][] = 'dell';
 
 $os = 'bcm963';
 $config['os'][$os]['text']             = 'Broadcom BCM963xx';
@@ -1389,10 +1396,7 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'hp';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
-// $config['os'][$os]['over'][1]['graph']  = "device_processor";
-// $config['os'][$os]['over'][1]['text']   = "CPU Usage";
-// $config['os'][$os]['over'][2]['graph']  = "device_mempool";
-// $config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 $os = 'procurve';
 $config['os'][$os]['text']             = 'HP ProCurve';
 $config['os'][$os]['type']             = 'network';
@@ -1403,6 +1407,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['mib_dir'][]        = 'hp';
 
 $os = 'speedtouch';
 $config['os'][$os]['text']             = 'Thomson Speedtouch';
@@ -1603,6 +1608,7 @@ $config['os'][$os]['type']             = 'printer';
 $config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
+$config['os'][$os]['mib_dir'][]        = 'dell';
 
 $os = 'ricoh';
 $config['os'][$os]['group']            = 'printer';
@@ -1735,6 +1741,7 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 $config['os'][$os]['icon']             = 'servertech';
+$config['os'][$os]['mib_dir'][]        = 'sentry';
 
 $os = 'sentry4';
 $config['os'][$os]['text']             = 'ServerTech Sentry4';
@@ -1742,6 +1749,7 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 $config['os'][$os]['icon']             = 'servertech';
+$config['os'][$os]['mib_dir'][]        = 'sentry';
 
 $os = 'raritan';
 $config['os'][$os]['text']             = 'Raritan PDU';
@@ -1815,6 +1823,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][1]['text']  = 'Memory Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_storage';
 $config['os'][$os]['over'][2]['text']  = 'Storage Usage';
+$config['os'][$os]['mib_dir'][]        = 'synology';
 
 $os = 'hikvision';
 $config['os'][$os]['text'] = 'Hikvision';
@@ -2067,6 +2076,7 @@ $config['os'][$os]['type']             = 'environment';
 $config['os'][$os]['icon']             = 'hwg';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['mib_dir'][]        = 'hwg';
 
 // HWGroup STE2
 $os = 'hwg-ste2';
@@ -2077,6 +2087,7 @@ $config['os'][$os]['over'][0]['graph'] = 'device_temperature';
 $config['os'][$os]['over'][0]['text']  = 'Temperature';
 $config['os'][$os]['over'][1]['graph'] = 'device_humidity';
 $config['os'][$os]['over'][1]['text']  = 'Humidity';
+$config['os'][$os]['mib_dir'][]        = 'hwg';
 
 // EATON PDU
 $os = 'eatonpdu';
