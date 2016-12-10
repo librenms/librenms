@@ -52,5 +52,7 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         $os = 'ddnos';
     } elseif (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB')))) {
         $os = 'pcoweb'; // Carel PCOweb
+    } elseif (starts_with($sysDescr, 'Linux mirthtemplate')) {
+        $os = 'mirth';
     }
 }

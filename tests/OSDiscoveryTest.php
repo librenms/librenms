@@ -859,6 +859,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('minkelsrms');
     }
 
+    public function testMirth()
+    {
+        $this->checkOS('mirth');
+    }
+
     public function testMonowall()
     {
         $this->checkOS('monowall');
