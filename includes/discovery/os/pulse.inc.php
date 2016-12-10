@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (str_contains($sysDescr, array('Pulse Connect Secure', 'Pulse Secure'))) {
+if (str_contains($sysDescr, array('Pulse Connect Secure', 'Pulse Secure', 'Juniper Networks,Inc,VA-DTE', 'VA-SPE'))) {
     $os = 'pulse';
 }
