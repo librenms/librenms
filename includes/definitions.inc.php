@@ -155,6 +155,17 @@ $config['os'][$os]['over'][1]['text']  = 'Memory Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_storage';
 $config['os'][$os]['over'][2]['text']  = 'Storage Usage';
 
+$os = 'mirth';
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['text']             = 'Mirth Connect';
+$config['os'][$os]['icon']             = 'mirth';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'qnap';
 $config['os'][$os]['type']             = 'storage';
 $config['os'][$os]['group']            = 'unix';
