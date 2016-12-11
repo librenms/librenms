@@ -351,6 +351,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscowlc');
     }
 
+    public function testCmts()
+    {
+        $this->checkOS('cmts');
+    }
+
     public function testCometsystemp85xx()
     {
         $this->checkOS('cometsystem-p85xx');

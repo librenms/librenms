@@ -888,6 +888,17 @@ $config['os'][$os]['text'] = 'Juniper JWOS';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'junos';
 
+$os = 'cmts';
+$config['os'][$os]['text']             = 'Arris CMTS';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'arris';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'screenos';
 $config['os'][$os]['text']             = 'Juniper ScreenOS';
 $config['os'][$os]['type']             = 'firewall';
