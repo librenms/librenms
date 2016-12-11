@@ -86,7 +86,7 @@ function get_port_stats_by_port_hostname()
     $hostname  = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
-    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
+    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
 
     $in_rate = $port['ifInOctets_rate'] * 8;
     $out_rate = $port['ifOutOctets_rate'] * 8;
@@ -1151,13 +1151,33 @@ function update_device()
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode(file_get_contents('php://input'), true);
-    $bad_fields = array('id','hostname');
+    $bad_fields = array('device_id','hostname');
     if (empty($data['field'])) {
         $message = 'Device field to patch has not been supplied';
     } elseif (in_array($data['field'], $bad_fields)) {
         $message = 'Device field is not allowed to be updated';
     } else {
-        if (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
+        if (is_array($data['field']) && is_array($data['data'])) {
+            foreach ($data['field'] as $tmp_field) {
+                if (in_array($tmp_field, $bad_fields)) {
+                    $message = 'Device field is not allowed to be updated';
+                }
+            }
+            if ($message == '' && count($data['field']) == count($data['data'])) {
+                for ($x=0; $x<count($data['field']); $x++) {
+                    $update[mres($data['field'][$x])] = mres($data['data'][$x]);
+                }
+                if (dbUpdate($update, 'devices', '`device_id`=?', array($device_id)) >= 0) {
+                    $status = 'ok';
+                    $code = 200;
+                    $message = 'Device fields have been updated';
+                } else {
+                    $message = 'Device fields failed to be updated';
+                }
+            } elseif ($message == '') {
+                $message = 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')';
+            }
+        } elseif (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
             $status = 'ok';
             $message = 'Device ' . mres($data['field']) . ' field has been updated';
             $code = 200;

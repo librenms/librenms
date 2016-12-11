@@ -66,7 +66,7 @@ require $install_dir . '/includes/services.inc.php';
 require $install_dir . '/includes/mergecnf.inc.php';
 require $install_dir . '/includes/functions.php';
 require $install_dir . '/includes/rewrites.php';  // FIXME both definitions and functions
-
+require $install_dir . '/lib/htmlpurifier-4.8.0-lite/library/HTMLPurifier.auto.php';
 
 if (module_selected('web', $init_modules)) {
     chdir($install_dir . '/html');
@@ -92,6 +92,7 @@ if (module_selected('alerts', $init_modules)) {
 require $install_dir . '/includes/cisco-entities.php';
 require $install_dir . '/includes/vmware_guestid.inc.php';
 require $install_dir . '/includes/defaults.inc.php';
+require $install_dir . '/includes/definitions.inc.php';
 include $install_dir . '/config.php';
 
 // init memcached
@@ -123,8 +124,6 @@ if (!module_selected('nodb', $init_modules)) {
     // load graph types from the database
     require $install_dir . '/includes/load_db_graph_types.inc.php';
 }
-
-require $install_dir . '/includes/definitions.inc.php';
 
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     require $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';

@@ -110,9 +110,8 @@ function get_userlevel($username)
     // Loop the list and find the highest level
     foreach ($entries as $entry) {
         $groupname = $entry['cn'][0];
-        $userlevel = array();
         if ($config['auth_ldap_groups'][$groupname]['level'] > $userlevel) {
-            $userlevel['level'] = $config['auth_ldap_groups'][$groupname]['level'];
+            $userlevel = $config['auth_ldap_groups'][$groupname]['level'];
         }
     }
 

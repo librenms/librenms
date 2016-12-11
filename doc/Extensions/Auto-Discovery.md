@@ -124,3 +124,8 @@ and you would like to still add devices automatically then you will need to set 
 
 If your devices only return a short hostname such as lax-fa0-dc01 but the full name should be lax-fa0-dc01.example.com then you can 
 set `$config['mydomain'] = 'example.com';`
+
+#### Unique sysName
+
+By default we require unique sysNames when adding devices (this is returned over snmp by your devices). If you would like to allow 
+devices to be added with duplicate sysNames then please set `$config['allow_duplicate_sysName'] = true;`.

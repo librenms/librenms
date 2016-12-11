@@ -15,7 +15,7 @@
 <script>
     var grid = $("#mempool").bootgrid({
         ajax: true,
-        rowCount: [25,50,100,250,-1],
+        rowCount: [50,100,250,-1],
         post: function ()
         {
             return {
