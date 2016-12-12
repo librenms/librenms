@@ -186,7 +186,7 @@ if ($config['enable_ports_poe']) {
 // foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 // foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 // foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
-if ($device['os_group'] == 'cisco') {
+if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmp_cache_portIfIndex($device, $port_stats);
     $port_stats = snmp_cache_portName($device, $port_stats);
     foreach ($pagp_oids as $oid) {

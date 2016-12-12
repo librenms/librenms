@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' UDP';
 
     // These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
