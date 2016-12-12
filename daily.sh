@@ -47,6 +47,7 @@ status_run() {
     local args="$@";
     local arg_text=$1;
     local arg_command=$2;
+    local arg_option=$3;
     local log_file;
     local exit_code;
     local tmp;
@@ -68,6 +69,9 @@ status_run() {
         printf " \033[0;32mOK\033[0m\n";
     else
         printf " \033[0;31mFAIL\033[0m\n";
+        if [[ "${arg_option}" == "update" ]]; then
+            php "${DIR_LIBRENMS}/daily.php" -f notify -o "${tmp}"
+        fi
     fi
     return ${exit_code}
 }
@@ -126,7 +130,7 @@ main () {
         elif [[ "$up" == "1" ]]; then
             # Update to Master-Branch
             old_ver=$(git show --pretty="%H" -s HEAD)
-            status_run 'Updating to latest codebase' 'git pull --quiet' ''
+            status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             new_ver=$(git show --pretty="%H" -s HEAD)
             if [ "$old_ver" != "$new_ver" ]; then
                 status_run "Updated from $old_ver to $new_ver" ''
@@ -134,7 +138,7 @@ main () {
         elif [[ "$up" == "3" ]]; then
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-            status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))'
+            status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
             new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
             if [[ "$old_ver" != "$new_ver" ]]; then
                 status_run "Updated from $old_ver to $new_ver" ''
