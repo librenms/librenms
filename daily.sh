@@ -70,7 +70,7 @@ status_run() {
     else
         printf " \033[0;31mFAIL\033[0m\n";
         if [[ "${arg_option}" == "update" ]]; then
-            php "${DIR_LIBRENMS}/daily.php" -f notify -o "${tmp}"
+            php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
     fi
     return ${exit_code}
