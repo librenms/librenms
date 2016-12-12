@@ -55,7 +55,7 @@ You have two options for adding a new device into LibreNMS.
 
 We have a few methods for you to get in touch to ask for help.
 
-[Mailing List](https://groups.google.com/forum/#!forum/librenms-project)
+[Community Forum](https://community.librenms.org)
 
 [IRC](https://webchat.freenode.net/) Freenode ##librenms
 
