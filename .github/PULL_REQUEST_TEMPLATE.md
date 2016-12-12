@@ -1,3 +1,5 @@
+DO NOT DELETE THIS TEXT
+
 #### Please note
 
 > Please read this information carefully. You can run `./scripts/pre-commit.php` to check your code before submitting.

@@ -176,7 +176,7 @@ echo "
       <a href="http://www.librenms.org/">Web site</a> |
       <a href="https://github.com/librenms/">GitHub</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
+      <a href="https://community.librenms.org">Community Forum</a> |
       <a href="http://twitter.com/librenms">Twitter</a> |
       <a href="http://www.librenms.org/changelog.html">Changelog</a> |
       <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
