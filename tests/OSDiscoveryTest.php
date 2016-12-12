@@ -608,6 +608,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('gamatronicups');
     }
 
+    public function testGenerexUpsCard()
+    {
+        $this->checkOS('generex-ups-card');
+    }
+
     public function testHikvision()
     {
         $this->checkOS('hikvision');
@@ -877,12 +882,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMrvld()
     {
         $this->checkOS('mrvld');
-    }
-
-    public function testMultimatic()
-    {
-        $this->checkOS('multimatic');
-        $this->checkOS('multimatic', 'multimatic1');
     }
 
     public function testNetapp()
