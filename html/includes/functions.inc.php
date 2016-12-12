@@ -605,7 +605,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
     if ($port['ifAlias']) {
-        $content .= escape_quotes($port['ifAlias']).'<br />';
+        $content .= display($port['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -856,7 +856,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
     $content = '<div class=list-large>'.$args['text'].' - '.fixifName($args['label']).'</div>';
     if ($args['ifAlias']) {
-        $content .= $args['ifAlias'].'<br />';
+        $content .= display($args['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
