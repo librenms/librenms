@@ -46,8 +46,8 @@ if ($if_list) {
     foreach ($ports as $port) {
         $done = 'yes';
         unset($class);
-        $port['ifAlias'] = str_ireplace($type.': ', '', $port['ifAlias']);
-        $port['ifAlias'] = str_ireplace('[PNI]', 'Private', $port['ifAlias']);
+        $port['ifAlias'] = str_ireplace($type.': ', '', display($port['ifAlias']));
+        $port['ifAlias'] = str_ireplace('[PNI]', 'Private', display($port['ifAlias']));
         $ifclass         = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
         if ($bg == '#ffffff') {
             $bg = '#e5e5e5';

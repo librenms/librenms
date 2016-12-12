@@ -104,7 +104,7 @@ if (isset($_REQUEST['search'])) {
 
                 foreach ($results as $result) {
                     $name        = $result['ifDescr'] == $result['ifAlias'] ? $result['ifName'] : $result['ifDescr'];
-                    $description = $result['ifAlias'];
+                    $description = display($result['ifAlias']);
 
                     if ($result['deleted'] == 0 && ($result['ignore'] == 0 || $result['ignore'] == 0) && ($result['ifInErrors_delta'] > 0 || $result['ifOutErrors_delta'] > 0)) {
                         // Errored ports

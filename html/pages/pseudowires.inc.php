@@ -76,7 +76,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID'].'</td><td>'.generate_device_link($pw_a).'</td><td>'.generate_port_link($pw_a)."</td>
                                                                                           <td rowspan=2> <img src='images/16/arrow_right.png'> </td>
                                                                                           <td>".generate_device_link($pw_b).'</td><td>'.generate_port_link($pw_b).'</td></tr>';
-        echo "<tr style=\"background-color: #$bg;\"><td colspan=2>".$pw_a['ifAlias'].'</td><td colspan=2>'.$pw_b['ifAlias'].'</td></tr>';
+        echo "<tr style=\"background-color: #$bg;\"><td colspan=2>".display($pw_a['ifAlias']).'</td><td colspan=2>'.display($pw_b['ifAlias']).'</td></tr>';
 
         if ($vars['view'] == 'minigraphs') {
             echo "<tr style=\"background-color: #$bg;\"><td></td><td colspan=2>";

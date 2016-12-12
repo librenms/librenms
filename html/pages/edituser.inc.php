@@ -121,7 +121,7 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($interface_perms as $interface_perm) {
             echo '<tr>
               <td>
-                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.$interface_perm['ifAlias']."
+                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.display($interface_perm['ifAlias'])."
               </td>
               <td>
                 &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>

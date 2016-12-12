@@ -39,11 +39,11 @@ echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this
 if ($device['os'] == 'nos') {
     echo '        <span class=list-large>
         '.generate_port_link($port, $port['label'])." $error_img $mac
-        </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
+        </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
 } else {
     echo '        <span class=list-large>
     '.generate_port_link($port, $port['ifIndex'].'. '.$port['label'])." $error_img $mac
-    </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
+    </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
 }
 
 if ($port['ifAlias']) {

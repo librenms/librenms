@@ -75,7 +75,7 @@ if (bill_permitted($bill_id)) {
 
         // Collected Earlier
         foreach ($ports as $port) {
-            $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
+            $portalias = (empty($port['ifAlias']) ? '' : ' - '.display($port['ifAlias']).'');
 
             echo '<div class="list-group-item">';
             echo generate_port_link($port, $port['ifName'].$portalias).' on '.generate_device_link($port);
