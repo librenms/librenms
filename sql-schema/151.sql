@@ -1,1 +1,1 @@
-INSERT INTO config VALUES ('','alert.transports.msteams.url','','','Microsoft Teams Webhook URL','alerting',0, 'transports', 0, 0, 0);
+INSERT INTO config VALUES ('','alert.transports.msteams.url','','','Microsoft Teams Webhook URL','alerting',-1, 'transports', 0, 0, 0);
