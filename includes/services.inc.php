@@ -206,7 +206,7 @@ function check_service($command)
     $valid_uom = array ('us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B');
 
     // Make our command safe.
-    $command = escapeshellcmd($command);
+    $command = 'LC_NUMERIC="C" '. escapeshellcmd($command);
 
     // Run the command and return its response.
     exec($command, $response_array, $status);
