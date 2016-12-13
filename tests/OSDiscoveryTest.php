@@ -611,6 +611,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testGenerexUps()
     {
         $this->checkOS('generex-ups');
+        $this->checkOS('generex-ups', 'generex-ups1');
+        $this->checkOS('generex-ups', 'generex-ups2');
     }
 
     public function testHikvision()
