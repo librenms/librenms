@@ -1927,10 +1927,10 @@ $config['os'][$os]['icon']             = 'enterasys';
 $config['os'][$os]['ifname']           = 1;
 
 // Generex CS121 / CS141 UPS SNMP Adapter
-$os = 'generex-ups-card';
+$os = 'generex-ups';
 $config['os'][$os]['text']                          = 'Generex UPS SNMP adapter';
 $config['os'][$os]['type']                          = 'power';
-$config['os'][$os]['icon']                          = 'generex-ups-card';
+$config['os'][$os]['icon']                          = 'generex-ups';
 $config['os'][$os]['discovery_modules']['storage']              = 0;
 $config['os'][$os]['discovery_modules']['bgp-peers']            = 0;
 $config['os'][$os]['discovery_modules']['ntp']                  = 0;
@@ -1952,6 +1952,10 @@ $config['os'][$os]['poller_modules']['ntp']         = 0;
 $config['os'][$os]['poller_modules']['ospf']        = 0;
 $config['os'][$os]['poller_modules']['services']    = 0;
 $config['os'][$os]['poller_modules']['storage']     = 0;
+$config['os'][$os]['over'][0]['graph']              = 'device_voltage';
+$config['os'][$os]['over'][0]['text']               = 'Voltage';
+$config['os'][$os]['over'][1]['graph']              = 'sensor_voltage';
+$config['os'][$os]['over'][1]['text']               = 'Battery Voltage';
 
 // Huawei UPS
 $os = 'huaweiups';

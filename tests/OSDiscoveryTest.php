@@ -608,9 +608,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('gamatronicups');
     }
 
-    public function testGenerexUpsCard()
+    public function testGenerexUps()
     {
-        $this->checkOS('generex-ups-card');
+        $this->checkOS('generex-ups');
     }
 
     public function testHikvision()
