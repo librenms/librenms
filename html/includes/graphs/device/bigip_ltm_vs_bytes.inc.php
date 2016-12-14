@@ -24,25 +24,24 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
+    include "includes/graphs/common.inc.php";
+    $rrd_options .= " -l 0 -E ";
+    $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
+
     $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
     if (file_exists($rrd_filename)) {
-        $ds_in  = 'bytesin';
-        $ds_out = 'bytesout';
+        $rrd_options .= " DEF:INBYTES=" . $rrd_filename . ":bytesin:AVERAGE ";
+        $rrd_options .= " CDEF:INBITS=INBYTES,8,* ";
+        $rrd_options .= " LINE1.25:INBITS#330033:'Bits In '";
+        $rrd_options .= " GPRINT:INBITS:LAST:%6.2lf%s ";
+        $rrd_options .= " GPRINT:INBITS:AVERAGE:%6.2lf%s ";
+        $rrd_options .= " GPRINT:INBITS:MAX:%6.2lf%s\l ";
 
-        $colour_area_in  = 'AA66AA';
-        $colour_line_in  = '330033';
-        $colour_area_out = 'FFDD88';
-        $colour_line_out = 'FF6600';
-
-        $in_text = 'Bytes in';
-        $out_text = 'Bytes out';
-
-        $colour_area_in_max  = 'cc88cc';
-        $colour_area_out_max = 'FFefaa';
-
-        $graph_max = 1;
-        $unit_text = 'Bytes';
-
-        require 'includes/graphs/generic_duplex.inc.php';
+        $rrd_options .= " DEF:OUTBYTES=" . $rrd_filename . ":bytesout:AVERAGE ";
+        $rrd_options .= " CDEF:OUTBITS=OUTBYTES,8,* ";
+        $rrd_options .= " LINE1.25:OUTBITS#FF6600:'Bits Out'";
+        $rrd_options .= " GPRINT:OUTBITS:LAST:%6.2lf%s ";
+        $rrd_options .= " GPRINT:OUTBITS:AVERAGE:%6.2lf%s ";
+        $rrd_options .= " GPRINT:OUTBITS:MAX:%6.2lf%s\l ";
     }
 }

@@ -52,6 +52,7 @@
 </table>
 <script type="text/javascript">
     $("#grid").bootgrid({
+        caseSensitive: false,
         statusMappings: {
             2: "danger"
         },
