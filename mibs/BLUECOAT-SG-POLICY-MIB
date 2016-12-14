@@ -1,0 +1,69 @@
+BLUECOAT-SG-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+devicePolicyMIB MODULE-IDENTITY
+        LAST-UPDATED    "200711050300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The policy MIB is used to monitor policy violations."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting. Changed the
+                         trap OID for compatibility with SNMPv1."
+        REVISION        "200208280300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 6 }
+
+devicePolicyMIBObjects
+        OBJECT IDENTIFIER ::= { devicePolicyMIB 1 }
+
+devicePolicyMIBNotifications
+        OBJECT IDENTIFIER ::= { devicePolicyMIB 2 }
+
+devicePolicyMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { devicePolicyMIBNotifications 0 }
+
+--
+-- Textual conventions
+--
+
+PolicyMessageString ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "255a"
+        STATUS          current
+        DESCRIPTION     "The message that the user would enter while setting
+                         the policy."
+        SYNTAX          OCTET STRING (SIZE (0..255))
+
+--
+-- MIB variables
+--
+
+devicePolicyValues
+        OBJECT IDENTIFIER ::= { devicePolicyMIBObjects 1 }
+
+devicePolicyMessage OBJECT-TYPE
+        SYNTAX          PolicyMessageString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The custom message the user entered for this policy"
+        ::= { devicePolicyValues 1 }
+
+--
+-- notifications
+--
+
+devicePolicyTrap NOTIFICATION-TYPE
+        OBJECTS { devicePolicyMessage }
+        STATUS          current
+        DESCRIPTION     "A notification is generated when triggered by policy"
+        ::= { devicePolicyMIBNotificationsPrefix 1 }
+
+END
+

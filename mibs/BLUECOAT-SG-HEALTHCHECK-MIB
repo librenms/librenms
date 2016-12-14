@@ -1,0 +1,204 @@
+BLUECOAT-SG-HEALTHCHECK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP       
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Counter64
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceHealthCheckMIB MODULE-IDENTITY
+        LAST-UPDATED    "201305220300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The health check MIB is used to monitor
+                         changes in the health of upstream systems."
+        REVISION        "201305220300Z"
+        DESCRIPTION     "Added OID for time of last health check."
+        REVISION        "201305210300Z"
+        DESCRIPTION     "Added OIDs for device health check table."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting. Changed the
+                         trap OID for compatibility with SNMPv1."
+        REVISION        "200208280300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 7 }
+
+deviceHealthCheckMIBObjects
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIB 1 }
+
+deviceHealthCheckMIBNotifs
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIB 2 }
+
+deviceHealthCheckMIBConformance
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIB 3 }   
+           
+deviceHealthCheckMIBNotifsPrefix
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIBNotifs 0 }
+        
+--
+-- Textual conventions
+--
+
+HealthCheckMessageString ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT     "255a"
+        STATUS           current
+        DESCRIPTION      "The message describing a change in the health
+                          of an upstream system."
+        SYNTAX           OCTET STRING (SIZE (0..255))
+
+--
+-- MIB variables
+--
+
+deviceHealthCheckStringValues
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIBObjects 1 }
+        
+deviceHealthCheckValues
+        OBJECT IDENTIFIER ::= { deviceHealthCheckMIBObjects 2 }
+        
+deviceHealthCheckMessage OBJECT-TYPE
+        SYNTAX          HealthCheckMessageString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The custom message generated for this change in health."
+        ::= { deviceHealthCheckStringValues 1 }
+
+deviceHealthCheckValueTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceHealthCheckValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of Heath Check services."
+        ::= { deviceHealthCheckValues 1 }
+
+deviceHealthCheckValueEntry OBJECT-TYPE
+        SYNTAX          DeviceHealthCheckValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A deviceHealthCheckValueTable entry describes the status
+                         of a health check service."
+        INDEX           { deviceHealthCheckName }
+        ::= { deviceHealthCheckValueTable 1 }
+
+HealthCheckStatus ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the current value of the health check.
+                (1) - unknown
+                (2) - ok
+                (3) - ok with errors
+                (4) - ok for some IPs                
+                (5) - ok but failing
+                (6) - check failed
+                (7) - dns failed
+                (8) - ok on alt server"
+
+        SYNTAX INTEGER {
+                unknown(1),
+                ok(2),
+                okWithErrors(3),
+                okForSomeIPs(4),
+                okButFailing(5),
+                checkFailed(6),
+                dnsFailed(7),
+                okOnAltServer(8)
+        }
+
+DeviceHealthCheckValueEntry ::= SEQUENCE {
+        deviceHealthCheckName       DisplayString,
+        deviceHealthCheckState      HealthCheckStatus,
+        deviceHealthCheckTime       Counter64
+        }
+
+deviceHealthCheckName OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE(1..127))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The name of health check service."
+        ::= { deviceHealthCheckValueEntry 1 } 
+
+
+deviceHealthCheckState OBJECT-TYPE
+        SYNTAX          HealthCheckStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates health check state."
+        ::= { deviceHealthCheckValueEntry 2 }
+
+deviceHealthCheckTime OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates time (duration) in milliseconds the last health check took."
+        ::= { deviceHealthCheckValueEntry 3 }
+
+--
+-- notifications
+--
+
+deviceHealthCheckTrap NOTIFICATION-TYPE
+        OBJECTS { deviceHealthCheckMessage }
+        STATUS          current
+        DESCRIPTION     "A notification is generated when the health
+                         of a monitored system changes."
+        ::= { deviceHealthCheckMIBNotifsPrefix 1 }
+        
+
+-- Conformance information *******************************************
+
+deviceHealthCheckMIBCompliances OBJECT IDENTIFIER
+    ::= {deviceHealthCheckMIBConformance 1}
+
+deviceHealthCheckMIBGroups OBJECT IDENTIFIER
+    ::= {deviceHealthCheckMIBConformance 2}
+
+deviceHealthCheckMIBNotifGroups OBJECT IDENTIFIER
+    ::= {deviceHealthCheckMIBConformance 3}
+
+-- Compliance statements *********************************************
+
+deviceHealthCheckMIBCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for health check module. "
+    MODULE -- this module
+        MANDATORY-GROUPS { deviceHealthCheckMIBGroup }
+        
+        OBJECT        deviceHealthCheckName
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+        
+        OBJECT        deviceHealthCheckState
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        deviceHealthCheckTime
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        deviceHealthCheckMessage
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+        ::= { deviceHealthCheckMIBCompliances 1 }
+
+deviceHealthCheckMIBGroup OBJECT-GROUP
+        OBJECTS {
+                deviceHealthCheckName,
+                deviceHealthCheckState,
+                deviceHealthCheckTime,
+                deviceHealthCheckMessage
+                }
+        STATUS       current
+        DESCRIPTION  "Group of Health Check-related objects implemented in ProxySG appliances."
+        ::= { deviceHealthCheckMIBGroups 1 }
+
+deviceHealthCheckMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  { deviceHealthCheckTrap }
+        STATUS         current
+        DESCRIPTION    "Group of Health Check notifications implemented in ProxySG appliances."
+        ::= { deviceHealthCheckMIBNotifGroups 1 }
+
+END
+
