@@ -13,14 +13,14 @@
 
 // Pages
 $subtypes = array();
-$subtypes['ltm-vs-det'] = 'Virtual Server Details';
+$subtypes['ltm_vs_det'] = 'Virtual Server Details';
 // If we have a defautl pool, display the details.
 if ($vars['poolid'] != 0) {
-    $subtypes['ltm-vs-pool'] = 'Default Pool Details';
+    $subtypes['ltm_vs_pool'] = 'Default Pool Details';
 }
 
 if (!$vars['subtype']) {
-    $vars['subtype'] = 'ltm-vs-det';
+    $vars['subtype'] = 'ltm_vs_det';
 }
 
 // Determine a policy to show.

@@ -34,5 +34,5 @@ global $config;
 if (is_file('pages/device/loadbalancer/'.mres($vars['subtype']).'.inc.php')) {
     include 'pages/device/loadbalancer/'.mres($vars['subtype']).'.inc.php';
 } else {
-    include 'pages/device/loadbalancer/ltm-vs-all.inc.php';
+    include 'pages/device/loadbalancer/ltm_vs_all.inc.php';
 }//end if

@@ -173,16 +173,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             }
         }
 
-        if ($device['os'] == 'f5') {
-            // F5 LTM
-            if (isset($component_count['f5-ltm-vs'])) {
-                $device_loadbalancer_count['ltm-vs'] = $component_count['f5-ltm-vs'];
-                $loadbalancer_tabs[] = 'ltm-vs';
-            }
-            if (isset($component_count['f5-ltm-pool'])) {
-                $device_loadbalancer_count['ltm-pool'] = $component_count['f5-ltm-pool'];
-                $loadbalancer_tabs[] = 'ltm-pool';
-            }
+        // F5 LTM
+        if (isset($component_count['f5-ltm-vs'])) {
+            $device_loadbalancer_count['ltm_vs'] = $component_count['f5-ltm-vs'];
+            $loadbalancer_tabs[] = 'ltm_vs';
+        }
+        if (isset($component_count['f5-ltm-pool'])) {
+            $device_loadbalancer_count['ltm_pool'] = $component_count['f5-ltm-pool'];
+            $loadbalancer_tabs[] = 'ltm_pool';
         }
 
         if (is_array($loadbalancer_tabs)) {

@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-include 'pages/device/loadbalancer/ltm-vs-common.inc.php';
+include 'pages/device/loadbalancer/ltm_vs_common.inc.php';
 
 if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $array = $components[$vars['poolid']];
