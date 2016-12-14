@@ -227,9 +227,9 @@ $ports = $ports_mapped['ports'];
 
 // check for ports with ifIndex based rrds
 include $config['install_dir'] . '/schema/rrd/001.php';
-$files = glob($renamer->getPattern($device));
+$files = glob($rrd_operation->getPattern($device));
 if (!empty($files)) {
-    $renamer->run();
+    $rrd_operation->run();
 }
 
 $ports_found = array ();

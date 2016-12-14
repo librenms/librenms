@@ -57,7 +57,7 @@ try {
         $file_rev = $file->getBasename();
 
         if ($file->isFile() && $file->getExtension() == 'php' && intval($file_rev) > intval($rrd_rev)) {
-            require $file->getRealPath();  // include the operation file, should define $renamer
+            require $file->getRealPath();  // include the operation file, should define $rrd_operation
             echo "Rename operation $file_rev: " . $rrd_operation->getDesc() . PHP_EOL;
             $rrd_operation->run();
             $new_rrd_rev = $file_rev;
