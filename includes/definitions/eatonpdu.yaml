@@ -1,0 +1,6 @@
+os: eatonpdu
+text: 'Eaton PDU'
+type: power
+icon: eaton
+over:
+    - { graph: device_current, text: Current }

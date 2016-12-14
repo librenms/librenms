@@ -1,0 +1,4 @@
+os: powervault
+text: 'Dell PowerVault'
+icon: dell
+type: storage

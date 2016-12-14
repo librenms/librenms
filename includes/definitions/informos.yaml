@@ -1,0 +1,6 @@
+os: informos
+text: 'HPE 3PAR'
+type: storage
+icon: hp
+over:
+    - { graph: device_bits, text: Traffic }

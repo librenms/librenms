@@ -1,0 +1,8 @@
+os: ceraos
+text: 'Ceragon CeraOS'
+type: wireless
+icon: ceragon
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_ceraos_RxLevel, text: 'Rx Level' }
+    - { graph: device_ping_perf, text: 'Ping Times' }

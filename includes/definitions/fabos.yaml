@@ -1,0 +1,6 @@
+os: fabos
+text: 'Brocade FabricOS'
+type: network
+icon: brocade
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

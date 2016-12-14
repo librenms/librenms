@@ -1,0 +1,6 @@
+os: ruckuswireless
+text: 'Ruckus Wireless'
+type: wireless
+icon: ruckus
+over:
+    - { graph: device_bits, text: Traffic }

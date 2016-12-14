@@ -1,0 +1,8 @@
+os: bintec-smart
+text: 'Bintec Smart Router'
+type: network
+icon: bintec
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

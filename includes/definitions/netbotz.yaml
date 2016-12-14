@@ -1,0 +1,6 @@
+os: netbotz
+text: 'Netbotz Environment sensor'
+type: environment
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }

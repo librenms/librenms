@@ -1,0 +1,4 @@
+os: drac
+text: 'Dell DRAC'
+icon: dell
+type: server

@@ -145,10 +145,21 @@ function poll_sensor($device, $class, $unit)
     }
 }//end poll_sensor()
 
+function load_os($device)
+{
+    global $config;
+    if (isset($device['os'])) {
+        return Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+        );
+    }
+}
 
 function poll_device($device, $options)
 {
     global $config, $device, $polled_devices, $memcache;
+
+    $config['os'][$device['os']] = load_os($device);
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];

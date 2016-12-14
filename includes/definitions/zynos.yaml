@@ -1,0 +1,5 @@
+os: zynos
+text: 'ZyXEL Ethernet Switch'
+group: zyxel
+type: network
+icon: zyxel

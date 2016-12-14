@@ -1,0 +1,8 @@
+os: sophos
+text: 'Sophos UTM Firewall'
+type: firewall
+icon: sophos
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

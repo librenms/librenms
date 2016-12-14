@@ -1,0 +1,5 @@
+os: netapp
+type: storage
+text: NetApp
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

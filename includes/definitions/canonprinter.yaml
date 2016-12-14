@@ -1,0 +1,7 @@
+os: canonprinter
+group: printer
+text: 'Canon Printer'
+type: printer
+icon: canon
+over:
+    - { graph: device_toner, text: Toner }

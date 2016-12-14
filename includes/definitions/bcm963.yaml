@@ -1,0 +1,5 @@
+os: bcm963
+text: 'Broadcom BCM963xx'
+icon: broadcom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

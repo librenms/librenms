@@ -1,0 +1,6 @@
+os: avaya-ers
+text: 'ERS Firmware'
+type: network
+icon: avaya
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

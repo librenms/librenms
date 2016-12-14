@@ -1,0 +1,4 @@
+os: deltaups
+text: 'Delta UPS'
+type: power
+icon: delta

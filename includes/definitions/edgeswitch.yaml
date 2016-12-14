@@ -1,0 +1,10 @@
+os: edgeswitch
+text: EdgeSwitch
+type: network
+icon: ubiquiti
+ifname: 1
+bad_snmpEngineTime: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

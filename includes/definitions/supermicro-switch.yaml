@@ -1,0 +1,6 @@
+os: supermicro-switch
+group: supermicro
+text: 'Supermicro Switch'
+type: network
+icon: supermicro
+ifname: 1

@@ -1,0 +1,4 @@
+os: avaya-ipo
+text: 'IP Office Firmware'
+type: network
+icon: avaya

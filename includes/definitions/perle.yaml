@@ -1,0 +1,6 @@
+os: perle
+text: Perle
+type: network
+icon: perle
+over:
+    - { graph: device_bits, text: Traffic }

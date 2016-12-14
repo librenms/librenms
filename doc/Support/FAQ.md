@@ -247,8 +247,8 @@ The easiest way to show you how to do that is to link to an existing pull reques
 
 To go into a bit more detail, the following are usually needed:
 
-**includes/definitions.inc.php**
-Update this file to include the required definitions for the new OS.
+**includes/definitions/$os.yaml**
+Create this file to include the required definitions for the new OS.
 **includes/discovery/os/ciscowlc.inc.php**
 This file just sets the $os variable, done by checking the SNMP tree for a particular value that matches the OS you are adding.  Typically, this will come from the presence of specific values in
 sysObjectID or sysDescr, or the existence of a particular enterprise tree.

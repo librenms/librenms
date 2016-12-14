@@ -1,0 +1,8 @@
+os: vmware
+type: server
+text: VMware
+ifXmcbc: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery_modules:
+    vmware-vminfo: 1

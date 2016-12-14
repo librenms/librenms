@@ -1,0 +1,7 @@
+os: ipoman
+text: 'Ingrasys iPoMan'
+type: power
+icon: ingrasys
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_power, text: Power }

@@ -1,0 +1,7 @@
+os: mgeups
+text: 'MGE UPS'
+group: ups
+type: power
+icon: mge
+over:
+    - { graph: device_current, text: Current }
