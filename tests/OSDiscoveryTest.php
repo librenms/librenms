@@ -1232,6 +1232,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('serveriron');
     }
 
+    public function testSgos()
+    {
+        $this->checkOS('sgos');
+    }
+
     public function testSharp()
     {
         $this->checkOS('sharp', 'sharp-mx2614n');

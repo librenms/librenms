@@ -1,0 +1,838 @@
+BLUECOAT-SG-PROXY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter64, Gauge32, Integer32
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+bluecoatSGProxyMIB MODULE-IDENTITY
+        LAST-UPDATED    "201111010300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The BLUECOAT-SG-PROXY-MIB provides system information
+                         and statistics for a BlueCoat SG proxy appliance."
+        REVISION        "201111010300Z"
+        DESCRIPTION     "Corrections regarding Capitalization and imports."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200708280300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 11 }
+
+---
+--- Main Groups
+---
+
+sgProxyConfig   OBJECT IDENTIFIER ::= { bluecoatSGProxyMIB 1 }
+sgProxySystem   OBJECT IDENTIFIER ::= { bluecoatSGProxyMIB 2 }
+sgProxyHttp     OBJECT IDENTIFIER ::= { bluecoatSGProxyMIB 3 }
+
+---
+--- Proxy Configuration Group (sgProxyConfig)
+---
+
+sgProxyAdmin OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The contact responsible for the administration of the
+                         proxy. Usually a name and email address."
+        ::= { sgProxyConfig 1 }
+
+sgProxySoftware OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Name of the proxy sofware."
+        ::= { sgProxyConfig 2 }
+
+sgProxyVersion OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Version of the proxy software."
+        ::= { sgProxyConfig 3 }
+
+sgProxySerialNumber OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Hardware serial number of the proxy appliance."
+        ::= { sgProxyConfig 4 }
+
+---
+--- Proxy System Group (sgProxySystem)
+---
+
+---
+--- Groups under sgProxySystem
+---
+
+--
+-- sgProxyCpuTable
+--
+
+sgProxyCpu      OBJECT IDENTIFIER ::= { sgProxySystem 1 }      
+sgProxyCache    OBJECT IDENTIFIER ::= { sgProxySystem 2 }
+sgProxyMemory   OBJECT IDENTIFIER ::= { sgProxySystem 3 }
+sgProxyCpuCoreTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SgProxyCpuCoreTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various cpu statistics."
+        ::= { sgProxySystem 4 }
+---
+--- Proxy CPU Group (sgProxyCpu) (part of sgProxySystem)
+---
+
+
+sgProxyCpuUpTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of time the proxy has been running
+                         since boot, in milliseconds. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 1 }
+
+sgProxyCpuBusyTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of busy CPU time since boot,
+                         in milliseconds. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 2 }
+
+sgProxyCpuIdleTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of idle CPU time since boot,
+                         in milliseconds. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 3 }
+
+sgProxyCpuUpTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of time the proxy has been running since
+                         the last SNMP access to this value, in milliseconds.
+                         This is no longer functional. Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 4 }
+
+sgProxyCpuBusyTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of busy CPU time since the last SNMP access
+                         to this value, in milliseconds. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 5 }
+
+sgProxyCpuIdleTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The amount of idle CPU time since the last SNMP access
+                         to this value, in milliseconds. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 6 }
+
+sgProxyCpuBusyPerCent OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The busy CPU time as a percentage, averaged over
+                         one minute. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 7 }
+
+sgProxyCpuIdlePerCent OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          deprecated
+        DESCRIPTION     "The idle CPU time as a percentage, averaged over
+                         one minute. This is no longer functional.
+                         Use sgProxyCpuTable instead."
+        ::= { sgProxyCpu 8 }
+
+---
+--- Proxy Cache Group (sgProxyCache) (part of sgProxySystem)
+---
+
+sgProxyStorage OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The quantity of storage in use by the proxy in bytes."
+        ::= { sgProxyCache 1 }
+
+sgProxyNumObjects OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of objects currently held by the proxy."
+        ::= { sgProxyCache 2 }
+
+---
+--- Proxy Memory Group (sgProxyMemory) (part of sgProxySystem)
+---
+
+sgProxyMemAvailable OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total memory available for use by the proxy,
+                         in bytes."
+        ::= { sgProxyMemory 1 }
+
+sgProxyMemCacheUsage OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The memory used by the proxy for object caching,
+                         in bytes."
+        ::= { sgProxyMemory 2 }
+
+sgProxyMemSysUsage OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The memory used by the proxy for system and support
+                         processes, in bytes."
+        ::= { sgProxyMemory 3 }
+
+sgProxyMemoryPressure OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The proportion of memory used in total by the proxy,
+                         as a percentage of the total memory available."
+        ::= { sgProxyMemory 4 }
+
+
+---
+--- Proxy CPU Table Group (sgProxyCpuTable) (part of sgProxySystem)
+---
+
+sgProxyCpuCoreTableEntry OBJECT-TYPE
+        SYNTAX          SgProxyCpuCoreTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A cpuTable entry describes the
+                         current cpu statistics."
+        INDEX           { sgProxyCpuCoreIndex }
+        ::= { sgProxyCpuCoreTable 1 }
+
+SgProxyCpuCoreTableEntry ::= SEQUENCE {
+        sgProxyCpuCoreIndex       				INTEGER,
+        sgProxyCpuCoreUpTime        			Counter64,
+        sgProxyCpuCoreBusyTime      			Counter64,
+        sgProxyCpuCoreIdleTime      			Counter64,
+        sgProxyCpuCoreUpTimeSinceLastAccess		Counter64,
+        sgProxyCpuCoreBusyTimeSinceLastAccess 	Counter64,
+        sgProxyCpuCoreIdleTimeSinceLastAccess 	Counter64,
+        sgProxyCpuCoreBusyPerCent 				Gauge32,
+        sgProxyCpuCoreIdlePerCent 				Gauge32
+        }
+
+sgProxyCpuCoreIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..32)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "CPU number."
+        ::= { sgProxyCpuCoreTableEntry 1 }
+        
+sgProxyCpuCoreUpTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of time the proxy has been running
+                         since boot, in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 2 }
+
+sgProxyCpuCoreBusyTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of busy CPU time since boot,
+                         in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 3 }
+
+sgProxyCpuCoreIdleTime OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of idle CPU time since boot,
+                         in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 4 }
+
+sgProxyCpuCoreUpTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of time the proxy has been running since
+                         the last SNMP access to this value, in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 5 }
+
+sgProxyCpuCoreBusyTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of busy CPU time since the last SNMP access
+                         to this value, in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 6 }
+
+sgProxyCpuCoreIdleTimeSinceLastAccess OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The amount of idle CPU time since the last SNMP access
+                         to this value, in milliseconds."
+        ::= { sgProxyCpuCoreTableEntry 7 }
+
+sgProxyCpuCoreBusyPerCent OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The busy CPU time as a percentage, averaged over
+                         one minute."
+        ::= { sgProxyCpuCoreTableEntry 8 }
+
+sgProxyCpuCoreIdlePerCent OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The idle CPU time as a percentage, averaged over
+                         one minute."
+        ::= { sgProxyCpuCoreTableEntry 9 }
+
+
+---
+--- Proxy HTTP Statistics Group (sgProxyHttp)
+---
+
+---
+--- Groups under sgProxyHttp
+---
+
+sgProxyHttpPerf         OBJECT IDENTIFIER ::= { sgProxyHttp 1 }
+sgProxyHttpResponse     OBJECT IDENTIFIER ::= { sgProxyHttp 2 }
+sgProxyHttpMedian       OBJECT IDENTIFIER ::= { sgProxyHttp 3 }
+
+---
+--- HTTP Performance Statistics Group (sgProxyHttpPerf) (part of sgProxyHttp)
+---
+
+---
+--- Groups under sgProxyHttpPerf
+---
+
+sgProxyHttpClient       OBJECT IDENTIFIER ::= { sgProxyHttpPerf 1 }
+sgProxyHttpServer       OBJECT IDENTIFIER ::= { sgProxyHttpPerf 2 }
+sgProxyHttpConnections  OBJECT IDENTIFIER ::= { sgProxyHttpPerf 3 }
+
+---
+--- HTTP Client Statistics Group (sgProxyHttpClient) (part of sgProxyHttpPerf)
+---
+
+sgProxyHttpClientRequests OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP requests received from clients."
+        ::= { sgProxyHttpClient 1 }
+
+sgProxyHttpClientHits OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP hits that the proxy clients
+                         have produced."
+        ::= { sgProxyHttpClient 2 }
+
+sgProxyHttpClientPartialHits OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP partial (near) hits that the proxy
+                         clients have produced."
+        ::= { sgProxyHttpClient 3 }
+
+sgProxyHttpClientMisses OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP misses that the proxy clients
+                         have produced."
+        ::= { sgProxyHttpClient 4 }
+
+sgProxyHttpClientErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP errors caused by client
+                         connections."
+        ::= { sgProxyHttpClient 5 }
+
+sgProxyHttpClientRequestRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Requests Per Second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average rate per second of HTTP requests."
+        ::= { sgProxyHttpClient 6 }
+
+sgProxyHttpClientHitRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The percentage HTTP hit rate (by objects)."
+        ::= { sgProxyHttpClient 7 }
+
+sgProxyHttpClientByteHitRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The percentage HTTP hit rate (by requested bytes).
+                         This is the number of bytes returned to the client
+                         for hits, as a fraction of the total bytes."
+        ::= { sgProxyHttpClient 8 }
+
+sgProxyHttpClientInBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of bytes received from the clients by
+                         the proxy."
+        ::= { sgProxyHttpClient 9 }
+
+sgProxyHttpClientOutBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of bytes delivered to clients from
+                         the proxy."
+        ::= { sgProxyHttpClient 10 }
+
+---
+--- HTTP Server Statistics Group (sgProxyHttpServer) (part of sgProxyHttpPerf)
+---
+
+sgProxyHttpServerRequests OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP requests that the proxy has
+                         issued."
+        ::= { sgProxyHttpServer 1 }
+
+sgProxyHttpServerErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of HTTP errors while fetching objects."
+        ::= { sgProxyHttpServer 2 }
+
+sgProxyHttpServerInBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of bytes received by the proxy from
+                         remote servers."
+        ::= { sgProxyHttpServer 3 }
+
+sgProxyHttpServerOutBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of bytes transmitted by the proxy to
+                         remote servers."
+        ::= { sgProxyHttpServer 4 }
+
+---
+--- HTTP Connections Group (sgProxyHttpConnections) (part of sgProxyHttpPerf)
+---
+
+sgProxyHttpClientConnections OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total number of HTTP connections with the
+                         proxy clients."
+        ::= { sgProxyHttpConnections 1 }
+
+sgProxyHttpClientConnectionsActive OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of active HTTP connections with the
+                         proxy clients."
+        ::= { sgProxyHttpConnections 2 }
+
+sgProxyHttpClientConnectionsIdle OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of idle HTTP connections with the
+                         proxy clients."
+        ::= { sgProxyHttpConnections 3 }
+
+sgProxyHttpServerConnections OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total number of HTTP connections with
+                         remote servers."
+        ::= { sgProxyHttpConnections 4 }
+
+sgProxyHttpServerConnectionsActive OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of active HTTP connections with
+                         remote servers."
+        ::= { sgProxyHttpConnections 5 }
+
+sgProxyHttpServerConnectionsIdle OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of idle HTTP connections with
+                         remote servers."
+        ::= { sgProxyHttpConnections 6 }
+
+---
+--- Proxy HTTP Response Group (sgProxyHttpResponse) (part of sgProxyHttp)
+---
+
+---
+--- Groups under sgProxyHttpResponse
+---
+
+sgProxyHttpResponseTime         OBJECT IDENTIFIER ::= { sgProxyHttpResponse 1 }
+sgProxyHttpResponseFirstByte    OBJECT IDENTIFIER ::= { sgProxyHttpResponse 2 }
+sgProxyHttpResponseByteRate     OBJECT IDENTIFIER ::= { sgProxyHttpResponse 3 }
+sgProxyHttpResponseSize         OBJECT IDENTIFIER ::= { sgProxyHttpResponse 4 }
+
+---
+--- HTTP Response Time (sgProxyHttpResponseTime) (part of sgProxyHttpResponse)
+---
+
+sgProxyHttpServiceTimeAll OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average service time for all HTTP requests,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 1 }
+
+sgProxyHttpServiceTimeHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average service time for all HTTP hits,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 2 }
+
+sgProxyHttpServiceTimePartialHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average service time for all HTTP partial (near)
+                         hits, in milliseconds."
+        ::= { sgProxyHttpResponseTime 3 }
+
+sgProxyHttpServiceTimeMiss OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average service time for all HTTP misses,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 4 }
+
+sgProxyHttpTotalFetchTimeAll OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total fetch time for all HTTP responses,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 5 }
+
+sgProxyHttpTotalFetchTimeHit OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total fetch time for all HTTP hits,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 6 }
+
+sgProxyHttpTotalFetchTimePartialHit OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total fetch time for all HTTP partial (near) hits,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 7 }
+
+sgProxyHttpTotalFetchTimeMiss OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total fetch time for all HTTP misses,
+                         in milliseconds."
+        ::= { sgProxyHttpResponseTime 8 }
+
+---
+--- HTTP First Byte (sgProxyHttpResponseFirstByte) (part of sgProxyHttpResponse)
+---
+
+sgProxyHttpFirstByteAll OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average time to first response byte for all HTTP
+                         requests, in milliseconds."
+        ::= { sgProxyHttpResponseFirstByte 1 }
+
+sgProxyHttpFirstByteHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average time to first response byte for all HTTP
+                         hits, in milliseconds."
+        ::= { sgProxyHttpResponseFirstByte 2 }
+
+sgProxyHttpFirstBytePartialHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average time to first response byte for all HTTP
+                         partial (near) hits, in milliseconds."
+        ::= { sgProxyHttpResponseFirstByte 3 }
+
+sgProxyHttpFirstByteMiss OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average time to first response byte for all HTTP
+                         misses, in milliseconds."
+        ::= { sgProxyHttpResponseFirstByte 4 }
+
+---
+--- HTTP Byte Rate (sgProxyHttpResponseByteRate) (part of sgProxyHttpResponse)
+---
+
+sgProxyHttpByteRateAll OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes Per Second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average byte rate for all HTTP responses, in bytes
+                         per second."
+        ::= { sgProxyHttpResponseByteRate 1 }
+
+sgProxyHttpByteRateHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes Per Second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average byte rate for all HTTP hits, in bytes
+                         per second."
+        ::= { sgProxyHttpResponseByteRate 2 }
+
+sgProxyHttpByteRatePartialHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes Per Second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average byte rate for all HTTP partial hits, in
+                         bytes per second."
+        ::= { sgProxyHttpResponseByteRate 3 }
+
+sgProxyHttpByteRateMiss OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes Per Second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average byte rate for all HTTP misses, in bytes
+                         per second."
+        ::= { sgProxyHttpResponseByteRate 4 }
+
+---
+--- HTTP Response Size (sgProxyHttpResponseSize) (part of sgProxyHttpResponse)
+---
+
+sgProxyHttpResponseSizeAll OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average response size for all HTTP responses,
+                         in bytes."
+        ::= { sgProxyHttpResponseSize 1 }
+
+sgProxyHttpResponseSizeHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average response size for all HTTP hits,
+                         in bytes."
+        ::= { sgProxyHttpResponseSize 2 }
+
+sgProxyHttpResponseSizePartialHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average response size for all HTTP partial hits,
+                         in bytes."
+        ::= { sgProxyHttpResponseSize 3 }
+
+sgProxyHttpResponseSizeMiss OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The average response size for all HTTP misses,
+                         in bytes."
+        ::= { sgProxyHttpResponseSize 4 }
+
+---
+--- Proxy HTTP Median Response Tables (sgProxyHttpMedian) (part of sgProxyHttp)
+---
+
+---
+--- HTTP Median Service Time Table (sgProxyHttpMedianServiceTable)
+---     (part of sgProxyHttpMedian)
+---
+
+sgProxyHttpMedianServiceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SgProxyHttpMedianServiceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of median HTTP service times."
+        ::= { sgProxyHttpMedian 1 }
+
+sgProxyHttpMedianServiceEntry OBJECT-TYPE
+        SYNTAX          SgProxyHttpMedianServiceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table entry for median HTTP service times."
+        INDEX           { sgProxyHttpMedianServiceTime }
+        ::= { sgProxyHttpMedianServiceTable 1 }
+
+SgProxyHttpMedianServiceEntry ::= SEQUENCE {
+        sgProxyHttpMedianServiceTime            INTEGER,
+        sgProxyHttpMedianServiceTimeAll         Gauge32,
+        sgProxyHttpMedianServiceTimeHit         Gauge32,
+        sgProxyHttpMedianServiceTimePartialHit  Gauge32,
+        sgProxyHttpMedianServiceTimeMiss        Gauge32,
+        sgProxyDnsMedianServiceTime             Gauge32
+        }
+
+sgProxyHttpMedianServiceTime OBJECT-TYPE
+        SYNTAX          INTEGER { one(1), five(5), sixty (60) }
+        UNITS           "Minutes"
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The median time used to index the table
+                         sgProxyHttpMedianServiceTable. This release supports
+                         one, five, and sixty minutes."
+        ::= { sgProxyHttpMedianServiceEntry 1 }
+
+sgProxyHttpMedianServiceTimeAll OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The median service time for all HTTP requests,
+                         in milliseconds."
+        ::= { sgProxyHttpMedianServiceEntry 2 }
+
+sgProxyHttpMedianServiceTimeHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The median service time for all HTTP hits,
+                         in milliseconds."
+        ::= { sgProxyHttpMedianServiceEntry 3 }
+
+sgProxyHttpMedianServiceTimePartialHit OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The median service time for all HTTP partial (near)
+                         hits, in milliseconds."
+        ::= { sgProxyHttpMedianServiceEntry 4 }
+
+sgProxyHttpMedianServiceTimeMiss OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The median service time for all HTTP misses,
+                         in milliseconds."
+        ::= { sgProxyHttpMedianServiceEntry 5 }
+
+sgProxyDnsMedianServiceTime OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "Milliseconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The median DNS service time, in milliseconds."
+        ::= { sgProxyHttpMedianServiceEntry 6 }
+
+---
+--- BLUECOAT-SG-PROXY-MIB Ends
+---
+
+END
+
