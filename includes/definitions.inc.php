@@ -2763,7 +2763,8 @@ $os = 'sgos';
 $config['os'][$os]['text']             = 'BlueCoat ProxySG';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
-$config['os'][$os]['icon']             = 'sgos';
+$config['os'][$os]['icon']             = 'bluecoat';
+$config['os'][$os]['mib_dir'][]        = 'bluecoat';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -3323,7 +3324,7 @@ $config['graph_types']['device']['xirrus_stations']['section'] = 'wireless';
 $config['graph_types']['device']['xirrus_stations']['order']   = '0';
 $config['graph_types']['device']['xirrus_stations']['descr']   = 'Associated Stations';
 
-$config['graph_types']['device']['sgos_average_requests']['section']  = 'proxy';
+$config['graph_types']['device']['sgos_average_requests']['section']  = 'network';
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
@@ -3378,11 +3379,6 @@ $i++;
 $config['device_types'][$i]['text'] = 'Appliance';
 $config['device_types'][$i]['type'] = 'appliance';
 $config['device_types'][$i]['icon'] = 'appliance.png';
-
-$i++;
-$config['device_types'][$i]['text'] = 'Proxy';
-$config['device_types'][$i]['type'] = 'proxy';
-$config['device_types'][$i]['icon'] = 'network.png';
 
 //
 // No changes below this line #

@@ -1,10 +1,10 @@
 <?php
 // BlueCoat ProxySG Fanspeeds
 if ($device['os'] == 'sgos') {
-        echo 'ProxySG ';
-        $fan_index = 0;
+    echo 'ProxySG ';
+    $fan_index = 0;
     for ($index = 21; $index < 39; $index++) { //Proxy SG Fan OID end in 21-38
-          $fanstatus_oid   = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.6.$index";
+        $fanstatus_oid   = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.6.$index";
         $fanstatus = snmp_get($device, $fanstatus_oid, '-Oqv', 'BLUECOAT-SG-SENSOR-MIB');
         if ($fanstatus != "notInstalled") {
             $fan_oid     = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.5.$index";

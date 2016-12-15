@@ -1,7 +1,7 @@
 <?php
 
-if (!$os) {
-    if (str_contains($sysDescr, 'SGOS')) {
+
+if (str_contains($sysDescr, 'SGOS')) {
         $os = 'sgos';
-    }
 }
+
