@@ -2780,6 +2780,20 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+// Bluecoat SGOS
+$os = 'sgos';
+$config['os'][$os]['text']             = 'BlueCoat ProxySG';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['icon']             = 'bluecoat';
+$config['os'][$os]['mib_dir'][]        = 'bluecoat';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Device - Wireless - AirMAX
 $config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['section'] = 'wireless';
 $config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['order'] = '0';
@@ -3332,7 +3346,9 @@ $config['graph_types']['device']['xirrus_stations']['section'] = 'wireless';
 $config['graph_types']['device']['xirrus_stations']['order']   = '0';
 $config['graph_types']['device']['xirrus_stations']['descr']   = 'Associated Stations';
 
-
+$config['graph_types']['device']['sgos_average_requests']['section']  = 'network';
+$config['graph_types']['device']['sgos_average_requests']['order']    = '0';
+$config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
 
 // Device Types
