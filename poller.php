@@ -55,7 +55,7 @@ if ($options['h'] == 'odd') {
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $where = true;
     // FIXME
-    $query = 'SELECT `device_id` FROM (SELECT @rownum :=0) r,
+    $query = 'SELECT * FROM (SELECT @rownum :=0) r,
         (
             SELECT @rownum := @rownum +1 AS rownum, `device_id`
             FROM `devices`
@@ -121,11 +121,10 @@ rrdtool_initialize();
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
 if (!isset($query)) {
-    $query = "SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
+    $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
 }
 
 foreach (dbFetch($query) as $device) {
-    $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = " .$device['device_id']);
     if ($device['os_group'] == 'cisco') {
         $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = " . $device['device_id']);
     } else {
