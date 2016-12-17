@@ -351,6 +351,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscowlc');
     }
 
+    public function testCmts()
+    {
+        $this->checkOS('cmts');
+    }
+
     public function testCometsystemp85xx()
     {
         $this->checkOS('cometsystem-p85xx');
@@ -962,6 +967,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('nos');
         $this->checkOS('nos', 'nos1');
         $this->checkOS('nos', 'nos2');
+        $this->checkOS('nos', 'nos3');
     }
 
     public function testNrg()
@@ -1224,6 +1230,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testServeriron()
     {
         $this->checkOS('serveriron');
+    }
+
+    public function testSgos()
+    {
+        $this->checkOS('sgos');
     }
 
     public function testSharp()
