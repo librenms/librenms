@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "a7a4ffcafcc52a474dd12e391837365a580d33bf"
+                "reference": "dc7074a2128a7fef1afaf7ef41903404176ac6d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/a7a4ffcafcc52a474dd12e391837365a580d33bf",
-                "reference": "a7a4ffcafcc52a474dd12e391837365a580d33bf",
+                "url": "https://api.github.com/repos/symfony/console/zipball/dc7074a2128a7fef1afaf7ef41903404176ac6d9",
+                "reference": "dc7074a2128a7fef1afaf7ef41903404176ac6d9",
                 "shasum": ""
             },
             "require": {
@@ -116,7 +116,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-12-13 15:32:21"
+            "time": "2016-12-17 10:47:22"
         },
         {
             "name": "symfony/debug",
@@ -124,12 +124,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "342af93b6be3aedfc922c7cf07e4e5d0bc96c6a7"
+                "reference": "e45647910b4b6fcb48d8cfe33e1793dd2d56306f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/342af93b6be3aedfc922c7cf07e4e5d0bc96c6a7",
-                "reference": "342af93b6be3aedfc922c7cf07e4e5d0bc96c6a7",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/e45647910b4b6fcb48d8cfe33e1793dd2d56306f",
+                "reference": "e45647910b4b6fcb48d8cfe33e1793dd2d56306f",
                 "shasum": ""
             },
             "require": {
@@ -173,7 +173,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-19 20:35:20"
+            "time": "2016-12-16 16:05:39"
         },
         {
             "name": "symfony/polyfill-mbstring",
