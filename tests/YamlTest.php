@@ -37,7 +37,13 @@ class YamlTest extends \PHPUnit_Framework_TestCase
 
         $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
         foreach (glob($pattern) as $file) {
-            $data = Yaml::parse(file_get_contents($file));
+            try {
+                $data = Yaml::parse(file_get_contents($file));
+            } catch (ParseException $e) {
+                //$this->assertNotEmpty($data, "$file Could not be parsed");
+                $this->assertEmpty($e->getMessage(), "$file Could not be parsed");
+            }
+
             $this->assertArrayHasKey('os', $data, $file);
             $this->assertArrayHasKey('type', $data, $file);
             $this->assertArrayHasKey('text', $data, $file);
