@@ -232,6 +232,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'powercode';
 $onfig['os'][$os]['type']              = 'server';
@@ -531,7 +532,7 @@ $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
 
 $os = 'cat1900';
-$config['os'][$os]['group']                                         = 'cat1900';
+$config['os'][$os]['group']                                         = 'cisco';
 $config['os'][$os]['text']                                          = 'Cisco Catalyst 1900';
 $config['os'][$os]['type']                                          = 'network';
 $config['os'][$os]['icon']                                          = 'cisco-old';
@@ -562,6 +563,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'iosxe';
 $config['os'][$os]['group']                                         = 'cisco';
@@ -845,6 +847,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'ons';
 $config['os'][$os]['group']                                         = 'cisco';
@@ -894,6 +897,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'acano';
 $config['os'][$os]['group']                                         = 'cisco';
@@ -996,6 +1000,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'ise';
 $config['os'][$os]['text']                                          = 'Cisco Identity Services Engine';
@@ -1023,6 +1028,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'primeinfrastructure';
 $config['os'][$os]['text']                                          = 'Prime Infrastructure';
@@ -1052,6 +1058,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'tpconductor';
 $config['os'][$os]['text']                                          = 'TelePresence Conductor';
@@ -1073,6 +1080,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'cimc';
 $config['os'][$os]['text']                                          = 'Cisco Integrated Management Controller';
@@ -1128,6 +1136,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 $os = 'cips';
 $config['os'][$os]['text']                                          = 'Cisco Intrusion Prevention System';
@@ -1155,6 +1164,7 @@ $config['os'][$os]['discovery_modules']['cisco-otv']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 // Brocade NOS
 $os = 'nos';
@@ -1272,6 +1282,7 @@ $config['os'][$os]['discovery_modules']['cisco-mac-accounting']     = 1;
 $config['os'][$os]['discovery_modules']['cisco-pw']                 = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf']                = 1;
 $config['os'][$os]['discovery_modules']['cisco-vrf-lite']           = 1;
+$config['os'][$os]['mib_dir'][]                                     = 'cisco';
 
 // Ruckus Wireless
 $os = 'ruckuswireless';
@@ -1511,6 +1522,7 @@ $os = 'adtran-aos';
 $config['os'][$os]['text']             = 'Adtran AOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'adtran';
+$config['os'][$os]['mib_dir'][]        = 'adtran';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -1539,6 +1551,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['mib_dir'][]        = 'accedian';
 
 $os = 'ironware';
 $config['os'][$os]['text']             = 'Brocade IronWare';
@@ -1841,9 +1854,10 @@ $config['os'][$os]['over'][2]['text']  = 'Frequencies';
 $config['os'][$os]['mib_dir'][]        = 'ups';
 
 $os = 'deltaups';
-$config['os'][$os]['text'] = 'Delta UPS';
-$config['os'][$os]['type'] = 'power';
-$config['os'][$os]['icon'] = 'delta';
+$config['os'][$os]['text']      = 'Delta UPS';
+$config['os'][$os]['type']      = 'power';
+$config['os'][$os]['icon']      = 'delta';
+$config['os'][$os]['mib_dir'][] = 'delta';
 
 $os = 'liebert';
 $config['os'][$os]['text'] = 'Liebert';
@@ -2057,6 +2071,7 @@ $config['os'][$os]['over'][1]['text']  = 'Humidity';
 $os = 'pcoweb';
 $config['os'][$os]['text']             = 'Carel pCOWeb';
 $config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['mib_dir'][]        = 'carel';
 $config['os'][$os]['over'][0]['graph'] = 'device_temperature';
 $config['os'][$os]['over'][0]['text']  = 'Temperature';
 $config['os'][$os]['over'][1]['graph'] = 'device_humidity';
@@ -2644,6 +2659,7 @@ $os = 'ibm-amm';
 $config['os'][$os]['text']             = 'IBM AMM';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'ibmnos';
+$config['os'][$os]['mib_dir'][]        = 'ibm';
 
 // Oracle ILOM
 $os = 'oracle-ilom';

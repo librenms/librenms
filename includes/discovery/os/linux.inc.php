@@ -50,7 +50,7 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         $os = 'sophos';
     } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
         $os = 'ddnos';
-    } elseif (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB')))) {
+    } elseif (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB', 'carel')))) {
         $os = 'pcoweb'; // Carel PCOweb
     } elseif (starts_with($sysDescr, 'Linux mirthtemplate')) {
         $os = 'mirth';
