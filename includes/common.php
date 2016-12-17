@@ -1536,3 +1536,14 @@ function load_os($device)
         );
     }
 }
+
+function load_all_os()
+{
+    global $config;
+    foreach (glob($config['install_dir'].'/includes/definitions/*.yaml') as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        $config['os'][$tmp['os']] = $tmp;
+    }
+}

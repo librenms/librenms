@@ -136,6 +136,7 @@ if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$confi
 if (module_selected('web', $init_modules)) {
     umask(0002);
     require $install_dir . '/html/includes/vars.inc.php';
+    load_all_os();
 }
 
 $console_color = new Console_Color2();
