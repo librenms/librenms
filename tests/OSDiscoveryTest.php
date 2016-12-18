@@ -460,6 +460,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('dsm');
         $this->checkOS('dsm', 'dsm-ds214');
+        $this->checkOS('dsm', 'dsm-ds916');
     }
 
     public function testEatonpdu()
@@ -1335,6 +1336,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos5');
         $this->checkOS('timos', 'timos6');
         $this->checkOS('timos', 'timos7');
+        $this->checkOS('timos', 'timos8');
     }
 
     public function testTpconductor()
