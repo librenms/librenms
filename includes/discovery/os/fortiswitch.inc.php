@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$version = snmp_get($device, 'fsSysVersion.0', '-Oqn', 'FORTINET-FORTISWITCH-MIB');
+$version = snmp_get($device, 'fsSysVersion.0', '-Oqn', 'FORTINET-FORTISWITCH-MIB', 'fortinet');
 if (str_contains($version, 'FortiSwitch')) {
     $os = 'fortiswitch';
 }
