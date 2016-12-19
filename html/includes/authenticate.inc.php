@@ -42,7 +42,7 @@ unset($form_username);
 
 // We are only interested in login details passed via POST.
 if (isset($_POST['username']) && isset($_POST['password'])) {
-    $form_username = mres($_POST['username']);
+    $form_username = clean($_POST['username']);
     $form_password = $_POST['password'];
 } elseif (isset($_GET['username']) && isset($_GET['password'])) {
     /* FIXME: allowing GET for authentication reduces security */
