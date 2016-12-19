@@ -18,7 +18,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
-1. [Proxmox](#proxmos) - SNMP extend
+1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
@@ -270,7 +270,7 @@ This script uses `rec_control get-all` to collect stats.
 
 ### Proxmox
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
-`wget https://github.com/librenms/librenms-agent/blob/master/agent-local/proxmox -O /usr/local/bin/proxmox`
+`wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox -O /usr/local/bin/proxmox`
 2. Make the script executable: `chmod +x /usr/local/bin/proxmox`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`

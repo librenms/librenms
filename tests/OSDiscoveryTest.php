@@ -63,6 +63,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
+            'os' => 'generic',
+            'os_group' => '',
         );
     }
 
@@ -308,6 +310,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('catos');
     }
 
+    public function testCeraos()
+    {
+        $this->checkOS('ceraos');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
@@ -342,6 +349,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCiscowlc()
     {
         $this->checkOS('ciscowlc');
+    }
+
+    public function testCmts()
+    {
+        $this->checkOS('cmts');
     }
 
     public function testCometsystemp85xx()
@@ -448,6 +460,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('dsm');
         $this->checkOS('dsm', 'dsm-ds214');
+        $this->checkOS('dsm', 'dsm-ds916');
     }
 
     public function testEatonpdu()
@@ -462,20 +475,28 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('eatonups', 'eaton-powerxpert');
     }
 
-    public function testEdgecore()
+    public function testEdgecos()
     {
-        $this->checkOS('edge-core', 'edgecore-es3528m');
+        $this->checkOS('edgecos', 'edgecos-es3528m');
+        $this->checkOS('edgecos', 'edgecos-ecs4120-28f');
+        $this->checkOS('edgecos', 'edgecos-es3528mv2');
+        $this->checkOS('edgecos', 'edgecos-ecs4510-28f');
+        $this->checkOS('edgecos', 'edgecos-ecs4510-52t');
+        $this->checkOS('edgecos', 'edgecos-ecs4210-28t');
     }
 
     public function testEdgeos()
     {
         $this->checkOS('edgeos');
         $this->checkOS('edgeos', 'edgeos-erl');
+        $this->checkOS('edgeos', 'edgeos-er');
     }
 
     public function testEdgeswitch()
     {
         $this->checkOS('edgeswitch');
+        $this->checkOS('edgeswitch', 'edgeswitch-ep-s16');
+        $this->checkOS('edgeswitch', 'edgeswitch-es-24-250w');
     }
 
     public function testEndian()
@@ -532,8 +553,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testFireware()
     {
-        $this->checkOS('fireware', 'fireware-xtm');
-        $this->checkOS('fireware', 'fireware-fbx');
+        $this->checkOS('fireware', 'fireware-m400');
+        $this->checkOS('fireware', 'fireware-xtm26w');
     }
 
     public function testFlareos()
@@ -550,6 +571,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFortios()
     {
         $this->checkOS('fortios');
+    }
+
+    public function testFortiswitch()
+    {
+        $this->checkOS('fortiswitch');
     }
 
     public function testFoundryos()
@@ -839,6 +865,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('minkelsrms');
     }
 
+    public function testMirth()
+    {
+        $this->checkOS('mirth');
+    }
+
     public function testMonowall()
     {
         $this->checkOS('monowall');
@@ -937,6 +968,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('nos');
         $this->checkOS('nos', 'nos1');
         $this->checkOS('nos', 'nos2');
+        $this->checkOS('nos', 'nos3');
     }
 
     public function testNrg()
@@ -1001,6 +1033,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('pbn');
     }
 
+    public function testPbncpe()
+    {
+        $this->checkOS('pbn-cp');
+    }
+
     public function testPcoweb()
     {
         $this->checkOS('pcoweb');
@@ -1034,6 +1071,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPoweralert()
     {
         $this->checkOS('poweralert');
+        $this->checkOS('poweralert', 'poweralert1');
+    }
+
+    public function testPowerconnect()
+    {
+        $this->checkOS('powerconnect');
     }
 
     public function testPowervault()
@@ -1084,6 +1127,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPulse()
     {
         $this->checkOS('pulse');
+        $this->checkOS('pulse', 'pulse-mag2600');
+        $this->checkOS('pulse', 'pulse-sa2500');
+        $this->checkOS('pulse', 'pulse-sa6500');
+        $this->checkOS('pulse', 'pulse-vaspe');
+        $this->checkOS('pulse', 'pulse-sa');
     }
 
     public function testQnap()
@@ -1185,6 +1233,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('serveriron');
     }
 
+    public function testSgos()
+    {
+        $this->checkOS('sgos');
+    }
+
     public function testSharp()
     {
         $this->checkOS('sharp', 'sharp-mx2614n');
@@ -1281,6 +1334,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos3');
         $this->checkOS('timos', 'timos4');
         $this->checkOS('timos', 'timos5');
+        $this->checkOS('timos', 'timos6');
+        $this->checkOS('timos', 'timos7');
+        $this->checkOS('timos', 'timos8');
     }
 
     public function testTpconductor()
@@ -1354,12 +1410,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('waas');
     }
 
-    public function testWatchguard()
-    {
-        $this->checkOS('firebox');
-        $this->checkOS('firebox', 'firebox1');
-    }
-
     public function testWebpower()
     {
         $this->checkOS('webpower');
@@ -1403,6 +1453,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('zynos', 'zynos-es');
         $this->checkOS('zynos', 'zynos-gs');
+        $this->checkOS('zynos', 'zynos-mes3528');
     }
 
     public function testZywall()

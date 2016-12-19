@@ -45,7 +45,7 @@ if ($device['os_group'] == 'cisco') {
         $rrd_name = array('vserver', $classmap_id);
         $rrd_def = array();
         foreach ($oids as $oid) {
-            $oid_ds = truncate(str_replace('slbVServer', '', $oid), 19, '');
+            $oid_ds = substr(str_replace('slbVServer', '', $oid), 0, 19);
             $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
         }
 

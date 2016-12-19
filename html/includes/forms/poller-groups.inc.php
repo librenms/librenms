@@ -24,7 +24,7 @@ $group_name = mres($_POST['group_name']);
 $descr      = mres($_POST['descr']);
 if (!empty($group_name)) {
     if (is_numeric($group_id)) {
-        if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id))) {
+        if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id)) >= 0) {
             $ok = 'Updated poller group';
         } else {
             $error = 'Failed to update the poller group';

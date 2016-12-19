@@ -135,16 +135,25 @@ function discover_device($device, $options = null)
         }
     }
     foreach ($config['discovery_modules'] as $module => $module_status) {
-        if ($force_module === true || $attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
+        $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
+        d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+        d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+        d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
+        if ($force_module === true ||
+            $attribs['discover_' . $module] ||
+            ($os_module_status && !isset($attribs['discover_' . $module])) ||
+            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
             $module_start = microtime(true);
-            echo "#### Load disco module $module ####\n";
+            echo "\n#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
+            printf("\n>> Runtime for discovery module '%s': %.4f seconds\n", $module, $module_time);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
+        } elseif (isset($os_module_status) && $os_module_status == '0') {
+            echo "Module [ $module ] disabled on os.\n\n";
         } else {
             echo "Module [ $module ] disabled globally.\n\n";
         }
@@ -907,4 +916,36 @@ function get_toner_capacity($raw_capacity)
         return 100;
     }
     return $raw_capacity;
+}
+
+/**
+ * @param $descr
+ * @return int
+ */
+function ignore_storage($descr)
+{
+    global $config;
+    $deny = 0;
+    foreach ($config['ignore_mount'] as $bi) {
+        if ($bi == $descr) {
+            $deny = 1;
+            d_echo("$bi == $descr \n");
+        }
+    }
+
+    foreach ($config['ignore_mount_string'] as $bi) {
+        if (strpos($descr, $bi) !== false) {
+            $deny = 1;
+            d_echo("strpos: $descr, $bi \n");
+        }
+    }
+
+    foreach ($config['ignore_mount_regexp'] as $bi) {
+        if (preg_match($bi, $descr) > '0') {
+            $deny = 1;
+            d_echo("preg_match $bi, $descr \n");
+        }
+    }
+
+    return $deny;
 }

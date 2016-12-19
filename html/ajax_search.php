@@ -1,16 +1,12 @@
 <?php
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
 if (!$_SESSION['authenticated']) {
-    echo 'unauthenticated';
+    echo "Unauthenticated\n";
     exit;
 }
 
@@ -108,7 +104,7 @@ if (isset($_REQUEST['search'])) {
 
                 foreach ($results as $result) {
                     $name        = $result['ifDescr'] == $result['ifAlias'] ? $result['ifName'] : $result['ifDescr'];
-                    $description = $result['ifAlias'];
+                    $description = display($result['ifAlias']);
 
                     if ($result['deleted'] == 0 && ($result['ignore'] == 0 || $result['ignore'] == 0) && ($result['ifInErrors_delta'] > 0 || $result['ifOutErrors_delta'] > 0)) {
                         // Errored ports

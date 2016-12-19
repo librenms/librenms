@@ -20,6 +20,7 @@ if ($enabled == 1) {
 
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
+    $version = version_info(false);
     $queries = array(
         'alert_rules'     => 'SELECT COUNT(`severity`) AS `total`,`severity` FROM `alert_rules` WHERE `disabled`=0 GROUP BY `severity`',
         'alert_templates' => 'SELECT COUNT(`id`) AS `total` FROM `alert_templates`',
@@ -69,6 +70,9 @@ if ($enabled == 1) {
         $data            = dbFetchRows($query);
         $response[$name] = $data;
     }
+    $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
+    $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
+    $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
 
     $output = array(
         'uuid' => $uuid,

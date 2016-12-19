@@ -1,6 +1,6 @@
 <?php
 if ($sensor_class == 'state') {
-    $sensors = dbFetchRows('SELECT * FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_type`, `sensor_index`+0, `sensor_oid`', array($sensor_class, $device['device_id']));
+    $sensors = dbFetchRows('SELECT `sensors`.*, `state_indexes`.`state_index_id` FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_type`, `sensor_index`+0, `sensor_oid`', array($sensor_class, $device['device_id']));
 } else {
     $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 }
@@ -44,9 +44,9 @@ if (count($sensors)) {
         $link = generate_url($link_array);
 
         if ($sensor['poller_type'] == "ipmi") {
-            $sensor['sensor_descr'] = truncate(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 48, '');
+            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 0, 48);
         } else {
-            $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+            $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
         }
 
         $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';

@@ -228,7 +228,12 @@ if ($format == "graph") {
                 $graph_array_zoom['width'] = '400';
                 $graph_array_zoom['legend'] = 'yes';
 
-                $overlib_link = "device/device=" . $device['device_id'] . "/";
+                $link_array         = $graph_array;
+                $link_array['page'] = 'graphs';
+                $link_array['type'] = $graph_type;
+                $link_array['device'] = $device['device_id'];
+                unset($link_array['height'], $link_array['width']);
+                $overlib_link = generate_url($link_array);
 
                 echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
                 echo '<div class="panel panel-default">';

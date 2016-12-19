@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' IP-FORWARD';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
@@ -11,7 +11,7 @@ if ($device['os'] != 'Snom') {
     $rrd_def = array();
     $snmpstring = '';
     foreach ($oids as $oid) {
-        $oid_ds       = truncate($oid, 19, '');
+        $oid_ds       = substr($oid, 0, 19);
         $rrd_create[] = "DS:$oid_ds:GAUGE:600:U:1000000"; // Limit to 1MPPS?
         $snmpstring .= ' IP-FORWARD-MIB::'.$oid.'.0';
     }

@@ -12,12 +12,6 @@
  * the source code distribution for details.
  */
 
-require_once '../includes/functions.php';
-require_once '../includes/device-groups.inc.php';
-if (file_exists('../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-       include '../html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-}
-
 function authToken(\Slim\Route $route)
 {
     $app   = \Slim\Slim::getInstance();
@@ -92,12 +86,14 @@ function get_port_stats_by_port_hostname()
     $hostname  = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
-    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
+    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
 
-    $port['in_rate'] = (formatRates($port['ifInOctets_rate'] * 8));
-    $port['out_rate'] = (formatRates($port['ifOutOctets_rate'] * 8));
-    $port['in_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $port['out_perc'] = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $in_rate = $port['ifInOctets_rate'] * 8;
+    $out_rate = $port['ifOutOctets_rate'] * 8;
+    $port['in_rate'] = formatRates($in_rate);
+    $port['out_rate'] = formatRates($out_rate);
+    $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
+    $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
     $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
     $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
     
@@ -1155,13 +1151,33 @@ function update_device()
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode(file_get_contents('php://input'), true);
-    $bad_fields = array('id','hostname');
+    $bad_fields = array('device_id','hostname');
     if (empty($data['field'])) {
         $message = 'Device field to patch has not been supplied';
     } elseif (in_array($data['field'], $bad_fields)) {
         $message = 'Device field is not allowed to be updated';
     } else {
-        if (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
+        if (is_array($data['field']) && is_array($data['data'])) {
+            foreach ($data['field'] as $tmp_field) {
+                if (in_array($tmp_field, $bad_fields)) {
+                    $message = 'Device field is not allowed to be updated';
+                }
+            }
+            if ($message == '' && count($data['field']) == count($data['data'])) {
+                for ($x=0; $x<count($data['field']); $x++) {
+                    $update[mres($data['field'][$x])] = mres($data['data'][$x]);
+                }
+                if (dbUpdate($update, 'devices', '`device_id`=?', array($device_id)) >= 0) {
+                    $status = 'ok';
+                    $code = 200;
+                    $message = 'Device fields have been updated';
+                } else {
+                    $message = 'Device fields failed to be updated';
+                }
+            } elseif ($message == '') {
+                $message = 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')';
+            }
+        } elseif (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
             $status = 'ok';
             $message = 'Device ' . mres($data['field']) . ' field has been updated';
             $code = 200;

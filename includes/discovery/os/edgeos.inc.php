@@ -2,7 +2,7 @@
 
 $items = array(
     'EdgeOS',
-    'EdgeRouter Lite',
+    'EdgeRouter',
 );
 
 if (starts_with($sysDescr, $items)) {

@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' ICMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
@@ -40,7 +40,7 @@ if ($device['os'] != 'Snom') {
         $rrd_def = array();
         $fields = array();
         foreach ($oids as $oid) {
-            $oid_ds    = truncate($oid, 19, '');
+            $oid_ds    = substr($oid, 0, 19);
             $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
             $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
         }

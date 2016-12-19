@@ -7,8 +7,8 @@ if ($config['old_graphs']) {
     // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
     include 'includes/graphs/common.inc.php';
 
-    $unit_text = str_pad(truncate($unit_text, 18, ''), 18);
-    $line_text = str_pad(truncate($line_text, 12, ''), 12);
+    $unit_text = str_pad(substr($unit_text, 0, 18), 18);
+    $line_text = str_pad(substr($line_text, 0, 12), 12);
 
     if ($multiplier) {
         $rrd_options .= ' DEF:'.$ds.'_o='.$rrd_filename.':'.$ds.':AVERAGE';

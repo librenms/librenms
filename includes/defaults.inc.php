@@ -22,19 +22,6 @@
 //
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
-// set install_dir
-$config['install_dir'] = realpath(__DIR__ . '/..');
-
-// initialize the class loader and add custom mappings
-require_once $config['install_dir'] . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->registerClass('Console_Color2', $config['install_dir'] . '/lib/console_colour.php');
-$classLoader->registerClass('Console_Table', $config['install_dir'] . '/lib/console_table.php');
-$classLoader->registerClass('PHPMailer', $config['install_dir'] . "/lib/phpmailer/class.phpmailer.php");
-$classLoader->registerClass('SMTP', $config['install_dir'] . "/lib/phpmailer/class.smtp.php");
-$classLoader->registerClass('PasswordHash', $config['install_dir'] . '/html/lib/PasswordHash.php');
-$classLoader->register();
-
 // Default directories
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
@@ -685,44 +672,45 @@ $config['warn']['ifdown'] = true;
 // Show down interfaces
 // List of poller modules. Need to be in the array to be
 // considered for execution.
-$config['poller_modules']['unix-agent']    = 0;
-$config['poller_modules']['os']            = 1;
-$config['poller_modules']['ipmi']          = 1;
-$config['poller_modules']['sensors']       = 1;
-$config['poller_modules']['processors']    = 1;
-$config['poller_modules']['mempools']      = 1;
-$config['poller_modules']['storage']       = 1;
-$config['poller_modules']['netstats']      = 1;
-$config['poller_modules']['hr-mib']        = 1;
-$config['poller_modules']['ucd-mib']       = 1;
-$config['poller_modules']['ipSystemStats'] = 1;
-$config['poller_modules']['ports']         = 1;
-$config['poller_modules']['bgp-peers']     = 1;
-$config['poller_modules']['junose-atm-vp'] = 1;
-$config['poller_modules']['toner']         = 1;
-$config['poller_modules']['ucd-diskio']    = 1;
-$config['poller_modules']['wifi']          = 1;
-$config['poller_modules']['ospf']          = 1;
-$config['poller_modules']['cisco-ipsec-flow-monitor']    = 1;
-$config['poller_modules']['cisco-remote-access-monitor'] = 1;
-$config['poller_modules']['cisco-cef']                   = 1;
-$config['poller_modules']['cisco-sla']                   = 1;
-$config['poller_modules']['cisco-mac-accounting']        = 1;
-$config['poller_modules']['cipsec-tunnels']              = 1;
-$config['poller_modules']['cisco-ace-loadbalancer']      = 1;
-$config['poller_modules']['cisco-ace-serverfarms']       = 1;
-$config['poller_modules']['netscaler-vsvr']              = 1;
-$config['poller_modules']['aruba-controller']            = 1;
+$config['poller_modules']['unix-agent']                  = 0;
+$config['poller_modules']['os']                          = 1;
+$config['poller_modules']['ipmi']                        = 1;
+$config['poller_modules']['sensors']                     = 1;
+$config['poller_modules']['processors']                  = 1;
+$config['poller_modules']['mempools']                    = 1;
+$config['poller_modules']['storage']                     = 1;
+$config['poller_modules']['netstats']                    = 1;
+$config['poller_modules']['hr-mib']                      = 1;
+$config['poller_modules']['ucd-mib']                     = 1;
+$config['poller_modules']['ipSystemStats']               = 1;
+$config['poller_modules']['ports']                       = 1;
+$config['poller_modules']['bgp-peers']                   = 1;
+$config['poller_modules']['junose-atm-vp']               = 0;
+$config['poller_modules']['toner']                       = 1;
+$config['poller_modules']['ucd-diskio']                  = 1;
+$config['poller_modules']['wifi']                        = 1;
+$config['poller_modules']['ospf']                        = 1;
+$config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
+$config['poller_modules']['cisco-remote-access-monitor'] = 0;
+$config['poller_modules']['cisco-cef']                   = 0;
+$config['poller_modules']['cisco-sla']                   = 0;
+$config['poller_modules']['cisco-mac-accounting']        = 0;
+$config['poller_modules']['cipsec-tunnels']              = 0;
+$config['poller_modules']['cisco-ace-loadbalancer']      = 0;
+$config['poller_modules']['cisco-ace-serverfarms']       = 0;
+$config['poller_modules']['cisco-asa-firewall']          = 0;
+$config['poller_modules']['cisco-voice']                 = 0;
+$config['poller_modules']['cisco-cbqos']                 = 0;
+$config['poller_modules']['cisco-otv']                   = 0;
+$config['poller_modules']['netscaler-vsvr']              = 0;
+$config['poller_modules']['aruba-controller']            = 0;
 $config['poller_modules']['entity-physical']             = 1;
 $config['poller_modules']['applications']                = 1;
-$config['poller_modules']['cisco-asa-firewall']          = 1;
-$config['poller_modules']['mib'] = 0;
-$config['poller_modules']['cisco-voice']                 = 1;
-$config['poller_modules']['cisco-cbqos']                 = 1;
+$config['poller_modules']['mib']                         = 0;
 $config['poller_modules']['stp']                         = 1;
-$config['poller_modules']['cisco-otv']                   = 1;
 $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
+$config['poller_modules']['loadbalancers']               = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -733,6 +721,13 @@ $config['discovery_modules']['entity-physical']      = 1;
 $config['discovery_modules']['processors']           = 1;
 $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;
+$config['discovery_modules']['cisco-mac-accounting'] = 0;
+$config['discovery_modules']['cisco-pw']             = 0;
+$config['discovery_modules']['cisco-vrf']            = 0;
+$config['discovery_modules']['cisco-cef']            = 0;
+$config['discovery_modules']['cisco-sla']            = 0;
+$config['discovery_modules']['cisco-cbqos']          = 0;
+$config['discovery_modules']['cisco-otv']            = 0;
 $config['discovery_modules']['ipv4-addresses']       = 1;
 $config['discovery_modules']['ipv6-addresses']       = 1;
 $config['discovery_modules']['route']                = 0;
@@ -742,24 +737,17 @@ $config['discovery_modules']['hr-device']            = 1;
 $config['discovery_modules']['discovery-protocols']  = 1;
 $config['discovery_modules']['arp-table']            = 1;
 $config['discovery_modules']['discovery-arp']        = 0;
-$config['discovery_modules']['junose-atm-vp']        = 1;
+$config['discovery_modules']['junose-atm-vp']        = 0;
 $config['discovery_modules']['bgp-peers']            = 1;
 $config['discovery_modules']['vlans']                = 1;
-$config['discovery_modules']['cisco-mac-accounting'] = 1;
-$config['discovery_modules']['cisco-pw']             = 1;
-$config['discovery_modules']['cisco-vrf']            = 1;
-//$config['discovery_modules']['cisco-cef']            = 1;
-$config['discovery_modules']['cisco-sla']      = 1;
-$config['discovery_modules']['vmware-vminfo']  = 1;
-$config['discovery_modules']['libvirt-vminfo'] = 1;
-$config['discovery_modules']['toner']          = 1;
-$config['discovery_modules']['ucd-diskio']     = 1;
-$config['discovery_modules']['services']       = 1;
-$config['discovery_modules']['charge']         = 1;
-$config['discovery_modules']['cisco-cbqos']    = 0;
-$config['discovery_modules']['stp']            = 1;
-$config['discovery_modules']['cisco-otv']      = 1;
-$config['discovery_modules']['ntp']            = 1;
+$config['discovery_modules']['vmware-vminfo']        = 0;
+$config['discovery_modules']['libvirt-vminfo']       = 1;
+$config['discovery_modules']['toner']                = 1;
+$config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['services']             = 1;
+$config['discovery_modules']['stp']                  = 1;
+$config['discovery_modules']['ntp']                  = 1;
+$config['discovery_modules']['loadbalancers']        = 0;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;
@@ -803,7 +791,7 @@ $config['enable_clear_discovery'] = 1;
 $config['force_ip_to_sysname']    = false;// Set to true if you want to use sysName in place of IPs
 
 // Allow duplicate devices by sysName
-$config['allow_duplicate_sysName'] = true;// Set to false if you want to only allow unique sysName's
+$config['allow_duplicate_sysName'] = false;// Set to true if you want to allow duplicate sysName's
 
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
