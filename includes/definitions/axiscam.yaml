@@ -1,4 +1,4 @@
 os: axiscam
 text: 'AXIS Network Camera'
-icon: axis
 type: network
+icon: axis

@@ -1,5 +1,5 @@
 os: cat1900
-group: cat1900
+group: cisco
 text: 'Cisco Catalyst 1900'
 type: network
 icon: cisco-old
@@ -30,3 +30,5 @@ discovery_modules:
     cisco-pw: 1
     cisco-vrf: 1
     cisco-vrf-lite: 1
+mib_dir:
+    - cisco

@@ -4,3 +4,5 @@ text: 'Supermicro Switch'
 type: network
 icon: supermicro
 ifname: 1
+mib_dir:
+    - supermicro

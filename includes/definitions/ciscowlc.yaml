@@ -27,3 +27,5 @@ discovery_modules:
     cisco-pw: 1
     cisco-vrf: 1
     cisco-vrf-lite: 1
+mib_dir:
+    - cisco

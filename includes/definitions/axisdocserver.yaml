@@ -1,4 +1,4 @@
 os: axisdocserver
 text: 'AXIS Network Document Server'
+type: network
 icon: axis
-type: server

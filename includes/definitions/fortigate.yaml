@@ -2,6 +2,8 @@ os: fortigate
 text: 'Fortinet Fortigate'
 type: firewall
 icon: fortinet
+mib_dir:
+    - fortinet
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_fortigate_cpu, text: 'CPU Usage' }

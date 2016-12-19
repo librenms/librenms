@@ -2,3 +2,5 @@ os: powervault
 text: 'Dell PowerVault'
 icon: dell
 type: storage
+mib_dir:
+    - dell
