@@ -1,0 +1,413 @@
+BLUECOAT-SG-ICAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ 	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP       
+		FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32, Gauge32, Counter64
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+bluecoatSGICAPMIB MODULE-IDENTITY
+        LAST-UPDATED    "201302081400Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "Internet Content Adaptation Protocol (ICAP) is an open standard protocol that
+			  allows content engines to send HTTP-based content to an ICAP server for
+			  performing value added services. The ProxySG appliance, when integrated with a 
+			  supported ICAP server such as the Proxy-AV, provides content scanning, 
+			  filtering, and repair service for Internet-based malicious code, in addition 
+			  to reducing bandwidth usage and latency.
+
+	                 This is the MIB module for ProxySG ICAP feature."
+        
+        REVISION        "201302081400Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 14 }
+
+bluecoatSgICAPMIBObjects
+        OBJECT IDENTIFIER ::= { bluecoatSGICAPMIB 1 }
+
+bluecoatSgICAPMIBNotifications
+        OBJECT IDENTIFIER ::= { bluecoatSGICAPMIB 2 }
+
+sgICAPMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { bluecoatSgICAPMIBNotifications 0 }
+
+bluecoatSgICAPMIBConformance
+      OBJECT IDENTIFIER ::= { bluecoatSGICAPMIB 3 }
+
+--
+-- Textual conventions
+--
+
+ICAPServiceEntityType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "In the ProxySG appliance, an ICAP service is a collection of attributes that
+             defines the communication between the appliance and the 
+             ICAP server. Similar ICAP scanning services can then be
+             grouped together to create a service group that helps 
+             to distribute and load balance scanning requests. 
+	     
+             This data type distinguishes an ICAP service entity 
+             between a service group and service.
+
+             service (1)      - A single service entity which may or 
+                                may not be part a service group
+
+	     serviceGroup (2) - a collection of services of same type 
+	                        of operation."
+	     
+    SYNTAX     INTEGER {
+                   service(1),
+                   servivceGroup(2)
+               }
+
+ICAPServiceNotificationType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "This TC enumerates an event related to ProxySG ICAP service. 
+             The events are sent as part of ICAP service notification. 
+             The events include:
+
+  	     queuedRequestsAboveThreshold(1) - The number of queued 
+  	         ICAP requests for a service has gone above the 
+  	         permissible threshold. This event denotes an impending 
+  	         service impact for new requests. New requests may 
+  	         be rejected and can cause serviceability issues for 
+  	         users. This problem usually occur because there is 
+  	         insufficient number of ICAP connections for the load 
+  	         the ProxySG is handling.
+
+          queuedRequestsBelowThreshold(2) - The number of queued 
+             ICAP requests has fallen below the alert 
+             threshold. This event indicates that the number of 
+             queued requests is now within normal limits and that 
+             the ICAP service has returned to a healthy state.
+
+          deferredRequestsAboveThreshold(3) - The number of 
+             deferred requests for a service has gone above the 
+             permissible threshold. This event denotes an impending 
+             service impact for new connections.
+
+          deferredRequestsBelowThreshold(4) - The number of 
+             deferred ICAP requests has fallen below the 
+             threshold. This event indicates that the number of 
+             deferred ICAP requests is now within normal limits 
+             and that the ICAP service has returned to a healthy 
+             state."
+             
+    SYNTAX     INTEGER {
+                   queuedRequestsAboveThreshold(1),
+                   queuedRequestsBelowThreshold(2),
+                   deferredRequestsAboveThreshold(3),
+                   deferredRequestsBelowThreshold(4)
+               }
+
+-- MIB variables
+--
+
+bluecoatSgICAPValues
+        OBJECT IDENTIFIER ::= { bluecoatSgICAPMIBObjects 1 }
+
+icapService
+        OBJECT IDENTIFIER ::= { bluecoatSgICAPValues 1 }
+
+
+icapServiceStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF IcapServiceStatsTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table represents various operational 
+        		statistics of ICAP services and service groups in 
+        		an ProxySG appliance."
+        ::= { icapService 1 }
+
+icapServiceStatsTableEntry OBJECT-TYPE
+        SYNTAX          IcapServiceStatsTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry in this table represents the 
+        		statistics for an ICAP service entity. An entity 
+        		is  uniquely identified by the service name 
+        		(icapServiceStatsEntityName)."
+        INDEX           { icapServiceStatsIndex }
+        ::= { icapServiceStatsTable 1 }
+
+IcapServiceStatsTableEntry ::= SEQUENCE {
+		icapServiceStatsIndex     	Unsigned32,
+		icapServiceStatsName      	OCTET STRING ,
+		icapServiceStatsEntityType	ICAPServiceEntityType,
+		icapServiceStatsPlainConns	Gauge32,
+		icapServiceStatsSecuredConns	Gauge32,
+		icapServiceStatsPlainActvReqs	Gauge32,
+		icapServiceStatsSecureActvReqs	Gauge32,
+		icapServiceStatsQueuedReqs	Gauge32,
+		icapServiceStatsDeferredReqs	Gauge32,
+		icapServiceStatsRcvdBytes	Counter64,
+		icapServiceStatsSentBytes	Counter64,
+		icapServiceStatsFailedReqs	Counter64,
+		icapServiceStatsSuccessfullReqs	Counter64
+        }
+
+icapServiceStatsIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..255)
+        MAX-ACCESS      not-accessible
+		STATUS          current
+        DESCRIPTION     "This is the index of the table and is an 
+        		unique identifier of the entity."
+        ::= { icapServiceStatsTableEntry 1 }
+
+icapServiceStatsName OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This attribute represents the configured 
+        		name of the service or the service group."
+        ::= { icapServiceStatsTableEntry 2 }
+
+icapServiceStatsEntityType OBJECT-TYPE
+        SYNTAX          ICAPServiceEntityType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This  attribute defines the entity type: 
+        		service or service group. The service group statistics 
+        		represent the sum of all the services that are
+        		members of the group."
+        ::= { icapServiceStatsTableEntry 3 }
+
+icapServiceStatsPlainConns OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of ICAP scanning transactions that are 
+        		 not encrypted."
+        ::= { icapServiceStatsTableEntry 4 }
+
+icapServiceStatsSecuredConns OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of ICAP scanning transactions that 
+        		 are encrypted and tunneled over SSL."
+        ::= { icapServiceStatsTableEntry 5 }
+
+icapServiceStatsPlainActvReqs OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Line of communication between the ProxySG
+        		 appliance and an ICAP server across which 
+        		 plain ICAP scanning requests are sent. 
+        		 This statistic is not tracked for service 
+        		 groups."
+        ::= { icapServiceStatsTableEntry 6 }
+
+icapServiceStatsSecureActvReqs OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Secure line of communication between the 
+        		 ProxySG appliance and an ICAP server across
+        		 which encrypted ICAP scanning requests are
+        		 sent. This statistic is not tracked for 
+        		 service groups."
+        ::= { icapServiceStatsTableEntry 7 }
+
+icapServiceStatsQueuedReqs OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "ICAP scanning transactions that are waiting
+        		 for an available connection."
+        ::= { icapServiceStatsTableEntry 8 }
+
+icapServiceStatsDeferredReqs OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of ICAP scanning transactions that 
+        		have been deferred until the full object has
+        		been received."
+        ::= { icapServiceStatsTableEntry 9 }
+
+
+icapServiceStatsRcvdBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of data bytes received from the 
+        		ICAP service or service group."
+        ::= { icapServiceStatsTableEntry 10 }
+
+icapServiceStatsSentBytes OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of bytes of ICAP data sent to the 
+        		 ICAP service or service group."
+        ::= { icapServiceStatsTableEntry 11 }
+
+icapServiceStatsFailedReqs OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of ICAP scanning transactions that failed
+        		because of a scanning timeout, connection 
+        		failure, server error, or a variety of other
+        		situations."
+        ::= { icapServiceStatsTableEntry 12 }
+
+icapServiceStatsSuccessfullReqs OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of ICAP scanning transactions 
+        		 that completed successfully."
+        ::= { icapServiceStatsTableEntry 13 }
+
+--
+-- notifications
+--
+sgICAPNotification OBJECT-TYPE
+        SYNTAX          ICAPServiceNotificationType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A notification type that describes an ICAP event."
+        ::= { bluecoatSgICAPValues 2 }
+
+
+sgICAPTrap NOTIFICATION-TYPE
+        OBJECTS { 
+		sgICAPNotification,
+  		icapServiceStatsName,
+		icapServiceStatsDeferredReqs,
+		icapServiceStatsQueuedReqs
+	}
+        STATUS          current
+        DESCRIPTION     "A notification that represents an ICAP- 
+        		related event on an ProxySG appliance. The attributes
+        		of an ICAP notification include:
+        		
+        		sgICAPNotification - defines the event type.
+        		
+        		icapServiceStatsName - the service on which the event
+        		       has occurred
+        		
+        		icapServiceStatsDeferredReqs - the number of deferred
+        		       connections on the service, at the time of event
+        		
+        		icapServiceStatsQueuedReqs - the number of queued 
+        		       connections on the service, at the time of event."
+        		       
+        ::= { sgICAPMIBNotificationsPrefix 1 }
+
+-- Conformance information *******************************************
+
+bluecoatSgICAPMIBCompliances OBJECT IDENTIFIER
+	::= {bluecoatSgICAPMIBConformance 1}
+
+bluecoatSgICAPMIBGroups OBJECT IDENTIFIER
+	::= {bluecoatSgICAPMIBConformance 2}
+
+bluecoatSgICAPMIBNotifGroups OBJECT IDENTIFIER
+	::= {bluecoatSgICAPMIBConformance 3}
+
+-- Compliance statements *********************************************
+bluecoatSgICAPMIBCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for ICAP Module. "
+    MODULE -- this module
+        MANDATORY-GROUPS { bluecoatSgICAPMIBGroup }
+    
+        OBJECT        icapServiceStatsName
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsEntityType
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsPlainConns
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsSecuredConns
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsPlainActvReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsSecureActvReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsQueuedReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsDeferredReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsRcvdBytes
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsSentBytes
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsFailedReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        icapServiceStatsSuccessfullReqs
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+        OBJECT        sgICAPNotification
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+
+
+    ::= { bluecoatSgICAPMIBCompliances 1 }
+
+
+bluecoatSgICAPMIBGroup OBJECT-GROUP
+    OBJECTS {
+		icapServiceStatsName,
+		icapServiceStatsEntityType,
+		icapServiceStatsPlainConns,
+		icapServiceStatsSecuredConns,
+		icapServiceStatsPlainActvReqs,
+		icapServiceStatsSecureActvReqs,
+		icapServiceStatsQueuedReqs,
+		icapServiceStatsDeferredReqs,
+		icapServiceStatsRcvdBytes,
+		icapServiceStatsSentBytes,
+		icapServiceStatsFailedReqs,
+		icapServiceStatsSuccessfullReqs,
+		sgICAPNotification
+            }
+    STATUS       current
+    DESCRIPTION "Group of ICAP-related objects implemented in ProxySG 
+    	   	appliances."
+    ::= { bluecoatSgICAPMIBGroups 1 }
+
+bluecoatSgICAPMIBNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS  { sgICAPTrap }
+    STATUS         current
+    DESCRIPTION    "Group of ICAP notifications implemented in
+    		ProxySG appliances."
+::= { bluecoatSgICAPMIBNotifGroups 1 }
+
+-- Units of conformance **********************************************
+
+END

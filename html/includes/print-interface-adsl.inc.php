@@ -25,7 +25,7 @@ onclick=\"location.href='device/".$device['device_id'].'/port/'.$port['port_id']
  <td valign=top width=350>";
 echo '        <span class=list-large>
               '.generate_port_link($port, $port['ifIndex'].'. '.$port['label']).'
-           </span><br /><span class=interface-desc>'.$port['ifAlias'].'</span>';
+           </span><br /><span class=interface-desc>'.display($port['ifAlias']).'</span>';
 
 if ($port['ifAlias']) {
     echo '<br />';

@@ -1,1 +1,2 @@
-ALTER TABLE `component_prefs` CHANGE `value` `value` VARCHAR(4000) NOT NULL COMMENT 'Value for the Component';
+INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'sgos_average_requests',  'network',  'Average HTTP Requests',  '');
+

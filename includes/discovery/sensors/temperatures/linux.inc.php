@@ -11,7 +11,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     $sensor_oid = ".1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1";
     $descr = "CPU Temp";
     $value = snmp_get($device, $sensor_oid, '-Oqve');
-    if ($value > 0) {
+    if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
     }
 }

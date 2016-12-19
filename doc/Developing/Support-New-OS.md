@@ -48,10 +48,8 @@ Look at other files to get help in the code structure.
 ```php
 <?php
 
-if (!$os) {
-    if (str_contains($sysDescr, 'Pulse Connect Secure')) {
-        $os = 'pulse';
-    }
+if (str_contains($sysDescr, array('Pulse Connect Secure', 'Pulse Secure', 'Juniper Networks,Inc,VA-DTE', 'VA-SPE'))) {
+    $os = 'pulse';
 }
 ```
 
@@ -65,9 +63,9 @@ This file will usually set the variables for $version, $hardware and $hostname r
 ```php
 <?php
 
-$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hostname = trim($poll_device['sysName'], '"');
 ```
 
 Quick explanation and examples :
@@ -173,11 +171,8 @@ Look at other files to get help in the code structure. For this example, it can 
 
 ```php
 // Pulse Secure OS definition
-<?php
-if (!$os) {
-    if (strstr($sysDescr, 'Pulse Connect Secure')) {
-        $os = 'pulse';
-    }
+if (str_contains($sysDescr, array('Pulse Connect Secure', 'Pulse Secure', 'Juniper Networks,Inc,VA-DTE', 'VA-SPE'))) {
+    $os = 'pulse';
 }
 ```
 
