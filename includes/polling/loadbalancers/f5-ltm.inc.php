@@ -82,12 +82,6 @@ if (count($components > 0)) {
             d_echo("\n\nComponent: ".$key."\n");
             d_echo("    Type: ".$type."\n");
             d_echo("    Label: ".$label."\n");
-            d_echo("    UID: ".$UID."\n");
-            d_echo("    PktsIn:     1.3.6.1.4.1.3375.2.2.10.2.3.1.6.".$UID." = ".$fields['pktsin']."\n");
-            d_echo("    PktsOut:    1.3.6.1.4.1.3375.2.2.10.2.3.1.8.".$UID." = ".$fields['pktsout']."\n");
-            d_echo("    BytesIn:    1.3.6.1.4.1.3375.2.2.10.2.3.1.7.".$UID." = ".$fields['bytesin']."\n");
-            d_echo("    BytesOut:   1.3.6.1.4.1.3375.2.2.10.2.3.1.9.".$UID." = ".$fields['bytesout']."\n");
-            d_echo("    TotalConns: 1.3.6.1.4.1.3375.2.2.10.2.3.1.11.".$UID." = ".$fields['totconns']."\n");
 
             // Let's check the status.
             $array['state'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$UID];
@@ -120,9 +114,6 @@ if (count($components > 0)) {
             d_echo("\n\nComponent: ".$key."\n");
             d_echo("    Type: ".$type."\n");
             d_echo("    Label: ".$label."\n");
-            d_echo("    UID: ".$UID."\n");
-            d_echo("    Minimum Up:   1.3.6.1.4.1.3375.2.2.10.2.3.1.6.".$UID." = ".$fields['minup']."\n");
-            d_echo("    Current Up:   1.3.6.1.4.1.3375.2.2.10.2.3.1.8.".$UID." = ".$fields['currup']."\n");
 
             // If we have less pool members than the minimum, we should error.
             if ($array['currentup'] < $array['minup']) {
@@ -158,12 +149,6 @@ if (count($components > 0)) {
             d_echo("\n\nComponent: ".$key."\n");
             d_echo("    Type: ".$type."\n");
             d_echo("    Label: ".$label."\n");
-            d_echo("    UID: ".$UID."\n");
-            d_echo("    PktsIn:     1.3.6.1.4.1.3375.2.2.5.4.3.1.5.".$UID." = ".$fields['pktsin']."\n");
-            d_echo("    PktsOut:    1.3.6.1.4.1.3375.2.2.5.4.3.1.7.".$UID." = ".$fields['pktsout']."\n");
-            d_echo("    BytesIn:    1.3.6.1.4.1.3375.2.2.5.4.3.1.6.".$UID." = ".$fields['bytesin']."\n");
-            d_echo("    BytesOut:   1.3.6.1.4.1.3375.2.2.5.4.3.1.8.".$UID." = ".$fields['bytesout']."\n");
-            d_echo("    TotalConns: 1.3.6.1.4.1.3375.2.2.5.4.3.1.8.".$UID." = ".$fields['totalconns']."\n");
 
             // If available and bad state
             // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue

@@ -97,11 +97,6 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
             if (count($result) > 0) {
                 // Let's log some debugging
                 d_echo("\n\n".$result['type'].": ".$result['label']."\n");
-                d_echo("    IP:      ".$result['IP']."\n");
-                d_echo("    Port:    ".$result['port']."\n");
-                d_echo("    Pool:    ".$result['pool']."\n");
-                d_echo("    UID:     ".$result['UID']."\n");
-                d_echo("    Hash:    ".$result['hash']."\n");
                 d_echo("    Status:  ".$result['status']."\n");
                 d_echo("    Message: ".$result['error']."\n");
 
@@ -149,14 +144,6 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
             if (count($result) > 0) {
                 // Let's log some debugging
                 d_echo("\n\n".$result['type'].": ".$result['label']."\n");
-                d_echo("    UID:               ".$result['UID']."\n");
-                d_echo("    Hash:              ".$result['hash']."\n");
-                d_echo("    Mode:              ".$result['mode']."\n");
-                d_echo("    Minimum Up:        ".$result['minup']."\n");
-                d_echo("    Min Up Status:     ".$result['minupstatus']."\n");
-                d_echo("    Currently Up:      ".$result['currentup']."\n");
-                d_echo("    Minimum Up Action: ".$result['minupaction']."\n");
-                d_echo("    Monitor:           ".$result['monitor']."\n");
                 d_echo("    Status:            ".$result['status']."\n");
                 d_echo("    Message:           ".$result['error']."\n");
 
@@ -206,13 +193,6 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
             if (count($result) > 0) {
                 // Let's log some debugging
                 d_echo("\n\n".$result['type'].": ".$result['label']."\n");
-                d_echo("    UID:      ".$result['UID']."\n");
-                d_echo("    Hash:     ".$result['hash']."\n");
-                d_echo("    IP:       ".$result['IP']."\n");
-                d_echo("    Port:     ".$result['port']."\n");
-                d_echo("    Ratio:    ".$result['ratio']."\n");
-                d_echo("    Weight:   ".$result['weight']."\n");
-                d_echo("    Priority: ".$result['priority']."\n");
                 d_echo("    Status:   ".$result['status']."\n");
                 d_echo("    Message:  ".$result['error']."\n");
 
