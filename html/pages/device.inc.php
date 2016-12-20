@@ -32,9 +32,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
     }
 
-    $component = new LibreNMS\Component();
-    $component_count = $component->getComponentCount($device['device_id']);
-
     echo '<div class="panel panel-default">';
         echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
         require 'includes/device-header.inc.php';
@@ -173,16 +170,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             }
         }
 
-        // F5 LTM
-        if (isset($component_count['f5-ltm-vs'])) {
-            $device_loadbalancer_count['ltm_vs'] = $component_count['f5-ltm-vs'];
-            $loadbalancer_tabs[] = 'ltm_vs';
-        }
-        if (isset($component_count['f5-ltm-pool'])) {
-            $device_loadbalancer_count['ltm_pool'] = $component_count['f5-ltm-pool'];
-            $loadbalancer_tabs[] = 'ltm_pool';
-        }
-
         if (is_array($loadbalancer_tabs)) {
             echo '<li class="'.$select['loadbalancer'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'loadbalancer')).'">
@@ -222,7 +209,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'vrf';
         }
 
-        $device_routing_count['cisco-otv'] = $component_count['Cisco-OTV'];
+        $component = new LibreNMS\Component();
+        $options['type'] = 'Cisco-OTV';
+        $options['filter']['device_id'] = array('=',$device['device_id']);
+        $otv = $component->getComponents(null, $options);
+        $device_routing_count['cisco-otv'] = count($otv);
         if ($device_routing_count['cisco-otv'] > 0) {
             $routing_tabs[] = 'cisco-otv';
         }
