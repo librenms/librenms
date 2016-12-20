@@ -570,7 +570,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
 
 function snmp_cache_portIfIndex($device, $array)
 {
-    $cmd = gen_snmpwalk_cmd($device, 'portIfIndex', ' -CI -Oq', 'CISCO-STACK-MIB');
+    $cmd = gen_snmpwalk_cmd($device, 'portIfIndex', ' -Oq', 'CISCO-STACK-MIB');
     $output    = trim(external_exec($cmd));
 
     foreach (explode("\n", $output) as $entry) {
@@ -588,7 +588,7 @@ function snmp_cache_portIfIndex($device, $array)
 
 function snmp_cache_portName($device, $array)
 {
-    $cmd = gen_snmpwalk_cmd($device, 'portName', ' -CI -OQs', 'CISCO-STACK-MIB');
+    $cmd = gen_snmpwalk_cmd($device, 'portName', ' -OQs', 'CISCO-STACK-MIB');
     $output    = trim(external_exec($cmd));
 
     // echo("Caching: portName\n");
