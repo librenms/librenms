@@ -187,13 +187,9 @@ if ($config['enable_ports_poe']) {
 // foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 // foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
-    $port_stats = snmp_cache_portIfIndex($device, $port_stats);
-    $port_stats = snmp_cache_portName($device, $port_stats);
     foreach ($pagp_oids as $oid) {
         $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
     }
-
-    $data_oids[] = 'portName';
 
     // Grab data to put ports into vlans or make them trunks
     // FIXME we probably shouldn't be doing this from the VTP MIB, right?
