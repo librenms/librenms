@@ -34,7 +34,7 @@ $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 $array    = array(
     'input_voltage' => array('descr' => 'Input','colour' => '630606',),
-    'nominal_voltage' => array('descr' => 'Nominal','colour' => '50C150',),
+    'line_nominal' => array('descr' => 'Nominal','colour' => '50C150',)
 );
 
 $i = 0;
