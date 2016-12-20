@@ -16,7 +16,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($devic
 
     if (is_array($config['device_traffic_descr'])) {
         foreach ($config['device_traffic_descr'] as $ifdescr) {
-            if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName']) || preg_match($ifdescr.'i', $port['portName'])) {
+            if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {
                 $ignore = 1;
             }
         }
