@@ -1699,8 +1699,6 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
-$config['os'][$os]['poller_modules']['loadbalancers']       = 1;
-$config['os'][$os]['discovery_modules']['loadbalancers']    = 1;
 
 $os = 'proxim';
 $config['os'][$os]['text']             = 'Proxim';
