@@ -2472,6 +2472,12 @@ $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['icon']             = 'enterasys';
 $config['os'][$os]['ifname']           = 1;
 
+ // ABB DPA UPScale (Generex CS121 SNMP Adapter)
+$os = 'abbdpaupscale';
+$config['os'][$os]['text'] = 'ABB DPA UPScale';
+$config['os'][$os]['type'] = 'power';
+$config['os'][$os]['icon'] = 'abb';
+
 // Multimatic UPS (Generex CS121 SNMP Adapter)
 $os = 'multimatic';
 $config['os'][$os]['text']                        = 'Multimatic UPS';
