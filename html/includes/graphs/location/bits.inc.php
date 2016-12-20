@@ -18,7 +18,7 @@ foreach ($devices as $device) {
 
         if (is_array($config['device_traffic_descr'])) {
             foreach ($config['device_traffic_descr'] as $ifdescr) {
-                if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName']) || preg_match($ifdescr.'i', $int['portName'])) {
+                if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName'])) {
                     $ignore = 1;
                 }
             }
