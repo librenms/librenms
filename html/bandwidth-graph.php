@@ -1,5 +1,4 @@
 <?php
-
 /**
  * LibreNMS
  *
@@ -9,6 +8,11 @@
  * @subpackage webinterface
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use Amenadiel\JpGraph\Graph\Graph;
+use Amenadiel\JpGraph\Plot\BarPlot;
+use Amenadiel\JpGraph\Plot\GroupBarPlot;
+use Amenadiel\JpGraph\Plot\LinePlot;
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
@@ -37,12 +41,6 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph.php';
-require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_line.php';
-require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_bar.php';
-require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_utils.inc.php';
-require_once $config['install_dir'] . '/html/lib/jpgraph/jpgraph_date.php';
-
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
@@ -59,7 +57,7 @@ if (is_numeric($_GET['bill_id'])) {
     exit;
 }
 
-if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET['bill_hist_id'])) {
     $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to` FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
     if (is_null($histrow)) {
         header("HTTP/1.0 404 Not Found");
@@ -68,8 +66,8 @@ if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
     $start        = $histrow['from'];
     $end          = $histrow['to'];
 } else {
-    $start        = $_GET[from];
-    $end          = $_GET[to];
+    $start        = $_GET['from'];
+    $end          = $_GET['to'];
 }
 
 $xsize = (is_numeric($_GET['x']) ? $_GET['x'] : '800' );

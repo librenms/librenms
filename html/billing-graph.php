@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS
  *
@@ -9,6 +8,9 @@
  * @subpackage billing
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use Amenadiel\JpGraph\Graph\Graph;
+use Amenadiel\JpGraph\Plot\LinePlot;
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
@@ -37,11 +39,6 @@ if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
     }
 }
 
-require $config['install_dir'] . '/html/lib/jpgraph/jpgraph.php';
-require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_line.php';
-require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_utils.inc.php';
-require $config['install_dir'] . '/html/lib/jpgraph/jpgraph_date.php';
-
 if (is_numeric($_GET['bill_id'])) {
     if (get_client_ip() != $_SERVER['SERVER_ADDR']) {
         if (bill_permitted($_GET['bill_id'])) {
@@ -61,7 +58,7 @@ if (is_numeric($_GET['bill_id'])) {
 $rate_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
 $bill_name = $rate_data['bill_name'];
 
-if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET['bill_hist_id'])) {
     $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
     if (is_null($histrow)) {
         header("HTTP/1.0 404 Not Found");
@@ -72,20 +69,20 @@ if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
     $rate_95th    = $histrow['rate_95th'];
     $rate_average = $histrow['rate_average'];
 } else {
-    $start        = $_GET[from];
-    $end          = $_GET[to];
+    $start        = $_GET['from'];
+    $end          = $_GET['to'];
     $rate_95th    = $rate_data['rate_95th'];
     $rate_average = $rate_data['rate_average'];
 }
 
-$xsize = $_GET[x];
-$ysize = $_GET[y];
-$count = $_GET[count];
+$xsize = $_GET['x'];
+$ysize = $_GET['y'];
+$count = $_GET['count'];
 $count = ($count + 0);
 $iter  = 1;
 
-if ($_GET[type]) {
-    $type = $_GET[type];
+if ($_GET['type']) {
+    $type = $_GET['type'];
 } else {
     $type = 'date';
 }
