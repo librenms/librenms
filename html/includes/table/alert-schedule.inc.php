@@ -50,61 +50,61 @@ $sql = "SELECT `S`.`schedule_id`, `S`.`recurring`, DATE_FORMAT(NOW(), '".$config
 
 foreach (dbFetchRows($sql, $param) as $schedule) {
     $status = 0;
-    if ($schedule['recurring'] == 0){
-	    $start  = strtotime($schedule['start']);
-	    $end    = strtotime($schedule['end']);
-	    $now    = strtotime($schedule['now']);
-	    if ($end < $now) {
-	        $status = 1;
-	    }
-	
-	    if ($now >= $start && $now < $end) {
-	        $status = 2;
-	    }	    
-    }else{
-	    $start = strtotime($schedule['start_recurring_dt']); 
-	    $end = $schedule['end_recurring_dt'] != '' && $schedule['end_recurring_dt'] != '0000-00-00' ? strtotime($schedule['end_recurring_dt'].' '. $schedule['end_recurring_hr']) : 0; 
-	    $now    = strtotime($schedule['now']);
-	    if ($end < $now && $end != 0){
-		    $status =1;
-	    }
-	    if ($start <= $now && ($now <= $end || $end == 0)){
-		    $status = 2;
-	    }
+    if ($schedule['recurring'] == 0) {
+        $start  = strtotime($schedule['start']);
+        $end    = strtotime($schedule['end']);
+        $now    = strtotime($schedule['now']);
+        if ($end < $now) {
+            $status = 1;
+        }
+    
+        if ($now >= $start && $now < $end) {
+            $status = 2;
+        }
+    } else {
+        $start = strtotime($schedule['start_recurring_dt']);
+        $end = $schedule['end_recurring_dt'] != '' && $schedule['end_recurring_dt'] != '0000-00-00' ? strtotime($schedule['end_recurring_dt'].' '. $schedule['end_recurring_hr']) : 0;
+        $now    = strtotime($schedule['now']);
+        if ($end < $now && $end != 0) {
+            $status =1;
+        }
+        if ($start <= $now && ($now <= $end || $end == 0)) {
+            $status = 2;
+        }
     }
-	$table_rd = '';
-	if ($schedule['recurring_day'] != ''){
-		$array_days = array(
-			0 => 'Su',
-			1 => 'Mo',
-			2 => 'Tu',
-			3 => 'We',
-			4 => 'Th',
-			5 => 'Fr',
-			6 => 'Sa'
-		);
-		$array_rd = explode(',', $schedule['recurring_day']);
+    $table_rd = '';
+    if ($schedule['recurring_day'] != '') {
+        $array_days = array(
+            0 => 'Su',
+            1 => 'Mo',
+            2 => 'Tu',
+            3 => 'We',
+            4 => 'Th',
+            5 => 'Fr',
+            6 => 'Sa'
+        );
+        $array_rd = explode(',', $schedule['recurring_day']);
 
-		foreach	($array_rd as $key_rd => $val_rd){
-			if (array_key_exists($val_rd, $array_days)){
-				$table_rd .= $table_rd != '' ? ','. $array_days[$val_rd] : $array_days[$val_rd];
-			}
-		}
-	}
+        foreach ($array_rd as $key_rd => $val_rd) {
+            if (array_key_exists($val_rd, $array_days)) {
+                $table_rd .= $table_rd != '' ? ','. $array_days[$val_rd] : $array_days[$val_rd];
+            }
+        }
+    }
 
 
     $response[] = array(
-        'title'  				=> $schedule['title'],
-        'recurring'  			=> $schedule['recurring'] == 1 ? 'yes' : 'no',
-        'start'  				=> $schedule['recurring'] == 1 ? '' : $schedule['start'],
-        'end'    				=> $schedule['recurring'] == 1 ? '' : $schedule['end'],
-        'start_recurring_dt'  	=> $schedule['recurring'] == 0 || $schedule['start_recurring_dt'] == '0000-00-00' ? '' : $schedule['start_recurring_dt'],
-        'end_recurring_dt' 		=> $schedule['recurring'] == 0 || $schedule['end_recurring_dt'] == '0000-00-00' ? '' : $schedule['end_recurring_dt'],
-        'start_recurring_hr'  	=> $schedule['recurring'] == 0 ? '' : substr($schedule['start_recurring_hr'], 0, 5),
-        'end_recurring_hr' 		=> $schedule['recurring'] == 0 ? '' : substr($schedule['end_recurring_hr'], 0, 5),
-        'recurring_day'	 		=> $schedule['recurring'] == 0 ? '' : $table_rd,
-        'id'				    => $schedule['schedule_id'],
-        'status'				=> $status,
+        'title'                  => $schedule['title'],
+        'recurring'              => $schedule['recurring'] == 1 ? 'yes' : 'no',
+        'start'                  => $schedule['recurring'] == 1 ? '' : $schedule['start'],
+        'end'                    => $schedule['recurring'] == 1 ? '' : $schedule['end'],
+        'start_recurring_dt'      => $schedule['recurring'] == 0 || $schedule['start_recurring_dt'] == '0000-00-00' ? '' : $schedule['start_recurring_dt'],
+        'end_recurring_dt'         => $schedule['recurring'] == 0 || $schedule['end_recurring_dt'] == '0000-00-00' ? '' : $schedule['end_recurring_dt'],
+        'start_recurring_hr'      => $schedule['recurring'] == 0 ? '' : substr($schedule['start_recurring_hr'], 0, 5),
+        'end_recurring_hr'         => $schedule['recurring'] == 0 ? '' : substr($schedule['end_recurring_hr'], 0, 5),
+        'recurring_day'             => $schedule['recurring'] == 0 ? '' : $table_rd,
+        'id'                    => $schedule['schedule_id'],
+        'status'                => $status,
     );
 }
 
