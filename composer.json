@@ -12,12 +12,15 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
+    "config": {
+        "platform": {"php": "5.3.9"}
+    },
     "require": {
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2",
         "slim/slim": "^2.6",
         "easybook/geshi": "^1.0.8",
-        "amenadiel/jpgraph": "3.6.6",
+        "amenadiel/jpgraph": "^3.6",
         "tecnickcom/tcpdf": "~6.2.0",
         "xjtuwangke/passwordhash": "dev-master",
         "pear/console_color2": "^0.1",
@@ -37,5 +40,8 @@
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Tests\\": "tests"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": "git ls-files -z vendor/ | xargs -0 git update-index --assume-unchanged"
     }
 }

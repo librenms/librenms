@@ -123,9 +123,9 @@ project.
     - Include its name, source URL, copyright notice, and license in doc/General/Credits.md
 
 - To add a php dependency, please use composer
-    - Clean your vendor directory. `git clean -x -f vendor/`
-    - Add the dependency `composer require slim/slim`
-    - Add the files and commit `git add -f vendor/`
+    - Clean your vendor directory. `git checkout vendor/;git clean -x -d -f vendor/`
+    - Add the dependency `composer require --update-no-dev -o slim/slim`
+    - Add the files and commit `git add -f vendor/ composer.json; git commit`
 
 - To add a javascript or other dependency
     - Where possible please include libraries in the lib/ folder.
@@ -158,7 +158,7 @@ project.
 
   Please note that the above is necessary even if you don't care about
   keeping the copyright to your code, because otherwise we could be accused
-  of misappropriating Obserivum's code.  As the code bases develop, we
+  of misappropriating Observium's code.  As the code bases develop, we
   expect them to diverge, which means this will become less of an issue
   anyway.
 
