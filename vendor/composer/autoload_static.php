@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5
+class ComposerStaticInit272059f49825f0adab6de160cf59ca72
 {
     public static $files = array (
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
@@ -559,6 +559,7 @@ class ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5
         'PhpAmqpLib\\Wire\\IO\\AbstractIO' => __DIR__ . '/..' . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/AbstractIO.php',
         'PhpAmqpLib\\Wire\\IO\\SocketIO' => __DIR__ . '/..' . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/SocketIO.php',
         'PhpAmqpLib\\Wire\\IO\\StreamIO' => __DIR__ . '/..' . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/StreamIO.php',
+        'Phpass\\PasswordHash' => __DIR__ . '/..' . '/xjtuwangke/passwordhash/src/Phpass/PasswordHash.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
         'SMTP' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.smtp.php',
         'SlimFlashTest' => __DIR__ . '/..' . '/slim/slim/tests/Middleware/FlashTest.php',
@@ -603,10 +604,10 @@ class ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitb5da051f4e96b9a7139a041fca044ff5::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit272059f49825f0adab6de160cf59ca72::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit272059f49825f0adab6de160cf59ca72::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit272059f49825f0adab6de160cf59ca72::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit272059f49825f0adab6de160cf59ca72::$classMap;
 
         }, null, ClassLoader::class);
     }

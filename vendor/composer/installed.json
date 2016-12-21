@@ -1,152 +1,5 @@
 [
     {
-        "name": "amenadiel/jpgraph",
-        "version": "3.6.6",
-        "version_normalized": "3.6.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/HuasoFoundries/jpgraph.git",
-            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/6596bdfd8c406672bd165bf7754df1130158ddac",
-            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac",
-            "shasum": ""
-        },
-        "require": {
-            "ext-gd": "*",
-            "php": ">=5.3.0"
-        },
-        "time": "2016-03-11 13:58:40",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Amenadiel\\JpGraph\\": "src/",
-                "Amenadiel\\JpGraph\\Graph\\": "src/graph",
-                "Amenadiel\\JpGraph\\Image\\": "src/image",
-                "Amenadiel\\JpGraph\\Plot\\": "src/plot",
-                "Amenadiel\\JpGraph\\Text\\": "src/text",
-                "Amenadiel\\JpGraph\\Themes\\": "src/themes",
-                "Amenadiel\\JpGraph\\Util\\": "src/util"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "QPL 1.0"
-        ],
-        "description": "jpGraph, library to make graphs and charts",
-        "homepage": "http://jpgraph.net/",
-        "keywords": [
-            "chart",
-            "data",
-            "graph",
-            "jpgraph",
-            "pie"
-        ]
-    },
-    {
-        "name": "dapphp/radius",
-        "version": "2.5.0",
-        "version_normalized": "2.5.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dapphp/radius.git",
-            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/dapphp/radius/zipball/72df4f8dc82281e7364b23212bbf16df6232151e",
-            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "dev-master"
-        },
-        "time": "2016-08-01 23:26:47",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Dapphp\\Radius\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL-3.0"
-        ],
-        "authors": [
-            {
-                "name": "Drew Phillips",
-                "email": "drew@drew-phillips.com",
-                "homepage": "https://drew-phillips.com/"
-            },
-            {
-                "name": "SysCo/al",
-                "homepage": "http://developer.sysco.ch/php/"
-            }
-        ],
-        "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
-        "homepage": "https://github.com/dapphp/radius",
-        "keywords": [
-            "Authentication",
-            "authorization",
-            "radius"
-        ]
-    },
-    {
-        "name": "easybook/geshi",
-        "version": "v1.0.8.18",
-        "version_normalized": "1.0.8.18",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/easybook/geshi.git",
-            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/easybook/geshi/zipball/4b06bfe8c6fbedd6aad0a0700d650f591386e287",
-            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">4.3.0"
-        },
-        "time": "2016-10-05 07:15:42",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "./"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-2.0"
-        ],
-        "authors": [
-            {
-                "name": "Nigel McNie",
-                "email": "nigel@geshi.org"
-            },
-            {
-                "name": "Benny Baumann",
-                "email": "BenBE@geshi.org"
-            }
-        ],
-        "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
-        "homepage": "http://qbnz.com/highlighter",
-        "keywords": [
-            "highlight",
-            "highlighter",
-            "syntax"
-        ]
-    },
-    {
         "name": "ezyang/htmlpurifier",
         "version": "v4.8.0",
         "version_normalized": "4.8.0.0",
@@ -190,6 +43,52 @@
         "homepage": "http://htmlpurifier.org/",
         "keywords": [
             "html"
+        ]
+    },
+    {
+        "name": "xjtuwangke/passwordhash",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/xjtuwangke/passwordhash.git",
+            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/xjtuwangke/passwordhash/zipball/a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
+            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2012-08-31 00:00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Phpass": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Public Domain"
+        ],
+        "authors": [
+            {
+                "name": "Solar Designer",
+                "email": "solar@openwall.com",
+                "homepage": "http://openwall.com/phpass/"
+            }
+        ],
+        "description": "Portable PHP password hashing framework",
+        "homepage": "http://github.com/xjtuwangke/passwordhash/",
+        "keywords": [
+            "blowfish",
+            "crypt",
+            "password",
+            "security"
         ]
     },
     {
@@ -298,49 +197,6 @@
         "homepage": "http://pear.php.net/package/Console_Table/",
         "keywords": [
             "console"
-        ]
-    },
-    {
-        "name": "php-amqplib/php-amqplib",
-        "version": "v2.0.2",
-        "version_normalized": "2.0.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-amqplib/php-amqplib.git",
-            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/682e3365f51c455f7a0bd32173d79922416fe9f0",
-            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2013-02-13 19:43:51",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "PhpAmqpLib": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL-2.1"
-        ],
-        "authors": [
-            {
-                "name": "Alvaro Videla"
-            }
-        ],
-        "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
-        "homepage": "https://github.com/videlalvaro/php-amqplib/",
-        "keywords": [
-            "message",
-            "queue",
-            "rabbitmq"
         ]
     },
     {
@@ -454,6 +310,101 @@
         ]
     },
     {
+        "name": "easybook/geshi",
+        "version": "v1.0.8.18",
+        "version_normalized": "1.0.8.18",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/easybook/geshi.git",
+            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/easybook/geshi/zipball/4b06bfe8c6fbedd6aad0a0700d650f591386e287",
+            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">4.3.0"
+        },
+        "time": "2016-10-05 07:15:42",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "./"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0"
+        ],
+        "authors": [
+            {
+                "name": "Nigel McNie",
+                "email": "nigel@geshi.org"
+            },
+            {
+                "name": "Benny Baumann",
+                "email": "BenBE@geshi.org"
+            }
+        ],
+        "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
+        "homepage": "http://qbnz.com/highlighter",
+        "keywords": [
+            "highlight",
+            "highlighter",
+            "syntax"
+        ]
+    },
+    {
+        "name": "amenadiel/jpgraph",
+        "version": "3.6.6",
+        "version_normalized": "3.6.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/HuasoFoundries/jpgraph.git",
+            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/6596bdfd8c406672bd165bf7754df1130158ddac",
+            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac",
+            "shasum": ""
+        },
+        "require": {
+            "ext-gd": "*",
+            "php": ">=5.3.0"
+        },
+        "time": "2016-03-11 13:58:40",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Amenadiel\\JpGraph\\": "src/",
+                "Amenadiel\\JpGraph\\Graph\\": "src/graph",
+                "Amenadiel\\JpGraph\\Image\\": "src/image",
+                "Amenadiel\\JpGraph\\Plot\\": "src/plot",
+                "Amenadiel\\JpGraph\\Text\\": "src/text",
+                "Amenadiel\\JpGraph\\Themes\\": "src/themes",
+                "Amenadiel\\JpGraph\\Util\\": "src/util"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "QPL 1.0"
+        ],
+        "description": "jpGraph, library to make graphs and charts",
+        "homepage": "http://jpgraph.net/",
+        "keywords": [
+            "chart",
+            "data",
+            "graph",
+            "jpgraph",
+            "pie"
+        ]
+    },
+    {
         "name": "tecnickcom/tcpdf",
         "version": "6.2.12",
         "version_normalized": "6.2.12.0",
@@ -519,49 +470,98 @@
         ]
     },
     {
-        "name": "xjtuwangke/passwordhash",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
+        "name": "dapphp/radius",
+        "version": "2.5.0",
+        "version_normalized": "2.5.0.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/xjtuwangke/passwordhash.git",
-            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3"
+            "url": "https://github.com/dapphp/radius.git",
+            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/xjtuwangke/passwordhash/zipball/a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
-            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
+            "url": "https://api.github.com/repos/dapphp/radius/zipball/72df4f8dc82281e7364b23212bbf16df6232151e",
+            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.3"
+            "php": ">=5.3"
         },
-        "time": "2014-07-16 15:38:21",
+        "require-dev": {
+            "phpunit/phpunit": "dev-master"
+        },
+        "time": "2016-08-01 23:26:47",
         "type": "library",
-        "installation-source": "source",
+        "installation-source": "dist",
         "autoload": {
-            "psr-0": {
-                "Phpass": "src/"
+            "psr-4": {
+                "Dapphp\\Radius\\": "src/"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "Public Domain"
+            "LGPL-3.0"
         ],
         "authors": [
             {
-                "name": "Solar Designer",
-                "email": "solar@openwall.com",
-                "homepage": "http://openwall.com/phpass/"
+                "name": "Drew Phillips",
+                "email": "drew@drew-phillips.com",
+                "homepage": "https://drew-phillips.com/"
+            },
+            {
+                "name": "SysCo/al",
+                "homepage": "http://developer.sysco.ch/php/"
             }
         ],
-        "description": "Portable PHP password hashing framework",
-        "homepage": "http://github.com/xjtuwangke/passwordhash/",
+        "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
+        "homepage": "https://github.com/dapphp/radius",
         "keywords": [
-            "blowfish",
-            "crypt",
-            "password",
-            "security"
+            "Authentication",
+            "authorization",
+            "radius"
+        ]
+    },
+    {
+        "name": "php-amqplib/php-amqplib",
+        "version": "v2.0.2",
+        "version_normalized": "2.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-amqplib/php-amqplib.git",
+            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/682e3365f51c455f7a0bd32173d79922416fe9f0",
+            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2013-02-13 19:43:51",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "PhpAmqpLib": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Alvaro Videla"
+            }
+        ],
+        "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
+        "homepage": "https://github.com/videlalvaro/php-amqplib/",
+        "keywords": [
+            "message",
+            "queue",
+            "rabbitmq"
         ]
     }
 ]

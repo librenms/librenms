@@ -454,6 +454,7 @@ return array(
     'PhpAmqpLib\\Wire\\IO\\AbstractIO' => $vendorDir . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/AbstractIO.php',
     'PhpAmqpLib\\Wire\\IO\\SocketIO' => $vendorDir . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/SocketIO.php',
     'PhpAmqpLib\\Wire\\IO\\StreamIO' => $vendorDir . '/php-amqplib/php-amqplib/PhpAmqpLib/Wire/IO/StreamIO.php',
+    'Phpass\\PasswordHash' => $vendorDir . '/xjtuwangke/passwordhash/src/Phpass/PasswordHash.php',
     'QRcode' => $vendorDir . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
     'SMTP' => $vendorDir . '/phpmailer/phpmailer/class.smtp.php',
     'SlimFlashTest' => $vendorDir . '/slim/slim/tests/Middleware/FlashTest.php',
