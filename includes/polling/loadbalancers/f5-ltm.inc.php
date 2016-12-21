@@ -44,14 +44,30 @@ $components = $keep;
 // Only collect SNMP data if we have enabled components
 if (count($components > 0)) {
     // Let's gather the stats..
-    $ltmVirtualServStatEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1', 0);
-    $ltmPoolMemberStatEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1', 0);
-    $sysGlobalHttpStat = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.1.1.2.4', 0);
+    $ltmVirtualServStatEntryPktsin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
+    $ltmVirtualServStatEntryPktsout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);
+    $ltmVirtualServStatEntryBytesin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
+    $ltmVirtualServStatEntryBytesout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
+    $ltmVirtualServStatEntryTotconns = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
+
+    $ltmPoolMemberStatEntryPktsin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
+    $ltmPoolMemberStatEntryPktsout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
+    $ltmPoolMemberStatEntryBytesin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
+    $ltmPoolMemberStatEntryBytesout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
+    $ltmPoolMemberStatEntryTotconns = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
 
     // and check the status
-    $ltmVsStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1', 0);
-    $ltmPoolMbrStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1', 0);
-    $ltmPoolEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1', 0);
+    $ltmVsStatusEntryState = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
+    $ltmVsStatusEntryMsg = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.5', 0);
+
+    $ltmPoolMbrStatusEntryState = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
+    $ltmPoolMbrStatusEntryAvail = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
+    $ltmPoolMbrStatusEntryMsg = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
+
+    $ltmPoolEntryMinup = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
+    $ltmPoolEntryMinupstatus = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
+    $ltmPoolEntryMinupaction = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
+    $ltmPoolEntryCurrentup = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
@@ -71,11 +87,11 @@ if (count($components > 0)) {
             );
 
             $fields = array(
-                'pktsin' => $ltmVirtualServStatEntry['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.'.$UID],
-                'pktsout' => $ltmVirtualServStatEntry['1.3.6.1.4.1.3375.2.2.10.2.3.1.8.'.$UID],
-                'bytesin' => $ltmVirtualServStatEntry['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.'.$UID],
-                'bytesout' => $ltmVirtualServStatEntry['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.'.$UID],
-                'totconns' => $ltmVirtualServStatEntry['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.'.$UID],
+                'pktsin' => $ltmVirtualServStatEntryPktsin['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.'.$UID],
+                'pktsout' => $ltmVirtualServStatEntryPktsout['1.3.6.1.4.1.3375.2.2.10.2.3.1.8.'.$UID],
+                'bytesin' => $ltmVirtualServStatEntryBytesin['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.'.$UID],
+                'bytesout' => $ltmVirtualServStatEntryBytesout['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.'.$UID],
+                'totconns' => $ltmVirtualServStatEntryTotconns['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.'.$UID],
             );
 
             // Let's print some debugging info.
@@ -84,11 +100,11 @@ if (count($components > 0)) {
             d_echo("    Label: ".$label."\n");
 
             // Let's check the status.
-            $array['state'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$UID];
+            $array['state'] = $ltmVsStatusEntryState['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$UID];
             if (($array['state'] == 2) || ($array['state'] == 3)) {
                 // The Virtual Server is unavailable.
                 $array['status'] = 2;
-                $array['error'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$UID];
+                $array['error'] = $ltmVsStatusEntryMsg['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$UID];
             } else {
                 // All is good.
                 $array['status'] = 0;
@@ -100,10 +116,10 @@ if (count($components > 0)) {
                 'DS:currup:GAUGE:600:0:U',
             );
 
-            $array['minup'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
-            $array['minupstatus'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$index];
-            $array['currentup'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
-            $array['minupaction'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
+            $array['minup'] = $ltmPoolEntryMinup['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
+            $array['minupstatus'] = $ltmPoolEntryMinupstatus['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$index];
+            $array['currentup'] = $ltmPoolEntryCurrentup['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
+            $array['minupaction'] = $ltmPoolEntryMinupaction['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
 
             $fields = array(
                 'minup' => $array['minup'],
@@ -134,15 +150,15 @@ if (count($components > 0)) {
                 'DS:totconns:COUNTER:600:0:U',
             );
 
-            $array['state'] = $ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];
-            $array['available'] = $ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$UID];
+            $array['state'] = $ltmPoolMbrStatusEntryState['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];
+            $array['available'] = $ltmPoolMbrStatusEntryAvail['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$UID];
 
             $fields = array(
-                'pktsin' => $ltmPoolMemberStatEntry['1.3.6.1.4.1.3375.2.2.5.4.3.1.5.'.$UID],
-                'pktsout' => $ltmPoolMemberStatEntry['1.3.6.1.4.1.3375.2.2.5.4.3.1.7.'.$UID],
-                'bytesin' => $ltmPoolMemberStatEntry['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
-                'bytesout' => $ltmPoolMemberStatEntry['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
-                'totalconns' => $ltmPoolMemberStatEntry['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
+                'pktsin' => $ltmPoolMemberStatEntryPktsin['1.3.6.1.4.1.3375.2.2.5.4.3.1.5.'.$UID],
+                'pktsout' => $ltmPoolMemberStatEntryPktsout['1.3.6.1.4.1.3375.2.2.5.4.3.1.7.'.$UID],
+                'bytesin' => $ltmPoolMemberStatEntryBytesin['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
+                'bytesout' => $ltmPoolMemberStatEntryBytesout['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
+                'totalconns' => $ltmPoolMemberStatEntryTotconns['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
             );
 
             // Let's print some debugging info.
@@ -155,7 +171,7 @@ if (count($components > 0)) {
             if (($array['available'] == 1) && ($array['state'] == 3)) {
                 // Warning Alarm, the pool member is down.
                 $array['status'] = 1;
-                $array['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$UID];
+                $array['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntryMsg['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$UID];
             } else {
                 // All is good.
                 $array['status'] = 0;
