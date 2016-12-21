@@ -2470,14 +2470,36 @@ $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['icon']             = 'enterasys';
 $config['os'][$os]['ifname']           = 1;
 
-// Multimatic UPS (Generex CS121 SNMP Adapter)
-$os = 'multimatic';
-$config['os'][$os]['text']                        = 'Multimatic UPS';
-$config['os'][$os]['type']                        = 'power';
-$config['os'][$os]['icon']                        = 'multimatic';
-$config['os'][$os]['poller_modules']['ospf']      = 0;
-$config['os'][$os]['poller_modules']['ntp']       = 0;
-$config['os'][$os]['poller_modules']['services']  = 0;
+// Generex CS121 / CS141 UPS SNMP Adapter
+$os = 'generex-ups';
+$config['os'][$os]['text']                          = 'Generex UPS SNMP adapter';
+$config['os'][$os]['type']                          = 'power';
+$config['os'][$os]['icon']                          = 'generex-ups';
+$config['os'][$os]['discovery_modules']['storage']              = 0;
+$config['os'][$os]['discovery_modules']['bgp-peers']            = 0;
+$config['os'][$os]['discovery_modules']['ntp']                  = 0;
+$config['os'][$os]['discovery_modules']['stp']                  = 0;
+$config['os'][$os]['discovery_modules']['diskio']               = 0;
+$config['os'][$os]['discovery_modules']['vlans']                = 0;
+$config['os'][$os]['discovery_modules']['arp-table']            = 0;
+$config['os'][$os]['discovery_modules']['discovery-protocols']  = 0;
+$config['os'][$os]['discovery_modules']['hr-device']            = 0;
+$config['os'][$os]['discovery_modules']['mempools']             = 0;
+$config['os'][$os]['discovery_modules']['entity-physical']      = 0;
+$config['os'][$os]['discovery_modules']['ports-stack']          = 0;
+$config['os'][$os]['discovery_modules']['ucd-diskio']           = 0;
+$config['os'][$os]['discovery_modules']['processors']           = 0;
+$config['os'][$os]['poller_modules']['ospf']        = 0;
+$config['os'][$os]['poller_modules']['ntp']         = 0;
+$config['os'][$os]['poller_modules']['services']    = 0;
+$config['os'][$os]['poller_modules']['ntp']         = 0;
+$config['os'][$os]['poller_modules']['ospf']        = 0;
+$config['os'][$os]['poller_modules']['services']    = 0;
+$config['os'][$os]['poller_modules']['storage']     = 0;
+$config['os'][$os]['over'][0]['graph']              = 'device_voltage';
+$config['os'][$os]['over'][0]['text']               = 'Voltage';
+$config['os'][$os]['over'][1]['graph']              = 'sensor_voltage';
+$config['os'][$os]['over'][1]['text']               = 'Battery Voltage';
 
 // Huawei UPS
 $os = 'huaweiups';
