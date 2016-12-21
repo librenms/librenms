@@ -1460,6 +1460,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testZywall()
     {
         $this->checkOS('zywall');
+        $this->checkOS('zywall', 'zywall1');
     }
 
     public function testZyxelnwa()
