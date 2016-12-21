@@ -119,10 +119,15 @@ be sure to note this as a comment in the code (preferably) or the commit
 message.  Accurate attribution is crucial to our success as a Free Software
 project.
 
-- To incorporate larger blocks of code from third parties (e.g. JavaScript
-  libraries):
-    - Include its name, source URL, copyright notice, and license in
-      doc/General/Credits.md
+- For any dependency
+    - Include its name, source URL, copyright notice, and license in doc/General/Credits.md
+
+- To add a php dependency, please use composer
+    - Clean your vendor directory. `git clean -x -f vendor/`
+    - Add the dependency `composer require slim/slim`
+    - Add the files and commit `git add -f vendor/`
+
+- To add a javascript or other dependency
     - Where possible please include libraries in the lib/ folder.
     - Add it in a separate commit into its own directory, using
       git subtree if it is available via git:
@@ -131,9 +136,7 @@ project.
       ```ssh
       git subtree add --squash --prefix=lib/jquery-bootgrid https://github.com/rstaib/jquery-bootgrid.git master
       ```
-    - Add the code to integrate it in a separate commit.  Include:
-        - code to update it in Makefile
-	- Scrutinizer exclusions to .scrutinizer.yml (not needed if added to lib/ folder).
+    - Add the code to integrate it in a separate commit.
 	- symlinks where necessary to maintain sensible paths
 
 - Don't submit code whose license conflicts with the GPLv3.  If you're not
