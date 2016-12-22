@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' IP-FORWARD';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them

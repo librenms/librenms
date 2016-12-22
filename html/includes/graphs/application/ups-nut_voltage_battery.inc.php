@@ -34,7 +34,8 @@ $addarea       = 1;
 $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', 'ups-nut', $app['app_id']));
 $array    = array(
-    'battery_voltage' => array('descr' => 'Current','colour' => '50C150',),
+    'battery_voltage' => array('descr' => 'Input','colour' => '630606',),
+    'battery_nominal' => array('descr' => 'Nominal','colour' => '50C150',)
 );
 
 $i = 0;

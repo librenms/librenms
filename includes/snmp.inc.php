@@ -568,46 +568,6 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
 }//end snmp_cache_port_oids()
 
 
-function snmp_cache_portIfIndex($device, $array)
-{
-    $cmd = gen_snmpwalk_cmd($device, 'portIfIndex', ' -CI -Oq', 'CISCO-STACK-MIB');
-    $output    = trim(external_exec($cmd));
-
-    foreach (explode("\n", $output) as $entry) {
-        $entry                    = str_replace('CISCO-STACK-MIB::portIfIndex.', '', $entry);
-        list($slotport, $ifIndex) = explode(' ', $entry, 2);
-        if ($slotport && $ifIndex) {
-            $array[$ifIndex]['portIfIndex'] = $slotport;
-            $array[$slotport]['ifIndex']    = $ifIndex;
-        }
-    }
-
-    return $array;
-}//end snmp_cache_portIfIndex()
-
-
-function snmp_cache_portName($device, $array)
-{
-    $cmd = gen_snmpwalk_cmd($device, 'portName', ' -CI -OQs', 'CISCO-STACK-MIB');
-    $output    = trim(external_exec($cmd));
-
-    // echo("Caching: portName\n");
-    foreach (explode("\n", $output) as $entry) {
-        $entry = str_replace('portName.', '', $entry);
-        list($slotport, $portName) = explode('=', $entry, 2);
-        $slotport                  = trim($slotport);
-        $portName                  = trim($portName);
-        if ($array[$slotport]['ifIndex']) {
-            $ifIndex = $array[$slotport]['ifIndex'];
-            $array[$slotport]['portName'] = $portName;
-            $array[$ifIndex]['portName']  = $portName;
-        }
-    }
-
-    return $array;
-}//end snmp_cache_portName()
-
-
 function snmp_gen_auth(&$device)
 {
     global $debug, $vdebug;

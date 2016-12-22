@@ -19,6 +19,8 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
                 break;
         }
         $value = snmp_get($device, $oid.$freq, '-Oqve');
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid.$freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+        if (is_numeric($value)) {
+            discover_sensor($valid['sensor'], 'frequency', $device, $oid.$freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+        }
     }
 }

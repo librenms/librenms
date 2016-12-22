@@ -86,7 +86,7 @@ function get_port_stats_by_port_hostname()
     $hostname  = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
-    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?', array($device_id, $ifName));
+    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
 
     $in_rate = $port['ifInOctets_rate'] * 8;
     $out_rate = $port['ifOutOctets_rate'] * 8;
