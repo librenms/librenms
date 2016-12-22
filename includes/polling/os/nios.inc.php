@@ -7,12 +7,12 @@ $hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-M
 ##############
 # Create ddns update rrd
 ##############
-$mibs = '+IB-DNSONE-MIB';
+$mibs = 'IB-DNSONE-MIB';
 $oids =
-    'IB-DNSONE-MIB::ibDDNSUpdateSuccess.0 ' .
-    'IB-DNSONE-MIB::ibDDNSUpdateFailure.0 ' .
-    'IB-DNSONE-MIB::ibDDNSUpdatePrerequisiteReject.0 ' .
-    'IB-DNSONE-MIB::ibDDNSUpdateReject.0';
+    'ibDDNSUpdateSuccess.0 ' .
+    'ibDDNSUpdateFailure.0 ' .
+    'ibDDNSUpdatePrerequisiteReject.0 ' .
+    'ibDDNSUpdateReject.0';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -39,10 +39,10 @@ $graphs['ib_dns_dyn_updates'] = true;
 ##################
 # Create dns performance graph (latency)
 ##################
-$mibs = '+IB-PLATFORMONE-MIB';
+$mibs = 'IB-PLATFORMONE-MIB';
 $oids =
-    'IB-PLATFORMONE-MIB::ibNetworkMonitorDNSNonAAT1AvgLatency.0 ' .
-    'IB-PLATFORMONE-MIB::ibNetworkMonitorDNSAAT1AvgLatency.0';
+    'ibNetworkMonitorDNSNonAAT1AvgLatency.0 ' .
+    'ibNetworkMonitorDNSAAT1AvgLatency.0';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -63,12 +63,12 @@ $graphs['ib_dns_performance'] = true;
 ##################
 # Create dns request return code graph
 ##################
-$mibs = '+IB-DNSONE-MIB';
+$mibs = 'IB-DNSONE-MIB';
 $oids =
-    'IB-DNSONE-MIB::ibBindZoneFailure.\"summary\" ' .
-    'IB-DNSONE-MIB::ibBindZoneNxDomain.\"summary\" ' .
-    'IB-DNSONE-MIB::ibBindZoneNxRRset.\"summary\" ' .
-    'IB-DNSONE-MIB::ibBindZoneSuccess.\"summary\"';
+    'ibBindZoneFailure.\"summary\" ' .
+    'ibBindZoneNxDomain.\"summary\" ' .
+    'ibBindZoneNxRRset.\"summary\" ' .
+    'ibBindZoneSuccess.\"summary\"';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -94,17 +94,17 @@ $graphs['ib_dns_request_return_codes'] = true;
 ##################
 # Create dhcp messages graph
 ##################
-$mibs = '+IB-DHCPONE-MIB';
+$mibs = 'IB-DHCPONE-MIB';
 $oids =
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfAcks.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfDeclines.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfDiscovers.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfInforms.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfNacks.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfOffers.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfOthers.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfReleases.0 ' .
-    'IB-DHCPONE-MIB::ibDhcpTotalNoOfRequests.0';
+    'ibDhcpTotalNoOfAcks.0 ' .
+    'ibDhcpTotalNoOfDeclines.0 ' .
+    'ibDhcpTotalNoOfDiscovers.0 ' .
+    'ibDhcpTotalNoOfInforms.0 ' .
+    'ibDhcpTotalNoOfNacks.0 ' .
+    'ibDhcpTotalNoOfOffers.0 ' .
+    'ibDhcpTotalNoOfOthers.0 ' .
+    'ibDhcpTotalNoOfReleases.0 ' .
+    'ibDhcpTotalNoOfRequests.0';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
