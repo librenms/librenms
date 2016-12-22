@@ -57,7 +57,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     // FIXME
     $query = 'SELECT * FROM (SELECT @rownum :=0) r,
         (
-            SELECT @rownum := @rownum +1 AS rownum, `device_id`
+            SELECT @rownum := @rownum +1 AS rownum, `devices`.*
             FROM `devices`
             WHERE `disabled` = 0
             ORDER BY `device_id` ASC
