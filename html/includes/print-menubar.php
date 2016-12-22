@@ -490,6 +490,16 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp']) {
             <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><i class="fa fa-external-link fa-rotate-180 fa-fw fa-lg" aria-hidden="true"></i> BGP Internal</a></li>');
 }
 
+    // CEF info
+if ($_SESSION['userlevel'] >= '5' && $routing_count['cef']) {
+    if ($separator) {
+        echo('            <li role="presentation" class="divider"></li>');
+        $separator = 0;
+    }
+    echo('<li><a href="routing/protocol=cef/"><i class="fa fa-exchange fa-fw fa-lg" aria-hidden="true"></i> Cisco CEF </a></li>');
+    $separator++;
+}
+
   // Do Alerts at the bottom
 if ($bgp_alerts) {
     echo('
