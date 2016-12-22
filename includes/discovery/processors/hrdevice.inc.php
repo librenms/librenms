@@ -62,10 +62,6 @@ if (is_array($hrDevice_array)) {
             $descr = str_replace('(TM)', '', $descr);
             $descr = str_replace('(R)', '', $descr);
 
-            $old_name = array('hrProcessor', $index);
-            $new_name = array('processor', 'hr', $index);
-            rrd_file_rename($device, $old_name, $new_name);
-
             if ($device['os'] == 'arista-eos' && $index == '1') {
                 unset($descr);
             }
