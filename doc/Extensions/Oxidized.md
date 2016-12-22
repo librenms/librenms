@@ -43,8 +43,6 @@ You will need to configure default credentials for your devices in the Oxidized 
         debug: false
         http:
           url: https://librenms/api/v0/oxidized
-          scheme: https
-          delimiter: !ruby/regexp /:/
           map:
             name: hostname
             model: os
@@ -75,6 +73,12 @@ To match on a device os of edgeos then please use the following:
 
 ```php
 $config['oxidized']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
+```
+
+Verify the return of groups by querying the API:
+
+```
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized				
 ```
 
 If you need to, you can specify credentials for groups by using the following in your Oxidized config:

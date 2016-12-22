@@ -614,6 +614,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('gamatronicups');
     }
 
+    public function testGenerexUps()
+    {
+        $this->checkOS('generex-ups');
+        $this->checkOS('generex-ups', 'generex-ups1');
+        $this->checkOS('generex-ups', 'generex-ups2');
+    }
+
     public function testHikvision()
     {
         $this->checkOS('hikvision');
@@ -883,12 +890,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMrvld()
     {
         $this->checkOS('mrvld');
-    }
-
-    public function testMultimatic()
-    {
-        $this->checkOS('multimatic');
-        $this->checkOS('multimatic', 'multimatic1');
     }
 
     public function testNetapp()
@@ -1459,6 +1460,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testZywall()
     {
         $this->checkOS('zywall');
+        $this->checkOS('zywall', 'zywall1');
     }
 
     public function testZyxelnwa()
