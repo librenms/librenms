@@ -98,7 +98,7 @@ function get_port_stats_by_port_hostname()
     $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
 
     //only return requested columns
-    if (isset ($_GET['columns'])) {
+    if (isset($_GET['columns'])) {
         $cols = explode(",", $_GET['columns']);
         foreach (array_keys($port) as $c) {
             if (!in_array($c, $cols)) {
