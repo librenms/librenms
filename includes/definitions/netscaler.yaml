@@ -1,0 +1,9 @@
+os: netscaler
+text: 'Citrix Netscaler'
+type: loadbalancer
+icon: citrix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+poller_modules:
+    netscaler-vsvr: 0

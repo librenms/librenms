@@ -1,0 +1,5 @@
+os: 3com
+text: 3Com
+over:
+    - { graph: device_bits, text: Traffic }
+type: network

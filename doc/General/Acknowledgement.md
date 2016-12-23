@@ -28,6 +28,7 @@ LibreNMS 3rd party acknowledgements
   - GeSHi - Generic Syntax Highlighter (http://qbnz.com/highlighter/): GPLv2+
   - MalaysiaMap.svg - By Exiang [CC BY 3.0 (http://creativecommons.org/licenses/by/3.0)], via Wikimedia Commons
   - HTML Purifier (http://htmlpurifier.org/): LGPL v2.1
+  - Symfony Yaml (https://github.com/symfony/yaml): MIT
 
 #### 3rd Party GPLv3 Non-compliant
 

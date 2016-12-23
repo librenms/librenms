@@ -1,0 +1,5 @@
+os: gamatronicups
+text: 'Gamatronic UPS Stack'
+type: power
+mib_dir:
+    - gamtronic

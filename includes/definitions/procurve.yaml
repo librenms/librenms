@@ -1,0 +1,10 @@
+os: procurve
+text: 'HP ProCurve'
+type: network
+icon: hp
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - hp

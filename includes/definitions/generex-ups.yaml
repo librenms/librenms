@@ -1,0 +1,27 @@
+os: generex-ups
+text: 'Generex UPS SNMP adapter'
+type: power
+icon: generex-ups
+discovery_modules:
+    storage: 0
+    bgp-peers: 0
+    ntp: 0
+    stp: 0
+    diskio: 0
+    vlans: 0
+    arp-table: 0
+    discovery-protocols: 0
+    hr-device: 0
+    mempools: 0
+    entity-physical: 0
+    ports-stack: 0
+    ucd-diskio: 0
+    processors: 0
+poller_modules:
+    ospf: 0
+    ntp: 0
+    services: 0
+    storage: 0
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: sensor_voltage, text: 'Battery Voltage' }

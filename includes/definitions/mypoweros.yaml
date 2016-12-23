@@ -1,0 +1,9 @@
+os: mypoweros
+text: 'Maipu MyPower'
+type: network
+icon: maipu
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

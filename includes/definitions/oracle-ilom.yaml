@@ -1,0 +1,8 @@
+os: oracle-ilom
+text: 'Oracle ILOM'
+type: appliance
+icon: oracle
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

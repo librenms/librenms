@@ -1,0 +1,5 @@
+os: ies
+text: 'ZyXEL DSLAM'
+group: zyxel
+type: network
+icon: zyxel

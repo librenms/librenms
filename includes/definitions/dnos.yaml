@@ -1,0 +1,11 @@
+os: dnos
+text: 'Dell Networking OS'
+type: network
+icon: dell
+mib_dir:
+    - dell
+    - f10
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

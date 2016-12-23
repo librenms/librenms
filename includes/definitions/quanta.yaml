@@ -1,0 +1,6 @@
+os: quanta
+text: Quanta
+type: network
+icon: quanta
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

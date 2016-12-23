@@ -1,0 +1,9 @@
+os: openbsd
+type: server
+group: unix
+text: OpenBSD
+bad_snmpEngineTime: true
+processor_stacked: 1
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }

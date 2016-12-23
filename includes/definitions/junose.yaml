@@ -1,0 +1,15 @@
+os: junose
+text: 'Juniper JunOSe'
+type: network
+icon: junos
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    junose-atm-vp: 1
+    wifi: 0
+    toner: 0
+discovery_modules:
+    junose-atm-vp: 1
+    toner: 0

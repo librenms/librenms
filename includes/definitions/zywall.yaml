@@ -1,0 +1,7 @@
+os: zywall
+text: 'ZyXEL ZyWALL'
+group: zyxel
+type: firewall
+over:
+    - { graph: device_bits, text: Traffic }
+icon: zyxel

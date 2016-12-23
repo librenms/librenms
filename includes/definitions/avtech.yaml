@@ -1,0 +1,6 @@
+os: avtech
+text: 'Avtech Environment Sensor'
+type: environment
+icon: avtech
+over:
+    - { graph: device_temperature, text: Temperature }

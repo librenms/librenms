@@ -1,0 +1,6 @@
+os: hpmsm
+text: 'HP MSM'
+type: wireless
+icon: hp
+over:
+    - { graph: device_bits, text: Traffic }

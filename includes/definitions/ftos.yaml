@@ -1,0 +1,10 @@
+os: ftos
+text: 'Force10 FTOS'
+type: network
+icon: force10
+mib_dir:
+    - f10
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

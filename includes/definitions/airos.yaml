@@ -1,0 +1,9 @@
+os: airos
+text: 'Ubiquiti AirOS'
+type: network
+icon: ubiquiti
+nobulk: 1
+group: ubnt
+over:
+    - { graph: device_bits }
+    - { graph: device_processor }

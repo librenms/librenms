@@ -1,0 +1,10 @@
+os: eatonups
+text: 'Eaton UPS'
+type: power
+icon: eaton
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_current, text: Current }
+    - { graph: device_frequency, text: Frequencies }
+mib_dir:
+    - ups

@@ -1,0 +1,8 @@
+os: monowall
+group: unix
+text: m0n0wall
+type: firewall
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+processor_stacked: 1

@@ -1,0 +1,12 @@
+os: screenos
+text: 'Juniper ScreenOS'
+type: firewall
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    wifi: 0
+    toner: 0
+discovery_modules:
+    toner: 0
