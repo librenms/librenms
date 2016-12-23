@@ -1,0 +1,6 @@
+os: ibm-amm
+text: 'IBM AMM'
+type: appliance
+icon: ibmnos
+mib_dir:
+    - ibm

@@ -1,0 +1,8 @@
+os: dell-rcs
+text: 'Dell Remote Console'
+type: appliance
+icon: dell
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+mib_dir:
+    - dell

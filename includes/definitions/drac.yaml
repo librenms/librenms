@@ -1,0 +1,6 @@
+os: drac
+text: 'Dell DRAC'
+icon: dell
+type: server
+mib_dir:
+    - dell

@@ -1,0 +1,6 @@
+os: deltaups
+text: 'Delta UPS'
+type: power
+icon: delta
+mib_dir:
+    - delta

@@ -1,0 +1,5 @@
+os: webpower
+text: WebPower
+type: power
+over:
+    - { graph: device_current, text: Current }

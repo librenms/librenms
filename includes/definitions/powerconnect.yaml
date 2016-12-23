@@ -1,0 +1,11 @@
+os: powerconnect
+text: 'Dell PowerConnect'
+ifname: 1
+type: network
+icon: dell
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - dell

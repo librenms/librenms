@@ -1,0 +1,8 @@
+os: calix
+text: Calix
+type: network
+ifname: 1
+empty_ifdescr: 1
+icon: calix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

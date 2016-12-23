@@ -1,0 +1,8 @@
+os: netgear
+text: 'Netgear ProSafe'
+type: network
+ifname: 1
+bad_if:
+    - cpu
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

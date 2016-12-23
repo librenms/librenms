@@ -1,0 +1,4 @@
+os: axiscam
+text: 'AXIS Network Camera'
+type: network
+icon: axis

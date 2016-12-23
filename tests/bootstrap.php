@@ -53,6 +53,7 @@ if (getenv('SNMPSIM')) {
     require $install_dir . '/tests/mocks/mock.snmp.inc.php';
 }
 
+require $install_dir . '/lib/yaml/vendor/autoload.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
 //error_reporting(E_ALL);

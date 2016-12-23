@@ -1,0 +1,7 @@
+os: epson
+group: printer
+text: 'Epson Printer'
+type: printer
+icon: epson
+over:
+    - { graph: device_toner, text: Toner }

@@ -1,0 +1,6 @@
+os: tplink
+text: 'TP-Link Switch'
+type: network
+icon: tplink
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

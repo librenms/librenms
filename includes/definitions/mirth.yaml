@@ -1,0 +1,8 @@
+os: mirth
+type: server
+text: 'Mirth Connect'
+icon: mirth
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

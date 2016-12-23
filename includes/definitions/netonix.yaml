@@ -1,0 +1,8 @@
+os: netonix
+text: Netonix
+type: network
+icon: netonix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

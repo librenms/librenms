@@ -1,0 +1,7 @@
+os: radlan
+text: Radlan
+ifname: 1
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }

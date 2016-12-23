@@ -1,0 +1,8 @@
+os: hwg-ste
+text: 'HWg STE'
+type: environment
+icon: hwg
+over:
+    - { graph: device_bits, text: Traffic }
+mib_dir:
+    - hwg
