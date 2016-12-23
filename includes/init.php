@@ -136,7 +136,11 @@ if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$confi
 if (module_selected('web', $init_modules)) {
     umask(0002);
     require $install_dir . '/html/includes/vars.inc.php';
-    $os_list = array_column(dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`'), 'os');
+    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
+    $os_list = array();
+    foreach ($tmp_list as $k => $v) {
+        $os_list[] = $v['os'];
+    }
     load_all_os($os_list);
 }
 
