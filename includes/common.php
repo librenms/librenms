@@ -1538,10 +1538,15 @@ function load_os($device)
     }
 }
 
-function load_all_os()
+function load_all_os($restricted = array())
 {
     global $config;
-    foreach (glob($config['install_dir'].'/includes/definitions/*.yaml') as $file) {
+    if (!empty($restricted)) {
+        $list = $restricted;
+    } else {
+        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+    }
+    foreach ($list as $file) {
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
         );

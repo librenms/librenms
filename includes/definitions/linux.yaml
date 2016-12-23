@@ -4,6 +4,8 @@ group: unix
 text: Linux
 ifXmcbc: 1
 ifname: 1
+mib_dir:
+    - supermicro
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }

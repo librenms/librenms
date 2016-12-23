@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class YamlTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,8 +41,7 @@ class YamlTest extends \PHPUnit_Framework_TestCase
             try {
                 $data = Yaml::parse(file_get_contents($file));
             } catch (ParseException $e) {
-                //$this->assertNotEmpty($data, "$file Could not be parsed");
-                $this->assertEmpty($e->getMessage(), "$file Could not be parsed");
+                throw new PHPUnitException("$file Could not be parsed");
             }
 
             $this->assertArrayHasKey('os', $data, $file);

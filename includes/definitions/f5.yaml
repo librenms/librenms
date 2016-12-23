@@ -6,7 +6,3 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
-poller_modules:
-    loadbalancers: 1
-discovery_modules:
-    loadbalancers: 1

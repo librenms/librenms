@@ -3,5 +3,7 @@ text: 'MGE UPS'
 group: ups
 type: power
 icon: mge
+mib_dir:
+    - mge
 over:
     - { graph: device_current, text: Current }

@@ -2,6 +2,8 @@ os: avaya-vsp
 text: 'Avaya VOSS'
 type: network
 icon: avaya
+mib_dir:
+    - nortel
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

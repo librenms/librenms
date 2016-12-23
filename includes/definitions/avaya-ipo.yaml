@@ -2,3 +2,5 @@ os: avaya-ipo
 text: 'IP Office Firmware'
 type: network
 icon: avaya
+mib_dir:
+    - nortel
