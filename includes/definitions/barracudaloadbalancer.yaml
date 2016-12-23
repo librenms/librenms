@@ -1,0 +1,6 @@
+os: barracudaloadbalancer
+text: 'Barracuda Load Balancer'
+type: loadbalancer
+icon: barracuda
+over:
+    - { graph: device_bits, text: Traffic }

@@ -1,0 +1,6 @@
+os: flareos
+text: 'EMC Flare OS'
+type: storage
+icon: emc
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

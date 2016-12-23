@@ -1,0 +1,7 @@
+os: lexmarkprinter
+group: printer
+text: 'Lexmark Printer'
+type: printer
+icon: lexmark
+over:
+    - { graph: device_toner, text: Toner }

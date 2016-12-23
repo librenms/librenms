@@ -1,0 +1,7 @@
+os: merakimx
+text: 'Meraki MX Appliance'
+type: firewall
+icon: meraki
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

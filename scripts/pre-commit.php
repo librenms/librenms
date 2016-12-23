@@ -113,6 +113,7 @@ function check_lint($passthru = false, $command_only = false)
     $lint_excludes = array('vendor/');
     if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
         $lint_excludes[] = 'lib/influxdb-php/';
+        $lint_excludes[] = 'lib/yaml/vendor/composer/autoload_static.php';
     }
 
     $lint_exclude = build_excludes('--exclude ', $lint_excludes);

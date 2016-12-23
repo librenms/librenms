@@ -1,0 +1,6 @@
+os: brother
+group: printer
+text: 'Brother Printer'
+type: printer
+over:
+    - { graph: device_toner, text: Toner }

@@ -1,0 +1,32 @@
+os: nxos
+group: cisco
+text: 'Cisco NX-OS'
+type: network
+icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    cisco-ace-serverfarms: 1
+    cisco-ace-loadbalancer: 1
+    cisco-cbqos: 1
+    cisco-cef: 1
+    cisco-mac-accounting: 1
+    cisco-voice: 1
+    cisco-remote-access-monitor: 1
+    cisco-sla: 1
+    cisco-ipsec-flow-monitor: 1
+    cipsec-tunnels: 1
+    cisco-otv: 1
+    ipmi: 0
+    toner: 0
+discovery_modules:
+    toner: 0
+    cisco-cef: 1
+    cisco-sla: 1
+    cisco-mac-accounting: 1
+    cisco-otv: 1
+    cisco-pw: 1
+    cisco-vrf: 1
+    cisco-vrf-lite: 1

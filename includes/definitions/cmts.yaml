@@ -1,0 +1,8 @@
+os: cmts
+text: 'Arris CMTS'
+type: network
+icon: arris
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

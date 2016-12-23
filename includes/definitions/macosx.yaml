@@ -1,0 +1,6 @@
+os: macosx
+text: 'Apple OS X'
+type: server
+icon: apple
+over:
+    - { graph: device_bits, text: Traffic }

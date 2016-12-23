@@ -103,11 +103,14 @@ function discover_device($device, $options = null)
     if ($device['os'] == 'generic') {
         // verify if OS has changed from generic
         $device['os'] = getHostOS($device);
+
         if ($device['os'] != 'generic') {
             echo "\nDevice os was updated to " . $device['os'] . '!';
             dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
         }
     }
+
+    $config['os'][$device['os']] = load_os($device);
 
     // Set type to a predefined type for the OS if it's not already set
     if ($device['type'] == 'unknown' || $device['type'] == '') {

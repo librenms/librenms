@@ -1,0 +1,6 @@
+os: raritan
+text: 'Raritan PDU'
+type: power
+over:
+    - { graph: device_current, text: Current }
+icon: raritan

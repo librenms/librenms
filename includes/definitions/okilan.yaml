@@ -1,0 +1,8 @@
+os: okilan
+group: printer
+text: 'OKI Printer'
+overgraph:
+    - device_toner
+overtext: Toner
+type: printer
+icon: oki

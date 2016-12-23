@@ -1,0 +1,6 @@
+os: barracudaspamfirewall
+text: 'Barracuda Spam Firewall'
+type: firewall
+icon: barracuda
+over:
+    - { graph: device_bits, text: Traffic }

@@ -1,0 +1,8 @@
+os: jetdirect
+group: printer
+text: 'HP Print server'
+ifname: 1
+type: printer
+icon: hp
+over:
+    - { graph: device_toner, text: Toner }

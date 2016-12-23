@@ -1,0 +1,8 @@
+os: arista_eos
+text: 'Arista EOS'
+type: network
+icon: arista
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

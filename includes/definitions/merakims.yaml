@@ -1,0 +1,7 @@
+os: merakims
+text: 'Meraki Switch'
+type: network
+icon: meraki
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

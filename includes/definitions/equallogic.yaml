@@ -1,0 +1,9 @@
+os: equallogic
+text: 'Dell EqualLogic'
+type: storage
+icon: dell
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_storage, text: 'Storage Usage' }
+mib_dir:
+    - dell

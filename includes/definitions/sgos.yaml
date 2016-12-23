@@ -1,0 +1,11 @@
+os: sgos
+text: 'BlueCoat ProxySG'
+type: network
+ifname: 1
+icon: bluecoat
+mib_dir:
+    - bluecoat
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

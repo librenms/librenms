@@ -1,0 +1,10 @@
+os: procera
+type: network
+group: unix
+text: 'Procera Networks'
+icon: procera
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+processor_stacked: 1

@@ -1,0 +1,11 @@
+os: juniperex2500os
+text: 'Juniper EX2500'
+type: network
+icon: junos
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+poller_modules:
+    wifi: 0
+    toner: 0
+discovery_modules:
+    toner: 0

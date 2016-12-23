@@ -1,0 +1,5 @@
+os: zyxelnwa
+text: 'ZyXEL NWA'
+group: zyxel
+type: network
+icon: zyxel
