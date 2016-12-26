@@ -2,107 +2,82 @@
 
 // APC Voltages
 if ($device['os'] == 'apc') {
-    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU');
-    d_echo($oids."\n");
+    echo 'APC ';
 
-    if ($oids) {
-        echo 'APC In ';
-    }
-
-    $divisor = 1;
-    $type    = 'apc';
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$current) = explode(' ', $data, 2);
-            $split_oid          = explode('.', $oid);
-            $index              = $split_oid[(count($split_oid) - 3)];
-            $oid                = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.'.$index.'.1.1';
-            $descr              = 'Input Feed '.chr(64 + $index);
-
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+    $oids = snmpwalk_cache_oid($device, 'atsInputVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcInFeed';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index;
+        $current = $data['atsInputVoltage'];
+        $descr = 'Input Feed';
+        if (count($oids) > 1) {
+            $descr .= ' ' . chr(64 + $index);
         }
+
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 
-    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3', '-OsqnU');
-    d_echo($oids."\n");
-
-    if ($oids) {
-        echo ' APC Out ';
-    }
-
-    $divisor = 1;
-    $type    = 'apc';
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$current) = explode(' ', $data, 2);
-            $split_oid          = explode('.', $oid);
-            $index              = $split_oid[(count($split_oid) - 3)];
-            $oid                = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3.'.$index.'.1.1';
-            $descr              = 'Output Feed';
-            if (count(explode("\n", $oids)) > 1) {
-                $descr .= " $index";
-            }
-
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+    $oids = snmpwalk_cache_oid($device, 'atsOutputVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcOutFeed';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3.' . $index;
+        $current = $data['atsOutputVoltage'];
+        $descr = 'Output Feed';
+        if (count($oids) > 1) {
+            $descr .= ' ' . chr(64 + $index);
         }
+
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.2.1.0', '-OsqnU');
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'upsAdvInputLineVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcIn';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.1.3.2.1.' . $index;
+        $current = $data['upsAdvInputLineVoltage'];
+        $descr = 'Input';
 
-    if ($oids) {
-        echo ' APC In ';
-        list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
-        $type               = 'apc';
-        $index              = '3.2.1.0';
-        $descr              = 'Input';
-
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.2.1.0', '-OsqnU');
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'upsAdvOutputVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcOut';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.1.4.2.1.' . $index;
+        $current = $data['upsAdvOutputVoltage'];
+        $descr = 'Output';
 
-    if ($oids) {
-        echo ' APC Out ';
-        list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
-        $type               = 'apc';
-        $index              = '4.2.1.0';
-        $descr              = 'Output';
-
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
+
 
     // PDU
-    $oids = snmp_get($device, ".1.3.6.1.4.1.318.1.1.12.1.15.0", "-OsqnU");
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'rPDUIdentDeviceLinetoLineVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcPduIn';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.12.1.15.' . $index;
+        $current = $data['rPDUIdentDeviceLinetoLineVoltage'];
+        $descr = 'Input';
 
-    if ($oids) {
-        echo ' Voltage In ';
-        list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
-        $type               = 'apc';
-        $index              = '1';
-        $descr              = 'Input';
-
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 
-    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.26.6.3.1.6', '-OsqnU');
-    d_echo($oids."\n");
+    $oids = snmpwalk_cache_oid($device, 'rPDU2PhaseStatusVoltage', array(), 'PowerNet-MIB');
+    foreach ($oids as $index => $data) {
+        $type = 'apcPduOut';
+        $divisor = 1;
+        $oid = '.1.3.6.1.4.1.318.1.1.26.6.3.1.6.' . $index;
+        $current = $data['rPDU2PhaseStatusVoltage'];
+        $descr = 'Output';
+        if (count($oids) > 1) {
+            $descr .= ' Phase ' . $index;
+        }
 
-    if ($oids) {
-        echo ' Voltage In ';
-        list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
-        $type               = 'apc';
-        $index              = '1';
-        $descr              = 'Input';
-
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }//end if
