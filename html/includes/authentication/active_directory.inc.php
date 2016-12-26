@@ -110,7 +110,7 @@ function adduser($username, $level = 0, $email = '', $realname = '', $can_modify
 {
     // Check to see if user is already added in the database
     if (!user_exists_in_db($username)) {
-        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
+        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor), 'users');
         if ($userid == false) {
             return false;
         } else {
