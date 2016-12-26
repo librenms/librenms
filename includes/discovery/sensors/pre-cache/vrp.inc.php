@@ -29,5 +29,7 @@ if ($device['os'] == 'vrp') {
     $vrp_oids = array();
     echo 'Caching OIDs:';
 
-    $vrp_oids = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.3', array(), 'HUAWEI-ENTITY-EXTENT-MIB', null);
+    $vrp_oids = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1', array(), 'HUAWEI-ENTITY-EXTENT-MIB');
+    $vrp_oids = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.3', $vrp_oids, 'HUAWEI-ENTITY-EXTENT-MIB');
+    $vrp_oids = snmpwalk_cache_index($device, '.1.3.6.1.2.1.47.1.1.1.1.7', $vrp_oids, 'HUAWEI-ENTITY-EXTENT-MIB');
 }

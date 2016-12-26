@@ -2,7 +2,7 @@
 /**
  * vrp.inc.php
  *
- * LibreNMS temperature sensor discovery module for VRP
+ * LibreNMS dbm sensor discovery module for VRP
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,49 +25,46 @@
 
 if ($device['os'] === 'vrp') {
     echo 'Huawei VRP ';
-
-    $data = $vrp_oids['hwEntityTemperature'];
+    $data = $vrp_oids['hwEntityOpticalRxPower'];
 
     foreach ($data as $index => $value) {
-        if (is_numeric($value) && $value > 0) {
-            $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.' . $index;
+        if (is_numeric($value) && $value >= 0) {
+            $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.' . $index;
             $descr = $vrp_oids['entPhysicalName'][$index];
-            $high_temp_thresh = $vrp_oids['hwEntityTemperatureThreshold'][$index];
-            $low_temp_thresh = $vrp_oids['hwEntityTemperatureLowThreshold'][$index];
             discover_sensor(
                 $valid['sensor'],
-                'temperature',
+                'dbm',
                 $device,
                 $oid,
-                $index,
+                'rx-' . $index,
                 'vrp',
                 $descr,
+                100,
                 1,
-                1,
-                $low_temp_thresh,
-                $low_temp_thresh,
-                $high_temp_thresh,
-                $high_temp_thresh,
+                0,
+                0,
+                70,
+                75,
                 $value
             );
         }
     }
 
-    $data = $vrp_oids['hwEntityOpticalTemperature'];
+    $data = $vrp_oids['hwEntityOpticalTxPower'];
 
     foreach ($data as $index => $value) {
         if (is_numeric($value) && $value >= 0) {
-            $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.' . $index;
+            $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.' . $index;
             $descr = $vrp_oids['entPhysicalName'][$index];
             discover_sensor(
                 $valid['sensor'],
-                'temperature',
+                'dbm',
                 $device,
                 $oid,
-                $index,
+                'tx-' . $index,
                 'vrp',
                 $descr,
-                1,
+                100,
                 1,
                 0,
                 0,
