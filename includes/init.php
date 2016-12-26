@@ -139,7 +139,7 @@ if (module_selected('web', $init_modules)) {
     $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
     $os_list = array();
     foreach ($tmp_list as $k => $v) {
-        $os_list[] = $v['os'];
+        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
     }
     load_all_os($os_list);
 }
