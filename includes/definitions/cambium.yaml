@@ -1,0 +1,7 @@
+os: cambium
+text: Cambium
+type: wireless
+icon: cambium
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+group: cambium

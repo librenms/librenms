@@ -1,0 +1,5 @@
+os: apc
+text: 'APC Management Module'
+type: power
+over:
+    - { graph: device_current, text: Current }

@@ -1,0 +1,5 @@
+os: windows
+type: server
+text: 'Microsoft Windows'
+ifname: 1
+processor_stacked: 1

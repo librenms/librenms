@@ -1,0 +1,8 @@
+os: edgeos
+text: EdgeOS
+type: network
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }

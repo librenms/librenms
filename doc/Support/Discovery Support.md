@@ -90,7 +90,7 @@ $config['discovery_modules']['charge']                    = 1;
 
 #### OS based Discovery config
 
-You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions.inc.php`
+You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions/$os.yaml`
 OS based settings have preference over global. Device based settings have preference over all others
 
 Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.

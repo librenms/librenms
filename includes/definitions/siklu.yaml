@@ -1,0 +1,6 @@
+os: siklu
+text: 'Siklu Wireless'
+type: wireless
+icon: siklu
+over:
+    - { graph: device_bits, text: Traffic }

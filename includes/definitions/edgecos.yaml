@@ -1,0 +1,9 @@
+os: edgecos
+text: Edgecore
+type: network
+icon: edge-core
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

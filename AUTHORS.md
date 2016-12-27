@@ -160,6 +160,7 @@ LibreNMS contributors:
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
 - Matthew Schwen <mschwen@gmail.com> (mattschwen)
 - Joel Cant <joel@linuxmod.co.uk> (NerdBlender
+- Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemir_a)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

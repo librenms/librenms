@@ -1,0 +1,5 @@
+os: dlink
+text: 'D-Link Switch'
+type: network
+icon: dlink
+ifname: 1

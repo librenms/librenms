@@ -44,6 +44,7 @@ require $install_dir . '/vendor/autoload.php';
 if (version_compare(PHP_VERSION, '5.4', '>=')) {
     require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
 }
+require $install_dir . '/lib/yaml/vendor/autoload.php';
 
 // function only files
 require_once $install_dir . '/includes/common.php';
@@ -126,6 +127,12 @@ if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$confi
 if (module_selected('web', $init_modules)) {
     umask(0002);
     require $install_dir . '/html/includes/vars.inc.php';
+    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
+    $os_list = array();
+    foreach ($tmp_list as $k => $v) {
+        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
+    }
+    load_all_os($os_list);
 }
 
 $console_color = new Console_Color2();

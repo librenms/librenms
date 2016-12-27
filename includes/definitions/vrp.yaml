@@ -1,0 +1,5 @@
+os: vrp
+group: vrp
+text: 'Huawei VRP'
+type: network
+icon: huawei

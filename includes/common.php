@@ -693,7 +693,8 @@ function c_echo($string, $enabled = true)
 function is_mib_graph($type, $subtype)
 {
     global $config;
-    return $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return isset($config['graph_types'][$type][$subtype]['section']) &&
+        $config['graph_types'][$type][$subtype]['section'] == 'mib';
 } // is_mib_graph
 
 
@@ -747,7 +748,7 @@ function get_graph_subtypes($type, $device = null)
 
         foreach ($config['graph_types'] as $type => $unused1) {
             foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-                if (is_mib_graph($type, $subtype) && in_array($graphs, $subtype)) {
+                if (is_mib_graph($type, $subtype) && in_array($subtype, $graphs)) {
                     $types[] = $subtype;
                 }
             }
@@ -1521,4 +1522,34 @@ function display($value)
         HTMLPurifier_Config::createDefault()
     );
     return $purifier->purify(stripslashes($value));
+}
+
+/**
+ * @param $device
+ * @return array|mixed
+ */
+function load_os($device)
+{
+    global $config;
+    if (isset($device['os'])) {
+        return Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+        );
+    }
+}
+
+function load_all_os($restricted = array())
+{
+    global $config;
+    if (!empty($restricted)) {
+        $list = $restricted;
+    } else {
+        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+    }
+    foreach ($list as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        $config['os'][$tmp['os']] = $tmp;
+    }
 }

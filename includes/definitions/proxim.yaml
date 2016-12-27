@@ -1,0 +1,6 @@
+os: proxim
+text: Proxim
+type: network
+icon: proxim
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

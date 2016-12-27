@@ -1,0 +1,6 @@
+os: netagent2
+text: 'NET Agent II UPS'
+group: ups
+type: power
+over:
+    - { graph: device_load, text: Load }

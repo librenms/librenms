@@ -1,0 +1,6 @@
+os: sinetica
+text: 'Sinetica UPS'
+group: ups
+type: power
+over:
+    - { graph: device_current, text: Current }

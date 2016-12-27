@@ -1,0 +1,7 @@
+os: netmanplus
+text: 'NetMan Plus'
+group: ups
+nobulk: 1
+type: power
+over:
+    - { graph: device_current, text: Current }

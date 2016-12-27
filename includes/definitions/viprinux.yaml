@@ -1,0 +1,9 @@
+os: viprinux
+text: Viprinux
+type: network
+icon: viprinux
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+group: viprinet

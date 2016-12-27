@@ -1,0 +1,6 @@
+os: aerohive
+text: 'Aerohive HiveOS'
+type: wireless
+icon: aerohive
+over:
+    - { graph: device_bits, text: Traffic }

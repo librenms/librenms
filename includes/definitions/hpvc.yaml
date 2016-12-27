@@ -1,0 +1,6 @@
+os: hpvc
+text: 'HP Virtual Connect'
+type: network
+icon: hp
+over:
+    - { graph: device_bits, text: Traffic }

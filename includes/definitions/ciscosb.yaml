@@ -1,0 +1,37 @@
+os: ciscosb
+group: cisco
+text: 'Cisco Small Business'
+ifname: 1
+type: network
+icon: linksys
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+bad_ifXEntry:
+    - SF300-24
+    - SF300-24P
+    - SF300-48
+    - SF302-08
+    - SG300-10
+    - SG300-10SFP
+    - SG300-20
+    - SG300-28
+    - SG300-28MP
+poller_modules:
+    cisco-cbqos: 1
+    cisco-cef: 1
+    cisco-mac-accounting: 1
+    cisco-voice: 1
+    cisco-remote-access-monitor: 1
+    cisco-sla: 1
+    cisco-ipsec-flow-monitor: 1
+    cipsec-tunnels: 1
+    cisco-otv: 1
+discovery_modules:
+    cisco-cef: 1
+    cisco-sla: 1
+    cisco-mac-accounting: 1
+    cisco-otv: 1
+    cisco-pw: 1
+    cisco-vrf: 1
+    cisco-vrf-lite: 1

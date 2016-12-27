@@ -1,0 +1,6 @@
+os: smartax
+group: huawei
+text: 'Huawei SmartAX'
+type: network
+icon: huawei
+ifname: 1

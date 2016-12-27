@@ -1,0 +1,7 @@
+os: sharp
+group: printer
+text: 'Sharp Printer'
+type: printer
+icon: sharp
+over:
+    - { graph: device_toner, text: Toner }

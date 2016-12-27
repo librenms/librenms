@@ -1,0 +1,10 @@
+os: routeros
+text: 'Mikrotik RouterOS'
+type: network
+nobulk: 1
+mib_dir:
+    - mikrotik
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

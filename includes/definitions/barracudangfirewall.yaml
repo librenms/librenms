@@ -1,0 +1,6 @@
+os: barracudangfirewall
+text: 'Barracuda NG Firewall'
+type: firewall
+icon: barracuda
+over:
+    - { graph: device_bits, text: Traffic }

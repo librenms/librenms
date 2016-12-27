@@ -1,0 +1,4 @@
+os: panos
+text: PanOS
+type: firewall
+icon: panos
