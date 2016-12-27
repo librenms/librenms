@@ -558,13 +558,8 @@ $config['allow_unauth_graphs_cidr'] = array();
 // Allow graphs to be viewed without authorisation from certain IP ranges
 $config['auth_mechanism'] = 'mysql';
 // Available mechanisms: mysql (default), ldap, http-auth
-$config['auth_remember'] = '30';  // days
-// This is how long in days to remember users who select 'remember me'
-
-$config['auth_no_remember'] = 60*4;  // minutes, maximum session life without 'remember me' checked
-$config['auth_idle_session_timeout'] = 0;  // minutes or 0 to disable; sessions inactive this long will be invalidated
-$config['auth_unauthenticated_session_timeout'] = 60;  // minutes before expiring unauthenticated sessions
-
+$config['auth_remember'] = '30';
+// This is how long in days to remember users who select remember me
 // LDAP Authentication
 $config['auth_ldap_version'] = 3;
 // v2 or v3
