@@ -16,6 +16,7 @@
         "platform": {"php": "5.3.9"}
     },
     "require": {
+        "php": ">=5.3.9",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2",
         "slim/slim": "^2.6",
