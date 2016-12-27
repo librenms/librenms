@@ -127,6 +127,12 @@ project.
     - Add the dependency `composer require --update-no-dev -o slim/slim`
     - Add the files and commit `git add -f vendor/ composer.json; git commit`
 
+    - Updating php dependencies
+        - Clean your vendor directory. `git checkout vendor/;git clean -x -d -f vendor/`
+        - Update dependencies `composer update --no-dev -o`
+        - Reset vendor git status `git ls-files -z vendor/ | xargs -0 git update-index --no-assume-unchanged`
+        - Add the files and commit `git add -f vendor/; git commit`
+
 - To add a javascript or other dependency
     - Where possible please include libraries in the lib/ folder.
     - Add it in a separate commit into its own directory, using

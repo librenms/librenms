@@ -406,6 +406,7 @@ return array(
     'LibreNMS\\Tests\\DiscoveryTest' => $baseDir . '/tests/OSDiscoveryTest.php',
     'LibreNMS\\Tests\\RrdtoolTest' => $baseDir . '/tests/RrdtoolTest.php',
     'LibreNMS\\Tests\\SyslogTest' => $baseDir . '/tests/SyslogTest.php',
+    'LibreNMS\\Tests\\YamlTest' => $baseDir . '/tests/YamlTest.php',
     'PDF417' => $vendorDir . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
     'PHPMailer' => $vendorDir . '/phpmailer/phpmailer/class.phpmailer.php',
     'PHPMailerOAuth' => $vendorDir . '/phpmailer/phpmailer/class.phpmaileroauth.php',

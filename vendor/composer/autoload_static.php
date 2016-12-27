@@ -511,6 +511,7 @@ class ComposerStaticInit272059f49825f0adab6de160cf59ca72
         'LibreNMS\\Tests\\DiscoveryTest' => __DIR__ . '/../..' . '/tests/OSDiscoveryTest.php',
         'LibreNMS\\Tests\\RrdtoolTest' => __DIR__ . '/../..' . '/tests/RrdtoolTest.php',
         'LibreNMS\\Tests\\SyslogTest' => __DIR__ . '/../..' . '/tests/SyslogTest.php',
+        'LibreNMS\\Tests\\YamlTest' => __DIR__ . '/../..' . '/tests/YamlTest.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
         'PHPMailer' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmailer.php',
         'PHPMailerOAuth' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmaileroauth.php',
