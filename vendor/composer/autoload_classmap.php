@@ -386,7 +386,6 @@ return array(
     'HTMLPurifier_VarParser_Flexible' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier/VarParser/Flexible.php',
     'HTMLPurifier_VarParser_Native' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier/VarParser/Native.php',
     'HTMLPurifier_Zipper' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier/Zipper.php',
-    'LibreNMS\\ClassLoader' => $baseDir . '/LibreNMS/ClassLoader.php',
     'LibreNMS\\Component' => $baseDir . '/LibreNMS/Component.php',
     'LibreNMS\\ComposerHelper' => $baseDir . '/LibreNMS/ComposerHelper.php',
     'LibreNMS\\Exceptions\\FileExistsException' => $baseDir . '/LibreNMS/Exceptions/FileExistsException.php',
