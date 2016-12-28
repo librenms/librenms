@@ -152,6 +152,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
+    public function testApic()
+    {
+        $this->checkOS('apic');
+    }
+
     public function testAreca()
     {
         $this->checkOS('areca');
