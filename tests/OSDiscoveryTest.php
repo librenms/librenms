@@ -349,6 +349,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCiscowap()
     {
         $this->checkOS('ciscowap');
+        $this->checkOS('ciscowap', 'ciscowap-wap321');
     }
 
     public function testCiscowlc()
