@@ -110,7 +110,7 @@ function discover_device($device, $options = null)
         }
     }
 
-    $config['os'][$device['os']] = load_os($device);
+    $config['os'][$device['os']] = load_os($device['os']);
 
     // Set type to a predefined type for the OS if it's not already set
     if ($device['type'] == 'unknown' || $device['type'] == '') {

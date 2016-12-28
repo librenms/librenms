@@ -107,6 +107,22 @@ function getHostOS($device)
         }
     }
 
+    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
+    foreach (glob($pattern) as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        if ($tmp['discovery']['method'] === 'sysObjectId' && is_array($tmp['discovery']['sysObjectId'])) {
+            if (starts_with($sysObjectId, $tmp['discovery']['sysObjectId'])) {
+                return $tmp['os'];
+            }
+        } elseif ($tmp['discovery']['method'] === 'sysName' && is_array($tmp['discovery']['sysName'])) {
+            if (starts_with($sysName, $tmp['discovery']['sysName'])) {
+                return $tmp['os'];
+            }
+        }
+    }
+
     return "generic";
 }
 
