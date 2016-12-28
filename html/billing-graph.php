@@ -13,7 +13,6 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 
 ini_set('allow_url_fopen', 0);
-ini_set('display_errors', 0);
 
 if (strpos($_SERVER['REQUEST_URI'], 'debug')) {
     $debug = '1';
@@ -229,12 +228,12 @@ $lineplot_out->SetColor('darkblue');
 $lineplot_out->SetFillColor('lightblue@0.4');
 $lineplot_out->SetWeight(1);
 
-if ($_GET['95th']) {
+if (isset($_GET['95th'])) {
     $lineplot_95th = new LinePlot($per_data, $ticks);
     $lineplot_95th->SetColor('red');
 }
 
-if ($_GET['ave']) {
+if (isset($_GET['ave'])) {
     $lineplot_ave = new LinePlot($ave_data, $ticks);
     $lineplot_ave->SetColor('red');
 }
@@ -247,11 +246,11 @@ $graph->Add($lineplot);
 $graph->Add($lineplot_in);
 $graph->Add($lineplot_out);
 
-if ($_GET['95th']) {
+if (isset($_GET['95th'])) {
     $graph->Add($lineplot_95th);
 }
 
-if ($_GET['ave']) {
+if (isset($_GET['ave'])) {
     $graph->Add($lineplot_ave);
 }
 
