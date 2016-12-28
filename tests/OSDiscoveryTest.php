@@ -761,6 +761,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('jetdirect', 'jetdirect2');
     }
 
+    public function testJetstream()
+    {
+        $this->checkOS('jetstream');
+    }
+
     public function testJuniperex2500os()
     {
         $this->checkOS('juniperex2500os');
