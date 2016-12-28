@@ -1,6 +1,6 @@
 os: lcos
 text: 'Lancom OS'
-type: firewall
+type: wireless
 icon: lancom
 over:
     - { graph: device_bits, text: 'Device Traffic' }
