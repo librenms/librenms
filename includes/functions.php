@@ -116,8 +116,8 @@ function getHostOS($device)
             if (starts_with($sysObjectId, $tmp['discovery']['sysObjectId'])) {
                 return $tmp['os'];
             }
-        } elseif ($tmp['discovery']['method'] === 'sysName' && is_array($tmp['discovery']['sysName'])) {
-            if (starts_with($sysName, $tmp['discovery']['sysName'])) {
+        } elseif ($tmp['discovery']['method'] === 'sysDescr' && is_array($tmp['discovery']['sysDescr'])) {
+            if (starts_with($sysDescr, $tmp['discovery']['sysDescr'])) {
                 return $tmp['os'];
             }
         }
