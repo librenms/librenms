@@ -43,6 +43,8 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "git ls-files -z vendor/ | xargs -0 git update-index --assume-unchanged"
+        "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
+        "post-autoload-dump": "LibreNMS\\ComposerHelper::postAutoloadDump",
+        "commit": "LibreNMS\\ComposerHelper::commit"
     }
 }

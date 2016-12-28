@@ -123,15 +123,12 @@ project.
     - Include its name, source URL, copyright notice, and license in doc/General/Credits.md
 
 - To add a php dependency, please use composer
-    - Clean your vendor directory. `git checkout vendor/;git clean -x -d -f vendor/`
     - Add the dependency `composer require --update-no-dev -o slim/slim`
-    - Add the files and commit `git add -f vendor/ composer.json; git commit`
+    - Add the files and commit `composer commit` or `git add -f vendor/ composer.json; git commit`
 
     - Updating php dependencies
-        - Clean your vendor directory. `git checkout vendor/;git clean -x -d -f vendor/`
         - Update dependencies `composer update --no-dev -o`
-        - Reset vendor git status `git ls-files -z vendor/ | xargs -0 git update-index --no-assume-unchanged`
-        - Add the files and commit `git add -f vendor/; git commit`
+        - Add the files and commit `composer commit` or `git add -f vendor/; git commit`
 
 - To add a javascript or other dependency
     - Where possible please include libraries in the lib/ folder.

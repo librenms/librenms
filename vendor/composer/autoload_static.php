@@ -493,6 +493,7 @@ class ComposerStaticInit272059f49825f0adab6de160cf59ca72
         'HTMLPurifier_Zipper' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier/Zipper.php',
         'LibreNMS\\ClassLoader' => __DIR__ . '/../..' . '/LibreNMS/ClassLoader.php',
         'LibreNMS\\Component' => __DIR__ . '/../..' . '/LibreNMS/Component.php',
+        'LibreNMS\\ComposerHelper' => __DIR__ . '/../..' . '/LibreNMS/ComposerHelper.php',
         'LibreNMS\\Exceptions\\FileExistsException' => __DIR__ . '/../..' . '/LibreNMS/Exceptions/FileExistsException.php',
         'LibreNMS\\Exceptions\\HostExistsException' => __DIR__ . '/../..' . '/LibreNMS/Exceptions/HostExistsException.php',
         'LibreNMS\\Exceptions\\HostIpExistsException' => __DIR__ . '/../..' . '/LibreNMS/Exceptions/HostIpExistsException.php',
