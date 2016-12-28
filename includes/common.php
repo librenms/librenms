@@ -1525,7 +1525,7 @@ function display($value)
 }
 
 /**
- * @param $device
+ * @param $os
  * @return array|mixed
  */
 function load_os($os)
@@ -1538,6 +1538,9 @@ function load_os($os)
     }
 }
 
+/**
+ * @param array $restricted
+ */
 function load_all_os($restricted = array())
 {
     global $config;
