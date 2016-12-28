@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
     'LibreNMS\\Tests\\' => array($baseDir . '/tests'),
     'LibreNMS\\' => array($baseDir . '/LibreNMS'),
     'Dapphp\\Radius\\' => array($vendorDir . '/dapphp/radius/src'),

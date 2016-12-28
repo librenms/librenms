@@ -44,7 +44,6 @@ require $install_dir . '/vendor/autoload.php';
 if (version_compare(PHP_VERSION, '5.4', '>=')) {
     require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
 }
-require $install_dir . '/lib/yaml/vendor/autoload.php';
 
 // function only files
 require_once $install_dir . '/includes/common.php';
