@@ -393,6 +393,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('datadomain');
     }
 
+    public function testDcnSoftware()
+    {
+        $this->checkOS('dcn-software');
+    }
+
     public function testDdnos()
     {
         $this->checkOS('ddnos');
