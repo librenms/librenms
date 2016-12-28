@@ -1,0 +1,6 @@
+os: hpe-msl
+text: 'HPE StoreEver MSL'
+type: storage
+icon: hp
+over:
+    - { graph: device_bits, text: Traffic }
