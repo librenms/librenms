@@ -29,6 +29,7 @@ LibreNMS 3rd party acknowledgements
   - MalaysiaMap.svg - By Exiang [CC BY 3.0 (http://creativecommons.org/licenses/by/3.0)], via Wikimedia Commons
   - HTML Purifier (http://htmlpurifier.org/): LGPL v2.1
   - Symfony Yaml (https://github.com/symfony/yaml): MIT
+  - PHPMailer (https://github.com/PHPMailer/PHPMailer): LGPL v2.1
 
 #### 3rd Party GPLv3 Non-compliant
 
