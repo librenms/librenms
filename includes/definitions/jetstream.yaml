@@ -1,0 +1,4 @@
+os: jetstream
+text: 'TP-Link JetStream'
+type: network
+icon: tplink
