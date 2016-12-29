@@ -171,8 +171,10 @@ function RunRules($device)
         }
         $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
-        if (isset($qry[0]['ip'])) {
-            $qry[0]['ip'] = inet6_ntop($qry[0]['ip']);
+        for ($i = 0 ; $i < count($qry) ; $i++) {
+            if (isset($qry[$i]['ip'])) {
+                $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
+            }
         }
         $s = sizeof($qry);
         if ($s == 0 && $inv === false) {
