@@ -808,6 +808,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('lantronix-slc');
     }
 
+    public function testLcos()
+    {
+        $this->checkOS('lcos');
+        $this->checkOS('lcos', 'lcos1');
+    }
+
     public function testLenovoemc()
     {
         $this->checkOS('lenovoemc');
