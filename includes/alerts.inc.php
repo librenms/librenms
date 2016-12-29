@@ -172,7 +172,7 @@ function RunRules($device)
         $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
         $cnt = count($qry);
-        for ($i = 0 ; $i < $cnt ; $i++) {
+        for ($i = 0; $i < $cnt; $i++) {
             if (isset($qry[$i]['ip'])) {
                 $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
             }
