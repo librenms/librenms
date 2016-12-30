@@ -1390,7 +1390,7 @@ function oxidized_reload_nodes()
 **/
 function dnslookup($device, $type = false, $return = false)
 {
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
+    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
         return '';
     }
     if (empty($type)) {
