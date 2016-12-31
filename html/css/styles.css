@@ -1647,8 +1647,12 @@ tr.search:nth-child(odd) {
 }
 
 .tt-suggestion:hover {
-	background-color: #0097CF;
-	color: #FFFFFF;
+  background-color: #0097CF;
+  color: #FFFFFF;
+}
+
+.tt-suggestion img {
+  width: 32px;
 }
 
 .gridster * {
@@ -2128,4 +2132,12 @@ label {
     text-align: center;
     display: block;
     width: 70px;
+}
+
+.device-table-icon img {
+    width: 32px;
+}
+
+.device_icon img {
+    height: 48px;
 }
