@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
@@ -27,6 +26,7 @@ $supported_sensors = array(
     'load'        => '%',
     'state'       => '#',
     'signal'      => 'dBm',
+    'airflow'     => 'cfm',
 );
 
 foreach ($supported_sensors as $sensor_type => $sensor_unit) {
