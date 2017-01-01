@@ -51,22 +51,6 @@ function generate_priority_status($priority)
     return isset($map[$priority]) ? $map[$priority] : 0;
 }
 
-function format_number_short($number, $sf)
-{
-    // This formats a number so that we only send back three digits plus an optional decimal point.
-    // Example: 723.42 -> 723    72.34 -> 72.3    2.23 -> 2.23
-
-    list($whole, $decimal) = explode(".", $number);
-
-    if (strlen($whole) >= $sf || !is_numeric($decimal)) {
-        $number = $whole;
-    } elseif (strlen($whole) < $sf) {
-        $diff = $sf - strlen($whole);
-        $number = $whole .".".substr($decimal, 0, $diff);
-    }
-    return $number;
-}
-
 function external_exec($command)
 {
     global $debug,$vdebug;
@@ -601,7 +585,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-        return format_number_short(round($value, $round), $sf).$ext;
+        return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -621,7 +605,7 @@ function format_bi($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return format_number_short(round($value, $round), $sf).$ext;
+    return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)

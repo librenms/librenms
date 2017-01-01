@@ -1,0 +1,30 @@
+{
+    "name": "dapphp/radius",
+    "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
+    "type": "library",
+    "keywords": ["radius","authentication","authorization"],
+    "homepage": "https://github.com/dapphp/radius",
+    "require": {
+        "php": ">=5.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "dev-master"
+    },
+    "license": "LGPL-3.0",
+    "authors": [
+        {
+            "name": "Drew Phillips",
+            "email": "drew@drew-phillips.com",
+            "homepage": "https://drew-phillips.com/"
+        },
+        {
+            "name": "SysCo/al",
+            "homepage": "http://developer.sysco.ch/php/"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Dapphp\\Radius\\": "src/"
+        }
+    }
+}
