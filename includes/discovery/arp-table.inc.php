@@ -59,7 +59,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $interface = get_port_by_index_cache($device['device_id'], $if);
         $port_id = $interface['port_id'];
 
-        if (!empty($ip) && $ipv === 'ipv4' && $raw_mac != '0:0:0:0:0:0' && !isset($arp_table[$port_id][$ip])) {
+        if (!empty($ip) && $ipv === 'ipv4' && !empty($raw_mac) && $raw_mac != '0:0:0:0:0:0' && !isset($arp_table[$port_id][$ip])) {
             $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
             $arp_table[$port_id][$ip] = $mac;
 
