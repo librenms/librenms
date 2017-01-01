@@ -1,0 +1,8 @@
+os: dell-ups
+text: 'Dell UPS'
+type: power 
+icon: dell
+over:
+    - { graph: device_current, text: Current }
+mib_dir:
+    - dell

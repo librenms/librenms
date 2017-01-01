@@ -421,6 +421,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dell-laser', 'dell-laser-mfp');
     }
 
+    public function testDellups()
+    {
+        $this->checkOS('dell-ups');
+    }
+
     public function testDeltaups()
     {
         $this->checkOS('deltaups');
