@@ -163,6 +163,7 @@ LibreNMS contributors:
 - Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemir_a)
 - Rob Nichols <rob@ignition360.com> (rdnn)
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
+- Julian Kornberger <jk+github@digineo.de> (corny)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
