@@ -28,7 +28,6 @@ if (strpos($_SERVER['PATH_INFO'], 'debug')) {
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
-require $config['install_dir'] . '/html/lib/tcpdf/tcpdf.php';
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
