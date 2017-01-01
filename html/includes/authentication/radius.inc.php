@@ -1,6 +1,7 @@
 <?php
 
-require_once $config['install_dir'].'/lib/pure_php_radius/radius.class.php';
+use Dapphp\Radius\Radius;
+use Phpass\PasswordHash;
 
 $radius = new Radius($config['radius']['hostname'], $config['radius']['secret'], $config['radius']['suffix'], $config['radius']['timeout'], $config['radius']['port']);
 

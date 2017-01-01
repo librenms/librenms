@@ -1,5 +1,7 @@
 <?php
 
+use Phpass\PasswordHash;
+
 if (!isset($_SESSION['username'])) {
     $_SESSION['username'] = '';
 }

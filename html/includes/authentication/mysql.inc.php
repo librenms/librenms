@@ -1,5 +1,6 @@
 <?php
 
+use Phpass\PasswordHash;
 
 function authenticate($username, $password)
 {

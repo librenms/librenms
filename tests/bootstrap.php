@@ -33,11 +33,8 @@ $config['install_dir'] = $install_dir;
 $config['mib_dir'] = $install_dir . '/mibs';
 $config['snmpget'] = 'snmpget';
 
-// initialize the class loader and add custom mappings
-require $install_dir . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->registerDir($install_dir . '/tests', 'LibreNMS\Tests');
-$classLoader->register();
+// initialize the class loader
+require $install_dir . '/vendor/autoload.php';
 
 require $install_dir . '/includes/common.php';
 require $install_dir . '/html/includes/functions.inc.php';
@@ -53,7 +50,6 @@ if (getenv('SNMPSIM')) {
     require $install_dir . '/tests/mocks/mock.snmp.inc.php';
 }
 
-require $install_dir . '/lib/yaml/vendor/autoload.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
 //error_reporting(E_ALL);
