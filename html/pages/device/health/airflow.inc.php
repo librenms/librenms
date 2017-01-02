@@ -24,7 +24,7 @@
  */
 
 $class      = 'airflow';
-$unit       = '';
+$unit       = 'CFM';
 $graph_type = 'sensor_airflow';
 
 require 'sensors.inc.php';
