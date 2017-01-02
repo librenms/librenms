@@ -499,6 +499,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('edgecos', 'edgecos-ecs4510-28f');
         $this->checkOS('edgecos', 'edgecos-ecs4510-52t');
         $this->checkOS('edgecos', 'edgecos-ecs4210-28t');
+        $this->checkOS('edgecos', 'edgecos-ecs3510-52t');
     }
 
     public function testEdgeos()
