@@ -181,7 +181,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $actions .= '
                 <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><img src="images/16/telnet.png" alt="telnet" title="Telnet to ' . $device['hostname'] . '" border="0" width="16" height="16"></a></div>
                 <div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><img src="images/16/ssh.png" alt="ssh" title="SSH to ' . $device['hostname'] . '" border="0" width="16" height="16"></a></div>
-                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '"><img src="images/16/http.png" alt="https" title="Launch browser https://' . $device['hostname'] . '" border="0" width="16" height="16" target="_blank"></a></div>
+                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '"><img src="images/16/http.png" alt="https" title="Launch browser https://' . $device['hostname'] . '" border="0" width="16" height="16" target="_blank" rel="noopener"></a></div>
             </div>
         </div>
     ';
