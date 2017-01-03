@@ -22,3 +22,12 @@ discovery_modules:
     toner: 0
     vmware-vminfo: 1
 processor_stacked: 1
+register_mibs:
+    rxCounter: GANDI-MIB
+    txCounter: GANDI-MIB
+    dropCounter: GANDI-MIB
+    acldropCounter: GANDI-MIB
+    ratedropCounter: GANDI-MIB
+    KNIrxCounter: GANDI-MIB
+    KNItxCounter: GANDI-MIB
+    KNIdropCounter: GANDI-MIB
