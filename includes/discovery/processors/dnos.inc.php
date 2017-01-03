@@ -7,12 +7,12 @@ if ($device['os'] == 'dnos') {
 
     if ($series == 'f10SSeriesProducts') {
         echo 'Dell S Series Chassis';
-        $usage = trim(snmp_get($device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitCpuUtil5Sec.1', '-OvQ'));
+        $usage = trim(snmp_get($device, 'chStackUnitCpuUtil5Sec.1', '-OvQ', 'F10-S-SERIES-CHASSIS-MIB'));
 
         discover_processor($valid['processor'], $device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitCpuUtil5Sec.1', '0', 'dnos-cpu', '1', $usage, null, null);
     } elseif ($series == 'f10CSeriesProducts') {
          echo 'Dell C Series Chassis';
-         $usage = trim(snmp_get($device, 'F10-C-SERIES-CHASSIS-MIB::chLineCardCpuUtil5Sec.1', '-OvQ'));
+         $usage = trim(snmp_get($device, 'chLineCardCpuUtil5Sec.1', '-OvQ', 'F10-S-SERIES-CHASSIS-MIB'));
 
          discover_processor($valid['processor'], $device, 'F10-C-SERIES-CHASSIS-MIB::chLineCardCpuUtil5Sec.1', '0', 'dnos-cpu', '1', $usage, null, null);
     } else {
