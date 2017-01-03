@@ -76,7 +76,6 @@ function graph_error($string)
             fpassthru($fd);
             fclose($fd);
             unlink($graphfile);
-            //exit();
         }
     } else {
         if (!$debug) {
@@ -88,7 +87,6 @@ function graph_error($string)
         imagestring($im, 3, $px, ($height / 2 - 8), $string, imagecolorallocate($im, 128, 0, 0));
         imagepng($im);
         imagedestroy($im);
-        //exit();
     }
 }
 
