@@ -14,12 +14,4 @@
 
 if (starts_with($sysObjectId, '.1.3.6.1.4.1.25053.3.1')) {
     $os = 'ruckuswireless';
-
-    $ruckus_mibs = array(
-        "ruckusZDSystemStats"           => "RUCKUS-ZD-SYSTEM-MIB",
-        "ruckusZDWLANTable"             => "RUCKUS-ZD-WLAN-MIB",
-        "ruckusZDWLANAPTable"           => "RUCKUS-ZD-WLAN-MIB",
-        "ruckusZDWLANAPRadioStatsTable" => "RUCKUS-ZD-WLAN-MIB",
-    );
-    register_mibs($device, $ruckus_mibs, "includes/discovery/os/ruckuswireless.inc.php");
 }
