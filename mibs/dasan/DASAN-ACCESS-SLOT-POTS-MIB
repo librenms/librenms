@@ -1,0 +1,663 @@
+-- Made by Jeon, DHL 
+-- at Thu Jan 27 16:50:00 2005
+
+     DASAN-ACCESS-SLOT-POTS-MIB DEFINITIONS ::= BEGIN 
+   
+     IMPORTS 
+          BITS, mib-2, Counter32, Gauge32, -- inserted by jeon 20041206
+          MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+          Integer32, IpAddress, Unsigned32 
+                  FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          RowStatus, TestAndIncr, AutonomousType, TimeStamp, DisplayString 
+                  FROM SNMPv2-TC 
+          MODULE-COMPLIANCE, OBJECT-GROUP, 
+          NOTIFICATION-GROUP                          
+                  FROM SNMPv2-CONF 
+          SnmpAdminString                             
+                  FROM SNMP-FRAMEWORK-MIB
+--          Unsigned32
+--          		  FROM DASAN-TC
+          InterfaceIndex                              
+                  FROM IF-MIB
+          dasanMgmt
+          		  FROM DASAN-SMI;
+
+     dasanAccessMib MODULE-IDENTITY 
+   
+         LAST-UPDATED   "200506112100Z" 
+         ORGANIZATION   "DASAN Networks" 
+         CONTACT-INFO 
+          " 
+          Postal: 
+   
+          Phone: 
+   
+          Email: 
+
+          " 
+         DESCRIPTION 
+          "Access Gateway Management Information Base (MIB)" 
+       
+         -- Revision History  
+   
+         REVISION     "200502112100Z"              -- Feb, 2005
+         DESCRIPTION 
+          "Initial Version by Jeon." 
+   
+   
+         --::= { mib-2 64 }
+         ::= { dasanMgmt 100 }
+         -- private oid
+         -- _ should be .... final assignment by IANA at publication time  
+   
+   
+     -- *****************************************************************  
+     --  
+     -- OID For the MIB 
+     -- 
+     -- *****************************************************************  
+        dasanAccGatewayMIBObjects    OBJECT IDENTIFIER::= { dasanAccessMib 2 }
+   
+      
+     -- *****************************************************************  
+     --  
+     -- Group Objects 
+     -- 
+     -- *****************************************************************  
+     
+     dsAccGwyPots		OBJECT IDENTIFIER ::= { dasanAccGatewayMIBObjects 1 } 
+     
+     dsAccGwyPotsConfiguration		OBJECT IDENTIFIER ::= { dsAccGwyPots 1 }
+     dsAccGwyPotsMonitor			OBJECT IDENTIFIER ::= { dsAccGwyPots 2 }
+	 dsAccGwyPotsControl			OBJECT IDENTIFIER ::= { dsAccGwyPots 3 }
+     
+     -- ***************************************************************** 
+     -- *****************************************************************                                                           
+      
+     dsAccGwyConfigPotsSystem		OBJECT IDENTIFIER ::= { dsAccGwyPotsConfiguration 1 } 
+     dsAccGwyConfigPotsSlot			OBJECT IDENTIFIER ::= { dsAccGwyPotsConfiguration 2 }
+     dsAccGwyConfigPotsPort			OBJECT IDENTIFIER ::= { dsAccGwyPotsConfiguration 3 }
+     
+     dsAccGwyMonitorPotsSystem		OBJECT IDENTIFIER ::= { dsAccGwyPotsMonitor 1 } 
+     dsAccGwyMonitorPotsSlot		OBJECT IDENTIFIER ::= { dsAccGwyPotsMonitor 2 }
+     dsAccGwyMonitorPotsPort		OBJECT IDENTIFIER ::= { dsAccGwyPotsMonitor 3 }
+     
+     dsAccGwyControlPotsSlot		OBJECT IDENTIFIER ::= { dsAccGwyPotsControl 1 }
+     dsAccGwyControlPotsPort		OBJECT IDENTIFIER ::= { dsAccGwyPotsControl 2 }
+                                                                                                                                                    
+
+     -- *****************************************************************   
+     -- ConfigPotsSystem
+     -- ***************************************************************** 
+                                                              
+     dsAccGwyConfigGlobalDigitmap	OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Input digit-mapping rule." 
+     	DEFVAL		{"x.T"}
+     ::= {dsAccGwyConfigPotsSystem 1}
+
+     dsAccGwyConfigGlobalSwitchDhcp	OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Config whether the ip-address of switch is assigned by DHCP Server or not." 
+     	DEFVAL		{"off"}
+     ::= {dsAccGwyConfigPotsSystem 2}
+     
+     -- *****************************************************************  
+     -- ConfigPotsSlot
+     -- *****************************************************************   
+     
+     dsAccGwyConfigSlotTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyConfigSlotEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU ConfigEntry objects." 
+     ::= { dsAccGwyConfigPotsSlot 1}
+     
+     dsAccGwyConfigSlotEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyConfigSlotEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "A configuration entry of AGLU Functions for each slot."
+         INDEX      { dsSlotIndex }
+     ::= { dsAccGwyConfigSlotTable 1 }
+   
+     DsAccGwyConfigSlotEntry ::= SEQUENCE 
+     {   
+		dsSlotIndex						   INTEGER,
+		dsSlotAddAreaCode                  INTEGER,
+		dsSlotAreaCode                     DisplayString,
+		dsSlotAreaCodeAllows               DisplayString,
+		dsSlotAreaCodeExceptions           DisplayString,
+		dsSlotCodecType   				   DisplayString,
+		dsSlotCodecPacketizationPeriodG711  INTEGER,
+		dsSlotCodecPacketizationPeriodG723  INTEGER,
+		dsSlotCodecPacketizationPeriodG729  INTEGER,
+		dsSlotJitterbuffer                 DisplayString,
+		dsSlotRingonTime                   INTEGER,
+		dsSlotRingoffTime                  INTEGER,
+		dsSlotHookflashMin                 INTEGER,
+		dsSlotHookflashMax                 INTEGER,
+		dsSlotInterdigitTimeout            INTEGER,
+		dsSlotEce                          DisplayString,
+		dsSlotFax                          INTEGER,
+		dsSlotCid                          INTEGER,
+		dsSlotVad                          INTEGER,
+		dsSlotCng                          INTEGER,
+		dsSlotOobdtmf                      INTEGER,
+		dsSlotNetworkHostname              DisplayString,
+		dsSlotNetworkDhcp                  INTEGER,
+		dsSlotNetworkIpaddress             DisplayString,
+		dsSlotNetworkSubnetmask            DisplayString,
+		dsSlotNetworkRouter                DisplayString,
+		dsSlotNetworkNameserver            DisplayString,
+		dsSlotVersion		               DisplayString
+
+	 }
+	 
+	 dsSlotIndex		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Slot-Index"
+     ::= {dsAccGwyConfigSlotEntry 1} 
+     
+     dsSlotAddAreaCode	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Adding AreaCode"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 2}
+     
+     dsSlotAreaCode	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current                            
+     	DESCRIPTION	"Auto area number used when AddAreaCode is set to 'on'"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 3}
+     
+     dsSlotAreaCodeAllows	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"If started with this value, it's going to apply for auto-area-number
+     	 			exception rule. For example, in case of AreaCodeAllows value is set to '**88', 
+     	 			auto-area-number[031] and Input	phone number [**887251234#], the number is [**88 031 7251234]. 
+     	 			And, in case of Input phone number [**880161234567#], the area-number isn't
+     	 			going to be inserted into input phone number. The result is [**880161234567#]"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 4}
+     
+     dsSlotAreaCodeExceptions	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"If started with this value, the phone number doesn't need the area-number."
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 5}
+     
+     dsSlotCodecType	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Codec list to be used, ordered by priority"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 6}
+
+     dsSlotCodecPacketizationPeriodG711	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Packet generation cycle of G.711 codec"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 7}
+     
+     dsSlotCodecPacketizationPeriodG723	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Packet generation cycle of G.723 codec"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 8}
+     
+     dsSlotCodecPacketizationPeriodG729	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Packet generation cycle of G.729 codec"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 9}
+     
+     dsSlotJitterbuffer	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Use of Jitterbuffer and jitterbuffer size"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 10}
+          
+     dsSlotRingonTime		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Ring-on-Time length"
+     	DEFVAL		{"1000"}
+     ::= {dsAccGwyConfigSlotEntry 11}
+     
+     dsSlotRingoffTime		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Ring-off-Time length"
+     	DEFVAL		{"2000"}
+     ::= {dsAccGwyConfigSlotEntry 12}
+     
+     dsSlotHookflashMin	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Minimum hook flash threshold time to recognize Hook-flash"
+     	DEFVAL		{"200"}
+     ::= {dsAccGwyConfigSlotEntry 13}
+     
+     dsSlotHookflashMax	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Maximum hook flash threshold time to recognize Hook-flash"
+     	DEFVAL		{"500"}          
+     ::= {dsAccGwyConfigSlotEntry 14}
+
+     dsSlotInterdigitTimeout	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Interdigit Timeout value"
+     	DEFVAL		{"8"}
+     ::= {dsAccGwyConfigSlotEntry 15}
+     
+     dsSlotEce	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Use of Echo Canceler and level"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 16}
+     
+     dsSlotFax	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Fax"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 17}
+          
+     dsSlotCid	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   belcore(1),
+                   ntt(2),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Caller ID [Belcore type, NTT type, no use]"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 18}
+     
+     dsSlotVad	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Voice Activation Detection."
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 19}
+     
+     dsSlotCng	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Comfortable Noise Generation"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 20}
+     
+     dsSlotOobdtmf	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Out-of-Band DTMF"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 21}
+     
+     dsSlotNetworkHostname	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Hostname of slot[AGLU]"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 22}
+     
+     dsSlotNetworkDhcp			OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   off(0),
+                   on(1),
+                   on-syslog(2)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Use of Network-Dhcp for slot[AGLU] to get ip address"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 23}
+     
+     dsSlotNetworkIpaddress		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"IP address of slot[AGLU]"
+     	DEFVAL		{"192.168.1.2"}
+     ::= {dsAccGwyConfigSlotEntry 24}
+     
+     dsSlotNetworkSubnetmask		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Subnetmask for slot[AGLU]"
+     	DEFVAL		{"255.255.255.0"}
+     ::= {dsAccGwyConfigSlotEntry 25}
+     
+     dsSlotNetworkRouter		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Gateway Router address for slot[AGLU]"
+     	DEFVAL		{"192.168.1.1"}
+     ::= {dsAccGwyConfigSlotEntry 26}
+     
+     dsSlotNetworkNameserver	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Domain Nameserver address for slot[AGLU]"
+     	DEFVAL		{"168.126.63.1"}
+     ::= {dsAccGwyConfigSlotEntry 27}
+
+     dsSlotVersion	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Version of slot image[AGLU]"
+     ::= {dsAccGwyConfigSlotEntry 28}
+        
+       
+     -- *****************************************************************   
+     -- ConfigPotsPort	
+     -- *****************************************************************    
+     
+     dsAccGwyConfigPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyConfigPortEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU ConfigEntry objects." 
+     ::= { dsAccGwyConfigPotsPort 1}
+     
+     dsAccGwyConfigPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyConfigPortEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each slot."
+         INDEX      { dsPortIndex }
+     ::= { dsAccGwyConfigPortTable 1 }
+   
+     DsAccGwyConfigPortEntry ::= SEQUENCE 
+     {   
+		dsPortIndex      INTEGER,
+		dsPortIvol       INTEGER,
+		dsPortOvol       INTEGER
+	}
+	                                                         
+	 dsPortIndex	OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AccessGateway Board(AGLU) port Index"
+     ::= {dsAccGwyConfigPortEntry 1}  
+    
+     dsPortIvol			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current  
+     	DESCRIPTION	"Input volume of AGLU port."
+     	DEFVAL		{"3"}
+     ::= {dsAccGwyConfigPortEntry 2}
+     
+     dsPortOvol			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Output volume of AGLU port." 
+     	DEFVAL		{"3"}
+     ::= {dsAccGwyConfigPortEntry 3}     
+         
+     -- *****************************************************************  
+     -- Monitor Pots system
+     -- *****************************************************************
+     dsMonitorAccGwyUpsStatus	OBJECT-TYPE
+	 	SYNTAX		DisplayString	 	
+	 	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"This object shows the UPS status."
+     ::= {dsAccGwyMonitorPotsSystem 1} 
+     
+     -- *****************************************************************   
+     -- MonitorPotsSlot	
+     -- *****************************************************************    
+     dsAccGwyMonitorSlotTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyMonitorSlotEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU Config Entry objects." 
+     ::= { dsAccGwyMonitorPotsSlot 1}
+     
+     dsAccGwyMonitorSlotEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyMonitorSlotEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each slot."
+         INDEX      { dsMonitorSlotIndex }
+     ::= { dsAccGwyMonitorSlotTable 1 }
+   
+     DsAccGwyMonitorSlotEntry ::= SEQUENCE 
+     {   
+		dsMonitorSlotIndex    		   INTEGER,
+		dsMonitorSlotInstallStatus     INTEGER
+	 }
+	 
+	 dsMonitorSlotIndex 				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Slot Index of a System"
+     ::= {dsAccGwyMonitorSlotEntry 1}  
+    
+     dsMonitorSlotInstallStatus			OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+     			   	  installed(1),
+       			      removed(2) 
+       			      }
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU concurrent slot status"
+     ::= {dsAccGwyMonitorSlotEntry 2}
+               
+     -- *****************************************************************   
+     -- MonitorPotsPort	
+     -- *****************************************************************    
+     
+     dsAccGwyMonitorPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyMonitorPortEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU Config Entry objects." 
+     ::= { dsAccGwyMonitorPotsPort 1}
+     
+     dsAccGwyMonitorPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyMonitorPortEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each slot."
+         INDEX      { dsMonitorPortIndex }
+     ::= { dsAccGwyMonitorPortTable 1 }
+   
+     DsAccGwyMonitorPortEntry ::= SEQUENCE 
+     {   
+		dsMonitorPortIndex    			   INTEGER,
+		dsMonitorPortStatus   		   	   DisplayString,
+		dsMonitorPortStatistics		       DisplayString
+	 }
+	 
+	 dsMonitorPortIndex  			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Board port Index"
+     ::= {dsAccGwyMonitorPortEntry 1}  
+    
+     dsMonitorPortStatus 			OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU port Status"
+     ::= {dsAccGwyMonitorPortEntry 2}
+     
+     dsMonitorPortStatistics		OBJECT-TYPE
+	 	SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU port Statistics"
+     ::= {dsAccGwyMonitorPortEntry 3} 
+      
+     -- *****************************************************************   
+     -- ControlPotsSlot	
+     -- *****************************************************************    
+     
+     dsAccGwyControlSlotTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyControlSlotEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU Config Entry objects." 
+     ::= { dsAccGwyControlPotsSlot 1}
+     
+     dsAccGwyControlSlotEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyControlSlotEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each slot."
+         INDEX      { dsControlSlotIndex }
+     ::= { dsAccGwyControlSlotTable 1 }
+   
+     DsAccGwyControlSlotEntry ::= SEQUENCE 
+     {   
+		dsControlSlotIndex          INTEGER,
+		dsControlSlotPotsRestart    INTEGER,
+		dsControlSlotRestart        INTEGER
+
+	 }
+	 
+	 dsControlSlotIndex   			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Slot Index of a System"
+     ::= {dsAccGwyControlSlotEntry 1}  
+    
+     dsControlSlotPotsRestart 			OBJECT-TYPE
+	 	SYNTAX		INTEGER  {
+                   restart(1)
+          			     }
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"AGLU function restart"
+     ::= {dsAccGwyControlSlotEntry 2}
+     
+     dsControlSlotRestart		OBJECT-TYPE
+	 	SYNTAX		INTEGER  {
+                   restart(1)
+          			     }
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"AGLU slot restart"
+     ::= {dsAccGwyControlSlotEntry 3} 
+          
+     -- *****************************************************************   
+     -- ControlPotsPort
+     -- *****************************************************************    
+     
+     dsAccGwyControlPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyControlPortEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU Config Entry objects." 
+     ::= { dsAccGwyControlPotsPort 1}
+     
+     dsAccGwyControlPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyControlPortEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each port."
+         INDEX      { dsControlPortIndex }
+     ::= { dsAccGwyControlPortTable 1 }
+   
+     DsAccGwyControlPortEntry ::= SEQUENCE 
+     {   
+		dsControlPortIndex  	    INTEGER,
+		dsControlPortReset   	    INTEGER,
+		dsControlPortPortBlock		INTEGER
+	 }
+	 
+	 dsControlPortIndex  			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Port Index of a System"
+     ::= {dsAccGwyControlPortEntry 1}  
+    
+     dsControlPortReset   			OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+                   reset(1)
+               }
+		MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Reset each port"
+     ::= {dsAccGwyControlPortEntry 2}
+     
+     dsControlPortPortBlock		OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+                   block(1),
+                   unblock(0)
+               }
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Admin AGLU port"
+     ::= {dsAccGwyControlPortEntry 3}       
+     
+     END
