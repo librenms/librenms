@@ -53,7 +53,6 @@ if ($auth === true && is_custom_graph($type, $subtype, $device)) {
     // Graph Template Missing");
 }
 
-
 function graph_error($string)
 {
     global $vars, $config, $debug, $graphfile;
@@ -77,7 +76,6 @@ function graph_error($string)
             fpassthru($fd);
             fclose($fd);
             unlink($graphfile);
-            exit();
         }
     } else {
         if (!$debug) {
@@ -89,10 +87,8 @@ function graph_error($string)
         imagestring($im, 3, $px, ($height / 2 - 8), $string, imagecolorallocate($im, 128, 0, 0));
         imagepng($im);
         imagedestroy($im);
-        exit();
     }
 }
-
 
 if ($error_msg) {
     // We have an error :(
