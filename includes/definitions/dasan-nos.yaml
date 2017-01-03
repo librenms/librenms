@@ -2,6 +2,8 @@ os: dasan-nos
 text: 'Dasan NOS'
 type: network
 icon: dasan
+mib_dir:
+    - dasan
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

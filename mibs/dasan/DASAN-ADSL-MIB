@@ -1,0 +1,3543 @@
+-- *****************************************************************
+-- DASAN ADSL MIB -  The MIB for ADSL, ADSL2Plus Product
+--                                                                       
+-- July 2004, Dongha Lee
+--
+-- Copyright (c) 2001 by Dasan Co., Ltd.
+-- All rights reserved.
+-- *****************************************************************
+ 
+ 
+DASAN-ADSL-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, mib-2,
+                IpAddress, Integer32, Counter32, Gauge32, TimeTicks, Unsigned32
+                      FROM SNMPv2-SMI
+                TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString,
+                RowStatus
+                      FROM SNMPv2-TC
+    		    ifIndex
+        	          FROM IF-MIB
+                adslLineAlarmConfProfileName, adslAtucChanIntervalNumber, adslAtucIntervalNumber, adslLineConfProfileName, adslAturChanIntervalNumber
+			          FROM ADSL-LINE-MIB
+
+                dasanMgmt           FROM DASAN-SMI;
+
+ 
+dasanAdslMIB MODULE-IDENTITY
+    LAST-UPDATED   "200407150000Z"
+    ORGANIZATION   "Dasan Co., Ltd."
+    CONTACT-INFO
+                   "Dasan Co., Ltd."
+    DESCRIPTION
+        "The MIB module to describe ADSL product.
+         The MIB module that provides objects that are proprietary and extension to ADSL-                                                                         
+        LINE-MIB. The MIB include extension to following Tables.                
+        1.) adslLineTable 
+    	2.) adslAtucPhysTable  
+    	3.) adslAturPhysTable
+    	4.) adslAtucChanTable
+    	5.) adslAturChanTable
+    	6.) adslAtucPerfDataTable
+    	--7.) adslAturPerfDataTable
+    	8.) adslAtucIntervalTable
+    	--9.) adslAturIntervalTable
+    	10.) adslAtucChanPerfDataTable
+    	11.) adslAturChanPerfDataTable
+    	12.) adslAtucChanIntervalTable
+    	13.) adslAturChanIntervalTable
+    	14.) adslLineConfProfileTable
+    	15.) adslLineAlarmConfProfileTable
+	
+        The MIB also include a set of scalar(s) clubbed under the group 'dsAdslCapabilityGroup'." 
+    ::= { dasanMgmt 5 }
+ 
+dasanAdslLineMIB  OBJECT IDENTIFIER ::= { dasanAdslMIB 1 }
+-- dasanAdslMIBObjects  OBJECT IDENTIFIER ::= { dasanAdslMIB 1 }               
+   
+dasanAdslMIBObjects OBJECT IDENTIFIER ::= { dasanAdslLineMIB 1 }
+-- dsAdslLineMIB OBJECT IDENTIFIER ::= { dasanAdslMIBObjects 1 }                                     
+   
+dsDslSystemParamGroup		OBJECT IDENTIFIER ::= { dasanAdslMIBObjects 1 }
+
+
+dsDslSystemDslType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			adsl(1),
+			sdsl(2),
+			shdsl(3)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the firmware to be downloaded."
+	DEFVAL   { 1 }
+	::= { dsDslSystemParamGroup 1 }
+
+
+dsDslSystemLineCodingType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			other(1),
+			dmt(2),
+			cap(3),
+			qam(4)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object indicates ADSL line code type."
+	DEFVAL   { 2 }
+	::= { dsDslSystemParamGroup 2 }
+
+
+dsDslSystemLineTxCfg OBJECT-TYPE
+	SYNTAX       BITS{
+			ansit1413(0),
+			etsi(1),
+			q9921PotsNonOverlapped(2),
+			q9921PotsOverlapped(3),
+			q9921IsdnNonOverlapped(4),
+			q9921IsdnOverlapped(5),
+			q9921TcmIsdnNonOverlapped(6),
+			q9921TcmIsdnOverlapped(7),
+			q9922PotsNonOverlapped(8),
+			q9922PotsOverlapped(9),
+			q9922TcmIsdnNonOverlapped(10),
+			q9922TcmIsdnOverlapped(11),
+			q9921TcmIsdnSymmetric(12)
+--			q9922TcmIsdnNonOverlapped(GS_CFG_LINE_TX_CFG_Q9922_TCM_ISDN_NON_OVERLAPPED),
+--			q9922TcmIsdnOverlapped(GS_CFG_LINE_TX_CFG_Q9922_TCM_ISDN_OVERLAPPED),
+			--q9921TcmIsdnSymmetric(GS_CFG_LINE_TX_CFG_Q9921_TCM_ISDN_SYMMETRIC),
+			--adslPlusPotsNonOverlapped(GS_CFG_LINE_TX_CFG_ADSL_PLUS_POTS_NON_OVERLAPPED),
+			--q9921GspanPlusPotsNonOverlapped(GS_CFG_LINE_TX_CFG_Q9921_GSPAN_PLUS_POTS_NON_OVERLAPPED),
+			--q9921GspanPlusPotsOverlapped(GS_CFG_LINE_TX_CFG_Q9921_GSPAN_PLUS_POTS_OVERLAPPED),
+			--q9923Adsl2PotsOverlapped(GS_CFG_LINE_TX_CFG_Q9923_ADSL2_POTS_OVERLAPPED),
+			--q9923Adsl2PotsNonOverlapped(GS_CFG_LINE_TX_CFG_Q9923_ADSL2_POTS_NON_OVERLAPPED),
+			--q9925Adsl2PlusPotsOverlapped(GS_CFG_LINE_TX_CFG_Q9925_ADSL2_PLUS_POTS_OVERLAPPED),
+			--q9925Adsl2PlusPotsNonOverlapped(GS_CFG_LINE_TX_CFG_Q9925_ADSL2_PLUS_POTS_NON_OVERLAPPED),
+			--q9923Readsl2PotsOverlapped(GS_CFG_LINE_TX_CFG_Q9923_READSL2_POTS_OVERLAPPED),
+			--q9923Readsl2PotsNonOverlapped(GS_CFG_LINE_TX_CFG_Q9923_READSL2_POTS_NON_OVERLAPPED),
+			--adslPlusPotsOverlapped(GS_CFG_LINE_TX_CFG_ADSL_PLUS_POTS_OVERLAPPED)	
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object indicates transmission capabilities with which the DSL system is configured."
+
+	DEFVAL   { 12 }		
+	::= { dsDslSystemParamGroup 3 }
+--2.7.6 
+--dsDslSystemShdslTxMode OBJECT-TYPE
+--	SYNTAX       BITS{
+--			region1(0),
+--			region2(1)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object indicates transmission capabilities with which the DSL system is configured. Not valid for SHDSL."
+--	DEFVAL   { GS_CFG_DEF_SHDSL_REGION }
+--	::= { dsDslSystemParamGroup 4 }
+
+dsAdslCapabilityGroup		OBJECT IDENTIFIER ::= { dasanAdslMIBObjects 2 }
+
+
+dsAdslCapabilityLineTxCap OBJECT-TYPE
+	SYNTAX       BITS{
+			ansit1413(0),
+			etsi(1),
+			q9921PotsNonOverlapped(2),
+			q9921PotsOverlapped(3),
+			q9921IsdnNonOverlapped(4),
+			q9921IsdnOverlapped(5),
+			q9921TcmIsdnNonOverlapped(6),
+			q9921TcmIsdnOverlapped(7),
+			q9922PotsNonOverlapped(8),
+			q9922PotsOverlapped(9),
+			q9922TcmIsdnNonOverlapped(10),
+			q9922TcmIsdnOverlapped(11),
+			q9921TcmIsdnSymmetric(12),
+			adslPlusPotsNonOverlapped(13),
+			q9921GspanPlusPotsNonOverlapped(31),
+			q9921GspanPlusPotsOverlapped(30),
+			q9923Adsl2PotsOverlapped(29),
+			q9923Adsl2PotsNonOverlapped(28),
+			q9925Adsl2PlusPotsOverlapped(27),
+			q9925Adsl2PlusPotsNonOverlapped(26),
+			q9923Readsl2PotsOverlapped(22),
+			q9923Readsl2PotsNonOverlapped(23),
+			adslPlusPotsOverlapped(18)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This bitmap specifies which all transmission modes, which the ATU-C is capable of supporting. Right now support for Annex A (q9921PotsNonOverlapped(2) and q9921PotsOverlapped(3)) is present.  This value depends on the DSL PHY firmware present on Columbia MND"
+	::= { dsAdslCapabilityGroup 1 }
+
+
+dsAdslLineExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslLineExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table includes common attributes describing both ends of the line.  It is required for all ADSL physical interfaces. This Table is an extension to adslLineTable defined in rfc-2662."
+	::= { dasanAdslMIBObjects 3 }
+
+
+dsAdslLineExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslLineExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslLineExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslLineExtnTable 1 }
+
+DsAdslLineExtnEntry ::= SEQUENCE {
+		dsAdslLineExtnAction     INTEGER,
+		dsAdslLineExtnUtopiaL2RxAddr     INTEGER,
+		dsAdslLineExtnUtopiaL2TxAddr     INTEGER,
+		dsAdslLineExtnTransAtucCap     BITS,
+		dsAdslLineExtnTransAtucActual     BITS,
+		dsAdslLineExtnClockType     INTEGER,
+		dsAdslLineExtnLineDmtTrellis     INTEGER}
+--2.7.6 GsvAdslLineExtnEntry (gsvAdslLineExtnTable.mib)
+		--dsAdslLineExtnTransAturCap     BITS,
+		--dsAdslLineExtnPMConfPMSF     INTEGER,
+		--dsAdslLineExtnDeltConfLDSF     INTEGER,
+		--dsAdslLineExtnTransAtucConfig     BITS }
+		 
+
+
+dsAdslLineExtnAction OBJECT-TYPE
+	SYNTAX       INTEGER{
+			startup(0),
+			spectrumReverb(5),
+			analogLb(6),
+			digitalLb(7),
+			atmLp(10),
+			spectrumMedley(26),
+			spectrumPilot(27),
+			spectrumCMtpr(30),
+			spectrumRMtpr(32),
+			hybridLossTest(33),
+			rcvLinearityTest(34),
+			rcvFilterTest(35),
+			rcvPowerPerBinTest(36),
+			idleNoisePerBinTest(37),
+			totalIdleNoiseTest(38),
+			selt(4134),
+			shutdown(101),
+			wakeup(102)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"this object indicates parameter that allows actions on a per line basis. These actions include abort, startup, and tests."
+	DEFVAL   { 0 }
+	::= { dsAdslLineExtnEntry 1 }
+
+
+dsAdslLineExtnUtopiaL2RxAddr OBJECT-TYPE
+	SYNTAX       INTEGER ( 1..254 )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates UTOPIA Level 2 Rx address for a line."
+	::= { dsAdslLineExtnEntry 2 }
+
+
+dsAdslLineExtnUtopiaL2TxAddr OBJECT-TYPE
+	SYNTAX       INTEGER ( 1..254 )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates UTOPIA Level 2 Tx address for a line."
+	::= { dsAdslLineExtnEntry 3 }
+
+
+dsAdslLineExtnTransAtucCap OBJECT-TYPE
+	SYNTAX       BITS{
+			ansit1413(0),
+			etsi(1),
+			q9921PotsNonOverlapped(2),
+			q9921PotsOverlapped(3),
+			q9921IsdnNonOverlapped(4),
+			q9921isdnOverlapped(5),
+			q9921tcmIsdnNonOverlapped(6),
+			q9921tcmIsdnOverlapped(7),
+			q9922potsNonOverlapeed(8),
+			q9922potsOverlapped(9),
+			q9922tcmIsdnNonOverlapped(10),
+			q9922tcmIsdnOverlapped(11),
+			q9921tcmIsdnSymmetric(12),
+			adslPlusPotsNonOverlapped(13),
+			q9921GspanPlusPotsNonOverlapped(31),
+			q9921GspanPlusPotsOverlapped(30),
+			vdslNonOverlapped(25),
+			vdslOverlapped(24),
+			q9923Adsl2PotsOverlapped(29),
+			q9923Adsl2PotsNonOverlapped(28),
+			q9925Adsl2PlusPotsOverlapped(27),
+			q9925Adsl2PlusPotsNonOverlapped(26),
+			q9923Readsl2PotsOverlapped(22),
+			q9923Readsl2PotsNonOverlapped(23),
+			adslPlusPotsOverlapped(18)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The transmission modes that the ATU-C is capable of supporting. The modes available are limited by the design of the equipment. REFERENCE Section 7.3.2 ITU G.997.1."
+	::= { dsAdslLineExtnEntry 4 }
+
+
+dsAdslLineExtnTransAtucActual OBJECT-TYPE
+	SYNTAX       BITS{
+			ansit1413(0),
+			etsi(1),
+			q9921PotsNonOverlapped(2),
+			q9921PotsOverlapped(3),
+			q9921IsdnNonOverlapped(4),
+			q9921isdnOverlapped(5),
+			q9921tcmIsdnNonOverlapped(6),
+			q9921tcmIsdnOverlapped(7),
+			q9922potsNonOverlapeed(8),
+			q9922potsOverlapped(9),
+			q9922tcmIsdnNonOverlapped(10),
+			q9922tcmIsdnOverlapped(11),
+			q9921tcmIsdnSymmetric(12),
+			adslPlusPotsNonOverlapped(13)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The transmission mode of the ATU-C. This object returns if there is no mode currently known. The initialization with the ATU-R will determine the mode used. REFERENCE Section 7.3.2 ITU G.997.1."
+	::= { dsAdslLineExtnEntry 5 }
+
+dsAdslLineExtnClockType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			oscillator(0),
+			crystal(4)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates parameter to set use of either crystal or oscillator."
+	::= { dsAdslLineExtnEntry 6 }
+
+dsAdslLineExtnLineDmtTrellis OBJECT-TYPE
+	SYNTAX       INTEGER{
+			trellisOn(1),
+			trellisOff(2)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Parameter that indicates whether trellis coding has been enabled or disabled. Trellis coding should always be enabled for its clear performance advantage."
+	::= { dsAdslLineExtnEntry 7 }
+
+
+--dsAdslLineExtnTransAturCap OBJECT-TYPE
+--	SYNTAX       BITS{
+--			ansit1413(0),
+--			etsi(1),
+--			q9921PotsNonOverlapped(2),
+--			q9921PotsOverlapped(3),
+--			q9921IsdnNonOverlapped(4),
+--			q9921isdnOverlapped(5),
+--			q9921tcmIsdnNonOverlapped(6),
+--			q9921tcmIsdnOverlapped(7),
+--			q9922potsNonOverlapeed(8),
+--			q9922potsOverlapped(9),
+--			q9922tcmIsdnNonOverlapped(10),
+--			q9922tcmIsdnOverlapped(11),
+--			q9921tcmIsdnSymmetric(12),
+--			adslPlusPotsNonOverlapped(13),
+--			q9921GspanPlusPotsNonOverlapped(31),
+--			q9921GspanPlusPotsOverlapped(30),
+--			vdslNonOverlapped(25),
+--			vdslOverlapped(24),
+--			q9923Adsl2PotsOverlapped(29),
+--			q9923Adsl2PotsNonOverlapped(28),
+--			q9925Adsl2PlusPotsOverlapped(27),
+--			q9925Adsl2PlusPotsNonOverlapped(26),
+--			q9923Readsl2PotsOverlapped(22),
+--			q9923Readsl2PotsNonOverlapped(23),
+--			adslPlusPotsOverlapped(18)
+--		}
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"The transmission modes that the ATU-R is capable of supporting. The modes available are limited by the design of the equipment."
+--	::= { dsAdslLineExtnEntry 8 }
+
+
+--dsAdslLineExtnPMConfPMSF OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			idleop(0),
+--			dataop(1),
+--			l2op(141)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"PM-related parameter used by the ATU-C to force a change in the line state.(Not available for ADSL/ADSL2Plus)."
+--	DEFVAL   { GS_CFG_DEF_ATUC_PM_CONF_PMSF }
+--	::= { dsAdslLineExtnEntry 9 }
+
+
+--dsAdslLineExtnDeltConfLDSF OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			inhibit(0),
+--			force(1)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"DELT-related parameter used by the ATU-C to force the line into loop diagnostics mode.(Not available for ADSL and ADSL2plus)."
+--	DEFVAL   { GS_CFG_DEF_ATUC_DELT_CONF_LDSF }
+--	::= { dsAdslLineExtnEntry 10 }
+
+
+--dsAdslLineExtnTransAtucConfig OBJECT-TYPE
+--	SYNTAX       BITS{         
+--	ansit1413(1)
+--			ansit1413(GS_CFG_LINE_TRANS_ATUC_CONFIG_ANSIT1413),
+--			etsi(GS_CFG_LINE_TRANS_ATUC_CONFIG_ETSI),
+--			q9921PotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921_POTS_NON_OVERLAPPED),
+--			q9921PotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921_POTS_OVERLAPPED),
+--			q9921IsdnNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921_ISDN_NON_OVERLAPPED),
+--			q9921isdnOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921ISDN_OVERLAPPED),
+--			q9921tcmIsdnNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921TCM_ISDN_NON_OVERLAPPED),
+--			q9921tcmIsdnOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921TCM_ISDN_OVERLAPPED),
+--			q9922potsNonOverlapeed(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9922POTS_NON_OVERLAPEED),
+--			q9922potsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9922POTS_OVERLAPPED),
+--			q9922tcmIsdnNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9922TCM_ISDN_NON_OVERLAPPED),
+--			q9922tcmIsdnOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9922TCM_ISDN_OVERLAPPED),
+--			q9921tcmIsdnSymmetric(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921TCM_ISDN_SYMMETRIC),
+--			adslPlusPotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_ADSL_PLUS_POTS_NON_OVERLAPPED),
+--			q9921GspanPlusPotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921_GSPAN_PLUS_POTS_NON_OVERLAPPED),
+--			q9921GspanPlusPotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9921_GSPAN_PLUS_POTS_OVERLAPPED),
+--			q9923Adsl2PotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9923_ADSL2_POTS_OVERLAPPED),
+--			q9923Adsl2PotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9923_ADSL2_POTS_NON_OVERLAPPED),
+--			q9925Adsl2PlusPotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9925_ADSL2_PLUS_POTS_OVERLAPPED),
+--			q9925Adsl2PlusPotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9925_ADSL2_PLUS_POTS_NON_OVERLAPPED),
+--			q9923Readsl2PotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9923_READSL2_POTS_OVERLAPPED),
+--			q9923Readsl2PotsNonOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_Q9923_READSL2_POTS_NON_OVERLAPPED),
+--			adslPlusPotsOverlapped(GS_CFG_LINE_TRANS_ATUC_CONFIG_ADSL_PLUS_POTS_OVERLAPPED)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"The transmission modes that the ATU-C is capable of supporting. The modes available are limited by the design of the equipment. REFERENCE Section 7.3.2 ITU G.997.1."
+--	DEFVAL   { GS_CFG_DEF_TRANS_ATUC_CONFIG }
+--	::= { dsAdslLineExtnEntry 11 }
+
+
+
+-- 
+-- --
+
+dsAdslAtucPhysExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucPhysExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATUC. This table is an extention to adslAtucPhysTable defined in rfc-2662."
+	::= { dasanAdslMIBObjects 4 }
+
+
+dsAdslAtucPhysExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucPhysExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucPhysExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAtucPhysExtnTable 1 }
+
+DsAdslAtucPhysExtnEntry ::= SEQUENCE {
+		dsAdslAtucPhysExtnOpState     INTEGER,
+		dsAdslAtucPhysExtnActualStd     INTEGER,
+		dsAdslAtucPhysExtnBertError     INTEGER,
+		dsAdslAtucPhysExtnTxAtmCellCounter     Counter32,
+		dsAdslAtucPhysExtnRxAtmCellCounter     INTEGER,
+		dsAdslAtucPhysExtnStartProgress     INTEGER,
+		dsAdslAtucPhysExtnIdleBertError     INTEGER,
+		dsAdslAtucPhysExtnIdleBertCells     INTEGER,
+		dsAdslAtucPhysExtnBertSync     INTEGER,
+		dsAdslAtucPhysExtnParametricTestResult     INTEGER, 
+-- 2.7.6 :GsvAdslAtucPhysExtnEntry (gsvAdslAtucPhysExtnTable.mib)		
+		--dsAdslAtucPhysExtnSeltInfoValid     INTEGER,
+		--dsAdslAtucPhysExtnSeltLoopLen     INTEGER,
+		--dsAdslAtucPhysExtnSeltLoopEnd     INTEGER,
+		--dsAdslAtucPhysExtnSeltLoopGauge     INTEGER,
+		--dsAdslAtucPhysExtnSeltUpShannonCap     Gauge32,
+		--dsAdslAtucPhysExtnSeltDownShannonCap     Gauge32,
+		--dsAdslAtucPhysExtnSeltInbandNoise     OCTET STRING,
+		--dsAdslAtucPhysExtnSeltTerminationResp     OCTET STRING,
+		--dsAdslAtucPhysExtnSeltUpMgnAtRate     OCTET STRING,
+		--dsAdslAtucPhysExtnSeltDownMgnAtRate     OCTET STRING,
+		dsAdslAtucPhysExtnDataBoostStatus     INTEGER,
+		dsAdslAtucPhysExtnTestArray     OCTET STRING,
+		dsAdslAtucPhysExtnChanPerfCD     INTEGER,
+		dsAdslAtucPhysExtnChanPerfBE     INTEGER,
+		dsAdslAtucPhysExtnDeltHLINSCus     INTEGER,
+		dsAdslAtucPhysExtnDeltHLINpsus     OCTET STRING,
+		dsAdslAtucPhysExtnDeltHLOGMTus     INTEGER,
+		dsAdslAtucPhysExtnDeltHLOGpsus     OCTET STRING,
+		dsAdslAtucPhysExtnDeltQLNMTus     INTEGER,
+		dsAdslAtucPhysExtnDeltQLNpsus     OCTET STRING,
+		dsAdslAtucPhysExtnDeltLastTxState     INTEGER,
+		dsAdslAtucPhysExtnPMState     INTEGER,
+		dsAdslAtucPhysExtnChanPerfCU     INTEGER,
+		dsAdslAtucPhysExtnExtendedPsdStatus     INTEGER,
+		dsAdslAtucPhysExtnChipVersion     INTEGER,
+		dsAdslAtucPhysExtnPilotTone     INTEGER,
+		dsAdslAtucMSGds     			Gauge32,
+		dsAdslAtucPhysExtnPsdMaskMode     INTEGER }
+
+
+dsAdslAtucPhysExtnOpState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			idle(0),
+			data(1),
+			handshake(16),
+			training(24),
+			llTest(128),
+			dlTest(131),
+			txTest(132),
+			framerSync(26),
+			fastRetrainInProg(27),
+			bootupLoad(8),
+			atmLpTest(133),
+			discovery(46),
+			deltTraining(139),
+			delt(140)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the operational state of the ATU. Values include idle,handshake, training, etc."
+	::= { dsAdslAtucPhysExtnEntry 1 }
+
+
+dsAdslAtucPhysExtnActualStd OBJECT-TYPE
+	SYNTAX       INTEGER{
+			t1413(0),
+			gLite(1),
+			gDmt(2),
+			alctl14(3),
+			multimode(4),
+			adi(5),
+			alctl(6),
+			t1413auto(9),  
+			adslPlus(48),  
+			gspanPlus(64),
+ 			adsl2(26),
+ 			adsl2Plus(27),
+ 			reAdsl2(28),
+ 			adsl2Auto(29),
+ 			adsl2PlusAuto(30) 
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides actual ATU-C configuration based on outcome of negotiation with ATU-R. In this case, the parameter provides actual standard used for the connection."
+	::= { dsAdslAtucPhysExtnEntry 2 }
+
+
+dsAdslAtucPhysExtnBertError OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the No. of bit errors detected during BERT."
+	::= { dsAdslAtucPhysExtnEntry 3 }
+
+
+dsAdslAtucPhysExtnTxAtmCellCounter OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object Provides transmit ATM cell counter."
+	::= { dsAdslAtucPhysExtnEntry 4 }
+
+
+dsAdslAtucPhysExtnRxAtmCellCounter OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object Provides receive ATM cell counter."
+	::= { dsAdslAtucPhysExtnEntry 5 }
+
+
+dsAdslAtucPhysExtnStartProgress OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides current detailed start up information to be used for debugging."
+	::= { dsAdslAtucPhysExtnEntry 6 }
+
+
+dsAdslAtucPhysExtnIdleBertError OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of bit errors."
+	::= { dsAdslAtucPhysExtnEntry 7 }
+
+
+dsAdslAtucPhysExtnIdleBertCells OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of idle cells."
+	::= { dsAdslAtucPhysExtnEntry 8 }
+
+
+dsAdslAtucPhysExtnBertSync OBJECT-TYPE
+	SYNTAX       INTEGER{
+			bertOutOfSync(0),
+			bertInSync(128)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates if the Signal is in Sync or not."
+	::= { dsAdslAtucPhysExtnEntry 9}
+
+
+dsAdslAtucPhysExtnParametricTestResult OBJECT-TYPE
+	SYNTAX       INTEGER{
+			ok(0),
+			fail(1),
+			dspIfFail(2)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates the Result of the Parametric Test conducted on the Xcvr."
+	::= { dsAdslAtucPhysExtnEntry 10}
+
+--dsAdslAtucPhysExtnSeltInfoValid OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			true(1),
+--			notConnected(32768),
+--			lostConnection(33024),
+--			noResponseSeltEngine(33280)
+--		}
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the information validity for the SELT operation conducted on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 11 }
+
+
+--dsAdslAtucPhysExtnSeltLoopLen OBJECT-TYPE
+--	SYNTAX       INTEGER
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the LOOP Length in Feet once when the SELT information is valid on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 12 }
+
+
+--dsAdslAtucPhysExtnSeltLoopEnd OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			open(0),
+--			short(1),
+--			unknown(2)
+--		}
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates whether the loop is short or open once when the SELT information is valid on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 13 }
+
+
+--dsAdslAtucPhysExtnSeltLoopGauge OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			greater26awg(4294967295),
+--			equal26awg(0),
+--			equal24awg(1),
+--			less26awg(2),
+--			unknownAwg(3)
+--		}
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the LOOP wire_gauge information once when the SELT information is valid on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 14 }
+
+
+--dsAdslAtucPhysExtnSeltUpShannonCap OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the LOOP Upstream Shannon Capacity (in bps) once when the SELT information is valid on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 15 }
+
+
+--dsAdslAtucPhysExtnSeltDownShannonCap OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the LOOP Downstream Shannon Capacity (in bps) once when the SELT information is valid on the Xcvr."
+--	::= { dsAdslAtucPhysExtnEntry 16 }
+
+
+--dsAdslAtucPhysExtnSeltInbandNoise OBJECT-TYPE
+--	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"256 values that indicate inband noise length in dBM/Hz, covering both bands from 0 to 1.1 MHz."
+--	::= { dsAdslAtucPhysExtnEntry 17 }
+
+
+--dsAdslAtucPhysExtnSeltTerminationResp OBJECT-TYPE
+--	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"180 discrete values that indicate termination response magnitude from 0 to 18Kft."
+--	::= { dsAdslAtucPhysExtnEntry 18 }
+
+
+--dsAdslAtucPhysExtnSeltUpMgnAtRate OBJECT-TYPE
+--	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"150 values that indicate SNR margin in dB/10 at a particular rate are provided, at 100K increments, up to 15 Mbps."
+--	::= { dsAdslAtucPhysExtnEntry 19 }
+
+
+--dsAdslAtucPhysExtnSeltDownMgnAtRate OBJECT-TYPE
+--	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"150 values that indicate SNR margin in dB/10 at a particular rate are provided, at 100K increments, up to 15 Mbps."
+--	::= { dsAdslAtucPhysExtnEntry 20 }
+
+
+dsAdslAtucPhysExtnDataBoostStatus OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enabled(32768),
+			disabled(0)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates whether DataBoost is utilized for the connection."
+	::= { dsAdslAtucPhysExtnEntry 21 }
+
+
+dsAdslAtucPhysExtnTestArray OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) ) 
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the Parametric Test Array. Every Four octects refer to one element in this array of octets."
+	::= { dsAdslAtucPhysExtnEntry 22 }
+
+
+dsAdslAtucPhysExtnChanPerfCD OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The near-end delineated total cell count performance parameter is a count of the total number of cells passed through the cell delineation and HEC function process operating on the ATM Data Path while in the SYNC state. (Not available for ADSL)."
+	::= { dsAdslAtucPhysExtnEntry 23 }
+
+
+dsAdslAtucPhysExtnChanPerfBE OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The near-end idle bit error count performance parameter is a count of the number of bit errors in the idle cell payload received in the ATM Data Path at the near-end. (Not available for ADSL)."
+	::= { dsAdslAtucPhysExtnEntry 24 }
+
+
+dsAdslAtucPhysExtnDeltHLINSCus OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the scale factor to be applied to the upstream Hlin(f) values.(Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAtucPhysExtnEntry 25 }
+
+
+dsAdslAtucPhysExtnDeltHLINpsus OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of complex upstream Hlin(f) values in linear scale. (Not available for ADSL and ADSL2plus).  Every two octets refer to one element in this array of octets."
+	::= { dsAdslAtucPhysExtnEntry 26 }
+
+
+dsAdslAtucPhysExtnDeltHLOGMTus OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the number of symbols used to measure the upstream Hlog(f).(Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAtucPhysExtnEntry 27 }
+
+
+dsAdslAtucPhysExtnDeltHLOGpsus OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of real upstream Hlog(f) values in dB. (Not available for ADSL and ADSL2plus). Every two octets refer to one element in this array of octets."
+	::= { dsAdslAtucPhysExtnEntry 28 }
+
+
+dsAdslAtucPhysExtnDeltQLNMTus OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the number of symbols used to measure the upstream QLN(f) values. (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAtucPhysExtnEntry 29 }
+
+
+dsAdslAtucPhysExtnDeltQLNpsus OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of real upstream QLN(f) values in dB. (Not available for ADSL and ADSL2plus). Every two octets refer to one element in this array of octets."
+	::= { dsAdslAtucPhysExtnEntry 30 }
+
+
+dsAdslAtucPhysExtnDeltLastTxState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dmtatucg9941(0),
+			dmtatucquiet1(1),
+			dmtatuccomb1(2),
+			dmtatucquiet2(3),
+			dmtatuccomb2(4),
+			dmtatucicomb1(5),
+			dmtatuclineprob(6),
+			dmtatucquiet3(7),
+			dmtatuccomb3(8),
+			dmtatucicomb2(9),
+			dmtatucmsgfmt(10),
+			dmtatucmsgpcb(11),
+			dmtatucquiet4(12),
+			dmtatucreverb1(13),
+			dmtatuctref1(14),
+			dmtatucreverb2(15),
+			dmtatucect(16),
+			dmtatucreverb3(17),
+			dmtatuctref2(18),
+			dmtatucreverb4(19),
+			dmtatucsegue1(20),
+			dmtatucmsg1(21),
+			dmtatucreverb5(22),
+			dmtatucsegue2(23),
+			dmtatucmedley(24),
+			dmtatucexchmarker(25),
+			dmtatucmsg2(26),
+			dmtatucreverb6(27),
+			dmtatucsegue3(28),
+			dmtatucparams(29),
+			dmtatucreverb7(30),
+			dmtatucsegue4(31),
+			dmtatucshowtime(32)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides last successful transmitted initialization state by the ATU-C. (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAtucPhysExtnEntry 31 }
+
+
+dsAdslAtucPhysExtnPMState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			idleop(0),
+			dataop(1),
+			l2op(141)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Line Power Management State. (Not available for ADSL)."
+	::= { dsAdslAtucPhysExtnEntry 32 }
+
+
+dsAdslAtucPhysExtnChanPerfCU OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" The near-end user total cell count performance parameter is a count of the total number of cells in the ATM Data Path delivered at the V-C (for ATU-C) or T-R (for ATU-R) interface. (Not available for ADSL)."
+	::= { dsAdslAtucPhysExtnEntry 33 }
+
+
+dsAdslAtucPhysExtnExtendedPsdStatus OBJECT-TYPE
+	SYNTAX       INTEGER{
+			standard(0),
+			jj100(1),
+			extended(32768)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"GlobespanVirata parameter that indicates whether an extended or the standard upstream PSD is used - for G.Span Plus mode of operation only. Only supported for G.Span Plus, therefore this parameter is not valid for ADSL2/ADSL2plus modes of operation."
+	::= { dsAdslAtucPhysExtnEntry 34 }
+
+
+dsAdslAtucPhysExtnChipVersion OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"GlobespanVirata parameter that indicates the DSP version number."
+	::= { dsAdslAtucPhysExtnEntry 35 }
+
+
+dsAdslAtucPhysExtnPilotTone OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"GlobespanVirata parameter that indicates the Pilot Tone Index."
+	::= { dsAdslAtucPhysExtnEntry 36 }
+
+
+dsAdslAtucMSGds OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates the Overhead Channel. This feature is not supported by DSLPHY as yet."
+	::= { dsAdslAtucPhysExtnEntry 37 }
+
+
+dsAdslAtucPhysExtnPsdMaskMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			adsl(0),
+			hsadslM1(3),
+			hsadslM2 (4),
+			msk2Rfi(32768),
+			flatMskRfi(32771),
+			cabMsk2Rfi (32772),
+			coMsk2Rfi0 (49152)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"GlobespanVirata parameter that indicates the actual Psd Mask currently being used."
+	::= { dsAdslAtucPhysExtnEntry 38 }
+
+dsAdslAturPhysExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAturPhysExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table is an extention to adslAtucPhysTable defined in rfc-2662. This table provides one row for each ATUR. Each row contains the Physical Layer Parameters table for that ATUR."
+	::= { dasanAdslMIBObjects 5 }
+
+
+dsAdslAturPhysExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAturPhysExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAturPhysExtnTable.
+		The Table is indexed by IfIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAturPhysExtnTable 1 }
+
+DsAdslAturPhysExtnEntry ::= SEQUENCE {
+		dsAdslAturPhysExtnConfig     OCTET STRING,
+-- 2.7.6 GsvAdslAturPhysExtnEntry (gsvAdslAturPhysExtnTable.mib)
+		dsAdslAturPhysExtnChanPerfCD     INTEGER,
+		dsAdslAturPhysExtnChanPerfCU     INTEGER,
+		dsAdslAturPhysExtnChanPerfBE     INTEGER,
+		dsAdslAturPhysExtnDeltHLINSCds     INTEGER,
+		dsAdslAturPhysExtnDeltHLINpsds     OCTET STRING,
+		dsAdslAturPhysExtnDeltHLOGMTds     INTEGER,
+		dsAdslAturPhysExtnDeltHLOGpsus     OCTET STRING,
+		dsAdslAturPhysExtnDeltQLNMTds     INTEGER,
+		dsAdslAturPhysExtnDeltQLNpsds     OCTET STRING,
+		dsAdslAturPhysExtnDeltLastTxState     INTEGER,
+		dsAdslAturMSGus     					Gauge32
+		}
+
+
+
+dsAdslAturPhysExtnConfig OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..255 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the upstream and downstream ATU-R configuration data (EOC - read 5 sec after data mode)."
+	::= { dsAdslAturPhysExtnEntry 1 }
+
+
+dsAdslAturPhysExtnChanPerfCD OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The far-end delineated total cell count performance parameter is a count of the total number of cells passed through the cell delineation and HEC function process operating on the ATM Data Path while in the SYNC state.(Not available for ADSL)."
+	::= { dsAdslAturPhysExtnEntry 2 }
+
+
+dsAdslAturPhysExtnChanPerfCU OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The far-end user total cell count performance parameter is a count of the total number of cells in the ATM Data Path delivered at the V-C (for ATU-C) or T-R (for ATUR) interface. (Not available for ADSL)."
+	::= { dsAdslAturPhysExtnEntry 3 }
+
+
+dsAdslAturPhysExtnChanPerfBE OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The far-end idle bit error count performance parameter is a count of the number of bit errors in the idle cell payload received in the ATM Data Path at the far-end. (Not available for ADSL)."
+	::= { dsAdslAturPhysExtnEntry 4 }
+
+
+dsAdslAturPhysExtnDeltHLINSCds OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the scale factor to be applied to the downstream Hlin(f) values.(Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAturPhysExtnEntry 5 }
+
+
+dsAdslAturPhysExtnDeltHLINpsds OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of complex downstream Hlin(f) values in linear scale. (Not available for ADSL and ADSL2plus). Every two octects refer to one element in this array of octets."
+	::= { dsAdslAturPhysExtnEntry 6 }
+
+
+dsAdslAturPhysExtnDeltHLOGMTds OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the number of symbols used to measure the downstream Hlog(f). (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAturPhysExtnEntry 7 }
+
+
+dsAdslAturPhysExtnDeltHLOGpsus OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of real downstream Hlog(f) values in dB. (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAturPhysExtnEntry 8 }
+
+
+dsAdslAturPhysExtnDeltQLNMTds OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides the number of symbols used to measure the downstream QLN(f) values. (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAturPhysExtnEntry 9 }
+
+
+dsAdslAturPhysExtnDeltQLNpsds OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..42 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides an array of real downstream QLN(f) values in dB. (Not available for ADSL and ADSL2plus). Every two octects refer to one element in this array of octets."
+	::= { dsAdslAturPhysExtnEntry 10 }
+
+
+dsAdslAturPhysExtnDeltLastTxState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dmtaturg9941(0),
+			dmtaturquiet1(1),
+			dmtaturcomb1(2),
+			dmtaturquiet2(3),
+			dmtaturcomb2(4),
+			dmtaturicomb1(5),
+			dmtaturlineprob(6),
+			dmtaturquiet3(7),
+			dmtaturcomb3(8),
+			dmtaturicomb2(9),
+			dmtaturmsgfmt(10),
+			dmtaturmsgpcb(11),
+			dmtaturreverb1(12),
+			dmtaturquiet4(13),
+			dmtaturreverb2(14),
+			dmtaturquiet5(15),
+			dmtaturreverb3(16),
+			dmtaturect(17),
+			dmtaturreverb4(18),
+			dmtatursegue1(19),
+			dmtaturreverb5(20),
+			dmtatursegue2(21),
+			dmtaturmsg1(22),
+			dmtaturmedley(23),
+			dmtaturexchmarker(24),
+			dmtaturmsg2(25),
+			dmtaturreverb6(26),
+			dmtatursegue3(27),
+			dmtaturparams(28),
+			dmtaturreverb7(29),
+			dmtatursegue4(30),
+			dmtaturshowtime(31)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"DELT-related parameter that provides last successful transmitted initialization state by the ATU-R. (Not available for ADSL and ADSL2plus)."
+	::= { dsAdslAturPhysExtnEntry 11 }
+
+
+dsAdslAturMSGus OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates the Overhead Channel.  This feature is not supported by DSLPHY as yet."
+	::= { dsAdslAturPhysExtnEntry 12 }
+
+
+dsAdslAtucChanExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucChanExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATUC channel. This Table is an extention to adslAtucChanTable defined in rfc 2662."
+	::= { dasanAdslMIBObjects 6 }
+
+
+dsAdslAtucChanExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucChanExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucChanExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAtucChanExtnTable 1 }
+
+DsAdslAtucChanExtnEntry ::= SEQUENCE {		
+        dsAdslAtucChanExtnCurrAtmStatus     INTEGER,
+		dsAdslAtucChanExtnRsSymbols     INTEGER,
+		dsAdslAtucChanExtnRsDepth     INTEGER,
+		dsAdslAtucChanExtnRsRedundancy     INTEGER }
+
+
+
+dsAdslAtucChanExtnCurrAtmStatus OBJECT-TYPE
+	SYNTAX       INTEGER{
+			noAtmDefect(0),
+			noCellDelineation(1),
+			lossOfCellDelineation(2)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"indicates an ncd or lcd failure if the counter surpasses 127. If neither ATM counter surpasses 127, the return value will be 'NoAtmDefect'."
+	::= { dsAdslAtucChanExtnEntry 1 }
+
+
+dsAdslAtucChanExtnRsSymbols OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates number of DMT symbols per Reed-Solomon code word (S) in the downstream direction. Note that S is not restricted to interleaved mode only. Even in fast mode, S is a valid constant value and is equal to 1."
+	::= { dsAdslAtucChanExtnEntry 2 }
+
+
+dsAdslAtucChanExtnRsDepth OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates interleaving depth (D) in the downstream direction. Note that D is not restricted to interleaved mode only. Even in fast mode, D is a valid constant value and is equal to 1."
+	::= { dsAdslAtucChanExtnEntry 3 }
+
+
+dsAdslAtucChanExtnRsRedundancy OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates number of redundant bytes (R) per Reed-Solomon code in the downstream direction."
+	::= { dsAdslAtucChanExtnEntry 4 }
+
+dsAdslAturChanExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAturChanExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table is extention to adslAturChanTable defined in rfc-2662. This table provides one row for each ATUR channel.  ADSL channel interfaces are those Interface Table entries where ifType is equal to adslInterleave(124) or adslFast(125)."
+	::= { dasanAdslMIBObjects 7 }
+
+
+dsAdslAturChanExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAturChanExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAturChanExtnTable.
+		The Table is indexed by IfIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAturChanExtnTable 1 }
+
+DsAdslAturChanExtnEntry ::= SEQUENCE {
+		dsAdslAturChanExtnCurrAtmStatus     INTEGER,
+		dsAdslAturChanExtnRsSymbols     Unsigned32,
+		dsAdslAturChanExtnRsDepth     Unsigned32,
+		dsAdslAturChanExtnRsRedundancy     Unsigned32 }
+
+
+dsAdslAturChanExtnCurrAtmStatus OBJECT-TYPE
+	SYNTAX       INTEGER{
+			noAtmDefect(0),
+			noCellDelineation(1),
+			lossOfCellDelineation(2)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates an ncd or lcd failure if the counter surpasses 127. If neither ATM counter surpasses 127, the return value will be NoAtmDefect."
+	::= { dsAdslAturChanExtnEntry 1 }
+
+
+dsAdslAturChanExtnRsSymbols OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates number of DMT symbols per Reed- Solomon code word (S) in the upstream direction Note that S is not restricted to interleaved mode only. Even in fast mode, S is a valid constant value and is equal to 1."
+	::= { dsAdslAturChanExtnEntry 2 }
+
+
+dsAdslAturChanExtnRsDepth OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates interleaving depth (D) in the upstream direction Note that D is not restricted to interleaved mode only. Even in fast mode, D is a valid constant value and is equal to 1."
+	::= { dsAdslAturChanExtnEntry 3 }
+
+
+dsAdslAturChanExtnRsRedundancy OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates number of redundant bytes (R) per Reed-Solomon code in the upstream direction."
+	::= { dsAdslAturChanExtnEntry 4 }
+
+dsAdslAtucPerfDataExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATUC. This table is extention to adslAtucPerfDataTable defined in rfc-2662."
+	::= { dasanAdslMIBObjects 8 }
+
+
+dsAdslAtucPerfDataExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucPerfDataExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAtucPerfDataExtnTable 1 }
+
+DsAdslAtucPerfDataExtnEntry ::= SEQUENCE {
+		dsAdslAtucPerfDataExtnStatFastR     Gauge32,
+		dsAdslAtucPerfDataExtnStatFailedFastR     Gauge32,
+		dsAdslAtucPerfDataExtnStatSesL     Gauge32,
+		dsAdslAtucPerfDataExtnStatUasL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinFastR     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinFailedFastR     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinSesL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinUasL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DayFastR     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DayFailedFastR     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DaySesL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DayUasL     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayFastR     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayFailedFastR     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DaySesL     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayUasL     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayTimeElapsed     Gauge32,
+-- 2.7.6 GsvAdslAtucPerfDataExtnEntry(gsvAdslAtucPerfDataExtnTable.mib)
+		dsAdslAtucPerfDataExtnStatFecsL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinFecsL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DayFecsL     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayFecsL     Gauge32,
+		dsAdslAtucPerfDataExtnStatLossL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr15MinLossL     Gauge32,
+		dsAdslAtucPerfDataExtnCurr1DayLossL     Gauge32,
+		dsAdslAtucPerfDataExtnPrev1DayLossL     Gauge32 }
+		--dsAdslAtucPerfDataExtnStatInitsFailed     Gauge32,
+		--dsAdslAtucPerfDataExtnCurr15MinInitsFailed     Gauge32,
+		--dsAdslAtucPerfDataExtnCurr1DayInitsFailed     Gauge32,
+		--dsAdslAtucPerfDataExtnPrev1DayInitsFailed     Gauge32 }
+
+
+
+dsAdslAtucPerfDataExtnStatFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The value of this object indicates the count of fast retrains. REFERENCE ITU G.997.1 Section 7.4.15.1"
+	::= { dsAdslAtucPerfDataExtnEntry 1 }
+
+
+dsAdslAtucPerfDataExtnStatFailedFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The value of this object indicates the count of failed fast retrains. REFERENCE ITU G.997.1 Section 7.4.15.2"
+	::= { dsAdslAtucPerfDataExtnEntry 2 }
+
+
+dsAdslAtucPerfDataExtnStatSesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The value of this object indicates the count of severely errored second line. REFERENCE ITU G.997.1 Section 7.2.1.1.7"
+	::= { dsAdslAtucPerfDataExtnEntry 3 }
+
+
+dsAdslAtucPerfDataExtnStatUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The value of this object indicates the count of unavailable errored seconds.  REFERENCE ITU G.997.1 Section 7.2.1.1.9"
+	::= { dsAdslAtucPerfDataExtnEntry 4 }
+
+
+dsAdslAtucPerfDataExtnCurr15MinFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the current 15 minute interval when there was fast retrains. REFERENCE ITU G.997.1 Section 7.4.15.1"
+	::= { dsAdslAtucPerfDataExtnEntry 5 }
+
+
+dsAdslAtucPerfDataExtnCurr15MinFailedFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the current 15 minute interval when there was failed fast retrains. REFERENCE ITU G.997.1 Section 7.4.15.2"
+	::= { dsAdslAtucPerfDataExtnEntry 6 }
+
+
+dsAdslAtucPerfDataExtnCurr15MinSesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the current 15 minute interval when there was severely errored seconds. REFERENCE ITU G.997.1 Section 7.2.1.1.7"
+	::= { dsAdslAtucPerfDataExtnEntry 7 }
+
+
+dsAdslAtucPerfDataExtnCurr15MinUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the current 15 minute interval when there was count for unavailable errored seconds. REFERENCE ITU G.997.1 Section 7.2.1.1.9"
+	::= { dsAdslAtucPerfDataExtnEntry 8 }
+
+
+dsAdslAtucPerfDataExtnCurr1DayFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of the number of seconds when there was fast retrains during the current day as measured by adslAtucPerfCurr1Day TimeElapsed. REFERENCE ITU G.997.1 Section 7.4.15.1"
+	::= { dsAdslAtucPerfDataExtnEntry 9 }
+
+
+dsAdslAtucPerfDataExtnCurr1DayFailedFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of the number of seconds when there was failed fast retrains during the current day as measured by adslAtucPerfCurr1Day TimeElapsed.REFERENCE ITU G.997.1 Section 7.4.15.2"
+	::= { dsAdslAtucPerfDataExtnEntry 10 }
+
+
+dsAdslAtucPerfDataExtnCurr1DaySesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of the number of seconds when there was Severely Errored Seconds during the current day as measured by adslAtucPerfCurr1DayTimeElapsed. REFERENCE ITU G.997.1 Section 7.2.1.1.7"
+	::= { dsAdslAtucPerfDataExtnEntry 11 }
+
+
+dsAdslAtucPerfDataExtnCurr1DayUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of the number of seconds when there was Unavailable Errored Seconds during the current day as measured by adslAtucPerfCurr1DayTimeElapsed. REFERENCE ITU G.997.1 Section 7.2.1.1.9"
+	::= { dsAdslAtucPerfDataExtnEntry 12 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the interval when there was fast retrains within the most recent previous 1 day period. REFERENCE ITU G.997.1 Section 7.4.15.1"
+	::= { dsAdslAtucPerfDataExtnEntry 13 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayFailedFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the interval when there was failed fast retrains within the most recent previous 1 day period.  REFERENCE ITU G.997.1 Section 7.4.15.2"
+	::= { dsAdslAtucPerfDataExtnEntry 14 }
+
+
+dsAdslAtucPerfDataExtnPrev1DaySesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the interval when there was severely errored seconds within the most recent previous 1 day period. REFERENCE ITU G.997.1 Section 7.2.1.1.7"
+	::= { dsAdslAtucPerfDataExtnEntry 15 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of seconds in the interval when there was unavailable errored seconds within the most recent previous 1 day period. REFERENCE ITU G.997.1 Section 7.2.1.1.9"
+	::= { dsAdslAtucPerfDataExtnEntry 16 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayTimeElapsed OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Total elapsed seconds in this interval in seconds."
+	::= { dsAdslAtucPerfDataExtnEntry 17 }
+
+
+dsAdslAtucPerfDataExtnStatFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals with one or more forward error correction (FEC) anomalies since agent reset (Not available for ADSL)."
+	::= { dsAdslAtucPerfDataExtnEntry 18 }
+
+
+dsAdslAtucPerfDataExtnCurr15MinFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals, in the current 15 minute interval, with one or more forward error correction (FEC) anomalies (Not available for ADSL)."
+	::= { dsAdslAtucPerfDataExtnEntry 19 }
+
+
+dsAdslAtucPerfDataExtnCurr1DayFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"NCount of 1-second intervals, during the current day as measured by adslAtucPerfCurr1Day-TimeElapsed, with one or moreforward error correction (FEC) anomalies (Not available for ADSL)."
+	::= { dsAdslAtucPerfDataExtnEntry 20 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals, within the most recent previous 1-day period, with one or more forward error correction (FEC) anomalies (Not available for ADSL)."
+	::= { dsAdslAtucPerfDataExtnEntry 21 }
+
+
+dsAdslAtucPerfDataExtnStatLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals containing one or more loss of signal (LOS) defects (Not available for ADSL)."
+	::= { dsAdslAtucPerfDataExtnEntry 22 }
+
+dsAdslAtucPerfDataExtnCurr15MinLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"."
+	::= { dsAdslAtucPerfDataExtnEntry 23 }
+
+
+dsAdslAtucPerfDataExtnCurr1DayLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"."
+	::= { dsAdslAtucPerfDataExtnEntry 24 }
+
+
+dsAdslAtucPerfDataExtnPrev1DayLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"."
+	::= { dsAdslAtucPerfDataExtnEntry 25 }
+
+
+--dsAdslAtucPerfDataExtnStatInitsFailed OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Count of the failed full initialization attempts since agent reset. A failed full initialization is when showtime is not reached at the end of the full initialization procedure."
+--	::= { dsAdslAtucPerfDataExtnEntry 23 }
+
+
+--dsAdslAtucPerfDataExtnCurr15MinInitsFailed OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Count of the failed line initialization attempts since agent reset. (length = 4 bytes)"
+--	::= { dsAdslAtucPerfDataExtnEntry 24 }
+
+
+--dsAdslAtucPerfDataExtnCurr1DayInitsFailed OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Count of the failed line initialization attempts in the day as measured by “adslAtucPerfCurr1Day-TimeElapsed.(length = 4 bytes)"
+--	::= { dsAdslAtucPerfDataExtnEntry 25 }
+
+
+--dsAdslAtucPerfDataExtnPrev1DayInitsFailed OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"Count of the failed line initialization attempts in the most recent previous 1-day period. (length = 4 bytes)"
+--	::= { dsAdslAtucPerfDataExtnEntry 26 }
+
+
+--2.7.6
+dsAdslAturPerfDataExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAturPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATU-R.  ADSL physical interfaces are those Interface Table Entries where ifType is equal to adsl(94). This table is an extn to 'adslAturPerfDataExtTable' which is part of ADSL-LINE-EXT-MIB (rfc 3440)."
+	::= { dasanAdslMIBObjects  9 }
+
+
+dsAdslAturPerfDataExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAturPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAturPerfDataExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAturPerfDataExtnTable 1 }
+
+DsAdslAturPerfDataExtnEntry ::= SEQUENCE {
+		dsAdslAturPerfDataExtnStatSesL		Counter32,
+		dsAdslAturPerfDataExtnCurr15MinSesL     Gauge32,
+		dsAdslAturPerfDataExtnCurr1DaySesL     Gauge32,
+		dsAdslAturPerfDataExtnPrev1DaySesL     Gauge32,
+	  	dsAdslAturPerfDataExtnStatUasL		Counter32,
+		dsAdslAturPerfDataExtnCurr15MinUasL     Gauge32,
+		dsAdslAturPerfDataExtnCurr1DayUasL     Gauge32,
+		dsAdslAturPerfDataExtnPrev1DayUasL     Gauge32,
+		dsAdslAturPerfDataExtnStatFecsL     Counter32,
+		dsAdslAturPerfDataExtnCurr15MinFecsL     Gauge32,
+		dsAdslAturPerfDataExtnCurr1DayFecsL     Gauge32,
+		dsAdslAturPerfDataExtnPrev1DayFecsL     Gauge32,
+		dsAdslAturPerfDataExtnStatLossL     Counter32,
+		dsAdslAturPerfDataExtnCurr15MinLossL     Gauge32,
+		dsAdslAturPerfDataExtnCurr1DayLossL     Gauge32,
+		dsAdslAturPerfDataExtnPrev1DayLossL     Gauge32
+		}
+
+dsAdslAturPerfDataExtnStatSesL OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"."
+	::= { dsAdslAturPerfDataExtnEntry 1 }
+	
+
+dsAdslAturPerfDataExtnCurr15MinSesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"  ."
+	::= { dsAdslAturPerfDataExtnEntry 2 }
+
+
+dsAdslAturPerfDataExtnCurr1DaySesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 3 }
+
+
+dsAdslAturPerfDataExtnPrev1DaySesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 4 }
+	
+dsAdslAturPerfDataExtnStatUasL OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"."
+	::= { dsAdslAturPerfDataExtnEntry 5 }
+	
+
+dsAdslAturPerfDataExtnCurr15MinUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"  ."
+	::= { dsAdslAturPerfDataExtnEntry 6 }
+
+
+dsAdslAturPerfDataExtnCurr1DayUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 7 }
+
+
+dsAdslAturPerfDataExtnPrev1DayUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 8 }
+	
+dsAdslAturPerfDataExtnStatFecsL OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals with one or more far end forward error correction (FFEC) anomalies since agent reset (Not available for ADSL)."
+	::= { dsAdslAturPerfDataExtnEntry 9 }
+
+
+dsAdslAturPerfDataExtnCurr15MinFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals containing one or more far end loss of signal (LOS) defects (Not available for ADSL)."
+	::= { dsAdslAturPerfDataExtnEntry 10 }
+
+
+dsAdslAturPerfDataExtnCurr1DayFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals, during the current day as measured by adslAturPerfCurr1Day-TimeElapsed, with one or more far end forward error correction (FFEC) anomalies (Not available for ADSL)."
+	::= { dsAdslAturPerfDataExtnEntry 11 }
+
+
+dsAdslAturPerfDataExtnPrev1DayFecsL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals, within the most recent previous 1-day period, with one or more far end forward error correction (FFEC) anomalies (Not available for ADSL)."
+	::= { dsAdslAturPerfDataExtnEntry 12  }
+	
+dsAdslAturPerfDataExtnStatLossL OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of 1-second intervals containing one or more far end loss of signal (LOS) defects (Not available for ADSL)."
+	::= { dsAdslAturPerfDataExtnEntry 13 }
+	
+
+dsAdslAturPerfDataExtnCurr15MinLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"  ."
+	::= { dsAdslAturPerfDataExtnEntry 14 }
+
+
+dsAdslAturPerfDataExtnCurr1DayLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 15 }
+
+
+dsAdslAturPerfDataExtnPrev1DayLossL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" ."
+	::= { dsAdslAturPerfDataExtnEntry 16 }
+	
+dsAdslAtucIntervalExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATUC performance data collection interval. This Table is an extention to adslAtucIntervalTable defined in rfc 2662."
+	::= { dasanAdslMIBObjects 10 } 
+
+
+dsAdslAtucIntervalExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucIntervalExtnTable.
+		The Table is indexed by ifIndex and adslAtucIntervalNumber."
+	INDEX        { ifIndex, adslAtucIntervalNumber }
+	::= { dsAdslAtucIntervalExtnTable 1 }
+
+DsAdslAtucIntervalExtnEntry ::= SEQUENCE {
+		adslAtucIntervalNumber     INTEGER,
+		dsAdslAtucIntervalExtnFastR     Gauge32,
+		dsAdslAtucIntervalExtnFailedFastR     Gauge32,
+		dsAdslAtucIntervalExtnSesL     Gauge32,
+		dsAdslAtucIntervalExtnUasL     Gauge32,
+		dsAdslAtucIntervalExtnTimeElapsed     Gauge32
+-- 2.7.6 GsvAdslAtucIntervalExtnEntry(gsvAdslAtucIntervalExtnTable.mib)		
+		--dsAdslAtucIntervalExtnFecsL     Gauge32,
+		--dsAdslAtucIntervalExtnInitsFailed     Gauge32 
+		}  
+
+dsAdslAtucIntervalExtnFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This variable indicates Count of seconds in the interval when there was Fast Retrains."
+	::= { dsAdslAtucIntervalExtnEntry 1 }
+
+
+dsAdslAtucIntervalExtnFailedFastR OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This variable indicates Count of seconds in the interval when there was Failed Fast Retrains."
+	::= { dsAdslAtucIntervalExtnEntry 2 }
+
+
+dsAdslAtucIntervalExtnSesL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This variable indicates Count of seconds in the interval when there was severely errored seconds."
+	::= { dsAdslAtucIntervalExtnEntry 3 }
+
+
+dsAdslAtucIntervalExtnUasL OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This variable indicates Count of seconds in the interval when there was unavailable errored seconds."
+	::= { dsAdslAtucIntervalExtnEntry 4 }
+
+
+dsAdslAtucIntervalExtnTimeElapsed OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This variable indicates the total Elapsed time in this interval."
+	::= { dsAdslAtucIntervalExtnEntry 5 }
+
+
+--dsAdslAtucIntervalExtnFecsL OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"This variable indicates Count of seconds in the interval when there was Forward error correction seconds."
+--	::= { dsAdslAtucIntervalExtnEntry 6 }
+
+
+--dsAdslAtucIntervalExtnInitsFailed OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"This variable indicates Count of the failed full line initialization attempts during the interval."
+--	::= { dsAdslAtucIntervalExtnEntry 7 }
+
+ 
+--2.7.6 gsvAdslAturIntervalExtnTable.mib
+--dsAdslAturIntervalExtnTable OBJECT-TYPE
+--	SYNTAX       SEQUENCE OF DsAdslAturIntervalExtnEntry
+--	MAX-ACCESS   not-accessible
+--	STATUS       current
+--	DESCRIPTION
+--		"This Table is an extention to adslAturIntervalExtTable defined in rfc 3440."
+--	::= { dasanAdslMIBObjects 11 }
+
+
+--dsAdslAturIntervalExtnEntry OBJECT-TYPE
+--	SYNTAX       DsAdslAturIntervalExtnEntry
+--	MAX-ACCESS   not-accessible
+--	STATUS       current
+--	DESCRIPTION
+--		"An entry (conceptual row) in the dsAdslAturIntervalExtnTable.
+--		The Table is indexed by ifIndex and adslAturIntervalNumber."
+--	INDEX        { ifIndex, adslAturIntervalNumber }
+--	::= { dsAdslAturIntervalExtnTable 1 }
+
+--DsAdslAturIntervalExtnEntry ::= SEQUENCE {
+--		dsAdslAturIntervalExtnFecsL     Gauge32 }
+
+--dsAdslAturIntervalExtnFecsL OBJECT-TYPE
+--	SYNTAX       Gauge32
+--	MAX-ACCESS   read-only
+--	STATUS       current
+--	DESCRIPTION
+--		"This variable indicates Count of seconds in the interval when there was Forward error correction seconds."
+--	::= { dsAdslAturIntervalExtnEntry 1 }
+
+dsAdslAtucChanPerfDataExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucChanPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides one row for each ATUC channel. This table is an extention to adslAtucChanPerfDataTable."
+	::= { dasanAdslMIBObjects 12 }
+
+
+dsAdslAtucChanPerfDataExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucChanPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucChanPerfDataExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAtucChanPerfDataExtnTable 1 }
+
+DsAdslAtucChanPerfDataExtnEntry ::= SEQUENCE {
+		dsAdslAtucChanPerfDataExtnTimeElapsed     Gauge32,
+		dsAdslAtucChanPerfDataExtnNcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnOcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnHec     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr15MinNcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr15MinOcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr15MinHec     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr1DayNcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr1DayOcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnCurr1DayHec     Gauge32,
+		dsAdslAtucChanPerfDataExtnPrev1DayNcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnPrev1DayOcd     Gauge32,
+		dsAdslAtucChanPerfDataExtnPrev1DayHec     Gauge32 }
+
+
+
+dsAdslAtucChanPerfDataExtnTimeElapsed OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		" Total elapsed seconds in this interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 1 }
+
+
+dsAdslAtucChanPerfDataExtnNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of no cell delineation(ncd) on this channel."
+	::= { dsAdslAtucChanPerfDataExtnEntry 2 }
+
+
+dsAdslAtucChanPerfDataExtnOcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of out of cell delineation (ocd) on this channel."
+	::= { dsAdslAtucChanPerfDataExtnEntry 3 }
+
+
+dsAdslAtucChanPerfDataExtnHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Header error check counter(hec) on this channel."
+	::= { dsAdslAtucChanPerfDataExtnEntry 4 }
+
+
+dsAdslAtucChanPerfDataExtnCurr15MinNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of no cell delineation(ncd) on this channel within the current 15 minute time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 5 }
+
+
+dsAdslAtucChanPerfDataExtnCurr15MinOcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of out of cell delineation (ocd) on this channel within the current 15 minute time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 6 }
+
+
+dsAdslAtucChanPerfDataExtnCurr15MinHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Header error check counter(hec) on this channel within the current 15 minute time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 7 }
+
+
+dsAdslAtucChanPerfDataExtnCurr1DayNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of no cell delineation (ncd) on this channel within the current 1 day time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 8 }
+
+
+dsAdslAtucChanPerfDataExtnCurr1DayOcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of out of cell delineation (ocd) on this channel within the current 1 day time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 9 }
+
+
+dsAdslAtucChanPerfDataExtnCurr1DayHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Header error check counter (hec) on this channel within the current 1 day time interval."
+	::= { dsAdslAtucChanPerfDataExtnEntry 10 }
+
+
+dsAdslAtucChanPerfDataExtnPrev1DayNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of no cell delineation (ncd) on this channel within the most recent previous 1-day period."
+	::= { dsAdslAtucChanPerfDataExtnEntry 11 }
+
+
+dsAdslAtucChanPerfDataExtnPrev1DayOcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Count of out of cell delineation (ocd) on this channel within the most recent previous 1-day period."
+	::= { dsAdslAtucChanPerfDataExtnEntry 12 }
+
+
+dsAdslAtucChanPerfDataExtnPrev1DayHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Header error check counter(hec) on this channel within the most recent previous 1-day period."
+	::= { dsAdslAtucChanPerfDataExtnEntry 13 }
+
+
+
+
+dsAdslAturChanPerfDataExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAturChanPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table is extention to adslAturChanPerfDataTable defined in rfc-2662. This table contains the Performance Data for that ATU-R channel (fast or interleaved)."
+	::= { dasanAdslMIBObjects 13 }
+
+
+dsAdslAturChanPerfDataExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAturChanPerfDataExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAturChanPerfDataExtnTable.
+		The Table is indexed by IfIndex."
+	INDEX        { ifIndex }
+	::= { dsAdslAturChanPerfDataExtnTable 1 }
+
+DsAdslAturChanPerfDataExtnEntry ::= SEQUENCE {
+		dsAdslAturChanPerfDataExtnNcd     Gauge32,
+		dsAdslAturChanPerfDataExtnHec     Gauge32,
+		dsAdslAturChanPerfDataExtnCurr15MinNcd     Gauge32,
+		dsAdslAturChanPerfDataExtnCurr15MinHec     Gauge32,
+		dsAdslAturChanPerfDataExtnCurr1DayNcd     Gauge32,
+		dsAdslAturChanPerfDataExtnCurr1DayHec     Gauge32,
+		dsAdslAturChanPerfDataExtnPrev1DayNcd     Gauge32,
+		dsAdslAturChanPerfDataExtnPrev1DayHec     Gauge32 }
+
+
+
+dsAdslAturChanPerfDataExtnNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with no cell delineation(NCD) error on this channel."
+	::= { dsAdslAturChanPerfDataExtnEntry 1 }
+
+
+dsAdslAturChanPerfDataExtnHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with Header error check (HEC) error on this channel."
+	::= { dsAdslAturChanPerfDataExtnEntry 2 }
+
+
+dsAdslAturChanPerfDataExtnCurr15MinNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with no cell delineation(NCD) error on this channel within the current 15 minute time interval."
+	::= { dsAdslAturChanPerfDataExtnEntry 3 }
+
+
+dsAdslAturChanPerfDataExtnCurr15MinHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with Header error check (HEC) error on this channel within the current 15 minute time interval."
+	::= { dsAdslAturChanPerfDataExtnEntry 4 }
+
+
+dsAdslAturChanPerfDataExtnCurr1DayNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with no cell delineation (NCD) error on this channel within the current 1 day time interval."
+	::= { dsAdslAturChanPerfDataExtnEntry 5 }
+
+
+dsAdslAturChanPerfDataExtnCurr1DayHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with Header error check (HEC) error on this channel within the current 1 day time interval."
+	::= { dsAdslAturChanPerfDataExtnEntry 6 }
+
+
+dsAdslAturChanPerfDataExtnPrev1DayNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with no cell delineation (NCD) error on this channel within the most recent previous period."
+	::= { dsAdslAturChanPerfDataExtnEntry 7 }
+
+
+dsAdslAturChanPerfDataExtnPrev1DayHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Number of packets with Header error check (HEC) error on this channel within the most recent previous period."
+	::= { dsAdslAturChanPerfDataExtnEntry 8 }
+
+
+
+dsAdslAtucChanIntervalExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAtucChanIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table provides a row for each ATUC channel's performance data collection interval. This table is an extension to adslAtucChanIntervalTable defined in rfc 2662."
+	::= { dasanAdslMIBObjects 14 }
+
+
+dsAdslAtucChanIntervalExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAtucChanIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAtucChanIntervalExtnTable.
+		The Table is indexed by ifIndex and adslAtucChanIntervalNumber."
+	INDEX        { ifIndex, adslAtucChanIntervalNumber }
+	::= { dsAdslAtucChanIntervalExtnTable 1 }
+
+DsAdslAtucChanIntervalExtnEntry ::= SEQUENCE {
+		dsAdslAtucChanIntervalExtnTimeElapsed     Counter32,
+		dsAdslAtucChanIntervalExtnNcd     Counter32,
+		dsAdslAtucChanIntervalExtnOcd     Counter32,
+		dsAdslAtucChanIntervalExtnHec     Counter32 }
+
+
+dsAdslAtucChanIntervalExtnTimeElapsed OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Total time elapsed (in seconds) in this interval."
+	::= { dsAdslAtucChanIntervalExtnEntry 1 }
+
+
+dsAdslAtucChanIntervalExtnNcd OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates count of no cell delineation on this channel for this interval."
+	::= { dsAdslAtucChanIntervalExtnEntry 2 }
+
+
+dsAdslAtucChanIntervalExtnOcd OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates count of out cell delineation on this channel for this interval."
+	::= { dsAdslAtucChanIntervalExtnEntry 3 }
+
+
+dsAdslAtucChanIntervalExtnHec OBJECT-TYPE
+	SYNTAX       Counter32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates Header error check counter on this channel during this interval."
+	::= { dsAdslAtucChanIntervalExtnEntry 4 }
+
+
+
+
+
+
+dsAdslAturChanIntervalExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslAturChanIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table is extention to adslAturChanIntervalTable defined in rfc-2662. This table provides one row for each ATUR channel's performance data collection interval."
+	::= { dasanAdslMIBObjects 15 }
+
+
+dsAdslAturChanIntervalExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslAturChanIntervalExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslAturChanIntervalExtnTable.
+		The Table is indexed by IfIndex and dsAdslAturChanIntervalExtnNumber."
+--	INDEX        { ifIndex, dsAdslAturChanIntervalExtnNumber }
+	INDEX        { ifIndex, adslAturChanIntervalNumber}
+	::= { dsAdslAturChanIntervalExtnTable 1 }
+
+DsAdslAturChanIntervalExtnEntry ::= SEQUENCE {
+		dsAdslAturChanIntervalExtnNcd     Gauge32,
+		dsAdslAturChanIntervalExtnHec     Gauge32 }
+
+
+dsAdslAturChanIntervalExtnNcd OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates count of no cell delineation on this channel for this interval."
+	::= { dsAdslAturChanIntervalExtnEntry 1 }
+
+
+dsAdslAturChanIntervalExtnHec OBJECT-TYPE
+	SYNTAX       Gauge32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates Header error check counter on this channel during this interval."
+	::= { dsAdslAturChanIntervalExtnEntry 2 }
+
+
+dsAdslLineConfProfileExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslLineConfProfileExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table contains information on the ADSL line configuration. This Table is an extension to adslLineConfProfileTable."
+	::= { dasanAdslMIBObjects 16 }
+
+
+dsAdslLineConfProfileExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslLineConfProfileExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslLineConfProfileExtnTable.
+		The Table is indexed by adslLineConfProfileName."
+	INDEX        { adslLineConfProfileName }
+	::= { dsAdslLineConfProfileExtnTable 1 }
+
+DsAdslLineConfProfileExtnEntry ::= SEQUENCE {
+		dsAdslLineConfProfileName     OCTET STRING,
+		--dsAdslLineConfProfileExtnParametricTestInputFile     DisplayString,
+		dsAdslLineConfProfileExtnRsIntCorrectionUp     INTEGER,
+		dsAdslLineConfProfileExtnLineType     INTEGER,
+		dsAdslLineConfProfileExtnTxEndBin     INTEGER,
+		dsAdslLineConfProfileExtnTxStartBin     INTEGER,
+		--dsAdslLineConfProfileExtnMaxBitsPerBin     INTEGER,
+		dsAdslLineConfProfileExtnRxStartBin     INTEGER,
+		dsAdslLineConfProfileExtnRxEndBin     INTEGER,
+		dsAdslLineConfProfileExtnRxBinAdjust     INTEGER,
+		--dsAdslLineConfProfileExtnTriggerMode     INTEGER,
+		--dsAdslLineConfProfileExtnAdi2x     INTEGER,
+		dsAdslLineConfProfileExtnStandard     INTEGER,
+		--dsAdslLineConfProfileExtnInitiate     INTEGER,
+		dsAdslLineConfProfileExtnTxPowerAttenuation     INTEGER,
+		--dsAdslLineConfProfileExtnCodingGain     INTEGER,
+		dsAdslLineConfProfileExtnRsFastOvrhdDown     INTEGER,
+		dsAdslLineConfProfileExtnIntCorrectionDown     INTEGER,
+		dsAdslLineConfProfileExtnRsFastOvrhdUp     INTEGER,
+		--dsAdslLineConfProfileExtnDrStby     INTEGER,
+		--dsAdslLineConfProfileExtnExpandedExchange     INTEGER,
+		--dsAdslLineConfProfileExtnEscapeFastRetrainEnable     INTEGER,
+		--dsAdslLineConfProfileExtnFastRetrainEnable     INTEGER,
+		--dsAdslLineConfProfileExtnBitSwap     INTEGER,
+		--dsAdslLineConfProfileExtnNtr     INTEGER,
+		dsAdslLineConfProfileExtnAnnexType     INTEGER,
+		--dsAdslLineConfProfileExtnAlctlUsVer     INTEGER,
+		--dsAdslLineConfProfileExtnUseCustomBin     INTEGER,
+		--dsAdslLineConfProfileExtnDnBinUsage     OCTET STRING,
+		dsAdslLineConfProfileExtnMaxDCo     INTEGER,
+		--dsAdslLineConfProfileExtnFullRetrain     INTEGER,
+		dsAdslLineConfProfileExtnAdvertisedCapabilities     INTEGER,
+		dsAdslLineConfProfileExtnPsdMaskType     INTEGER,
+		dsAdslLineConfProfileExtnLineDmtConfMode     INTEGER,
+		--dsAdslLineConfProfileExtnEraseProfiles     INTEGER,
+		--dsAdslLineConfProfileExtnRsMemory     INTEGER,
+		--dsAdslLineConfProfileExtnParamHybridLossTestStart     INTEGER,
+		--dsAdslLineConfProfileExtnParamHybridLossTestEnd     INTEGER,
+		--dsAdslLineConfProfileExtnLineConfDmtTrellis     INTEGER,
+--2.7.6 GsvAdslLineConfProfileExtnEntry(gsvAdslLineConfProfileExtnTable.mib)
+		--dsAdslLineConfProfileExtnDataBoost     INTEGER,
+		dsAdslLineConfProfileExtnUpstreamPSD     INTEGER,
+		dsAdslLineConfProfileExtnPMMode     BITS,
+		dsAdslLineConfProfileExtnPML0Time     INTEGER,
+		dsAdslLineConfProfileExtnPML2Time     INTEGER,
+		dsAdslLineConfProfileExtnPML2ATPR     INTEGER,
+		dsAdslLineConfProfileExtnPML2Rate     INTEGER,
+		--dsAdslLineConfProfileExtnMSGMINds     INTEGER,
+		--dsAdslLineConfProfileExtnMSGMINus     INTEGER,
+		dsAdslLineConfProfileExtnAtucConfMinINP   		INTEGER,
+		dsAdslLineConfProfileExtnPML2EntryThresholdRate INTEGER,
+		dsAdslLineConfProfileExtnPML2ExitThresholdRate  INTEGER,
+		dsAdslLineConfProfileExtnPML2EntryRateMinTime   INTEGER
+		 }		
+	
+dsAdslLineConfProfileName OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..32 ) )
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This object is used by the line configuration table in order to identify a row of this table."
+	::= { dsAdslLineConfProfileExtnEntry 1 }
+
+
+--dsAdslLineConfProfileExtnParametricTestInputFile OBJECT-TYPE
+--	SYNTAX       DisplayString 
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates Name of the Input file from which to take the Mask Array Size, lower and upper mask Array. Null string means no file is specified."
+--	::= { dsAdslLineConfProfileExtnEntry 2 }
+
+
+dsAdslLineConfProfileExtnRsIntCorrectionUp OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable125us(3),
+			dsAdslLineConfProfileExtnTable250us(4),
+			dsAdslLineConfProfileExtnTable500us(5),
+			dsAdslLineConfProfileExtnTable1ms(6),
+			dsAdslLineConfProfileExtnTable2ms(7),
+			dsAdslLineConfProfileExtnTable4ms(8),
+			disable(15)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Sets the correction time for the upstream-interleaved buffer. RS can also be disabled. The Default Value for ADSL+ is 3."
+	DEFVAL   { 3 }
+	::= { dsAdslLineConfProfileExtnEntry 3 }
+
+
+dsAdslLineConfProfileExtnLineType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			noChannel(1),
+			fastOnly(2),
+			interleavedOnly(3),
+			fastOrInterleaved(4),
+			fastAndInterleaved(5)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object is used to configure the ADSL physical line mode."
+	DEFVAL   { 3 }
+	::= { dsAdslLineConfProfileExtnEntry 4 }
+
+
+dsAdslLineConfProfileExtnTxEndBin OBJECT-TYPE
+	SYNTAX       INTEGER ( 6..511 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Highest bin number allowed for Tx signal. The Range & default for ADSL+ is 0x06 - 0x1ff and 0x1ff respectively."
+	DEFVAL   { 511 }
+	::= { dsAdslLineConfProfileExtnEntry 5 }
+
+
+dsAdslLineConfProfileExtnTxStartBin OBJECT-TYPE
+	SYNTAX       INTEGER ( 6..511 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Lowest bin number allowed for Tx signal.The Range for ADSL+ is 0x06 - 0x1ff. The Default for Annex B is 0x40 respectively."
+	DEFVAL   { 1 }
+	::= { dsAdslLineConfProfileExtnEntry 6 }
+
+
+--dsAdslLineConfProfileExtnMaxBitsPerBin OBJECT-TYPE
+--	SYNTAX       INTEGER ( 0..15 )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Maximum Rx number of bits per bin."
+--	DEFVAL   { 14 }
+--	::= { dsAdslLineConfProfileExtnEntry 7 }
+
+
+dsAdslLineConfProfileExtnRxStartBin OBJECT-TYPE
+	SYNTAX       INTEGER ( 1..511 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Lowest bin number allowed for Rx signal. The Range for ADSL+ is 0x01 - 0x1ff. The default for Annex B is 0x01."
+	DEFVAL   { 1 }
+	::= { dsAdslLineConfProfileExtnEntry 8 }
+
+
+dsAdslLineConfProfileExtnRxEndBin OBJECT-TYPE
+	SYNTAX       INTEGER ( 6..511 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Highest bin number allowed for Rx signal. The Range and default value for ADSL+ is 0x01 - 0x1ff and 0x1d respectively."
+	DEFVAL   { 511 }
+	::= { dsAdslLineConfProfileExtnEntry 9 }
+
+
+dsAdslLineConfProfileExtnRxBinAdjust OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Employs Rx Start/End bin settings."
+	DEFVAL   { 0 }
+	::= { dsAdslLineConfProfileExtnEntry 10 }
+
+
+--dsAdslLineConfProfileExtnTriggerMode OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			disable(0),
+--			locCrc(1),
+--			rmtCrc(2),
+--			snrInc(4),
+--			snrDec(8)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates the Type of event that triggers fast retrain."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 11 }
+
+
+--dsAdslLineConfProfileExtnAdi2x OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			standard(1)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"For non standard compliant ADI CPE."
+--	DEFVAL   { 1 }
+--	::= { dsAdslLineConfProfileExtnEntry 12 }
+
+
+dsAdslLineConfProfileExtnStandard OBJECT-TYPE
+	SYNTAX       INTEGER{
+			t1413(0),
+			gLite(1),
+			gDmt(2),
+			alctl14(3),
+			multimode(4),
+			adi(5),
+			alctl(6),
+			t1413Auto(9),
+			adslPlus(48),
+			gspanPlus(49),
+			adsl2(26),
+			adsl2Plus(27),
+			readsl2(28),
+			adsl2Auto(29),
+			adsl2PlusAuto(30)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Preferred standard compliance. Outcome is dependent upon standard support of the remote unit.GlobespanVirata High Speed ADSL DMT (ADSL+) applications only."
+	DEFVAL   { 27 }
+	::= { dsAdslLineConfProfileExtnEntry 13 }
+
+
+--dsAdslLineConfProfileExtnInitiate OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			waitPn(0),
+--			ctone(1),
+--			initiatePn(128)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Specifies which end initiates startup. It is also used to send a C-tone to the remote unit."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 14 }
+
+
+dsAdslLineConfProfileExtnTxPowerAttenuation OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable0(0),
+			point1(13),
+			point2(14),
+			point3(15),
+			point4(16),
+			point5(17),
+			point6(18),
+			point7(19),
+			point8(20),
+			point9(21),
+			dsAdslLineConfProfileExtnTable1(1),
+			dsAdslLineConfProfileExtnTable2(2),
+			dsAdslLineConfProfileExtnTable3(3),
+			dsAdslLineConfProfileExtnTable4(4),
+			dsAdslLineConfProfileExtnTable5(5),
+			dsAdslLineConfProfileExtnTable6(6),
+			dsAdslLineConfProfileExtnTable7(7),
+			dsAdslLineConfProfileExtnTable8(8),
+			dsAdslLineConfProfileExtnTable9(9),
+			dsAdslLineConfProfileExtnTable10(10),
+			dsAdslLineConfProfileExtnTable11(11),
+			dsAdslLineConfProfileExtnTable12(12),
+			dsAdslLineConfProfileExtnTable13(32781),
+			dsAdslLineConfProfileExtnTable14(32782),
+			dsAdslLineConfProfileExtnTable15(32783),
+			dsAdslLineConfProfileExtnTable16(32784),
+			dsAdslLineConfProfileExtnTable17(32785),
+			dsAdslLineConfProfileExtnTable18(32786),
+			dsAdslLineConfProfileExtnTable19(32787),
+			dsAdslLineConfProfileExtnTable20(32788),
+			dsAdslLineConfProfileExtnTable21(32789),
+			dsAdslLineConfProfileExtnTable22(32790),
+			dsAdslLineConfProfileExtnTable23(32791),
+			dsAdslLineConfProfileExtnTable24(32792),
+			dsAdslLineConfProfileExtnTable25(32793),
+			dsAdslLineConfProfileExtnTable26(32794),
+			dsAdslLineConfProfileExtnTable27(32795),
+			dsAdslLineConfProfileExtnTable28(32796),
+			dsAdslLineConfProfileExtnTable29(32797),
+			dsAdslLineConfProfileExtnTable30(32798),
+			dsAdslLineConfProfileExtnTable31(32799),
+			dsAdslLineConfProfileExtnTable32(32800),
+			dsAdslLineConfProfileExtnTable33(32801),
+			dsAdslLineConfProfileExtnTable34(32802),
+			dsAdslLineConfProfileExtnTable35(32803),
+			dsAdslLineConfProfileExtnTable36(32804),
+			dsAdslLineConfProfileExtnTable37(32805),
+			dsAdslLineConfProfileExtnTable38(32806),
+			dsAdslLineConfProfileExtnTable39(32807),
+			dsAdslLineConfProfileExtnTable40(32808)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Specifies value of Tx power attenuation."
+	DEFVAL   { 0 }
+	::= { dsAdslLineConfProfileExtnEntry 15 }
+
+
+--dsAdslLineConfProfileExtnCodingGain OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			auto(65280),
+--			dsAdslLineConfProfileExtnTable0(0),
+--			dsAdslLineConfProfileExtnTable1(4096),
+--			dsAdslLineConfProfileExtnTable2(8192),
+--			dsAdslLineConfProfileExtnTable3(12288),
+--			dsAdslLineConfProfileExtnTable4(16384),
+--			dsAdslLineConfProfileExtnTable5(20480),
+--			dsAdslLineConfProfileExtnTable6(24576),
+--			dsAdslLineConfProfileExtnTable7(28672)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Sets the coding gain in dB increments."
+--	DEFVAL   { 65280 }
+--	::= { dsAdslLineConfProfileExtnEntry 16 }
+
+
+dsAdslLineConfProfileExtnRsFastOvrhdDown OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable50(1),
+			dsAdslLineConfProfileExtnTable25(2),
+			dsAdslLineConfProfileExtnTable12(3),
+			dsAdslLineConfProfileExtnTable6(4),
+			dsAdslLineConfProfileExtnTable3(5),
+			dsAdslLineConfProfileExtnTable1(7),
+			disable(15)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Sets the percentage overhead for the downstream-fast buffer."
+	DEFVAL   { 15 }
+	::= { dsAdslLineConfProfileExtnEntry 17 }
+
+
+dsAdslLineConfProfileExtnIntCorrectionDown OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable125Us(3),
+			dsAdslLineConfProfileExtnTable250Us(4),
+			dsAdslLineConfProfileExtnTable500Us(5),
+			dsAdslLineConfProfileExtnTable1Ms(6),
+			dsAdslLineConfProfileExtnTable2Ms(7),
+			dsAdslLineConfProfileExtnTable4Ms(8),
+			disable(15)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter sets the correction time for the downstream interleaved buffer.RS can also be disabled."
+	DEFVAL   { 6 }
+	::= { dsAdslLineConfProfileExtnEntry 18 }
+
+
+dsAdslLineConfProfileExtnRsFastOvrhdUp OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable50(1),
+			dsAdslLineConfProfileExtnTable25(2),
+			dsAdslLineConfProfileExtnTable12(3),
+			dsAdslLineConfProfileExtnTable6(4),
+			dsAdslLineConfProfileExtnTable3(5),
+			dsAdslLineConfProfileExtnTable1(7),
+			disable(15)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Sets the 4576014verhead for the upstream-fast buffer."
+	DEFVAL   { 15 }
+	::= { dsAdslLineConfProfileExtnEntry 19 }
+
+
+--dsAdslLineConfProfileExtnDrStby OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			disable(0),
+--			enable(1)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Provides the ability to disable power to the line driver."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 20 }
+  
+
+--dsAdslLineConfProfileExtnExpandedExchange OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			expanded(32768),
+--			short(0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/Disable EES."
+--	DEFVAL   { 32768 }
+--	::= { dsAdslLineConfProfileExtnEntry 21 }
+
+
+--dsAdslLineConfProfileExtnEscapeFastRetrainEnable OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(1),
+--			disable(0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/ Disable escape to the fast retrain capability."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 22 }
+  
+
+--dsAdslLineConfProfileExtnFastRetrainEnable OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(0),
+--			disable(32768)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/ Disable the fast retrain capability."
+--	DEFVAL   { 32768 }
+--	::= { dsAdslLineConfProfileExtnEntry 23 }
+  
+
+--dsAdslLineConfProfileExtnBitSwap OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			disable(0),
+--			enable(32768)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/Disable bit swapping."
+--	DEFVAL   { 32768 }
+--	::= { dsAdslLineConfProfileExtnEntry 24 }
+
+
+--dsAdslLineConfProfileExtnNtr OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			localOcs(1),
+--			refck8K (0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/ Disable NTR on a per chip basis."
+--	DEFVAL   { 1 }
+--	::= { dsAdslLineConfProfileExtnEntry 25 }
+
+
+dsAdslLineConfProfileExtnAnnexType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			annexA(0),
+			annexB (1),
+			highSpeed (2),
+			annexADSL2 (5)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is set as per annex compliance of the code release. GlobespanVirata High Speed ADSL DMT (ADSL+) applications only."
+	DEFVAL   { 5  }
+	::= { dsAdslLineConfProfileExtnEntry 26 }
+
+
+--dsAdslLineConfProfileExtnAlctlUsVer OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			unknown(2)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used for T1.413 demo purposes only."
+--	DEFVAL   { 2 }
+--	::= { dsAdslLineConfProfileExtnEntry 27 }
+
+
+--dsAdslLineConfProfileExtnUseCustomBin OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(32768),
+--			disable(0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Enable/ Disable user selection on which of the 256 bins will be enabled for downstream transmission."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 28 }
+
+
+--dsAdslLineConfProfileExtnDnBinUsage OBJECT-TYPE
+--	SYNTAX       OCTET STRING (SIZE ( 0..255 ) )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"The parameter where a 1 in bit position indicates usage of corresponding bin,whereas a 0 disables usage of corresponding bin."
+--	::= { dsAdslLineConfProfileExtnEntry 29 }
+
+
+dsAdslLineConfProfileExtnMaxDCo OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsAdslLineConfProfileExtnTable64(0),
+			dsAdslLineConfProfileExtnTable128(4096),
+			dsAdslLineConfProfileExtnTable256(8192)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object is used to indicate Maximum interleaving depth supported by the customer's hardware."
+	DEFVAL   { 0 }
+	::= { dsAdslLineConfProfileExtnEntry 30 }
+
+
+--dsAdslLineConfProfileExtnFullRetrain OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(0),
+--			disable(32768)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to Indicate enable/disable of auto retrain capability."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 31 }
+
+
+dsAdslLineConfProfileExtnAdvertisedCapabilities OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			annexa(1),
+			annexb(2),
+			adslplus(16)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Controls if the CO will attempt to startup using alternate standards if the CPE does not support ADSL+. "
+	DEFVAL   { 1 }
+	::= { dsAdslLineConfProfileExtnEntry 32 }
+
+
+dsAdslLineConfProfileExtnPsdMaskType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			adsl(0),
+			hsadslM1(3),
+			hsadslM2 (4),
+			msk2Rfi (32768),
+			flatMskRfi (32771),
+			cabMsk2Rfi (32772),
+			coMsk2Rfio(49152),
+			adsl2NonovlpM1(275),
+			adls2NonovlpM2(291), 
+			adls2NonovlpFlat(259)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Selects the PSD mask option to be used."
+	DEFVAL   { 3 }
+	::= { dsAdslLineConfProfileExtnEntry 33 }
+
+
+dsAdslLineConfProfileExtnLineDmtConfMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			ecMode(1),
+			fdmMode(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Selects if there is overlap or no overlap of bins."
+	DEFVAL   { 2 }
+	::= { dsAdslLineConfProfileExtnEntry 34 }
+
+
+--dsAdslLineConfProfileExtnEraseProfiles OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(32768),
+--			disable(0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Enables/Disables the ability to erase all fast retrain profiles at startup."
+--	DEFVAL   { 0 }
+--	::= { dsAdslLineConfProfileExtnEntry 35 }
+  
+
+--dsAdslLineConfProfileExtnRsMemory OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			present(0),
+--			notpresent(32768)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates whether customer's Hardware uses external RS RAM."
+--	DEFVAL   { 32768 }
+--	::= { dsAdslLineConfProfileExtnEntry 36 }
+
+
+--dsAdslLineConfProfileExtnParamHybridLossTestStart OBJECT-TYPE
+--	SYNTAX       INTEGER ( 0..511 )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates Start bin for range of bins to be measured."
+--	DEFVAL   { 2 }
+--	::= { dsAdslLineConfProfileExtnEntry 37 }
+  
+
+--dsAdslLineConfProfileExtnParamHybridLossTestEnd OBJECT-TYPE
+--	SYNTAX       INTEGER ( 0..511 )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"Indicates End bin for range of bins to be measured."
+--	DEFVAL   { 64 }
+--	::= { dsAdslLineConfProfileExtnEntry 38 }
+
+
+--dsAdslLineConfProfileExtnLineConfDmtTrellis OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			on(1),
+--			off(2)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This parameter enables/disables trellis coding. Trellis coding should always be enabled for its clear performance advantage."
+--	DEFVAL   { 1 }
+--	::= { dsAdslLineConfProfileExtnEntry 39 }
+
+-- dsAdslLineConfProfileExtnDataBoost OBJECT-TYPE
+--	SYNTAX       INTEGER{
+--			enable(32768),
+--			disable(0)
+--		}
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"This object is used to enable/disable DataBoost option."
+--	DEFVAL   { 32768 }
+--	::= { dsAdslLineConfProfileExtnEntry 40 }
+
+
+dsAdslLineConfProfileExtnUpstreamPSD OBJECT-TYPE
+	SYNTAX       INTEGER{
+			extended(32768),
+			standard(0),
+			jj100(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object sets the upstream PSD to be either extended or standard. Used for GSpan Plus only."
+	DEFVAL   { 0 }  
+	::= { dsAdslLineConfProfileExtnEntry 41 }
+
+
+dsAdslLineConfProfileExtnPMMode OBJECT-TYPE
+	SYNTAX       BITS{
+			pmstatel3enable(0),
+			pmstatel2enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"PM-related parameter used by the ATU-C to set the allowed link states."
+--	DEFVAL   { GS-CFG-DEF-ATUC-PM-MODE }
+	::= { dsAdslLineConfProfileExtnEntry 42 }
+
+
+dsAdslLineConfProfileExtnPML0Time OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..255 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state. This parameter represents the minimum time (in seconds) between an exit from the L2 state and the next entry into the L2 state."
+--	DEFVAL   { GS-CFG-DEF-ATUC-PM-L0-TIME }
+	::= { dsAdslLineConfProfileExtnEntry 43 }
+
+
+dsAdslLineConfProfileExtnPML2Time OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..255 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state. This parameter represents the minimum time (in seconds) between an Entry into the L2 state and the first Power Trim in the L2 state and between two consecutive Power Trims in the L2 State."
+--	DEFVAL   { GS-CFG-DEF-ATUC-PM-L2-TIME }
+	::= { dsAdslLineConfProfileExtnEntry 44 }
+
+
+dsAdslLineConfProfileExtnPML2ATPR OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..31 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state. This parameter represents the maximum aggregate transmit power reduction (in dB) that can be performed through a single Power Trim in the L2 state."
+--	DEFVAL   { GS-CFG-DEF-ATUC-PM-L2-ATPR }
+	::= { dsAdslLineConfProfileExtnEntry 45 }
+
+
+dsAdslLineConfProfileExtnPML2Rate OBJECT-TYPE
+	SYNTAX       INTEGER ( 256000..1024000 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state. This parameter specifies the minimum net data rate during the low power state (L2). The data rate is coded in bit/s."
+--	DEFVAL   { GS-CFG-DEF-ATUC-PM-L2-RATE }
+	::= { dsAdslLineConfProfileExtnEntry 46 }
+
+
+--dsAdslLineConfProfileExtnMSGMINds OBJECT-TYPE
+--	SYNTAX       INTEGER ( 4000..64000 )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"configureS downstream overhead channel bandwidth"
+--	DEFVAL   { GS_CFG_DEF_ATUC_MSG_MIN_DS }
+--	::= { dsAdslLineConfProfileExtnEntry 47 }
+
+
+--dsAdslLineConfProfileExtnMSGMINus OBJECT-TYPE
+--	SYNTAX       INTEGER ( 4000..64000 )
+--	MAX-ACCESS   read-write
+--	STATUS       current
+--	DESCRIPTION
+--		"configureS upstream overhead channel bandwidth"
+--	DEFVAL   { GS_CFG_DEF_ATUR_MSG_MIN_US }
+--	::= { dsAdslLineConfProfileExtnEntry 48 } 
+                                    
+dsAdslLineConfProfileExtnAtucConfMinINP		OBJECT-TYPE
+	SYNTAX		INTEGER ( 0..400 )
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Parameter used to specify the minimum impulse noise protection
+		for the downstream bearer channel."
+	DEFVAL { 400 }
+	::= { dsAdslLineConfProfileExtnEntry 63 }                                 
+                                                                
+dsAdslLineConfProfileExtnPML2EntryThresholdRate	OBJECT-TYPE
+	SYNTAX			INTEGER ( 256000..1024000 )
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state.
+		This parameter specifies the downstream data rate threshold
+		that triggers autonomous entry into low power state (L2). The data rate
+		is coded in bit/s, and must be less than or equal to the value of
+		GSMIB_adslAtucConfGsPML2Exit ThresholdRate."
+	DEFVAL  { 0 }
+	::= { dsAdslLineConfProfileExtnEntry 64 }
+		
+dsAdslLineConfProfileExtnPML2ExitThresholdRate 	OBJECT-TYPE
+	SYNTAX			INTEGER ( 256000..1024000 )
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"PM configuration parameter, related to the L2 low power state.
+		This parameter specifies the downstream data rate threshold
+		that triggers autonomous exit from low power state (L2). The data rate
+		is coded in bit/s, and must be less than the value of
+		GSMIB_adslAtucConfPML2MinRate."
+	DEFVAL { 512000 }
+	::= { dsAdslLineConfProfileExtnEntry 65 }
+	
+dsAdslLineConfProfileExtnPML2EntryRateMinTime	OBJECT-TYPE
+	SYNTAX			INTEGER ( 900..65535 )
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"PM configuration parameter, related to the L2 low power state.
+		This parameter specifies the minimum interval of time that the
+		net data rate for the bearer channel should stay below
+		GSMIB_adslAtucConfGsPML2EntryThresholdRate before
+		autonomous entry into low power state (L2). 
+		The minimum entry rate time is coded in seconds, and can 
+		range from 900 to 65535."
+	DEFVAL { 1800 }
+	::= { dsAdslLineConfProfileExtnEntry  66 }
+		
+		
+dsAdslLineAlarmConfProfileExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsAdslLineAlarmConfProfileExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table contains information on the ADSL line configuration. This table is an extention to adslLineAlarmConfProfileExtnTable defined in rfc 2662."
+	::= { dasanAdslMIBObjects 17 }
+
+
+dsAdslLineAlarmConfProfileExtnEntry OBJECT-TYPE
+	SYNTAX       DsAdslLineAlarmConfProfileExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsAdslLineAlarmConfProfileExtnTable.
+		The Table is indexed by adslLineAlarmConfProfileName."
+	INDEX        { adslLineAlarmConfProfileName }
+	::= { dsAdslLineAlarmConfProfileExtnTable 1 }
+
+DsAdslLineAlarmConfProfileExtnEntry ::= SEQUENCE {
+		dsAdslLineAlarmConfProfileName     OCTET STRING,
+		dsAdslLineAlarmExtnAtucThresh15MinFailFastR     INTEGER,
+		dsAdslLineAlarmExtnAtucThresh15MinSesL     INTEGER,
+		dsAdslLineAlarmExtnAtucThresh15MinUasL     INTEGER,
+		dsAdslLineAlarmExtnAtucOpStateTrapEnable     INTEGER,       
+-- 2.7.6 GsvAdslAlarmConfProfileExtEntry (gsvAdslAlarmConfProfileExtTable.mib)		
+		dsAdslLineAlarmExtnAtucThresh15MinFecsL     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayLofs     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayLoss     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayLols     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayLprs     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayESs     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DaySesL     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayUasL     	Integer32,
+		dsAdslLineAlarmExtnAtucThresh1DayFecsL     	Integer32,
+		dsAdslLineAlarmExtnAturThresh15MinFecsL     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayLofs     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayLoss     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayLprs     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayESs     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DaySesL     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayUasL     	Integer32,
+		dsAdslLineAlarmExtnAturThresh1DayFecsL     	Integer32,
+		
+		dsAdslLineAlarmExtnAturThresh15MinSesL     	Integer32,
+		dsAdslLineAlarmExtnAturThresh15MinUasL     	Integer32,
+		dsAdslLineAlarmExtnAtucPmStateTrapEnable	INTEGER         
+		}
+
+
+dsAdslLineAlarmConfProfileName OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..32 ) )
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This object is used by the line alarm configuration Extn table in order to identify a row of this table. When `dynamic' profiles are implemented, the profile  name is user specified.  Also, the system will always provide a default profile whose name is `DEND"
+	::= { dsAdslLineAlarmConfProfileExtnEntry 1 }
+
+
+dsAdslLineAlarmExtnAtucThresh15MinFailFastR OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of failed retrains encountered by an ADSL interface within any giving 15 minutes performance data collection period, which cause the SNMP agent to send an adslAtucFailedFastRTrap."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 2 }
+
+dsAdslLineAlarmExtnAtucThresh15MinSesL OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Severe errored seconds encountered by an ADSL interface within any giving 15 minutes performance data collection period, which cause the SNMP to send an adslAtucSesLTrap."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 3 }
+
+
+dsAdslLineAlarmExtnAtucThresh15MinUasL OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The first time the value of the corresponding instance of adslAtucPerf15MinUasL reaches or exceeds this value within a given 15-minute performance data collection period, an adslAtucUasLThreshTrap notifications will be generated."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 4 }
+
+
+dsAdslLineAlarmExtnAtucOpStateTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER {                
+					disable(0),
+					enable(1)
+					}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables and disables the OpStateChangeTrap."
+	::= { dsAdslLineAlarmConfProfileExtnEntry 5 }
+
+dsAdslLineAlarmExtnAtucThresh15MinFecsL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 15 Minutes performance data collection period, which cause the SNMP agent to send an ' dsAdslAtucTrapsPerfFecsLThresh'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 6 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayLofs OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Frame Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfLofsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 7 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayLoss OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Signal Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfLossThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 8 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayLols OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Link Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfLolsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 9 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayLprs OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Power Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfLprsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 10 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayESs OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Errored Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfESsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 11 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DaySesL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Severe errored Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAtucPerfSesLThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 12 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayUasL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of unavailable errored seconds encountered by an ADSL interface within any giving 1 day performance data collection period, which cause the SNMP agent to send an 'dsAdslAtucPerfUasLThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 13 }
+
+
+dsAdslLineAlarmExtnAtucThresh1DayFecsL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 1 day performance data collection period, which cause the SNMP agent to send an ' dsAdslAtucTrapsPerfFecsLThresh1Day'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 14 }
+
+
+dsAdslLineAlarmExtnAturThresh15MinFecsL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 15 Minutes performance data collection period, which cause the SNMP agent to send an ' dsAdslAturTrapsPerfFecsLThresh'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 15 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayLofs OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Frame Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAturPerfLofsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 16 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayLoss OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Signal Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAturPerfLossThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 17 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayLprs  OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Loss of Power Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAturPerfLprsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 18 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayESs OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Errored Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAturPerfESsThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 19 }
+
+
+dsAdslLineAlarmExtnAturThresh1DaySesL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Severe errored Seconds encountered by an ADSL interface, within any given 1 day performance data collection period, which causes the SNMP agent to send an 'dsAdslAturPerfSesLThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 20 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayUasL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of unavailable errored seconds encountered by an ADSL interface within any giving 1 day performance data collection period, which cause the SNMP agent to send an 'dsAdslAturPerfUasLThresh1DayTrap'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 21 }
+
+
+dsAdslLineAlarmExtnAturThresh1DayFecsL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..86400 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 1 day performance data collection period, which cause the SNMP agent to send an ' dsAdslAturTrapsPerfFecsLThresh1Day'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 22 }
+
+dsAdslLineAlarmExtnAturThresh15MinSesL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 15 Minutes performance data collection period, which cause the SNMP agent to send an ' dsAdslAtucTrapsPerfFecsLThresh'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 23 }
+	
+dsAdslLineAlarmExtnAturThresh15MinUasL OBJECT-TYPE
+	SYNTAX       Integer32 ( 0..900 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The number of Forward error correction seconds encountered by an ADSL interface within any giving 15 Minutes performance data collection period, which cause the SNMP agent to send an ' dsAdslAtucTrapsPerfFecsLThresh'."
+	DEFVAL   { 0 }
+	::= { dsAdslLineAlarmConfProfileExtnEntry 24 }
+
+dsAdslLineAlarmExtnAtucPmStateTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER {             
+					disable(0),
+					enable(1)
+					}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables and disables the PmStateChangeTrap."
+	::= { dsAdslLineAlarmConfProfileExtnEntry 25 }  
+
+dsAdslTrap OBJECT IDENTIFIER ::= { dasanAdslLineMIB  2 }
+
+dsAdslAtucTraps OBJECT IDENTIFIER ::= {dsAdslTrap 1}
+	
+	dsAdslAtucOpStateChangeTrap		NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPhysExtnOpState }
+		STATUS	current
+		DESCRIPTION 
+			"Operational state of the transceiver is changed"
+		::= { dsAdslAtucTraps  1 }
+		
+	dsAdslAtucPmStateChangeTrap 		NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPhysExtnPMState }
+		STATUS  current
+		DESCRIPTION
+			"Current PM state of the transceiver is changed."
+		::= { dsAdslAtucTraps  2 }	 
+		
+		
+	dsAdslAtucPerfFailedFastRThreshTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr15MinFailedFastR, 
+				  dsAdslLineAlarmExtnAtucThresh15MinFailFastR }
+		STATUS	current
+		DESCRIPTION 
+			"Failed retrains 15-minute interval threshold reached"
+		::= { dsAdslAtucTraps  3 }
+
+	dsAdslAtucPerfSesLThreshTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr15MinSesL,
+				  dsAdslLineAlarmExtnAtucThresh15MinSesL }
+		STATUS	current
+		DESCRIPTION 
+			"Severely Errored Seconds 15-minute interval threshold reached"
+		::= { dsAdslAtucTraps  4 }
+
+	dsAdslAtucPerfUasLThreshTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr15MinUasL, 
+				  dsAdslLineAlarmExtnAtucThresh15MinUasL }
+		STATUS	current
+		DESCRIPTION 
+			"Unavailable Errored Seconds 15-minute interval threshold reached"
+		::= { dsAdslAtucTraps  5 }
+
+	dsAdslAtucPerfFecsLThreshTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr15MinFecsL,
+			 	  dsAdslLineAlarmExtnAtucThresh15MinFecsL}
+		STATUS	current
+		DESCRIPTION 
+			"Forward error correction 15-minute interval threshold reached"
+		::= { dsAdslAtucTraps  6 }
+
+	
+	dsAdslAtucPerfLofsThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAtucPerfCurr1DayLofs,
+		 		  dsAdslLineAlarmExtnAtucThresh1DayLofs}
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Frames 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  7 }
+  
+	dsAdslAtucPerfLossThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAtucPerfCurr1DayLoss,
+				  dsAdslLineAlarmExtnAtucThresh1DayLoss }
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Signal 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  8 }
+ 
+	dsAdslAtucPerfLolsThresh1DayTrap	NOTIFICATION-TYPE    
+		OBJECTS { adslAtucPerfCurr1DayLols,
+		 		  dsAdslLineAlarmExtnAtucThresh1DayLols}
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Link 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  9 }
+ 
+	dsAdslAtucPerfLprsThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAtucPerfCurr1DayLprs,
+				  dsAdslLineAlarmExtnAtucThresh1DayLprs}        
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Power 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  10 }
+ 
+	dsAdslAtucPerfESsThresh1DayTrap		NOTIFICATION-TYPE
+		OBJECTS { adslAtucPerfCurr1DayESs, 
+				  dsAdslLineAlarmExtnAtucThresh1DayESs}
+		STATUS	current
+		DESCRIPTION 
+			"Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  11 }
+ 
+	dsAdslAtucPerfSesLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr1DaySesL,
+				  dsAdslLineAlarmExtnAtucThresh1DaySesL }
+		STATUS	current
+		DESCRIPTION 
+			"Severely Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  12 }
+  
+	dsAdslAtucPerfUasLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr1DayUasL,
+				  dsAdslLineAlarmExtnAtucThresh1DayUasL}
+		STATUS	current
+		DESCRIPTION 
+			"Unavailable Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  13 }
+
+	dsAdslAtucPerfFecsLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAtucPerfDataExtnCurr1DayFecsL,
+				  dsAdslLineAlarmExtnAtucThresh1DayFecsL }
+		STATUS	current
+		DESCRIPTION 
+			"Forward error correction Seconds 1-day interval threshold reached"
+		::= { dsAdslAtucTraps  14 }
+
+	
+dsAdslAturTraps OBJECT IDENTIFIER ::= {dsAdslTrap 2}     
+	
+	dsAdslAturSesLThreshTrap		NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr15MinSesL,
+				  dsAdslLineAlarmExtnAturThresh15MinSesL}
+		STATUS	current
+		DESCRIPTION 
+			"Severely Errored Seconds 15-minute interval threshold reached"
+		::= { dsAdslAturTraps  1 }
+
+     dsAdslAturUasLThreshTrap		NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr15MinUasL,
+				  dsAdslLineAlarmExtnAturThresh15MinUasL}
+		STATUS	current
+		DESCRIPTION 
+			"Unavailable Errored Seconds 15-minute interval threshold reached"
+		::= { dsAdslAturTraps  2 }
+		
+     dsAdslAturPerfFecsLThreshTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr15MinFecsL,
+				  dsAdslLineAlarmExtnAturThresh15MinFecsL}
+		STATUS	current
+		DESCRIPTION 
+			"Forward error correction 15-minute interval threshold reached"
+		::= { dsAdslAturTraps  3 }
+     
+     dsAdslAturPerfLofsThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAturPerfCurr1DayLofs,
+			  	  dsAdslLineAlarmExtnAturThresh1DayLofs}
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Frames 1-day interval threshold reached"
+		::= { dsAdslAturTraps  4 }
+		
+     dsAdslAturPerfLossThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAturPerfCurr1DayLoss,
+				  dsAdslLineAlarmExtnAturThresh1DayLoss}
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Signal 1-day interval threshold reached"
+		::= { dsAdslAturTraps  5 }
+		
+     dsAdslAturPerfLprsThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAturPerfCurr1DayLprs, 
+				  dsAdslLineAlarmExtnAturThresh1DayLprs}
+		STATUS	current
+		DESCRIPTION 
+			"Loss of Power 1-day interval threshold reached"
+		::= { dsAdslAturTraps  6 } 
+		
+     dsAdslAturPerfESsThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { adslAturPerfCurr1DayESs,
+				dsAdslLineAlarmExtnAturThresh1DayESs}
+		STATUS	current
+		DESCRIPTION 
+			"Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAturTraps  7 }
+		
+     dsAdslAturPerfSesLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr1DaySesL,
+		 		  dsAdslLineAlarmExtnAturThresh1DaySesL}
+		STATUS	current
+		DESCRIPTION 
+			"Severely Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAturTraps  8 }
+		
+     dsAdslAturPerfUasLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr1DayUasL,
+				  dsAdslLineAlarmExtnAturThresh1DayUasL }
+		STATUS	current
+		DESCRIPTION 
+			"Unavailable Errored Seconds 1-day interval threshold reached"
+		::= { dsAdslAturTraps  9 }
+		
+     dsAdslAturPerfFecsLThresh1DayTrap	NOTIFICATION-TYPE
+		OBJECTS { dsAdslAturPerfDataExtnCurr1DayFecsL,
+				  dsAdslLineAlarmExtnAturThresh1DayFecsL }
+		STATUS	current
+		DESCRIPTION 
+			"Forward error correction  Seconds 1-day interval threshold is reached"
+		::= { dsAdslAturTraps  10 }
+END 
