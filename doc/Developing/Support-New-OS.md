@@ -30,9 +30,19 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Pulse Connect Secure
+        - Pulse Secure
+        - Juniper Networks,Inc,VA-DTE
+        - VA-SPE
 ```
 
 #### Discovery OS
+
+> NOTE: In the above example, an discovery os file is not needed as we are matching the device based on the contents 
+of it's sysDescr value. You can also do this with sysObjectId. If you require a more complex discovery then you can 
+continue to create the os discovery file, below is an example:
 
 We create a new file named as our OS definition and in this directory:
 
