@@ -152,9 +152,10 @@ function discover_os($sysObjectId, $sysDescr)
     return 'generic';
 }
 
-function preg_match_any($subject, $regexes) {
-    foreach((array)$regexes as $regex) {
-        if (preg_match($regex, $subject) {
+function preg_match_any($subject, $regexes)
+{
+    foreach ((array)$regexes as $regex) {
+        if (preg_match($regex, $subject)) {
             return true;
         }
     }
