@@ -138,7 +138,7 @@ function discover_os($sysObjectId, $sysDescr)
                             $result &= str_contains($sysDescr, $value);
                             break;
                         case 'sysDescr_regex':
-                            $result &= preg_match($sysDescr, $value);
+                            $result &= preg_match_any($sysDescr, $value);
                             break;
                         default:
                     }
@@ -150,6 +150,16 @@ function discover_os($sysObjectId, $sysDescr)
         }
     }
     return 'generic';
+}
+
+function preg_match_any($subject, $regexes)
+{
+    foreach ((array)$regexes as $regex) {
+        if (preg_match($regex, $subject)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function percent_colour($perc)
