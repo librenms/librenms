@@ -111,6 +111,9 @@ function discover_device($device, $options = null)
     }
 
     $config['os'][$device['os']] = load_os($device);
+    if (is_array($config['os'][$device['os']]['register_mibs'])) {
+        register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
+    }
 
     // Set type to a predefined type for the OS if it's not already set
     if ($device['type'] == 'unknown' || $device['type'] == '') {

@@ -35,3 +35,5 @@ discovery_modules:
     cisco-pw: 1
     cisco-vrf: 1
     cisco-vrf-lite: 1
+register_mibs:
+    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
