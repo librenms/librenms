@@ -141,6 +141,34 @@ Add the following line at the end:
 
 Exit and save.
 
+### Smokeping and RRDCached ###
+
+If you are using the standard smokeping data dir (/opt/smokeping/data) then you may need to alter the rrdcached config slightly.
+
+In the standard configuration the -B argument may have been used to restrict rrdcached to read only from a single base dir.
+
+
+If this is true, when you try an open one of the smokeping graphs from within LibreNMS you will see something like this error at the end of the rrdcached command:
+
+```bash
+ERROR: rrdcached: /var/lib/smokeping/<device name>.rrd: Permission denied
+```
+
+So you will need to either change the dir in which smokeping saves its rrd files to be the same as the main librenms dir or you can remove the -B argument from the rrdcached config to allow it to read from more than one dir.
+
+To remove the -B switch:
+
+```bash
+sudo nano /etc/default/rrdcached
+```
+then find:
+
+```bash
+BASE_OPTIONS=
+```
+ 
+If -B is in the list of arguments delete it.
+
 ### Configure LibreNMS ###
 
 ```bash
