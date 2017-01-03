@@ -243,21 +243,7 @@ Restart snmpd and LibreNMS should populate the additional disk after a fresh dis
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
-The easiest way to show you how to do that is to link to an existing pull request that has been merged in on [GitHub](https://github.com/librenms/librenms/pull/352/files)
-
-To go into a bit more detail, the following are usually needed:
-
-**includes/definitions/$os.yaml**
-Create this file to include the required definitions for the new OS.
-**includes/discovery/os/ciscowlc.inc.php**
-This file just sets the $os variable, done by checking the SNMP tree for a particular value that matches the OS you are adding.  Typically, this will come from the presence of specific values in
-sysObjectID or sysDescr, or the existence of a particular enterprise tree.
-**includes/polling/os/ciscowlc.inc.php**
-This file will usually set the variables for $version and $hardware gained from an snmp lookup.
-**html/images/os/$os.png**
-This is a 32x32 png format image of the OS you are adding support for.
-
-You will also need to supply a test unit within `tests/OSDiscoveryTest.php`. Please see [Support-New-OS](Support-New-OS.md) for further information.
+Please see [Supporting a new OS](../Developing/Support-New-OS.md)
 
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
