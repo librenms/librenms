@@ -185,6 +185,13 @@ function RunFollowUp()
             $alert['query'] = GenSQL($alert['rule']);
         }
         $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
+        //make sure we can json_encode all the datas later
+        $cnt = count($chk);
+        for ($i = 0; $i < $cnt; $i++) {
+            if (isset($chk[$i]['ip'])) {
+                $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
+            }
+        }
         $o     = sizeof($alert['details']['rule']);
         $n     = sizeof($chk);
         $ret   = 'Alert #'.$alert['id'];

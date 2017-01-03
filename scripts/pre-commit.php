@@ -7,9 +7,7 @@ $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-require_once $install_dir . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->register();
+require $install_dir . '/vendor/autoload.php';
 
 $short_opts = 'lsupch';
 $long_opts = array(
@@ -113,7 +111,6 @@ function check_lint($passthru = false, $command_only = false)
     $lint_excludes = array('vendor/');
     if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
         $lint_excludes[] = 'lib/influxdb-php/';
-        $lint_excludes[] = 'lib/yaml/vendor/composer/autoload_static.php';
     }
 
     $lint_exclude = build_excludes('--exclude ', $lint_excludes);
