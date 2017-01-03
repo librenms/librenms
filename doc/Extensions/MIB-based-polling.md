@@ -152,7 +152,8 @@ Alternatively you can enable MIB polling per device by enabling it within the mo
 
 ### Discovery
 
-You need to add your desired MIBs to `/opt/librenms/mibs` folder. Afterwards you need to register your MIBs to the OS definition. 
+You need to add your desired MIBs to `/opt/librenms/mibs` folder. 
+You will then need to create a list of the OIDs you wish to use in the OS definition
 
 #### Example
 `/opt/librenms/includes/definitions/ruckuswireless.yaml`
