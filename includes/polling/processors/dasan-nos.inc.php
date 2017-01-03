@@ -2,7 +2,7 @@
 /**
  * dasan-nos.inc.php
  *
- * LibreNMS os polling module for Dasan NOS
+ * LibreNMS processor poller module for Dasan NOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list($hardware, $version) = explode(' ', $poll_device['sysDescr'], 2);
-
-$tmp = snmp_get_multi_oid($device, 'dsSerialNumber.0 dsFirmwareVersion', '-OQUs', 'DASAN-SWITCH-MIB:DASAN-PRODUCTS-MIB');
-
-$serial = $tmp['dsSerialNumber.0'];
-$version = $tmp['dsFirmwareVersion.0'];
+$proc = snmp_get($device, 'dsCpuLoad5s.0', '-Ovq', 'DASAN-SWITCH-MIB');
