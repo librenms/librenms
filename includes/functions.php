@@ -210,7 +210,7 @@ function getImageName($device, $use_database = true)
     $device['os'] = strtolower($device['os']);
 
     // fetch from the database
-    if ($use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if ($device['icon'] != 'generic' && $use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
         return $device['icon'];
     }
 
