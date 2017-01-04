@@ -1,0 +1,7 @@
+os: kyocera
+group: printer
+text: 'Kyocera Mita Printer'
+over:
+    - { graph: device_toner, text: Toner }
+ifname: 1
+type: printer

@@ -15,8 +15,6 @@
 $init_modules = array('web', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-require $config['install_dir'] . '/html/lib/Slim/Slim.php';
-\Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');

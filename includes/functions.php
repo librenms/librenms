@@ -106,8 +106,60 @@ function getHostOS($device)
             return $os;
         }
     }
+    return discover_os($sysObjectId, $sysDescr);
+}
 
-    return "generic";
+/**
+ * @param $sysObjectId
+ * @param $sysDescr
+ * @return string
+ */
+function discover_os($sysObjectId, $sysDescr)
+{
+    global $config;
+    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
+    foreach (glob($pattern) as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
+            foreach ($tmp['discovery'] as $item) {
+                if (!is_array($item) || empty($item)) {
+                    break;
+                }
+                // all items must be true
+                $result = true;
+                foreach ($item as $key => $value) {
+                    switch ($key) {
+                        case 'sysObjectId':
+                            $result &= starts_with($sysObjectId, $value);
+                            break;
+                        case 'sysDescr':
+                            $result &= str_contains($sysDescr, $value);
+                            break;
+                        case 'sysDescr_regex':
+                            $result &= preg_match_any($sysDescr, $value);
+                            break;
+                        default:
+                    }
+                }
+                if ($result) {
+                    return $tmp['os'];
+                }
+            }
+        }
+    }
+    return 'generic';
+}
+
+function preg_match_any($subject, $regexes)
+{
+    foreach ((array)$regexes as $regex) {
+        if (preg_match($regex, $subject)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function percent_colour($perc)
@@ -158,7 +210,7 @@ function getImageName($device, $use_database = true)
     $device['os'] = strtolower($device['os']);
 
     // fetch from the database
-    if ($use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if ($device['icon'] != 'generic' && $use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
         return $device['icon'];
     }
 
@@ -1390,7 +1442,7 @@ function oxidized_reload_nodes()
 **/
 function dnslookup($device, $type = false, $return = false)
 {
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
+    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
         return '';
     }
     if (empty($type)) {

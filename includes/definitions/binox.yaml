@@ -1,0 +1,8 @@
+os: binox
+text: 'Telco Systems BiNOX'
+type: network
+icon: telco-systems
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

@@ -1,0 +1,6 @@
+os: riverbed
+text: Riverbed
+type: network
+icon: riverbed
+over:
+    - { graph: device_bits, text: Traffic }

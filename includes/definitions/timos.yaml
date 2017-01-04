@@ -1,0 +1,8 @@
+os: timos
+group: timos
+text: 'Alcatel-Lucent TimOS'
+type: network
+ifXmcbc: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: alcatellucent

@@ -1,0 +1,850 @@
+-- *****************************************************************
+-- dasan-bridge-mib.my  
+--   DASAN Enterprise Bridge MIBs                    
+-- 
+--   Aug 3. 2005 dhlee@da-san.com created.
+--
+-- ***************************************************************** 
+ 
+DASAN-BRIDGE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32, Gauge32, Counter64, Unsigned32,
+    Integer32, TimeTicks, mib-2,
+    NOTIFICATION-TYPE
+    			FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,
+    PhysAddress, TruthValue, RowStatus,
+    TimeStamp, AutonomousType, TestAndIncr
+                        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP        FROM SNMPv2-CONF
+    ifIndex             FROM IF-MIB
+    dasanEvents,dasanMgmt,dasanModules
+                        FROM DASAN-SMI 
+    dasanSwitchMIBObjects,dsSwitchModules
+			FROM DASAN-SWITCH-MIB;
+           
+    MacAddress ::= OCTET STRING (SIZE (6))
+    BridgeId ::= OCTET STRING (SIZE (8))
+    Timeout ::= INTEGER     
+ 
+                          
+dsBridge MODULE-IDENTITY
+    LAST-UPDATED   "200508030000Z"
+    ORGANIZATION   "Dasan Co., Ltd."
+    CONTACT-INFO
+                   "Dasan Co., Ltd."
+    DESCRIPTION
+        "The MIB module to describe bridge of DASAN product."
+    ::= { dsSwitchModules 22 }
+ 
+    dsTp OBJECT IDENTIFIER ::= { dsBridge 3 }
+ 
+--
+-- Textual Convention
+-- 
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+VlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX      Unsigned32
+
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+
+
+
+--
+-- dasanVlanBase
+-- 
+
+dsVlanBase OBJECT IDENTIFIER ::= { dsBridge 1 }
+
+dsVlanVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of IEEE 802.1Q that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    ::= { dsVlanBase 1 }
+
+dsVlanMaxVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum IEEE 802.1Q VLAN ID that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 9.3.2.3"
+    ::= { dsVlanBase 2 }
+
+dsVlanMaxSupportedVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of VLANs that this
+        device supports."
+    ::= { dsVlanBase 3 }
+
+dsVlanNumVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of VLANs that are
+        configured in this device."
+    ::= { dsVlanBase 4 }
+
+dsVlanGvrpStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 enabled(1),
+                 disabled(2)
+                } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative status requested by management for
+        GVRP.  The value enabled(1) indicates that GVRP should
+        be enabled on this device, on all ports for which it has
+        not been specifically disabled.  When disabled(2), GVRP
+        is disabled on all ports and all GVRP packets will be
+        forwarded transparently.  This object affects all GVRP
+        Applicant and Registrar state machines.  A transition
+        from disabled(2) to enabled(1) will cause a reset of all
+        GVRP state machines on all ports."
+    ::= { dsVlanBase 5 }
+
+--
+-- dsVlanCurrentTable
+--
+dsVlanCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DsVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing current configuration information
+        for each VLAN currently configured into the device by
+        (local or network) management, or dynamically created
+        as a result of GVRP requests received."
+    ::= { dsBridge 2 }
+
+dsVlanCurrentEntry OBJECT-TYPE
+    SYNTAX      DsVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a VLAN configured into the device by
+        (local or network) management, or dynamically created
+        as a result of GVRP requests received."
+    INDEX   { dsVlanIndex, dsVlanName}
+    ::= { dsVlanCurrentTable 1 }
+
+
+DsVlanCurrentEntry ::=
+    SEQUENCE {
+        dsVlanIndex
+            VlanIndex,  
+        dsVlanName
+            OCTET STRING,
+        dsVlanFdbId
+            Unsigned32,
+        dsVlanCurrentEgressPorts
+            PortList,
+        dsVlanCurrentUntaggedPorts
+            PortList,
+        dsVlanStatus
+            INTEGER,
+        dsVlanCreationTime
+            TimeTicks,
+        dsVlanCurrentPhysicalPorts
+            PortList
+    }
+
+dsVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier refering to this VLAN."
+    ::= { dsVlanCurrentEntry 1 } 
+    
+dsVlanName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-NAME to this VLAN."
+    ::= { dsVlanCurrentEntry 2 } 
+    
+dsVlanFdbId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Filtering Database used by this VLAN. This value is 
+        allocated automatically by the device whenever the VLAN 
+        is created: either dynamically by GVRP, or by management, 
+        in dot1qVlanStaticTable.  Allocation of this value follows 
+        the learning constraints defined for this VLAN in 
+        dot1qLearningConstraintsTable."
+    ::= { dsVlanCurrentEntry 3 }
+
+dsVlanCurrentEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are transmitting traffic for
+        this VLAN as either tagged or untagged frames."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { dsVlanCurrentEntry 4 }
+
+dsVlanCurrentUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are transmitting traffic for
+        this VLAN as untagged frames."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { dsVlanCurrentEntry 5 }
+
+dsVlanStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    permanent(2),
+                    dynamicGvrp(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry.
+            other(1) - this entry is currently in use but the
+                conditions under which it will remain so differ
+                from the following values.
+            permanent(2) - this entry, corresponding to an entry
+                in dot1qVlanStaticTable, is currently in use and
+                will remain so after the next reset of the
+                device.  The port lists for this entry include
+                ports from the equivalent dot1qVlanStaticTable
+                entry and ports learnt dynamically.
+            dynamicGvrp(3) - this entry is currently in use
+
+
+                and will remain so until removed by GVRP.  There
+                is no static entry for this VLAN and it will be
+                removed when the last port leaves the VLAN."
+    ::= { dsVlanCurrentEntry 6 }
+
+dsVlanCreationTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this VLAN was created."
+    ::= { dsVlanCurrentEntry 7 }
+
+dsVlanCurrentPhysicalPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are physical."
+    REFERENCE
+        "."
+    ::= { dsVlanCurrentEntry 8 }
+
+
+--
+-- dsTpFdbTable 
+--
+dsTpFdbTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF DsTpFdbEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "A table that contains information about unicast entries
+        for which the device has forwarding and/or filtering
+        information.  This information is used by the
+        transparent bridging function in determining how to
+        propagate a received frame."
+     ::= { dsTp 1 }
+
+dsTpFdbEntry OBJECT-TYPE
+     SYNTAX  DsTpFdbEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "Information about a specific unicast MAC address for
+        which the device has some forwarding and/or filtering
+        information."
+     INDEX  { dsTpFdbFid, dsTpFdbVlanName, dsTpFdbAddress }
+     ::= { dsTpFdbTable 1 }    
+              
+DsTpFdbEntry ::=
+     SEQUENCE {   
+       dsTpFdbFid
+       INTEGER,
+       dsTpFdbVlanName
+       OCTET STRING,    
+       dsTpFdbAddress
+       MacAddress,
+       dsTpFdbPort
+       Integer32,
+       dsTpFdbStatus
+       INTEGER
+     } 
+ 
+dsTpFdbFid OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "The identity of this Filtering Database."
+     ::= { dsTpFdbEntry 1 }
+	 
+dsTpFdbVlanName OBJECT-TYPE
+     SYNTAX OCTET STRING
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "The name of VLAN related to this Filtering Database."
+     ::= { dsTpFdbEntry 2 }   
+     
+dsTpFdbAddress OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE (6))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unicast MAC address for which the bridge has
+              forwarding and/or filtering information."
+     REFERENCE
+             "IEEE 802.1D-1990: Section 3.9.1, 3.9.2"
+     ::= { dsTpFdbEntry 3 }
+	 
+dsTpFdbPort OBJECT-TYPE
+     SYNTAX Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "Either the value '0', or the port number of the port on
+        which a frame having a source address equal to the value
+        of the corresponding instance of dsTpFdbAddress has
+        been seen."
+     ::= { dsTpFdbEntry 4 }
+
+dsTpFdbStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+	    other(1),
+	    invalid(2),
+	    learned(3),
+	    self(4),
+	    mgmt(5)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "The status of this entry.  The meanings of the values
+        are:
+            other(1) - none of the following.
+            invalid(2) - this entry is no longer valid (e.g., it
+                was learned but has since aged out), but has not
+                yet been flushed from the table.
+            learned(3) - the value of the corresponding instance
+                of dsTpFdbPort was learned and is being used.
+
+            self(4) - the value of the corresponding instance of
+                dsTpFdbAddress represents one of the device's
+                addresses.  The corresponding instance of
+                dsTpFdbPort indicates which of the device's
+                ports has this address.
+            mgmt(5) - the value of the corresponding instance of
+                dsTpFdbAddress is also the value of an
+                existing instance of dsStaticAddress."
+     ::= { dsTpFdbEntry 5 }
+         
+         
+--
+-- dsStpBase
+--
+
+dsStpBase OBJECT IDENTIFIER ::= { dsBridge 4 }
+
+--
+-- dsStpTable
+--                   
+
+dsStpTable  OBJECT-TYPE
+     SYNTAX  SEQUENCE OF DsStpEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "The table of STP supported this device."
+     ::= { dsBridge 5 }
+
+dsStpEntry OBJECT-TYPE
+     SYNTAX  DsStpEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "The table of STP supported this device."
+     INDEX  { dsStpIndex }
+     ::= { dsStpTable 1 }    
+              
+DsStpEntry ::=
+     SEQUENCE {
+       dsStpIndex
+       INTEGER,    
+       dsStpVid
+       INTEGER,
+       dsStpProtocolSpecification
+       INTEGER,
+       dsStpPriority
+       Integer32,  
+       dsStpTimeSinceTopologyChange
+       TimeTicks,
+       dsStpTopChanges
+       Counter,
+       dsStpDesignatedRoot
+       BridgeId,
+       dsStpRootCost
+       INTEGER,
+       dsStpRootPort
+       INTEGER,
+       dsStpMaxAge
+       Timeout,
+       dsStpHelloTime
+       Timeout,
+       dsStpHoldTime
+       INTEGER,
+       dsStpForwardDelay
+       Timeout,
+       dsStpBridgeMaxAge
+       Timeout,
+       dsStpBridgeHelloTime
+       Timeout,
+       dsStpBridgeForwardDelay
+       Timeout 
+     } 
+
+dsStpIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "."
+     ::= { dsStpEntry 1}  
+	 
+dsStpVid OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "."
+     ::= { dsStpEntry 2}
+
+dsStpProtocolSpecification OBJECT-TYPE
+     SYNTAX  INTEGER {
+             unknown(1),
+             decLb100(2),
+             ieee8021d(3)
+             }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "An indication of what version of the Spanning
+              Tree Protocol is being run.  The value
+              'decLb100(2)' indicates the DEC LANbridge 100
+              Spanning Tree protocol.  IEEE 802.1d
+              implementations will return 'ieee8021d(3)'.  If
+              future versions of the IEEE Spanning Tree Protocol
+              are released that are incompatible with the
+              current version a new value will be defined."
+     ::= { dsStpEntry 3 }
+
+dsStpPriority OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+             "The value of the write-able portion of the Bridge
+              ID, i.e., the first two octets of the (8 octet
+              long) Bridge ID.  The other (last) 6 octets of the
+              Bridge ID are given by the value of
+             dot1dBaseBridgeAddress."
+     REFERENCE
+             "IEEE 802.1D-1990: Section 4.5.3.7"
+     ::= { dsStpEntry 4 }
+
+dsStpTimeSinceTopologyChange OBJECT-TYPE
+     SYNTAX  TimeTicks
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The time (in hundredths of a second) since the
+             last time a topology change was detected by the
+             bridge entity."
+     REFERENCE
+             "IEEE 802.1D-1990: Section 6.8.1.1.3"
+     ::= { dsStpEntry 5 }
+
+dsStpTopChanges OBJECT-TYPE
+     SYNTAX  Counter
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The total number of topology changes detected by
+              this bridge since the management entity was last
+              reset or initialized."
+     REFERENCE
+             "IEEE 802.1D-1990: Section 6.8.1.1.3"
+     ::= { dsStpEntry 6 }
+
+dsStpDesignatedRoot OBJECT-TYPE
+     SYNTAX  BridgeId
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+            "The bridge identifier of the root of the spanning
+             tree as determined by the Spanning Tree Protocol
+             as executed by this node.  This value is used as
+             the Root Identifier parameter in all Configuration
+             Bridge PDUs originated by this node."
+     REFERENCE
+            "IEEE 802.1D-1990: Section 4.5.3.1"
+     ::= { dsStpEntry 7 }
+
+dsStpRootCost OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+            "The cost of the path to the root as seen from
+             this bridge."
+     REFERENCE
+            "IEEE 802.1D-1990: Section 4.5.3.2"
+     ::= { dsStpEntry 8 }
+
+dsStpRootPort OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+	     "The port number of the port which offers the
+	     lowest cost path from this bridge to the root
+	     bridge."
+     REFERENCE
+ 	     "IEEE 802.1D-1990: Section 4.5.3.3"
+     ::= { dsStpEntry 9 }
+
+dsStpMaxAge OBJECT-TYPE
+     SYNTAX  Timeout
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+	      "The maximum age of Spanning Tree Protocol
+	      information learned from the network on any port
+	      before it is discarded, in units of hundredths of
+	      a second.  This is the actual value that this
+	      bridge is currently using."
+     REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.4"
+     ::= { dsStpEntry 10 }
+
+dsStpHelloTime OBJECT-TYPE
+     SYNTAX  Timeout
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+	      "The amount of time between the transmission of
+	      Configuration bridge PDUs by this node on any port
+	      when it is the root of the spanning tree or trying
+	      to become so, in units of hundredths of a second.
+	      This is the actual value that this bridge is
+	      currently using."
+     REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.5"
+     ::= { dsStpEntry 11 }
+
+dsStpHoldTime OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+	      "This time value determines the interval length
+	      during which no more than two Configuration bridge
+	      PDUs shall be transmitted by this node, in units
+	      of hundredths of a second."
+     REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.14"
+     ::= { dsStpEntry 12 }
+
+dsStpForwardDelay OBJECT-TYPE
+      SYNTAX  Timeout
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "This time value, measured in units of hundredths
+	      of a second, controls how fast a port changes its
+	      spanning state when moving towards the Forwarding
+	      state.  The value determines how long the port
+	      stays in each of the Listening and Learning
+	      states, which precede the Forwarding state.  This
+	      value is also used, when a topology change has
+	      been detected and is underway, to age all dynamic
+	      entries in the Forwarding Database.  [Note that
+	      this value is the one that this bridge is
+	      currently using, in contrast to
+	      dot1dStpBridgeForwardDelay which is the value that
+	      this bridge and all others would start using
+	      if/when this bridge were to become the root.]"
+      REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.6"
+      ::= { dsStpEntry 13 }
+
+dsStpBridgeMaxAge OBJECT-TYPE
+      SYNTAX  Timeout (600..4000)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The value that all bridges use for MaxAge when
+	      this bridge is acting as the root.  Note that
+	      802.1D-1990 specifies that the range for this
+	      parameter is related to the value of
+	      dot1dStpBridgeHelloTime. The granularity of this
+	      timer is specified by 802.1D-1990 to be 1 second.
+	      An agent may return a badValue error if a set is
+	      attempted to a value which is not a whole number
+	      of seconds."
+      REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.8"
+      ::= { dsStpEntry 14 }
+
+dsStpBridgeHelloTime OBJECT-TYPE
+      SYNTAX  Timeout (100..1000)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The value that all bridges use for HelloTime when
+	      this bridge is acting as the root.  The
+	      granularity of this timer is specified by 802.1D-
+	      1990 to be 1 second.  An agent may return a
+	      badValue error if a set is attempted to a value
+	      which is not a whole number of seconds."
+      REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.9"
+      ::= { dsStpEntry 15 }
+
+dsStpBridgeForwardDelay OBJECT-TYPE
+      SYNTAX  Timeout (400..3000)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The value that all bridges use for ForwardDelay
+	      when this bridge is acting as the root.  Note that
+	      802.1D-1990 specifies that the range for this
+	      parameter is related to the value of
+	      dot1dStpBridgeMaxAge.  The granularity of this
+	      timer is specified by 802.1D-1990 to be 1 second.
+	      An agent may return a badValue error if a set is
+	      attempted to a value which is not a whole number
+	      of seconds."
+      REFERENCE
+	      "IEEE 802.1D-1990: Section 4.5.3.10"
+      ::= { dsStpEntry 16 }
+
+--
+-- dsStpPortTable
+--
+dsStpPortTable  OBJECT-TYPE
+     SYNTAX  SEQUENCE OF DsStpPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "The port table of STP supported this device."
+     ::= { dsBridge 6 }
+
+dsStpPortEntry OBJECT-TYPE
+     SYNTAX  DsStpPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "The port table of STP supported this device."
+     INDEX  { dsStpIndex, dsStpPort }
+     ::= { dsStpPortTable 1 }    
+              
+DsStpPortEntry ::=
+     SEQUENCE {  
+       dsStpPort
+       Integer32,
+       dsStpPortPriority
+       Integer32,  
+       dsStpPortState
+       INTEGER,
+       dsStpPortEnable
+       INTEGER,
+       dsStpPortPathCost
+       Integer32,
+       dsStpPortDesignatedRoot
+       BridgeId,
+       dsStpPortDesignatedCost
+       INTEGER,
+       dsStpPortDesignatedBridge
+       BridgeId,
+       dsStpPortDesignatedPort
+       OCTET STRING,
+       dsStpPortForwardTransitions
+       Counter
+     } 
+
+dsStpPort OBJECT-TYPE
+      SYNTAX  Integer32 (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	  "The port number of the port for which this entry
+	  contains Spanning Tree Protocol management
+	  information."
+      ::= { dsStpPortEntry 1 }
+
+dsStpPortPriority OBJECT-TYPE
+      SYNTAX  Integer32 (0..255)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The value of the priority field which is
+	      contained in the first (in network byte order)
+	      octet of the (2 octet long) Port ID.  The other
+	      octet of the Port ID is given by the value of
+	      dot1dStpPort."
+      ::= { dsStpPortEntry 2 }
+
+dsStpPortState OBJECT-TYPE
+      SYNTAX  INTEGER {
+		  disabled(1),
+		  blocking(2),
+		  listening(3),
+		  learning(4),
+		  forwarding(5),
+		  broken(6)
+	      }
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The port's current state as defined by
+	      application of the Spanning Tree Protocol.  This
+	      state controls what action a port takes on
+	      reception of a frame.  If the bridge has detected
+	      a port that is malfunctioning it will place that
+	      port into the broken(6) state.  For ports which
+	      are disabled (see dsStpPortEnable), this object
+	      will have a value of disabled(1)."
+      ::= { dsStpPortEntry 3 }
+
+dsStpPortEnable OBJECT-TYPE
+      SYNTAX  INTEGER {
+		  enabled(1),
+		  disabled(2)
+	      }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The enabled/disabled status of the port."
+      ::= { dsStpPortEntry 4 }
+
+dsStpPortPathCost OBJECT-TYPE
+      SYNTAX  Integer32 (1..65535)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+	      "The contribution of this port to the path cost of
+	      paths towards the spanning tree root which include
+	      this port.  802.1D-1990 recommends that the
+	      default value of this parameter be in inverse
+	      proportion to the speed of the attached LAN."
+      ::= { dsStpPortEntry 5 }
+
+dsStpPortDesignatedRoot OBJECT-TYPE
+      SYNTAX  BridgeId
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The unique Bridge Identifier of the Bridge
+	      recorded as the Root in the Configuration BPDUs
+	      transmitted by the Designated Bridge for the
+	      segment to which the port is attached."
+      ::= { dsStpPortEntry 6 }
+
+dsStpPortDesignatedCost OBJECT-TYPE
+      SYNTAX  INTEGER
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The path cost of the Designated Port of the
+	      segment connected to this port.  This value is
+	      compared to the Root Path Cost field in received
+	      bridge PDUs."
+      ::= { dsStpPortEntry 7 }
+
+dsStpPortDesignatedBridge OBJECT-TYPE
+      SYNTAX  BridgeId
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The Bridge Identifier of the bridge which this
+	  port considers to be the Designated Bridge for
+	      this port's segment."
+      ::= { dsStpPortEntry 8 }
+
+dsStpPortDesignatedPort OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The Port Identifier of the port on the Designated
+	      Bridge for this port's segment."
+      ::= { dsStpPortEntry 9 }
+
+dsStpPortForwardTransitions OBJECT-TYPE
+      SYNTAX  Counter
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+	      "The number of times this port has transitioned
+	      from the Learning state to the Forwarding state."
+      ::= { dsStpPortEntry 10 }
+END

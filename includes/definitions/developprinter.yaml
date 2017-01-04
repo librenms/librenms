@@ -1,0 +1,7 @@
+os: developprinter
+group: printer
+text: 'Develop Printer'
+type: printer
+icon: develop
+over:
+    - { graph: device_toner, text: Toner }

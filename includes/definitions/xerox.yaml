@@ -1,0 +1,7 @@
+os: xerox
+group: printer
+text: 'Xerox Printer'
+ifname: 1
+type: printer
+over:
+    - { graph: device_toner, text: Toner }

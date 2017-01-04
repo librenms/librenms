@@ -152,6 +152,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
+    public function testApic()
+    {
+        $this->checkOS('apic');
+    }
+
     public function testAreca()
     {
         $this->checkOS('areca');
@@ -344,6 +349,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCiscowap()
     {
         $this->checkOS('ciscowap');
+        $this->checkOS('ciscowap', 'ciscowap-wap321');
     }
 
     public function testCiscowlc()
@@ -378,6 +384,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cumulus');
     }
 
+    public function testDasanNos()
+    {
+        $this->checkOS('dasan-nos');
+    }
+
     public function testDatacom()
     {
         $this->checkOS('datacom');
@@ -386,6 +397,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDatadomain()
     {
         $this->checkOS('datadomain');
+    }
+
+    public function testDcnSoftware()
+    {
+        $this->checkOS('dcn-software');
     }
 
     public function testDdnos()
@@ -408,6 +424,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dell-laser');
         $this->checkOS('dell-laser', 'dell-laser-color');
         $this->checkOS('dell-laser', 'dell-laser-mfp');
+    }
+
+    public function testDellups()
+    {
+        $this->checkOS('dell-ups');
     }
 
     public function testDeltaups()
@@ -483,6 +504,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('edgecos', 'edgecos-ecs4510-28f');
         $this->checkOS('edgecos', 'edgecos-ecs4510-52t');
         $this->checkOS('edgecos', 'edgecos-ecs4210-28t');
+        $this->checkOS('edgecos', 'edgecos-ecs3510-52t');
     }
 
     public function testEdgeos()
@@ -599,6 +621,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('fujitsupyos', 'fujitsupyos-10gbe');
     }
 
+    public function testFujitsueternusos()
+    {
+        $this->checkOS('fujitsueternusos');
+    }
+
     public function testFxos()
     {
         $this->checkOS('fxos');
@@ -635,6 +662,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHpblmos()
     {
         $this->checkOS('hpblmos');
+    }
+
+    public function testHpeMsl()
+    {
+        $this->checkOS('hpe-msl');
     }
 
     public function testHpmsm()
@@ -746,6 +778,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('jetdirect', 'jetdirect2');
     }
 
+    public function testJetstream()
+    {
+        $this->checkOS('jetstream');
+    }
+
     public function testJuniperex2500os()
     {
         $this->checkOS('juniperex2500os');
@@ -785,6 +822,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLantronixslc()
     {
         $this->checkOS('lantronix-slc');
+    }
+
+    public function testLcos()
+    {
+        $this->checkOS('lcos');
+        $this->checkOS('lcos', 'lcos1');
     }
 
     public function testLenovoemc()
@@ -1460,6 +1503,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testZywall()
     {
         $this->checkOS('zywall');
+        $this->checkOS('zywall', 'zywall1');
     }
 
     public function testZyxelnwa()

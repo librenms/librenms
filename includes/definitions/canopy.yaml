@@ -1,0 +1,7 @@
+os: canopy
+text: Canopy
+type: wireless
+icon: cambium
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+group: cambium

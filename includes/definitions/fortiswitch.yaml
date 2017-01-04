@@ -1,0 +1,10 @@
+os: fortiswitch
+text: 'Fortinet FortiSwitch'
+type: network
+icon: fortinet
+mib_dir:
+    - fortinet
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

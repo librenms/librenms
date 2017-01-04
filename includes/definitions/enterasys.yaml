@@ -1,0 +1,7 @@
+os: enterasys
+text: Enterasys
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: enterasys
+ifname: 1

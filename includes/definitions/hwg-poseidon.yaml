@@ -1,0 +1,6 @@
+os: hwg-poseidon
+text: 'HWg Poseidon'
+type: environment
+icon: hwg-poseidon
+over:
+    - { graph: device_bits, text: Traffic }

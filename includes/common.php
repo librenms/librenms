@@ -51,22 +51,6 @@ function generate_priority_status($priority)
     return isset($map[$priority]) ? $map[$priority] : 0;
 }
 
-function format_number_short($number, $sf)
-{
-    // This formats a number so that we only send back three digits plus an optional decimal point.
-    // Example: 723.42 -> 723    72.34 -> 72.3    2.23 -> 2.23
-
-    list($whole, $decimal) = explode(".", $number);
-
-    if (strlen($whole) >= $sf || !is_numeric($decimal)) {
-        $number = $whole;
-    } elseif (strlen($whole) < $sf) {
-        $diff = $sf - strlen($whole);
-        $number = $whole .".".substr($decimal, 0, $diff);
-    }
-    return $number;
-}
-
 function external_exec($command)
 {
     global $debug,$vdebug;
@@ -601,7 +585,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-        return format_number_short(round($value, $round), $sf).$ext;
+        return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -621,7 +605,7 @@ function format_bi($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return format_number_short(round($value, $round), $sf).$ext;
+    return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)
@@ -693,7 +677,8 @@ function c_echo($string, $enabled = true)
 function is_mib_graph($type, $subtype)
 {
     global $config;
-    return $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return isset($config['graph_types'][$type][$subtype]['section']) &&
+        $config['graph_types'][$type][$subtype]['section'] == 'mib';
 } // is_mib_graph
 
 
@@ -747,7 +732,7 @@ function get_graph_subtypes($type, $device = null)
 
         foreach ($config['graph_types'] as $type => $unused1) {
             foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-                if (is_mib_graph($type, $subtype) && in_array($graphs, $subtype)) {
+                if (is_mib_graph($type, $subtype) && in_array($subtype, $graphs)) {
                     $types[] = $subtype;
                 }
             }
@@ -1056,7 +1041,7 @@ function print_mib_poller_disabled()
 {
     echo '<h4>MIB polling is not enabled</h4>
 <p>
-Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> to enable.
+Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> or enable for this device specifically to enable.
 </p>';
 } // print_mib_poller_disabled
 
@@ -1521,4 +1506,37 @@ function display($value)
         HTMLPurifier_Config::createDefault()
     );
     return $purifier->purify(stripslashes($value));
+}
+
+/**
+ * @param $os
+ * @return array|mixed
+ */
+function load_os($os)
+{
+    global $config;
+    if (isset($os)) {
+        return Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $os . '.yaml')
+        );
+    }
+}
+
+/**
+ * @param array $restricted
+ */
+function load_all_os($restricted = array())
+{
+    global $config;
+    if (!empty($restricted)) {
+        $list = $restricted;
+    } else {
+        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+    }
+    foreach ($list as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        $config['os'][$tmp['os']] = $tmp;
+    }
 }

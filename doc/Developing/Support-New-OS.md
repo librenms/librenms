@@ -13,29 +13,36 @@ If we have the MIB, we can copy the file into the default directory:
 ```
 
 #### New OS definition
-Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
+Let's begin to declare the new OS in LibreNMS. At first we create a new definition file located here:
 
 ```bash
-includes/definitions.inc.php
+includes/definitions/$os.yaml
 ```
 
-```php
-// Pulse Secure OS definition
-$os = 'pulse';
-$config['os'][$os]['text']             = 'Pulse Secure';
-$config['os'][$os]['type']             = 'firewall';
-$config['os'][$os]['icon']             = 'junos';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
-$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+This is a [Yaml file](https://en.wikipedia.org/wiki/YAML). Please be careful of the formatting of this file.
 
-//The icon described before is the image we have to create and put in the directory html/images/os
+```yaml
+os: pulse
+text: 'Pulse Secure'
+type: firewall
+icon: pulse
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Pulse Connect Secure
+        - Pulse Secure
+        - Juniper Networks,Inc,VA-DTE
+        - VA-SPE
 ```
 
 #### Discovery OS
+
+> NOTE: In the above example, an discovery os file is not needed as we are matching the device based on the contents 
+of it's sysDescr value. You can also do this with sysObjectId. If you require a more complex discovery then you can 
+continue to create the os discovery file, below is an example:
 
 We create a new file named as our OS definition and in this directory:
 
@@ -127,26 +134,26 @@ iveCpuUtil.0 = Gauge32: 28
 ```
 
 #### New OS definition
-Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
+Let's begin to declare the new OS in LibreNMS. At first we create a new definition file located here:
 
 ```bash
-includes/definitions.inc.php
+includes/definitions/$os.yaml
 ```
 
-```php
-// Pulse Secure OS definition
-$os = 'pulse';
-$config['os'][$os]['text']             = 'Pulse Secure';
-$config['os'][$os]['type']             = 'firewall';
-$config['os'][$os]['icon']             = 'junos';
-$config['os'][$os]['over'][0]['graph'] = 'device_bits';
-$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
-$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+This is a [Yaml file](https://en.wikipedia.org/wiki/YAML). Please be careful of the formatting of this file.
 
-//The icon described before is the image we have to create and put in the directory html/images/os
+```yaml
+os: pulse
+text: 'Pulse Secure'
+type: firewall
+icon: pulse
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+```
+
+If you are adding custom graphs, please add the following to `includes/definitions.inc.php`:
 
 //Don't forget to declare the specific graphs if needed. It will be located near the end of the file.
 

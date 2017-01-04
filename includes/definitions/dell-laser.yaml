@@ -1,0 +1,10 @@
+os: dell-laser
+group: printer
+text: 'Dell Laser'
+ifname: 1
+type: printer
+icon: dell
+over:
+    - { graph: device_toner, text: Toner }
+mib_dir:
+    - dell

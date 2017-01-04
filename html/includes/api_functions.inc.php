@@ -96,7 +96,17 @@ function get_port_stats_by_port_hostname()
     $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
     $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
     $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
-    
+
+    //only return requested columns
+    if (isset($_GET['columns'])) {
+        $cols = explode(",", $_GET['columns']);
+        foreach (array_keys($port) as $c) {
+            if (!in_array($c, $cols)) {
+                unset($port[$c]);
+            }
+        }
+    }
+
     $output    = array(
         'status' => 'ok',
         'port'   => $port,
@@ -1007,6 +1017,8 @@ function get_inventory()
         $total_inv = 0;
         $inventory = array();
     } else {
+        $sql .= ' AND `device_id`=?';
+        $params[] = $device_id;
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
         $code      = 200;
         $status    = 'ok';

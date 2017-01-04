@@ -77,21 +77,24 @@ if ($device['os'] == 'apc') {
         discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    // PDU
+    // rPDUIdentDeviceLinetoLineVoltage
     $oids = snmp_get($device, ".1.3.6.1.4.1.318.1.1.12.1.15.0", "-OsqnU");
     d_echo($oids."\n");
 
     if ($oids) {
         echo ' Voltage In ';
         list($oid,$current) = explode(' ', $oids);
-        $divisor            = 1;
-        $type               = 'apc';
-        $index              = '1';
-        $descr              = 'Input';
+        if ($current >= 0) { // Newer units using rPDU2 can return the following rPDUIdentDeviceLinetoLineVoltage.0; Value (Integer): -1 hence this check.
+            $divisor            = 1;
+            $type               = 'apc';
+            $index              = '1';
+            $descr              = 'Input';
 
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
     }
 
+    // rPDU2PhaseStatusVoltage
     $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.26.6.3.1.6', '-OsqnU');
     d_echo($oids."\n");
 

@@ -490,6 +490,16 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp']) {
             <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><i class="fa fa-external-link fa-rotate-180 fa-fw fa-lg" aria-hidden="true"></i> BGP Internal</a></li>');
 }
 
+    // CEF info
+if ($_SESSION['userlevel'] >= '5' && $routing_count['cef']) {
+    if ($separator) {
+        echo('            <li role="presentation" class="divider"></li>');
+        $separator = 0;
+    }
+    echo('<li><a href="routing/protocol=cef/"><i class="fa fa-exchange fa-fw fa-lg" aria-hidden="true"></i> Cisco CEF </a></li>');
+    $separator++;
+}
+
   // Do Alerts at the bottom
 if ($bgp_alerts) {
     echo('
@@ -621,7 +631,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
            <ul class="dropdown-menu scrollable-menu">
              <li><a href="api-access/"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
-             <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
+             <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
            </ul>
            </li>
            <li role="presentation" class="divider"></li>');

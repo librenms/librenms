@@ -1,0 +1,8 @@
+os: bdcom
+text: 'Calix E7'
+type: network
+icon: bdcom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }

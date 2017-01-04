@@ -1,0 +1,7 @@
+os: ricoh
+group: printer
+text: 'Ricoh Printer'
+type: printer
+icon: ricoh
+over:
+    - { graph: device_toner, text: Toner }
