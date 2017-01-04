@@ -1509,22 +1509,19 @@ function display($value)
 }
 
 /**
- * @param $os
+ * @param $device
  * @return array|mixed
  */
-function load_os($os)
+function load_os($device)
 {
     global $config;
-    if (isset($os)) {
+    if (isset($device['os'])) {
         return Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($config['install_dir'] . '/includes/definitions/' . $os . '.yaml')
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
         );
     }
 }
 
-/**
- * @param array $restricted
- */
 function load_all_os($restricted = array())
 {
     global $config;
