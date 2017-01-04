@@ -2,3 +2,8 @@ os: airport
 type: wireless
 text: 'Apple AirPort'
 icon: apple
+discovery:
+    - sysDescr:
+        - Apple AirPort
+        - Apple Base Station
+        - Base Station V3.84

@@ -7,7 +7,8 @@ $skip_oids = array(
     '.1.3.6.1.4.1.17713.21',
     '.1.3.6.1.4.1.2.3.51.3',
     '.1.3.6.1.4.1.7779.', // nios
-    '.1.3.6.1.4.1.9.1.1348' // Cisco Unified Communications Manager
+    '.1.3.6.1.4.1.9.1.1348', // Cisco Unified Communications Manager
+    '.1.3.6.1.4.1.3375.2.1', // F5
 );
 
 if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {

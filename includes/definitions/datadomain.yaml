@@ -7,3 +7,6 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.19746.3.1

@@ -4,3 +4,8 @@ type: network
 icon: brocade
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.1588.2.1.1.1
+        - .1.3.6.1.4.1.1588.2.1.1.43
+        - .1.3.6.1.4.1.1588.2.1.1.72

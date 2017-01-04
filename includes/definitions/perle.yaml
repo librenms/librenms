@@ -4,3 +4,6 @@ type: network
 icon: perle
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr:
+        - Perle MCR-MGT
