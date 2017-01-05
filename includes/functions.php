@@ -801,6 +801,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->Port       = $config['email_smtp_port'];
                 $mail->Username   = $config['email_smtp_username'];
                 $mail->Password   = $config['email_smtp_password'];
+                $mail->SMTPAutoTLS= $config['email_auto_tls'];
                 $mail->SMTPDebug  = false;
                 break;
             default:
