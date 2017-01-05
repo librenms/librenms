@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1.49')) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.2620.1.6.123.1')) {
     $os = 'gaia';
 }
