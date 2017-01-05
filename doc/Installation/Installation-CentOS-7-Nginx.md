@@ -47,8 +47,21 @@ yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php
 pear install Net_IPv4-1.3.4
 pear install Net_IPv6-1.2.2b2
 ```
+#### Configure PHP
 
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
+
+In `/etc/php-fpm.d/www.conf` make these changes:
+
+```nginx
+;listen = 127.0.0.1:9000
+listen = /var/run/php/php7.0-fpm.sock
+
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+```
+#### Restart PHP
 
 ```bash
 service php-fpm restart
