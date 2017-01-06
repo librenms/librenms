@@ -8,7 +8,7 @@ source: Installation/Installation-Ubuntu-1604-Nginx.md
 #### Install / Configure MySQL
 ```bash
 apt-get install mariadb-server mariadb-client
-service mysql restart
+systemctl restart mysql
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mysql restart```
+```systemctl restart mysql```
 
 ### Web Server ###
 
@@ -42,7 +42,7 @@ sql-mode=""
 In `/etc/php/7.0/fpm/php.ini` and `/etc/php/7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-service php7.0-fpm restart
+systemctl restart php7.0-fpm
 phpenmod mcrypt
 ```
 
@@ -98,7 +98,7 @@ server {
 ```
 
 ```bash
-service nginx restart
+systemctl restart nginx
 ```
 
 #### Web installer
@@ -117,7 +117,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job
