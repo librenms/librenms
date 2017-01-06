@@ -4,3 +4,5 @@ text: 'Brother Printer'
 type: printer
 over:
     - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr_regex: /Brother NC-.*(h|w),/
