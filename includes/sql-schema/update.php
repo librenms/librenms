@@ -102,11 +102,7 @@ foreach ($filelist as $file) {
                 }
             }
 
-            if ($db_rev < 5) {
-                echo " done.\n";
-            } else {
-                echo " done ($err errors).\n";
-            }
+            echo " done ($err errors).\n";
         } else {
             echo " Could not open file!\n";
         }//end if
@@ -115,9 +111,7 @@ foreach ($filelist as $file) {
         $db_rev = $filename;
         if ($insert) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
-            if ($db_rev >= 6) {
-                $insert = 0;
-            }
+            $insert = 0;
         } else {
             dbUpdate(array('version' => $db_rev), 'dbSchema');
         }
