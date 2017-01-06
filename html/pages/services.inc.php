@@ -99,10 +99,10 @@ if (isset($state)) {
     </tr>
 <?php
 if ($_SESSION['userlevel'] >= '5') {
-    $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';
+    $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id ORDER BY D.hostname';
     $host_par = array();
 } else {
-    $host_sql = 'SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY D.hostname ORDER BY D.hostname';
+    $host_sql = 'SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? ORDER BY D.hostname';
     $host_par = array($_SESSION['user_id']);
 }
 

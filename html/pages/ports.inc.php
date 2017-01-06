@@ -87,9 +87,9 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
 <?php
 
 if ($_SESSION['userlevel'] >= 5) {
-    $results = dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
+    $results = dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` ORDER BY `hostname`");
 } else {
-    $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
+    $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array($_SESSION['user_id']));
 }
 foreach ($results as $data) {
     echo('        <option value="'.$data['device_id'].'"');
@@ -100,7 +100,7 @@ foreach ($results as $data) {
 }
 
 if ($_SESSION['userlevel'] < 5) {
-    $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
+    $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array($_SESSION['user_id']));
 } else {
     $results = array();
 }
