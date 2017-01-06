@@ -8,7 +8,7 @@ source: Installation/Installation-CentOS-7-Apache.md
 #### Install / Configure MySQL
 ```bash
 yum install mariadb-server mariadb
-service mariadb restart
+systemctl restart mariadb
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mariadb restart```
+```systemctl restart mariadb```
 
 ### Web Server ###
 
@@ -107,7 +107,7 @@ Add the following config:
 #### Restart Web server
 
 ```bash
-service httpd restart
+systemctl restart httpd
 ```
 
 #### Web installer
@@ -130,7 +130,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job
@@ -141,8 +141,7 @@ service snmpd restart
 
 ```bash
 chown -R librenms:librenms /opt/librenms
-systemctl enable httpd
-systemctl enable mariadb
+systemctl enable httpd mariadb
 ```
 
 Run validate.php as root in the librenms directory:
