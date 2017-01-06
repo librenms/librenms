@@ -1,8 +1,8 @@
 <?php
 /**
- * jetstream.inc.php
+ * dasan-nos.inc.php
  *
- * LibreNMS os discovery module for JetStream
+ * LibreNMS processor discovery module for Dasan NOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,11 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$jetstream = array(
-    '.1.3.6.1.4.1.11863.5.34'
-);
-
-if (starts_with($sysObjectId, $jetstream)) {
-    $os = 'jetstream';
+if ($device['os'] === 'dasan-nos') {
+    echo 'Dasan NOS : ';
+    $descr = 'Processor';
+    $usage = snmp_get($device, 'dsCpuLoad5s.0', '-Ovq', 'DASAN-SWITCH-MIB', 'dasan');
+    if (is_numeric($usage)) {
+        discover_processor($valid['processor'], $device, 'dsCpuLoad5s.0', '0', 'dasan-nos', $descr, '1', $usage);
+    }
 }
-
-unset($jetstream);

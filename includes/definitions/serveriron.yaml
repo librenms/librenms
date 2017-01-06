@@ -7,6 +7,9 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: brocade
+discovery:
+    - sysDescr:
+        - ServerIron
 register_mibs:
     snL4slbTotalConnections: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
     snL4slbLimitExceeds: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB

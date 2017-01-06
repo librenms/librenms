@@ -1,8 +1,8 @@
 <?php
 /**
- * netonix.inc.php
+ * dasan-nos.inc.php
  *
- * LibreNMS os discovery module for Netonix
+ * LibreNMS processor poller module for Dasan NOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2016 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.46242')) {
-    $os = 'netonix';
-}
+$proc = snmp_get($device, 'dsCpuLoad5s.0', '-Ovq', 'DASAN-SWITCH-MIB');

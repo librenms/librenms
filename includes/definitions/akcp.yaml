@@ -3,3 +3,6 @@ text: 'AKCP SensorProbe'
 type: environment
 over:
     - { graph: device_temperature, text: temperature }
+discovery:
+    - sysDescr:
+        - SensorProbe

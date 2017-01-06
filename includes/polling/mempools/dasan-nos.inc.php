@@ -1,8 +1,8 @@
 <?php
 /**
- * hpe-msl.inc.php
+ * dasan-nos.inc.php
  *
- * LibreNMS os discovery module for HPE MSL
+ * LibreNMS mempool poller module for Dasan NOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$msl_oids = array(
-    '.1.3.6.1.4.1.11.10.2.1.3.25',
-);
-
-if (starts_with($sysObjectId, $msl_oids)) {
-    $os = 'hpe-msl';
-}
-
-unset($msl_oids);
+$mempool['total'] = snmp_get($device, 'dsTotalMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
+$mempool['used']  = snmp_get($device, 'dsUsedMem.0', '-OvQU', 'DASAN-SWITCH-MIB');
+$mempool['free']  = snmp_get($device, 'dsFreeMem.0', '-OvQU', 'DASAN-SWITCH-MIB');

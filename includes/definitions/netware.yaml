@@ -2,3 +2,6 @@ os: netware
 type: server
 text: 'Novell Netware'
 icon: novell
+discovery:
+    - sysDescr:
+        - Novell NetWare

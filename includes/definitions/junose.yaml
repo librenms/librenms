@@ -13,3 +13,6 @@ poller_modules:
 discovery_modules:
     junose-atm-vp: 1
     toner: 0
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.4874

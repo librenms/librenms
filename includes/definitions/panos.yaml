@@ -2,3 +2,6 @@ os: panos
 text: PanOS
 type: firewall
 icon: panos
+discovery:
+    - sysDescr:
+        - Palo Alto Networks
