@@ -6,3 +6,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_xirrus_stations, text: 'Wifi Clients' }
     - { graph: device_xirrus_rssi, text: 'Signal RSSI' }
+discovery:
+    - sysDescr:
+        - Xirrus
+        - ArrayOS

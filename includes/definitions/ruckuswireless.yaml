@@ -11,3 +11,6 @@ register_mibs:
     ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
     ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
     ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.25053.3.1

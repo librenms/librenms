@@ -3,3 +3,6 @@ type: storage
 text: NetApp
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+        - NetApp

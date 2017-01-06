@@ -32,3 +32,6 @@ discovery_modules:
     cisco-vrf-lite: 1
 mib_dir:
     - cisco
+discovery:
+    - sysDescr:
+        - Cisco Systems Catalyst 1900

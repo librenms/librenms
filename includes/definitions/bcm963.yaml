@@ -4,3 +4,6 @@ type: network
 icon: broadcom
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+        - bcm963

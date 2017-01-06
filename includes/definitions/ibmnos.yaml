@@ -4,3 +4,8 @@ type: network
 icon: ibmnos
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr:
+        - IBM Networking Operating System
+        - IBM Flex System Fabric
+        - IBM Networking OS

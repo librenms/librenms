@@ -33,3 +33,6 @@ discovery_modules:
     cisco-vrf-lite: 1
 register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
+discovery:
+    - sysDescr:
+        - IOS XR

@@ -4,3 +4,7 @@ type: power
 over:
     - { graph: device_current, text: Current }
 icon: raritan
+discovery:
+    - sysDescr:
+        - Raritan
+        - PX2

@@ -14,3 +14,6 @@ register_mibs:
     tempValue: IOMEGANAS-MIB
     raidStatus: IOMEGANAS-MIB
     diskStatus: IOMEGANAS-MIB
+discovery:
+    - sysDescr:
+        - EMC SOHO-NAS Storage.
