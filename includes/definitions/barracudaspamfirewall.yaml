@@ -4,3 +4,6 @@ type: firewall
 icon: barracuda
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr:
+        - Barracuda Spam Firewall

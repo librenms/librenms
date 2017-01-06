@@ -14,3 +14,6 @@ poller_modules:
     ospf: 0
     services: 0
     storage: 0
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.11606.24
