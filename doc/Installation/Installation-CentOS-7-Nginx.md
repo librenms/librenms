@@ -8,7 +8,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 #### Install / Configure MySQL
 ```bash
 yum install mariadb-server mariadb
-service mariadb restart
+systemctl restart mariadb
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mariadb restart```
+```systemctl restart mariadb```
 
 ### Web Server ###
 
@@ -50,8 +50,20 @@ pear install Net_IPv6-1.2.2b2
 
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
+In `/etc/php-fpm.d/www.conf` make these changes:
+
+```nginx
+;listen = 127.0.0.1:9000
+listen = /var/run/php/php7.0-fpm.sock
+
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+```
+Restart PHP.
+
 ```bash
-service php-fpm restart
+systemctl restart php-fpm
 ```
 
 #### Add librenms user
@@ -118,7 +130,7 @@ server {
 #### Restart Web server
 
 ```bash
-service nginx restart
+systemctl restart nginx
 ```
 
 #### Web installer
@@ -141,7 +153,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job
@@ -152,8 +164,7 @@ service snmpd restart
 
 ```bash
 chown -R librenms:librenms /opt/librenms
-systemctl enable nginx
-systemctl enable mariadb
+systemctl enable nginx mariadb
 ```
 
 Run validate.php as root in the librenms directory:

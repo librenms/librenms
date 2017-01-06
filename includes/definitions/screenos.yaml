@@ -10,3 +10,7 @@ poller_modules:
     toner: 0
 discovery_modules:
     toner: 0
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.674.3224.1
+        - .1.3.6.1.4.1.3224
