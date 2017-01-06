@@ -3,7 +3,7 @@ group: cisco
 text: 'Cisco Small Business'
 ifname: 1
 type: network
-icon: linksys
+icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
