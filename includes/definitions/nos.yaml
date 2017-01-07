@@ -7,3 +7,9 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: brocade
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.1588.2.2.1.1
+    - sysDescr:
+        - 'Brocade VDX'
+        - 'BR-VDX'
+        - 'VDX67'

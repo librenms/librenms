@@ -4,3 +4,7 @@ type: network
 icon: hp
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.25506.11.1
+    - sysDescr: Comware
+    - sysDescr_regex: '/HP [a-zA-Z0-9- ]+ Switch Software Version/'
