@@ -1419,3 +1419,30 @@ function rewrite_ceraos_hardware($ceragon_type, $device)
     }
     return $hardware;
 };
+
+/**
+ * @param $descr
+ * @return int
+ */
+function get_nagios_state($descr)
+{
+    switch ($descr) {
+        case 'On':
+        case 'Okay':
+        case 'Ok':
+            return 0;
+            break;
+        case 'Standby':
+        case 'Idle':
+        case 'Maintenance':
+            return 1;
+            break;
+        case 'Under':
+        case 'Over':
+            return 2;
+            break;
+        default:
+            return 3;
+            break;
+    }
+}
