@@ -3,7 +3,8 @@ GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
 THEME_REPO="https://github.com/librenms-docs/librenms_theme.git"
 
-pip install --user "mkdocs==0.16.0"
+pip install --user 'jinja2<2.9'
+pip install --user mkdocs
 pip install --user pymdown-extensions
 pip install --user git+git://github.com/aleray/mdx_del_ins.git
 
