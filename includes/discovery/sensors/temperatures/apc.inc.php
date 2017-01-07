@@ -137,4 +137,25 @@ if ($device['os'] == 'apc') {
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
     }
+
+    $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedAnalogEntry', array(), 'PowerNet-MIB');
+    foreach ($cooling_unit as $index => $data) {
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.1.2.1.3.' . $index;
+        $descr = $data['coolingUnitExtendedAnalogDescription'];
+        $scale = $data['coolingUnitExtendedAnalogScale'];
+        $value = $data['coolingUnitExtendedAnalogValue'];
+        if (preg_match('/Temperature/', $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        }
+    }
+
+    foreach ($cooling_unit_analog as $index => $data) {
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.1.2.1.3.' . $index;
+        $descr = $data['coolingUnitStatusAnalogDescription'];
+        $scale = $data['coolingUnitStatusAnalogScale'];
+        $value = $data['coolingUnitStatusAnalogValue'];
+        if (preg_match('/Temperature/', $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        }
+    }
 }//end if
