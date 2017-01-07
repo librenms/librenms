@@ -143,7 +143,7 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$count_query = 'SELECT COUNT(id)';
+$count_query = 'SELECT COUNT(*)';
 $full_query  = 'SELECT *';
 $sql         = '';
 $param       = array();
@@ -152,7 +152,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $param = array($device['device_id']);
 }
 
-$query       = " FROM alert_rules $sql ORDER BY id ASC";
+$query       = " FROM alert_rules $sql";
 $count_query = $count_query.$query;
 $count       = dbFetchCell($count_query, $param);
 if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -162,7 +162,7 @@ if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
 }
 
 $start      = (($page_number - 1) * $results);
-$full_query = $full_query.$query." LIMIT $start,$results";
+$full_query = $full_query.$query." ORDER BY id ASC LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
