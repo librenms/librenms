@@ -1509,7 +1509,7 @@ function rrdtest($path, &$stdOutput, &$stdError)
 
 function create_state_index($state_name)
 {
-    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) !== true) {
+    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) != true) {
         $insert = array('state_name' => $state_name);
         return dbInsert($insert, 'state_indexes');
     }

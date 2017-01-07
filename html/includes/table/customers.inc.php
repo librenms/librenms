@@ -38,7 +38,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT * $sql";
+$sql = "SELECT `port_descr_descr` $sql";
 
 foreach (dbFetchRows($sql, $param) as $customer) {
     $i++;

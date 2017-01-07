@@ -36,34 +36,6 @@ if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC
     $insert = 1;
 }
 
-// For transition from old system
-if ($old_rev = @dbFetchCell('SELECT revision FROM `dbSchema`')) {
-    echo "-- Transitioning from old revision-based schema to database version system\n";
-    $db_rev = 6;
-
-    if ($old_rev <= 1000) {
-        $db_rev = 1;
-    }
-
-    if ($old_rev <= 1435) {
-        $db_rev = 2;
-    }
-
-    if ($old_rev <= 2245) {
-        $db_rev = 3;
-    }
-
-    if ($old_rev <= 2804) {
-        $db_rev = 4;
-    }
-
-    if ($old_rev <= 2827) {
-        $db_rev = 5;
-    }
-
-    $insert = 1;
-}//end if
-
 $updating = 0;
 
 $include_dir_regexp = '/\.sql$/';
@@ -130,11 +102,7 @@ foreach ($filelist as $file) {
                 }
             }
 
-            if ($db_rev < 5) {
-                echo " done.\n";
-            } else {
-                echo " done ($err errors).\n";
-            }
+            echo " done ($err errors).\n";
         } else {
             echo " Could not open file!\n";
         }//end if
@@ -143,9 +111,7 @@ foreach ($filelist as $file) {
         $db_rev = $filename;
         if ($insert) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
-            if ($db_rev >= 6) {
-                $insert = 0;
-            }
+            $insert = 0;
         } else {
             dbUpdate(array('version' => $db_rev), 'dbSchema');
         }

@@ -240,14 +240,6 @@ if ($_SESSION['userlevel'] < '5') {
             }
         }
 
-        $peerhost = dbFetchRow('SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', array($peer['bgpPeerIdentifier']));
-
-        if ($peerhost) {
-            $peername = generate_device_link($peerhost, shorthost($peerhost['hostname']));
-        } else {
-            unset($peername);
-        }
-
         if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
             $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
         } else {
