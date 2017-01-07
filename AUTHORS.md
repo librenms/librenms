@@ -162,6 +162,7 @@ LibreNMS contributors:
 - Joel Cant <joel@linuxmod.co.uk> (NerdBlender
 - Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemir_a)
 - Rob Nichols <rob@ignition360.com> (rdnn)
+- Patrick Fruh <info@kaeltis.de> (Kaeltis)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
