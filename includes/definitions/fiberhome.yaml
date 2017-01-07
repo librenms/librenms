@@ -2,3 +2,5 @@ os: fiberhome
 text: Fiberhome
 type: network
 icon: fiberhome
+discovery:
+    - sysDescr_regex: '/^AN5516-0[16]$/'
