@@ -45,4 +45,66 @@ if ($device['os'] == 'apc') {
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     }
+
+    $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', array(), 'PowerNet-MIB');
+    foreach ($cooling_status as $index => $data) {
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.2.2.1.4.' . $index;
+        $state_name = $data['coolingUnitStatusDiscreteDescription'];
+        $state_index_id = create_state_index($state_name);
+
+        if ($state_index_id !== null) {
+            $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
+            $states = array();
+            foreach ($tmp_states as $k => $ref) {
+                preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+                $nagios_state = get_nagios_state($matches[1]);
+                $states[] = array($state_index_id, $matches[1], 0, $matches[2], $nagios_state);
+            }
+            foreach ($states as $value) {
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+
+    unset($cooling_status);
+
+    $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', array(), 'PowerNet-MIB');
+    foreach ($cooling_unit as $index => $data) {
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
+        $state_name = $data['coolingUnitExtendedDiscreteDescription'];
+        $state_index_id = create_state_index($state_name);
+
+        if ($state_index_id !== null) {
+            $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
+            $states = array();
+            foreach ($tmp_states as $k => $ref) {
+                preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+                $nagios_state = get_nagios_state($matches[1]);
+                $states[] = array($state_index_id, $matches[1], 0, $matches[2], $nagios_state);
+            }
+            foreach ($states as $value) {
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+
+    unset($cooling_unit);
 }
