@@ -2,3 +2,5 @@ os: axiscam
 text: 'AXIS Network Camera'
 type: network
 icon: axis
+discovery:
+    - sysDescr_regex: '/AXIS .* (Network Camera|Video Server|Network Video Encoder)/'

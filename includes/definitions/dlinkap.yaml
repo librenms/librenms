@@ -2,3 +2,8 @@ os: dlinkap
 text: 'D-Link Access Point'
 type: wireless
 icon: dlink
+discovery:
+    - sysDescr:
+        - 'D-Link DAP-'
+        - 'D-Link Access Point'
+    - sysDescr_regex: '/D-Link .* AP/'
