@@ -117,6 +117,6 @@ while ($end == 0) {
 ";
         exit;
     }//end if
-    echo print $console_color->convert('%rLast update at '.date('Y-m-d h:i:s')."%n\n\n");
+    echo print $console_color->convert('%rLast update at: '.date('Y-m-d h:i:s')."%n\n\n");
     sleep(5);
 }//end while
