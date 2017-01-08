@@ -215,7 +215,7 @@ function check_unit($passthru = false, $command_only = false, $snmpsim = false)
 
     $proc_snmpsimd = null;
     if ($snmpsim) {
-        echo 'Starting snmpsimd...' .  PHP_EOL;
+        echo 'Starting snmpsimd... ' .  PHP_EOL;
         $proc_snmpsimd = new Proc($snmpsim_cmd);
     }
 
@@ -229,7 +229,7 @@ function check_unit($passthru = false, $command_only = false, $snmpsim = false)
         if ($phpunit_ret > 0) {
             echo "failed\n";
             echo implode(PHP_EOL, $phpunit_output) . PHP_EOL;
-            echo 'snmpsimd: output at /tmp/snmpsimd.log';
+            echo 'snmpsimd: debug output at /tmp/snmpsimd.log';
         } else {
             echo "success\n";
         }
