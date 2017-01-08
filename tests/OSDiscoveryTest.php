@@ -634,7 +634,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testGaia()
     {
         $this->checkOS('gaia');
-        $this->checkOS('gaia', 'gaia1'); 
+        $this->checkOS('gaia', 'gaia1');
     }
 
     public function testGamatronicups()
