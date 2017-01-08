@@ -1509,16 +1509,32 @@ function display($value)
 }
 
 /**
- * @param $os
- * @return array|mixed
+ * Load the os definition for the device and set type and os_group
+ * $device['os'] must be set
+ *
+ * @param array $device
+ * @throws Exception No OS to load
  */
-function load_os($os)
+function load_os(&$device)
 {
     global $config;
-    if (isset($os)) {
-        return Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($config['install_dir'] . '/includes/definitions/' . $os . '.yaml')
-        );
+    if (!isset($device['os'])) {
+        throw new Exception('No OS to load');
+    }
+
+    $config['os'][$device['os']] = Symfony\Component\Yaml\Yaml::parse(
+        file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+    );
+
+    // Set type to a predefined type for the OS if it's not already set
+    if ($device['type'] == 'unknown' || $device['type'] == '') {
+        if ($config['os'][$device['os']]['type']) {
+            $device['type'] = $config['os'][$device['os']]['type'];
+        }
+    }
+
+    if ($config['os'][$device['os']]['group']) {
+        $device['os_group'] = $config['os'][$device['os']]['group'];
     }
 }
 

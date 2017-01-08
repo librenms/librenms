@@ -110,21 +110,9 @@ function discover_device($device, $options = null)
         }
     }
 
-    $config['os'][$device['os']] = load_os($device['os']);
+    load_os($device);
     if (is_array($config['os'][$device['os']]['register_mibs'])) {
         register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
-    }
-
-    // Set type to a predefined type for the OS if it's not already set
-    if ($device['type'] == 'unknown' || $device['type'] == '') {
-        if ($config['os'][$device['os']]['type']) {
-            $device['type'] = $config['os'][$device['os']]['type'];
-        }
-    }
-
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
-        echo ' (' . $device['os_group'] . ')';
     }
 
     echo "\n";
