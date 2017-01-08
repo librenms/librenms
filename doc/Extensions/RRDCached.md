@@ -32,6 +32,28 @@ Features: Supported features in the version indicated.
 | >=1.5.5 | No        | G,C,U    |
 | >=1.6.x | No        | G,C,U    |
 
+### RRDCached installation Ubuntu 16
+```ssh
+sudo apt-get install rrdcached
+```
+
+- Edit /opt/librenms/config.php to include:
+```php
+$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+```
+- Edit /etc/default/rrdcached to include:
+```ssh
+DAEMON=/usr/bin/rrdcached
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/var/run/rrdcached.pid
+SOCKFILE=/var/run/rrdcached.sock
+SOCKGROUP=librenms
+BASE_OPTIONS="-B -F"
+```
+
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
 In this example, we'll use the Repoforge repository.

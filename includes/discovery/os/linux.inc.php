@@ -7,7 +7,9 @@ $skip_oids = array(
     '.1.3.6.1.4.1.17713.21',
     '.1.3.6.1.4.1.2.3.51.3',
     '.1.3.6.1.4.1.7779.', // nios
-    '.1.3.6.1.4.1.9.1.1348' // Cisco Unified Communications Manager
+    '.1.3.6.1.4.1.9.1.1348', // Cisco Unified Communications Manager
+    '.1.3.6.1.4.1.3375.2.1', // F5
+    '.1.3.6.1.4.1.534.', // Eaton
 );
 
 if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
@@ -33,17 +35,6 @@ if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
         }
     } elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
         $os = 'pktj';
-        $pktj_mibs = array(
-            "rxCounter" => "GANDI-MIB",  // RX Packets
-            "txCounter" => "GANDI-MIB",  // TX Packets
-            "dropCounter" => "GANDI-MIB",  // Dropped counters
-            "acldropCounter" => "GANDI-MIB",  // ACL Dropped counter
-            "ratedropCounter" => "GANDI-MIB",  // Rate Dropped counter
-            "KNIrxCounter" => "GANDI-MIB",  // KNI RX counter
-            "KNItxCounter" => "GANDI-MIB",  // KNI TX counter
-            "KNIdropCounter" => "GANDI-MIB",  // KNI DROP counter
-        );
-        register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
     } elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.40310')) {
         $os = 'cumulus';
     } elseif (str_contains($sysDescr, array('g56fa85e', 'gc80f187', 'g829be90', 'g63c0044', 'gba768e5'))) {

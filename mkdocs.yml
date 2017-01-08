@@ -1,6 +1,7 @@
 site_name: LibreNMS Docs
 docs_dir: doc
 theme_dir: 'librenms_theme'
+theme: null
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:

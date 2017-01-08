@@ -64,13 +64,15 @@ if ($device['os_group'] == 'cisco') {
                 $db_update[$db_value] = $tunnel[$db_oid];
             }
 
-            $updated = dbUpdate(
-                $db_update,
-                'ipsec_tunnels',
-                '`tunnel_id` = ?',
-                array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])
-            );
-            $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+            if (!empty($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])) {
+                $updated = dbUpdate(
+                    $db_update,
+                    'ipsec_tunnels',
+                    '`tunnel_id` = ?',
+                    array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])
+                );
+                $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+            }
         }
 
         if (is_numeric($tunnel['cipSecTunHcInOctets']) &&
@@ -112,11 +114,8 @@ if ($device['os_group'] == 'cisco') {
         }
     }//end foreach
 
-    if (is_array($valid_tunnels)) {
+    if (is_array($valid_tunnels) && count($valid_tunnels) > 0) {
         d_echo($valid_tunnels);
-        if (empty($valid_tunnels)) {
-            $valid_tunnels = array(0);
-        }
         dbDelete(
             'ipsec_tunnels',
             "`tunnel_id` NOT IN (" . implode(',', $valid_tunnels) . ") AND `device_id`=?",

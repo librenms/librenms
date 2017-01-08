@@ -2,3 +2,6 @@ os: liebert
 text: Liebert
 type: power
 icon: liebert
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.476.1.42

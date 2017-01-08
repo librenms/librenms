@@ -261,7 +261,7 @@ function add_device()
     $port         = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
     $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
-    $force_add    = $data['force_add'] ? mres($data['force_add']) : 0;
+    $force_add    = $data['force_add'] ? true : false;
     if ($data['version'] == 'v1' || $data['version'] == 'v2c') {
         if ($data['community']) {
             $config['snmp']['community'] = array($data['community']);
@@ -1017,6 +1017,8 @@ function get_inventory()
         $total_inv = 0;
         $inventory = array();
     } else {
+        $sql .= ' AND `device_id`=?';
+        $params[] = $device_id;
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
         $code      = 200;
         $status    = 'ok';

@@ -5,3 +5,6 @@ type: printer
 icon: sharp
 over:
     - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr:
+        - SHARP MX-

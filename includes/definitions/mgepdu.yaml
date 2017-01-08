@@ -4,3 +4,6 @@ type: power
 icon: mge
 mib_dir:
     - mge
+discovery:
+    - sysDescr:
+        - MGE Switched PDU

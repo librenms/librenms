@@ -5,3 +5,6 @@ type: network
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
+discovery:
+    - sysDescr:
+        - AT-8000

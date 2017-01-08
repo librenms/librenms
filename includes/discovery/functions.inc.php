@@ -110,7 +110,10 @@ function discover_device($device, $options = null)
         }
     }
 
-    $config['os'][$device['os']] = load_os($device);
+    $config['os'][$device['os']] = load_os($device['os']);
+    if (is_array($config['os'][$device['os']]['register_mibs'])) {
+        register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
+    }
 
     // Set type to a predefined type for the OS if it's not already set
     if ($device['type'] == 'unknown' || $device['type'] == '') {
@@ -710,7 +713,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
             echo 'N';
         } else {
             //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_network', '`ipv6_network` = ?', array($ipv6_network));
+            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
             echo 'n';
         }
 
@@ -722,7 +725,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
             echo '+';
         } else {
             //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_address', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
+            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
             echo '.';
         }
 

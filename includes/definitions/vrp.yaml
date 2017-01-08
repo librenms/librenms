@@ -9,3 +9,9 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
     - huawei
+discovery:
+    - sysDescr:
+        - VRP (R) Software
+        - VRP Software Version
+        - Software Version VRP
+        - Versatile Routing Platform Software
