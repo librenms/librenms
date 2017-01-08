@@ -68,7 +68,6 @@ if ($all && $ret === 0) {
 }
 exit($ret); //return the combined/single return value of tests
 
-
 /**
  * Run the specified check and return the return value.
  * Make sure it isn't skipped by SKIP_TYPE_CHECK env variable and hasn't been run already
