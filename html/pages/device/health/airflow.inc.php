@@ -1,8 +1,8 @@
 <?php
 /**
- * dell-rcs.inc.php
+ * airflow.inc.php
  *
- * LibreNMS os discovery module for Dell Remote Console
+ * LibreNMS airflow health page for WebUI
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (starts_with($sysObjectId, '.1.3.6.1.4.1.10418.18.21.17')) {
-    $os = 'dell-rcs';
-}
+$class      = 'airflow';
+$unit       = 'CFM';
+$graph_type = 'sensor_airflow';
+
+require 'sensors.inc.php';

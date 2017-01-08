@@ -1,8 +1,8 @@
 <?php
 /**
- * lcos.inc.php
+ * airflow.inc.php
  *
- * LibreNMS os discovery module for Lancom
+ * LibreNMS airflow module for discovery
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,14 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$lcos_oids = array(
-    '.1.3.6.1.4.1.2356.11.8.103',
-    '.1.3.6.1.4.1.2356.600.6.310',
-);
+echo 'Airflow: ';
 
-if (starts_with($sysObjectId, $lcos_oids)) {
-    $os = 'lcos';
-}
+// Include all discovery modules
+$include_dir = 'includes/discovery/sensors/airflow';
+require 'includes/include-dir.inc.php';
 
-unset($lcos_oids);
+d_echo($valid['sensor']['airflow']);
+
+check_valid_sensors($device, 'airflow', $valid['sensor']);
+
+echo "\n";
