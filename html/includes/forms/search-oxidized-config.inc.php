@@ -13,18 +13,19 @@ header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
-$parameters = mres($_POST['search_in_conf_textbox']);
+$parameters = clean($_POST['search_in_conf_textbox']);
 if (isset($parameters)) {
     $status  = 'ok';
     $message = 'Queried';
-    $output = search_oxidized_config($parameters);
+    $output = clean(search_oxidized_config($parameters));
 } else {
     $status  = 'error';
     $message = 'ERROR: Could not query';
 }
-die(json_encode(array(
+
+echo _json_encode(array(
      'status'                   => $status,
      'message'                  => $message,
      'search_in_conf_textbox'   => $parameters,
      'output'                   => $output
-)));
+));
