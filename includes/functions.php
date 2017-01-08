@@ -198,9 +198,7 @@ function getImage($device)
 
 function getImageSrc($device)
 {
-    global $config;
-
-    return 'images/os/' . getImageName($device) . '.png';
+    return 'images/os/' . getImageName($device);
 }
 
 function getImageName($device, $use_database = true)
@@ -210,11 +208,12 @@ function getImageName($device, $use_database = true)
     $device['os'] = strtolower($device['os']);
 
     // fetch from the database
-    if ($device['icon'] != 'generic' && $use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if ($use_database && $device['icon'] != 'generic.png' && is_file($config['html_dir'] . '/images/os/' . $device['icon'])) {
         return $device['icon'];
     }
 
     // linux specific handling, distro icons
+    $distro = null;
     if ($device['os'] == "linux") {
         $features = strtolower(trim($device['features']));
         list($distro) = explode(" ", $features);
@@ -223,18 +222,23 @@ function getImageName($device, $use_database = true)
         }
     }
 
-    // use the icon from os config
-    if (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        return $config['os'][$device['os']]['icon'];
-    }
+    $possibilities = array(
+        $distro,
+        $config['os'][$device['os']]['icon'],
+        $device['os'],
+    );
 
-    // guess the icon has the same name as the os
-    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-        return $device['os'];
+    foreach ($possibilities as $basename) {
+        foreach (array("svg", "png") as $ext) {
+            $name = $basename . '.' . $ext;
+            if (is_file($config['html_dir'] . '/images/os/' . $name)) {
+                return $name;
+            }
+        }
     }
 
     // fallback to the generic icon
-    return 'generic';
+    return 'generic.png';
 }
 
 function renamehost($id, $new, $source = 'console')
