@@ -23,4 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$emu2_temp_scale = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
+$sensor_config['scale'] = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
