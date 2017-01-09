@@ -4,5 +4,5 @@ type: network
 icon: bnt
 discovery:
     - sysDescr_regex:
-        - '/Blade Network Technologies/'
+        - '/Blade Network Technologies/i'
         - '/^BNT /'
