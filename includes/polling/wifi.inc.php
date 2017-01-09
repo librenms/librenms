@@ -66,20 +66,21 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         echo (($wificlients1 + 0).' clients on wireless connector, ');
     } elseif ($device['os'] == 'unifi') {
         echo 'Checking Unifi Wireless clients... ';
+        $wificlients1 = 0;
+        $wificlients2 = 0;
 
-        $clients = snmp_walk($device, 'unifiVapNumStations', '-Oqv', 'UBNT-UniFi-MIB');
-        $bands = snmp_walk($device, 'unifiVapRadio', '-Oqv', 'UBNT-UniFi-MIB');
-        $clients = explode("\n", $clients);
-        $bands = explode("\n", $bands);
+        $clients = explode("\n", snmp_walk($device, 'unifiVapNumStations', '-Oqv', 'UBNT-UniFi-MIB'));
+        $bands = explode("\n", snmp_walk($device, 'unifiVapRadio', '-Oqv', 'UBNT-UniFi-MIB'));
+
         foreach ($bands as $index => $band_index) {
             if ($band_index == "ng") {
-                $wificlients1 = $wificlients1 + $clients[$index] + 0;
+                $wificlients1 += $clients[$index];
             } else {
-                $wificlients2 = $wificlients2 + $clients[$index] + 0;
+                $wificlients2 += $clients[$index];
             }
         }
 
-        echo (($wificlients1 + 0).' clients on Radio0, '.($wificlients2 + 0)." clients on Radio1\n");
+        echo $wificlients1 . ' clients on Radio0, ' . $wificlients2 . " clients on Radio1\n";
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
     }
 
