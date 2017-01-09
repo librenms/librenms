@@ -23,6 +23,7 @@ function poll_sensor($device, $class, $unit)
     $sensors = array();
     $misc_sensors = array();
     $all_sensors = array();
+
     foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             $misc_sensors[] = $sensor;
@@ -36,6 +37,9 @@ function poll_sensor($device, $class, $unit)
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
 
     foreach ($sensors as $sensor) {
+        if (file_exists('includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php')) {
+            require_once 'includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php';
+        }
         echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
 
         if ($sensor['poller_type'] == 'snmp') {
@@ -44,7 +48,7 @@ function poll_sensor($device, $class, $unit)
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
-                require_once 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
+                require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
             }
 
 

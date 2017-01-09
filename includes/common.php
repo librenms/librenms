@@ -1540,3 +1540,16 @@ function load_all_os($restricted = array())
         $config['os'][$tmp['os']] = $tmp;
     }
 }
+
+/**
+ * @param $scale
+ * @param $value
+ * @return float
+ */
+function fahrenheit_to_celsius($scale, $value)
+{
+    if ($scale === 'fahrenheit') {
+        $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
