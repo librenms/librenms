@@ -234,7 +234,7 @@ if (defined('SHOW_SETTINGS')) {
                     <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
-                        <span class="device-icon">' . $deviceIcon . '</span><br>
+                        <span class="device-table-icon">' . $deviceIcon . '</span><br>
                         <span class="small">' . shorthost(ip_to_sysname($device, $device['hostname'])) . '</span>
                     </div>
                     </a>';
