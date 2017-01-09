@@ -22,9 +22,9 @@ $components = $components[$device['device_id']];
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'LTM Vitrual Servers       Now      Avg      Max\\n'";
-$colours = array_merge($config['graph_colours']['mixed'], $config['graph_colours']['manycolours'], $config['graph_colours']['manycolours']);
+$colours = array_merge($config['graph_colours']['mixed'], $config['graph_colours']['manycolours']);
+$colcount = 0;
 $count = 0;
-d_echo("<pre>");
 
 // add all LTM VS on this device.
 foreach ($components as $compid => $comp) {
@@ -32,13 +32,12 @@ foreach ($components as $compid => $comp) {
     $hash = $comp['hash'];
     $rrd_filename = rrd_name($device['hostname'], array($comp['type'], $label, $hash));
     if (file_exists($rrd_filename)) {
-        d_echo("\n  Adding VS: ".$comp['label']."\t+ added to the graph");
-
         // Grab a colour from the array.
-        if (isset($colours[$count])) {
-            $colour = $colours[$count];
+        if (isset($colours[$colcount])) {
+            $colour = $colours[$colcount];
         } else {
-            d_echo("\nError: Out of colours. Have: ".(count($colours)-1).", Requesting:".$count);
+            $colcount = 0;
+            $colour = $colours[$colcount];
         }
 
         $rrd_options .= " DEF:DS" . $count . "=" . $rrd_filename . ":pktsin:AVERAGE ";
@@ -47,6 +46,6 @@ foreach ($components as $compid => $comp) {
         $rrd_options .= " GPRINT:DS" . $count . ":AVERAGE:%6.2lf%s ";
         $rrd_options .= " GPRINT:DS" . $count . ":MAX:%6.2lf%s\l ";
         $count++;
+        $colcount++;
     }
 }
-d_echo("</pre>");

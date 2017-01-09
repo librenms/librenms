@@ -17,8 +17,8 @@
     <tr>
         <th data-column-id="poolid" data-type="numeric" data-visible="false">poolid</th>
         <th data-column-id="name">Name</th>
-        <th data-column-id="minup">Minimum Members</th>
-        <th data-column-id="currentup">Current Members</th>
+        <th data-column-id="minup" data-type="numeric">Minimum Members</th>
+        <th data-column-id="currentup" data-type="numeric">Current Members</th>
         <th data-column-id="status" data-visible="false">Status</th>
         <th data-column-id="message">Status</th>
     </tr>

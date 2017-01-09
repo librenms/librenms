@@ -117,7 +117,7 @@ if (count($components > 0)) {
             );
 
             $array['minup'] = $ltmPoolEntryMinup['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
-            $array['minupstatus'] = $ltmPoolEntryMinupstatus['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$index];
+            $array['minupstatus'] = $ltmPoolEntryMinupstatus['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$UID];
             $array['currentup'] = $ltmPoolEntryCurrentup['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
             $array['minupaction'] = $ltmPoolEntryMinupaction['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
 
