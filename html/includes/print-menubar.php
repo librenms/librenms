@@ -89,6 +89,12 @@ if ($config['title_image']) {
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
            <ul class="dropdown-menu scrollable-menu">
            <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
+<?php
+if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
+    echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
+}
+
+?>
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
