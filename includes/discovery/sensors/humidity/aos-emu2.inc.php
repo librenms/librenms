@@ -27,7 +27,7 @@ if ($device['os'] === 'aos-emu2') {
     foreach ($emu2_temp as $id => $temp) {
         if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
             $index           = $temp['emsProbeStatusProbeIndex'];
-            $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.3.' . $index;
+            $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
             $descr           = $temp['emsProbeStatusProbeName'];
             $low_limit       = $temp['emsProbeStatusProbeMinHumidityThresh'];
             $low_warn_limit  = $temp['emsProbeStatusProbeLowHumidityThresh'];
