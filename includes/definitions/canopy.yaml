@@ -5,3 +5,7 @@ icon: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 group: cambium
+discovery:
+    - sysDescr_regex:
+        - '/^CANOPY/'
+        - '/^CMM/'
