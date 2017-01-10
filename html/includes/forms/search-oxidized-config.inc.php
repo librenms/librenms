@@ -17,7 +17,7 @@ $parameters = clean($_POST['search_in_conf_textbox']);
 if (isset($parameters)) {
     $status  = 'ok';
     $message = 'Queried';
-    $output = clean(search_oxidized_config($parameters));
+    $output = search_oxidized_config($parameters);
 } else {
     $status  = 'error';
     $message = 'ERROR: Could not query';
