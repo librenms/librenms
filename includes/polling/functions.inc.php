@@ -18,10 +18,11 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
- * @return mixed
+ * @return array
  */
 function sensor_precache($device)
 {
+    $sensor_config = array();
     if (file_exists('includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php')) {
         include 'includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php';
     }
