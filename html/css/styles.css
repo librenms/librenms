@@ -1825,7 +1825,7 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device_icon img {
+    .device-header-table .device-icon .device-icon-48h img {
        max-width: 20px;
        max-height: 20px;
     }
@@ -2138,6 +2138,17 @@ label {
     width: 32px;
 }
 
-.device_icon img {
-    height: 48px;
+.device-icon img {
+    max-height: 32px;
+    max-width: 40px;
+}
+
+.device-icon {
+  display: inline-block;
+  height: 32px;
+  width: 40px;
+}
+
+.device-icon-48h img {
+  height: 48px;
 }
