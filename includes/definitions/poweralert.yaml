@@ -4,3 +4,6 @@ type: power
 over:
     - { graph: device_current, text: Current }
 icon: tripplite
+discovery:
+    - sysDescr_regex:
+        - '/POWERALERT/i'
