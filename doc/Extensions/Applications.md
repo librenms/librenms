@@ -227,7 +227,10 @@ A small shell script that checks your system package manager for any available u
 For pacman users automatically refreshing the database, it is recommended you use an alternative database location `--dbpath=/var/lib/pacman/checkupdate`
 
 ##### SNMP Extend
-1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/os-updates.sh -O /etc/snmp/os-updates.sh
+```
 2. Make the script executable (chmod +x /etc/snmp/os-updates.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
