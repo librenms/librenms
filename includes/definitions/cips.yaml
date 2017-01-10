@@ -26,3 +26,6 @@ discovery_modules:
     cisco-vrf-lite: 1
 mib_dir:
     - cisco
+discovery:
+    - sysDescr_regex:
+        - '/^Cisco Intrusion Prevention System/'
