@@ -8,9 +8,10 @@ mib_dir:
 over:
     - { graph: device_current, text: Current }
 discovery:
+    - sysDescr:
+        - 'Pulsar M'
+        - 'MGE UPS SYSTEMS - Network Management Proxy'
     - sysDescr_regex:
-        - '/Pulsar M/'
-        - '/MGE UPS SYSTEMS - Network Management Proxy/'
         - '/^Galaxy/'
         - '/^Evolution/'
         - '/^Comet/'
