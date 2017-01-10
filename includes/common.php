@@ -1553,3 +1553,17 @@ function fahrenheit_to_celsius($scale, $value)
     }
     return sprintf('%.02f', $value);
 }
+
+/**
+ * @param $value
+ * @param null $default
+ * @param int $min
+ * @return null
+ */
+function set_null($value, $default = null, $min = 0)
+{
+    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
+        $value = $default;
+    }
+    return $value;
+}
