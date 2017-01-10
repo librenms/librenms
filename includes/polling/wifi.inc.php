@@ -26,9 +26,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         $wificlients1 = (snmp_get($device, 'wirelessNumber.0', '-OUqnv', 'AIRPORT-BASESTATION-3-MIB') + 0);
 
         echo $wificlients1." clients\n";
-
-        // FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
-    } elseif ($device['os'] == 'ios' and substr($device['hardware'], 0, 4) == 'AIR-' || ($device['os'] == 'ios' && strpos($device['hardware'], 'ciscoAIR') !== false)) {
+    } elseif ($device['os'] == 'ios' && (starts_with($device['hardware'], 'AIR-') || str_contains($device['hardware'], 'ciscoAIR'))) {
         echo 'Checking Aironet Wireless clients... ';
 
         $wificlients1 = snmp_get($device, 'cDot11ActiveWirelessClients.1', '-OUqnv', 'CISCO-DOT11-ASSOCIATION-MIB');
@@ -46,8 +44,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
             'Wireless',
             'Atheros',
         );
+        $sql = 'SELECT COUNT(*) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalDescr` LIKE ?';
         foreach ($wirelesscards as $wirelesscheck) {
-            if (dbFetchCell('SELECT COUNT(*) FROM `entPhysical` WHERE `device_id` = ?AND `entPhysicalDescr` LIKE ?', array($device['device_id'], '%'.$wirelesscheck.'%')) >= '1') {
+            if (dbFetchCell($sql, array($device['device_id'], '%'.$wirelesscheck.'%')) >= 1) {
                 echo 'Checking RouterOS Wireless clients... ';
 
                 $wificlients1 = snmp_get($device, 'mtxrWlApClientCount', '-OUqnv', 'MIKROTIK-MIB');
@@ -58,7 +57,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
             unset($wirelesscards);
         }
-    } elseif ($device['os'] == 'symbol' and (stristr($device['hardware'], 'AP'))) {
+    } elseif ($device['os'] == 'symbol' && str_contains($device['hardware'], 'AP', true)) {
         echo 'Checking Symbol Wireless clients... ';
 
         $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1', '-Ovq', '""');
@@ -66,21 +65,28 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         echo (($wificlients1 + 0).' clients on wireless connector, ');
     } elseif ($device['os'] == 'unifi') {
         echo 'Checking Unifi Wireless clients... ';
-        $wificlients1 = 0;
-        $wificlients2 = 0;
 
-        $clients = explode("\n", snmp_walk($device, 'unifiVapNumStations', '-Oqv', 'UBNT-UniFi-MIB'));
-        $bands = explode("\n", snmp_walk($device, 'unifiVapRadio', '-Oqv', 'UBNT-UniFi-MIB'));
+        $clients = snmpwalk_cache_oid($device, 'UBNT-UniFi-MIB::unifiVapRadio', array());
+        $clients = snmpwalk_cache_oid($device, 'UBNT-UniFi-MIB::unifiVapNumStations', $clients);
 
-        foreach ($bands as $index => $band_index) {
-            if ($band_index == "ng") {
-                $wificlients1 += $clients[$index];
+        if (!empty($clients)) {
+            $wificlients1 = 0;
+            $wificlients2 = 0;
+        }
+
+        foreach ($clients as $entry) {
+            if ($entry['unifiVapRadio'] == 'ng') {
+                $wificlients1 += $entry['unifiVapNumStations'];
             } else {
-                $wificlients2 += $clients[$index];
+                $wificlients2 += $entry['unifiVapNumStations'];
             }
         }
 
-        echo $wificlients1 . ' clients on Radio0, ' . $wificlients2 . " clients on Radio1\n";
+        if (!empty($clients)) {
+            echo $wificlients1 . ' clients on Radio0, ' . $wificlients2 . " clients on Radio1\n";
+        } else {
+            echo "AP does not supply client counts\n";
+        }
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
     }
 
@@ -97,6 +103,6 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         unset(${'wificlients'.$i});
         $i++;
     }
-}//end if
-
-echo "\n";
+} else {
+    echo 'Unsupported type: ' . $device['type'] . PHP_EOL;
+}
