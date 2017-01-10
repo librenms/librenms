@@ -8,3 +8,12 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
     - hp
+discovery:
+    - sysDescr:
+        - 'ProCurve'
+        - 'PROCURVE'
+        - 'HP 1820'
+    - sysDescr_regex:
+        - '/eCos-[0-9.]+/'
+        - '/HP(.+)2530(.+)/'
+        - '/HP(.+)54[0-1][2-6]R(.+)/'

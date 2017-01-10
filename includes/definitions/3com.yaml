@@ -3,3 +3,8 @@ text: 3Com
 over:
     - { graph: device_bits, text: Traffic }
 type: network
+discovery:
+    - sysDescr:
+        - 3Com Switch
+        - 3Com SuperStack
+        - 3Com Baseline

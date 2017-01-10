@@ -6,3 +6,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery_modules:
     vmware-vminfo: 1
+discovery:
+    - sysDescr_regex:
+        - '/^VMware ESX/'
+        - '/^VMware-vCenter-Server-Appliance/'

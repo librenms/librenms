@@ -4,3 +4,6 @@ text: 'Huawei SmartAX'
 type: network
 icon: huawei
 ifname: 1
+discovery:
+    - sysDescr:
+        - Huawei Integrated Access Software

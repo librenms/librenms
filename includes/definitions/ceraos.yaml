@@ -6,3 +6,6 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_ceraos_RxLevel, text: 'Rx Level' }
     - { graph: device_ping_perf, text: 'Ping Times' }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.2281

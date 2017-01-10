@@ -4,3 +4,6 @@ type: appliance
 icon: ibmnos
 mib_dir:
     - ibm
+discovery:
+    - sysDescr:
+        - BladeCenter Advanced Management Module

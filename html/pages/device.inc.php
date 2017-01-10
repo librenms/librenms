@@ -22,15 +22,12 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
 
     $device  = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
+    load_os($device);
 
     $entity_state = get_dev_entity_state($device['device_id']);
 
     // print_r($entity_state);
     $pagetitle[] = $device['hostname'];
-
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
-    }
 
     echo '<div class="panel panel-default">';
         echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';

@@ -5,3 +5,6 @@ icon: meraki
 ifname: 1
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^Meraki MS/'

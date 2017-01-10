@@ -6,3 +6,5 @@ mib_dir:
     - eaton
 over:
     - { graph: device_current, text: Current }
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.534.6.6.7

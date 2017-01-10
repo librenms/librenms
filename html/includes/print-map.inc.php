@@ -84,7 +84,7 @@ if (in_array('mac', $config['network_map_items'])) {
                              `D1`.`device_id` != `D2`.`device_id`
                              $where
                              $sql
-                      GROUP BY `P1`.`port_id`,`P2`.`port_id`
+                      GROUP BY `P1`.`port_id`,`P2`.`port_id`,`D1`.`device_id`, `D1`.`os`, `D1`.`hostname`, `D2`.`device_id`, `D2`.`os`, `D2`.`hostname`, `P1`.`port_id`, `P1`.`device_id`, `P1`.`ifName`, `P1`.`ifSpeed`, `P1`.`ifOperStatus`, `P1`.`ifAdminStatus`, `P1`.`ifInOctets_rate`, `P1`.`ifOutOctets_rate`, `P2`.`port_id`, `P2`.`device_id`, `P2`.`ifName`, `P2`.`ifSpeed`, `P2`.`ifOperStatus`, `P2`.`ifAdminStatus`, `P2`.`ifInOctets_rate`, `P2`.`ifOutOctets_rate`
                       ORDER BY `remote_matching_ips` DESC, `local_ifname`, `remote_ifname`
                      ", $sql_array);
 }
@@ -125,7 +125,7 @@ if (in_array('xdp', $config['network_map_items'])) {
                              `remote_device_id` != 0
                              $where
                              $sql
-                      GROUP BY `P1`.`port_id`,`P2`.`port_id`
+                      GROUP BY `P1`.`port_id`,`P2`.`port_id`,`D1`.`device_id`, `D1`.`os`, `D1`.`hostname`, `D2`.`device_id`, `D2`.`os`, `D2`.`hostname`, `P1`.`port_id`, `P1`.`device_id`, `P1`.`ifName`, `P1`.`ifSpeed`, `P1`.`ifOperStatus`, `P1`.`ifAdminStatus`, `P1`.`ifInOctets_rate`, `P1`.`ifOutOctets_rate`, `P2`.`port_id`, `P2`.`device_id`, `P2`.`ifName`, `P2`.`ifSpeed`, `P2`.`ifOperStatus`, `P2`.`ifAdminStatus`, `P2`.`ifInOctets_rate`, `P2`.`ifOutOctets_rate`
                       ORDER BY `local_ifname`, `remote_ifname`
                       ", $sql_array);
 }

@@ -788,9 +788,9 @@ function getlocations()
 
     // Fetch regular locations
     if ($_SESSION['userlevel'] >= '5') {
-        $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D GROUP BY location ORDER BY location');
+        $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
     }
 
     foreach ($rows as $row) {
@@ -1361,4 +1361,24 @@ function get_rules_from_json()
 {
     global $config;
     return json_decode(file_get_contents($config['install_dir'] . '/misc/alert_rules.json'), true);
+}
+
+function search_oxidized_config($search_in_conf_textbox)
+{
+    global $config;
+    $oxidized_search_url = $config['oxidized']['url'] . '/nodes/conf_search?format=json';
+    $postdata = http_build_query(
+        array(
+            'search_in_conf_textbox' => $search_in_conf_textbox,
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context  = stream_context_create($opts);
+    return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
 }
