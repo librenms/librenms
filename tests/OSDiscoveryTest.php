@@ -177,6 +177,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('asa');
     }
 
+    public function testAsusMerlin()
+    {
+        $this->checkOS('asuswrt-merlin');
+    }
+
     public function testAvayaers()
     {
         $this->checkOS('avaya-ers');
@@ -1382,6 +1387,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos6');
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
+    }
+
+    public function testTomato()
+    {
+        $this->checkOS('tomato');
     }
 
     public function testTpconductor()
