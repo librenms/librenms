@@ -1,1 +1,1 @@
-ALTER TABLE  `dbSchema` DROP `revision`;
+SELECT NOW()

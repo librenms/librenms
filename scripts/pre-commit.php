@@ -7,9 +7,7 @@ $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-require_once $install_dir . '/LibreNMS/ClassLoader.php';
-$classLoader = new LibreNMS\ClassLoader();
-$classLoader->register();
+require $install_dir . '/vendor/autoload.php';
 
 $short_opts = 'lsupch';
 $long_opts = array(

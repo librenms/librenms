@@ -1,0 +1,11 @@
+os: vrp
+group: vrp
+text: 'Huawei VRP'
+type: network
+icon: huawei
+discovery:
+    - sysDescr:
+        - VRP (R) Software
+        - VRP Software Version
+        - Software Version VRP
+        - Versatile Routing Platform Software

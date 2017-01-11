@@ -1,0 +1,11 @@
+os: foundryos
+text: 'Foundry Networking'
+type: network
+icon: foundry
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Foundry Networks

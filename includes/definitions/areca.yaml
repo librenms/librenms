@@ -1,0 +1,8 @@
+os: areca
+text: 'Areca RAID Subsystem'
+type: appliance
+over:
+    - { graph: '', text: '' }
+discovery:
+    - sysDescr:
+        - Raid Subsystem V

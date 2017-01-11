@@ -1,0 +1,8 @@
+os: sentry4
+text: 'ServerTech Sentry4'
+type: power
+over:
+    - { graph: device_current, text: Current }
+icon: servertech
+mib_dir:
+    - sentry
