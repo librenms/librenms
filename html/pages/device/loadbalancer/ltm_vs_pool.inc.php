@@ -73,7 +73,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                                 </thead>
                                 <?php
                                 foreach ($components as $comp) {
-                                    if ($comp['category'] != 'LTMPoolMember') {
+                                    if ($comp['type'] != 'f5-ltm-poolmember') {
                                         continue;
                                     }
                                     if (!strstr($comp['UID'], $parent)) {
