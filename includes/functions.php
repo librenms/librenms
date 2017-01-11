@@ -98,25 +98,7 @@ function getHostOS($device)
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
-    $os = null;
-    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
-    foreach (glob($pattern) as $file) {
-        include $file;
-        if (isset($os)) {
-            return $os;
-        }
-    }
-    return discover_os($sysObjectId, $sysDescr);
-}
-
-/**
- * @param $sysObjectId
- * @param $sysDescr
- * @return string
- */
-function discover_os($sysObjectId, $sysDescr)
-{
-    global $config;
+    // check yaml files
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
         $tmp = Symfony\Component\Yaml\Yaml::parse(
@@ -149,6 +131,17 @@ function discover_os($sysObjectId, $sysDescr)
             }
         }
     }
+
+    // check include files
+    $os = null;
+    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    foreach (glob($pattern) as $file) {
+        include $file;
+        if (isset($os)) {
+            return $os;
+        }
+    }
+
     return 'generic';
 }
 
