@@ -1,7 +1,7 @@
 os: ibm-imm
 text: 'IBM IMM'
 type: appliance
-icon: ibmnos
+icon: ibmos
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
