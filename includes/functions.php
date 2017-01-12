@@ -89,6 +89,12 @@ function logfile($string)
     fclose($fd);
 }
 
+/**
+ * Detect the os of the given device.
+ *
+ * @param array $device device to check
+ * @return string the name of the os
+ */
 function getHostOS($device)
 {
     global $config;
@@ -106,26 +112,8 @@ function getHostOS($device)
         );
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
-                if (!is_array($item) || empty($item)) {
-                    break;
-                }
-                // all items must be true
-                $result = true;
-                foreach ($item as $key => $value) {
-                    switch ($key) {
-                        case 'sysObjectId':
-                            $result &= starts_with($sysObjectId, $value);
-                            break;
-                        case 'sysDescr':
-                            $result &= str_contains($sysDescr, $value);
-                            break;
-                        case 'sysDescr_regex':
-                            $result &= preg_match_any($sysDescr, $value);
-                            break;
-                        default:
-                    }
-                }
-                if ($result) {
+                // check each item individually, if all the conditions in that item are true, we have a match
+                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
                     return $tmp['os'];
                 }
             }
@@ -145,6 +133,46 @@ function getHostOS($device)
     return 'generic';
 }
 
+/**
+ * Check an array of conditions if all match, return true
+ * sysObjectId if sysObjectId starts with any of the values under this item
+ * sysDescr if sysDescr contains any of the values under this item
+ * sysDescr_regex if sysDescr matches any of the regexes under this item
+ *
+ * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
+ * @param string $sysObjectId The sysObjectId to check against
+ * @param string $sysDescr the sysDesr to check against
+ * @return bool the result (all items passed return true)
+ */
+function checkDiscovery($array, $sysObjectId, $sysDescr)
+{
+    // all items must be true
+    foreach ($array as $key => $value) {
+        if ($key == 'sysObjectId') {
+            if (!starts_with($sysObjectId, $value)) {
+                return false;
+            }
+        } elseif ($key == 'sysDescr') {
+            if (!str_contains($sysDescr, $value)) {
+                return false;
+            }
+        } elseif ($key == 'sysDescr_regex') {
+            if (!preg_match_any($sysDescr, $value)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Check an array of regexes against a subject if any match, return true
+ *
+ * @param string $subject the string to match against
+ * @param array|string $regexes an array of regexes or single regex to check
+ * @return bool if any of the regexes matched, return true
+ */
 function preg_match_any($subject, $regexes)
 {
     foreach ((array)$regexes as $regex) {
