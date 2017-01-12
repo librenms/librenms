@@ -16,7 +16,7 @@
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('d::');
+$options = getopt('d::h:f:;');
 if (isset($options['d'])) {
     echo "DEBUG!\n";
     $debug = true;
@@ -44,7 +44,22 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 
 rrdtool_initialize();
 
-foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC') as $service) {
+$where = '';
+if ($options['h']) {
+    if (is_numeric($options['h'])) {
+        $where = "AND `S`.`device_id` = ".$options['h'];
+    } else {
+        if (preg_match('/\*/', $options['h'])) {
+            $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+        } else {
+            $where = "AND `hostname` = '".mres($options['h'])."'";
+        }
+    }
+}
+
+$sql = 'SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ' . $where . ' ORDER by D.device_id DESC';
+
+foreach (dbFetchRows($sql) as $service) {
     // Run the polling function
     poll_service($service);
 } //end foreach
