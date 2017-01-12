@@ -26,7 +26,7 @@ if (starts_with($sysDescr, 'Linux')) {
         $os = 'pktj';
     } elseif (starts_with($sysObjectId, '.1.3.6.1.4.1.40310')) {
         $os = 'cumulus';
-    } elseif (str_contains($sysDescr, array('g56fa85e', 'gc80f187', 'g829be90', 'g63c0044', 'gba768e5'))) {
+    } elseif (str_contains($sysDescr, array('g56fa85e', 'gc80f187', 'g829be90', 'g63c0044', 'gba768e5', 'g4dc0e52'))) {
         $os = 'sophos';
     } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {
         $os = 'ddnos';
