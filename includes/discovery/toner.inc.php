@@ -18,19 +18,30 @@ if ($device['os_group'] == 'printer') {
 
     foreach ($oids as $index => $data) {
         $last_index = substr($index, strrpos($index, '.') + 1);
-        if ($device['os'] == 'ricoh' || $device['os'] == 'nrg' || $device['os'] == 'lanier') {
+        
+        $raw_toner     = $data['prtMarkerSuppliesLevel'];
+        $descr         = $data['prtMarkerSuppliesDescription'];
+        $raw_capacity  = $data['prtMarkerSuppliesMaxCapacity'];
+        $raw_toner     = $data['prtMarkerSuppliesLevel'];
+        $toner_oid     = ".1.3.6.1.2.1.43.11.1.1.9.$index";
+        $capacity_oid  = ".1.3.6.1.2.1.43.11.1.1.8.$index";
+
+        if (empty($raw_toner)) {
             $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
-            $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$last_index";
-            $capacity_oid = '';
-
-            $descr = snmp_get($device, $descr_oid, '-Oqva');
             $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
-        } else {
-            $toner_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
-            $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
+        }
 
-            $descr = $data['prtMarkerSuppliesDescription'];
-            $raw_toner = $data['prtMarkerSuppliesLevel'];
+        if (empty($descr)) {
+            $descr_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.3.$last_index";
+            $descr = snmp_get($device, $descr_oid, '-Oqva');
+        }
+
+        if (empty($raw_toner)) {
+            $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
+        }
+
+        if (!empty($data['prtMarkerColorantValue'])) {
+            $descr = ucfirst($data['prtMarkerColorantValue']);
         }
 
         $type = 'jetdirect';
@@ -60,7 +71,6 @@ d_echo($sql);
 foreach ($sql as $test_toner) {
     $toner_oid = $test_toner['toner_oid'];
     $toner_type = $test_toner['toner_type'];
-    echo "$toner_oid and $toner_type\n";
     if (!$valid_toner[$toner_type][$toner_oid]) {
         echo '-';
         dbDelete('toner', '`toner_id` = ?', array($test_toner['toner_id']));
