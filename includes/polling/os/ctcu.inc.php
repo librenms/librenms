@@ -1,8 +1,8 @@
 <?php
 /**
- * sinetica.inc.php
+ * ctcu.inc.php
  *
- * LibreNMS os polling module for Sinetica
+ * LibreNMS os polling module for CTC Union
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
