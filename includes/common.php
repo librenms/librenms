@@ -1527,9 +1527,12 @@ function load_os(&$device)
     );
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['type'] == 'unknown' || $device['type'] == '') {
+    if ($device['type'] == 'unknown' || $device['type'] == '' || $config['os'][$device['os']]['type'] != $device['type']) {
         if ($config['os'][$device['os']]['type']) {
             $device['type'] = $config['os'][$device['os']]['type'];
+            log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
+            $sql = dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
+            echo "Changed Type! : ".$device['type'].PHP_EOL;
         }
     }
 
