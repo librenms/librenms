@@ -1557,3 +1557,16 @@ function load_all_os($restricted = array())
         $config['os'][$tmp['os']] = $tmp;
     }
 }
+
+/**
+ * @param $value
+ * @param int $default
+ * @return int
+ */
+function set_numeric($value, $default = 0)
+{
+    if (!isset($value) || !is_numeric($value)) {
+        $value = $default;
+    }
+    return $value;
+}

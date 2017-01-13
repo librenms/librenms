@@ -1322,6 +1322,12 @@ function fping($host, $params, $address_family = AF_INET)
         $rcv = 1;
         $loss = 100;
     }
+    $xmt      = set_numeric($xmt);
+    $rcv      = set_numeric($rcv);
+    $loss     = set_numeric($loss);
+    $min      = set_numeric($min);
+    $max      = set_numeric($max);
+    $avg      = set_numeric($avg);
     $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
     return $response;
 }
