@@ -15,10 +15,3 @@ if ($icon != $device['icon']) {
     $sql = dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
     echo "Changed Icon! : $icon\n";
 }
-
-if ($config['os'][$device['os']]['type'] != $device['type']) {
-    log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
-    $device['type'] = $config['os'][$device['os']]['type'];
-    $sql = dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
-    echo "Changed Type! : ".$device['type'].PHP_EOL;
-}
