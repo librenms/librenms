@@ -667,7 +667,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 {
     d_echo("Discover Toner: $oid, $index, $type, $descr, $capacity_oid, $capacity, $current\n");
 
-    if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_capacity_oid` =?', array($device['device_id'], $type, $index, $capacity_oid)) == '0') {
+    if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_oid` =?', array($device['device_id'], $type, $index, $oid)) == '0') {
         $inserted = dbInsert(array('device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current), 'toner');
         echo '+';
         log_event('Toner added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'toner', $inserted);
@@ -681,7 +681,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
         }
     }
 
-    $valid[$type][$index] = 1;
+    $valid[$type][$oid] = 1;
 }
 
 //end discover_toner()
