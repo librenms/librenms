@@ -1337,8 +1337,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('sophos');
         $this->checkOS('sophos', 'sophos1');
-        $this->checkOS('sophos', 'sophos2');
-        $this->checkOS('sophos', 'sophos3');
     }
 
     public function testSpeedtouch()
