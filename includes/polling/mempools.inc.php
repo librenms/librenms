@@ -41,11 +41,11 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
                         );
 
     if (!empty($mempool['largestfree'])) {
-        $mempool['state']['mempool_largestfree'] = $mempool['largestfree'];
+        $mempool['state']['mempool_largestfree'] = set_numeric($mempool['largestfree']);
     }
 
     if (!empty($mempool['lowestfree'])) {
-        $mempool['state']['mempool_lowestfree'] = $mempool['lowestfree'];
+        $mempool['state']['mempool_lowestfree'] = set_numeric($mempool['lowestfree']);
     }
 
     dbUpdate($mempool['state'], 'mempools', '`mempool_id` = ?', array($mempool['mempool_id']));
