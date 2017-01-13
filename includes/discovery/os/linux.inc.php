@@ -1,16 +1,7 @@
 <?php
 
 
-$skip_oids = array(
-    '.1.3.6.1.4.1.674.10892.2',
-    '.1.3.6.1.4.1.17163.1.1',
-    '.1.3.6.1.4.1.17713.21',
-    '.1.3.6.1.4.1.2.3.51.3',
-    '.1.3.6.1.4.1.7779.', // nios
-    '.1.3.6.1.4.1.9.1.1348' // Cisco Unified Communications Manager
-);
-
-if (starts_with($sysDescr, 'Linux') && !starts_with($sysObjectId, $skip_oids)) {
+if (starts_with($sysDescr, 'Linux')) {
     $os = 'linux';
 
     // Specific Linux-derivatives

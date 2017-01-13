@@ -5,3 +5,7 @@ type: printer
 icon: canon
 over:
     - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr:
+        - Canon MF
+        - Canon iR

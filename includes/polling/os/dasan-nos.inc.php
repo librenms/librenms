@@ -25,4 +25,7 @@
 
 list($hardware, $version) = explode(' ', $poll_device['sysDescr'], 2);
 
-$version = preg_replace('/\/(.*)/', '', $version);
+$tmp = snmp_get_multi_oid($device, 'dsSerialNumber.0 dsFirmwareVersion', '-OQUs', 'DASAN-SWITCH-MIB:DASAN-PRODUCTS-MIB');
+
+$serial = $tmp['dsSerialNumber.0'];
+$version = $tmp['dsFirmwareVersion.0'];

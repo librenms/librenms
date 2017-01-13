@@ -6,3 +6,6 @@ overgraph:
 overtext: Toner
 type: printer
 icon: oki
+discovery:
+    - sysDescr:
+        - OKI OkiLAN

@@ -25,3 +25,6 @@ discovery_modules:
     cisco-pw: 1
     cisco-vrf: 1
     cisco-vrf-lite: 1
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.9.1.2238
