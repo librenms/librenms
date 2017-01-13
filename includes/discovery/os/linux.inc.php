@@ -32,5 +32,12 @@ if (starts_with($sysDescr, 'Linux')) {
         $os = 'pcoweb'; // Carel PCOweb
     } elseif (starts_with($sysDescr, 'Linux mirthtemplate')) {
         $os = 'mirth';
+    } elseif ($wrt = snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv')) {
+        $wrt = trim($wrt, '"');
+        if (starts_with($wrt, 'ASUSWRT-Merlin')) {
+            $os = 'asuswrt-merlin';
+        } elseif (starts_with($wrt, 'Tomato ')) {
+            $os = 'tomato';
+        }
     }
 }
