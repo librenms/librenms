@@ -5,6 +5,7 @@ if ($device['os'] == 'routeros') {
 
     $divisor = 10.0;
     $type    = 'mikrotik';
+    $insert_index = 0;
 
     $oids = snmp_walk($device, 'mtxrHlTemperature', '-OsqnU', 'MIKROTIK-MIB');
 
@@ -18,7 +19,8 @@ if ($device['os'] == 'routeros') {
             $oid              = '.1.3.6.1.4.1.14988.1.1.3.10.'.$index;
             $temperature      = (snmp_get($device, $oid, '-Oqv') / $divisor);
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $temperature);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, $divisor, '1', null, null, null, null, $temperature);
+            $insert_index++;
         }
     }
 
@@ -34,7 +36,8 @@ if ($device['os'] == 'routeros') {
             $oid              = '.1.3.6.1.4.1.14988.1.1.3.11.'.$index;
             $temperature      = (snmp_get($device, $oid, '-Oqv') / $divisor);
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $temperature);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, $divisor, '1', null, null, null, null, $temperature);
+            $insert_index++;
         }
     }
 }
