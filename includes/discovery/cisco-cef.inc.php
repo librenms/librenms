@@ -25,8 +25,8 @@ if (is_array($cefs)) {
                 echo ' | |-'.$path.': '.$path_name['cefSwitchingPath']."\n";
                 $cef_exists[$device['device_id']][$entity][$afi][$path] = 1;
 
-                if (dbFetchCell('SELECT COUNT(*) from `cef` WHERE device_id = ? AND entPhysicalIndex = ?, AND afi=? AND cef_index=?', array($device['device_id'], $entity, $afi, $path)) != '1') {
-                    dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path), 'cef');
+                if (dbFetchCell('SELECT COUNT(*) from `cef_switching` WHERE device_id = ? AND entPhysicalIndex = ? AND afi=? AND cef_index=?', array($device['device_id'], $entity, $afi, $path)) != '1') {
+                    dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path), 'cef_switching');
                     echo '+';
                 }
             }
