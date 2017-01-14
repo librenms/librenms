@@ -45,7 +45,7 @@ if (count($components > 0)) {
         // Set the status, 16 = Bad
         if ($array['stratum'] == 16) {
             $array['status'] = 2;
-            $array['error'] = 'NTP Stratum is Insane';
+            $array['error'] = 'NTP is not in sync';
         } else {
             $array['status'] = 0;
             $array['error'] = '';

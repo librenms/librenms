@@ -8,3 +8,5 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 processor_stacked: 1
+discovery:
+    - sysDescr_regex: '/^Linux.*endian/'

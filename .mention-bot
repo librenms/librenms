@@ -13,7 +13,7 @@
   "assignToReviewer": false,
   "skipTitle": "--no review--",
   "withLabel": "",
-  "delayed": true,
-  "delayedUntil": "30 minutes",
+  "delayed": false,
+  "delayedUntil": "30m",
   "skipCollaboratorPR": false
 }
