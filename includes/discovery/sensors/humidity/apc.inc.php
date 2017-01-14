@@ -16,7 +16,7 @@ if ($device['os'] == 'apc') {
         $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighHumidEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeHighHumidThreshold'] : null);
         $high_limit      = ($apc_env_data[$index]['iemConfigProbeMaxHumidEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeMaxHumidThreshold'] : null);
 
-        if ($current != 0) {
+        if ($current > 0) {
             // Humidity = 0 -> Sensor not available
             discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
@@ -35,8 +35,10 @@ if ($device['os'] == 'apc') {
             $low_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeLowHumidityThresh'];
             $high_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeHighHumidityThresh'];
             $high_limit = $apc_env_data[$index]['emsProbeStatusProbeMaxHumidityThresh'];
-
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            
+            if ($current > 0) {
+                discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            }
         }
     }
 }//end if
