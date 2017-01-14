@@ -1,6 +1,6 @@
-os: monowall
+os: voswall
 group: unix
-text: m0n0wall
+text: Voswall
 type: firewall
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -8,4 +8,4 @@ over:
 processor_stacked: 1
 discovery:
     - sysDescr:
-        - m0n0wall
+        - Voswall
