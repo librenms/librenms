@@ -123,7 +123,7 @@ LibreNMS contributors:
 - Russell Morris <github@rkmorris.us> (arrmo)
 - Bennett Blodinger <bennett.blodinger@gmail.com> (benwa)
 - Michael Hansen <nerdalertdk@gmail.com> (nerdalertdk)
-- Daniel Cox <danielcoxman@gmail.com> (ospfbgp) 
+- Daniel Cox <danielcoxman@gmail.com> (ospfbgp)
 - Joseph Cunningham <joey.was@gmail.com> (joeywas)
 - Michael Van Delft <librenms@xo.tc> (HybridAU)
 - Piotr Jurga <deutor1361@gmail.com> (deutor)
@@ -155,7 +155,7 @@ LibreNMS contributors:
 - Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
 - Andres Rahn <andreser@gmail.com> (Andreser)
 - Christoph Zilian <czilian@hotmail.com> (czilian)
-- Guillem Mateos <bbguillem@gmail.com> (guillemmateos) 
+- Guillem Mateos <bbguillem@gmail.com> (guillemmateos)
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
 - Matthew Schwen <mschwen@gmail.com> (mattschwen)
@@ -164,6 +164,7 @@ LibreNMS contributors:
 - Rob Nichols <rob@ignition360.com> (rdnn)
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
 - Julian Kornberger <jk+github@digineo.de> (corny)
+- ant Kenworthy <git@manchetermonkey.co.uk> (mcrmonkey)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
