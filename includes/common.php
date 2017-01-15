@@ -1086,7 +1086,7 @@ function version_info($remote = true)
 {
     global $config;
     $output = array();
-    if (check_git_exists() == true) {
+    if (check_git_exists() === true) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
             set_curl_proxy($api);

@@ -108,7 +108,7 @@ if (!($username === 'root' || (isset($config['user']) && $username === $config['
     print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
-if ($git_found == true) {
+if ($git_found === true) {
     if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
         $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
         print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
@@ -259,7 +259,7 @@ if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_
     print_list($devices, "\t %s\n");
 }
 
-if ($git_found == true) {
+if ($git_found === true) {
     if ($versions['local_branch'] != 'master') {
         print_warn("Your local git branch is not master, this will prevent automatic updates.");
     }
