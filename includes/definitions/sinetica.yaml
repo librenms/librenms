@@ -4,3 +4,6 @@ group: ups
 type: power
 over:
     - { graph: device_current, text: Current }
+discovery:
+    - sysDescr_regex:
+        - '/^Sinetica UPSController./'

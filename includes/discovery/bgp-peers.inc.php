@@ -201,7 +201,7 @@ if ($config['enable_bgp']) {
                         $afi  = $entry['afi'];
                         $safi = $entry['safi'];
                         if (!$af_list[$afi][$safi] || !$af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
-                            dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ?, afi=?, safi=?', array($device['device_id'], $peer['ip'], $afi, $safi));
+                            dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi));
                         }
                     }
                 }

@@ -42,7 +42,7 @@ if ($options['f'] === 'rrd_purge') {
 
 if ($options['f'] === 'syslog') {
     if (is_numeric($config['syslog_purge'])) {
-        $rows = dbFetchRow('SELECT MIN(seq) FROM syslog');
+        $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
         while (true) {
             $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
             if (empty($limit)) {

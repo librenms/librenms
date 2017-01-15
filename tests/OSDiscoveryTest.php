@@ -177,6 +177,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('asa');
     }
 
+    public function testAsusMerlin()
+    {
+        $this->checkOS('asuswrt-merlin');
+    }
+
     public function testAvayaers()
     {
         $this->checkOS('avaya-ers');
@@ -519,6 +524,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('edgeswitch');
         $this->checkOS('edgeswitch', 'edgeswitch-ep-s16');
         $this->checkOS('edgeswitch', 'edgeswitch-es-24-250w');
+        $this->checkOS('edgeswitch', 'unifiswitch');
     }
 
     public function testEndian()
@@ -1336,8 +1342,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('sophos');
         $this->checkOS('sophos', 'sophos1');
-        $this->checkOS('sophos', 'sophos2');
-        $this->checkOS('sophos', 'sophos3');
     }
 
     public function testSpeedtouch()
@@ -1382,6 +1386,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos6');
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
+    }
+
+    public function testTomato()
+    {
+        $this->checkOS('tomato');
     }
 
     public function testTpconductor()

@@ -1,8 +1,8 @@
 <?php
 /**
- * sinetica.inc.php
+ * tomato.inc.php
  *
- * LibreNMS os discovery module for Sinetica
+ * LibreNMS os polling module for Tomato
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (starts_with($sysDescr, 'Sinetica UPSController.')) {
-    $os = 'sinetica';
-}
+list($ignore, $version) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+
+unset($ignore);

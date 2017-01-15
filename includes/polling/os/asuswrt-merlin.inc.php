@@ -1,8 +1,8 @@
 <?php
 /**
- * netagent2.inc.php
+ * asuswrt-merlin.inc.php
  *
- * LibreNMS os discovery module for Megatec Net Agent II
+ * LibreNMS os polling module for AsusWRT-Merlin
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (starts_with($sysDescr, 'NET Agent II')) {
-    $os = 'netagent2';
-}
+list($ignore, $hardware) = explode(' ', trim(snmp_get($device, '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'));
+
+unset($ignore);

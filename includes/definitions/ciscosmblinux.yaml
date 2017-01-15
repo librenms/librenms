@@ -7,6 +7,9 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+   - sysDescr_regex: '/^Linux.*Cisco Small Business/'
+
 poller_modules:
     cisco-cbqos: 1
     cisco-cef: 1

@@ -1509,16 +1509,33 @@ function display($value)
 }
 
 /**
- * @param $os
- * @return array|mixed
+ * Load the os definition for the device and set type and os_group
+ * $device['os'] must be set
+ *
+ * @param array $device
+ * @throws Exception No OS to load
  */
-function load_os($os)
+function load_os(&$device)
 {
     global $config;
-    if (isset($os)) {
-        return Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($config['install_dir'] . '/includes/definitions/' . $os . '.yaml')
-        );
+    if (!isset($device['os'])) {
+        throw new Exception('No OS to load');
+    }
+
+    $config['os'][$device['os']] = Symfony\Component\Yaml\Yaml::parse(
+        file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+    );
+
+    // Set type to a predefined type for the OS if it's not already set
+    if ($config['os'][$device['os']]['type'] != $device['type']) {
+        log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
+        $device['type'] = $config['os'][$device['os']]['type'];
+        dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
+        echo "Device type changed to " . $device['type'] . "!\n";
+    }
+
+    if ($config['os'][$device['os']]['group']) {
+        $device['os_group'] = $config['os'][$device['os']]['group'];
     }
 }
 
@@ -1563,6 +1580,18 @@ function fahrenheit_to_celsius($scale, $value)
 function set_null($value, $default = null, $min = 0)
 {
     if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
+        $value = $default;
+    }
+    return $value;
+}
+
+ * @param $value
+ * @param int $default
+ * @return int
+ */
+function set_numeric($value, $default = 0)
+{
+    if (!isset($value) || !is_numeric($value)) {
         $value = $default;
     }
     return $value;
