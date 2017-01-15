@@ -1585,6 +1585,7 @@ function set_null($value, $default = null, $min = 0)
     return $value;
 }
 
+/*
  * @param $value
  * @param int $default
  * @return int
