@@ -176,7 +176,7 @@ over:
 ```
 
 If you are adding custom graphs, please add the following to `includes/definitions.inc.php`:
-
+```php
 //Don't forget to declare the specific graphs if needed. It will be located near the end of the file.
 
 //Pulse Secure Graphs
