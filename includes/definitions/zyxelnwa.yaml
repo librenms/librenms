@@ -5,4 +5,4 @@ type: network
 icon: zyxel
 discovery:
     - sysDescr_regex:
-        - '/^NWA-/'
+        - '/^NWA/'
