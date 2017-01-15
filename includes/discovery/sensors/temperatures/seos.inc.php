@@ -15,6 +15,7 @@ if ($device['os'] == 'seos') {
             $index            = $split_oid[(count($split_oid) - 2)] . "." . $split_oid[(count($split_oid) - 1)];
             $oid              = '.1.3.6.1.4.1.2352.2.4.1.4.1.3.'.$index;
             $temperature      = snmp_get($device, $oid, '-Oqv');
+            $descr = str_replace('"', '', $descr);
 
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
             $insert_index++;
@@ -31,6 +32,7 @@ if ($device['os'] == 'seos') {
             $index            = $split_oid[(count($split_oid) - 2)] . "." . $split_oid[(count($split_oid) - 1)];
             $oid              = '.1.3.6.1.4.1.2352.2.4.1.6.1.3.'.$index;
             $temperature      = snmp_get($device, $oid, '-Oqv');
+            $descr = str_replace('"', '', $descr);
 
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
             $insert_index++;
