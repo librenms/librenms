@@ -1086,19 +1086,20 @@ function version_info($remote = true)
 {
     global $config;
     $output = array();
-    if ($remote === true && $config['update_channel'] == 'master') {
-        $api = curl_init();
-        set_curl_proxy($api);
-        curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
-        curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
-        curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
-        $output['github'] = json_decode(curl_exec($api), true);
+    if (check_git_exists() === true) {
+        if ($remote === true && $config['update_channel'] == 'master') {
+            $api = curl_init();
+            set_curl_proxy($api);
+            curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
+            curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
+            curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+            $output['github'] = json_decode(curl_exec($api), true);
+        }
+        list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+        $output['local_sha']    = $local_sha;
+        $output['local_date']   = $local_date;
+        $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-    $output['local_sha']    = $local_sha;
-    $output['local_date']   = $local_date;
-    $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
-
     $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
@@ -1569,4 +1570,13 @@ function set_numeric($value, $default = 0)
         $value = $default;
     }
     return $value;
+}
+
+function check_git_exists()
+{
+    if (`which git`) {
+        return true;
+    } else {
+        return false;
+    }
 }
