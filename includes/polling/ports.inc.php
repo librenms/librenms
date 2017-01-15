@@ -695,7 +695,6 @@ foreach ($ports as $port) {
             if (!isset($val_check)) {
                 unset($port['update'][$key]);
             }
-            $port['update'][$key] = set_numeric($val_check);
         }
 
         // Update Database
