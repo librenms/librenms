@@ -23,7 +23,7 @@
 $name = 'ups-apcups';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.117.112.115.45.97.112.99.117.112.115';
-$ups_apcups = snmp_get($device, $oid, '-Oqv');
+$ups_apcups = trim(snmp_get($device, $oid, '-Oqv'), '"');
 
 echo ' '.$name;
 
