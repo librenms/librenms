@@ -29,11 +29,11 @@ if ($device['os'] === 'aos-emu2') {
             $index           = $temp['emsProbeStatusProbeIndex'];
             $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.3.' . $index;
             $descr           = $temp['emsProbeStatusProbeName'];
-            $low_limit       = set_null(fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeMinTempThresh']));
-            $low_warn_limit  = set_null(fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeLowTempThresh']));
-            $high_limit      = set_null(fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeMaxTempThresh']));
-            $high_warn_limit = set_null(fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeHighTempThresh']));
-            $current         = set_null(fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeTemperature']));
+            $low_limit       = fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeMinTempThresh']);
+            $low_warn_limit  = fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeLowTempThresh']);
+            $high_limit      = fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeMaxTempThresh']);
+            $high_warn_limit = fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeHighTempThresh']);
+            $current         = fahrenheit_to_celsius($emu2_temp_scale, $temp['emsProbeStatusProbeTemperature']);
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
