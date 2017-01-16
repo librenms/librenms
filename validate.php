@@ -213,10 +213,14 @@ if ($space_check < 1) {
 }
 
 // Check programs
-$bins = array('fping','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
+$bins = array('fping','fping6','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
+$suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
-    if (!is_file($config[$bin])) {
+    $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
+    if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed");
+    } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
+        print_fail("$bin should be suid, please chmod u+s $cmd");
     }
 }
 
