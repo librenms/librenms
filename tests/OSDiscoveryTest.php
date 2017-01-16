@@ -379,6 +379,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('comware', 'comware-hp-c1234');
     }
 
+    public function testCtcu()
+    {
+        $this->checkOS('ctcu');
+    }
+
     public function testCucm()
     {
         $this->checkOS('cucm');
