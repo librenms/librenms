@@ -48,7 +48,7 @@ if ($ports['total']) {
 
     echo '
     <tr>
-      <td><i class="fa fa-link" style="color:blue" aria-hidden="true"></i> '.$ports['total'].'</td>
+      <td><i class="fa fa-link" style="color:#0080FF" aria-hidden="true"></i> '.$ports['total'].'</td>
       <td><i class="fa fa-link" style="color:green" aria-hidden="true"></i> '.$ports['up'].'</td>
       <td><i class="fa fa-link" style="color:red" aria-hidden="true"></i> '.$ports['down'].'</td>
       <td><i class="fa fa-link" style="color:grey" aria-hidden="true"></i> '.$ports['disabled'].'</td>

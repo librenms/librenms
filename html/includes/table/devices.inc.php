@@ -203,11 +203,11 @@ foreach (dbFetchRows($sql, $param) as $device) {
             $col_port = '';
         }
         if ($port_count) {
-            $col_port = '<i class="fa fa-link" style="color:blue"></i> ' . $port_count . '<br>';
+            $col_port = '<i class="fa fa-link" style="color:#0080FF"></i> ' . $port_count . '<br>';
         }
 
         if ($sensor_count) {
-            $col_port .= '<i class="fa fa-heartbeat" style="color:blue"></i> ' . $sensor_count;
+            $col_port .= '<i class="fa fa-heartbeat" style="color:#0080FF"></i> ' . $sensor_count;
         }
     } else {
         $platform = $device['hardware'];
