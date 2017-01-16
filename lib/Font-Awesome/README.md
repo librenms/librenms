@@ -1,25 +1,31 @@
-#[Font Awesome v4.4.0](http://fontawesome.io)
-###The iconic font and CSS framework
+# [Font Awesome v4.7.0](http://fontawesome.io) [![Changelog #226](https://img.shields.io/badge/changelog-%23226-9E978E.svg)](https://changelog.com/podcast/226)
+### The iconic font and CSS framework
 
-Font Awesome is a full suite of 585 pictographic icons for easy scalable vector graphics on websites,
-created and maintained by [Dave Gandy](http://twitter.com/davegandy).
+Font Awesome is a full suite of 675 pictographic icons for easy scalable vector graphics on websites,
+created and maintained by [Dave Gandy](https://twitter.com/davegandy).
 Stay up to date with the latest release and announcements on Twitter:
 [@fontawesome](http://twitter.com/fontawesome).
 
 Get started at http://fontawesome.io!
 
-##License
+## License
 - The Font Awesome font is licensed under the SIL OFL 1.1:
   - http://scripts.sil.org/OFL
 - Font Awesome CSS, LESS, and Sass files are licensed under the MIT License:
-  - http://opensource.org/licenses/mit-license.html
+  - https://opensource.org/licenses/mit-license.html
 - The Font Awesome documentation is licensed under the CC BY 3.0 License:
   - http://creativecommons.org/licenses/by/3.0/
 - Attribution is no longer required as of Font Awesome 3.0, but much appreciated:
   - `Font Awesome by Dave Gandy - http://fontawesome.io`
-- Full details: http://fontawesome.io/license
+- Full details: http://fontawesome.io/license/
 
-##Changelog
+## Changelog
+- [v4.7.0 GitHub pull request](https://github.com/FortAwesome/Font-Awesome/pull/10012)
+- [v4.6.3 GitHub pull request](https://github.com/FortAwesome/Font-Awesome/pull/9189)
+- [v4.6.2 GitHub pull request](https://github.com/FortAwesome/Font-Awesome/pull/9117)
+- [v4.6.1 GitHub pull request](https://github.com/FortAwesome/Font-Awesome/pull/8962)
+- [v4.6.0 GitHub milestones](https://github.com/FortAwesome/Font-Awesome/issues?q=milestone%3A4.6.0+is%3Aclosed)
+- [v4.5.0 GitHub milestones](https://github.com/FortAwesome/Font-Awesome/issues?q=milestone%3A4.5.0+is%3Aclosed)
 - [v4.4.0 GitHub milestones](https://github.com/FortAwesome/Font-Awesome/issues?q=milestone%3A4.4.0+is%3Aclosed)
 - [v4.3.0 GitHub milestones](https://github.com/FortAwesome/Font-Awesome/issues?q=milestone%3A4.3.0+is%3Aclosed)
 - [v4.2.0 GitHub milestones](https://github.com/FortAwesome/Font-Awesome/issues?milestone=12&page=1&state=closed)
@@ -41,7 +47,7 @@ Get started at http://fontawesome.io!
 Please read through our [contributing guidelines](https://github.com/FortAwesome/Font-Awesome/blob/master/CONTRIBUTING.md).
 Included are directions for opening issues, coding standards, and notes on development.
 
-##Versioning
+## Versioning
 
 Font Awesome will be maintained under the Semantic Versioning guidelines as much as possible. Releases will be numbered
 with the following format:
@@ -52,17 +58,17 @@ And constructed with the following guidelines:
 
 * Breaking backward compatibility bumps the major (and resets the minor and patch)
 * New additions, including new icons, without breaking backward compatibility bumps the minor (and resets the patch)
-* Bug fixes and misc changes bumps the patch
+* Bug fixes, changes to brand logos, and misc changes bumps the patch
 
 For more information on SemVer, please visit http://semver.org.
 
-##Author
+## Author
 - Email: dave@fontawesome.io
 - Twitter: http://twitter.com/davegandy
 - GitHub: https://github.com/davegandy
 
-##Component
-To include as a [component](http://github.com/component/component), just run
+## Component
+To include as a [component](https://github.com/componentjs/component), just run
 
     $ component install FortAwesome/Font-Awesome
 
