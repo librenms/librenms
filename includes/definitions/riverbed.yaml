@@ -7,3 +7,15 @@ over:
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.17163.1.1
+register_mibs:
+    optimizedConnections: STEELHEAD-MIB
+    passthroughConnections: STEELHEAD-MIB
+    halfOpenedConnections: STEELHEAD-MIB
+    halfClosedConnections: STEELHEAD-MIB
+    establishedConnections: STEELHEAD-MIB
+    activeConnections: STEELHEAD-MIB
+    totalConnections: STEELHEAD-MIB
+    dsHitsTotal: STEELHEAD-MIB
+    dsMissTotal: STEELHEAD-MIB
+    bwPassThroughIn: STEELHEAD-MIB
+    bwPassThroughOut: STEELHEAD-MIB
