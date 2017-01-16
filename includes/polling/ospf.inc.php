@@ -120,7 +120,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     // Loop the OIDs
                     if ($ospf_instance_db[$device['context_name']][$oid] != $ospf_instance_poll[$oid]) {
                         // If data has changed, build a query
-                        $ospf_instance_update[$oid] = set_numeric($ospf_instance_poll[$oid]);
+                        $ospf_instance_update[$oid] = $ospf_instance_poll[$oid];
                         // log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); // FIXME
                     }
                 }
@@ -222,7 +222,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (empty($ospf_ports_db[$ospf_port_id][$device['context_name']])) {
-            dbInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
+            bInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
             echo '+';
             $ospf_ports_db[$ospf_port_id][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_ports` WHERE `device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
         }
@@ -252,7 +252,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                     // Loop the OIDs
                     if ($ospf_port_db[$device['context_name']][$oid] != $ospf_port_poll[$oid]) {
                         // If data has changed, build a query
-                        $ospf_port_update[$oid] = set_numeric($ospf_port_poll[$oid]);
+                        $ospf_port_update[$oid] = $ospf_port_poll[$oid];
                         // log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); // FIXME
                     }
                 }
@@ -340,7 +340,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
                     if ($ospf_nbr_db[$device['context_name']][$oid] != $ospf_nbr_poll[$oid]) {
                         // If data has changed, build a query
-                        $ospf_nbr_update[$oid] = set_numeric($ospf_nbr_poll[$oid]);
+                        $ospf_nbr_update[$oid] = $ospf_nbr_poll[$oid];
                         // log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['port_id']); // FIXME
                     }
                 }
