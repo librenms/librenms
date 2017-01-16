@@ -12,7 +12,7 @@ if (count($mempools)) {
         <div class="panel-heading">
         ';
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">';
-    echo '<i class="fa fa-cogs" style="color:black" aria-hidden="true"></i> <strong>Memory Pools</strong></a>';
+    echo '<i class="fa fa-braille" style="color:'.$config[theme_icon_colour].'" aria-hidden="true"></i> <strong>Memory Pools</strong></a>';
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">

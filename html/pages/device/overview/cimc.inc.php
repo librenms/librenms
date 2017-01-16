@@ -13,7 +13,7 @@ if (count($components) > 0) {
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                        <i class="fa fa-cogs" style="color:black" aria-hidden="true"></i> <strong>Hardware Components</strong>
+                    <i class="fa fa-cogs" style="<?php echo $config[theme_icon_colour]?>" aria-hidden="true"></i> <strong>Hardware Components</strong>
                     </div>
                     <table class="table table-hover table-condensed table-striped">
     <?php

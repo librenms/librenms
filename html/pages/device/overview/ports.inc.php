@@ -6,7 +6,7 @@ if ($ports['total']) {
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">
-              <strong>Overall Traffic</strong>
+              <i class="fa fa-road" style="color:'.$config[theme_icon_colour].'" aria-hidden="true"></i><strong> Overall Traffic</strong>
             </div>
             <table class="table table-hover table-condensed table-striped">';
 
@@ -48,7 +48,7 @@ if ($ports['total']) {
 
     echo '
     <tr>
-      <td><i class="fa fa-link" style="color:blue" aria-hidden="true"></i> '.$ports['total'].'</td>
+      <td><i class="fa fa-link" style="color:black" aria-hidden="true"></i> '.$ports['total'].'</td>
       <td><i class="fa fa-link" style="color:green" aria-hidden="true"></i> '.$ports['up'].'</td>
       <td><i class="fa fa-link" style="color:red" aria-hidden="true"></i> '.$ports['down'].'</td>
       <td><i class="fa fa-link" style="color:grey" aria-hidden="true"></i> '.$ports['disabled'].'</td>

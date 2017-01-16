@@ -359,7 +359,7 @@ if ($_SESSION['userlevel'] != '10') {
           <input type='checkbox' ";
                     if ($vars['can_modify_passwd'] == '1') {
                         echo "checked='checked'";
-                    } echo " name='can_modify_passwd'> Allow the user to change his password.
+                    } echo " name='can_modify_passwd'> Allow the user to change their password.
         </label>
       </div>
     </div>

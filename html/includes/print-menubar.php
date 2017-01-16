@@ -48,14 +48,14 @@ if ($config['title_image']) {
     <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Overview</span></a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-home fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Overview</span></a>
           <ul class="dropdown-menu multi-level" role="menu">
-              <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> Dashboard</a></li>
            <li class="dropdown-submenu">
-            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Maps</a>
+            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-map fa-fw fa-lg" aria-hidden="true"></i> Maps</a>
             <ul class="dropdown-menu">
               <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
-              <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
                 <?php
                     require_once '../includes/device-groups.inc.php';
                     $devices_groups = GetDeviceGroups();
@@ -88,7 +88,7 @@ if ($config['title_image']) {
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
            <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
+           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-chevron-right fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
 <?php
 if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
     echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
@@ -121,10 +121,9 @@ if (dbFetchCell("SELECT 1 from `packages` LIMIT 1")) {
 } # if ($packages)
 ?>
             <li role="presentation" class="divider"></li>
-            <li role="presentation" class="dropdown-header"> Search</li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv4 Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv6 Search</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> MAC Search</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv4 Address</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv6 Address</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> MAC Address</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> ARP Tables</a></li>
 <?php
 if (is_module_enabled('poller', 'mib')) {
@@ -184,11 +183,11 @@ if ($_SESSION['userlevel'] >= '10') {
                 echo('
                     <li role="presentation" class="divider"></li>
                     <li class="dropdown-submenu">
-                    <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Locations</a>
+                    <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
                     <ul class="dropdown-menu scrollable-menu">
                 ');
                 foreach ($locations as $location) {
-                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building-o fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
+                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
                 }
                 echo('
                     </ul>
@@ -211,8 +210,9 @@ if ($_SESSION['userlevel'] >= '10') {
     }
 
      echo '
-            <li><a href="addhost/"><i class="fa fa-plus fa-col-success fa-fw fa-lg" aria-hidden="true"></i> Add Device</a></li>
-            <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg" aria-hidden="true"></i> Delete Device</a></li>';
+            <li role="presentation" class="divider"></li>
+            <li><a href="addhost/"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Device</a></li>
+            <li><a href="delhost/"><i class="fa fa-trash fa-fw fa-lg" aria-hidden="true"></i> Delete Device</a></li>';
 }
 
 ?>
@@ -233,17 +233,17 @@ if ($config['show_services']) {
 if (($service_status[1] > 0) || ($service_status[2] > 0)) {
     echo '            <li role="presentation" class="divider"></li>';
     if ($service_status[1] > 0) {
-        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell-o fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ('.$service_status[1].')</a></li>';
+        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ('.$service_status[1].')</a></li>';
     }
     if ($service_status[2] > 0) {
-        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell-o fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ('.$service_status[2].')</a></li>';
+        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ('.$service_status[2].')</a></li>';
     }
 }
 
 if ($_SESSION['userlevel'] >= '10') {
     echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg" aria-hidden="true"></i> Add Service</a></li>');
+            <li><a href="addsrv/"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Service</a></li>');
 }
 ?>
           </ul>
@@ -298,15 +298,15 @@ if ($_SESSION['userlevel'] >= '5') {
         $ifbreak = 1;
     }
     if ($config['int_peering']) {
-        echo('            <li><a href="iftype/type=peering/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>');
+        echo('            <li><a href="iftype/type=peering/"><i class="fa fa-handshake-o fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>');
         $ifbreak = 1;
     }
     if ($config['int_peering'] && $config['int_transit']) {
-        echo('            <li><a href="iftype/type=peering,transit/"><i class="fa fa-user-secret fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>');
+        echo('            <li><a href="iftype/type=peering,transit/"><i class="fa fa-rocket fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>');
         $ifbreak = 1;
     }
     if ($config['int_core']) {
-        echo('            <li><a href="iftype/type=core/"><i class="fa fa-anchor fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>');
+        echo('            <li><a href="iftype/type=core/"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>');
         $ifbreak = 1;
     }
     if (is_array($config['custom_descr']) === false) {
@@ -336,8 +336,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 }
 ?>
 
-            <li><a href="ports/state=down/"><i class="fa fa-exclamation-triangle fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Down</a></li>
-            <li><a href="ports/state=admindown/"><i class="fa fa-pause fa-col-info fa-fw fa-lg" aria-hidden="true"></i> Disabled</a></li>
+            <li><a href="ports/state=down/"><i class="fa fa-arrow-circle-down fa-fw fa-lg" aria-hidden="true"></i> Down</a></li>
+            <li><a href="ports/state=admindown/"><i class="fa fa-arrow-circle-o-down fa-fw fa-lg" aria-hidden="true"></i> Disabled</a></li>
 <?php
 
 if ($deleted_ports) {
@@ -363,8 +363,8 @@ $menu_sensors = $used_sensors;
         <li class="dropdown">
           <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Health</span></a>
           <ul class="dropdown-menu">
-            <li><a href="health/metric=mempool/"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> Memory</a></li>
-            <li><a href="health/metric=processor/"><i class="fa fa-desktop fa-fw fa-lg" aria-hidden="true"></i> Processor</a></li>
+            <li><a href="health/metric=mempool/"><i class="fa fa-braille fa-fw fa-lg" aria-hidden="true"></i> Memory</a></li>
+            <li><a href="health/metric=processor/"><i class="fa fa-microchip fa-fw fa-lg" aria-hidden="true"></i> Processor</a></li>
             <li><a href="health/metric=storage/"><i class="fa fa-database fa-fw fa-lg" aria-hidden="true"></i> Storage</a></li>
 <?php
 if ($menu_sensors) {
@@ -456,13 +456,13 @@ $routing_count['cisco-otv'] = count($otv);
 if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
 ?>
         <li class="dropdown">
-          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-arrows fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Routing</span></a>
+          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Routing</span></a>
           <ul class="dropdown-menu">
 <?php
     $separator = 0;
 
 if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) {
-    echo('            <li><a href="routing/protocol=vrf/"><i class="fa fa-arrows-alt fa-fw fa-lg" aria-hidden="true"></i> VRFs</a></li>');
+    echo('            <li><a href="routing/protocol=vrf/"><i class="fa fa-arrows fa-fw fa-lg" aria-hidden="true"></i> VRFs</a></li>');
     $separator++;
 }
 
@@ -491,7 +491,7 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp']) {
         echo('            <li role="presentation" class="divider"></li>');
         $separator = 0;
     }
-    echo('<li><a href="routing/protocol=bgp/type=all/graph=NULL/"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> BGP All Sessions </a></li>
+    echo('<li><a href="routing/protocol=bgp/type=all/graph=NULL/"><i class="fa fa-circle-o fa-fw fa-lg" aria-hidden="true"></i> BGP All Sessions </a></li>
             <li><a href="routing/protocol=bgp/type=external/graph=NULL/"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> BGP External</a></li>
             <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><i class="fa fa-external-link fa-rotate-180 fa-fw fa-lg" aria-hidden="true"></i> BGP Internal</a></li>');
 }
@@ -535,15 +535,15 @@ if ($alerts['active_count'] > 0) {
           <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-exclamation-circle fa-col-<?php echo $alert_colour;?> fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Alerts</span></a>
           <ul class="dropdown-menu">
               <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg" aria-hidden="true"></i> Notifications</a></li>
-              <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg" aria-hidden="true"></i> Historical Log</a></li>
+              <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Alert History</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i> Statistics</a></li>
                 <?php
                 if ($_SESSION['userlevel'] >= '10') {
                     ?>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-tasks fa-fw fa-lg" aria-hidden="true"></i> Rules</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Maintenance Windows</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> Rule Mapping</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Templates</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> Rule Mapping</a></li>
+                  <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
                     <?php
                 }
                 ?>
@@ -577,7 +577,6 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
     echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
 ?>
         <ul class="dropdown-menu">
-          <li role="presentation" class="dropdown-header"> Settings</li>
           <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
 <?php
     $notifications = new ObjectCache('notifications');
@@ -596,7 +595,6 @@ if ($_SESSION['authenticated']) {
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>
         <ul class="dropdown-menu">
-          <li role="presentation" class="dropdown-header"> Settings</li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
@@ -604,7 +602,6 @@ if ($_SESSION['userlevel'] >= '10') {
 
 ?>
           <li role="presentation" class="divider"></li>
-          <li role="presentation" class="dropdown-header"> Users</li>
 
 <?php if ($_SESSION['userlevel'] >= '10') {
     if (auth_usermanagement()) {
@@ -614,19 +611,19 @@ if ($_SESSION['userlevel'] >= '10') {
            ');
     }
     echo('
-           <li><a href="edituser/"><i class="fa fa-user-secret fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
-           <li><a href="authlog/"><i class="fa fa-key fa-fw fa-lg" aria-hidden="true"></i> Authlog</a></li>
+           <li><a href="edituser/"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+           <li><a href="authlog/"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
            <li role="presentation" class="divider"></li> ');
     echo('
            <li class="dropdown-submenu">
-               <a href="#"><i class="fa fa-clock-o fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+               <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-list-alt fa-fw fa-lg" aria-hidden="true"></i> Poll-log</a></li>');
+               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=pollers/"><i class="fa fa-clock-o fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
-                    <li><a href="pollers/tab=groups/"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> Groups</a></li>');
+                    <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
+                    <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
     }
     echo ('
                </ul>
@@ -636,7 +633,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <li class="dropdown-submenu">
            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
            <ul class="dropdown-menu scrollable-menu">
-             <li><a href="api-access/"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
+             <li><a href="api-access/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
              <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
            </ul>
            </li>
@@ -655,7 +652,7 @@ if ($_SESSION['authenticated']) {
 ?>
 
            <li role="presentation" class="divider"></li>
-           <li><a href="about/"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;<?php echo($config['project_name']); ?></a></li>
+           <li><a href="about/"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;<?php echo($config['project_name']); ?></a></li>
          </ul>
        </li>
      </ul>

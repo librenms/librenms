@@ -24,11 +24,11 @@ if ($services['total']) {
         <div class="row col-md-12">
             <div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
-                    <i class="fa fa-cogs" style="color:black" aria-hidden="true"></i> <strong>Services</strong>
+                <i class="fa fa-cogs" style="color:<?php echo $config[theme_icon_colour]?>" aria-hidden="true"></i> <strong>Services</strong>
                 </div>
                 <table class="table table-hover table-condensed table-striped">
                     <tr>
-                        <td title="Total"><i class="fa fa-cog" style="color:blue" aria-hidden="true"></i> <?php echo $services['total']?></td>
+                        <td title="Total"><i class="fa fa-cog" style="color:#0080FF" aria-hidden="true"></i> <?php echo $services['total']?></td>
                         <td title="Status - Ok"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> <?php echo $services[0]?></td>
                         <td title="Status - Warning"><i class="fa fa-cog" style="color:orange" aria-hidden="true"></i> <?php echo $services[1]?></td>
                         <td title="Status - Critical"><i class="fa fa-cog" style="color:red" aria-hidden="true"></i> <?php echo $services[2]?></td>

@@ -7,7 +7,7 @@ echo "<div class='row'>
             <div class='panel-heading'>";
 
 if ($config['overview_show_sysDescr']) {
-    echo '<strong>'.$device['sysDescr'].'</strong>';
+    echo '<i class="fa fa-id-card" style="color:'.$config[theme_icon_colour].'" aria-hidden="true"></i> <strong>'.$device['sysDescr'].'</strong>';
 }
 
 echo '</div>
