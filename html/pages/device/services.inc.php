@@ -39,7 +39,7 @@ foreach ($menu_options as $option => $text) {
     $sep = ' | ';
 }
 unset($sep);
-echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><img src="images/16/add.png" border="0" align="absmiddle"> Add Service</a></div>';
+echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
 print_optionbar_end();
 ?>
     <div class="row col-sm-12"><span id="message"></span></div>
