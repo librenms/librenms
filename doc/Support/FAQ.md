@@ -254,8 +254,8 @@ You can also use the command line to obtain the information.  Especially, if snm
 Replace the relevant information in these commands such as HOSTNAME and COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
 ```bash
-./discovery.php -h HOSTNAME -d -m os
-./poller.php -h HOSTNAME -r -f -d -m os
+./discovery.php -h HOSTNAME -d
+./poller.php -h HOSTNAME -r -f -d
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .
 ```
 
