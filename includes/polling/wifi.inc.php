@@ -88,6 +88,14 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
             echo "AP does not supply client counts\n";
         }
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
+    } elseif ($device['os'] == 'deliberant' && str_contains($device['hardware'], "DLB APC Button")) {
+        echo 'Checking Deliberant APC Button wireless clients... ';
+        $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.32761.3.5.1.2.1.1.16.7', '-OUqnv');
+        echo $wificlients1." clients\n";
+    } elseif ($device['os'] == 'deliberant' && $device['hardware'] == "\"DLB APC 2Mi\"") {
+        echo 'Checking Deliberant APC 2Mi wireless clients... ';
+        $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.32761.3.5.1.2.1.1.16.5', '-OUqnv');
+        echo $wificlients1." clients\n";
     }
 
     // Loop through all $wificlients# and data_update()
