@@ -165,6 +165,7 @@ LibreNMS contributors:
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
 - Julian Kornberger <jk+github@digineo.de> (corny)
 - ant Kenworthy <git@manchetermonkey.co.uk> (mcrmonkey)
+- Aleksandr Stankevic <aleksandr.stankevic@gmail.com> (sysmonk)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
