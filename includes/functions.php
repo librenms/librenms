@@ -89,6 +89,12 @@ function logfile($string)
     fclose($fd);
 }
 
+/**
+ * Detect the os of the given device.
+ *
+ * @param array $device device to check
+ * @return string the name of the os
+ */
 function getHostOS($device)
 {
     global $config;
@@ -98,6 +104,23 @@ function getHostOS($device)
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
+    // check yaml files
+    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
+    foreach (glob($pattern) as $file) {
+        $tmp = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($file)
+        );
+        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
+            foreach ($tmp['discovery'] as $item) {
+                // check each item individually, if all the conditions in that item are true, we have a match
+                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
+                    return $tmp['os'];
+                }
+            }
+        }
+    }
+
+    // check include files
     $os = null;
     $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
     foreach (glob($pattern) as $file) {
@@ -106,52 +129,50 @@ function getHostOS($device)
             return $os;
         }
     }
-    return discover_os($sysObjectId, $sysDescr);
-}
 
-/**
- * @param $sysObjectId
- * @param $sysDescr
- * @return string
- */
-function discover_os($sysObjectId, $sysDescr)
-{
-    global $config;
-    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
-    foreach (glob($pattern) as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
-        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
-            foreach ($tmp['discovery'] as $item) {
-                if (!is_array($item) || empty($item)) {
-                    break;
-                }
-                // all items must be true
-                $result = true;
-                foreach ($item as $key => $value) {
-                    switch ($key) {
-                        case 'sysObjectId':
-                            $result &= starts_with($sysObjectId, $value);
-                            break;
-                        case 'sysDescr':
-                            $result &= str_contains($sysDescr, $value);
-                            break;
-                        case 'sysDescr_regex':
-                            $result &= preg_match_any($sysDescr, $value);
-                            break;
-                        default:
-                    }
-                }
-                if ($result) {
-                    return $tmp['os'];
-                }
-            }
-        }
-    }
     return 'generic';
 }
 
+/**
+ * Check an array of conditions if all match, return true
+ * sysObjectId if sysObjectId starts with any of the values under this item
+ * sysDescr if sysDescr contains any of the values under this item
+ * sysDescr_regex if sysDescr matches any of the regexes under this item
+ *
+ * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
+ * @param string $sysObjectId The sysObjectId to check against
+ * @param string $sysDescr the sysDesr to check against
+ * @return bool the result (all items passed return true)
+ */
+function checkDiscovery($array, $sysObjectId, $sysDescr)
+{
+    // all items must be true
+    foreach ($array as $key => $value) {
+        if ($key == 'sysObjectId') {
+            if (!starts_with($sysObjectId, $value)) {
+                return false;
+            }
+        } elseif ($key == 'sysDescr') {
+            if (!str_contains($sysDescr, $value)) {
+                return false;
+            }
+        } elseif ($key == 'sysDescr_regex') {
+            if (!preg_match_any($sysDescr, $value)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Check an array of regexes against a subject if any match, return true
+ *
+ * @param string $subject the string to match against
+ * @param array|string $regexes an array of regexes or single regex to check
+ * @return bool if any of the regexes matched, return true
+ */
 function preg_match_any($subject, $regexes)
 {
     foreach ((array)$regexes as $regex) {
@@ -193,14 +214,13 @@ function interface_errors($rrd_file, $period = '-1d')
 
 function getImage($device)
 {
-    return '<img src="' . getImageSrc($device) . '" />';
+    $title = $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
+    return '<img src="' . getImageSrc($device) . '" title="' . $title . '"/>';
 }
 
 function getImageSrc($device)
 {
-    global $config;
-
-    return 'images/os/' . getImageName($device) . '.png';
+    return 'images/os/' . getImageName($device);
 }
 
 function getImageName($device, $use_database = true)
@@ -210,31 +230,34 @@ function getImageName($device, $use_database = true)
     $device['os'] = strtolower($device['os']);
 
     // fetch from the database
-    if ($device['icon'] != 'generic' && $use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if ($use_database && is_file($config['html_dir'] . '/images/os/' . $device['icon'])) {
         return $device['icon'];
     }
 
     // linux specific handling, distro icons
+    $distro = null;
     if ($device['os'] == "linux") {
         $features = strtolower(trim($device['features']));
         list($distro) = explode(" ", $features);
-        if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-            return $distro;
+    }
+
+    $possibilities = array(
+        $distro,
+        $config['os'][$device['os']]['icon'],
+        $device['os'],
+    );
+
+    foreach ($possibilities as $basename) {
+        foreach (array('.svg', '.png') as $ext) {
+            $name = $basename . $ext;
+            if (is_file($config['html_dir'] . '/images/os/' . $name)) {
+                return $name;
+            }
         }
     }
 
-    // use the icon from os config
-    if (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        return $config['os'][$device['os']]['icon'];
-    }
-
-    // guess the icon has the same name as the os
-    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-        return $device['os'];
-    }
-
     // fallback to the generic icon
-    return 'generic';
+    return 'generic.png';
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -797,6 +820,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->Port       = $config['email_smtp_port'];
                 $mail->Username   = $config['email_smtp_username'];
                 $mail->Password   = $config['email_smtp_password'];
+                $mail->SMTPAutoTLS= $config['email_auto_tls'];
                 $mail->SMTPDebug  = false;
                 break;
             default:
@@ -1296,6 +1320,12 @@ function fping($host, $params, $address_family = AF_INET)
         $rcv = 1;
         $loss = 100;
     }
+    $xmt      = set_numeric($xmt);
+    $rcv      = set_numeric($rcv);
+    $loss     = set_numeric($loss);
+    $min      = set_numeric($min);
+    $max      = set_numeric($max);
+    $avg      = set_numeric($avg);
     $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
     return $response;
 }

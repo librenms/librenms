@@ -170,10 +170,10 @@ if ($config['enable_bgp']) {
 
             $peer['update']['bgpPeerState']              = $bgpPeerState;
             $peer['update']['bgpPeerAdminStatus']        = $bgpPeerAdminStatus;
-            $peer['update']['bgpPeerFsmEstablishedTime'] = $bgpPeerFsmEstablishedTime;
-            $peer['update']['bgpPeerInUpdates']          = $bgpPeerInUpdates;
+            $peer['update']['bgpPeerFsmEstablishedTime'] = set_numeric($bgpPeerFsmEstablishedTime);
+            $peer['update']['bgpPeerInUpdates']          = set_numeric($bgpPeerInUpdates);
             $peer['update']['bgpLocalAddr']              = $bgpLocalAddr;
-            $peer['update']['bgpPeerOutUpdates']         = $bgpPeerOutUpdates;
+            $peer['update']['bgpPeerOutUpdates']         = set_numeric($bgpPeerOutUpdates);
 
             dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
 

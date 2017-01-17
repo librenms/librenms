@@ -2,6 +2,11 @@ os: ciscowap
 text: 'Cisco Wireless Acess Point'
 type: wireless
 icon: cisco
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.9.6.1.32.321.1
+    - sysDescr:
+        - 'Cisco Small Business WAP'
 poller_modules:
     cisco-cbqos: 1
     cisco-cef: 1

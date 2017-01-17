@@ -26,7 +26,7 @@ if ($_POST['editing']) {
 
         #FIXME needs more sanity checking! and better feedback
 
-        $param = array('purpose' => $vars['descr'], 'type' => $vars['type'], 'ignore' => $vars['ignore'], 'disabled' => $vars['disabled']);
+        $param = array('purpose' => $vars['descr'], 'type' => $vars['type'], 'ignore' => set_numeric($vars['ignore']), 'disabled' => set_numeric($vars['disabled']));
 
         $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
 

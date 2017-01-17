@@ -1362,3 +1362,23 @@ function get_rules_from_json()
     global $config;
     return json_decode(file_get_contents($config['install_dir'] . '/misc/alert_rules.json'), true);
 }
+
+function search_oxidized_config($search_in_conf_textbox)
+{
+    global $config;
+    $oxidized_search_url = $config['oxidized']['url'] . '/nodes/conf_search?format=json';
+    $postdata = http_build_query(
+        array(
+            'search_in_conf_textbox' => $search_in_conf_textbox,
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context  = stream_context_create($opts);
+    return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+}

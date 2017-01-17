@@ -548,7 +548,7 @@ foreach ($ports as $port) {
             }
 
             if ($config['slow_statistics'] == true) {
-                $port[$port_update][$oid]         = $this_port[$oid];
+                $port[$port_update][$oid]         = set_numeric($this_port[$oid]);
                 $port[$port_update][$oid.'_prev'] = $port[$oid];
             }
 

@@ -4,3 +4,6 @@ group: ups
 type: power
 over:
     - { graph: device_load, text: Load }
+discovery:
+    - sysDescr_regex:
+        - '/^NET Agent II/'
