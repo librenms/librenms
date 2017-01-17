@@ -382,6 +382,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCtcu()
     {
         $this->checkOS('ctcu');
+        $this->checkOS('ctcu', 'ctcu1');
+        $this->checkOS('ctcu', 'ctcu2');
+        $this->checkOS('ctcu', 'ctcu3');
     }
 
     public function testCucm()
