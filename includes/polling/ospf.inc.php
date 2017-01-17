@@ -222,7 +222,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (empty($ospf_ports_db[$ospf_port_id][$device['context_name']])) {
-            bInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
+            dbInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
             echo '+';
             $ospf_ports_db[$ospf_port_id][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_ports` WHERE `device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
         }
