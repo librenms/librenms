@@ -1559,7 +1559,7 @@ function load_all_os($restricted = array())
             file_get_contents($file)
         );
         if (isset($config['os'][$tmp['os']])) {
-            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $tmp['os'][$device['os']]);
+            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $tmp['os'][$tmp['os']]);
         } else {
             $config['os'][$tmp['os']] = $tmp;
         }
