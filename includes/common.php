@@ -1558,10 +1558,10 @@ function load_all_os($restricted = array())
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
         );
-        if (isset($config['os'][$device['os']])) {
-            $config['os'][$device['os']] = array_replace_recursive($tmp, $config['os'][$device['os']]);
+        if (isset($config['os'][$tmp['os']])) {
+            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $tmp['os'][$device['os']]);
         } else {
-            $config['os'][$device['os']] = $tmp;
+            $config['os'][$tmp['os']] = $tmp;
         }
     }
 }
