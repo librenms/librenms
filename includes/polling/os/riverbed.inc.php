@@ -25,11 +25,20 @@ $version  = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.3.0', '-OQv'), '"')
  *
  */
 
-$conn_half_open   = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.3.0', '-OUQn');
-$conn_half_closed = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.4.0', '-OUQn');
-$conn_established = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.5.0', '-OUQn');
-$conn_active      = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.6.0', '-OUQn');
-$conn_total       = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.7.0', '-OUQn');
+$conn_array = array(
+    '.1.3.6.1.4.1.17163.1.1.5.2.3.0',
+    '.1.3.6.1.4.1.17163.1.1.5.2.4.0',
+    '.1.3.6.1.4.1.17163.1.1.5.2.5.0',
+    '.1.3.6.1.4.1.17163.1.1.5.2.6.0',
+    '.1.3.6.1.4.1.17163.1.1.5.2.7.0'
+);
+$connections = snmp_get_multi_oid($device, $conn_array);
+
+$conn_half_open   = $connections['.1.3.6.1.4.1.17163.1.1.5.2.3.0'];
+$conn_half_closed = $connections['.1.3.6.1.4.1.17163.1.1.5.2.4.0'];
+$conn_established = $connections['.1.3.6.1.4.1.17163.1.1.5.2.5.0'];
+$conn_active      = $connections['.1.3.6.1.4.1.17163.1.1.5.2.6.0'];
+$conn_total       = $connections['.1.3.6.1.4.1.17163.1.1.5.2.7.0'];
 
 if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && $conn_active >= 0 && $conn_total >= 0) {
     $rrd_def = array(
@@ -60,9 +69,14 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
  * miss .1.3.6.1.4.1.17163.1.1.5.4.2.0
  *
  */
+$datastore_array = array(
+    '.1.3.6.1.4.1.17163.1.1.5.4.1.0',
+    '.1.3.6.1.4.1.17163.1.1.5.4.2.0'
+);
+$datastore = snmp_get_multi_oid($device, $conn_array);
 
-$datastore_hits = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.4.1.0', '-OUQn');
-$datastore_miss = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.4.2.0', '-OUQn');
+$datastore_hits = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.1.0'];
+$datastore_miss = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.2.0'];
 
 if ($datastore_hits >= 0 && $datastore_miss >= 0) {
     $rrd_def = array(
@@ -87,9 +101,15 @@ if ($datastore_hits >= 0 && $datastore_miss >= 0) {
  * passthrough .1.3.6.1.4.1.17163.1.1.5.2.2.0
  *
  */
+$optimization_array = array(
+    '.1.3.6.1.4.1.17163.1.1.5.2.1.0',
+    '.1.3.6.1.4.1.17163.1.1.5.2.2.0'
+);
 
-$conn_optimized   = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.1.0', '-OUQn');
-$conn_passthrough = snmp_get($device, '.1.3.6.1.4.1.17163.1.1.5.2.2.0', '-OUQn');
+$optimizations = snmp_get_multi_oid($device, $optimization_array);
+
+$conn_optimized   = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.1.0'];
+$conn_passthrough = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.2.0'];
 
 if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
     $rrd_def = array(
