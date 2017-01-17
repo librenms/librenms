@@ -82,7 +82,7 @@ if ($device['sysContact']) {
 if ($device['location']) {
     echo '<tr>
         <td>Location</td>
-        <td>'.$device['location'].'</td>
+        <td>'.$device['location'].'&nbsp;&nbsp;<a href="http://maps.google.com/?q='.$device['location'].'" target="_blank"><button type="button" class="btn btn-success btn-xs"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></a></td>
       </tr>';
     if (get_dev_attrib($device, 'override_sysLocation_bool') && !empty($device['real_location'])) {
         echo '<tr>
