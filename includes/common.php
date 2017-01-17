@@ -1525,18 +1525,13 @@ function load_os(&$device)
     $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
-print_r("##################################################\n");
-    print_r($config['os'][$device['os']]);
-print_r("##################################################\n");
+
     if (isset($config['os'][$device['os']])) {
         $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
     } else {
         $config['os'][$device['os']] = $tmp_os;
     }
 
-print_r("##################################################\n");
-    print_r($config['os'][$device['os']]);
-print_r("##################################################\n");
     // Set type to a predefined type for the OS if it's not already set
     if ($config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
