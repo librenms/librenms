@@ -1522,12 +1522,14 @@ function load_os(&$device)
     if (!isset($device['os'])) {
         throw new Exception('No OS to load');
     }
-
     $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
-    $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
-
+    if (isset($config['os'][$device['os']])) {
+        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+    } else {
+        $config['os'][$device['os']] = $tmp_os;
+    }
     // Set type to a predefined type for the OS if it's not already set
     if ($config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
@@ -1556,7 +1558,11 @@ function load_all_os($restricted = array())
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
         );
-        $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+        if (isset($config['os'][$device['os']])) {
+            $config['os'][$device['os']] = array_replace_recursive($tmp, $config['os'][$device['os']]);
+        } else {
+            $config['os'][$device['os']] = $tmp;
+        }
     }
 }
 
