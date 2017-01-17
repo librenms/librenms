@@ -29,6 +29,7 @@ if ($device['os'] === 'vrp') {
 
     foreach ($data as $index => $value) {
         if (is_numeric($value) && $value >= 0) {
+            $value = uw_to_dbm($value);
             $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.' . $index;
             $descr = $vrp_oids['entPhysicalName'][$index] . ' Rx';
             discover_sensor(
@@ -39,7 +40,7 @@ if ($device['os'] === 'vrp') {
                 'rx-' . $index,
                 'vrp',
                 $descr,
-                100,
+                1,
                 1,
                 0,
                 0,
@@ -54,6 +55,7 @@ if ($device['os'] === 'vrp') {
 
     foreach ($data as $index => $value) {
         if (is_numeric($value) && $value >= 0) {
+            $value = uw_to_dbm($value);
             $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.' . $index;
             $descr = $vrp_oids['entPhysicalName'][$index] . ' Tx';
             discover_sensor(
@@ -64,7 +66,7 @@ if ($device['os'] === 'vrp') {
                 'tx-' . $index,
                 'vrp',
                 $descr,
-                100,
+                1,
                 1,
                 0,
                 0,

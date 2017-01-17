@@ -1540,3 +1540,8 @@ function load_all_os($restricted = array())
         $config['os'][$tmp['os']] = $tmp;
     }
 }
+
+function uw_to_dbm($value)
+{
+    return 10 * log10($value / 1000);
+}
