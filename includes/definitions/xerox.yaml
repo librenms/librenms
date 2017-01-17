@@ -10,3 +10,4 @@ discovery:
         - Xerox Phaser
         - Xerox WorkCentre
         - FUJI XEROX DocuPrint
+    - sysDescr_regex: '/^.*DocuPrint.*/'
