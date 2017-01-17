@@ -584,6 +584,9 @@ $config['graph_types']['device']['riverbed_optimization']['descr'] = 'Optimizati
 $config['graph_types']['device']['riverbed_datastore']['section'] = 'network';
 $config['graph_types']['device']['riverbed_datastore']['order'] = 2;
 $config['graph_types']['device']['riverbed_datastore']['descr'] = 'Data store productivity';
+$config['graph_types']['device']['riverbed_passthrough']['section'] = 'network';
+$config['graph_types']['device']['riverbed_passthrough']['order'] = 3;
+$config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth Passthrough';
 
 // Device Types
 $i = 0;

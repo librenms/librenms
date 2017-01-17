@@ -30,7 +30,7 @@ $conn_array = array(
     '.1.3.6.1.4.1.17163.1.1.5.2.4.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.5.0',
     '.1.3.6.1.4.1.17163.1.1.5.2.6.0',
-    '.1.3.6.1.4.1.17163.1.1.5.2.7.0'
+    '.1.3.6.1.4.1.17163.1.1.5.2.7.0',
 );
 $connections = snmp_get_multi_oid($device, $conn_array);
 
@@ -71,7 +71,7 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
  */
 $datastore_array = array(
     '.1.3.6.1.4.1.17163.1.1.5.4.1.0',
-    '.1.3.6.1.4.1.17163.1.1.5.4.2.0'
+    '.1.3.6.1.4.1.17163.1.1.5.4.2.0',
 );
 $datastore = snmp_get_multi_oid($device, $conn_array);
 
@@ -103,7 +103,7 @@ if ($datastore_hits >= 0 && $datastore_miss >= 0) {
  */
 $optimization_array = array(
     '.1.3.6.1.4.1.17163.1.1.5.2.1.0',
-    '.1.3.6.1.4.1.17163.1.1.5.2.2.0'
+    '.1.3.6.1.4.1.17163.1.1.5.2.2.0',
 );
 
 $optimizations = snmp_get_multi_oid($device, $optimization_array);
@@ -126,4 +126,43 @@ if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
 
     data_update($device, 'riverbed_optimisation', $tags, $fields);
     $graphs['riverbed_optimisation'] = true;
+}
+
+/* bandwidth passthrough
+ *
+ * in .1.3.6.1.4.1.17163.1.1.5.3.3.1.0
+ * out .1.3.6.1.4.1.17163.1.1.5.3.3.2.0
+ * total .1.3.6.1.4.1.17163.1.1.5.3.3.3.0
+ *
+ */
+
+$bandwidth_array = array(
+    '.1.3.6.1.4.1.17163.1.1.5.3.3.1.0',
+    '.1.3.6.1.4.1.17163.1.1.5.3.3.2.0',
+    '.1.3.6.1.4.1.17163.1.1.5.3.3.3.0',
+);
+
+$bandwidth = snmp_get_multi_oid($device, $bandwidth_array);
+
+$bw_in = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.1.0'];
+$bw_out = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.2.0'];
+$bw_total = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.3.0'];
+
+if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
+    $rrd_def = array(
+        'DS:bw_in:GAUGE:600:0:U',
+        'DS:bw_out:GAUGE:600:0:U',
+        'DS:bw_total:GAUGE:600:0:U',
+    );
+
+    $fields = array(
+        'bw_in' => $bw_in,
+        'bw_out' => $bw_out,
+        'bw_total' => $bw_total,
+    );
+
+    $tags = compact('rrd_def');
+
+    data_update($device, 'riverbed_passthrough', $tags, $fields);
+    $graphs['riverbed_passthrough'] = true;
 }
