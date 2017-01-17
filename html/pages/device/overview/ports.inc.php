@@ -48,10 +48,10 @@ if ($ports['total']) {
 
     echo '
     <tr>
-      <td><img src="images/16/connect.png" align="absmiddle"> '.$ports['total'].'</td>
-      <td><img src="images/16/if-connect.png" align="absmiddle"> '.$ports['up'].'</td>
-      <td><img src="images/16/if-disconnect.png" align="absmiddle"> '.$ports['down'].'</td>
-      <td><img src="images/16/if-disable.png" align="absmiddle"> '.$ports['disabled'].'</td>
+      <td><i class="fa fa-link" style="color:#0080FF" aria-hidden="true"></i> '.$ports['total'].'</td>
+      <td><i class="fa fa-link" style="color:green" aria-hidden="true"></i> '.$ports['up'].'</td>
+      <td><i class="fa fa-link" style="color:red" aria-hidden="true"></i> '.$ports['down'].'</td>
+      <td><i class="fa fa-link" style="color:grey" aria-hidden="true"></i> '.$ports['disabled'].'</td>
     </tr>';
 
     echo '<tr>
