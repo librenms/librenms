@@ -85,28 +85,22 @@ function get_mib_dir($device)
 function mibdir($mibdir = null, $device = array())
 {
     global $config;
-    // FIXME: prepend + to allow system mibs?
 
     $extra_dir = implode(':', get_mib_dir($device));
     if (!empty($extra_dir)) {
-        $extra_dir .= ':';
+        $extra_dir = ":".$extra_dir;
     }
 
     if (is_null($mibdir)) {
-        return " -M $extra_dir${config['mib_dir']}";
+        return " -M ${config['mib_dir']}$extra_dir";
     }
 
     if (empty($mibdir)) {
+        // use system mibs
         return '';
     }
 
-    if (str_contains($mibdir, '/')) {
-        // pass through mib dir (for legace compatability
-        return " -M $extra_dir$mibdir";
-    } else {
-        // automatically set up includes
-        return " -M $extra_dir${config['mib_dir']}/$mibdir:${config['mib_dir']}";
-    }
+    return " -M ${config['mib_dir']}$extra_dir:${config['mib_dir']}/$mibdir";
 }//end mibdir()
 
 /**

@@ -3,3 +3,10 @@ text: 'D-Link Switch'
 type: network
 icon: dlink
 ifname: 1
+discovery:
+    - sysDescr:
+        - 'D-Link DES-'
+        - 'Dlink DES-'
+    - sysDescr_regex:
+        - '/^DES-/'
+        - '/^DGS-/'

@@ -28,10 +28,10 @@ $param = array();
 $sql = 'FROM `ports`';
 
 if (is_admin() === false && is_read() === false) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
-    $sql    .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
+    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
+    $sql .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
 
-    $where  .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
+    $where .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
     $param[] = $_SESSION['user_id'];
     $param[] = $_SESSION['user_id'];
 }
@@ -39,12 +39,12 @@ if (is_admin() === false && is_read() === false) {
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
 if (!empty($_POST['hostname'])) {
-    $where  .= ' AND `D`.`hostname` LIKE ?';
+    $where .= ' AND `D`.`hostname` LIKE ?';
     $param[] = '%' . $_POST['hostname'] . '%';
 }
 
 if (!empty($_POST['location'])) {
-    $where  .= " AND `D`.`location` = ?";
+    $where .= " AND `D`.`location` = ?";
     $param[] = $_POST['location'];
 }
 
@@ -55,13 +55,27 @@ if (!empty($_POST['errors'])) {
 }
 
 if (!empty($_POST['device_id'])) {
-    $sql    .= ' AND `ports`.`device_id`=?';
+    $sql .= ' AND `ports`.`device_id`=?';
     $param[] = $_POST['device_id'];
 }
 
 if (!empty($_POST['state'])) {
-    $sql .= ' AND `ports`.`ifOperStatus`=?';
-    $param[] = $_POST['state'];
+    switch ($_POST['state']) {
+        case "down":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
+            $param[] = "up";
+            $param[] = "down";
+            break;
+        case "up":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `ports`.`ifOperStatus` = ?";
+            $param[] = "up";
+            $param[] = "up";
+            break;
+        case "admindown":
+            $sql .= " AND `ports`.`ifAdminStatus` = ? AND `D`.`ignore` = 0";
+            $param[] = "down";
+            break;
+    }
 }
 
 if (!empty($_POST['ifSpeed'])) {
@@ -81,16 +95,16 @@ if (!empty($_POST['port_descr_type'])) {
 
 if (!empty($_POST['ifAlias'])) {
     $sql .= ' AND `ports`.`ifAlias` LIKE ?';
-    $param[] = '%'.$_POST['ifAlias'].'%';
+    $param[] = '%' . $_POST['ifAlias'] . '%';
 }
 
-$sql    .= ' AND `ports`.`disabled`=?';
+$sql .= ' AND `ports`.`disabled`=?';
 $param[] = (int)(isset($_POST['disabled']) && $_POST['disabled']);
 
-$sql    .= ' AND `ports`.`ignore`=?';
+$sql .= ' AND `ports`.`ignore`=?';
 $param[] = (int)(isset($_POST['ignore']) && $_POST['ignore']);
 
-$sql    .= ' AND `ports`.`deleted`=?';
+$sql .= ' AND `ports`.`deleted`=?';
 $param[] = (int)(isset($_POST['deleted']) && $_POST['deleted']);
 
 $count_sql = "SELECT COUNT(`ports`.`port_id`) $sql";
@@ -110,7 +124,7 @@ if (isset($sort) && !empty($sort)) {
 }
 
 if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - ($rowCount));
     $limit_high = $rowCount;
 }
 
@@ -160,10 +174,10 @@ foreach (dbFetchRows($query, $param) as $port) {
 }
 
 $output = array(
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 );
 
 echo _json_encode($output);

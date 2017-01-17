@@ -34,7 +34,7 @@ $pagetitle[] = 'Oxidized';
             type: 'POST',
             url: 'ajax_form.php',
             data: {
-                type: "oxidized-search-config",
+                type: "search-oxidized-config",
                 search_in_conf_textbox: search_in_conf_textbox
             },
             dataType: "json",

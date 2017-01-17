@@ -1086,19 +1086,20 @@ function version_info($remote = true)
 {
     global $config;
     $output = array();
-    if ($remote === true && $config['update_channel'] == 'master') {
-        $api = curl_init();
-        set_curl_proxy($api);
-        curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
-        curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
-        curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
-        $output['github'] = json_decode(curl_exec($api), true);
+    if (check_git_exists() === true) {
+        if ($remote === true && $config['update_channel'] == 'master') {
+            $api = curl_init();
+            set_curl_proxy($api);
+            curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
+            curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
+            curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+            $output['github'] = json_decode(curl_exec($api), true);
+        }
+        list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+        $output['local_sha']    = $local_sha;
+        $output['local_date']   = $local_date;
+        $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-    $output['local_sha']    = $local_sha;
-    $output['local_date']   = $local_date;
-    $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
-
     $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
@@ -1527,10 +1528,11 @@ function load_os(&$device)
     );
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['type'] == 'unknown' || $device['type'] == '') {
-        if ($config['os'][$device['os']]['type']) {
-            $device['type'] = $config['os'][$device['os']]['type'];
-        }
+    if ($config['os'][$device['os']]['type'] != $device['type']) {
+        log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
+        $device['type'] = $config['os'][$device['os']]['type'];
+        dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
+        echo "Device type changed to " . $device['type'] . "!\n";
     }
 
     if ($config['os'][$device['os']]['group']) {
@@ -1554,5 +1556,27 @@ function load_all_os($restricted = array())
             file_get_contents($file)
         );
         $config['os'][$tmp['os']] = $tmp;
+    }
+}
+
+/**
+ * @param $value
+ * @param int $default
+ * @return int
+ */
+function set_numeric($value, $default = 0)
+{
+    if (!isset($value) || !is_numeric($value)) {
+        $value = $default;
+    }
+    return $value;
+}
+
+function check_git_exists()
+{
+    if (`which git`) {
+        return true;
+    } else {
+        return false;
     }
 }

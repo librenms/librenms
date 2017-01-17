@@ -14,7 +14,7 @@ if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
             $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($vars['id']));
 
             if ($vars['confirm'] == 'yes') {
-                if (deluser($delete_username)) {
+                if (deluser($vars['id']) >= 0) {
                     print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
                 } else {
                     print_error('Error deleting user "'.$delete_username.'"!');

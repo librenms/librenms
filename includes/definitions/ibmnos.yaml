@@ -1,7 +1,7 @@
 os: ibmnos
 text: 'IBM Networking Operating System'
 type: network
-icon: ibmnos
+icon: ibmos
 over:
     - { graph: device_bits, text: Traffic }
 discovery:

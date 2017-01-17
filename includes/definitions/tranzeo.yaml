@@ -3,3 +3,6 @@ text: Tranzeo
 type: network
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^Tranzeo/'
