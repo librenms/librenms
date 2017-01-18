@@ -22,6 +22,7 @@ global $config;
 
 $graphs = array(
     'exim-stats_frozen' => 'Frozen',
+    'exim-stats_queue' => 'Queue'
 );
 
 foreach ($graphs as $key => $text) {

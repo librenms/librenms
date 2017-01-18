@@ -18,27 +18,37 @@
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
-
-//NET-SNMP-EXTEND-MIB::nsExtendOutputFull."exim-stats"
+require 'includes/graphs/common.inc.php';
 $name = 'exim-stats';
 $app_id = $app['app_id'];
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.101.120.105.109.45.115.116.97.116.115';
-$stats = snmp_get($device, $oid, '-Oqv');
+$scale_min     = 0;
+$colours       = 'mixed';
+$unit_text     = 'Queue';
+$unitlen       = 18;
+$bigdescrlen   = 18;
+$smalldescrlen = 18;
+$dostack       = 0;
+$printtotal    = 0;
+$addarea       = 1;
+$transparency  = 33;
 
-echo ' '.$name;
+$rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
 
-list ($frozen, $queue) = explode("\n", $stats);
-
-$rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:frozen:GAUGE:600:0:U',
-    'DS:queue:GAUGE:600:0:U'
+$array = array(
+    'frozen' => array('descr' => 'Queue emails','colour' => 'c13a38',),
 );
 
-$fields = array(
-    'frozen' => $frozen,
-    'queue' => $queue
-);
+$i = 0;
+if (is_file($rrd_filename)) {
+    foreach ($array as $ds => $vars) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr']    = $vars['descr'];
+        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['colour']   = $vars['colour'];
+        $i++;
+    }
+} else {
+    echo "file missing: $rrd_filename";
+}
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+require 'includes/graphs/generic_v3_multiline.inc.php';

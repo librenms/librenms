@@ -129,6 +129,7 @@ $graphs['gpsd'] = array(
 
 $graphs['exim-stats'] = array(
     'frozen',
+    'queue'
 );
 
 print_optionbar_start();
