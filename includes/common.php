@@ -1522,10 +1522,15 @@ function load_os(&$device)
     if (!isset($device['os'])) {
         throw new Exception('No OS to load');
     }
-
-    $config['os'][$device['os']] = Symfony\Component\Yaml\Yaml::parse(
+    $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
+
+    if (isset($config['os'][$device['os']])) {
+        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+    } else {
+        $config['os'][$device['os']] = $tmp_os;
+    }
 
     // Set type to a predefined type for the OS if it's not already set
     if ($config['os'][$device['os']]['type'] != $device['type']) {
@@ -1555,8 +1560,25 @@ function load_all_os($restricted = array())
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
         );
-        $config['os'][$tmp['os']] = $tmp;
+        if (isset($config['os'][$tmp['os']])) {
+            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+        } else {
+            $config['os'][$tmp['os']] = $tmp;
+        }
     }
+}
+
+/**
+ * @param $scale
+ * @param $value
+ * @return float
+ */
+function fahrenheit_to_celsius($scale, $value)
+{
+    if ($scale === 'fahrenheit') {
+        $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
 }
 
 function uw_to_dbm($value)
@@ -1565,6 +1587,20 @@ function uw_to_dbm($value)
 }
 
 /**
+ * @param $value
+ * @param null $default
+ * @param int $min
+ * @return null
+ */
+function set_null($value, $default = null, $min = 0)
+{
+    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
+        $value = $default;
+    }
+    return $value;
+}
+
+/*
  * @param $value
  * @param int $default
  * @return int
