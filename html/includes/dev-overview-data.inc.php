@@ -82,7 +82,7 @@ if ($device['sysContact']) {
 if ($device['location']) {
     echo '<tr>
         <td>Location</td>
-        <td>'.$device['location'].'&nbsp;&nbsp;<a href="http://maps.google.com/?q='.$device['location'].'" target="_blank"><button type="button" class="btn btn-success btn-xs"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></a></td>
+        <td>'.$device['location'].'</td>
       </tr>';
     if (get_dev_attrib($device, 'override_sysLocation_bool') && !empty($device['real_location'])) {
         echo '<tr>
@@ -99,7 +99,7 @@ if (!is_array($loc)) {
 if (is_array($loc)) {
     echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$loc['lat'].','.$loc['lng'].']</td>
+        <td>['.$loc['lat'].','.$loc['lng'].'] &nbsp;&nbsp;<a href="http://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank"><div class="pull-right"><button type="button" class="btn btn-success btn-xs"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
 }
 
