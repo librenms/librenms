@@ -1569,6 +1569,33 @@ function load_all_os($restricted = array())
 }
 
 /**
+ * @param $scale
+ * @param $value
+ * @return float
+ */
+function fahrenheit_to_celsius($scale, $value)
+{
+    if ($scale === 'fahrenheit') {
+        $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * @param $value
+ * @param null $default
+ * @param int $min
+ * @return null
+ */
+function set_null($value, $default = null, $min = 0)
+{
+    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
+        $value = $default;
+    }
+    return $value;
+}
+
+/*
  * @param $value
  * @param int $default
  * @return int

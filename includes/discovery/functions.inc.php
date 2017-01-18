@@ -179,6 +179,11 @@ function discover_device($device, $options = null)
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
 {
 
+    $low_limit      = set_null($low_limit);
+    $low_warn_limit = set_null($low_warn_limit);
+    $warn_limit     = set_null($warn_limit);
+    $high_limit     = set_null($high_limit);
+
     if (!is_numeric($divisor)) {
         $divisor  = 1;
     }
