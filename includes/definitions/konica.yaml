@@ -1,0 +1,9 @@
+os: konica
+group: printer
+text: 'Konica-Minolta Printer'
+type: printer
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr:
+        - KONICA MINOLTA 

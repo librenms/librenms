@@ -8,7 +8,7 @@ source: Installation/Installation-Ubuntu-1604-Apache.md
 #### Install / Configure MySQL
 ```bash
 apt-get install mariadb-server mariadb-client
-service mysql restart
+systemctl restart mysql
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mysql restart```
+```systemctl restart mysql```
 
 ### Web Server ###
 
@@ -91,7 +91,7 @@ Add the following config:
 ```bash
 a2ensite librenms.conf
 a2enmod rewrite
-service apache2 restart
+systemctl restart apache2
 ```
 
 > NOTE: If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site.
@@ -114,7 +114,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job

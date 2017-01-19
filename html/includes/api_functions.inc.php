@@ -96,7 +96,17 @@ function get_port_stats_by_port_hostname()
     $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
     $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
     $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
-    
+
+    //only return requested columns
+    if (isset($_GET['columns'])) {
+        $cols = explode(",", $_GET['columns']);
+        foreach (array_keys($port) as $c) {
+            if (!in_array($c, $cols)) {
+                unset($port[$c]);
+            }
+        }
+    }
+
     $output    = array(
         'status' => 'ok',
         'port'   => $port,
@@ -251,7 +261,7 @@ function add_device()
     $port         = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
     $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
-    $force_add    = $data['force_add'] ? mres($data['force_add']) : 0;
+    $force_add    = $data['force_add'] ? true : false;
     if ($data['version'] == 'v1' || $data['version'] == 'v2c') {
         if ($data['community']) {
             $config['snmp']['community'] = array($data['community']);
@@ -1007,6 +1017,8 @@ function get_inventory()
         $total_inv = 0;
         $inventory = array();
     } else {
+        $sql .= ' AND `device_id`=?';
+        $params[] = $device_id;
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
         $code      = 200;
         $status    = 'ok';

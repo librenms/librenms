@@ -41,6 +41,28 @@ class Component
         'error'     => '',
     );
 
+    public function getComponentCount($device_id = null)
+    {
+        if (is_null($device_id)) {
+            // SELECT type, count(*) as count FROM component GROUP BY type
+            $SQL = "SELECT `type` as `name`, count(*) as count FROM `component` GROUP BY `type`";
+            $rows = dbFetchRows($SQL, array());
+        } else {
+            $SQL = "SELECT `type` as `name`, count(*) as count FROM `component` WHERE `device_id` = ? GROUP BY `type`";
+            $rows = dbFetchRows($SQL, array($device_id));
+        }
+
+        if (isset($rows)) {
+            // We found some, lets re-process to make more accessible
+            $result = array();
+            foreach ($rows as $value) {
+                $result[$value['name']] = $value['count'];
+            }
+            return $result;
+        }
+        // We didn't find any components
+        return false;
+    }
     public function getComponentType($TYPE = null)
     {
         if (is_null($TYPE)) {

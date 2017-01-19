@@ -1,0 +1,241 @@
+-- *****************************************************************
+-- dasanRouterMIB -  The MIB for Router Product
+--
+-- April 2001, Wonhee Lee
+-- December 2002, Seungdong Lee
+-- May 2003, dhlee 
+--
+-- Copyright (c) 2001 by Dasan Co., Ltd.
+-- All rights reserved.
+-- *****************************************************************
+ 
+ 
+DASAN-ROUTER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32, Gauge32, Counter64,
+    Integer32, TimeTicks, mib-2,
+    NOTIFICATION-TYPE
+    			FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,
+    PhysAddress, TruthValue, RowStatus,
+    TimeStamp, AutonomousType, TestAndIncr
+                        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP        FROM SNMPv2-CONF
+    ifIndex             FROM IF-MIB
+    dasanEvents,dasanMgmt           
+                        FROM DASAN-SMI;
+dasanRouterMIB MODULE-IDENTITY
+    LAST-UPDATED   "200305150000Z"
+    ORGANIZATION   "Dasan Co., Ltd."
+    CONTACT-INFO
+                   "Dasan Co., Ltd."
+    DESCRIPTION
+        "The MIB module to describe router product."
+    ::= { dasanMgmt 2 }
+ 
+dasanRouterMIBObjects  OBJECT IDENTIFIER ::= { dasanRouterMIB 1 }
+
+dsRouterSystem           OBJECT IDENTIFIER ::= { dasanRouterMIBObjects 1 }
+--
+--  dSwitchSystem :-) dhlee@da-san.com ,  Last updated  2002/05/22
+--  
+    dsRouterResetSystem OBJECT-TYPE
+       SYNTAX      INTEGER { reset(1)}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Send system-reset to this system."
+       ::= { dsRouterSystem 1 }
+
+    dsRouterWriteConfig OBJECT-TYPE
+       SYNTAX      INTEGER { write(1)}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Write current running configuration to flash memory."
+       ::= { dsRouterSystem 2 }
+
+    dsRouterOsVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The version of running OS."
+       ::= { dsRouterSystem 3 }
+
+    dsRouterTftpServer OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The IP address or hostname of TFTP server."
+       ::= { dsRouterSystem 4 }
+
+    dsRouterTftpFile OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The Remote file name"
+       ::= { dsRouterSystem 5 }
+
+    dsRouterTftpStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+			idle(0),
+                        get(1),
+                        unknown(2),
+                        busy(3),
+                        failed(4),
+                        succeeded(5),
+                        abort(6),
+                        put(7)
+		}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "TFTP transaction status. To receive a file from remote server,
+                get is used. To send OS or Configuration to remote server,
+                put is used. Abort can be used to terminate running tftp client."
+       ::= { dsRouterSystem 6 }
+
+    dsRouterTftpFileType OBJECT-TYPE
+       SYNTAX      INTEGER {
+			operating-system(0),
+                        configuration(1)
+		}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "TFTP transaction status. To initiate TFTP, action is used.
+                Abort can be used to terminate running tftp client."
+       ::= { dsRouterSystem 7 }          
+--
+--  appended :-) dhkim@da-san.com ,  Last updated  2003/02/03
+--                       
+
+    dsRouterCpuLoad5s OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 5 seconds"
+       ::= { dsRouterSystem 8 } 
+
+    dsRouterCpuLoad1m OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 1 minute"
+       ::= { dsRouterSystem 9 } 
+
+    dsRouterCpuLoad10m OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 10 minutes"
+       ::= { dsRouterSystem 10 } 
+
+    dsRouterCpuLoad5sisr OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 5 seconds(interupt service routine)"
+       ::= { dsRouterSystem 11 } 
+
+    dsRouterCpuLoad1misr OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 1 minute(interupt service routine)"
+       ::= { dsRouterSystem 12 } 
+
+    dsRouterCpuLoad10misr OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Avg. Value of CPU Load for 10 minutes(interupt service routine)"
+       ::= { dsRouterSystem 13 } 
+
+    dsRouterTotalMem OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Total memory of system"
+       ::= { dsRouterSystem 14 }   
+       
+    dsRouterUsedMem OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Used memory of system"
+       ::= { dsRouterSystem 15 }        
+
+    dsRouterFreeMem OBJECT-TYPE
+       SYNTAX      INTEGER 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Free memory of sytem"
+       ::= { dsRouterSystem 16 }        
+
+dsRouterPortCRCcnt       OBJECT IDENTIFIER ::= { dasanRouterMIBObjects 4 }
+
+    dsRouterCRCInterval  OBJECT-TYPE
+       SYNTAX      TimeTicks 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION ""
+       ::= { dsRouterPortCRCcnt 1 }
+
+    dsRouterCRCThreshold  OBJECT-TYPE
+       SYNTAX       INTEGER 
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION  "The fixed CRC threshold for all port"
+       ::= { dsRouterPortCRCcnt 2 }
+
+   dsRouterPortCRCTable  	    OBJECT-TYPE
+       SYNTAX SEQUENCE OF   DsRouterPortCRCEntry
+       MAX-ACCESS           not-accessible
+       STATUS	            mandatory
+       DESCRIPTION	    "The current CRC Table of each port"
+       ::= { dsRouterPortCRCcnt 3 }
+
+   dsRouterPortCRCEntry  	OBJECT-TYPE
+       SYNTAX		DsRouterPortCRCEntry
+       MAX-ACCESS	not-accessible
+       STATUS		mandatory
+       DESCRIPTION	"The current CRC entry"
+       INDEX		{ dsRouterPortCRCIndex } 
+       ::= { dsRouterPortCRCTable 1 }
+
+   DsRouterPortCRCEntry 	::= SEQUENCE {
+       dsRouterPortCRCIndex	Integer32,
+       dsRouterPortCRCcnt	Integer32
+    	     } 
+
+   dsRouterPortCRCIndex  OBJECT-TYPE
+       SYNTAX	   Integer32
+       MAX-ACCESS  read-only
+       STATUS	   mandatory
+       DESCRIPTION "The physical port index"
+       ::= { dsRouterPortCRCEntry 1 }
+
+   dsRouterPortCRCcnt	   OBJECT-TYPE
+       SYNTAX	   Integer32
+       MAX-ACCESS  read-only
+       STATUS	   mandatory
+       DESCRIPTION    "The current CRC count per port"
+       ::= { dsRouterPortCRCEntry 2 }
+END

@@ -8,6 +8,7 @@
 !/.php_cs
 !/.github/
 !/.codeclimate.yml
+!/.mention-bot
 
 # Others #
 ##########
@@ -24,6 +25,7 @@ logs
 nbproject
 patches
 rrd
+!/lib/yaml
 /vendor
 composer.phar
 librenms_theme

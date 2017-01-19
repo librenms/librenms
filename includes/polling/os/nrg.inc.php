@@ -3,7 +3,7 @@
 // SNMPv2-MIB::sysDescr.0 = STRING: NRG MP C4500 1.60 / NRG Network Printer C model / NRG Network Scanner C model / NRG Network Facsimile C model
 // SNMPv2-MIB::sysDescr.0 = STRING: NRG SP C410DN 1.01 / NRG Network Printer C model
 // SNMPv2-MIB::sysDescr.0 = STRING: NRG MP 171 1.01 / NRG Network Printer C model / NRG Network Scanner C model / NRG Network Facsimile C model
-$descr = trim(snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-OQv', '', ''), '" ');
+$descr = trim($poll_device['sysDescr'], '" ');
 
 $ninfo = trim(substr($descr, 0, strpos($descr, '/')));
 

@@ -198,7 +198,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                 unset($ospf_area_db);
                 $ospf_area_count++;
             } else {
-                dbDelete('ospf_ports', '`device_id` = ? AND `ospfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_db['ospfAreaId'], $device['context_name']));
+                dbDelete('ospf_ports', '`device_id` = ? AND `ospfIfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_db['ospfAreaId'], $device['context_name']));
             }//end if
         }//end foreach
     }//end if

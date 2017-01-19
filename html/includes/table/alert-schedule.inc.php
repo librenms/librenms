@@ -25,7 +25,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`S`.`title` LIKE '%$searchPhrase%' OR `S`.`start` LIKE '%$searchPhrase%' OR `S`.`end` LIKE '%$searchPhrase%')";
 }
 
-$count_sql = "SELECT COUNT(`id`) $sql";
+$count_sql = "SELECT COUNT(`schedule_id`) $sql";
 $total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;

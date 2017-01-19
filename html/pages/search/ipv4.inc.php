@@ -35,7 +35,7 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
-$sql .= " $where GROUP BY `hostname` ORDER BY `hostname`";
+$sql .= " $where ORDER BY `hostname`";
 
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"'.$data['device_id'].'\""+';
