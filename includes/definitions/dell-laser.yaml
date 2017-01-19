@@ -12,4 +12,4 @@ discovery:
     - sysDescr:
         - 'Dell Color Laser'
         - 'Dell Laser Printer'
-    - sysDescr_regex: '/^Dell.*MFP/'
+    - sysDescr_regex: '/^Dell.*(MFP|Printer|Laser)/'
