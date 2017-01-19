@@ -12,6 +12,8 @@ source: API/API-Docs.md
         - [`del_device`](#api-route-2)
         - [`get_device`](#api-route-3)
         - [`get_graphs`](#api-route-5)
+        - [`list_available_health_graphs`](#api-route-list_available_health_graphs)
+        - [`get_health_graph`](#api-route-get_health_graph)
         - [`get_graph_generic_by_hostname`](#api-route-6)
         - [`get_port_graphs`](#api-route-7)
         - [`get_port_stack`](#api-route-29)
@@ -29,6 +31,8 @@ source: API/API-Docs.md
     - [`devicegroups`](#api-devicegroups)
         - [`get_devicegroups`](#api-route-get_devicegroups)
         - [`get_devices_by_group`](#api-route-get_devices_by_group)
+    - [`portgroups`](#api-portgroups)
+        - [`get_graph_by_portgroup`](#api-route-get_graph_by_portgroup)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
         - [`list_ipsec`](#list_ipsec)
@@ -221,6 +225,146 @@ Output:
 }
 ```
 
+### <a name="api-route-list_available_health_graphs">Function: `list_available_health_graphs`</a> [`top`](#top)
+This function allows to do three things:
+
+  - Get a list of overall health graphs available.
+  - Get a list of health graphs based on provided class.
+  - Get the health sensors information based on ID.
+  
+Route: /api/v0/devices/:hostname/health(/:type)(/:sensor_id)
+
+  - hostname can be either the device hostname or id
+  - type (optional) is health type / sensor class
+  - sensor_id (optional) is the sensor id to retreive specific information.
+  
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 2,
+    "graphs": [
+        {
+            "desc": "Airflow",
+            "name": "device_airflow"
+        },
+        {
+            "desc": "Voltage",
+            "name": "device_voltage"
+        }
+    ]
+}
+```
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 2,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "desc": "Input Feed A"
+        },
+        {
+            "sensor_id": "2",
+            "desc": "Output Feed"
+        }
+    ]
+}
+```
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage/1
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "graphs": [
+        {
+            "sensor_id": "1",
+            "sensor_deleted": "0",
+            "sensor_class": "voltage",
+            "device_id": "1",
+            "poller_type": "snmp",
+            "sensor_oid": ".1.3.6.1.4.1.318.1.1.27.1.1.0",
+            "sensor_index": "1",
+            "sensor_type": "apc",
+            "sensor_descr": "Input",
+            "sensor_divisor": "1",
+            "sensor_multiplier": "1",
+            "sensor_current": "1",
+            "sensor_limit": "1.15",
+            "sensor_limit_warn": null,
+            "sensor_limit_low": "0.85",
+            "sensor_limit_low_warn": null,
+            "sensor_alert": "1",
+            "sensor_custom": "No",
+            "entPhysicalIndex": null,
+            "entPhysicalIndex_measured": null,
+            "lastupdate": "2017-01-13 13:50:26",
+            "sensor_prev": "1"
+        }
+    ]
+}
+```
+
+### <a name="api-route-get_health_graph">Function: `get_health_graph`</a> [`top`](#top)
+
+Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph 
+will be provided. If no sensor_id value is provided then you will be sent a stacked sensor graph.
+
+Route: /api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)
+
+  - hostname can be either the device hostname or id
+  - type is the name of the health graph as returned by [`list_available_health_graphs`](#api-route-list_available_health_graphs)
+  - sensor_id (optional) restricts the graph to return a particular health sensor graph.
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage
+```
+
+Output:
+
+Output is a stacked graph for the health type provided.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage/1
+```
+
+Output:
+
+Output is the graph of the particular health type sensor provided.
+
+
+ 
 ### <a name="api-route-6">Function: `get_graph_generic_by_hostname`</a> [`top`](#top)
 
 Get a specific graph for a device, this does not include ports.
@@ -822,6 +966,32 @@ Output:
      }
 ]
 ```
+
+## <a name="api-portgroups">`Port Groups`</a> [`top`](#top)
+
+### <a name="api-route-get_graph_by_portgroup">Function: `get_graph_by_portgroup`</a> [`top`](#top)
+
+Get the graph based on the group type.
+
+Route: /api/v0/devices/portgroups/:group
+
+  - group is the type of port group graph you want, I.e Transit, Peering, etc. You can specify multiple types comma separated.
+
+Input:
+
+  - from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
+  - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
+  - width: The graph width, defaults to 1075.
+  - height: The graph height, defaults to 300.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/transit,peering
+```
+
+Output:
+
+Output is an image.
 
 ## <a name="api-routing">`Routing`</a> [`top`](#top)
 
