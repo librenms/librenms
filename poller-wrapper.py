@@ -77,6 +77,7 @@ except:
 poller_path = config['install_dir'] + '/poller.php'
 db_username = config['db_user']
 db_password = config['db_pass']
+db_port     = config['db_port']
 
 if config['db_host'][:5].lower() == 'unix:':
     db_server = config['db_host']
@@ -86,7 +87,6 @@ elif ':' in config['db_host']:
     db_port = int(config['db_host'].rsplit(':')[1])
 else:
     db_server = config['db_host']
-    db_port = 0
 
 db_dbname = config['db_name']
 
