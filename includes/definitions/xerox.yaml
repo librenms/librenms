@@ -9,5 +9,4 @@ discovery:
     - sysDescr:
         - Xerox Phaser
         - Xerox WorkCentre
-        - FUJI XEROX DocuPrint
-    - sysDescr_regex: '/^.*DocuPrint.*/'
+        - DocuPrint
