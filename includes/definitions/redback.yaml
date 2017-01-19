@@ -1,7 +1,0 @@
-os: redback
-text: 'Redback'
-type: network
-icon: generic
-discovery:
-    - sysDescr:
-        - Redback
