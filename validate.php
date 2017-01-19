@@ -154,7 +154,7 @@ if (isset($config['user'])) {
 }
 
 // Run test on MySQL
-$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
+$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
 if (mysqli_connect_error()) {
     print_fail('Error connecting to your database '.mysqli_connect_error());
 } else {
