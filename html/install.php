@@ -300,6 +300,7 @@ if ($ext_loaded == 'no') {
     $config['db_user'] = $dbuser;
     $config['db_pass'] = $dbpass;
     $config['db_name'] = $dbname;
+    $config['db_port'] = $dbport;
     $sql_file = '../build.sql';
     $_SESSION['last'] = time();
     ob_end_flush();
@@ -330,6 +331,7 @@ if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
+          <input type="hidden" name="dbport" value="<?php echo $dbport; ?>">
           <button type="submit" class="btn btn-success">Goto Add User</button>
         </form>
       </div>
@@ -351,6 +353,7 @@ $config_file = <<<"EOD"
 
 ### Database config
 \$config\['db_host'\] = '$dbhost';
+\$config\['db_port'\] = '$dbport';
 \$config\['db_user'\] = '$dbuser';
 \$config\['db_pass'\] = '$dbpass';
 \$config\['db_name'\] = '$dbname';
