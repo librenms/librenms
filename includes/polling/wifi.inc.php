@@ -38,6 +38,8 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.8744.5.25.1.7.2.0', '-OUqnv');
         echo $wificlients1." clients\n";
     } elseif ($device['os'] == 'routeros') {
+        echo 'It is RouterOS' . PHP_EOL;
+        include 'includes/polling/mib/routeros-mib.inc.php';
         // MikroTik RouterOS
         // Check inventory for wireless card in device. Valid types be here:
         $wirelesscards = array(
