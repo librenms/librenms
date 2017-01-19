@@ -72,10 +72,12 @@ if ($enabled == 1) {
     $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
     $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
     $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
-
+    $device_info = dbFetchRows('SELECT COUNT(*) AS `count`,`os`, `sysDescr`, `sysObjectID` FROM `devices` GROUP BY `os`, `sysDescr`, `sysObjectID`');
+    
     $output = array(
         'uuid' => $uuid,
         'data' => $response,
+        'info' => $device_info,
     );
     $data   = json_encode($output);
     $submit = array('data' => $data);
