@@ -45,12 +45,12 @@ if (is_admin() !== false) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="notes" class="col-sm-4 control-label">Recurring <exp>*</exp>: </label>
+                        <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
                         <div class="col-sm-2">
                             <input type="radio" class="form-control" id="recurring0" name="recurring" value="0" style="width: 20px;" checked="checked"/>
                         </div>
                         <div class="col-sm-2">
-                            <div style="padding-top:10px;"><label for="recurring0">No</label></div>
+                            <label class="col-sm-for="recurring0">No</label>
                         </div>
                         <div class="col-sm-2">
                             <input type="radio" class="form-control" id="recurring1" name="recurring" value="1" style="width: 20px;" />
