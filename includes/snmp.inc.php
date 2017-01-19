@@ -443,6 +443,22 @@ function snmpwalk_cache_double_oid($device, $oid, $array, $mib = null, $mibdir =
     return $array;
 }//end snmpwalk_cache_double_oid()
 
+function snmpwalk_cache_index($device, $oid, $array, $mib = null, $mibdir = null)
+{
+    $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
+
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value) = explode('=', $entry, 2);
+        $oid              = trim($oid);
+        $value            = trim($value);
+        list($oid, $first) = explode('.', $oid);
+        if (!strstr($value, 'at this OID') && isset($oid) && isset($first)) {
+            $array[$oid][$first] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_double_oid()
 
 function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir = null)
 {
