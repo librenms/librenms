@@ -455,6 +455,11 @@ foreach ($ports as $port) {
             d_echo('Using ifDescr as ifAlias');
         }
 
+        if ($this_port['ifName'] == '' || $this_port['ifName'] == null) {
+            $this_port['ifName'] = $this_port['ifDescr'];
+            d_echo('Using ifDescr as ifName');
+        }
+
         // Update IF-MIB data
         $tune_port = false;
         foreach ($data_oids as $oid) {
