@@ -301,13 +301,18 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 }//end generate_device_link()
 
 
-function overlib_link($url, $text, $contents, $class)
+function overlib_link($url, $text, $contents, $class = null)
 {
     global $config;
 
     $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
     $contents = str_replace('"', "\'", $contents);
-    $output   = '<a class="'.$class.'" href="'.$url.'"';
+    if ($class === null) {
+        $output   = '<a href="'.$url.'"';
+    } else {
+        $output   = '<a class="'.$class.'" href="'.$url.'"';
+    }
+
     if ($config['web_mouseover'] === false) {
         $output .= '>';
     } else {
