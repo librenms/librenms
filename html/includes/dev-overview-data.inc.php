@@ -99,7 +99,7 @@ if (!is_array($loc)) {
 if (is_array($loc)) {
     echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$loc['lat'].','.$loc['lng'].'] &nbsp;&nbsp;<a href="http://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank"><div class="pull-right"><button type="button" class="btn btn-success btn-xs"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
+        <td>['.$loc['lat'].','.$loc['lng'].'] <div class="pull-right"><a href="https://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
 }
 
