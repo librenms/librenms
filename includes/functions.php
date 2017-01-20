@@ -636,7 +636,7 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
         if (host_exists($host, $snmphost) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
-                oxidized_reload_nodes();
+                oxidized_reload_§nodes();
                 return $device_id;
             }
         }

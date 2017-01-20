@@ -1533,7 +1533,7 @@ function load_os(&$device)
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($config['os'][$device['os']]['type'] != $device['type']) {
+    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
