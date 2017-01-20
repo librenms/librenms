@@ -7,3 +7,10 @@ over:
     - { graph: device_arubacontroller_numclients, text: 'Number of Clients' }
 poller_modules:
     aruba-controller: 1
+discovery:
+    - sysDescr:
+        - 'ArubaOS'
+    - 
+      sysDescr: 'AOS-W'
+      sysObjectId: '.1.3.6.1.4.1.6486.800'
+
