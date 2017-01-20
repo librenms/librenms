@@ -58,7 +58,7 @@ if ($config['autodiscovery']['xdp'] === true) {
             d_echo($cdp_if_array);
             foreach (array_keys($cdp_if_array) as $entry_key) {
                 $cdp = $cdp_if_array[$entry_key];
-                if (is_valid_hostname($cdp['cdpCacheDeviceId'])) {
+                if (is_valid_hostname($cdp['cdpCacheDeviceId']) || ($config['discovery_by_ip'] == true)) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
                     if (!$remote_device_id) {
