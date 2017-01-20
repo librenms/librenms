@@ -3,3 +3,7 @@ text: 'ZyXEL DSLAM'
 group: zyxel
 type: network
 icon: zyxel
+discovery:
+    - sysDescr_regex:
+        - '/IES-((?!Cisco Systems).)*$/' # = str_contains($sysDescr, 'IES-') && !str_contains($sysDescr, 'Cisco Systems')
+
