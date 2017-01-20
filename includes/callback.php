@@ -72,8 +72,17 @@ if ($enabled == 1) {
     $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
     $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
     $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
-    $device_info = dbFetchRows('SELECT COUNT(*) AS `count`,`os`, `sysDescr`, `sysObjectID` FROM `devices` GROUP BY `os`, `sysDescr`, `sysObjectID`');
-    
+
+    // collect sysDescr and sysObjectID for submission
+    $device_info = dbFetchRows('SELECT COUNT(*) AS `count`,`os`, `sysDescr`, `sysObjectID` FROM `devices`
+        WHERE `sysDescr` IS NOT NULL AND `sysObjectID` IS NOT NULL GROUP BY `os`, `sysDescr`, `sysObjectID`');
+
+    // sanitize sysDescr
+    $device_info = array_map(function ($entry) {
+        $entry['sysDescr'] = preg_replace('/^Linux [A-Za-z\-0-9\.]+ (?=[0-9\.]{5,9})/', 'Linux hostname ', $entry['sysDescr']);
+        return $entry;
+    }, $device_info);
+
     $output = array(
         'uuid' => $uuid,
         'data' => $response,
