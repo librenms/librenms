@@ -1,0 +1,152 @@
+-- -*- snmpv2 -*-
+-- ----------------------------------------------------------------------
+-- MIB file for CoolIT DCLC
+-- ----------------------------------------------------------------------
+--
+-- CIS-SENSORS-MIB.txt   [plain text]
+CIS-SENSORS-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, enterprises,
+    Integer32, Gauge32
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+ 
+coolitSensorsMIB MODULE-IDENTITY
+    LAST-UPDATED "201505260000Z"
+    ORGANIZATION "CoolIT Systems, Inc."
+    CONTACT-INFO    
+        "Primary Contact: Mike Holden
+         email: mike.holden@coolitsystems.com"
+    DESCRIPTION
+        "This MIB module defines objects for DCLC sensors."
+ 
+    REVISION     "201505260000Z"
+    DESCRIPTION  "Derived from LM-SENSORS-MIB."
+ 
+    ::= { coolitSensors 1 }
+ 
+coolit            OBJECT IDENTIFIER ::= { enterprises 30518 }
+coolitSensors      OBJECT IDENTIFIER ::= { coolit 16 }
+ 
+--
+coolitGroup        OBJECT-GROUP
+    OBJECTS { coolitSensorsDevice,
+                        coolitSensorsUnits,
+                        coolitSensorsDivisor,
+                        coolitSensorsValue,
+                        coolitSensorsMinValue,
+                        coolitSensorsMaxValue,
+                        coolitSensorsControl }
+    STATUS current
+    DESCRIPTION
+            "A collection of objects providing basic instrumentation
+            and control for a CoolIT DCLC Server."
+    ::= { coolitSensors 8 }
+ 
+coolitBasicCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "The compliance statement."
+    MODULE
+            MANDATORY-GROUPS { coolitGroup }
+            GROUP coolitGroup
+            DESCRIPTION "This group is mandatory for this MIB."
+    ::= { coolitSensors 9 }
+ 
+ 
+coolitSensorsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoolITSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of sensors and their values."
+    ::= { coolitSensors 2 }
+ 
+coolitSensorsEntry OBJECT-TYPE
+    SYNTAX      CoolITSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing a device and its statistics."
+    INDEX       { coolitSensorsIndex }
+    ::= { coolitSensorsTable 1 }
+ 
+CoolITSensorsEntry ::= SEQUENCE {
+    coolitSensorsIndex    Integer32,
+    coolitSensorsDevice   DisplayString,
+    coolitSensorsUnits    SnmpAdminString,
+    coolitSensorsDivisor  Gauge32,
+    coolitSensorsValue    Integer32,
+    coolitSensorsMinValue Integer32,
+    coolitSensorsMaxValue Integer32,
+    coolitSensorsControl  Gauge32
+}
+ 
+coolitSensorsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Reference index for each observed device."
+    ::= { coolitSensorsEntry 1 }
+ 
+coolitSensorsDevice OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the sensor we are reading."
+    ::= { coolitSensorsEntry 2 }
+ 
+coolitSensorsUnits OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The units of the device we are reading."
+    ::= { coolitSensorsEntry 3 }
+            
+coolitSensorsDivisor OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To convert the integral value into proper units."
+    ::= { coolitSensorsEntry 4 }
+ 
+coolitSensorsValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this sensor."
+    ::= { coolitSensorsEntry 5 }
+ 
+coolitSensorsMinValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum allowed value of this sensor."
+    ::= { coolitSensorsEntry 6 }
+ 
+coolitSensorsMaxValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum allowed value of this sensor."
+    ::= { coolitSensorsEntry 7 }
+            
+coolitSensorsControl OBJECT-TYPE
+    SYNTAX      Gauge32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The control parameter for the device, if any."
+    ::= { coolitSensorsEntry 8 }
+ 
+END
