@@ -97,6 +97,9 @@ function nicecase($item)
         case 'gpsd':
             return 'GPSD';
 
+        case 'exim-stats':
+            return 'EXIM Stats';
+
         default:
             return ucfirst($item);
     }
