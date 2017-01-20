@@ -94,6 +94,7 @@ $graphs['nfs-v3-stats'] = array(
 $graphs['os-updates'] = array(
     'packages',
 );
+
 $graphs['dhcp-stats'] = array(
      'stats',
 );
@@ -124,6 +125,11 @@ $graphs['gpsd'] = array(
     'satellites',
     'dop',
     'mode',
+);
+
+$graphs['exim-stats'] = array(
+    'frozen',
+    'queue'
 );
 
 print_optionbar_start();
