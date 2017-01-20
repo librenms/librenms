@@ -2,18 +2,16 @@ MIKROTIK-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, IpAddress,
-Counter64, enterprises, NOTIFICATION-TYPE FROM SNMPv2-SMI
+Counter64, enterprises, NOTIFICATION-TYPE, TimeTicks FROM SNMPv2-SMI
 TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
-TimeTicks FROM SNMPv2-SMI
-OBJECT-GROUP FROM SNMPv2-CONF
-NOTIFICATION-GROUP FROM SNMPv2-CONF;
+OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "201604010000Z"
+  LAST-UPDATED "201608310000Z"
   ORGANIZATION "MikroTik"
-  CONTACT-INFO "@mikrotik.com"
+  CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "201604010000Z"
+  REVISION "201608310000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -39,6 +37,7 @@ mtxrInterfaceStats OBJECT IDENTIFIER ::= { mtXRouterOs 14 }
 mtxrPOE OBJECT IDENTIFIER ::= { mtXRouterOs 15 }
 mtxrLTEModem OBJECT IDENTIFIER ::= { mtXRouterOs 16 }
 mtxrPartition OBJECT IDENTIFIER ::= { mtXRouterOs 17 }
+mtxrScriptRun OBJECT IDENTIFIER ::= { mtXRouterOs 18 }
 
 ObjectIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "x"
@@ -55,6 +54,12 @@ ObjectIndex ::= TEXTUAL-CONVENTION
 --
 -- SYNTAX Integer32 (-2147483648..2147483647)
 -- SYNTAX Unsigned32 (0..4294967295)
+
+HexInt ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS current
+    DESCRIPTION "Hex"
+    SYNTAX Integer32 (-2147483648..2147483647)
 
 Voltage ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-1"
@@ -1238,6 +1243,49 @@ mtxrScriptRunCmd OBJECT-TYPE
     DESCRIPTION "set non zero to run"
     ::= { mtxrScriptTableEntry 3 }
 
+-- SCRIPT RUN *****************************************************************
+
+mtxrScriptRunTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrScriptRunTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "invisible to getnext, accesible only with get request and write premission"
+    ::= { mtxrScriptRun 1 }
+
+mtxrScriptRunTableEntry OBJECT-TYPE
+    SYNTAX MtxrScriptRunTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrScriptRunIndex }
+    ::= { mtxrScriptRunTable 1 }
+
+MtxrScriptRunTableEntry ::= SEQUENCE {
+	mtxrScriptRunIndex ObjectIndex,
+	mtxrScriptRunOutput DisplayString
+}
+
+mtxrScriptRunIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrScriptRunTableEntry 1 }
+
+mtxrScriptRunOutput OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "this oid on get request will run script and return it's output"
+    ::= { mtxrScriptRunTableEntry 2 }
+
+mtxrScriptRunGroup OBJECT-GROUP OBJECTS {
+	mtxrScriptRunOutput
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 21 }
+
 -- Dual Nstreme ***************************************************************
 
 mtxrDnStatTable OBJECT-TYPE
@@ -1549,7 +1597,8 @@ mtxrSystemGroup OBJECT-GROUP OBJECTS {
         mtxrSerialNumber,
         mtxrFirmwareVersion,
         mtxrNote,
-        mtxrBuildTime
+        mtxrBuildTime,
+        mtxrFirmwareUpgradeVersion
     }
     STATUS current
     DESCRIPTION ""
@@ -1673,7 +1722,9 @@ mtxrPOEGroup OBJECT-GROUP OBJECTS {
 mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
         mtxrLTEModemSignalRSSI,
         mtxrLTEModemSignalRSRQ,
-        mtxrLTEModemSignalRSRP
+        mtxrLTEModemSignalRSRP,
+        mtxrLTEModemCellId,
+        mtxrLTEModemAccessTechnology
     }
     STATUS current
     DESCRIPTION ""
@@ -2342,7 +2393,7 @@ mtxrPOEEntry OBJECT-TYPE
 MtxrPOEEntry ::= SEQUENCE {
     mtxrPOEInterfaceIndex ObjectIndex,
     mtxrPOEName DisplayString,
-    mtxrPOEStatus Integer32,
+    mtxrPOEStatus INTEGER,
     mtxrPOEVoltage Voltage,
     mtxrPOECurrent Integer32,
     mtxrPOEPower Power
@@ -2416,7 +2467,9 @@ MtxrLTEModemEntry ::= SEQUENCE {
     mtxrLTEModemInterfaceIndex ObjectIndex,
     mtxrLTEModemSignalRSSI Integer32,
     mtxrLTEModemSignalRSRQ Integer32,
-    mtxrLTEModemSignalRSRP Integer32
+    mtxrLTEModemSignalRSRP Integer32,
+    mtxrLTEModemCellId HexInt,
+    mtxrLTEModemAccessTechnology INTEGER
 }
 
 mtxrLTEModemInterfaceIndex OBJECT-TYPE
@@ -2447,13 +2500,37 @@ mtxrLTEModemSignalRSRP OBJECT-TYPE
     DESCRIPTION "dBm"
     ::= { mtxrLTEModemEntry 4 }
 
+mtxrLTEModemCellId OBJECT-TYPE
+    SYNTAX HexInt
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "current cell ID"
+    ::= { mtxrLTEModemEntry 5 }
+
+mtxrLTEModemAccessTechnology OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(-1),
+        gsmcompact(0),
+        gsm(1),
+        utran(2),
+        egprs(3),
+        hsdpa(4),
+        hsupa(5),
+        hsdpahsupa(6),
+        eutran(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "as reported by +CREG"
+    ::= { mtxrLTEModemEntry 6 }
+
 -- Partition ************************************************************
 
 mtxrPartitionTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrPartitionEntry
     MAX-ACCESS not-accessible
     STATUS current
-    DESCRIPTION "LTE Modems"
+    DESCRIPTION "system partitions"
     ::= { mtxrPartition 1 }
 
 mtxrPartitionEntry OBJECT-TYPE

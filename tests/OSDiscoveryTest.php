@@ -382,6 +382,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCtcu()
     {
         $this->checkOS('ctcu');
+        $this->checkOS('ctcu', 'ctcu1');
+        $this->checkOS('ctcu', 'ctcu2');
+        $this->checkOS('ctcu', 'ctcu3');
     }
 
     public function testCucm()
@@ -558,6 +561,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testEquallogic()
     {
         $this->checkOS('equallogic');
+    }
+
+    public function testEricssonES()
+    {
+        $this->checkOS('ericsson-es');
     }
 
     public function testExtremeware()
@@ -814,6 +822,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testJwos()
     {
         $this->checkOS('jwos');
+    }
+
+    public function testKti()
+    {
+        $this->checkOS('kti');
     }
 
     public function testKonica()
@@ -1220,9 +1233,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('raritan', 'raritan-px2');
     }
 
-    public function testRedback()
+    public function testSEOS()
     {
-        $this->checkOS('redback');
+        $this->checkOS('seos');
     }
 
     public function testRicoh()
