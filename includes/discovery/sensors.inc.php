@@ -25,9 +25,14 @@ require 'includes/discovery/sensors/runtime.inc.php';
 require 'includes/discovery/sensors/current.inc.php';
 require 'includes/discovery/sensors/power.inc.php';
 require 'includes/discovery/sensors/fanspeeds.inc.php';
-require 'includes/discovery/sensors/charge.inc.php';
 require 'includes/discovery/sensors/load.inc.php';
 require 'includes/discovery/sensors/states.inc.php';
 require 'includes/discovery/sensors/dbm.inc.php';
 require 'includes/discovery/sensors/signal.inc.php';
-require 'includes/discovery/sensors/airflow.inc.php';
+
+$run_sensors = array(
+    'airflow',
+    'charge',
+);
+sensors($run_sensors, $device, $pre_cache);
+unset($pre_cache);
