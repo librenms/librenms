@@ -91,6 +91,7 @@ pages:
 - Support:
     - Support/Configuration.md
     - Support/Discovery Support.md
+    - Support/Example-Hardware-Setup.md
     - Support/FAQ.md
     - Support/Features.md
     - Support/Install Validation.md
