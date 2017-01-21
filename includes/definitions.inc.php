@@ -574,6 +574,19 @@ $config['graph_types']['device']['sgos_average_requests']['section']  = 'network
 $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
+//riverbed specific graphs
+$config['graph_types']['device']['riverbed_connections']['section'] = 'network';
+$config['graph_types']['device']['riverbed_connections']['order'] = 0;
+$config['graph_types']['device']['riverbed_connections']['descr'] = 'Connections';
+$config['graph_types']['device']['riverbed_optimization']['section'] = 'network';
+$config['graph_types']['device']['riverbed_optimization']['order'] = 1;
+$config['graph_types']['device']['riverbed_optimization']['descr'] = 'Optimization';
+$config['graph_types']['device']['riverbed_datastore']['section'] = 'network';
+$config['graph_types']['device']['riverbed_datastore']['order'] = 2;
+$config['graph_types']['device']['riverbed_datastore']['descr'] = 'Data store productivity';
+$config['graph_types']['device']['riverbed_passthrough']['section'] = 'network';
+$config['graph_types']['device']['riverbed_passthrough']['order'] = 3;
+$config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth Passthrough';
 
 // Device Types
 $i = 0;

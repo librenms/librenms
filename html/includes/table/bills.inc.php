@@ -147,7 +147,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     
     if (!$prev && is_admin()) {
         $actions .= "<a href='" . generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) .
-            "'><i class='fa fa-pencil' style='color:".$config[theme_icon_colour]."' title='Edit' aria-hidden='true'></i> Edit</a> ";
+            "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
     $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));
     

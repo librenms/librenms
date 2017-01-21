@@ -166,12 +166,12 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $actions = '
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xs-1"><a href="' . generate_device_url($device) . '"> <i class="fa fa-id-card" style="color:'.$config[theme_icon_colour].'" title="View device"></i></a></div>
-                <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle" style="color:'.$config[theme_icon_colour].'" title="View alerts"></i></a></div>
+                <div class="col-xs-1"><a href="' . generate_device_url($device) . '"> <i class="fa fa-id-card fa-lg icon-theme" title="View device"></i></a></div>
+                <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>
     ';
 
     if ($_SESSION['userlevel'] >= '7') {
-        $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil" style="color:'.$config[theme_icon_colour].'" title="Edit device"></i></a></div>';
+        $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
     }
 
     if ($subformat == 'detail') {
@@ -179,9 +179,9 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     $actions .= '
-                <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-unlock-alt" style="color:'.$config[theme_icon_colour].'" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock" style="color:'.$config[theme_icon_colour].'" title="SSH to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe" style="color:'.$config[theme_icon_colour].'" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+                <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
+                <div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
+                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
             </div>
         </div>
     ';
@@ -203,11 +203,11 @@ foreach (dbFetchRows($sql, $param) as $device) {
             $col_port = '';
         }
         if ($port_count) {
-            $col_port = '<i class="fa fa-link" style="color:'.$config[theme_icon_colour].'"></i> ' . $port_count . '<br>';
+            $col_port = '<i class="fa fa-link fa-lg icon-theme"></i> ' . $port_count . '<br>';
         }
 
         if ($sensor_count) {
-            $col_port .= '<i class="fa fa-dashboard" style="color:'.$config[theme_icon_colour].'"></i> ' . $sensor_count;
+            $col_port .= '<i class="fa fa-dashboard fa-lg icon-theme"></i> ' . $sensor_count;
         }
     } else {
         $platform = $device['hardware'];

@@ -24,7 +24,7 @@ if ($services['total']) {
         <div class="row col-md-12">
             <div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
-                <i class="fa fa-cogs" style="color:<?php echo $config[theme_icon_colour]?>" aria-hidden="true"></i> <strong>Services</strong>
+                <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong>
                 </div>
                 <table class="table table-hover table-condensed table-striped">
                     <tr>

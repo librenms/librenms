@@ -19,19 +19,19 @@
 function generate_priority_icon($priority)
 {
     $map = array(
-        "emerg"     => "server_delete",
-        "alert"     => "cancel",
-        "crit"      => "application_lightning",
-        "err"       => "application_delete",
-        "warning"   => "application_error",
-        "notice"    => "application_edit",
-        "info"      => "application",
-        "debug"     => "bug",
-        ""          => "application",
+        "emerg"     => "fa-plus-circle text-danger",
+        "alert"     => "fa-ban text-danger",
+        "crit"      => "fa-minus-circle text-danger",
+        "err"       => "fa-times-circle text-warning",
+        "warning"   => "fa-exclamation-triangle text-warning",
+        "notice"    => "fa-info-circle text-info",
+        "info"      => "fa-info-circle text-info",
+        "debug"     => "fa-bug text-muted",
+        ""          => "fa-info-circle text-info",
     );
 
-    $image = isset($map[$priority]) ? $map[$priority] : 'application';
-    return '<img src="images/16/' . $image .'.png" title="' . $priority . '">';
+    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
+    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
 }
 
 function generate_priority_status($priority)
@@ -1522,10 +1522,15 @@ function load_os(&$device)
     if (!isset($device['os'])) {
         throw new Exception('No OS to load');
     }
-
-    $config['os'][$device['os']] = Symfony\Component\Yaml\Yaml::parse(
+    $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
+
+    if (isset($config['os'][$device['os']])) {
+        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+    } else {
+        $config['os'][$device['os']] = $tmp_os;
+    }
 
     // Set type to a predefined type for the OS if it's not already set
     if ($config['os'][$device['os']]['type'] != $device['type']) {
@@ -1555,11 +1560,42 @@ function load_all_os($restricted = array())
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
         );
-        $config['os'][$tmp['os']] = $tmp;
+        if (isset($config['os'][$tmp['os']])) {
+            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+        } else {
+            $config['os'][$tmp['os']] = $tmp;
+        }
     }
 }
 
 /**
+ * @param $scale
+ * @param $value
+ * @return float
+ */
+function fahrenheit_to_celsius($scale, $value)
+{
+    if ($scale === 'fahrenheit') {
+        $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * @param $value
+ * @param null $default
+ * @param int $min
+ * @return null
+ */
+function set_null($value, $default = null, $min = 0)
+{
+    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
+        $value = $default;
+    }
+    return $value;
+}
+
+/*
  * @param $value
  * @param int $default
  * @return int
