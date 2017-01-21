@@ -563,6 +563,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('equallogic');
     }
 
+    public function testEricssonES()
+    {
+        $this->checkOS('ericsson-es');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
@@ -1228,9 +1233,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('raritan', 'raritan-px2');
     }
 
-    public function testRedback()
+    public function testSEOS()
     {
-        $this->checkOS('redback');
+        $this->checkOS('seos');
     }
 
     public function testRicoh()

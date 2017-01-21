@@ -98,6 +98,7 @@ server {
 ```
 
 ```bash
+rm /etc/nginx/sites-enabled/default
 systemctl restart nginx
 ```
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS
+ * LibreNMS module to capture details from various Load Balancers
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -9,6 +9,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysDescr, array('CANOPY', 'CMM'))) {
-    $os = 'canopy';
+if ($device['os'] == 'f5') {
+    include "includes/polling/loadbalancers/f5-ltm.inc.php";
 }
