@@ -38,7 +38,7 @@ if [ "$1" = "-n" ]; then
 	fi
 fi
 
-IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2)
+IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2 | cut -d @ -f 1)
 
 echo ${BASE}.${ID}
 if [ "X${IFACE}" = "X" ]; then
