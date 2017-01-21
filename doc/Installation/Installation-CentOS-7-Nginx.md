@@ -35,7 +35,7 @@ sql-mode=""
 
 ### Web Server ###
 
-#### Install / Configure Nginx 
+#### Install / Configure Nginx
 
 ```bash
 yum install epel-release
@@ -159,6 +159,12 @@ systemctl restart snmpd
 #### Cron job
 
 `cp librenms.nonroot.cron /etc/cron.d/librenms`
+
+#### Copy logrotate config
+
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+
+    cp misc/librenms.logrotate /etc/logrotate.d/librenms
 
 #### Final steps
 
