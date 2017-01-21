@@ -1580,25 +1580,10 @@ function fahrenheit_to_celsius($scale, $value)
     }
     return sprintf('%.02f', $value);
 }
-
-/**
- * @param $scale
- * @param $value
- * @return float
- */
-function fahrenheit_to_celsius($scale, $value)
-{
-    if ($scale === 'fahrenheit') {
-        $value = ($value - 32) / 1.8;
-    }
-    return sprintf('%.02f', $value);
-}
-
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
-
 /**
  * @param $value
  * @param null $default
@@ -1612,21 +1597,6 @@ function set_null($value, $default = null, $min = 0)
     }
     return $value;
 }
-
-/*
- * @param $value
- * @param null $default
- * @param int $min
- * @return null
- */
-function set_null($value, $default = null, $min = 0)
-{
-    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
-        $value = $default;
-    }
-    return $value;
-}
-
 /*
  * @param $value
  * @param int $default
@@ -1639,7 +1609,6 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
-
 function check_git_exists()
 {
     if (`which git`) {
