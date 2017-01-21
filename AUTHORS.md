@@ -168,6 +168,7 @@ LibreNMS contributors:
 - Aleksandr Stankevic <aleksandr.stankevic@gmail.com> (sysmonk)
 - Richard Mayhew <richard@splash.co.za> (InsaneSplash)
 - Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
+- Patrick Velder <patrick2+librenms@velder.li> (patrick7)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
