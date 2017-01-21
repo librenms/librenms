@@ -10,13 +10,11 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'riverbed') {
-    d_echo('Riverbed');
-    $oid = '.1.3.6.1.4.1.17163.1.1.2.9.0';
-    $index = 0;
-    $descr = 'System Temperature';
-    $temperature = snmp_get($device, $oid, '-Oqv');
-    if (is_numeric($temperature)) {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'riverbed', $descr, '1', '1', 0, null, null, 65, $temperature);
-    }
+d_echo('Riverbed');
+$oid = '.1.3.6.1.4.1.17163.1.1.2.9.0';
+$index = 0;
+$descr = 'System Temperature';
+$temperature = snmp_get($device, $oid, '-Oqv');
+if (is_numeric($temperature)) {
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'riverbed', $descr, '1', '1', 0, null, null, 65, $temperature);
 }

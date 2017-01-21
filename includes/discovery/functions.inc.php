@@ -970,9 +970,11 @@ function sensors($types, $device, $pre_cache = array())
 
             if (is_file($dir . $device['os_group'] . '.inc.php')) {
                 include_once $dir . $device['os_group'] . '.inc.php';
-            } elseif (is_file($dir . $device['os'] . '.inc.php')) {
+            }
+            if (is_file($dir . $device['os'] . '.inc.php')) {
                 include_once $dir . $device['os'] . '.inc.php';
-            } elseif (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+            }
+            if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
                 if (is_file($dir  . '/rfc1628.inc.php')) {
                     include_once $dir . '/rfc1628.inc.php';
                 }
