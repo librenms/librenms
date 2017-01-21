@@ -19,19 +19,19 @@
 function generate_priority_icon($priority)
 {
     $map = array(
-        "emerg"     => "server_delete",
-        "alert"     => "cancel",
-        "crit"      => "application_lightning",
-        "err"       => "application_delete",
-        "warning"   => "application_error",
-        "notice"    => "application_edit",
-        "info"      => "application",
-        "debug"     => "bug",
-        ""          => "application",
+        "emerg"     => "fa-plus-circle text-danger",
+        "alert"     => "fa-ban text-danger",
+        "crit"      => "fa-minus-circle text-danger",
+        "err"       => "fa-times-circle text-warning",
+        "warning"   => "fa-exclamation-triangle text-warning",
+        "notice"    => "fa-info-circle text-info",
+        "info"      => "fa-info-circle text-info",
+        "debug"     => "fa-bug text-muted",
+        ""          => "fa-info-circle text-info",
     );
 
-    $image = isset($map[$priority]) ? $map[$priority] : 'application';
-    return '<img src="images/16/' . $image .'.png" title="' . $priority . '">';
+    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
+    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
 }
 
 function generate_priority_status($priority)
@@ -1580,12 +1580,10 @@ function fahrenheit_to_celsius($scale, $value)
     }
     return sprintf('%.02f', $value);
 }
-
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
-
 /**
  * @param $value
  * @param null $default
@@ -1599,7 +1597,6 @@ function set_null($value, $default = null, $min = 0)
     }
     return $value;
 }
-
 /*
  * @param $value
  * @param int $default
@@ -1612,7 +1609,6 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
-
 function check_git_exists()
 {
     if (`which git`) {

@@ -227,7 +227,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
 }//end if
 
 if ($_SESSION['userlevel'] >= '10' && $config['enable_billing'] == 1) {
-    echo "<span style='float: right;'><a href='" . generate_url(array('page'=>'bills', 'view'=>'add', 'port'=>$port['port_id'])) . "'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>";
+    echo "<span style='float: right;'><a href='" . generate_url(array('page'=>'bills', 'view'=>'add', 'port'=>$port['port_id'])) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> border='0' align='absmiddle'> Create Bill</a></span>";
 }
 
 print_optionbar_end();

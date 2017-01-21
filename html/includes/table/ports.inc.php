@@ -144,12 +144,12 @@ foreach (dbFetchRows($query, $param) as $port) {
     $actions = '<div class="container-fluid"><div class="row">';
     $actions .= '<div class="col-xs-1"><a href="';
     $actions .= generate_device_url($device, array('tab' => 'alerts'));
-    $actions .= '"><img src="images/16/bell.png" border="0" align="absmiddle" alt="View alerts" title="View alerts" /></a></div>';
+    $actions .= '"><i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts" aria-hidden="true"></i></a></div>';
 
     if ($_SESSION['userlevel'] >= '7') {
         $actions .= '<div class="col-xs-1"><a href="';
         $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
-        $actions .= '"><img src="images/16/wrench.png" border="0" align="absmiddle" alt="Edit ports" title="Edit ports" /></a></div>';
+        $actions .= '"><i class="fa fa-pencil fa-lg icon-theme" title="Edit ports" aria-hidden="true"></i></a></div>';
     }
 
     $actions .= '</div></div>';
