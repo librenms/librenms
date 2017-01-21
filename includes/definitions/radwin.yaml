@@ -1,0 +1,12 @@
+os: radwin
+text: 'RADWIN'
+type: wireless
+icon: radwin
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    - sysObjectID:
+        - enterprises.4458
