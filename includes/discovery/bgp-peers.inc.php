@@ -97,7 +97,24 @@ if ($config['enable_bgp']) {
                 $astext = get_astext($peer['as']);
 
                 if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['ip'])) < '1') {
-                    $add = dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'bgpPeerRemoteAs' => $peer['as'], 'context_name' => $device['context_name']), 'bgpPeers');
+                    $bgpPeers = array(
+                        'device_id' => $device['device_id'],
+                        'bgpPeerIdentifier' => $peer['ip'],
+                        'bgpPeerRemoteAs' => $peer['as'],
+                        'context_name' => $device['context_name'],
+                        'astext' => $astext,
+                        'bgpPeerState' => 'idle',
+                        'bgpPeerAdminStatus' => 'stop',
+                        'bgpLocalAddr' => '0.0.0.0',
+                        'bgpPeerRemoteAddr' => '0.0.0.0',
+                        'bgpPeerInUpdates' => 0,
+                        'bgpPeerOutUpdates' => 0,
+                        'bgpPeerInTotalMessages' => 0,
+                        'bgpPeerOutTotalMessages' => 0,
+                        'bgpPeerFsmEstablishedTime' => 0,
+                        'bgpPeerInUpdateElapsedTime' => 0,
+                    );
+                    $add = dbInsert($bgpPeers, 'bgpPeers');
                     if ($config['autodiscovery']['bgp'] === true) {
                         $name             = gethostbyaddr($peer['ip']);
                         $remote_device_id = discover_new_device($name, $device, 'BGP');
@@ -152,7 +169,7 @@ if ($config['enable_bgp']) {
 
                         if (!isset($j_peerIndexes)) {
                             $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                            print_r($j_bgp);
+                            d_echo($j_bgp);
                             foreach ($j_bgp as $index => $entry) {
                                 switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
                                     case 'ipv4':
@@ -189,9 +206,33 @@ if ($config['enable_bgp']) {
                         foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi) {
                             list ($afi,$safi)     = explode('.', $afisafi);
                             $safi                 = $safis[$safi];
-                            $af_list[$afi][$safi] = 1;
+                            $af_list[$peer['ip']][$afi][$safi] = 1;
                             if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi)) == 0) {
-                                dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi), 'bgpPeers_cbgp');
+                                $cbgp = array(
+                                    'device_id' => $device['device_id'],
+                                    'bgpPeerIdentifier' => $peer['ip'],
+                                    'afi' => $afi,
+                                    'safi' => $safi,
+                                    'AcceptedPrefixes' => 0,
+                                    'DeniedPrefixes' => 0,
+                                    'PrefixAdminLimit' => 0,
+                                    'PrefixThreshold' => 0,
+                                    'PrefixClearThreshold' => 0,
+                                    'AdvertisedPrefixes' => 0,
+                                    'SuppressedPrefixes' => 0,
+                                    'WithdrawnPrefixes' => 0,
+                                    'AcceptedPrefixes_delta' => 0,
+                                    'AcceptedPrefixes_prev' => 0,
+                                    'DeniedPrefixes_delta' => 0,
+                                    'DeniedPrefixes_prev' => 0,
+                                    'AdvertisedPrefixes_delta' => 0,
+                                    'AdvertisedPrefixes_prev' => 0,
+                                    'SuppressedPrefixes_delta' => 0,
+                                    'SuppressedPrefixes_prev' => 0,
+                                    'WithdrawnPrefixes_delta' => 0,
+                                    'WithdrawnPrefixes_prev' => 0,
+                                );
+                                dbInsert($cbgp, 'bgpPeers_cbgp');
                             }
                         }
                     }
@@ -200,7 +241,7 @@ if ($config['enable_bgp']) {
                     foreach (dbFetchRows($af_query) as $entry) {
                         $afi  = $entry['afi'];
                         $safi = $entry['safi'];
-                        if (!$af_list[$afi][$safi] || !$af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
+                        if (!$af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
                             dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi));
                         }
                     }

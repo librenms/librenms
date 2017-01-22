@@ -281,14 +281,14 @@ if ($config['enable_bgp']) {
 
                     // FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
                     $update = 'UPDATE bgpPeers_cbgp SET';
-                    $peer['c_update']['AcceptedPrefixes']     = $cbgpPeerAcceptedPrefixes;
-                    $peer['c_update']['DeniedPrefixes']       = $cbgpPeerDeniedPrefixes;
-                    $peer['c_update']['PrefixAdminLimit']     = $cbgpPeerAdminLimit;
-                    $peer['c_update']['PrefixThreshold']      = $cbgpPeerPrefixThreshold;
-                    $peer['c_update']['PrefixClearThreshold'] = $cbgpPeerPrefixClearThreshold;
-                    $peer['c_update']['AdvertisedPrefixes']   = $cbgpPeerAdvertisedPrefixes;
-                    $peer['c_update']['SuppressedPrefixes']   = $cbgpPeerSuppressedPrefixes;
-                    $peer['c_update']['WithdrawnPrefixes']    = $cbgpPeerWithdrawnPrefixes;
+                    $peer['c_update']['AcceptedPrefixes']     = set_numeric($cbgpPeerAcceptedPrefixes);
+                    $peer['c_update']['DeniedPrefixes']       = set_numeric($cbgpPeerDeniedPrefixes);
+                    $peer['c_update']['PrefixAdminLimit']     = set_numeric($cbgpPeerAdminLimit);
+                    $peer['c_update']['PrefixThreshold']      = set_numeric($cbgpPeerPrefixThreshold);
+                    $peer['c_update']['PrefixClearThreshold'] = set_numeric($cbgpPeerPrefixClearThreshold);
+                    $peer['c_update']['AdvertisedPrefixes']   = set_numeric($cbgpPeerAdvertisedPrefixes);
+                    $peer['c_update']['SuppressedPrefixes']   = set_numeric($cbgpPeerSuppressedPrefixes);
+                    $peer['c_update']['WithdrawnPrefixes']    = set_numeric($cbgpPeerWithdrawnPrefixes);
 
                     $oids = array(
                         'AcceptedPrefixes',
@@ -299,8 +299,8 @@ if ($config['enable_bgp']) {
                     );
 
                     foreach ($oids as $oid) {
-                        $peer['c_update'][$oid.'_delta'] = $peer['c_update'][$oid] - $peer_afi[$oid];
-                        $peer['c_update'][$oid.'_prev'] = $peer_afi[$oid];
+                        $peer['c_update'][$oid.'_delta'] = set_numeric($peer['c_update'][$oid] - $peer_afi[$oid]);
+                        $peer['c_update'][$oid.'_prev'] = set_numeric($peer_afi[$oid]);
                     }
 
                     dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
