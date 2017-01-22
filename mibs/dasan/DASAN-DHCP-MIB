@@ -1,0 +1,347 @@
+--
+-- $Id: dasan-dhcp-mib.mib,v 1.3 2007/03/23 09:05:20 dhlee Exp $ 
+-- 	(c) 2002, DASAN Networks, Inc. All rights reserved. 
+--
+-- Revision history
+-- ===========================================================================
+-- 2002/09/09  SYK  created
+-- 2003/03/13  dhlee modify  : all entry is read-only
+
+DASAN-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, 
+    TimeTicks, Counter32, snmpModules, mib-2
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp
+        FROM SNMPv2-TC
+    dasanMgmt           
+        FROM DASAN-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+org            OBJECT IDENTIFIER ::= { iso 3 }
+dod            OBJECT IDENTIFIER ::= { org 6 }
+internet       OBJECT IDENTIFIER ::= { dod 1 }
+
+directory      OBJECT IDENTIFIER ::= { internet 1 }
+
+mgmt           OBJECT IDENTIFIER ::= { internet 2 }
+
+transmission   OBJECT IDENTIFIER ::= { mib-2 10 }
+
+experimental   OBJECT IDENTIFIER ::= { internet 3 }
+
+private        OBJECT IDENTIFIER ::= { internet 4 }
+
+security       OBJECT IDENTIFIER ::= { internet 5 }
+
+snmpV2         OBJECT IDENTIFIER ::= { internet 6 }
+
+dasan	       OBJECT IDENTIFIER ::= { enterprises 6296 }
+
+dasanSwitchMIB OBJECT IDENTIFIER ::= { dasanMgmt 1 }
+
+dasanSwitchMIBObjects  OBJECT IDENTIFIER ::= { dasanSwitchMIB 1 }
+
+
+-- dhcpMIB MODULE-IDENTITY
+dsDhcpMIBObjects MODULE-IDENTITY
+    LAST-UPDATED "0209090000Z"
+    ORGANIZATION "DASAN Networks, Inc"
+    CONTACT-INFO
+            "       SeungYong, Kwon 
+
+             Postal: 
+
+                Tel: +82 2 3484 6570 
+
+             E-mail: sykwon@da-san.com"
+    DESCRIPTION
+            "The MIB module for DASAN DHCP entities."    
+    ::= {dasanSwitchMIBObjects 5 }
+-- ::= { dasan 9, 1, 1, 5 }
+
+-- dsDhcpMIBObjects OBJECT IDENTIFIER ::= { dhcpMIB 1, 1, 5 }
+
+--- This DHCP MIB module consists of the following groups:
+---
+--- (1) DHCP daemon configuration group
+--- (2) currently none.
+
+
+--- DHCP daemon configuration group
+---
+--- This group contains the contents of dhcpd.conf file.
+--- Only few options are listed here.
+
+SubnetConfIndex	::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"The value of this object identifies the subnet"
+    SYNTAX	Integer32
+ 
+SubnetConfRangeIndex	::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"The value of this object identifies the range of the subnet"
+    SYNTAX	Integer32
+
+dsDhcpDaemonConf		OBJECT IDENTIFIER ::= { dsDhcpMIBObjects 1 }	
+
+dsDefaultLeaseTime	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only   -- read-write -> read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The default ip-address lease time."
+    ::= { dsDhcpDaemonConf 1 }
+
+dsMaxLeaseTime		OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The maximum ip-address lease time."
+    ::= { dsDhcpDaemonConf 2 }
+
+dsSubnetMask		OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The default sub-net mask."
+    ::= { dsDhcpDaemonConf 3 }
+
+dsBroadcastAddress	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"The default broadcast address."
+    ::= { dsDhcpDaemonConf 4 }
+	 
+dsDomainName		OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The name of domain."
+    ::= { dsDhcpDaemonConf 5 }
+
+dsDomainNameServerTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF DomainNameServerEntry
+    MAX-ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"This table contains all server ip address"    
+    ::= { dsDhcpDaemonConf 6 }
+
+dsDomainNameServerEntry		OBJECT-TYPE
+    SYNTAX	DomainNameServerEntry
+    MAX-ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"This table contains all server ip address"
+    INDEX	{ dsDomainNameServerIpIdx }
+    ::= { dsDomainNameServerTable 1 }
+
+DomainNameServerEntry	::= SEQUENCE {
+    dsDomainNameServerIpIdx	INTEGER,
+    dsDomainNameServerIp		IpAddress
+    	}
+
+dsDomainNameServerIpIdx	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The index of ip address."
+    ::= { dsDomainNameServerEntry 1 }
+
+dsDomainNameServerIp	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The ip address of domain name server."
+    ::= { dsDomainNameServerEntry 2 }
+
+dsSubnetConfTable		OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SubnetConfEntry
+    MAX-ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"The subnet address table"
+    ::= { dsDhcpDaemonConf 7 }
+
+dsSubnetConfEntry	OBJECT-TYPE
+    SYNTAX	SubnetConfEntry
+    MAX-ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"The subnet address table." 
+	INDEX   { dsSubnetConfIndex }  
+    ::= { dsSubnetConfTable 1 }
+
+SubnetConfEntry	::= SEQUENCE {
+    dsSubnetConfName		DisplayString,
+    dsSubnetConfSubnet		IpAddress,
+    dsSubnetConfNetmask		IpAddress,
+    dsSubnetConfBroadcastAddr	IpAddress,
+    dsSubnetConfDefaultLeaseTime	INTEGER,
+    dsSubnetConfMaxLeaseTime	INTEGER,
+    dsSubnetConfTotalCount	INTEGER,
+    dsSubnetConfAllocatedCount	INTEGER,
+    dsSubnetConfRouters		IpAddress,
+    dsSubnetConfRangeBitmap		OCTET STRING,
+    dsSubnetConfIndex		SubnetConfIndex,
+    dsSubnetConfDomainName  OCTET STRING
+	}
+
+dsSubnetConfName		OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The subnet of this table entry." 
+    ::= { dsSubnetConfEntry 1 }
+
+dsSubnetConfSubnet	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The subnet of this table entry." 
+    ::= { dsSubnetConfEntry 2 }
+    
+dsSubnetConfNetmask	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The netmask of this table entry."
+    ::= { dsSubnetConfEntry 3 }
+
+dsSubnetConfBroadcastAddr	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"The Broadcast address of this table entry."
+    ::= { dsSubnetConfEntry 4 }
+
+dsSubnetConfDefaultLeaseTime	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The default ip-address lease time."
+    ::= { dsSubnetConfEntry 5 }
+
+dsSubnetConfMaxLeaseTime	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The maximum ip-address lease time."
+    ::= { dsSubnetConfEntry 6 }
+
+dsSubnetConfTotalCount	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The total number of ip-addresses in this group."
+    ::= { dsSubnetConfEntry 7 }
+
+dsSubnetConfAllocatedCount	OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The total number of allocated ip-addresses in this group."
+    ::= { dsSubnetConfEntry 8 }
+
+dsSubnetConfRouters	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The router address of this table entry."
+    ::= { dsSubnetConfEntry 9 }
+
+dsSubnetConfRangeBitmap	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..32))
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"The bitmap of free addresses."
+    ::= { dsSubnetConfEntry 10 }    
+        
+dsSubnetConfIndex OBJECT-TYPE
+	SYNTAX SubnetConfIndex
+    MAX-ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"The Index of subnet."
+    ::= { dsSubnetConfEntry 11 }    
+
+dsSubnetConfDomainName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(0..64))
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The domain suffix of subnet."
+    ::= { dsSubnetConfEntry 12 }    
+   
+   
+dsSubnetConfRangeTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SubnetConfRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS	mandatory   
+    DESCRIPTION
+	"The subnet ip table."    
+    ::= { dsDhcpDaemonConf 8 }
+
+dsSubnetConfRangeEntry	OBJECT-TYPE
+    SYNTAX	SubnetConfRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"The subnet ip table."
+    INDEX { dsSubnetConfIndex, dsSubnetConfRangeIndex }
+--	INDEX	{ SubnetConfIndex, SubnetConfRangeIndex }
+    ::= { dsSubnetConfRangeTable 1 }
+
+SubnetConfRangeEntry	::= SEQUENCE {
+    dsSubnetConfRangeStart 	IpAddress,
+    dsSubnetConfRangeEnd	IpAddress,
+    dsSubnetConfRangeIndex	SubnetConfRangeIndex
+	}
+    
+dsSubnetConfRangeStart	OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The start ip address allocatable." 
+    ::= { dsSubnetConfRangeEntry 1 }
+
+dsSubnetConfRangeEnd		OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"The end ip address allocatable." 
+    ::= { dsSubnetConfRangeEntry 2 }   
+    
+dsSubnetConfRangeIndex 		OBJECT-TYPE
+    SYNTAX	SubnetConfRangeIndex
+    MAX-ACCESS  not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"The index of Range Entry." 
+    ::= { dsSubnetConfRangeEntry 3 } 
+
+END

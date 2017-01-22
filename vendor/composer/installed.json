@@ -1,0 +1,618 @@
+[
+    {
+        "name": "ezyang/htmlpurifier",
+        "version": "v4.8.0",
+        "version_normalized": "4.8.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ezyang/htmlpurifier.git",
+            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "time": "2016-07-16T12:58:58+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "HTMLPurifier": "library/"
+            },
+            "files": [
+                "library/HTMLPurifier.composer.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Edward Z. Yang",
+                "email": "admin@htmlpurifier.org",
+                "homepage": "http://ezyang.com"
+            }
+        ],
+        "description": "Standards compliant HTML filter written in PHP",
+        "homepage": "http://htmlpurifier.org/",
+        "keywords": [
+            "html"
+        ]
+    },
+    {
+        "name": "xjtuwangke/passwordhash",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/xjtuwangke/passwordhash.git",
+            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/xjtuwangke/passwordhash/zipball/a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
+            "reference": "a7bcd9705add858cd496bdd8cdc9bbed231e8bb3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2012-08-31T00:00:00+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Phpass": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Public Domain"
+        ],
+        "authors": [
+            {
+                "name": "Solar Designer",
+                "email": "solar@openwall.com",
+                "homepage": "http://openwall.com/phpass/"
+            }
+        ],
+        "description": "Portable PHP password hashing framework",
+        "homepage": "http://github.com/xjtuwangke/passwordhash/",
+        "keywords": [
+            "blowfish",
+            "crypt",
+            "password",
+            "security"
+        ]
+    },
+    {
+        "name": "pear/console_color2",
+        "version": "0.1.2",
+        "version_normalized": "0.1.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Console_Color2.git",
+            "reference": "cab2b886aa55cc9e23464d1f49edf97bee9f5a63"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Console_Color2/zipball/cab2b886aa55cc9e23464d1f49edf97bee9f5a63",
+            "reference": "cab2b886aa55cc9e23464d1f49edf97bee9f5a63",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.0.0"
+        },
+        "time": "2012-10-23T11:52:18+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Console_Color2": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Daniel O'Connor",
+                "email": "daniel.oconnor@gmail.com",
+                "role": "Pear Developer"
+            },
+            {
+                "name": "Stefan Walk",
+                "email": "et@php.net"
+            },
+            {
+                "name": "Scott Mattocks",
+                "email": "scottmattocks@php.net"
+            }
+        ],
+        "description": "This Class allows you to easily use ANSI console colors in your application.",
+        "homepage": "https://github.com/pear/Console_Color2",
+        "keywords": [
+            "console"
+        ]
+    },
+    {
+        "name": "pear/console_table",
+        "version": "v1.3.0",
+        "version_normalized": "1.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Console_Table.git",
+            "reference": "64100b9ee81852f4fa17823e55d0b385a544f976"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Console_Table/zipball/64100b9ee81852f4fa17823e55d0b385a544f976",
+            "reference": "64100b9ee81852f4fa17823e55d0b385a544f976",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.0"
+        },
+        "suggest": {
+            "pear/Console_Color2": ">=0.1.2"
+        },
+        "time": "2016-01-21T16:14:31+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "Table.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Jan Schneider",
+                "homepage": "http://pear.php.net/user/yunosh"
+            },
+            {
+                "name": "Tal Peer",
+                "homepage": "http://pear.php.net/user/tal"
+            },
+            {
+                "name": "Xavier Noguer",
+                "homepage": "http://pear.php.net/user/xnoguer"
+            },
+            {
+                "name": "Richard Heyes",
+                "homepage": "http://pear.php.net/user/richard"
+            }
+        ],
+        "description": "Library that makes it easy to build console style tables.",
+        "homepage": "http://pear.php.net/package/Console_Table/",
+        "keywords": [
+            "console"
+        ]
+    },
+    {
+        "name": "slim/slim",
+        "version": "2.6.2",
+        "version_normalized": "2.6.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/slimphp/Slim.git",
+            "reference": "20a02782f76830b67ae56a5c08eb1f563c351a37"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/slimphp/Slim/zipball/20a02782f76830b67ae56a5c08eb1f563c351a37",
+            "reference": "20a02782f76830b67ae56a5c08eb1f563c351a37",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "suggest": {
+            "ext-mcrypt": "Required for HTTP cookie encryption"
+        },
+        "time": "2015-03-08T18:41:17+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Slim": "."
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Josh Lockhart",
+                "email": "info@joshlockhart.com",
+                "homepage": "http://www.joshlockhart.com/"
+            }
+        ],
+        "description": "Slim Framework, a PHP micro framework",
+        "homepage": "http://github.com/codeguy/Slim",
+        "keywords": [
+            "microframework",
+            "rest",
+            "router"
+        ]
+    },
+    {
+        "name": "easybook/geshi",
+        "version": "v1.0.8.18",
+        "version_normalized": "1.0.8.18",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/easybook/geshi.git",
+            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/easybook/geshi/zipball/4b06bfe8c6fbedd6aad0a0700d650f591386e287",
+            "reference": "4b06bfe8c6fbedd6aad0a0700d650f591386e287",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">4.3.0"
+        },
+        "time": "2016-10-05T07:15:42+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "./"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0"
+        ],
+        "authors": [
+            {
+                "name": "Nigel McNie",
+                "email": "nigel@geshi.org"
+            },
+            {
+                "name": "Benny Baumann",
+                "email": "BenBE@geshi.org"
+            }
+        ],
+        "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
+        "homepage": "http://qbnz.com/highlighter",
+        "keywords": [
+            "highlight",
+            "highlighter",
+            "syntax"
+        ]
+    },
+    {
+        "name": "amenadiel/jpgraph",
+        "version": "3.6.6",
+        "version_normalized": "3.6.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/HuasoFoundries/jpgraph.git",
+            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/6596bdfd8c406672bd165bf7754df1130158ddac",
+            "reference": "6596bdfd8c406672bd165bf7754df1130158ddac",
+            "shasum": ""
+        },
+        "require": {
+            "ext-gd": "*",
+            "php": ">=5.3.0"
+        },
+        "time": "2016-03-11T13:58:40+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Amenadiel\\JpGraph\\": "src/",
+                "Amenadiel\\JpGraph\\Graph\\": "src/graph",
+                "Amenadiel\\JpGraph\\Image\\": "src/image",
+                "Amenadiel\\JpGraph\\Plot\\": "src/plot",
+                "Amenadiel\\JpGraph\\Text\\": "src/text",
+                "Amenadiel\\JpGraph\\Themes\\": "src/themes",
+                "Amenadiel\\JpGraph\\Util\\": "src/util"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "QPL 1.0"
+        ],
+        "description": "jpGraph, library to make graphs and charts",
+        "homepage": "http://jpgraph.net/",
+        "keywords": [
+            "chart",
+            "data",
+            "graph",
+            "jpgraph",
+            "pie"
+        ]
+    },
+    {
+        "name": "tecnickcom/tcpdf",
+        "version": "6.2.12",
+        "version_normalized": "6.2.12.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/tecnickcom/TCPDF.git",
+            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/2f732eaa91b5665274689b1d40b285a7bacdc37f",
+            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2015-09-12T10:08:34+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "fonts",
+                "config",
+                "include",
+                "tcpdf.php",
+                "tcpdf_parser.php",
+                "tcpdf_import.php",
+                "tcpdf_barcodes_1d.php",
+                "tcpdf_barcodes_2d.php",
+                "include/tcpdf_colors.php",
+                "include/tcpdf_filters.php",
+                "include/tcpdf_font_data.php",
+                "include/tcpdf_fonts.php",
+                "include/tcpdf_images.php",
+                "include/tcpdf_static.php",
+                "include/barcodes/datamatrix.php",
+                "include/barcodes/pdf417.php",
+                "include/barcodes/qrcode.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPLv3"
+        ],
+        "authors": [
+            {
+                "name": "Nicola Asuni",
+                "email": "info@tecnick.com",
+                "homepage": "http://nicolaasuni.tecnick.com"
+            }
+        ],
+        "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+        "homepage": "http://www.tcpdf.org/",
+        "keywords": [
+            "PDFD32000-2008",
+            "TCPDF",
+            "barcodes",
+            "datamatrix",
+            "pdf",
+            "pdf417",
+            "qrcode"
+        ]
+    },
+    {
+        "name": "dapphp/radius",
+        "version": "2.5.0",
+        "version_normalized": "2.5.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dapphp/radius.git",
+            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/dapphp/radius/zipball/72df4f8dc82281e7364b23212bbf16df6232151e",
+            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "dev-master"
+        },
+        "time": "2016-08-01T23:26:47+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Dapphp\\Radius\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Drew Phillips",
+                "email": "drew@drew-phillips.com",
+                "homepage": "https://drew-phillips.com/"
+            },
+            {
+                "name": "SysCo/al",
+                "homepage": "http://developer.sysco.ch/php/"
+            }
+        ],
+        "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
+        "homepage": "https://github.com/dapphp/radius",
+        "keywords": [
+            "Authentication",
+            "authorization",
+            "radius"
+        ]
+    },
+    {
+        "name": "php-amqplib/php-amqplib",
+        "version": "v2.0.2",
+        "version_normalized": "2.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-amqplib/php-amqplib.git",
+            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/682e3365f51c455f7a0bd32173d79922416fe9f0",
+            "reference": "682e3365f51c455f7a0bd32173d79922416fe9f0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2013-02-13T19:43:51+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "PhpAmqpLib": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Alvaro Videla"
+            }
+        ],
+        "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
+        "homepage": "https://github.com/videlalvaro/php-amqplib/",
+        "keywords": [
+            "message",
+            "queue",
+            "rabbitmq"
+        ]
+    },
+    {
+        "name": "symfony/yaml",
+        "version": "v2.8.15",
+        "version_normalized": "2.8.15.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/yaml.git",
+            "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/yaml/zipball/befb26a3713c97af90d25dd12e75621ef14d91ff",
+            "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.9"
+        },
+        "time": "2016-11-14T16:15:57+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.8-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\Yaml\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Yaml Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "phpmailer/phpmailer",
+        "version": "v5.2.21",
+        "version_normalized": "5.2.21.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PHPMailer/PHPMailer.git",
+            "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d51856b76c06fc687fcd9180efa7a0bed0d761e",
+            "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.0.0"
+        },
+        "require-dev": {
+            "phpdocumentor/phpdocumentor": "*",
+            "phpunit/phpunit": "4.7.*"
+        },
+        "suggest": {
+            "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
+        },
+        "time": "2016-12-28T15:35:48+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "class.phpmailer.php",
+                "class.phpmaileroauth.php",
+                "class.phpmaileroauthgoogle.php",
+                "class.smtp.php",
+                "class.pop3.php",
+                "extras/EasyPeasyICS.php",
+                "extras/ntlm_sasl_client.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Jim Jagielski",
+                "email": "jimjag@gmail.com"
+            },
+            {
+                "name": "Marcus Bointon",
+                "email": "phpmailer@synchromedia.co.uk"
+            },
+            {
+                "name": "Andy Prevost",
+                "email": "codeworxtech@users.sourceforge.net"
+            },
+            {
+                "name": "Brent R. Matzelle"
+            }
+        ],
+        "description": "PHPMailer is a full-featured email creation and transfer class for PHP"
+    }
+]

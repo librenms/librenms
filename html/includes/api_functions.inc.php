@@ -123,8 +123,13 @@ function get_graph_generic_by_hostname()
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
+    $sensor_id    = $router['sensor_id'] ?: null;
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+    if (isset($sensor_id)) {
+        $vars['id']   = $sensor_id;
+        $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+    }
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -261,7 +266,7 @@ function add_device()
     $port         = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
     $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
-    $force_add    = $data['force_add'] ? mres($data['force_add']) : 0;
+    $force_add    = $data['force_add'] ? true : false;
     if ($data['version'] == 'v1' || $data['version'] == 'v2c') {
         if ($data['community']) {
             $config['snmp']['community'] = array($data['community']);
@@ -678,6 +683,53 @@ function get_graphs()
     echo _json_encode($output);
 }
 
+function list_available_health_graphs()
+{
+    global $config;
+    $code     = 200;
+    $status   = 'ok';
+    $message  = '';
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (isset($router['type'])) {
+        list($dump, $type) = explode('_', $router['type']);
+    }
+    $sensor_id = $router['sensor_id'] ?: null;
+    $graphs    = array();
+
+    if (isset($type)) {
+        if (isset($sensor_id)) {
+              $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', array($sensor_id));
+        } else {
+            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                $graphs[] = array(
+                    'sensor_id' => $graph['sensor_id'],
+                    'desc'      => $graph['sensor_descr'],
+                );
+            }
+        }
+    } else {
+        foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
+            $graphs[] = array(
+                'desc' => ucfirst($graph['sensor_class']),
+                'name' => 'device_'.$graph['sensor_class'],
+            );
+        }
+    }
+
+    $total_graphs = count($graphs);
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+        'count'   => $total_graphs,
+        'graphs'  => $graphs,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
 
 function get_port_graphs()
 {
@@ -1017,6 +1069,8 @@ function get_inventory()
         $total_inv = 0;
         $inventory = array();
     } else {
+        $sql .= ' AND `device_id`=?';
+        $params[] = $device_id;
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
         $code      = 200;
         $status    = 'ok';

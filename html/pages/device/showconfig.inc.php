@@ -1,7 +1,5 @@
 <?php
 
-require 'lib/geshi/geshi.php';
-
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 if (is_admin()) {
     if (!is_array($config['rancid_configs'])) {

@@ -3,3 +3,6 @@ type: server
 text: 'Microsoft Windows'
 ifname: 1
 processor_stacked: 1
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.311.1.1.3
+    - sysDescr: Windows

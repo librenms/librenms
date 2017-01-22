@@ -6,3 +6,8 @@ icon: supermicro
 ifname: 1
 mib_dir:
     - supermicro
+discovery:
+    - sysDescr_regex:
+        - '/^Supermicro Switch/'
+        - '/^SSE-/'
+        - '/^SBM-/'

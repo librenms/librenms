@@ -6,3 +6,9 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Pulse Connect Secure
+        - Pulse Secure
+        - Juniper Networks,Inc,VA-DTE
+        - VA-SPE

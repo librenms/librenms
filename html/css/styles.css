@@ -1647,8 +1647,12 @@ tr.search:nth-child(odd) {
 }
 
 .tt-suggestion:hover {
-	background-color: #0097CF;
-	color: #FFFFFF;
+  background-color: #0097CF;
+  color: #FFFFFF;
+}
+
+.tt-suggestion img {
+  width: 32px;
 }
 
 .gridster * {
@@ -1821,7 +1825,7 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device_icon img {
+    .device-header-table .device-icon .device-icon-48h img {
        max-width: 20px;
        max-height: 20px;
     }
@@ -2128,4 +2132,23 @@ label {
     text-align: center;
     display: block;
     width: 70px;
+}
+
+.device-table-icon img {
+    width: 32px;
+}
+
+.device-icon img {
+    max-height: 32px;
+    max-width: 40px;
+}
+
+.device-icon {
+  display: inline-block;
+  height: 32px;
+  width: 40px;
+}
+
+.device-icon-48h img {
+  height: 48px;
 }

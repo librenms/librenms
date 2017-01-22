@@ -1,9 +1,51 @@
 {
+    "name": "librenms/librenms",
+    "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
+    "type": "project",
+    "keywords": ["network", "monitoring", "snmp", "laravel"],
+    "homepage": "http://www.librenms.org/",
+    "license": "GPL-3.0",
+    "support": {
+        "source": "https://github.com/librenms/librenms/",
+        "docs": "http://docs.librenms.org/",
+        "forum": "https://community.librenms.org/",
+        "issues": "https://github.com/librenms/librenms/issues/",
+        "irc": "irc://irc.freenode.org/#librenms"
+    },
+    "config": {
+        "platform": {"php": "5.3.9"}
+    },
+    "require": {
+        "php": ">=5.3.9",
+        "ezyang/htmlpurifier": "^4.8",
+        "phpmailer/phpmailer": "^5.2.21",
+        "slim/slim": "^2.6",
+        "easybook/geshi": "^1.0.8",
+        "amenadiel/jpgraph": "^3.6",
+        "tecnickcom/tcpdf": "~6.2.0",
+        "xjtuwangke/passwordhash": "dev-master",
+        "pear/console_color2": "^0.1",
+        "pear/console_table": "^1.3",
+        "dapphp/radius": "^2.0",
+        "php-amqplib/php-amqplib": "^2.0",
+        "symfony/yaml": "^2.8"
+    },
     "require-dev": {
         "squizlabs/php_codesniffer": "2.6.*",
         "phpunit/phpunit": "4.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "LibreNMS\\": "LibreNMS",
+            "LibreNMS\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
+        "post-autoload-dump": "LibreNMS\\ComposerHelper::postAutoloadDump",
+        "commit": "LibreNMS\\ComposerHelper::commit"
     }
 }

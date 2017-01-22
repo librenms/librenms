@@ -185,7 +185,7 @@ If you are running Apache 2.2.18 or higher (current version in Centos 7 official
   </Directory>
 </VirtualHost>
 ```
-If the file `/etc/httpd/conf.d/welcome.conf` exists, you will want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html). 
+If the file `/etc/httpd/conf.d/welcome.conf` exists, you will want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html).
 ```bash
 rn /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
 ```
@@ -376,6 +376,12 @@ If the thread count needs to be changed, you can do so by editing the cron file 
 Create the cronjob
 
     cp librenms.nonroot.cron /etc/cron.d/librenms
+
+### Copy logrotate config ###
+
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+
+    cp misc/librenms.logrotate /etc/logrotate.d/librenms
 
 ### Daily Updates ###
 

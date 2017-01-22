@@ -8,13 +8,13 @@ PULSESECURE-PSG-MIB DEFINITIONS ::= BEGIN
         		FROM RFC1155-SMI;
         
 pulsesecure-gateway MODULE-IDENTITY
-    LAST-UPDATED "201410161000Z"
+    LAST-UPDATED "201607071610Z"
     ORGANIZATION "Pulse Secure"
     CONTACT-INFO    
 	 "Internet: https://www.pulsesecure.net"
     DESCRIPTION
 	"This file defines the private Pulse Secure MIB extensions."
-    REVISION     "201410161000Z"
+    REVISION     "201607071610Z"
     DESCRIPTION
 	"Initial Version"
     ::= { enterprises 12532 }
@@ -287,7 +287,7 @@ logDescription OBJECT-TYPE
 ivsName OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  accessible-for-notify
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Virtual System name"
     ::= { pulsesecure-gateway 30 }
@@ -444,6 +444,30 @@ iveTotalSignedInUsers OBJECT-TYPE
         "The Total number of Users Logged In for the Cluster"
     ::= { pulsesecure-gateway 48 } 
 
+vpnACLSPercentage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The percentage of system ACL entries reached"
+    ::= { pulsesecure-gateway 49 }
+
+vpnACLSCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of system ACL entries reached"
+    ::= { pulsesecure-gateway 50 }
+
+blockedIPv6 OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+        "IPv6 Address that is blocked due to consecutive failed login attempts"
+    ::= { pulsesecure-gateway 51 }
+
 iveTraps OBJECT IDENTIFIER ::= { pulsesecure-gateway 251 }
 
 -- iveTraps.1 and iveTraps.2 are loaded incorrectly in HP OpenView 
@@ -464,6 +488,7 @@ iveLogFull NOTIFICATION-TYPE
     ::= { iveTraps 5 }
 
 iveMaxConcurrentUsersSignedIn NOTIFICATION-TYPE
+    OBJECTS { iveConcurrentUsers }
     STATUS	current
     DESCRIPTION
 	"Maximum number of concurrent users signed in"
@@ -473,7 +498,7 @@ iveTooManyFailedLoginAttempts NOTIFICATION-TYPE
     OBJECTS { blockedIP }
     STATUS	current
     DESCRIPTION
-	"Too many failed login attempts"
+	"Too many failed login attempts from IPv4 address"
     ::= { iveTraps 7 }
 
 externalAuthServerUnreachable NOTIFICATION-TYPE
@@ -585,7 +610,7 @@ swapUtilNotify NOTIFICATION-TYPE
 
 iveMaxConcurrentUsersVirtualSystem NOTIFICATION-TYPE
     OBJECTS { ivsName }
-    STATUS	current
+    STATUS	deprecated
     DESCRIPTION
 	"Maximum number of concurrent Virtual System users signed in"
     ::= { iveTraps 24 }
@@ -691,25 +716,34 @@ iveProcessesReachedMaxLimit NOTIFICATION-TYPE
     DESCRIPTION
 	"The count of processes (by processName) has reached to maximum limit"
     ::= { iveTraps 38 }
+
+iveACLsNearMaxLimit NOTIFICATION-TYPE
+    OBJECTS { vpnACLSPercentage }
+    STATUS current
+    DESCRIPTION
+    "The percentage of ACL entries has reached maximum supported limit"
+    ::= { iveTraps 39 }
+
+iveACLsCrossedMaxLimit NOTIFICATION-TYPE
+    OBJECTS { vpnACLSCount }
+    STATUS current
+    DESCRIPTION
+    "The count of ACL entries has crossed maximum supported limit"
+    ::= { iveTraps 40 }
     
+iveTooManyFailedLoginAttemptsIPv6 NOTIFICATION-TYPE
+    OBJECTS { blockedIPv6 }
+    STATUS	current
+    DESCRIPTION
+	"Too many failed login attempts from IPv6 address"
+    ::= { iveTraps 41 }
+
 -- Product Name
 iveSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 252 }
 iveICProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 253 }
 iveMAGProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 254 }
 iveVAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 255 }
-
-iveProductSA700   OBJECT IDENTIFIER ::= {iveSAProduct 1}
-iveProductSA2000  OBJECT IDENTIFIER ::= {iveSAProduct 2 }
-iveProductSA2500  OBJECT IDENTIFIER ::= {iveSAProduct 3 }
-iveProductSA4000  OBJECT IDENTIFIER ::= {iveSAProduct 4 }
-iveProductSA4500  OBJECT IDENTIFIER ::= {iveSAProduct 5 }
-iveProductSA6000 OBJECT IDENTIFIER ::= {iveSAProduct 6 }
-iveProductSA6500 OBJECT IDENTIFIER ::= {iveSAProduct 7 }
-
-iveProductIC4000  OBJECT IDENTIFIER ::= {iveICProduct 1 }
-iveProductIC4500  OBJECT IDENTIFIER ::= {iveICProduct 2 }
-iveProductIC6000 OBJECT IDENTIFIER ::= {iveICProduct 3 }
-iveProductIC6500 OBJECT IDENTIFIER ::= {iveICProduct 4 }
+ivePSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 256 }
 
 --MAG platform
 iveProductMAG2600  OBJECT IDENTIFIER ::= {iveMAGProduct 1 }
@@ -721,25 +755,13 @@ iveProductSM360 OBJECT IDENTIFIER ::= {iveMAGProduct 4 }
 iveProductVASPE  OBJECT IDENTIFIER ::= {iveVAProduct 1 }
 iveProductVADTE  OBJECT IDENTIFIER ::= {iveVAProduct 2 }
 
---SA 
-iveSA700   OBJECT IDENTIFIER ::= {iveProductSA700 1}
-iveSA2000   OBJECT IDENTIFIER ::= {iveProductSA2000 1}
-iveSA2500   OBJECT IDENTIFIER ::= {iveProductSA2500 1}
-iveSA4000   OBJECT IDENTIFIER ::= {iveProductSA4000 1}
-iveSA4500   OBJECT IDENTIFIER ::= {iveProductSA4500 1}
-iveSA4000FIPS  OBJECT IDENTIFIER ::= {iveProductSA4000 2}
-iveSA4500FIPS   OBJECT IDENTIFIER ::= {iveProductSA4500 2}
-iveSA6000   OBJECT IDENTIFIER ::= {iveProductSA6000 1}
-iveSA6500   OBJECT IDENTIFIER ::= {iveProductSA6500 1}
-iveSA6000FIPS  OBJECT IDENTIFIER ::= {iveProductSA6000 2}
-iveSA6500FIPS   OBJECT IDENTIFIER ::= {iveProductSA6500 2}
-
---IC
-iveIC4000   OBJECT IDENTIFIER ::= {iveProductIC4000 1}
-iveIC6000   OBJECT IDENTIFIER ::= {iveProductIC6000 1}
-iveIC4500   OBJECT IDENTIFIER ::= {iveProductIC4500 1}
-iveIC6500   OBJECT IDENTIFIER ::= {iveProductIC6500 1}
-iveIC6000FIPS  OBJECT IDENTIFIER ::=  {iveProductIC6000 2}
+--PSA platform
+iveProductPSA300    OBJECT IDENTIFIER ::= {ivePSAProduct 1 }
+iveProductPSA3000   OBJECT IDENTIFIER ::= {ivePSAProduct 2 }
+iveProductPSA5000   OBJECT IDENTIFIER ::= {ivePSAProduct 3 }
+iveProductPSA7000f  OBJECT IDENTIFIER ::= {ivePSAProduct 4 }
+iveProductPSA7000c  OBJECT IDENTIFIER ::= {ivePSAProduct 5 }
+iveProductPSA10000  OBJECT IDENTIFIER ::= {ivePSAProduct 6 }
 
 --MAG platform incase we have other rev
 iveMAG2600  OBJECT IDENTIFIER ::= {iveProductMAG2600 1}
@@ -751,5 +773,12 @@ iveMAGSM360   OBJECT IDENTIFIER ::= {iveProductSM360 1}
 iveVASPE OBJECT IDENTIFIER ::= {iveProductVASPE 1}
 iveVADTE OBJECT IDENTIFIER ::= {iveProductVADTE 1}
 
+--PSA platform incase we have other rev
+ivePSA300    OBJECT IDENTIFIER ::= {iveProductPSA300 1 }
+ivePSA3000   OBJECT IDENTIFIER ::= {iveProductPSA3000 1 }
+ivePSA5000   OBJECT IDENTIFIER ::= {iveProductPSA5000 1 }
+ivePSA7000f  OBJECT IDENTIFIER ::= {iveProductPSA7000f 1 }
+ivePSA7000c  OBJECT IDENTIFIER ::= {iveProductPSA7000c 1 }
+ivePSA10000  OBJECT IDENTIFIER ::= {iveProductPSA10000 1 }
 
 END
