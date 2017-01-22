@@ -1222,7 +1222,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('radlan');
     }
 
-    public function testRADWIN()
+    public function testRadwin()
     {
         $this->checkOS('radwin');
     }
