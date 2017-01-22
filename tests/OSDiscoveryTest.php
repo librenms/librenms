@@ -1538,5 +1538,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testZyxelnwa()
     {
         $this->checkOS('zyxelnwa');
+        $this->checkOS('zyxelnwa', 'zyxelnwa1');
     }
 }
