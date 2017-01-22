@@ -23,6 +23,7 @@ if ($sub_type == 'new-maintenance') {
     // Defaults
     $status = 'error';
     $update = 0;
+    $message = '';
 
     $schedule_id = mres($_POST['schedule_id']);
     if ($schedule_id > 0) {
@@ -31,6 +32,12 @@ if ($sub_type == 'new-maintenance') {
 
     $title = mres($_POST['title']);
     $notes = mres($_POST['notes']);
+    $recurring = mres($_POST['recurring']);
+    $start_recurring_dt = mres($_POST['start_recurring_dt']);
+    $end_recurring_dt = mres($_POST['end_recurring_dt']);
+    $start_recurring_hr = mres($_POST['start_recurring_hr']);
+    $end_recurring_hr = mres($_POST['end_recurring_hr']);
+    $recurring_day = mres($_POST['recurring_day']);
     $start = mres($_POST['start']);
     $end   = mres($_POST['end']);
     $maps  = mres($_POST['maps']);
@@ -39,12 +46,63 @@ if ($sub_type == 'new-maintenance') {
         $message = 'Missing title<br />';
     }
 
-    if (empty($start)) {
-        $message .= 'Missing start date<br />';
+    if (!in_array($recurring, array(0,1))) {
+        $message .= 'Missing recurring choice<br />';
     }
-
-    if (empty($end)) {
-        $message .= 'Missing end date<br />';
+    
+    // check values if recurring is set to yes
+    if ($recurring == 1) {
+        if (empty($start_recurring_dt)) {
+            $message .= 'Missing start recurring date<br />';
+        } else {
+            // check if date is correct
+            list($ysrd, $msrd, $dsrd) = explode('-', $start_recurring_dt);
+            if (!checkdate($msrd, $dsrd, $ysrd)) {
+                $message .= 'Please check start recurring date<br />';
+            }
+        }
+        // end recurring dt not mandatory.. but if set, check if correct
+        if (!empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
+            list($yerd, $merd, $derd) = explode('-', $end_recurring_dt);
+            if (!checkdate($merd, $derd, $yerd)) {
+                $message .= 'Please check end recurring date<br />';
+            }
+        } else {
+            $end_recurring_dt = null;
+        }
+        
+        if (empty($start_recurring_hr)) {
+            $message .= 'Missing start recurring hour<br />';
+        }
+                
+        if (empty($end_recurring_hr)) {
+            $message .= 'Missing end recurring hour<br />';
+        }
+        
+        if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
+            $recurring_day = implode(',', $_POST['recurring_day']);
+        } else {
+            $recurring_day = null;
+        }
+        
+        // recurring = 1 => empty no reccurency values to be sure.
+        $start = '0000-00-00 00:00:00';
+        $end = '0000-00-00 00:00:00';
+    } else {
+        if (empty($start)) {
+            $message .= 'Missing start date<br />';
+        }
+    
+        if (empty($end)) {
+            $message .= 'Missing end date<br />';
+        }
+        
+        // recurring = 0 => empty no reccurency values to be sure.
+        $start_recurring_dt = '0000-00-00';
+        $end_recurring_dt = null;
+        $start_recurring_hr = '00:00:00';
+        $end_recurring_hr = '00:00:00';
+        $recurring_day = null;
     }
 
     if (!is_array($_POST['maps'])) {
@@ -53,9 +111,9 @@ if ($sub_type == 'new-maintenance') {
 
     if (empty($message)) {
         if (empty($schedule_id)) {
-            $schedule_id = dbInsert(array('start' => $start, 'end' => $end, 'title' => $title, 'notes' => $notes), 'alert_schedule');
+            $schedule_id = dbInsert(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule');
         } else {
-            dbUpdate(array('start' => $start, 'end' => $end, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($schedule_id));
+            dbUpdate(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($schedule_id));
         }
 
         if ($schedule_id > 0) {
@@ -106,11 +164,17 @@ if ($sub_type == 'new-maintenance') {
     }
 
     $response = array(
-        'start'   => $schedule['start'],
-        'end'     => $schedule['end'],
-        'title'   => $schedule['title'],
-        'notes'   => $schedule['notes'],
-        'targets' => $items,
+        'start'                   => $schedule['start'],
+        'end'                     => $schedule['end'],
+        'title'                   => $schedule['title'],
+        'notes'                   => $schedule['notes'],
+        'recurring'               => $schedule['recurring'],
+        'start_recurring_dt'    => ($schedule['start_recurring_dt'] != '0000-00-00' ? $schedule['start_recurring_dt']: '1970-01-01 00:00:01'),
+        'end_recurring_dt'      => ($schedule['end_recurring_dt']!= '0000-00-00' ? $schedule['end_recurring_dt'] : '1970-01-01 00:00:01'),
+        'start_recurring_hr'    => substr($schedule['start_recurring_hr'], 0, 5),
+        'end_recurring_hr'       => substr($schedule['end_recurring_hr'], 0, 5),
+        'recurring_day'           => $schedule['recurring_day'],
+        'targets'                => $items,
     );
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
