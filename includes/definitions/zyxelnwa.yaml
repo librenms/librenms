@@ -4,5 +4,8 @@ group: zyxel
 type: network
 icon: zyxel
 discovery:
-    - sysDescr_regex:
-        - '/^NWA-/'
+    -
+      sysDescr_regex:
+          - '/^NWA/'
+      sysObjectId:
+          - '.1.3.6.1.4.1.890.1.15'
