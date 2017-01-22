@@ -6,7 +6,10 @@ over:
     - { graph: device_bits, text: Traffic }
 icon: zyxel
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.890.1.6
-        - .1.3.6.1.4.1.890.1.15
+    -
+      sysObjectId:
+          - .1.3.6.1.4.1.890.1.6
+          - .1.3.6.1.4.1.890.1.15
+      sysDescr_regex:
+          - '/^ZyWALL/'
     - sysDescr_regex: '/^ZyWALL 2X/'
