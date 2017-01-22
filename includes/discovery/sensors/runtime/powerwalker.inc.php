@@ -2,7 +2,7 @@
 /**
  * powerwalker.inc.php
  *
- * LibreNMS pre-cache sensor discovery module for PowerWalker
+ * LibreNMS runtime sensor discovery module for PowerWalker
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,14 @@
  */
 
 if ($device['os'] === 'powerwalker') {
-    echo 'Pre-cache PowerWalker: ';
+    echo("PowerWalker ");
 
-    $pw_oids = array();
-    echo 'Caching OIDs:';
+    $descr   = 'Battery time remaining';
+    $oid     = '.1.3.6.1.2.1.33.1.2.3.0';
+    $value   = snmp_get($device, 'upsEstimatedMinutesRemaining.0', '-Oqv', 'UPS-MIB');
+    $value   = preg_replace('/\D/', '', $value);
 
-    $pw_oids = snmpwalk_cache_index($device, 'upsInputEntry', array(), 'UPS-MIB');
-    $pw_oids = snmpwalk_cache_index($device, 'upsOutputEntry', $pw_oids, 'UPS-MIB');
+    if (is_numeric($value) && $value > 0) {
+        discover_sensor($valid['sensor'], 'runtime', $device, $oid, 1, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
+    }
 }

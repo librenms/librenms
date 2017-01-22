@@ -2,7 +2,7 @@
 /**
  * powerwalker.inc.php
  *
- * LibreNMS pre-cache sensor discovery module for PowerWalker
+ * LibreNMS frequency sensor discovery module for PowerWalker
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,16 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
+ * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
 if ($device['os'] === 'powerwalker') {
-    echo 'Pre-cache PowerWalker: ';
+    echo("PowerWalker ");
 
-    $pw_oids = array();
-    echo 'Caching OIDs:';
-
-    $pw_oids = snmpwalk_cache_index($device, 'upsInputEntry', array(), 'UPS-MIB');
-    $pw_oids = snmpwalk_cache_index($device, 'upsOutputEntry', $pw_oids, 'UPS-MIB');
+    if (is_numeric($pw_oids['upsInputFrequency'][1])) {
+        $descr = 'Input Voltage';
+        $oid = '.1.3.6.1.2.1.33.1.3.3.1.2.1';
+        discover_sensor($valid['sensor'], 'frequency', $device, $oid, 2, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
+    }
 }

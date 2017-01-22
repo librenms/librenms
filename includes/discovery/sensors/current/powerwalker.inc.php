@@ -2,7 +2,7 @@
 /**
  * powerwalker.inc.php
  *
- * LibreNMS voltages sensor discovery module for PowerWalker
+ * LibreNMS current sensor discovery module for PowerWalker
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,31 +19,31 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
+ * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
 if ($device['os'] === 'powerwalker') {
     echo("PowerWalker ");
 
-    $descr = 'Battery Voltage';
-    $oid = '.1.3.6.1.2.1.33.1.2.5.0';
-    $value = snmp_get($device, 'upsBatteryVoltage.0', '-Oqv', 'UPS-MIB');
+    $descr = 'Battery Current';
+    $oid = '.1.3.6.1.2.1.33.1.2.6.0';
+    $value = snmp_get($device, 'upsBatteryCurrent.0', '-Oqv', 'UPS-MIB');
     $value = preg_replace('/\D/', '', $value);
 
     if (is_numeric($value) && $value > 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 1, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 1, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
     }
 
-    if (is_numeric($pw_oids['upsInputVoltage'][1])) {
+    if (is_numeric($pw_oids['upsInputCurrent'][1])) {
         $descr = 'Input Voltage';
-        $oid = '.1.3.6.1.2.1.33.1.3.3.1.3.1';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 2, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
+        $oid = '.1.3.6.1.2.1.33.1.3.3.1.4.1';
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 2, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
     }
 
-    if (is_numeric($pw_oids['upsOutputVoltage'][1])) {
+    if (is_numeric($pw_oids['upsOutputCurrent'][1])) {
         $descr = 'Output Voltage';
-        $oid = '.1.3.6.1.2.1.33.1.4.4.1.2.1';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 3, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
+        $oid = '.1.3.6.1.2.1.33.1.4.4.1.3.1';
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 3, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
     }
 }
