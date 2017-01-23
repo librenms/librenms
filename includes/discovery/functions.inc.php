@@ -94,6 +94,7 @@ function discover_device($device, $options = null)
     $valid = array();
     // Reset $valid array
     $attribs = get_dev_attribs($device['device_id']);
+    $device['attribs'] = $attribs;
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $device_start = microtime(true);

@@ -11,7 +11,7 @@ if (count($drives)) {
               <div class="panel panel-default panel-condensed">
                 <div class="panel-heading">';
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=storage/">';
-    echo "<img src='images/icons/storage.png'> <strong>Storage</strong></a>";
+    echo '<i class="fa fa-database fa-lg icon-theme" aria-hidden="true"></i> <strong>Storage</strong></a>';
     echo '    </div>
             <table class="table table-hover table-condensed table-striped">';
 
