@@ -2,24 +2,13 @@
 
 echo "MIKROTIK-MIB ";
 
-$ifIndex_array = explode("\n", snmp_walk($device, "ifIndex", "-Oqv", "IF-MIB"));
+$ifIndex_array = explode("\n", snmp_walk($device, "ifType", "-Oq", "IF-MIB"));
 
-$snmp_get_oids = "";
-foreach ($ifIndex_array as $ifIndex) {
-        $snmp_get_oids .= "ifDescr.$ifIndex ifName.$ifIndex ifType.$ifIndex ";
-}
-
-$ifDescr_array = array();
-$ifDescr_array = snmp_get_multi($device, $snmp_get_oids, '-OQU', 'IF-MIB');
-d_echo($ifDescr_array);
-foreach ($ifIndex_array as $ifIndex) {
-    d_echo("\$ifDescr_array[$ifIndex]['IF-MIB::ifDescr'] = " . $ifDescr_array[$ifIndex]['IF-MIB::ifDescr'] . "\n");
-    $ifDescr = $ifDescr_array[$ifIndex]['IF-MIB::ifDescr'];
-    d_echo("\$ifDescr_array[$ifIndex]['IF-MIB::ifName'] = " . $ifDescr_array[$ifIndex]['IF-MIB::ifName'] . "\n");
-    d_echo("\$ifDescr_array[$ifIndex]['IF-MIB::ifType'] = " . $ifDescr_array[$ifIndex]['IF-MIB::ifType'] . "\n");
-    $ifType = $ifDescr_array[$ifIndex]['IF-MIB::ifType'];
-
+d_echo($ifIndex_array);
+foreach ($ifIndex_array as $ifResult) {
+    list($oid, $ifType) = preg_split('/ /', $ifResult);
     if ($ifType == 'ieee80211') {
+        list($junk, $ifIndex) = preg_split('/\./', $oid);
         // $mib_oids     (oidindex,dsname,dsdescription,dstype)
         $mib_oids['mtxrWlApTxRate.'.$ifIndex] = array(
                     '',
