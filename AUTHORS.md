@@ -167,6 +167,7 @@ LibreNMS contributors:
 - ant Kenworthy <git@manchetermonkey.co.uk> (mcrmonkey)
 - Aleksandr Stankevic <aleksandr.stankevic@gmail.com> (sysmonk)
 - Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
+- Patrick Velder <patrick2+librenms@velder.li> (patrick7)
 - Robert Towster <rnt-github@towster.com> (towster)
 
 [1]: http://observium.org/ "Observium web site"
