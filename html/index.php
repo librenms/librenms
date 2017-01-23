@@ -335,28 +335,28 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
     echo('<script type="text/javascript">
         $(document).ready(function() {
 
-           $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
+           $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
            var Countdown = {
                sec: '. $config['page_refresh'] .',
 
                Start: function() {
                    var cur = this;
                    this.interval = setInterval(function() {
-                       $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
+                       $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
                        cur.sec -= 1;
                        display_time = cur.sec;
                        if (display_time == 0) {
                            location.reload();
                        }
                        if (display_time % 1 === 0 && display_time <= 300) {
-                           $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw\"></i> Refresh in " + display_time);
+                           $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + display_time);
                        }
                    }, 1000);
                },
 
                Pause: function() {
                    clearInterval(this.interval);
-                   $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw\"></i> Resume");
+                   $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw fa-lg\"></i> Resume");
                    delete this.interval;
                },
 
@@ -387,7 +387,7 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
     var no_refresh = ' . var_export((bool)$no_refresh, true) . ';
     $(document).ready(function() {
         $("#countdown_timer").html("Refresh disabled");
-        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i>");
+        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i>");
         $("#countdown_timer_status").click("", function(event) {
             event.preventDefault();
         });

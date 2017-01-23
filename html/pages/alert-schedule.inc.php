@@ -32,8 +32,14 @@ if (is_admin() !== false) {
             <thead>
                 <tr>
                     <th data-column-id="title">Title</th>
-                    <th data-column-id="start" data-order="desc">Start</th>
-                    <th data-column-id="end">End</th>
+                    <th data-column-id="recurring">Recurring</th>
+                    <th data-column-id="start" data-order="desc">Start (no recurring)</th>
+                    <th data-column-id="end">End (no recurring)</th>
+                    <th data-column-id="start_recurring_dt">Start recurring dt</th>
+                    <th data-column-id="end_recurring_dt">End recurring dt</th>
+                    <th data-column-id="start_recurring_hr">Start recurring hr</th>
+                    <th data-column-id="end_recurring_hr">End recurring hr</th>
+                    <th data-column-id="recurring_day" data-sortable="false" data-searchable="false">Recurring on days</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
                 </tr>
             </thead>

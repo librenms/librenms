@@ -166,6 +166,7 @@ LibreNMS contributors:
 - Julian Kornberger <jk+github@digineo.de> (corny)
 - ant Kenworthy <git@manchetermonkey.co.uk> (mcrmonkey)
 - Aleksandr Stankevic <aleksandr.stankevic@gmail.com> (sysmonk)
+- Richard Mayhew <richard@splash.co.za> (InsaneSplash)
 - Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
 - Patrick Velder <patrick2+librenms@velder.li> (patrick7)
 - Robert Towster <rnt-github@towster.com> (towster)

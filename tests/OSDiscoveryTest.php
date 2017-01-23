@@ -1222,6 +1222,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('radlan');
     }
 
+    public function testRadwin()
+    {
+        $this->checkOS('radwin');
+    }
+
     public function testRaisecom()
     {
         $this->checkOS('raisecom');
@@ -1538,5 +1543,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testZyxelnwa()
     {
         $this->checkOS('zyxelnwa');
+        $this->checkOS('zyxelnwa', 'zyxelnwa1');
     }
 }
