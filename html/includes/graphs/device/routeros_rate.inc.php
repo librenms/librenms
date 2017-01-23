@@ -12,18 +12,16 @@ foreach (glob($rrd_filename) as $filename) {
         list($port_index, $junk) = preg_split("/\./", $second);
 
         $port_name = dbFetchCell($sql, array($device['device_id'], $port_index));
-        $rrd_list = array(
-            array(
-                'ds' => 'mtxrWlApTxRate',
-                'filename' => $filename,
-                'descr' => $port_name . ' Tx Rate',
-            ),
-            array(
+        $rrd_list[] = array(
+                    'ds' => 'mtxrWlApTxRate',
+                    'filename' => $filename,
+                    'descr' => $port_name . ' Tx Rate',
+            );
+        $rrd_list[] = array(
                 'ds' => 'mtxrWlApRxRate',
                 'filename' => $filename,
                 'descr' => $port_name . ' Rx Rate',
-            ),
-        );
+            );
     } else {
         echo "file missing: $rrd_filename";
     }
