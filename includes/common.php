@@ -465,6 +465,12 @@ function safename($name)
     return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
 }
 
+function safeglob($name)
+{
+    return preg_replace('/[^a-zA-Z0-9,._\-\*]/', '_', $name);
+}
+
+
 /**
  * Function format the rrdtool description text correctly.
  * @param $descr

@@ -4,6 +4,13 @@ echo "MIKROTIK-MIB ";
 
 $ifIndex_array = explode("\n", snmp_walk($device, "ifType", "-Oq", "IF-MIB"));
 
+$mib_graphs = array(
+    'routeros_rate',
+    'routeros_clients',
+    'routeros_noisefloor',
+    'routeros_txccq',
+);
+
 d_echo($ifIndex_array);
 foreach ($ifIndex_array as $ifResult) {
     list($oid, $ifType) = preg_split('/ /', $ifResult);
@@ -39,18 +46,11 @@ foreach ($ifIndex_array as $ifResult) {
                     'mtxrWlApOveralTxCCQ',
                     'Tx CCQ',
                     'GAUGE',
-                    );
+                );
+
+        poll_mib_def($device, 'MIKROTIK-MIB:mikrotik-wifi'.$ifIndex, 'mikrotik', $mib_oids, $mib_graphs, $graphs);
+        unset($mib_oids);
     }
 }
 
-
-$mib_graphs = array(
-    'routeros_rate',
-    'routeros_clients',
-    'routeros_noisefloor',
-    'routeros_txccq',
-);
-
-
-poll_mib_def($device, 'MIKROTIK-MIB:mikrotik-wifi', 'mikrotik', $mib_oids, $mib_graphs, $graphs);
 // EOF
