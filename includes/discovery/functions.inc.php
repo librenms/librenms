@@ -962,26 +962,24 @@ function ignore_storage($descr)
 function sensors($types, $device, $pre_cache = array())
 {
     global $config;
-    if (is_array($types)) {
-        foreach ($types as $type) {
-            echo ucfirst($type) . ': ';
+    foreach ((array)$types as $type) {
+        echo ucfirst($type) . ': ';
 
-            $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
+        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
 
-            if (is_file($dir . $device['os_group'] . '.inc.php')) {
-                include_once $dir . $device['os_group'] . '.inc.php';
-            }
-            if (is_file($dir . $device['os'] . '.inc.php')) {
-                include_once $dir . $device['os'] . '.inc.php';
-            }
-            if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
-                if (is_file($dir  . '/rfc1628.inc.php')) {
-                    include_once $dir . '/rfc1628.inc.php';
-                }
-            }
-            d_echo($valid['sensor'][$type]);
-            check_valid_sensors($device, $type, $valid['sensor']);
-            echo "\n";
+        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+            include_once $dir . $device['os_group'] . '.inc.php';
         }
+        if (is_file($dir . $device['os'] . '.inc.php')) {
+            include_once $dir . $device['os'] . '.inc.php';
+        }
+        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+            if (is_file($dir  . '/rfc1628.inc.php')) {
+                include_once $dir . '/rfc1628.inc.php';
+            }
+        }
+        d_echo($valid['sensor'][$type]);
+        check_valid_sensors($device, $type, $valid['sensor']);
+        echo "\n";
     }
 }
