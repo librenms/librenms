@@ -38,15 +38,25 @@ discovery:
         - VA-SPE
 ```
 
-#### Icon
+#### Icon and Logo
 
-Put a SVG vector image to **html/images/os/$os.svg**. Legacy PNG bitmaps (32x32 px) are also supported.
-
-- Square icons are prefered to a name.
-- A vector image should not contain padding.
+Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.
+- A vector image should not contain padding.  
 - The file should not be larger than 20 Kb. Simplify paths to reduce large files.
+- Use plain SVG without gzip compression.
+
+##### Icon
+- Save the icon SVG to **html/images/os/$os.svg**.
+- Icons should look good when viewed at 32x32 px.
+- Square icons are preferred to full logos with text.
 - Remove small ornaments that are almost not visible when displayed with 32px width (e.g. ® or ™).
-- Use plain SVG without compression.
+
+##### Logo
+- Save the logo SVG to **html/images/logos/$os.svg**.
+- Logos can be any dimension, but often are wide and contain the company name.
+- If a logo is not present, the icon will be used.
+
+##### Hints
 
 Hints for [Inkscape](https://inkscape.org/):
 
@@ -57,8 +67,8 @@ Hints for [Inkscape](https://inkscape.org/):
 - Use `File -> Clean up document` to remove unused gradients, patterns, or markers.
 - Use `File -> Save As -> Plain SVG` to save the final image.
 
-By optimizing the SVG you can shrink the filesize in some cases to less than 20 %.
-[SVG Optimizer](https://github.com/svg/svgo) does a great job.
+By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
+[SVG Optimizer](https://github.com/svg/svgo) does a great job. There is also an [online version](https://jakearchibald.github.io/svgomg/).
 
 #### Discovery OS
 
