@@ -253,7 +253,8 @@ function getIconTag($device)
     return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
 }
 
-function getImageTitle($device) {
+function getImageTitle($device)
+{
     return $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
 }
 
