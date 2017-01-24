@@ -185,7 +185,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $icon = 'redMarker';
                 $z_offset = 10000;  // move marker to foreground
             }
-            $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getImageSrc($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".$map_devices['hostname']."</a>';
+            $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".$map_devices['hostname']."</a>';
 var tooltip = '".$map_devices['hostname']."';
 var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
 marker.bindPopup(title);
