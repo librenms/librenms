@@ -1188,6 +1188,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
         $this->checkOS('procurve', 'procurve-2530');
+        $this->checkOS('procurve', 'procurve-2620');
         $this->checkOS('procurve', 'procurve-5402r');
     }
 
