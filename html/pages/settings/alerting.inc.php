@@ -362,7 +362,7 @@ foreach ($api_urls as $api_url) {
                 <div class="panel-body">
                     <div class="form-group">
                         <div class="col-sm-2">
-                            <a href="https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='.$callback.'"><img src="https://pagerduty.com/assets/pd_connect_button.png width="202" height="36" alt="Connect to PagerDuty"></a>
+                            <a href="https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='.$callback.'"><img src="images/pd_connect_button.png" width="202" height="36" alt="Connect to PagerDuty"></a>
                         </div>
                         <div class="col-sm-1">';
 if (empty($config_groups['alert.transports.pagerduty']['config_value']) === false) {
