@@ -207,7 +207,7 @@ $space_check = (disk_free_space($config['install_dir']) / 1024 / 1024);
 if ($space_check < 512 && $space_check > 1) {
     print_warn('Disk space where '.$config['install_dir'].' is located is less than 512Mb');
 }
-
+d
 if ($space_check < 1) {
     print_fail('Disk space where '.$config['install_dir'].' is located is empty!!!');
 }
@@ -218,9 +218,7 @@ $suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
-        print_fail("$bin location is incorrect or bin not installed");
-        print_fail("You can also manually set the path to $bin by placing the following in config.php:");
-        print_fail("\$config['$bin'] = \"/path/to/$bin\";");
+        print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
     } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
         print_fail("$bin should be suid, please chmod u+s $cmd");
     }
