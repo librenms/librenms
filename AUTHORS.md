@@ -169,7 +169,7 @@ LibreNMS contributors:
 - Richard Mayhew <richard@splash.co.za> (InsaneSplash)
 - Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
 - Patrick Velder <patrick2+librenms@velder.li> (patrick7)
-- Robert Towster <rnt-github@towster.com> (towster)
+- Robert Towster <rnt-github at towster.com> (towster)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
