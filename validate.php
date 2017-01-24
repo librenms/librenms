@@ -219,6 +219,8 @@ foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed");
+        print_fail("You can also manually set the path to $bin by placing the following in config.php:");
+        print_fail("\$config['$bin'] = \"/path/to/$bin\";");
     } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
         print_fail("$bin should be suid, please chmod u+s $cmd");
     }
