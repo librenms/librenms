@@ -11,10 +11,10 @@ if (!empty($agent_data['munin'])) {
         $plugins_db[$plugin_db['mplug_type']]['id'] = $plugin_db['mplug_id'];
     }
 
-    $old_plugins_rrd_dir = $host_rrd.'/plugins';
-    $plugins_rrd_dir     = $host_rrd.'/munin';
+    $old_plugins_rrd_dir = $host_rrd.'plugins';
+    $plugins_rrd_dir     = $host_rrd.'munin';
     if (is_dir($old_plugins_rrd_dir) && !is_dir($plugins_rrd_dir)) {
-        rename($old_plugins_dir, $plugins_dir);
+        rename($old_plugins_rrd_dir, $plugins_rrd_dir);
     }
 
     if (!is_dir($plugins_rrd_dir)) {
