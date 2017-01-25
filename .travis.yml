@@ -12,8 +12,8 @@ matrix:
     env: SKIP_STYLE_CHECK=1
   - php: 5.6
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
-  - php: hhvm
-    env: SKIP_STYLE_CHECK=1
+#  - php: hhvm
+#    env: SKIP_STYLE_CHECK=1
 
   allow_failures:
   - php: hhvm
