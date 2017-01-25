@@ -18,7 +18,7 @@ if (!empty($group_count_check)) {
         echo '<td>';
         echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-group' data-group_id='".$group['id']."' name='edit-device-group'";
         if (!is_null($group['params'])) {
-            echo " disabled title='LibreNMS V2 device groups cannot be edited in LibreNMS V1'";
+            echo " disabled title='LibreNMS V2 dynamic device groups cannot be edited in LibreNMS V1'";
         }
         echo "><i class='fa fa-pencil' aria-hidden='true'></i></button> ";
         echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-group_id='".$group['id']."' name='delete-device-group'><i class='fa fa-trash' aria-hidden='true'></i></button>";

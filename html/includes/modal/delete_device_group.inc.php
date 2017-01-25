@@ -25,7 +25,7 @@ if (is_admin() === false) {
                 <h5 class="modal-title" id="Delete">Confirm Delete</h5>
             </div>
             <div class="modal-body">
-                <p>If you would like to remove the device group then please click Delete.</p>
+                <p>If you would like to remove the dynamic device group then please click Delete.</p>
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_token_form">
@@ -61,7 +61,7 @@ $('#device-group-removal').click('', function(event) {
             $("#confirm-delete").modal('hide');
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info">The device group could not be deleted.</div>');
+            $("#message").html('<div class="alert alert-info">The dynamic device group could not be deleted.</div>');
             $("#confirm-delete").modal('hide');
         }
     });
