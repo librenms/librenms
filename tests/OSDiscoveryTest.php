@@ -168,6 +168,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('arista_eos');
     }
 
+    public function testArrayOS()
+    {
+        $this->checkOS('arrayos');
+    }
+
     public function testArubaos()
     {
         $this->checkOS('arubaos');
