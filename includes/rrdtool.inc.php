@@ -275,7 +275,6 @@ function rrdtool_escape($string, $length = null)
 {
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
-    $result = str_replace('%', '%%', $result);          # double percent signs
     if (is_numeric($length)) {
         $extra = substr_count($string, ':', 0, $length);
         $result = substr(str_pad($result, $length), 0, ($length + $extra));
@@ -301,6 +300,7 @@ function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    $host = str_replace(':', '_', trim($host, '[]'));
     return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 

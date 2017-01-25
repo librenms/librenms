@@ -835,7 +835,7 @@ $config['unix-agent-read-time-out'] = 10;
 // seconds
 
 // Lat / Lon support for maps
-$config['geoloc']['latlng']                             = false; // True to enable translation of location to latlng co-ordinates
+$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
 $config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';

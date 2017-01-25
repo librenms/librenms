@@ -169,6 +169,7 @@ LibreNMS contributors:
 - Richard Mayhew <richard@splash.co.za> (InsaneSplash)
 - Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
 - Patrick Velder <patrick2+librenms@velder.li> (patrick7)
+- Andrew Wippler <andrew.wippler+librenms@gmail.com> (andrewwippler)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
