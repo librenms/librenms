@@ -1,7 +1,7 @@
 os: moxa-etherdevice
 icon: moxa
 text: Moxa
-type: switch
+type: network
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
