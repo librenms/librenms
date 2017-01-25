@@ -417,6 +417,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDcnSoftware()
     {
         $this->checkOS('dcn-software');
+        $this->checkOS('dcn-software', 'dcn-software1');
     }
 
     public function testDdnos()
