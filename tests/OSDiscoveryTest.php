@@ -345,6 +345,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosb', 'ciscosb4');
         $this->checkOS('ciscosb', 'ciscosb5');
         $this->checkOS('ciscosb', 'ciscosb6');
+        $this->checkOS('ciscosb', 'ciscosb7');
     }
 
     public function testCiscosmblinux()
@@ -790,6 +791,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('ise');
         $this->checkOS('ise', 'ise1');
+        $this->checkOS('ise', 'ise2');
     }
 
     public function testJetdirect()
@@ -1186,6 +1188,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
         $this->checkOS('procurve', 'procurve-2530');
+        $this->checkOS('procurve', 'procurve-2620');
         $this->checkOS('procurve', 'procurve-5402r');
     }
 

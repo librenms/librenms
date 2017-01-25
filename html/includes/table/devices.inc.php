@@ -153,7 +153,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     $type = strtolower($device['os']);
 
-    $image = getImage($device);
+    $image = getIconTag($device);
 
     if ($device['os'] == 'ios') {
         formatCiscoHardware($device, true);

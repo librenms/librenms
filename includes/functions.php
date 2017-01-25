@@ -212,45 +212,80 @@ function interface_errors($rrd_file, $period = '-1d')
     return $errors;
 }
 
-function getImage($device)
+/**
+ * @param $device
+ * @return string the logo image path for this device. Images are often wide, not square.
+ */
+function getLogo($device)
 {
-    $title = $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
-    return '<img src="' . getImageSrc($device) . '" title="' . $title . '"/>';
+    $img = getImageName($device, true, 'images/logos/');
+    if (!starts_with($img, 'generic')) {
+        return 'images/logos/' . $img;
+    }
+
+    return getIcon($device);
 }
 
-function getImageSrc($device)
+/**
+ * @param $device
+ * @return string an image tag with the logo for this device. Images are often wide, not square.
+ */
+function getLogoTag($device)
+{
+    return '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"/>';
+}
+
+/**
+ * @param $device
+ * @return string the path to the icon image for this device.  Close to square.
+ */
+function getIcon($device)
 {
     return 'images/os/' . getImageName($device);
 }
 
-function getImageName($device, $use_database = true)
+/**
+ * @param $device
+ * @return string an image tag with the icon for this device.  Close to square.
+ */
+function getIconTag($device)
+{
+    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
+}
+
+function getImageTitle($device)
+{
+    return $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
+}
+
+function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
     global $config;
 
-    $device['os'] = strtolower($device['os']);
+    $os = strtolower($device['os']);
 
     // fetch from the database
-    if ($use_database && is_file($config['html_dir'] . '/images/os/' . $device['icon'])) {
+    if ($use_database && is_file($config['html_dir'] . "/$dir" . $device['icon'])) {
         return $device['icon'];
     }
 
     // linux specific handling, distro icons
     $distro = null;
-    if ($device['os'] == "linux") {
+    if ($os == "linux") {
         $features = strtolower(trim($device['features']));
         list($distro) = explode(" ", $features);
     }
 
     $possibilities = array(
         $distro,
-        $config['os'][$device['os']]['icon'],
-        $device['os'],
+        $config['os'][$os]['icon'],
+        $os,
     );
 
     foreach ($possibilities as $basename) {
         foreach (array('.svg', '.png') as $ext) {
             $name = $basename . $ext;
-            if (is_file($config['html_dir'] . '/images/os/' . $name)) {
+            if (is_file($config['html_dir'] . "/$dir" . $name)) {
                 return $name;
             }
         }
@@ -648,7 +683,12 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
 
 function isDomainResolves($domain)
 {
-    return (gethostbyname($domain) != $domain || count(dns_get_record($domain)) != 0);
+    if (gethostbyname($domain) != $domain) {
+        return true;
+    }
+
+    $records = dns_get_record($domain);  // returns array or false
+    return !empty($records);
 }
 
 function hoststatus($id)

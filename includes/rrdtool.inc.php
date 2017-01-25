@@ -300,6 +300,7 @@ function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    $host = str_replace(':', '_', trim($host, '[]'));
     return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 
