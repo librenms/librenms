@@ -766,7 +766,7 @@ $('#gsearch').typeahead({
   valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;Ports</strong></h5>',
-        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
     }
 },
 {
