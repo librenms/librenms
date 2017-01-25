@@ -14,7 +14,6 @@ poller_modules:
     bgp-peers: 0
     ospf: 0
     stp: 0
-    wifi: 0
 discovery_modules:
     bgp-peers: 0
     stp: 0

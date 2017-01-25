@@ -10,5 +10,3 @@ discovery:
     - sysDescr:
         - 'kernel JUNOS'
         - 'kernel Junos'
-poller_modules:
-    wifi: 0
