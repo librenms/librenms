@@ -207,7 +207,7 @@ $space_check = (disk_free_space($config['install_dir']) / 1024 / 1024);
 if ($space_check < 512 && $space_check > 1) {
     print_warn('Disk space where '.$config['install_dir'].' is located is less than 512Mb');
 }
-d
+
 if ($space_check < 1) {
     print_fail('Disk space where '.$config['install_dir'].' is located is empty!!!');
 }
