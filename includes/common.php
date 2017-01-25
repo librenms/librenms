@@ -1503,9 +1503,10 @@ function clean($value)
  */
 function display($value)
 {
-    $purifier = new HTMLPurifier(
-        HTMLPurifier_Config::createDefault()
-    );
+    global $config;
+    $p_config = HTMLPurifier_Config::createDefault();
+    $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+    $purifier = new HTMLPurifier($p_config);
     return $purifier->purify(stripslashes($value));
 }
 
