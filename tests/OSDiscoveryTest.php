@@ -924,6 +924,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-pulsar');
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
+        $this->checkOS('mgeups', 'mgeups-ex2200');
         $this->checkOS('mgeups', 'mgeups-proxy');
         $this->checkOS('mgeups', 'mgeups-comet');
     }
