@@ -1,7 +1,7 @@
 os: procurve
 text: 'HP ProCurve'
 type: network
-icon: hpe
+icon: hp
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
