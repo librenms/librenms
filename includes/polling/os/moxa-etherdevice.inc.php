@@ -11,5 +11,5 @@
  */
 
 
-$version = snmp_get($device, "MOXA-IKS6726A-MIB::firmwareVersion.0", "-OQvs", "");
+$version = snmp_get($device, "firmwareVersion.0", "-OQvs", "MOXA-IKS6726A-MIB");
 $hardware =  $poll_device['sysDescr'];
