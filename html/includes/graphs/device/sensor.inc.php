@@ -2,15 +2,9 @@
 
 require 'includes/graphs/common.inc.php';
 
-if ($_GET['width'] > '300') {
-    $descr_len = '40';
-} else {
-    $descr_len = '22';
-}
 
-$rrd_options .= ' -E ';
 $iter         = '1';
-$rrd_options .= " COMMENT:'".str_pad($unit_long, $descr_len)."    Cur     Min    Max\\n'";
+$rrd_options .= " COMMENT:'$unit_long                  Cur       Min       Max\\n'";
 
 foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`', array($class, $device['device_id'])) as $sensor) {
     // FIXME generic colour function
@@ -46,7 +40,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
             break;
     }//end switch
 
-    $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], $descr_len), 0, $descr_len);
+    $sensor['sensor_descr_fixed'] = rrdtool_escape($sensor['sensor_descr'], 12);
     $rrd_file     = get_sensor_rrd($device, $sensor);
     $rrd_options .= ' DEF:sensor'.$sensor['sensor_id']."=$rrd_file:sensor:AVERAGE ";
     $rrd_options .= ' LINE1:sensor'.$sensor['sensor_id'].'#'.$colour.":'".str_replace(':', '\:', str_replace('\*', '*', $sensor['sensor_descr_fixed']))."'";

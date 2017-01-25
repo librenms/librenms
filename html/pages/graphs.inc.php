@@ -165,7 +165,7 @@ foreach (get_graph_subtypes($type, $device) as $avail_type) {
         print_optionbar_start();
         echo('<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
-            <img valign=absmiddle src="images/16/information.png" />
+            <i class="fa fa-info-circle fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>');
         echo($config['graph_descr'][$vars['type']]);

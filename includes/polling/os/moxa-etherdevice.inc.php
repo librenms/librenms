@@ -2,6 +2,7 @@
 /*
  * LibreNMS
  *
+ * Copyright (c) 2017 Aldemir Akpinar <aldemir.akpinar@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -9,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if (starts_with($sysDescr, array('CANOPY', 'CMM'))) {
-    $os = 'canopy';
-}
+
+$version = snmp_get($device, "firmwareVersion.0", "-OQvs", "MOXA-IKS6726A-MIB");
+$hardware =  $poll_device['sysDescr'];

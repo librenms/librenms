@@ -19,19 +19,19 @@
 function generate_priority_icon($priority)
 {
     $map = array(
-        "emerg"     => "server_delete",
-        "alert"     => "cancel",
-        "crit"      => "application_lightning",
-        "err"       => "application_delete",
-        "warning"   => "application_error",
-        "notice"    => "application_edit",
-        "info"      => "application",
-        "debug"     => "bug",
-        ""          => "application",
+        "emerg"     => "fa-plus-circle text-danger",
+        "alert"     => "fa-ban text-danger",
+        "crit"      => "fa-minus-circle text-danger",
+        "err"       => "fa-times-circle text-warning",
+        "warning"   => "fa-exclamation-triangle text-warning",
+        "notice"    => "fa-info-circle text-info",
+        "info"      => "fa-info-circle text-info",
+        "debug"     => "fa-bug text-muted",
+        ""          => "fa-info-circle text-info",
     );
 
-    $image = isset($map[$priority]) ? $map[$priority] : 'application';
-    return '<img src="images/16/' . $image .'.png" title="' . $priority . '">';
+    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
+    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
 }
 
 function generate_priority_status($priority)
@@ -197,7 +197,7 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
-function get_all_devices($device, $type = "")
+function get_all_devices()
 {
     global $cache;
     $devices = array();
@@ -1503,9 +1503,8 @@ function clean($value)
  */
 function display($value)
 {
-    $purifier = new HTMLPurifier(
-        HTMLPurifier_Config::createDefault()
-    );
+    /** @var HTMLPurifier $purifier */
+    global $purifier;
     return $purifier->purify(stripslashes($value));
 }
 
@@ -1533,7 +1532,7 @@ function load_os(&$device)
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($config['os'][$device['os']]['type'] != $device['type']) {
+    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
@@ -1580,12 +1579,10 @@ function fahrenheit_to_celsius($scale, $value)
     }
     return sprintf('%.02f', $value);
 }
-
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
-
 /**
  * @param $value
  * @param null $default
@@ -1599,7 +1596,6 @@ function set_null($value, $default = null, $min = 0)
     }
     return $value;
 }
-
 /*
  * @param $value
  * @param int $default
@@ -1612,7 +1608,6 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
-
 function check_git_exists()
 {
     if (`which git`) {

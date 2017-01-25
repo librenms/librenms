@@ -27,7 +27,7 @@ foreach (explode("\n", $oids) as $data) {
 $multiplier = 1;
 $divisor    = 1;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
-    if (is_numeric($entry['jnxDomCurrentModuleTemperature'])) {
+    if (is_numeric($entry['jnxDomCurrentModuleTemperature']) && $entry['jnxDomCurrentModuleTemperature'] != 0 && $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold']) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.8.'.$index;
         $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Temperature';
         $limit_low = $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold']/$divisor;
@@ -37,6 +37,7 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $current = $entry['jnxDomCurrentModuleTemperature'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
+
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

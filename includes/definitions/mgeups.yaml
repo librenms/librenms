@@ -8,6 +8,8 @@ mib_dir:
 over:
     - { graph: device_current, text: Current }
 discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.705.1
     - sysDescr:
         - 'Pulsar M'
         - 'MGE UPS SYSTEMS - Network Management Proxy'

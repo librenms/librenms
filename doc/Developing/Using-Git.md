@@ -108,5 +108,26 @@ Thanks for your first pull request :)
 Ok, that should get you started on the contributing path. If you have any other questions then stop by our IRC Channel
 on Freenode ##librenms.
 
+### Hints and tips
+
+Undo last commit
+
+`git reset --soft 'HEAD^'`
+
+Remove specific commit
+
+`git revert <HASH>`
+
+Restore deleted file
+
+`git checkout $(git rev-list -n 1 HEAD -- "$file")^ -- "$file"`
+
+Merge last two commits
+
+`git rebase --interactive HEAD~2`
+In the text file that opens, change the last commit to squash from pick then save an exit.
+
+For more tips take a look at [Oh shit, git!](http://ohshitgit.com/)
+
 [1]: http://gitready.com
 [2]: http://git-scm.com/book

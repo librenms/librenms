@@ -17,14 +17,11 @@ if ($device['disabled'] == '1') {
     $class = 'alert-info';
 }
 
-$type = strtolower($device['os']);
-
-$image = getImage($device);
 $host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 
 echo '
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td><span class="device-icon-48h">'.$image.'</span></td>
+             <td><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
              <td>';
 if ($host_id > 0) {
     echo '

@@ -7,7 +7,7 @@ echo "<div class='row'>
             <div class='panel-heading'>";
 
 if ($config['overview_show_sysDescr']) {
-    echo '<strong>'.$device['sysDescr'].'</strong>';
+    echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>'.$device['sysDescr'].'</strong>';
 }
 
 echo '</div>
@@ -99,7 +99,7 @@ if (!is_array($loc)) {
 if (is_array($loc)) {
     echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$loc['lat'].','.$loc['lng'].']</td>
+        <td>['.$loc['lat'].','.$loc['lng'].'] <div class="pull-right"><a href="https://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
 }
 

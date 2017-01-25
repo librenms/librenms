@@ -92,7 +92,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     }
 
     if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
-        $error_img = generate_port_link($interface, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
+        $error_img = generate_port_link($interface, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", errors);
     } else {
         $error_img = '';
     }

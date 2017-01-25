@@ -6,12 +6,60 @@ if ($sensor_class == 'state') {
 }
 
 if (count($sensors)) {
+    switch (strtolower($sensor_type)) {
+        case "charge":
+            $sensor_fa_icon = "fa-battery-half";
+            break;
+        case "temperature":
+            $sensor_fa_icon = "fa-thermometer-three-quarters";
+            break;
+        case "humidity":
+            $sensor_fa_icon = "fa-tint";
+            break;
+        case "fanspeed":
+            $sensor_fa_icon = "fa-asterisk";
+            break;
+        case "voltage":
+            $sensor_fa_icon = "fa-bolt";
+            break;
+        case "current":
+            $sensor_fa_icon = "fa-bolt";
+            break;
+        case "frequency":
+            $sensor_fa_icon = "fa-line-chart";
+            break;
+        case "runtime":
+            $sensor_fa_icon = "fa-hourglass";
+            break;
+        case "power":
+            $sensor_fa_icon = "fa-power-off";
+            break;
+        case "dBm":
+            $sensor_fa_icon = "fa-signal";
+            break;
+        case "state":
+            $sensor_fa_icon = "fa-bullseye";
+            break;
+        case "load":
+            $sensor_fa_icon = "fa-percent";
+            break;
+        case "signal":
+            $sensor_fa_icon = "fa-signal";
+            break;
+        case "airflow":
+            $sensor_fa_icon = "fa-superpowers";
+            break;
+        default:
+            $sensor_fa_icon = "fa-delicious";
+            break;
+    }//end switch
+
     echo '<div class="container-fluid ">
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device='.$device['device_id'].'/tab=health/metric='.strtolower($sensor_type).'/"><img src="images/icons/'.strtolower($sensor_type).'.png"><strong> '.$sensor_type.'</strong></a>';
+    echo '<a href="device/device='.$device['device_id'].'/tab=health/metric='.strtolower($sensor_type).'/"><i class="fa '.$sensor_fa_icon.' fa-lg icon-theme" aria-hidden="true"></i><strong> '.$sensor_type.'</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     foreach ($sensors as $sensor) {
@@ -51,8 +99,8 @@ if (count($sensors)) {
 
         $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
         foreach (array('day', 'week', 'month', 'year') as $period) {
-            $graph_array['from']  = $config['time'][$period];
-            $overlib_content .= str_replace('"', "\'", generate_graph_tag($graph_array));
+            $graph_array['from'] = $config['time'][$period];
+            $overlib_content    .= str_replace('"', "\'", generate_graph_tag($graph_array));
         }
 
         $overlib_content .= '</div>';
@@ -62,25 +110,30 @@ if (count($sensors)) {
         $graph_array['bg']     = 'ffffff00';
         // the 00 at the end makes the area transparent.
         $graph_array['from'] = $config['time']['day'];
-        $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
+        $sensor_minigraph    = generate_lazy_graph_tag($graph_array);
 
         if (!empty($state_translation['0']['state_descr'])) {
-            $state_style="";
+            $state_style = "";
             switch ($state_translation['0']['state_generic_value']) {
-                case 0: // OK
-                    $state_style="class='label label-success'";
+                case 0:
+                // OK
+                    $state_style = "class='label label-success'";
                     break;
-                case 1: // Warning
-                    $state_style="class='label label-warning'";
+                case 1:
+                // Warning
+                    $state_style = "class='label label-warning'";
                     break;
-                case 2: // Critical
-                    $state_style="class='label label-danger'";
+                case 2:
+                // Critical
+                    $state_style = "class='label label-danger'";
                     break;
-                case 3: // Unknown
+                case 3:
+                // Unknown
                 default:
-                    $state_style="class='label label-default'";
+                    $state_style = "class='label label-default'";
                     break;
             }
+
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
@@ -92,7 +145,7 @@ if (count($sensors)) {
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content, $sensor_class).'</td>
                 </tr>';
-        }
+        }//end if
     }//end foreach
 
     echo '</table>';
