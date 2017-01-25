@@ -201,7 +201,7 @@ function poll_device($device, $options)
     $poll_update_array = array();
     $update_array = array();
 
-    $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
+    $host_rrd = rrd_name($device['hostname'], '', '');
     if ($config['norrd'] !== true && !is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
