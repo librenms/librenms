@@ -21,8 +21,7 @@
 */
 
 if ($device['os'] == 'moxa-etherdevice') {
-    $perc     = snmp_get($device, "MOXA-IKS6726A-MIB::memoryUsage.0", '-OvQ');
-    $mempool['total'] = snmp_get($device, "MOXA-IKS6726A-MIB::totalMemory.0", '-OvQ');
-    $mempool['used'] = snmp_get($device, "MOXA-IKS6726A-MIB::usedMemory.0", '-OvQ');
-    $mempool['free'] = snmp_get($device, "MOXA-IKS6726A-MIB::freeMemory.0", '-OvQ');
+    $mempool['total'] = snmp_get($device, "totalMemory.0", '-OvQ','MOXA-IKS6726A-MIB');
+    $mempool['used'] = snmp_get($device, "usedMemory.0", '-OvQ','MOXA-IKS6726A-MIB');
+    $mempool['free'] = snmp_get($device, "freeMemory.0", '-OvQ','MOXA-IKS6726A-MIB');
 }

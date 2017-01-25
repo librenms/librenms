@@ -958,6 +958,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('moxa-nport');
     }
 
+    public function testMoxaEtherdevice()
+    {
+        $this->checkOS('moxa-etherdevice');
+    }
+
     public function testMrvld()
     {
         $this->checkOS('mrvld');

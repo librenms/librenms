@@ -11,13 +11,11 @@
  * the source code distribution for details.
  */
 
-
-
 if ($device['os'] == 'moxa-etherdevice') {
     echo 'Moxa EtherDevice';
 
-    $total = str_replace('"', "", snmp_get($device, "MOXA-IKS6726A-MIB::totalMemory.0", '-OvQ'));
-    $avail = str_replace('"', "", snmp_get($device, "MOXA-IKS6726A-MIB::freeMemory.0", '-OvQ'));
+    $total = snmp_get($device, "totalMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
+    $avail = snmp_get($device, "freeMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
 
     if ((is_numeric($total)) && (is_numeric($avail))) {
         discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice-mem', 'Memory', '1', null, null);

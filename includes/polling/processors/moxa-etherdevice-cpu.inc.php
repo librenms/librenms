@@ -10,12 +10,10 @@
  * the source code distribution for details.
  */
 
-
 echo 'Moxa EtherDevice CPU Usage';
 
 if ($device['os'] == 'moxa-etherdevice') {
-    $usage = str_replace('"', "", snmp_get($device, 'MOXA-IKS6726A-MIB::cpuLoading30s.0', '-OvQ'));
-    //$proc = $usage;
+    $usage = snmp_get($device, 'cpuLoading30s.0', '-OvQ','MOXA-IKS6726A-MIB');
 
     if (is_numeric($usage)) {
         $proc = ($usage * 100);
