@@ -407,6 +407,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
+        $this->checkOS('dasan-nos', 'dasan-nos1');
     }
 
     public function testDatacom()
