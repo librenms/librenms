@@ -149,7 +149,6 @@ foreach ($app_list as $app) {
 
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
-    } else {
     }
 
     echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));
