@@ -25,7 +25,7 @@
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web');
+$init_modules = array('web', 'phpunit');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
@@ -33,7 +33,7 @@ if (!getenv('SNMPSIM')) {
 
 if (getenv('DBTEST')) {
     if (!is_file($install_dir . '/config.php')) {
-        exec("cp $install_dir/tests/config/config.php $install_dir/config.php");
+        exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
     }
 }
 

@@ -36,8 +36,10 @@ $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 // Libraries
-require('Net/IPv4.php');
-require('Net/IPv6.php');
+if (!module_selected('phunit', $init_modules)) {
+    require('Net/IPv4.php');
+    require('Net/IPv6.php');
+}
 
 # composer autoload
 require $install_dir . '/vendor/autoload.php';
