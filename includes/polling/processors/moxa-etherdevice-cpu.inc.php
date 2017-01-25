@@ -13,7 +13,7 @@
 echo 'Moxa EtherDevice CPU Usage';
 
 if ($device['os'] == 'moxa-etherdevice') {
-    $usage = snmp_get($device, 'cpuLoading30s.0', '-OvQ','MOXA-IKS6726A-MIB');
+    $usage = snmp_get($device, 'cpuLoading30s.0', '-OvQ', 'MOXA-IKS6726A-MIB');
 
     if (is_numeric($usage)) {
         $proc = ($usage * 100);
