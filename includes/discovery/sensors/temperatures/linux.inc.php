@@ -16,7 +16,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     }
 }
 
-if (startswith($sysObjectId, '.1.3.6.1.4.1.232.')) {
+if (starts_with($sysObjectId, '.1.3.6.1.4.1.232.')) {
     echo 'HP_ILO ';
     $oids = snmp_walk($device, '.1.3.6.1.4.1.232.6.2.6.8.1.2.1', '-Osqn', '');
     $oids = trim($oids);
