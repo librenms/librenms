@@ -118,7 +118,7 @@ if (bill_permitted($bill_id)) {
         $sep = ' | ';
     }
     
-    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><img align=absmiddle src="images/16/arrow_left.png"> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
