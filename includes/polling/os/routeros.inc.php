@@ -6,3 +6,4 @@ if (strstr($poll_device['sysDescr'], 'RouterOS')) {
 }
 
 $features = 'Level '.trim(snmp_get($device, '1.3.6.1.4.1.14988.1.1.4.3.0', '-OQv', '', ''), '"');
+$serial = trim(snmp_get($device, '1.3.6.1.4.1.14988.1.1.7.3.0', '-OQv', '', ''), '"');
