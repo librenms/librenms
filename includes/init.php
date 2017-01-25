@@ -36,7 +36,7 @@ $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 // Libraries
-if (!module_selected('phunit', $init_modules)) {
+if (!module_selected('phpunit', $init_modules)) {
     require('Net/IPv4.php');
     require('Net/IPv6.php');
 }
