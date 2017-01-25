@@ -254,7 +254,7 @@ function '.$unique_id.'() {
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Ports</strong></h5>",
-      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}} - <i>{{description}}</i></small></p>\')
+      suggestion: Handlebars.compile(\'<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>{{name}}</strong> – {{hostname}} - <i>{{description}}</i></small></p>\')
     }
   });
 
@@ -290,7 +290,7 @@ function '.$unique_id.'() {
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Applications</strong></h5>",
-      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}</small></p>\')
+      suggestion: Handlebars.compile(\'<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>{{name}}</strong> – {{hostname}}</small></p>\')
     }
   });
 
@@ -328,7 +328,7 @@ function '.$unique_id.'() {
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Munin</strong></h5>",
-      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{plugin}}</strong> – {{hostname}}</small></p>\')
+      suggestion: Handlebars.compile(\'<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>{{plugin}}</strong> – {{hostname}}</small></p>\')
     }
   });
 
