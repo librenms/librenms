@@ -24,7 +24,7 @@
  */
 
 list($hardware, $version) = explode(' - ', $poll_device['sysDescr']);
-$hardware = preg_replace('/Hardware:/', '', $hardware);
+$hardware = str_replace('Hardware:', '', $hardware);
 preg_match('/\.([0-9\.]+) /', $version, $matches);
 $version = $matches[1];
 
