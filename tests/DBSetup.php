@@ -69,3 +69,4 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
         }
     }
 }
+
