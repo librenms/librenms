@@ -178,6 +178,10 @@ function get_device()
         echo _json_encode($output);
         $app->stop();
     } else {
+        $host_id = get_vm_parent_id($device);
+        if (is_numeric($host_id)) {
+            $device = array_merge($device, array('parent_id' => $host_id));
+        }
         $output = array(
             'status'  => 'ok',
             'devices' => array($device),
@@ -185,7 +189,6 @@ function get_device()
         echo _json_encode($output);
     }
 }
-
 
 function list_devices()
 {
@@ -232,7 +235,11 @@ function list_devices()
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+        $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
         $devices[] = $device;
     }
 
