@@ -6,7 +6,7 @@ Introduction
 LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
-many more.  LibreNMS is a community-based fork of [Observium][9].
+many more.
 
 We intend LibreNMS to be a viable project and community that:
 - encourages contribution,
@@ -88,10 +88,9 @@ exception):
 [6]: http://freenode.net/changuide "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
-[9]: http://observium.org/ "Observium web site"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
 [11]: http://www.librenms.org/#downloads
-[12]: https://github.com/librenms/librenms/tree/master/doc/Observium_Welcome.md
+[12]: http://docs.librenms.org/General/Welcome-to-Observium-users/
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: http://docs.librenms.org/General/Contributing/
