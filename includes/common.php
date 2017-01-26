@@ -1615,6 +1615,7 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
+
 function check_git_exists()
 {
     if (`which git`) {
@@ -1622,4 +1623,15 @@ function check_git_exists()
     } else {
         return false;
     }
+}
+
+function get_vm_parent_id($device)
+{
+    global $config;
+
+    if (empty($device['hostname'])) {
+        return false;
+    }
+
+    return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 }
