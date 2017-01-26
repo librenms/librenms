@@ -1352,6 +1352,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('netagent2');
     }
 
+    public function testSlms()
+    {
+        $this->checkOS('slms');
+    }
+
     public function testSmartax()
     {
         $this->checkOS('smartax');
