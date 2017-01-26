@@ -23,7 +23,7 @@ if (!$_SESSION['authenticated']) {
 if (is_numeric($_GET['device_id'])) {
     foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($_GET['device_id'])) as $interface) {
         $interface  = ifNameDescr($interface);
-        $string = display($interface['label'].' - '.$interface['ifAlias']);
+        $string = addslashes(display($interface['label'].' - '.$interface['ifAlias']));
         echo "obj.options[obj.options.length] = new Option('".$string."','".$interface['port_id']."');\n";
     }
 }
