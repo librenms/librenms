@@ -22,12 +22,20 @@ $tmp = dbFetchCell(
     'SELECT dashboard FROM users WHERE user_id=?',
     array($_SESSION['user_id'])
 );
+
+if ($tmp != 0) {
+    if (dbFetchCell('SELECT `dashboard_id` FROM `dashboards` WHERE `dashboard_id` = ?', array($tmp)) == 0) {
+        $tmp = 0;
+    }
+}
+
 if ($tmp != 0) {
     $default_dash = $tmp;
 } elseif ((int)$config['webui']['default_dashboard_id']) {
     // if the user hasn't set their default page, and there is a global default set
     $default_dash = dbFetchCell('SELECT `dashboard_id` FROM `dashboards` WHERE `dashboard_id` = ?', array((int)$config['webui']['default_dashboard_id']));
 }
+
 if ($default_dash == 0 && dbFetchCell(
     'SELECT dashboard_id FROM dashboards WHERE user_id=?',
     array($_SESSION['user_id'])
@@ -54,6 +62,7 @@ if (empty($vars['dashboard'])) {
         $msg_box[] = array('type' => 'error', 'message' => 'Dashboard <code>#'.$orig.'</code> does not exist! Loaded <code>'.$vars['dashboard']['dashboard_name'].'</code> instead.','title' => 'Requested Dashboard Not Found!');
     }
 }
+
 $data = array();
 foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `dashboard_id`=?', array($vars['dashboard']['dashboard_id'])) as $items) {
     $data[] = $items;
@@ -604,7 +613,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     $('#new-widget').popover();
 
     <?php
-    if (empty($vars['dashboard']['dashboard_id'])) {
+    if (empty($vars['dashboard']['dashboard_id']) && $default_dash == 0) {
         echo "\$('#dashboard_name').val('Default');\n";
         echo "dashboard_add(\$('#add_form'));\n";
     }
