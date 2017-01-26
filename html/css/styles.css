@@ -2128,10 +2128,17 @@ label {
     text-align: center;
 }
 
+.device-table-header-actions {
+  min-width: 120px;
+  text-align: center;
+}
+
 .device-table-icon {
     text-align: center;
     display: block;
     width: 70px;
+    height: 32px;
+    line-height: 32px;
 }
 
 .device-table-icon img {
