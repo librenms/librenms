@@ -135,11 +135,6 @@ if (module_selected('web', $init_modules)) {
         $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
     }
     load_all_os($os_list);
-
-    // initialize HTML Purifier
-    $p_config = HTMLPurifier_Config::createDefault();
-    $p_config->set('Cache.SerializerPath', $config['temp_dir']);
-    $purifier = new HTMLPurifier($p_config);
 }
 
 $console_color = new Console_Color2();
