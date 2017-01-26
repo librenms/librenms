@@ -26,7 +26,7 @@ $rrd_filename  = rrd_name($device['hostname'], 'riverbed_passthrough');
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Bandwidth Passthrough';
-$unitlen       = 10;
+$unitlen       = 21;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
 $dostack       = 0;
@@ -42,7 +42,7 @@ $data_sources  = array(
 $i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds => $vars) {
+    foreach ($data_sources as $ds => $vars) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $vars['descr'];
         $rrd_list[$i]['ds']       = $ds;
