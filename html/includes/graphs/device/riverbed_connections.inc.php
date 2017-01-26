@@ -26,7 +26,7 @@ $rrd_filename  = rrd_name($device['hostname'], 'riverbed_connections');
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Connections';
-$unitlen       = 10;
+$unitlen       = 11;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
 $dostack       = 0;
@@ -37,14 +37,14 @@ $data_sources  = array(
     'half_open' => array('descr' => 'Half open','colour' => '66873e',),
     'half_closed' => array('descr' => 'Half closed','colour' => 'f49842',),
     'established' => array('descr' => 'Established','colour' => '438099',),
-    'closed' => array('descr' => 'Closed','colour' => 'af2121',),
+    'active' => array('descr' => 'Active','colour' => 'af2121',),
     'total' => array('descr' => 'Total','colour' => '000000',)
 );
 
 $i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds => $vars) {
+    foreach ($data_sources as $ds => $vars) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $vars['descr'];
         $rrd_list[$i]['ds']       = $ds;
