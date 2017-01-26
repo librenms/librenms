@@ -499,6 +499,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('drac', 'drac2');
     }
 
+    public function testDraytek()
+    {
+        $this->checkOS('draytek');
+    }
+
     public function testDsm()
     {
         $this->checkOS('dsm');
