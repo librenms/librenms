@@ -635,6 +635,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFreebsd()
     {
         $this->checkOS('freebsd');
+        $this->checkOS('freebsd', 'freebsd-freenas');
     }
 
     public function testFtos()
