@@ -4,16 +4,18 @@
 if ($device['os'] == 'apc') {
     echo 'APC Load ';
     // UPS
-    $three_phase = snmp_get($device, 'upsBasicOutputPhase.0', '-OsqvU', 'PowerNet-MIB');
-    echo $three_phase;
-    if ($three_phase == 3) {
-        for ($ph_ld = 1; $ph_ld <= 3;) { // Input Current 3Phase
-            $ph_load = snmp_get($device, 'upsPhaseOutputPercentLoad.1.1.'.$ph_ld, '-OsqvU', 'PowerNet-MIB');
-            $phld_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.1.1';
-
-            discover_sensor($valid['sensor'], 'load', $device, $phld_oid.'.'.$ph_ld, $phld_oid.'.'.$ph_ld, apc, 'Phase '. $ph_ld .' Output Load', 1, 1, null, null, null, null, $ph_load);
-            $ph_ld++;
+    $phasecount = snmp_get($device, 'upsBasicOutputPhase.0', '-OsqvU', 'PowerNet-MIB');
+    if ($phasecount > 1) {
+        $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputPercentLoad', array(), 'PowerNet-MIB');
+        foreach ($oids as $index => $data) {
+            $type = 'apcUPS';
+            $descr = 'Phase ' . substr($index, -1);
+            $load_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.1.' . $index;
+            $divisor = 1;
+            $load = $data['upsPhaseOutputPercentLoad'] / $divisor;
+            discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
         }
+        unset($oids);
     } else {
         $oid_array = array(
             array(
