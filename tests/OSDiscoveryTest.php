@@ -168,6 +168,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('arista_eos');
     }
 
+    public function testArrayOS()
+    {
+        $this->checkOS('arrayos');
+    }
+
     public function testArubaos()
     {
         $this->checkOS('arubaos');
@@ -402,6 +407,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
+        $this->checkOS('dasan-nos', 'dasan-nos1');
     }
 
     public function testDatacom()
@@ -417,6 +423,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDcnSoftware()
     {
         $this->checkOS('dcn-software');
+        $this->checkOS('dcn-software', 'dcn-software1');
     }
 
     public function testDdnos()
@@ -629,6 +636,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFreebsd()
     {
         $this->checkOS('freebsd');
+        $this->checkOS('freebsd', 'freebsd-freenas');
     }
 
     public function testFtos()
@@ -924,6 +932,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-pulsar');
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
+        $this->checkOS('mgeups', 'mgeups-ex2200');
         $this->checkOS('mgeups', 'mgeups-proxy');
         $this->checkOS('mgeups', 'mgeups-comet');
     }
@@ -1189,6 +1198,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testProcurve()
     {
         $this->checkOS('procurve');
+        $this->checkOS('procurve', 'procurve1');
         $this->checkOS('procurve', 'procurve-1800-8g');
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
@@ -1341,6 +1351,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMegatec()
     {
         $this->checkOS('netagent2');
+    }
+
+    public function testSlms()
+    {
+        $this->checkOS('slms');
     }
 
     public function testSmartax()
