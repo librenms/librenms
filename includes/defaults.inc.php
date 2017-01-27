@@ -34,6 +34,9 @@ $config['db']['extension']       = 'mysqli';//mysql and mysqli available
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
+//MySQL port
+$config['db_port']               = 3306;
+
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
 
