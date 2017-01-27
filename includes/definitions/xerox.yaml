@@ -10,3 +10,8 @@ discovery:
         - Xerox Phaser
         - Xerox WorkCentre
         - DocuPrint
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+
