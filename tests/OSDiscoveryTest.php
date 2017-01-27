@@ -598,6 +598,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('fabos');
         $this->checkOS('fabos', 'fabos1');
         $this->checkOS('fabos', 'fabos2');
+        $this->checkOS('fabos', 'fabos3');
     }
 
     public function testFiberhome()

@@ -158,7 +158,7 @@ LibreNMS contributors:
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
 - Matthew Schwen <mschwen@gmail.com> (mattschwen)
 - Joel Cant <joel@linuxmod.co.uk> (NerdBlender
-- Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemir_a)
+- Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemira)
 - Rob Nichols <rob@ignition360.com> (rdnn)
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
 - Julian Kornberger <jk+github@digineo.de> (corny)
