@@ -225,7 +225,9 @@ if ($device['os'] == 'apc') {
             $divisor = 10;
             $current = $data['upsPhaseOutputCurrent'] / $divisor;
         }
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        if ($current >= 0) {
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        }
     }
     unset($index);
     unset($data);

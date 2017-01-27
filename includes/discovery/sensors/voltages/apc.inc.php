@@ -15,8 +15,9 @@ if ($device['os'] == 'apc') {
              $voltage_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.3.' . $index;
              $divisor = 1;
              $voltage = $data['upsPhaseOutputVoltage'] / $divisor;
-
-              discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $voltage);
+            if ($voltage >= 0) {
+                 discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $voltage);
+            }
         }
         unset($index);
         unset($data);

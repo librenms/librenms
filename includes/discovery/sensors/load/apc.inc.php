@@ -7,13 +7,16 @@ if ($device['os'] == 'apc') {
     $phasecount = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OsqvU', 'PowerNet-MIB');
     if ($phasecount > 1) {
         $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputPercentLoad', array(), 'PowerNet-MIB');
+        d_echo($oids);
         foreach ($oids as $index => $data) {
             $type = 'apcUPS';
             $descr = 'Phase ' . substr($index, -1);
-            $load_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.1.' . $index;
+            $load_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.' . $index;
             $divisor = 1;
-            $load = $data['upsPhaseOutputPercentLoad'] / $divisor;
-            discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
+            $load = $data['upsPhaseOutputPercentLoad'];
+            if ($load >= 0) {
+                discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
+            }
         }
         unset($oids);
     } else {
