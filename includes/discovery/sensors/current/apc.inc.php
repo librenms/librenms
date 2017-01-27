@@ -204,7 +204,7 @@ if ($device['os'] == 'apc') {
     }
     unset($oids);
     
-    $phasecount = snmp_get($device, 'upsBasicOutputPhase.0', '-OsqvU', 'PowerNet-MIB');
+    $phasecount = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OsqvU', 'PowerNet-MIB');
 
     if ($phasecount > 1) {
         $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', $oids, 'PowerNet-MIB');
