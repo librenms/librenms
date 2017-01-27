@@ -9,3 +9,8 @@ discovery:
     - sysDescr:
         - Canon MF
         - Canon iR
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+
