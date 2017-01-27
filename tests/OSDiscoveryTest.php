@@ -583,6 +583,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ericsson-es');
     }
 
+    public function testExinda()
+    {
+        $this->checkOS('exinda');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
