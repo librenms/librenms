@@ -111,15 +111,14 @@ if (isset($config['page_title'])) {
 <?php
 if (empty($config['favicon'])) {
 ?>
-  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/favicon-152.png">
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/favicon-144.png">
-  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/favicon-120.png">
-  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/favicon-114.png">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
-  <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
-  <link rel="icon" href="images/favicon-32.png" sizes="32x32">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="msapplication-TileImage" content="images/favicon-144.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="images/manifest.json">
+  <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <meta name="msapplication-config" content="images/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
 <?php
 } else {
     echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
