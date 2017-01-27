@@ -351,6 +351,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosb', 'ciscosb5');
         $this->checkOS('ciscosb', 'ciscosb6');
         $this->checkOS('ciscosb', 'ciscosb7');
+        $this->checkOS('ciscosb', 'ciscosb8');
     }
 
     public function testCiscosmblinux()
@@ -497,6 +498,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('drac');
         $this->checkOS('drac', 'drac1');
         $this->checkOS('drac', 'drac2');
+    }
+
+    public function testDraytek()
+    {
+        $this->checkOS('draytek');
     }
 
     public function testDsm()
