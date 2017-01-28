@@ -177,7 +177,7 @@ var greenMarker = L.AwesomeMarkers.icon({
             $icon = 'greenMarker';
             $z_offset = 0;
             $tmp_loc = parse_location($map_devices['location']);
-            if (!empty($tmp_loc['lat']) && !empty($tmp_loc['lng'])) {
+            if (is_numeric($tmp_loc['lat']) && is_numeric($tmp_loc['lng'])) {
                 $map_devices['lat'] = $tmp_loc['lat'];
                 $map_devices['lng'] = $tmp_loc['lng'];
             }
