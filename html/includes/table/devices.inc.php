@@ -197,7 +197,9 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $platform = $device['hardware'] . '<br>' . $device['features'];
         $os = $device['os_text'] . '<br>' . $device['version'];
         $uptime = formatUptime($device['uptime'], 'short');
-        $hostname .= '<br>' . $device['sysName'];
+        if (ip_to_sysname($device, $device['hostname']) !== $device['sysName']) {
+            $hostname .= '<br>' . $device['sysName'];
+        }
         if (empty($port_count)) {
             $port_count = 0;
             $col_port = '';
