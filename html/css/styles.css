@@ -1580,8 +1580,13 @@ tr.search:nth-child(odd) {
 }
 
 .navbar-brand {
-  padding-left: 15px !important;
-  padding-top: 8px !important;
+  padding: 8px 15px 8px 15px !important;
+  line-height: 32px;
+}
+
+.navbar-brand img {
+  height: 100%;
+  max-width: 170px;
 }
 
 #visualization {
