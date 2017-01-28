@@ -6,3 +6,8 @@ type: printer
 icon: hp
 over:
     - { graph: device_toner, text: Toner }
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

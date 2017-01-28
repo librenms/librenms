@@ -8,3 +8,8 @@ over:
 discovery:
     - sysDescr:
         - SHARP MX-
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+
