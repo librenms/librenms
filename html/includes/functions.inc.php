@@ -741,7 +741,7 @@ function geteventicon($message)
     }
 
     if (isset($icon)) {
-        return array($icon,$icon_colour);
+        return array('icon' => $icon,'colour' => $icon_colour);
     } else {
         return false;
     }
