@@ -292,7 +292,7 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
     }
 
     // fallback to the generic icon
-    return 'generic.png';
+    return 'generic.svg';
 }
 
 function renamehost($id, $new, $source = 'console')
