@@ -308,6 +308,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('canonprinter', 'canonprinter-mf');
         $this->checkOS('canonprinter', 'canonprinter-ir-adv');
+        $this->checkOS('canonprinter', 'canon-d1180');
     }
 
     public function testCanopy()
