@@ -23,8 +23,11 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$hardware_array = snmp_get_multi($device, 'hpHttpMgDeviceProductName.1 hpHttpMgDeviceSerialNumber.1 hpHttpMgDeviceVersion.1', '-OQUs', 'SEMI-MIB');
-d_echo($hardware_array);
-$hardware  = trim($hardware_array[0]['hpHttpMgDeviceProductName'], '"');
-$serial  = trim($hardware_array[0]['hpHttpMgDeviceSerialNumber'], '"');
-$version  = trim($hardware_array[0]['hpHttpMgDeviceVersion'], '"');
+$oids = 'hpHttpMgDeviceProductName.1 hpHttpMgDeviceSerialNumber.1 hpHttpMgDeviceVersion.1';
+
+$data = snmp_get_multi($device, $oids, '-OQUs', 'SEMI-MIB');
+d_echo($data);
+
+$hardware = $data[1]['hpHttpMgDeviceProductName'];
+$serial = $data[1]['hpHttpMgDeviceSerialNumber'];
+$version = $data[1]['hpHttpMgDeviceVersion'];
