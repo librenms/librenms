@@ -54,6 +54,7 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
             # Clean up "Dell Computer Corporation" and "Intel Corporation"
             $hardware = str_replace(" Computer Corporation", "", $hardware);
             $hardware = str_replace(" Corporation", "", $hardware);
+            $hardware = str_replace(" Inc.", "", $hardware);
         }
 
         if ($agent_data['dmi']['system-serial-number']) {
