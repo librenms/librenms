@@ -849,6 +849,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('jwos');
     }
 
+    public function testKemp()
+    {
+        $this->checkOS('kemp');
+    }
+
     public function testKti()
     {
         $this->checkOS('kti');
