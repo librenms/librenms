@@ -10,6 +10,7 @@
  * the source code distribution for details.
  */
 
-echo 'Pre-cache JunOS: ';
-
-$pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
+if ($device['os'] === 'junos') {
+    $pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
+    d_echo($pre_cache);
+}

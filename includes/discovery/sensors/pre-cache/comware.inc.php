@@ -10,6 +10,7 @@
  * the source code distribution for details.
  */
 
-echo 'Pre-cache Comware: ';
-
-$pre_cache['comware_oids'] = snmpwalk_cache_multi_oid($device, 'hh3cTransceiverInfoTable', array(), 'HH3C-TRANSCEIVER-INFO-MIB');
+if ($device['os'] === 'comware') {
+    $pre_cache['comware_oids'] = snmpwalk_cache_multi_oid($device, 'hh3cTransceiverInfoTable', array(), 'HH3C-TRANSCEIVER-INFO-MIB');
+    d_echo($pre_cache);
+}

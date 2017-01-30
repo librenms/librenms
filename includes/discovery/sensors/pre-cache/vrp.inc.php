@@ -23,8 +23,9 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-echo 'Pre-cache VRP: ';
-
-$pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1', array(), 'HUAWEI-ENTITY-EXTENT-MIB');
-$pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1', $pre_cache['vrp_oids'], 'HUAWEI-ENTITY-EXTENT-MIB');
-$pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.2.1.47.1.1.1.1.7', $pre_cache['vrp_oids'], 'HUAWEI-ENTITY-EXTENT-MIB');
+if ($device['os'] === 'vrp') {
+    $pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1', array(), 'HUAWEI-ENTITY-EXTENT-MIB');
+    $pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1', $pre_cache['vrp_oids'], 'HUAWEI-ENTITY-EXTENT-MIB');
+    $pre_cache['vrp_oids'] = snmpwalk_cache_index($device, '.1.3.6.1.2.1.47.1.1.1.1.7', $pre_cache['vrp_oids'], 'HUAWEI-ENTITY-EXTENT-MIB');
+    d_echo($pre_cache);
+}
