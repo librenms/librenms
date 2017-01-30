@@ -17,7 +17,7 @@ if ($device['disabled'] == '1') {
     $class = 'alert-info';
 }
 
-$host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
+$host_id = get_vm_parent_id($device);
 
 echo '
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">

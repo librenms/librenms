@@ -8,3 +8,8 @@ over:
 discovery:
     - sysDescr:
         - NRG Network Printer
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

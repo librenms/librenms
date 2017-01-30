@@ -1,7 +1,7 @@
 os: hpblmos
 text: 'HP Blade Management'
 type: appliance
-icon: hp
+icon: hpe
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

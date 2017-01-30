@@ -1504,7 +1504,14 @@ function clean($value)
 function display($value)
 {
     /** @var HTMLPurifier $purifier */
-    global $purifier;
+    global $config, $purifier;
+    if (!isset($purifier)) {
+        // initialize HTML Purifier here since this is the only user
+        $p_config = HTMLPurifier_Config::createDefault();
+        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        $purifier = new HTMLPurifier($p_config);
+    }
+
     return $purifier->purify(stripslashes($value));
 }
 
@@ -1608,6 +1615,7 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
+
 function check_git_exists()
 {
     if (`which git`) {
@@ -1615,4 +1623,15 @@ function check_git_exists()
     } else {
         return false;
     }
+}
+
+function get_vm_parent_id($device)
+{
+    global $config;
+
+    if (empty($device['hostname'])) {
+        return false;
+    }
+
+    return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 }

@@ -341,7 +341,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 <?php
 
 if ($deleted_ports) {
-    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-col-primary fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
+    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
 }
 
 ?>
@@ -422,8 +422,6 @@ if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 foreach ($app_list as $app) {
     if (isset($app['app_type'])) {
         $app_i_list = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ? ORDER BY `app_instance`", array($app['app_type']));
-        $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
-        $icon = (file_exists($image) ? $app['app_type'] : "apps");
         if (count($app_i_list) > 1) {
             echo '<li class="dropdown-submenu">';
             echo '<a href="apps/app='.$app['app_type'].'/"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($app['app_type']).' </a>';
