@@ -40,5 +40,5 @@ $run_sensors = array(
     'temperatures',
     'voltages',
 );
-sensors($run_sensors, $device, $pre_cache);
+sensors($run_sensors, $device, $valid, $pre_cache);
 unset($pre_cache);

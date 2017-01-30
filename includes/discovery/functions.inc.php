@@ -961,7 +961,7 @@ function ignore_storage($descr)
  * @param $device
  * @param array $pre_cache
  */
-function sensors($types, $device, $pre_cache = array())
+function sensors($types, $device, $valid, $pre_cache = array())
 {
     global $config;
     foreach ((array)$types as $type) {
