@@ -86,6 +86,11 @@ foreach ($db_info_list as $db_info) {
     }
 }//end foreach
 
+# Clean up "Dell Computer Corporation" and "Intel Corporation"
+$hardware = str_replace(" Computer Corporation", "", $hardware);
+$hardware = str_replace(" Corporation", "", $hardware);
+$hardware = str_replace(" Inc.", "", $hardware);
+
 /*
  * Finished discovering VMware information.
  */
