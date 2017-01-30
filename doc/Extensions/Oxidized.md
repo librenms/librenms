@@ -100,3 +100,9 @@ It's also possible to exclude certain device types and OS' from being output via
 $config['oxidized']['ignore_types'] = array('server');
 $config['oxidized']['ignore_os'] = array('linux');
 ```
+
+If you're runnng SELinux, you'll need to allow httpd to connect outbound to the network, otherwise Oxidized integration in the web UI will silently fail:
+
+```
+setsebool -P httpd_can_network_connect 1
+```
