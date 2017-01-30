@@ -1038,6 +1038,19 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
+/**
+ * @param $string
+ * @param int $max
+ * @return string
+ */
+function shorten_text($string, $max = 30)
+{
+    if (strlen($string) > 50) {
+        return substr($string, 0, $max) . "...";
+    } else {
+        return $string;
+    }
+}
 
 function shorten_interface_type($string)
 {
