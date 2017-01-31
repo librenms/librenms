@@ -210,7 +210,7 @@ function list_devices()
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
-    }elseif ($type == 'location') {
+    } elseif ($type == 'location') {
         $sql = "`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`ignore`='1' AND `disabled`='0'";
@@ -1470,4 +1470,3 @@ function list_services()
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
-
