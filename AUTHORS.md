@@ -171,6 +171,7 @@ LibreNMS contributors:
 - Robert Towster <rnt-github at towster.com> (towster)
 - Rocky Luke <rockyluke@offline.net> (rockyluke)
 - Tim Jackson <jackson.tim@gmail.com> (jackson-tim)
+- Jørn-Stian Lønsetteig <jeg@glemte.no> (gilrim)
 
 Observium was written by:
 - Adam Armstrong
