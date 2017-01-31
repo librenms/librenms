@@ -14,13 +14,11 @@ poller_modules:
     bgp-peers: 0
     ospf: 0
     stp: 0
-    wifi: 0
-    toner: 0
 discovery_modules:
     bgp-peers: 0
     stp: 0
-    toner: 0
     vmware-vminfo: 1
+    libvirt-vminfo: 1
 processor_stacked: 1
 register_mibs:
     rxCounter: GANDI-MIB

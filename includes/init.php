@@ -23,13 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 /**
- * @param array $modules
+ * @param array $modules Which modules to initialize
  */
-//function librenms_init($init_modules = array())
-//{
-//global $console_color, $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
@@ -107,7 +103,7 @@ if ($config['memcached']['enable'] === true) {
 
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass']);
+    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
     if (!$database_link) {
         echo '<h2>MySQL Error</h2>';
         echo mysqli_connect_error();
@@ -132,7 +128,7 @@ if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$confi
 if (module_selected('web', $init_modules)) {
     umask(0002);
     if (!isset($config['title_image'])) {
-        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.png';
+        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
     $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');

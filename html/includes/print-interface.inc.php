@@ -21,7 +21,7 @@ if ($int_colour) {
 $port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', array($port['port_id']));
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
-    $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", 'port_errors');
+    $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
 } else {
     $error_img = '';
 }
@@ -175,8 +175,6 @@ $neighborsCount=0;
 $nbLinks=0;
 if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', array($if_id)) as $link) {
-        // echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
-        // $br = "<br />";
         $int_links[$link['port_id']]      = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
         $nbLinks++;

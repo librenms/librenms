@@ -58,8 +58,15 @@ if ($config['autodiscovery']['xdp'] === true) {
             d_echo($cdp_if_array);
             foreach (array_keys($cdp_if_array) as $entry_key) {
                 $cdp = $cdp_if_array[$entry_key];
-                if (is_valid_hostname($cdp['cdpCacheDeviceId'])) {
-                    $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
+                if (is_valid_hostname($cdp['cdpCacheDeviceId']) || ($config['discovery_by_ip'] == true)) {
+                    $ip_arr = explode(" ", $cdp['cdpCacheAddress']);
+                    $a = hexdec($ip_arr[0]);
+                    $b = hexdec($ip_arr[1]);
+                    $c = hexdec($ip_arr[2]);
+                    $d = hexdec($ip_arr[3]);
+
+                    $cdp_ip = "$a.$b.$c.$d";
+                    $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId'], $cdp_ip));
 
                     if (!$remote_device_id) {
                         $skip_discovery = false;
@@ -77,15 +84,6 @@ if ($config['autodiscovery']['xdp'] === true) {
                             if ($config['discovery_by_ip'] !== true) {
                                 $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
                             } else {
-                                $ip_arr = explode(" ", $cdp['cdpCacheAddress']);
-
-                                $a = hexdec($ip_arr[0]);
-                                $b = hexdec($ip_arr[1]);
-                                $c = hexdec($ip_arr[2]);
-                                $d = hexdec($ip_arr[3]);
-
-                                $cdp_ip = "$a.$b.$c.$d";
-
                                 $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
                             }
                         }

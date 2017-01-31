@@ -66,7 +66,7 @@ if ($_SESSION['userlevel'] != '10') {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', array($vars['user_id']));
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a></strong></td></tr>";
+            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone      = 'yes';
         }
@@ -124,7 +124,7 @@ if ($_SESSION['userlevel'] != '10') {
                 <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.display($interface_perm['ifAlias'])."
               </td>
               <td>
-                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $ipermdone = 'yes';
@@ -196,7 +196,7 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];

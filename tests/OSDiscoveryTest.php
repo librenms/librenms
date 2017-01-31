@@ -168,6 +168,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('arista_eos');
     }
 
+    public function testArrayOS()
+    {
+        $this->checkOS('arrayos');
+    }
+
     public function testArubaos()
     {
         $this->checkOS('arubaos');
@@ -303,6 +308,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('canonprinter', 'canonprinter-mf');
         $this->checkOS('canonprinter', 'canonprinter-ir-adv');
+        $this->checkOS('canonprinter', 'canon-d1180');
     }
 
     public function testCanopy()
@@ -346,6 +352,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosb', 'ciscosb5');
         $this->checkOS('ciscosb', 'ciscosb6');
         $this->checkOS('ciscosb', 'ciscosb7');
+        $this->checkOS('ciscosb', 'ciscosb8');
     }
 
     public function testCiscosmblinux()
@@ -402,6 +409,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
+        $this->checkOS('dasan-nos', 'dasan-nos1');
     }
 
     public function testDatacom()
@@ -417,6 +425,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDcnSoftware()
     {
         $this->checkOS('dcn-software');
+        $this->checkOS('dcn-software', 'dcn-software1');
     }
 
     public function testDdnos()
@@ -490,6 +499,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('drac');
         $this->checkOS('drac', 'drac1');
         $this->checkOS('drac', 'drac2');
+    }
+
+    public function testDraytek()
+    {
+        $this->checkOS('draytek');
     }
 
     public function testDsm()
@@ -570,6 +584,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ericsson-es');
     }
 
+    public function testExinda()
+    {
+        $this->checkOS('exinda');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
@@ -585,6 +604,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('fabos');
         $this->checkOS('fabos', 'fabos1');
         $this->checkOS('fabos', 'fabos2');
+        $this->checkOS('fabos', 'fabos3');
     }
 
     public function testFiberhome()
@@ -629,6 +649,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFreebsd()
     {
         $this->checkOS('freebsd');
+        $this->checkOS('freebsd', 'freebsd-freenas');
     }
 
     public function testFtos()
@@ -668,6 +689,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('generex-ups');
         $this->checkOS('generex-ups', 'generex-ups1');
         $this->checkOS('generex-ups', 'generex-ups2');
+        $this->checkOS('generex-ups', 'generex-ups3');
     }
 
     public function testHikvision()
@@ -827,6 +849,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('jwos');
     }
 
+    public function testKemp()
+    {
+        $this->checkOS('kemp');
+    }
+
     public function testKti()
     {
         $this->checkOS('kti');
@@ -924,6 +951,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgeups', 'mgeups-pulsar');
         $this->checkOS('mgeups', 'mgeups-galaxy');
         $this->checkOS('mgeups', 'mgeups-evolution');
+        $this->checkOS('mgeups', 'mgeups-ex2200');
         $this->checkOS('mgeups', 'mgeups-proxy');
         $this->checkOS('mgeups', 'mgeups-comet');
     }
@@ -956,6 +984,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMoxaNport()
     {
         $this->checkOS('moxa-nport');
+    }
+
+    public function testMoxaEtherdevice()
+    {
+        $this->checkOS('moxa-etherdevice');
     }
 
     public function testMrvld()
@@ -1184,6 +1217,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testProcurve()
     {
         $this->checkOS('procurve');
+        $this->checkOS('procurve', 'procurve1');
         $this->checkOS('procurve', 'procurve-1800-8g');
         $this->checkOS('procurve', 'procurve-1820');
         $this->checkOS('procurve', 'procurve-ecos-100');
@@ -1336,6 +1370,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMegatec()
     {
         $this->checkOS('netagent2');
+    }
+
+    public function testSlms()
+    {
+        $this->checkOS('slms');
     }
 
     public function testSmartax()

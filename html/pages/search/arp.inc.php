@@ -38,7 +38,7 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
-$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ORDER BY `hostname`";
+$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"'.$data['device_id'].'\""+';
     if ($data['device_id'] == $_POST['device_id']) {

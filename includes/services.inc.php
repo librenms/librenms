@@ -152,7 +152,7 @@ function poll_service($service)
             $DS[$k] = $v['uom'];
         }
         d_echo("Service DS: "._json_encode($DS)."\n");
-        if ($service['service_ds'] == "") {
+        if (($service['service_ds'] == "{}") || ($service['service_ds'] == "")) {
             $update['service_ds'] = json_encode($DS);
         }
 

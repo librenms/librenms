@@ -26,6 +26,7 @@ These are the configuration options you will need to use to specify to get start
 
 ```php
 $config['db_host'] = '127.0.0.1';
+$config['db_port'] = 3306;
 $config['db_user'] = '';
 $config['db_pass'] = '';
 $config['db_name'] = '';

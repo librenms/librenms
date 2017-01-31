@@ -10,3 +10,5 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
+poller_modules:
+    wifi: 1
