@@ -17,6 +17,11 @@ $features = 'build-'.$data[0]['vmwProdBuild'];
 $hardware = snmp_get($device, 'entPhysicalDescr.1', '-OsvQU', 'ENTITY-MIB');
 $serial   = snmp_get($device, 'entPhysicalSerialNum.1', '-OsvQU', 'ENTITY-MIB');
 
+# Clean up "Dell Computer Corporation", "Dell Inc." and "Intel Corporation"
+$hardware = str_replace(" Computer Corporation", "", $hardware);
+$hardware = str_replace(" Corporation", "", $hardware);
+$hardware = str_replace(" Inc.", "", $hardware);
+
 /*
  * CONSOLE: Start the VMware discovery process.
  */
