@@ -1821,8 +1821,13 @@ function get_toner_levels($device, $raw_value, $capacity)
         return 50;
     }
 
-    // -2 means unknown, -1 mean no restrictions
-    if ($raw_value == '-2' || $raw_value == '-1') {
+    // -2 means unknown
+    if ($raw_value == '-2') {
+        return false;
+    }
+
+    // -1 mean no restrictions
+    if ($raw_value == '-1') {
         return 0;  // FIXME: is 0 what we should return?
     }
 
