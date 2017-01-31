@@ -23,22 +23,9 @@ else
     ID=$(($ID+1))
 fi
 
-
-if [ "$1" = "-n" ]; then
-    for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
-        if [ "$dev" == "$ID" ]; then
-            ID=$dev
-            BRK=1
-            break
-        fi
-    done
-    if [ -z "$BRK"  ]; then
-        exit 0
-    fi
-fi
-echo ${BASE}.${ID}
 IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2 | cut -d @ -f 1)
 
+echo ${BASE}.${ID}
 if [ "X${IFACE}" = "X" ]; then
     echo noSuchName
 else
