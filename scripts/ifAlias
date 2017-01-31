@@ -18,33 +18,28 @@ ID=$(cut -d . -f 13 <<< $2)
 cache=$(ip l)
 
 if [ -z "$ID" ]; then
-	ID=0
+	ID=1
+else
+    ID=$(($ID+1))
 fi
+
 
 if [ "$1" = "-n" ]; then
 	IFS="
 "
-
-    if [ "$ID" -eq 0 ]; then
-        echo ${BASE}.1
-        ID=1;
-    else
+    if [ "$ID" -ne 1 ]; then
         for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
-            if [ "$LAST" == "$ID" ]; then
+            if [ "$dev" == "$ID" ]; then
                 ID=$dev
-                #ID=$LAST
                 BRK=1
-                break
-            else
-                LAST=$dev
             fi
         done
         if [ -z "$BRK"  ]; then
             exit 0
         fi
-        echo ${BASE}.${ID}
     fi
 fi
+echo ${BASE}.${ID}
 IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2 | cut -d @ -f 1)
 
 if [ "X${IFACE}" = "X" ]; then
