@@ -27,16 +27,14 @@ fi
 if [ "$1" = "-n" ]; then
 	IFS="
 "
-    if [ "$ID" -ne 1 ]; then
-        for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
-            if [ "$dev" == "$ID" ]; then
-                ID=$dev
-                BRK=1
-            fi
-        done
-        if [ -z "$BRK"  ]; then
-            exit 0
+    for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
+        if [ "$dev" == "$ID" ]; then
+            ID=$dev
+            BRK=1
         fi
+    done
+    if [ -z "$BRK"  ]; then
+        exit 0
     fi
 fi
 echo ${BASE}.${ID}
