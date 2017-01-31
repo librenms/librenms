@@ -98,40 +98,40 @@ if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' &&
 }
 
 echo "
-        <td><i class='fa fa-server fa-lg icon-theme'  aria-hidden='true'></i> <b>Devices</b></td><td class='text-right'>$stat_devices</td>
-        <td><i class='fa fa-link fa-lg icon-theme'  aria-hidden='true'></i> <b>Ports</b></td><td class='text-right'>$stat_ports</td>
+        <td><i class='fa fa-fw fa-server fa-lg icon-theme'  aria-hidden='true'></i> <b>Devices</b></td><td class='text-right'>$stat_devices</td>
+        <td><i class='fa fa-fw fa-link fa-lg icon-theme'  aria-hidden='true'></i> <b>Ports</b></td><td class='text-right'>$stat_ports</td>
       </tr>
       <tr>
-        <td><i class='fa fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Addresses<b></td><td class='text-right'>$stat_ipv4_addy</td>
-        <td><i class='fa fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Networks</b></td><td class='text-right'>$stat_ipv4_nets</td>
+        <td><i class='fa fa-fw fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Addresses<b></td><td class='text-right'>$stat_ipv4_addy</td>
+        <td><i class='fa fa-fw fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Networks</b></td><td class='text-right'>$stat_ipv4_nets</td>
       </tr>
       <tr>
-        <td><i class='fa fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Addresses<b></td><td class='text-right'>$stat_ipv6_addy</td>
-        <td><i class='fa fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Networks</b></td><td class='text-right'>$stat_ipv6_nets</td>
+        <td><i class='fa fa-fw fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Addresses<b></td><td class='text-right'>$stat_ipv6_addy</td>
+        <td><i class='fa fa-fw fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Networks</b></td><td class='text-right'>$stat_ipv6_nets</td>
        </tr>
      <tr>
-        <td><i class='fa fa-cogs fa-lg icon-theme'  aria-hidden='true'></i> <b>Services<b></td><td class='text-right'>$stat_services</td>
-        <td><i class='fa fa-cubes fa-lg icon-theme'  aria-hidden='true'></i> <b>Applications</b></td><td class='text-right'>$stat_apps</td>
+        <td><i class='fa fa-fw fa-cogs fa-lg icon-theme'  aria-hidden='true'></i> <b>Services<b></td><td class='text-right'>$stat_services</td>
+        <td><i class='fa fa-fw fa-cubes fa-lg icon-theme'  aria-hidden='true'></i> <b>Applications</b></td><td class='text-right'>$stat_apps</td>
       </tr>
       <tr>
-        <td><i class='fa fa-microchip fa-lg icon-theme'  aria-hidden='true'></i> <b>Processors</b></td><td class='text-right'>$stat_processors</td>
-        <td><i class='fa fa-braille fa-lg icon-theme'  aria-hidden='true'></i> <b>Memory</b></td><td class='text-right'>$stat_memory</td>
+        <td><i class='fa fa-fw fa-microchip fa-lg icon-theme'  aria-hidden='true'></i> <b>Processors</b></td><td class='text-right'>$stat_processors</td>
+        <td><i class='fa fa-fw fa-braille fa-lg icon-theme'  aria-hidden='true'></i> <b>Memory</b></td><td class='text-right'>$stat_memory</td>
       </tr>
       <tr>
-        <td><i class='fa fa-database fa-lg icon-theme'  aria-hidden='true'></i> <b>Storage</b></td><td class='text-right'>$stat_storage</td>
-        <td><i class='fa fa-hdd-o fa-lg icon-theme'  aria-hidden='true'></i> <b>Disk I/O</b></td><td class='text-right'>$stat_diskio</td>
+        <td><i class='fa fa-fw fa-database fa-lg icon-theme'  aria-hidden='true'></i> <b>Storage</b></td><td class='text-right'>$stat_storage</td>
+        <td><i class='fa fa-fw fa-hdd-o fa-lg icon-theme'  aria-hidden='true'></i> <b>Disk I/O</b></td><td class='text-right'>$stat_diskio</td>
       </tr>
       <tr>
-        <td><i class='fa fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>HR-MIB</b></td><td class='text-right'>$stat_hrdev</td>
-        <td><i class='fa fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
+        <td><i class='fa fa-fw fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>HR-MIB</b></td><td class='text-right'>$stat_hrdev</td>
+        <td><i class='fa fa-fw fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
       </tr>
       <tr>
-        <td><i class='fa fa-calendar-o fa-lg icon-theme'  aria-hidden='true'></i> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
-        <td><i class='fa fa-calendar fa-lg icon-theme'  aria-hidden='true'></i> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
+        <td><i class='fa fa-fw fa-calendar-o fa-lg icon-theme'  aria-hidden='true'></i> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
+        <td><i class='fa fa-fw fa-calendar fa-lg icon-theme'  aria-hidden='true'></i> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
       </tr>
       <tr>
-        <td><i class='fa fa-dashboard fa-lg icon-theme'  aria-hidden='true'></i> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
-        <td><i class='fa fa-print fa-lg icon-theme'  aria-hidden='true'></i> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
+        <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme'  aria-hidden='true'></i> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
+        <td><i class='fa fa-fw fa-print fa-lg icon-theme'  aria-hidden='true'></i> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
       </tr>
     </table>
 </div>
