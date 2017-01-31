@@ -24,23 +24,29 @@ fi
 if [ "$1" = "-n" ]; then
 	IFS="
 "
-	for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
-		if [ "$LAST" == "$ID" ]; then
-			ID=$dev
-			BRK=1
-			break
-		else
-			LAST=$dev
-		fi
-	done
-	if [ -z "$BRK" ]; then
-		exit 0
-	fi
-fi
 
+    if [ "$ID" -eq 0 ]; then
+        echo ${BASE}.1
+        ID=1;
+    else
+        for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
+            if [ "$LAST" == "$ID" ]; then
+                ID=$dev
+                #ID=$LAST
+                BRK=1
+                break
+            else
+                LAST=$dev
+            fi
+        done
+        if [ -z "$BRK"  ]; then
+            exit 0
+        fi
+        echo ${BASE}.${ID}
+    fi
+fi
 IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2 | cut -d @ -f 1)
 
-echo ${BASE}.${ID}
 if [ "X${IFACE}" = "X" ]; then
 	echo noSuchName
 else
