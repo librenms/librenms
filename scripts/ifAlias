@@ -29,6 +29,7 @@ if [ "$1" = "-n" ]; then
         if [ "$dev" == "$ID" ]; then
             ID=$dev
             BRK=1
+            break
         fi
     done
     if [ -z "$BRK"  ]; then
