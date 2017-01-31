@@ -21,7 +21,7 @@ $host_id = get_vm_parent_id($device);
 
 echo '
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
+             <td width="250px"><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
              <td>';
 if ($host_id > 0) {
     echo '
