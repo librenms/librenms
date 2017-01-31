@@ -10,9 +10,9 @@ if ($config['twofactor'] && isset($twofactorform)) {
               <h3 class="panel-title">
                 <?php
                 if ($config['title_image']) {
-                    echo('<img src="' . $config['title_image'] . '">');
+                    echo '<img src="' . $config['title_image'] . '">';
                 } else {
-                    echo('<img src="images/librenms_logo_light.svg">');
+                    echo '<img src="images/librenms_logo_light.svg">';
                 }
                 ?>
               </h3>
