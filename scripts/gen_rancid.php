@@ -44,12 +44,12 @@ $rancid_map['mikrotik']	= 'mikrotik';
 $rancid_map['screenos']	= 'netscreen';
 
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
-	if (isset($rancid_map[$devices['os']])) {
-		$status = "up";
-		if($devices['disabled']) {
-			$status = "down";
-		}
-		echo $devices['hostname'] . ':' . $rancid_map[$devices['os']] . ':' . $status . PHP_EOL;
-	}
+    if (isset($rancid_map[$devices['os']])) {
+        $status = "up";
+        if($devices['disabled']) {
+            $status = "down";
+        }
+        echo $devices['hostname'] . ':' . $rancid_map[$devices['os']] . ':' . $status . PHP_EOL;
+    }
 }
 echo "# EOF " . PHP_EOL;
