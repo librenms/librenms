@@ -8,7 +8,13 @@ if ($config['twofactor'] && isset($twofactorform)) {
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <img src="images/librenms_logo_light.svg">
+                <?php
+                if ($config['title_image']) {
+                    echo '<img src="' . $config['title_image'] . '">';
+                } else {
+                    echo '<img src="images/librenms_logo_light.svg">';
+                }
+                ?>
               </h3>
             </div>
             <div class="panel-body">
