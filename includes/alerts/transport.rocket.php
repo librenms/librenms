@@ -15,7 +15,7 @@
 /**
  * API Transport
  * @author ToeiRei <vbauer@stargazer.at>
- * @copyright 2017 ToeiRei, LibreNMS
+ * @copyright 2017 ToeiRei, LibreNMS work based on the work of f0o. It's his work.
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
