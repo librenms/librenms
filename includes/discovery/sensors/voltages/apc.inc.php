@@ -3,7 +3,8 @@
 if ($device['os'] == 'apc') {
     echo 'APC ';
 
-    $phasecount = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OsqvU', 'PowerNet-MIB');
+    $phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
+    d_echo($phasecount);
     // Check for three phase UPS devices - else skip to normal discovery
     if ($phasecount > 1) {
         $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');

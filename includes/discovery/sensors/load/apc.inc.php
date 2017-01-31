@@ -4,7 +4,7 @@
 if ($device['os'] == 'apc') {
     echo 'APC Load ';
     // UPS
-    $phasecount = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OsqvU', 'PowerNet-MIB');
+    $phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
     if ($phasecount > 1) {
         $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputPercentLoad', array(), 'PowerNet-MIB');
         d_echo($oids);
