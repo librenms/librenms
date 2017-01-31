@@ -45,8 +45,8 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocke
         if (dbDelete('config', '`config_id`=?', array($config_id))) {
             if ($action == 'remove-slack') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.slack.$config_id.%'");
-	    } elseif ($action == 'remove-rocket') {
-		dbDelete('config', "`config_name` LIKE 'alert.transports.rocket.$config_id.%'");
+            } elseif ($action == 'remove-rocket') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.rocket.$config_id.%'");
             } elseif ($action == 'remove-hipchat') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.hipchat.$config_id.%'");
             } elseif ($action == 'remove-pushover') {
