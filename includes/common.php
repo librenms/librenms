@@ -1073,7 +1073,7 @@ function ceph_rrd($gtype)
 function parse_location($location)
 {
     preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (!empty($tmp_loc[2]) && !empty($tmp_loc[3])) {
+    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
 }//end parse_location()
