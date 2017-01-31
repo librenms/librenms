@@ -58,7 +58,6 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocke
             } elseif ($action == 'remove-playsms') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.playsms.$config_id.%'");
             }
-
             $status  = 'ok';
             $message = 'Config item removed';
         } else {
