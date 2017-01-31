@@ -133,6 +133,11 @@ You can override a large number of visual elements by creating your own css styl
 will be the order they are loaded in the browser.
 
 ```php
+$config['title_image'] = "images/custom/yourlogo.png";
+```
+You can override the default logo with yours, place any custom images files into `html/images/custom` so they will be ignored by auto updates.
+
+```php
 $config['page_refresh']     = "300";
 ```
 Set how often pages are refreshed in seconds. The default is every 5 minutes. Some pages don't refresh at all by design.

@@ -17,6 +17,9 @@ $features = 'build-'.$data[0]['vmwProdBuild'];
 $hardware = snmp_get($device, 'entPhysicalDescr.1', '-OsvQU', 'ENTITY-MIB');
 $serial   = snmp_get($device, 'entPhysicalSerialNum.1', '-OsvQU', 'ENTITY-MIB');
 
+# Clean up Generic hardware descriptions
+$hardware = rewrite_generic_hardware($hardware);
+
 /*
  * CONSOLE: Start the VMware discovery process.
  */
