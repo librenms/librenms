@@ -26,6 +26,7 @@ These are the configuration options you will need to use to specify to get start
 
 ```php
 $config['db_host'] = '127.0.0.1';
+$config['db_port'] = 3306;
 $config['db_user'] = '';
 $config['db_pass'] = '';
 $config['db_name'] = '';
@@ -130,6 +131,11 @@ $config['webui']['custom_css'][]       = "css/custom/styles.css";
 You can override a large number of visual elements by creating your own css stylesheet and referencing it here, place any custom css files into 
 `html/css/custom` so they will be ignored by auto updates. You can specify as many css files as you like, the order they are within your config 
 will be the order they are loaded in the browser.
+
+```php
+$config['title_image'] = "images/custom/yourlogo.png";
+```
+You can override the default logo with yours, place any custom images files into `html/images/custom` so they will be ignored by auto updates.
 
 ```php
 $config['page_refresh']     = "300";

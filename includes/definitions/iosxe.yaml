@@ -21,9 +21,7 @@ poller_modules:
     cipsec-tunnels: 1
     cisco-otv: 1
     ipmi: 0
-    toner: 0
 discovery_modules:
-    toner: 0
     cisco-cef: 1
     cisco-sla: 1
     cisco-mac-accounting: 1

@@ -166,9 +166,9 @@ if (isset($_REQUEST['search'])) {
                     }
 
                     if ($result['bgpPeerRemoteAs'] == $result['bgpLocalAs']) {
-                        $bgp_image = 'images/16/brick_link.png';
+                        $bgp_image = '<i class="fa fa-square fa-lg icon-theme" aria-hidden="true"></i>';
                     } else {
-                        $bgp_image = 'images/16/world_link.png';
+                        $bgp_image = '<i class="fa fa-external-link-square fa-lg icon-theme" aria-hidden="true"></i>';
                     }
 
                     $bgp[] = array(

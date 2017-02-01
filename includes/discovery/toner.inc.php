@@ -48,17 +48,19 @@ if ($device['os_group'] == 'printer') {
         $capacity = get_toner_capacity($data['prtMarkerSuppliesMaxCapacity']);
         $current = get_toner_levels($device, $raw_toner, $capacity);
 
-        discover_toner(
-            $valid_toner,
-            $device,
-            $toner_oid,
-            $last_index,
-            $type,
-            $descr,
-            $capacity_oid,
-            $capacity,
-            $current
-        );
+        if (is_numeric($current)) {
+            discover_toner(
+                $valid_toner,
+                $device,
+                $toner_oid,
+                $last_index,
+                $type,
+                $descr,
+                $capacity_oid,
+                $capacity,
+                $current
+            );
+        }
     }
 }
 

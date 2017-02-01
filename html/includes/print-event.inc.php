@@ -3,14 +3,18 @@
 $hostname = gethostbyid($entry['host']);
 
 unset($icon);
+$icon_returned = geteventicon($entry['message']);
+$icon_type = $icon_returned['icon'];
+$icon_colour = $icon_returned['colour'];
 
-$icon = geteventicon($entry['message']);
-if ($icon) {
-    $icon = '<img src="images/16/'.$icon.'" />';
+if ($icon_type) {
+    $icon = "<i class='fa $icon_type fa-lg' style='color:$icon_colour' aria-hidden='true'></i>";
+} else {
+    $icon = "<i class='fa fa-bookmark-o fa-lg' style='color:black' aria-hidden='true'></i>";
 }
 
 echo '<tr>
-  <td>
+  <td>'.$icon.'&nbsp;
     '.$entry['datetime'].'
   </td>';
 

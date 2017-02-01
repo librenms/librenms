@@ -308,6 +308,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('canonprinter', 'canonprinter-mf');
         $this->checkOS('canonprinter', 'canonprinter-ir-adv');
+        $this->checkOS('canonprinter', 'canon-d1180');
     }
 
     public function testCanopy()
@@ -583,6 +584,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ericsson-es');
     }
 
+    public function testExinda()
+    {
+        $this->checkOS('exinda');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
@@ -683,6 +689,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('generex-ups');
         $this->checkOS('generex-ups', 'generex-ups1');
         $this->checkOS('generex-ups', 'generex-ups2');
+        $this->checkOS('generex-ups', 'generex-ups3');
     }
 
     public function testHikvision()
@@ -840,6 +847,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testJwos()
     {
         $this->checkOS('jwos');
+    }
+
+    public function testKemp()
+    {
+        $this->checkOS('kemp');
     }
 
     public function testKti()
