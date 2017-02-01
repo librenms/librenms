@@ -1,0 +1,47 @@
+General information
+===================
+The following listing shows all available traps that a LANTIME system
+can send, as well as its severity level (from our point of view)
+and a potential "clearing" trap which sometimes is pretty interesting
+for management software or alarming systems.
+
+Trapname                    Cleared By              Severity level
+==================================================================
+NTPNotSync                  NTPSync                 warning or critical
+NTPStopped                  NormalOperation         critical
+TrapServerBoot              -                       info
+TrapReceiverNotSync         ReceiverSnyc            warning or critical
+TrapReceiverNotResponding   TrapReceiverNotSync,    critical
+                            ReceiverSnyc
+AntennaFaulty               AntennaReconnect        warning or critical
+ConfigChanged               -                       info
+LeapSecondAnnounced         -                       info or warning
+SHSTimeLimitError           SHSTimeLimitOk          critical
+SecondaryRecNotSync         SecondaryRecSync        warning
+SecondaryRecNotResp         SecondaryRecNotSync,    warning or critical
+                            SecondaryRecSync
+PowerSupplyFailure          PowerSupplyUp           critical
+AntennaShortCircuit         -                       critical
+NTPClientAlarm              -                       info or warning
+NetworkDown                 NetworkUp               critical
+XmrLimitExceeded            -                       warning
+XmrRefDisconnect            XmrRefReconnect         critical or warning
+FdmError                    -                       warning
+SHSTimeLimitWarning         -                       warning
+PtpPortDisconnected         PtpPortConnected        warning or critical
+PtpStateChanged             -                       info or warning
+PtpError                    -                       warning or critical
+LowSystemResources          -                       warning
+FanDown                     FanUp                   critical
+CertificateExpired          -                       info or warning
+OscillatorNotWarmedUp       OscillatorWarmedUp      info
+XmrRefChanged               -                       info or warning
+NormalOperation             -                       info
+HeartBeat                   -                       info
+TestNotification            -                       info
+TrapMessage                 -                       info
+SufficientSystemResources   -                       info
+OscillatorNotWarmedUp       OscillatorWarmedUp      info
+ClusterMasterChanged        -                       info
+ClusterFalsetickerDet.      ClusterFalsetickerClr.  warning or info
+IMSError                    IMSOk                   warning or critical
