@@ -1,0 +1,8 @@
+os: mbg-ltos6
+text: LANTIME v6
+type: timing
+icon: meinberg
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.5597.3
+    - sysDescr_regex:
+        - '/Meinberg\s+LANTIME\s+V6\./'
