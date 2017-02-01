@@ -16,6 +16,7 @@ Table of Content:
     - [Nagios-Compatible](#transports-nagios)
     - [IRC](#transports-irc)
     - [Slack](#transports-slack)
+    - [Rocket.chat](#transports-rocket)
     - [HipChat](#transports-hipchat)
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
@@ -306,6 +307,19 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 
 ```
 ~~
+
+## <a name="transports-slack">Rocket.chat</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the [attachments](https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Rocket.chat will be made. Below is an example of how to send alerts to two channels with different customised options:
+
+```php
+$config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/api/v1/chat.postMessage", 'channel' => '#Alerting');
+
+$config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/api/v1/chat.postMessage", 'channel' => '@john', 'username' => 'LibreNMS', 'icon_emoji' => ':ghost:');
+
+```
 
 ## <a name="transports-hipchat">HipChat</a>
 
