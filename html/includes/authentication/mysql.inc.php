@@ -153,7 +153,7 @@ function deluser($userid)
 
 function get_userlist()
 {
-    return dbFetchRows('SELECT * FROM `users`');
+    return dbFetchRows('SELECT * FROM `users` ORDER BY `username`');
 }//end get_userlist()
 
 
