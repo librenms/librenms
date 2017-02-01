@@ -445,12 +445,6 @@ if ($_SESSION['userlevel'] != '10') {
                   <select name='user_id' class='form-control input-sm'>";
         foreach ($user_list as $user_entry) {
             switch ($user_entry['level']) {
-                case "1":
-                    $user_level = '';
-                    break;
-                case "5":
-                    $user_level = '';
-                    break;
                 case "10":
                     $user_level = ' (admin)';
                     break;
