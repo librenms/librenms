@@ -455,7 +455,6 @@ if ($_SESSION['userlevel'] != '10') {
                     $user_level = '';
             }
             echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].$user_level.'</option>';
-
         }
 
         echo "</select>
