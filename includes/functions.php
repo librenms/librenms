@@ -317,7 +317,7 @@ function delete_device($id)
 {
     global $config, $debug;
 
-    if (php_sapi_name() !== 'cli') {
+    if (isCli() === false) {
         ignore_user_abort(true);
         set_time_limit(0);
     }
