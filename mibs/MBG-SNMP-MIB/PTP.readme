@@ -1,0 +1,30 @@
+General information
+===================
+A lot has changed in the PTP configuration and state section by this version.
+Many objects have been updated and added in either section to provide as many options
+as the web interface does. Please read this document carefully to fully understand
+the differences and to be prepared to deal with the new options and objects.
+
+PTP state
+===================
+First of all, you should query the object "mbgLtNgPtpAvail" to find out which slots
+contain PTP cards to query. In case an object returns "no(0)" there is no PTP card
+avail in the specific slot and all state objects WILL return their DEFAULT VALUE.
+
+PTP configuration
+===================
+In contrast to all PTP state objects general configuration options like the IP
+address, hostname, and many other objects are settable even if "mbgLtNgPtpAvail" returns
+"no(0)". The point is to allow the customer to prepare/configure PTP cards
+that are planned to be inserted in the future. Please be aware that not all cards
+do really support every feature that is theoretically avail at the time writing
+this documentation. Thus, especially older PTP cards might respond with "SNMP Generic Error"
+when trying to set some newer configuration options that are not supported due to older hardware.
+Potential related objects are IPv6, SyncE, Outputs, 1 Step, NTP mode and Hybrid mode.
+Please take a look at the MIB file and its objects for more detailed explanations.
+
+Attention
+===================
+Setting a full featured and configured PTP profile is NOT possible. You can simply
+set and modify single features of that profile but to switch to a complete
+profile please use the web interface.

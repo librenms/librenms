@@ -922,6 +922,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mypoweros');
     }
 
+    public function testMbgLtos6()
+    {
+        $this->checkOS('mbg-ltos6');
+    }
+
     public function testMellanox()
     {
         $this->checkOS('mellanox');
