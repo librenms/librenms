@@ -316,6 +316,12 @@ function renamehost($id, $new, $source = 'console')
 function delete_device($id)
 {
     global $config, $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
     $ret = '';
 
     $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
