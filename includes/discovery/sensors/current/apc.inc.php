@@ -203,9 +203,8 @@ if ($device['os'] == 'apc') {
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
     }
     unset($oids);
-    
-    $phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
 
+    $phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
     if ($phasecount > 1) {
         $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', $oids, 'PowerNet-MIB');
         $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputCurrent', $in_oids, 'PowerNet-MIB');
@@ -213,32 +212,13 @@ if ($device['os'] == 'apc') {
         $oids = snmpwalk_cache_oid($device, 'upsHighPrecOutputCurrent', $oids, 'PowerNet-MIB');
     }
 
-    foreach ($oids as $index => $data) {
-        $type = 'apcUPS';
-        $descr = 'Phase ' . substr($index, -1) . ' Output';
-        if (isset($data['upsHighPrecOutputCurrent'])) {
-            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.4.' . $index;
-            $divisor = 10;
-            $current = $data['upsHighPrecOutputCurrent'] / $divisor;
-        } else {
-            $current_oid = '.1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.' . $index;
-            $divisor = 10;
-            $current = $data['upsPhaseOutputCurrent'] / $divisor;
-        }
-        if ($current >= -1) {
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
-        }
-    }
-    unset($index);
-    unset($data);
     if (isset($in_oids)) {
         foreach ($in_oids as $index => $data) {
             $type = 'apcUPS';
-            $current_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.4.' . $index;
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.' . $index;
             $divisor = 10;
             $current = $data['upsPhaseInputCurrent'] / $divisor;
             $in_index = '3.1.4.' . $index;
-
             if (substr($index, 0, 1) == 2 && $data['upsPhaseInputCurrent'] != -1) {
                 $descr = 'Phase ' . substr($index, -1) . ' Bypass Input';
                 discover_sensor($valid['sensor'], 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
@@ -248,4 +228,25 @@ if ($device['os'] == 'apc') {
             }
         }
     }
+    unset($index);
+    unset($data);
+
+    foreach ($oids as $index => $data) {
+        $type = 'apcUPS';
+        $descr = 'Phase ' . substr($index, -1) . ' Output';
+        if (isset($data['upsHighPrecOutputCurrent'])) {
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.4.' . $index;
+            $divisor = 10;
+            $current = $data['upsHighPrecOutputCurrent'] / $divisor;
+        } else {
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.4.' . $index;
+            $divisor = 10;
+            $current = $data['upsPhaseOutputCurrent'] / $divisor;
+        }
+        if ($current >= -1) {
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        }
+    }
+    unset($index);
+    unset($data);
 }
