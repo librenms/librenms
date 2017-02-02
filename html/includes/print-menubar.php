@@ -98,15 +98,15 @@ if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-bookmark fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
 <?php
 
 if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-calendar-o fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-archive fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
 }
 
 if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
-    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-calendar-o fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-archive fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
 }
 
 ?>
