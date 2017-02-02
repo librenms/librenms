@@ -97,20 +97,7 @@ if ($config['memcached']['enable'] === true) {
 
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
-    if (!$database_link) {
-        $error = mysqli_connect_error();
-        if ($error == 'No such file or directory') {
-            $error = 'Could not connect to ' . $config['db_host'];
-        }
-        if (isCli()) {
-            echo "MySQL Error: $error\n";
-        } else {
-            echo "<h2>MySQL Error</h2><p>$error</p>";
-        }
-        die;
-    }
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
+    $database_link = dbConnect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
 
     // pull in the database config settings
     mergedb();

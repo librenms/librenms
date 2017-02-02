@@ -3,6 +3,8 @@
 
 // MYSQL Check - FIXME
 // 1 UNKNOWN
+$config['db_port'] = '';
+$config['db_socket'] = '';
 include 'config.php';
 
 if (!isset($sql_file)) {
@@ -15,7 +17,7 @@ if ($sql_fh === false) {
     exit(1);
 }
 
-$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
+$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port'], $config['db_socket']);
 if ($database_link === false) {
     echo 'ERROR: Cannot connect to database: '.mysqli_error($database_link)."\n";
     exit(1);
