@@ -1127,6 +1127,38 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$ciscospark_token   = get_config_by_name('alert.transports.ciscospark.token');
+$ciscospark_roomid   = get_config_by_name('alert.transports.ciscospark.roomid');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#ciscospark_transport_expand"><i class="fa fa-caret-down"></i> Cisco Spark transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="ciscospark" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="ciscospark_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="ciscospark_token" class="col-sm-4 control-label">Cisco Spark API Token</label>
+                        <div class="col-sm-4">
+                            <input id="ciscospark_token" class="form-control" type="text" name="global-config-input" value="'.$ciscospark_token['config_value'].'" data-config_id="'.$ciscospark_token['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="ciscospark_roomid" class="col-sm-4 control-label">Cisco Spark RoomID</label>
+                        <div class="col-sm-4">
+                            <input id="ciscospark_roomid" class="form-control" type="text" name="global-config-input" value="'.$ciscospark_roomid['config_value'].'" data-config_id="'.$ciscospark_roomid['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
