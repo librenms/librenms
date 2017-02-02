@@ -102,11 +102,11 @@ if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])
 <?php
 
 if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-archive fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-tag fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
 }
 
 if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
-    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-archive fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-tag fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
 }
 
 ?>
