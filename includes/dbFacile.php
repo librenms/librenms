@@ -18,7 +18,8 @@
  */
 
 
-function dbConnect($host, $user = '', $password = '', $database = '', $port = '', $socket = '') {
+function dbConnect($host, $user = '', $password = '', $database = '', $port = '', $socket = '')
+{
     $db_link = mysqli_connect('p:' . $host, $user, $password, $database, $port, $socket);
     if ($db_link === false) {
         $error = mysqli_connect_error();
