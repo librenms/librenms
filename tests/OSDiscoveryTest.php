@@ -221,6 +221,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('avtech', 'avtech-tempager4e');
     }
 
+    public function testAvrhd()
+    {
+        $this->checkOS('avr-hd');
+    }
+
     public function testAxiscam()
     {
         $this->checkOS('axiscam');

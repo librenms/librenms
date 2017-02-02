@@ -1,0 +1,9 @@
+os: avr-hd
+text: 'avr-hd'
+type: appliance
+icon: exterity
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescrId:
+        - avr-hd
