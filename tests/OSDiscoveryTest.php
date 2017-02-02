@@ -1586,6 +1586,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('zynos', 'zynos-es');
         $this->checkOS('zynos', 'zynos-gs');
         $this->checkOS('zynos', 'zynos-mes3528');
+        $this->checkOS('zynos', 'zynos-xs');
     }
 
     public function testZywall()
