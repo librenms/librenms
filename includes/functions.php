@@ -292,7 +292,7 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
     }
 
     // fallback to the generic icon
-    return 'generic.png';
+    return 'generic.svg';
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -316,6 +316,12 @@ function renamehost($id, $new, $source = 'console')
 function delete_device($id)
 {
     global $config, $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
     $ret = '';
 
     $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
@@ -1513,7 +1519,7 @@ function oxidized_reload_nodes()
 function dnslookup($device, $type = false, $return = false)
 {
     if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return '';
+        return false;
     }
     if (empty($type)) {
         // We are going to use the transport to work out the record type
@@ -1526,7 +1532,7 @@ function dnslookup($device, $type = false, $return = false)
         }
     }
     if (empty($return)) {
-        return '';
+        return false;
     }
     $record = dns_get_record($device['hostname'], $type);
     return $record[0][$return];
@@ -1821,8 +1827,13 @@ function get_toner_levels($device, $raw_value, $capacity)
         return 50;
     }
 
-    // -2 means unknown, -1 mean no restrictions
-    if ($raw_value == '-2' || $raw_value == '-1') {
+    // -2 means unknown
+    if ($raw_value == '-2') {
+        return false;
+    }
+
+    // -1 mean no restrictions
+    if ($raw_value == '-1') {
         return 0;  // FIXME: is 0 what we should return?
     }
 

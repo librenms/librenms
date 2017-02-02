@@ -710,32 +710,38 @@ function print_optionbar_end()
 
 function geteventicon($message)
 {
-    if ($message == 'Device status changed to Down') {
-        $icon = 'server_connect.png';
+    if ($message == 'Device status changed to Down from check') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'red';
     }
 
-    if ($message == 'Device status changed to Up') {
-        $icon = 'server_go.png';
+    if ($message == 'Device status changed to Up from check') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'green';
     }
 
-    if ($message == 'Interface went down' || $message == 'Interface changed state to Down') {
-        $icon = 'if-disconnect.png';
+    if ($message == 'Interface went down' || $message == 'Interface changed state to Down' || $message == 'ifOperStatus: up -> down') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'red';
     }
 
-    if ($message == 'Interface went up' || $message == 'Interface changed state to Up') {
-        $icon = 'if-connect.png';
+    if ($message == 'Interface went up' || $message == 'Interface changed state to Up' || $message == 'ifOperStatus: down -> up') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'green';
     }
 
-    if ($message == 'Interface disabled') {
-        $icon = 'if-disable.png';
+    if ($message == 'Interface disabled' || $message == 'ifAdminStatus: up -> down') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'grey';
     }
 
-    if ($message == 'Interface enabled') {
-        $icon = 'if-enable.png';
+    if ($message == 'Interface enabled' || $message == 'ifAdminStatus: down -> up') {
+        $icon = 'fa-bookmark';
+        $icon_colour = 'green';
     }
 
     if (isset($icon)) {
-        return $icon;
+        return array('icon' => $icon,'colour' => $icon_colour);
     } else {
         return false;
     }
@@ -1032,6 +1038,19 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
+/**
+ * @param $string
+ * @param int $max
+ * @return string
+ */
+function shorten_text($string, $max = 30)
+{
+    if (strlen($string) > 50) {
+        return substr($string, 0, $max) . "...";
+    } else {
+        return $string;
+    }
+}
 
 function shorten_interface_type($string)
 {
