@@ -1,4 +1,5 @@
 <?php
+
 if (strstr($device['sysDescr'], 'IBM Flex System Fabric')) {
     $check_oids = snmp_get($device, '.1.3.6.1.4.1.20301.2.5.1.3.1.22.0', '-OsqnU', '');
     if ($check_oids !== false) {

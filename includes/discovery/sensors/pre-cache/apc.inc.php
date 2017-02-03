@@ -23,4 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$cooling_unit_analog = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', array(), 'PowerNet-MIB');
+if ($device['os'] === 'apc') {
+    $pre_cache['cooling_unit_analog'] = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', array(), 'PowerNet-MIB');
+    d_echo($pre_cache);
+}

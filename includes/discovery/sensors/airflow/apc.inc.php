@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-foreach ($cooling_unit_analog as $index => $data) {
+foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.1.2.1.3.' . $index;
     $descr = $data['coolingUnitStatusAnalogDescription'];
     $scale = $data['coolingUnitStatusAnalogScale'];

@@ -1,12 +1,10 @@
 <?php
 
-if ($device['os'] == "drac") {
-    $oids = snmp_walk($device, "powerSupplyIndex.1", "-OsqnU", "IDRAC-MIB-SMIv2");
-    d_echo($oids."\n");
-    $oids = trim($oids);
-    if ($oids) {
-        echo("Dell iDRAC");
-    }
+$oids = snmp_walk($device, "powerSupplyIndex.1", "-OsqnU", "IDRAC-MIB-SMIv2");
+d_echo($oids."\n");
+$oids = trim($oids);
+if ($oids) {
+    echo("Dell iDRAC");
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {

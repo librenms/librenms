@@ -10,20 +10,18 @@
  * the source code distribution for details.
  */
 
-if (strstr($device['hardware'], 'Dell')) {
-    $temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', array(), 'MIB-Dell-10892');
-    $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
+$temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', array(), 'MIB-Dell-10892');
+$cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 
-    if (is_array($temp)) {
-        foreach ($temp as $index => $entry) {
-            $descr = $temp[$index]['coolingDeviceLocationName'];
-            $value = $temp[$index]['coolingDeviceReading'];
-            $lowlimit = $temp[$index]['coolingDeviceLowerCriticalThreshold'];
-            $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
-            $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'];
-            $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'];
+if (is_array($temp)) {
+    foreach ($temp as $index => $entry) {
+        $descr = $temp[$index]['coolingDeviceLocationName'];
+        $value = $temp[$index]['coolingDeviceReading'];
+        $lowlimit = $temp[$index]['coolingDeviceLowerCriticalThreshold'];
+        $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
+        $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'];
+        $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'];
 
-            discover_sensor($valid['sensor'], 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
-        }
+        discover_sensor($valid['sensor'], 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }

@@ -1,12 +1,10 @@
 <?php
 
-if ($device['os'] == 'sentry3') {
-    $oids = snmp_walk($device, 'infeedVoltage', '-OsqnU', 'Sentry3-MIB');
-    d_echo($oids."\n");
+$oids = snmp_walk($device, 'infeedVoltage', '-OsqnU', 'Sentry3-MIB');
+d_echo($oids."\n");
 
-    if ($oids) {
-        echo 'Sentry3-MIB ';
-    }
+if ($oids) {
+    echo 'Sentry3-MIB ';
 
     $divisor = 10;
     $type    = 'sentry3';
@@ -24,4 +22,4 @@ if ($device['os'] == 'sentry3') {
             discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
         }
     }
-}//end if
+}
