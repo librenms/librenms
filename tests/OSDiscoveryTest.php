@@ -1107,11 +1107,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('okilan');
     }
 
-    public function testOpensolaris()
-    {
-        $this->checkOS('opensolaris');
-    }
-
     public function testOnefs()
     {
         $this->checkOS('onefs');
@@ -1126,6 +1121,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('openbsd');
         $this->checkOS('openbsd', 'openbsd1');
+    }
+
+    public function testOpengear()
+    {
+        $this->checkOS('opengear');
+    }
+
+    public function testOpensolaris()
+    {
+        $this->checkOS('opensolaris');
     }
 
     public function testOracleilom()
