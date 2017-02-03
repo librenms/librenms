@@ -1,11 +1,10 @@
 <?php
 
-if ($device['os'] == "hytera") {
-    $oids = snmp_walk($device, "rptVoltage", "-OsqnU", "HYTERA-REPEATER-MIB");
-    d_echo($oids);
-    if ($oids !== false) {
-        echo("HYTERA-REPEATER-MIB ");
-    }
+$oids = snmp_walk($device, "rptVoltage", "-OsqnU", "HYTERA-REPEATER-MIB");
+d_echo($oids);
+if ($oids !== false) {
+    echo("HYTERA-REPEATER-MIB ");
+
     $divisor = 1;
     $type = "hytera";
 

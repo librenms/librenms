@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Calix E5-1xx Temperature Discovery module
  *
@@ -11,7 +10,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
 
 if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
     echo 'Calix E5: ';

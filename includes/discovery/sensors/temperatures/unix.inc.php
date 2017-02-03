@@ -1,14 +1,11 @@
 <?php
 
-if ($device['os'] == 'linux' || $device['os'] == 'pktj' || $device['os'] == 'cumulus') {
-    $oids = snmp_walk($device, 'lmTempSensorsDevice', '-Osqn', 'LM-SENSORS-MIB');
-    d_echo($oids."\n");
+$oids = snmp_walk($device, 'lmTempSensorsDevice', '-Osqn', 'LM-SENSORS-MIB');
+d_echo($oids."\n");
 
-    $oids = trim($oids);
-    if ($oids) {
-        echo 'LM-SENSORS-MIB: ';
-    }
-
+$oids = trim($oids);
+if ($oids) {
+    echo 'LM-SENSORS-MIB: ';
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {

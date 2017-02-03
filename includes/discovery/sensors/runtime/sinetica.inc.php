@@ -23,16 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'sinetica') {
-    $runtime_oid = '.1.3.6.1.4.1.13891.101.2.3.0';
-    $runtime = snmp_get($device, $runtime_oid, '-Osqvt');
+$runtime_oid = '.1.3.6.1.4.1.13891.101.2.3.0';
+$runtime = snmp_get($device, $runtime_oid, '-Osqvt');
 
-    if (!empty($runtime)) {
-        $type               = 'sinetcia';
-        $index              = '2.3.0';
-        $descr              = 'Runtime';
-        $low_limit          = 5;
-        $low_limit_warn     = 10;
-        discover_sensor($valid['sensor'], 'runtime', $device, $runtime_oid, $index, $type, $descr, 1, 1, $low_limit, $low_limit_warn, null, null, $runtime);
-    }
-}//end if
+if (!empty($runtime)) {
+    $type               = 'sinetcia';
+    $index              = '2.3.0';
+    $descr              = 'Runtime';
+    $low_limit          = 5;
+    $low_limit_warn     = 10;
+    discover_sensor($valid['sensor'], 'runtime', $device, $runtime_oid, $index, $type, $descr, 1, 1, $low_limit, $low_limit_warn, null, null, $runtime);
+}

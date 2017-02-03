@@ -23,18 +23,16 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'aos-emu2') {
-    foreach ($emu2_temp as $id => $temp) {
-        if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
-            $index           = $temp['emsProbeStatusProbeIndex'];
-            $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
-            $descr           = $temp['emsProbeStatusProbeName'];
-            $low_limit       = $temp['emsProbeStatusProbeMinHumidityThresh'];
-            $low_warn_limit  = $temp['emsProbeStatusProbeLowHumidityThresh'];
-            $high_limit      = $temp['emsProbeStatusProbeMaxHumidityThresh'];
-            $high_warn_limit = $temp['emsProbeStatusProbeHighHumidityThresh'];
-            $current         = $temp['emsProbeStatusProbeHumidity'];
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
-        }
+foreach ($emu2_temp as $id => $temp) {
+    if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
+        $index           = $temp['emsProbeStatusProbeIndex'];
+        $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
+        $descr           = $temp['emsProbeStatusProbeName'];
+        $low_limit       = $temp['emsProbeStatusProbeMinHumidityThresh'];
+        $low_warn_limit  = $temp['emsProbeStatusProbeLowHumidityThresh'];
+        $high_limit      = $temp['emsProbeStatusProbeMaxHumidityThresh'];
+        $high_warn_limit = $temp['emsProbeStatusProbeHighHumidityThresh'];
+        $current         = $temp['emsProbeStatusProbeHumidity'];
+        discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 }

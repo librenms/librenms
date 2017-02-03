@@ -10,13 +10,11 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'hwg-ste') {
-    $temp = snmpwalk_cache_multi_oid($device, 'sensTable', array(), 'STE-MIB');
-    $cur_oid = '.1.3.6.1.4.1.21796.4.1.3.1.5.';
+$temp = snmpwalk_cache_multi_oid($device, 'sensTable', array(), 'STE-MIB');
+$cur_oid = '.1.3.6.1.4.1.21796.4.1.3.1.5.';
 
-    if (is_array($temp)) {
-        foreach ($temp as $index => $entry) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid.$index, $index, 'hwg-ste', $temp[$index]['sensName'], '10', '1', null, null, null, null, $temp[$index]['sensValue'], 'snmp', $index);
-        }
+if (is_array($temp)) {
+    foreach ($temp as $index => $entry) {
+        discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid.$index, $index, 'hwg-ste', $temp[$index]['sensName'], '10', '1', null, null, null, null, $temp[$index]['sensValue'], 'snmp', $index);
     }
 }
