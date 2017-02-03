@@ -513,6 +513,9 @@ function location_to_latlng($device)
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
             curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
+            curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
             switch ($config['geoloc']['engine']) {
