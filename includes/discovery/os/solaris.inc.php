@@ -1,3 +1,4 @@
+
 <?php
 
 if (starts_with($sysDescr, 'SunOS')) {
