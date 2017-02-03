@@ -4,6 +4,8 @@ group: zyxel
 type: network
 icon: zyxel
 discovery:
-    - sysDescr_regex:
-        - '/IES-((?!Cisco Systems).)*$/' # = str_contains($sysDescr, 'IES-') && !str_contains($sysDescr, 'Cisco Systems')
+    -
+      sysObjectId: .1.3.6.1.4.1.890.
+      sysDescr:
+        - IES-
 
