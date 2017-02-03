@@ -1409,3 +1409,17 @@ function search_oxidized_config($search_in_conf_textbox)
     $context  = stream_context_create($opts);
     return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
 }
+
+/**
+ * @param $data
+ * @return bool|mixed
+ */
+function array_to_htmljson($data)
+{
+    if (is_array($data)) {
+        $data = htmlentities(json_encode($data));
+        return str_replace(',', ',<br />', $data);
+    } else {
+        return false;
+    }
+}
