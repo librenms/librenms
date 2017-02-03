@@ -3,6 +3,7 @@ group: timos
 text: 'Alcatel-Lucent TiMOS'
 type: network
 ifXmcbc: 1
+ifname: 1
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 icon: alcatellucent
