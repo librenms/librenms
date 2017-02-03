@@ -956,7 +956,7 @@ function is_port_valid($port, $device)
     global $config;
 
     if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
-        // one entry in port array is just wrong.
+        // If these are all empty, we are just going to show blank names in the ui
         $valid = 0;
     } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
         $valid = 0;
