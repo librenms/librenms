@@ -1473,6 +1473,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos6');
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
+        $this->checkOS('timos', 'timos9');
     }
 
     public function testTomato()
