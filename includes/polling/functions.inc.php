@@ -489,7 +489,7 @@ function location_to_latlng($device)
     $device_location = $device['location'];
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /", "+", $device_location);
-        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $device_location); // Removes special chars.
+        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
         // We have a location string for the device.
         $loc = parse_location($device_location);
         if (!is_array($loc)) {
