@@ -31,7 +31,6 @@ function dbConnect($host, $user = '', $password = '', $database = '', $port = ''
         } else {
             echo "<h2>MySQL Error</h2><p>$error</p>";
         }
-        exit(1);
     }
     return $db_link;
 }

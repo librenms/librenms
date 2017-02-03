@@ -439,6 +439,11 @@ class IRCBot
         if (!is_resource($this->sql)) {
             $this->sql = dbConnect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'], $this->config['db_name'], $this->config['db_port'], $this->config['db_socket']);
         }
+        if ($this->sql === false) {
+            $this->log('Cannot connect to MySQL');
+            return die();
+        }
+
         return true;
     }//end chkdb()
 
