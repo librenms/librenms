@@ -15,36 +15,34 @@
  * limitations under the License.
 */
 
-if ($device['os'] == 'sentry4') {
-    $oids = snmp_walk($device, 'st4TempSensorValue', '-Osqn', 'Sentry4-MIB');
-    d_echo($oids."\n");
+$oids = snmp_walk($device, 'st4TempSensorValue', '-Osqn', 'Sentry4-MIB');
+d_echo($oids."\n");
 
-    $oids       = trim($oids);
-    $divisor    = '10';
-    $multiplier = '1';
-    if ($oids) {
-        echo 'ServerTech Sentry4 Temperature ';
-    }
+$oids       = trim($oids);
+$divisor    = '10';
+$multiplier = '1';
+if ($oids) {
+    echo 'ServerTech Sentry4 Temperature ';
+}
 
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid,$descr) = explode(' ', $data, 2);
-            $split_oid        = explode('.', $oid);
-            $index            = $split_oid[(count($split_oid) - 1)];
+foreach (explode("\n", $oids) as $data) {
+    $data = trim($data);
+    if ($data) {
+        list($oid,$descr) = explode(' ', $data, 2);
+        $split_oid        = explode('.', $oid);
+        $index            = $split_oid[(count($split_oid) - 1)];
 
-            // Sentry4-MIB::st4TempSensorValue
-            $temperature_oid = '.1.3.6.1.4.1.1718.4.1.9.3.1.1.1.'.$index;
-            $descr           = 'Removable Sensor '.$index;
-            $low_warn_limit  = (snmp_get($device, "st4TempSensorLowWarning.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
-            $low_limit       = (snmp_get($device, "st4TempSensorLowAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
-            $high_warn_limit = (snmp_get($device, "st4TempSensorHighWarning.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
-            $high_limit      = (snmp_get($device, "st4TempSensorHighAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
-            $current         = (snmp_get($device, "$temperature_oid", '-Ovq', 'Sentry4-MIB') / $divisor);
+        // Sentry4-MIB::st4TempSensorValue
+        $temperature_oid = '.1.3.6.1.4.1.1718.4.1.9.3.1.1.1.'.$index;
+        $descr           = 'Removable Sensor '.$index;
+        $low_warn_limit  = (snmp_get($device, "st4TempSensorLowWarning.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
+        $low_limit       = (snmp_get($device, "st4TempSensorLowAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
+        $high_warn_limit = (snmp_get($device, "st4TempSensorHighWarning.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
+        $high_limit      = (snmp_get($device, "st4TempSensorHighAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
+        $current         = (snmp_get($device, "$temperature_oid", '-Ovq', 'Sentry4-MIB') / $divisor);
 
-            if ($current >= 0) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
-            }
+        if ($current >= 0) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 }

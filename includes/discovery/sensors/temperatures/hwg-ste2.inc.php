@@ -10,14 +10,12 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'hwg-ste2') {
-    d_echo('HWg STE2 Temperature ');
-    $oid = '.1.3.6.1.4.1.21796.4.9.3.1.4.2';
-    $sensorType = 'ste2_temp';
-    $descr = 'Input 2 Temperature';
-    $temperature = snmp_get($device, $oid, '-Osqnv');
+d_echo('HWg STE2 Temperature ');
+$oid = '.1.3.6.1.4.1.21796.4.9.3.1.4.2';
+$sensorType = 'ste2_temp';
+$descr = 'Input 2 Temperature';
+$temperature = snmp_get($device, $oid, '-Osqnv');
 
-    if ($temperature !== false) {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, '1', $sensorType, $descr, '1', '1', null, null, null, null, $temperature);
-    }
+if ($temperature !== false) {
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, '1', $sensorType, $descr, '1', '1', null, null, null, null, $temperature);
 }
