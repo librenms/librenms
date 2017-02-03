@@ -26,7 +26,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp
+  - sudo apt-get install -y snmp php-pear
   - sudo pear install Net_IPv4
   - sudo pear install Net_IPv6
 
