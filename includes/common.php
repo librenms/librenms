@@ -197,7 +197,7 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
-function get_all_devices($device, $type = "")
+function get_all_devices()
 {
     global $cache;
     $devices = array();
@@ -1073,7 +1073,7 @@ function ceph_rrd($gtype)
 function parse_location($location)
 {
     preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (!empty($tmp_loc[2]) && !empty($tmp_loc[3])) {
+    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
 }//end parse_location()
@@ -1503,9 +1503,15 @@ function clean($value)
  */
 function display($value)
 {
-    $purifier = new HTMLPurifier(
-        HTMLPurifier_Config::createDefault()
-    );
+    /** @var HTMLPurifier $purifier */
+    global $config, $purifier;
+    if (!isset($purifier)) {
+        // initialize HTML Purifier here since this is the only user
+        $p_config = HTMLPurifier_Config::createDefault();
+        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        $purifier = new HTMLPurifier($p_config);
+    }
+
     return $purifier->purify(stripslashes($value));
 }
 
@@ -1609,6 +1615,7 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
+
 function check_git_exists()
 {
     if (`which git`) {
@@ -1616,4 +1623,15 @@ function check_git_exists()
     } else {
         return false;
     }
+}
+
+function get_vm_parent_id($device)
+{
+    global $config;
+
+    if (empty($device['hostname'])) {
+        return false;
+    }
+
+    return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 }

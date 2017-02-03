@@ -19,11 +19,11 @@ echo '<ul class="nav nav-tabs">';
 $poll_tabs = array(
     array(
         'name' => 'Pollers',
-        'icon' => 'clock_link',
+        'icon' => 'fa-th-large',
     ),
     array(
         'name' => 'Groups',
-        'icon' => 'clock_add',
+        'icon' => 'fa-th',
     ),
 );
 
@@ -31,7 +31,7 @@ foreach ($poll_tabs as $tab) {
     echo '
             <li>
                 <a href="' . generate_url(array('page'=>'pollers','tab'=>lcfirst($tab['name']))) . '">
-                   <img src="images/16/'.$tab['icon'].'.png" align="absmiddle" border="0"> '.$tab['name'].'
+                <i class="fa '.$tab['icon'].' fa-lg icon-theme" aria-hidden="true"></i>'.$tab['name'].'
                 </a>
             </li>';
 }

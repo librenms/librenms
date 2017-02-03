@@ -7,3 +7,8 @@ over:
 discovery:
     - sysDescr:
         - KONICA MINOLTA 
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

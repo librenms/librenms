@@ -18,28 +18,29 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 {
     global $config;
 
-    if (!empty($config['mydomain']) && isDomainResolves($hostname . '.' . $config['mydomain'])) {
-        $dst_host = $hostname . '.' . $config['mydomain'];
-    } else {
-        $dst_host = $hostname;
+    if (!empty($config['mydomain'])) {
+        $full_host = rtrim($hostname, '.') . '.' . $config['mydomain'];
+        if (isDomainResolves($full_host)) {
+            $hostname = $full_host;
+        }
     }
 
-    d_echo("discovering $dst_host\n");
+    d_echo("discovering $hostname\n");
 
-    $ip = gethostbyname($dst_host);
+    $ip = gethostbyname($hostname);
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
         // $ip isn't a valid IP so it must be a name.
-        if ($ip == $dst_host) {
-            d_echo("name lookup of $dst_host failed\n");
-            log_event("$method discovery of " . $dst_host  . " failed - Check name lookup", $device['device_id'], 'discovery');
+        if ($ip == $hostname) {
+            d_echo("name lookup of $hostname failed\n");
+            log_event("$method discovery of " . $hostname  . " failed - Check name lookup", $device['device_id'], 'discovery');
  
             return false;
         }
-    } elseif (filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
+    } elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
         // gethostbyname returned a valid $ip, was $dst_host an IP?
         if ($config['discovery_by_ip'] === false) {
-            d_echo('Discovery by IP disabled, skipping ' . $dst_host);
-            log_event("$method discovery of " . $dst_host . " failed - Discovery by IP disabled", $device['device_id'], 'discovery');
+            d_echo('Discovery by IP disabled, skipping ' . $hostname);
+            log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery');
  
             return false;
         }
@@ -47,7 +48,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
     d_echo("ip lookup result: $ip\n");
 
-    $dst_host = rtrim($dst_host, '.');
+    $hostname = rtrim($hostname, '.');
     // remove trailing dot
     if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
         d_echo("$ip in an excluded network - skipping\n");
@@ -57,7 +58,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
     if (match_network($config['nets'], $ip)) {
         try {
-            $remote_device_id = addHost($dst_host, '', '161', 'udp', $config['distributed_poller_group']);
+            $remote_device_id = addHost($hostname, '', '161', 'udp', $config['distributed_poller_group']);
             $remote_device = device_by_id_cache($remote_device_id, 1);
             echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
             discover_device($remote_device);
@@ -78,7 +79,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $dst_host . " ($ip) failed - " . $e->getMessage());
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage());
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");

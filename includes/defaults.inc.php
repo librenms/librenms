@@ -34,6 +34,9 @@ $config['db']['extension']       = 'mysqli';//mysql and mysqli available
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
+//MySQL port
+$config['db_port']               = 3306;
+
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
 
@@ -683,9 +686,9 @@ $config['poller_modules']['ipSystemStats']               = 1;
 $config['poller_modules']['ports']                       = 1;
 $config['poller_modules']['bgp-peers']                   = 1;
 $config['poller_modules']['junose-atm-vp']               = 0;
-$config['poller_modules']['toner']                       = 1;
+$config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
-$config['poller_modules']['wifi']                        = 1;
+$config['poller_modules']['wifi']                        = 0;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -738,8 +741,8 @@ $config['discovery_modules']['junose-atm-vp']        = 0;
 $config['discovery_modules']['bgp-peers']            = 1;
 $config['discovery_modules']['vlans']                = 1;
 $config['discovery_modules']['vmware-vminfo']        = 0;
-$config['discovery_modules']['libvirt-vminfo']       = 1;
-$config['discovery_modules']['toner']                = 1;
+$config['discovery_modules']['libvirt-vminfo']       = 0;
+$config['discovery_modules']['toner']                = 0;
 $config['discovery_modules']['ucd-diskio']           = 1;
 $config['discovery_modules']['services']             = 1;
 $config['discovery_modules']['stp']                  = 1;
@@ -835,7 +838,7 @@ $config['unix-agent-read-time-out'] = 10;
 // seconds
 
 // Lat / Lon support for maps
-$config['geoloc']['latlng']                             = false; // True to enable translation of location to latlng co-ordinates
+$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
 $config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';

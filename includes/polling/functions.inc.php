@@ -201,7 +201,7 @@ function poll_device($device, $options)
     $poll_update_array = array();
     $update_array = array();
 
-    $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
+    $host_rrd = rrd_name($device['hostname'], '', '');
     if ($config['norrd'] !== true && !is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
@@ -489,6 +489,7 @@ function location_to_latlng($device)
     $device_location = $device['location'];
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /", "+", $device_location);
+        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $device_location); // Removes special chars.
         // We have a location string for the device.
         $loc = parse_location($device_location);
         if (!is_array($loc)) {

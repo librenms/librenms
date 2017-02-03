@@ -79,6 +79,17 @@ set snmp contact contact
 set snmp community YOUR-COMMUNITY authorization read-only
 ```
 
+### Mikrotik
+#### RouterOS 6.x
+```
+#Terminal SNMP v2 Configuration
+/snmp community
+set [ find default=yes ] read-access=no
+add addresses=<SRC IP/NETWORK> name=<COMMUNITY>
+/snmp
+set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
+```
+
 ### Palo Alto
 #### PANOS 6.x/7.x
 1. Access the web admin page and log in

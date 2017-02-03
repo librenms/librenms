@@ -969,6 +969,12 @@ $rewrite_hrDevice = array(
     '  '            => ' ',
 );
 
+$rewrite_GenericHW = array(
+    ' Computer Corporation' => '',
+    ' Corporation'          => '',
+    ' Inc.'                 => '',
+);
+
 // Specific rewrite functions
 
 
@@ -1053,6 +1059,11 @@ function rewrite_junos_hardware($hardware)
     return ($hardware);
 }
 
+function rewrite_generic_hardware($hardware)
+{
+    global $rewrite_GenericHW;
+    return array_str_replace($rewrite_GenericHW, $hardware);
+}
 
 function fixiftype($type)
 {
