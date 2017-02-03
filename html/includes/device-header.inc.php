@@ -20,8 +20,9 @@ if ($device['disabled'] == '1') {
 $host_id = get_vm_parent_id($device);
 
 echo '
+            <colgroup><col class="device-title-bar"></colgroup>
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td width="250px"><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
+             <td><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
              <td>';
 if ($host_id > 0) {
     echo '
