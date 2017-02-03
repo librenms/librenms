@@ -25,7 +25,7 @@
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'phpunit');
+$init_modules = array('web');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
