@@ -1238,13 +1238,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testProcurve()
     {
         $this->checkOS('procurve');
-        $this->checkOS('procurve', 'procurve1');
-        $this->checkOS('procurve', 'procurve-1800-8g');
-        $this->checkOS('procurve', 'procurve-1820');
-        $this->checkOS('procurve', 'procurve-ecos-100');
-        $this->checkOS('procurve', 'procurve-2530');
-        $this->checkOS('procurve', 'procurve-2620');
-        $this->checkOS('procurve', 'procurve-5402r');
+        $this->checkOS('procurve', 'procurve-131');
+        $this->checkOS('procurve', 'procurve-151');
+        $this->checkOS('procurve', 'procurve-167-hp');
+        $this->checkOS('procurve', 'procurve-167-hpe');
+        $this->checkOS('procurve', 'procurve-50-procurve');
+        $this->checkOS('procurve', 'procurve-66');
     }
 
     public function testProxim()
