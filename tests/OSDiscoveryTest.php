@@ -1089,7 +1089,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('nos');
         $this->checkOS('nos', 'nos1');
         $this->checkOS('nos', 'nos2');
-        $this->checkOS('nos', 'nos3');
     }
 
     public function testNrg()
