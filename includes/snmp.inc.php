@@ -184,7 +184,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     return $cmd;
 } // end gen_snmp_cmd()
 
-function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null)
+function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = array())
 {
     $time_start = microtime(true);
 
@@ -195,8 +195,6 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
 
-
-    $array = array();
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);

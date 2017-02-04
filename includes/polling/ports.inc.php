@@ -122,21 +122,96 @@ $ifmib_oids = array(
     'ifOutDiscards',
 );
 
+$single_base_oids = array(
+    'ifName',
+    'ifAlias',
+    'ifDescr',
+    'ifHighSpeed',
+
+);
+
+$hc_oids = array(
+    'ifInMulticastPkts',
+    'ifInBroadcastPkts',
+    'ifOutMulticastPkts',
+    'ifOutBroadcastPkts',
+    'ifHCInOctets',
+    'ifHCInUcastPkts',
+    'ifHCInMulticastPkts',
+    'ifHCInBroadcastPkts',
+    'ifHCOutOctets',
+    'ifHCOutUcastPkts',
+    'ifHCOutMulticastPkts',
+    'ifHCOutBroadcastPkts',
+    'ifPromiscuousMode',
+    'ifConnectorPresent',
+);
+
+$nonhc_oids = array(
+    'ifSpeed',
+    'ifInOctets',
+    'ifInUcastPkts',
+    'ifInUnknownProtos',
+    'ifOutOctets',
+    'ifOutUcastPkts',
+);
+
+$shared_oids = array(
+    'ifInErrors',
+    'ifOutErrors',
+    'ifInNUcastPkts',
+    'ifOutNUcastPkts',
+    'ifInDiscards',
+    'ifOutDiscards',
+    'ifPhysAddress',
+    'ifAdminStatus',
+    'ifOperStatus',
+    'ifLastChange',
+    'ifType',
+    'ifMtu',
+);
+
 echo 'Caching Oids: ';
+$port_stats = array();
+$data       = array();
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require_once 'ports/f5.inc.php';
 } else {
-    if (!in_array(strtolower($device['hardware']), array_map('strtolower', $config['os'][$device['os']]['bad_ifXEntry']))) {
-        $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
-    }
-    $hc_test = array_slice($port_stats, 0, 1);
-    if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
-        $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
+    if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
+        echo('Select ports polling');
+        $data = snmpwalk_cache_oid($device, 'ifName', $data, 'IF-MIB');
+        $data = snmpwalk_cache_oid($device, 'ifAlias', $data, 'IF-MIB');
+        $data = snmpwalk_cache_oid($device, 'ifDescr', $data, 'IF-MIB');
+        $data = snmpwalk_cache_oid($device, 'ifHighSpeed', $data, 'IF-MIB');
+        $lports = dbFetchRows("SELECT `ifIndex` FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
+        foreach ($lports as $lport) {
+            $i = $lport['ifIndex'];
+            if (is_numeric($data[$i]['ifHighSpeed'])) {
+                $full_oids = array_merge($hc_oids, $shared_oids);
+            } else {
+                $full_oids = array_merge($nonhc_oids, $shared_oids);
+            }
+            $oids = implode(".$i ", $full_oids) . ".$i";
+            unset($full_oids);
+            if (is_array($data[$i])) {
+                $port_stats[$i] = $data[$i];
+            }
+            $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
+        }
+        unset($data);
     } else {
-        foreach ($ifmib_oids as $oid) {
-            echo "$oid ";
-            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
+        if (!in_array(strtolower($device['hardware']), array_map('strtolower', $config['os'][$device['os']]['bad_ifXEntry']))) {
+            $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+        }
+        $hc_test = array_slice($port_stats, 0, 1);
+        if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
+            $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
+        } else {
+            foreach ($ifmib_oids as $oid) {
+                echo "$oid ";
+                $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
+            }
         }
     }
 }
