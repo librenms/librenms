@@ -257,6 +257,32 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }//end snmp_get()
 
+// This function is an alternative to snmp_get_multi() above. snmp_get_multi() returns a multidimensional array using the OID indexes as first level keys.
+// This function returns a response more in keeping with what would be expected from snmpget with multiple OIDs, ie a string containgin the results, seperated by \n
+function snmp_multiget($device, $oids, $options = null, $mib = null, $mibdir = null)
+{
+    $time_start = microtime(true);
+
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
+
+    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    recordSnmpStatistic('snmpget', $time_start);
+    if (is_string($data) && (preg_match('/(Error in packet|Unknown Object Identifier|No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
+        d_echo($data);
+        return false;
+    } elseif ($data || $data === '0') {
+        return $data;
+    } else {
+        d_echo($data);
+        return false;
+    }
+}//end snmp_multiget()
+
+
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
