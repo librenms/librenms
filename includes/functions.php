@@ -160,6 +160,10 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             if (!preg_match_any($sysDescr, $value)) {
                 return false;
             }
+        } elseif ($key == 'sysObjectId_regex') {
+            if (!preg_match_any($sysObjectId, $value)) {
+                return false;
+            }
         }
     }
 
