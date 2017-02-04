@@ -43,7 +43,7 @@ if ($agent_data['app'][$name]) {
             $sock = fsockopen('unix:///var/run/rrdcached.sock');
         } elseif (file_exists('/var/run/rrdcached/rrdcached.sock')) {
             $sock = fsockopen('unix:///var/run/rrdcached/rrdcached.sock');
-	} elseif (file_exists('/run/rrdcached.sock')) {
+        } elseif (file_exists('/run/rrdcached.sock')) {
             $sock = fsockopen('unix:///run/rrdcached.sock');
         } elseif (file_exists('/tmp/rrdcached.sock')) {
             $sock = fsockopen('unix:///tmp/rrdcached.sock');
