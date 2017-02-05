@@ -184,20 +184,22 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $data = snmpwalk_cache_oid($device, 'ifAlias', $data, 'IF-MIB');
         $data = snmpwalk_cache_oid($device, 'ifDescr', $data, 'IF-MIB');
         $data = snmpwalk_cache_oid($device, 'ifHighSpeed', $data, 'IF-MIB');
-        $lports = dbFetchRows("SELECT `ifIndex` FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
+        $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
-            $i = $lport['ifIndex'];
-            if (is_numeric($data[$i]['ifHighSpeed'])) {
-                $full_oids = array_merge($hc_oids, $shared_oids);
-            } else {
-                $full_oids = array_merge($nonhc_oids, $shared_oids);
+            if (is_port_valid($port, $device)) {
+                $i = $lport['ifIndex'];
+                if (is_numeric($data[$i]['ifHighSpeed'])) {
+                    $full_oids = array_merge($hc_oids, $shared_oids);
+                } else {
+                    $full_oids = array_merge($nonhc_oids, $shared_oids);
+                }
+                $oids = implode(".$i ", $full_oids) . ".$i";
+                unset($full_oids);
+                if (is_array($data[$i])) {
+                    $port_stats[$i] = $data[$i];
+                }
+                $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
             }
-            $oids = implode(".$i ", $full_oids) . ".$i";
-            unset($full_oids);
-            if (is_array($data[$i])) {
-                $port_stats[$i] = $data[$i];
-            }
-            $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
         }
         unset($data);
     } else {
