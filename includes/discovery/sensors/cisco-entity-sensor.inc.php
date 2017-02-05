@@ -181,4 +181,7 @@ if ($device['os_group'] == 'cisco') {
             }//end if
         }//end foreach
     }//end if
+    unset(
+        $entity_array
+    );
 }//end if

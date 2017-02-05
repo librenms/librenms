@@ -140,11 +140,13 @@ function discover_device($device, $options = null)
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
             ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
             $module_start = microtime(true);
+            $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds\n", $module, $module_time);
+            $module_mem  = (memory_get_usage() - $start_memory);
+            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";

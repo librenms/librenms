@@ -321,7 +321,6 @@ function poll_device($device, $options)
                     unlink($oldrrd);
                 }
                 unset($tags, $fields, $oldrrd);
-                print_r(get_defined_vars());
             } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                 echo "Module [ $module ] disabled on host.\n\n";
             } elseif (isset($os_module_status) && $os_module_status == '0') {

@@ -28,3 +28,7 @@ foreach (dbFetchRows($sql) as $test_processor) {
 }
 
 echo "\n";
+
+unset(
+    $sql
+);
