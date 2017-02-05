@@ -1454,9 +1454,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testSwos()
     {
-        $this->checkOS('swos', 'swos-rb250gs');
-        $this->checkOS('swos', 'swos-rb260gs');
-        $this->checkOS('swos', 'swos-rb260gsp');
+        $this->checkOS('swos');
     }
 
     public function testSymbol()
