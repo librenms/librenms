@@ -113,7 +113,15 @@ if (is_array($oids)) {
 
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", array($device['device_id'], $type, $index)) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current);
+                if ($type == "power" && $device['os'] == "arista_eos" && preg_match("/DOM (R|T)x Power/i", $descr)) {
+                    $type = "dbm";
+                    $current = round(10 * log10($sensor_value / 10000), 3);
+                    $multiplier = 1;
+                    $divisor = 1;
+                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+                } else {
+                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current);
+                }
             }
         }//end if
     }//end foreach
