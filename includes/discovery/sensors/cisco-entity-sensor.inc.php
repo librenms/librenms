@@ -126,22 +126,22 @@ if ($device['os_group'] == 'cisco') {
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $entry) {
+                    foreach ($t_oids[$index] as $t_index => $key) {
                         // Critical Limit
-                        if ($entry['entSensorThresholdSeverity'] == 'major' && $entry['entSensorThresholdRelation'] == 'greaterOrEqual') {
-                            $limit = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
+                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                            $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($entry['entSensorThresholdSeverity'] == 'major' && $entry['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
                             $limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         // Warning Limit
-                        if ($entry['entSensorThresholdSeverity'] == 'minor' && $entry['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
                             $warn_limit = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($entry['entSensorThresholdSeverity'] == 'minor' && $entry['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
                             $warn_limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
