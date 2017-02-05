@@ -36,3 +36,8 @@ if ($device['os_group'] == "cisco") {
      */
     include "cisco-voice/cisco-iosxcode.inc.php";
 }
+
+unset(
+    $output,
+    $key
+);
