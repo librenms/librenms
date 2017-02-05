@@ -519,7 +519,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
             $update_data = array(
                 'remote_platform' => $remote_platform,
                 'remote_version' => $remote_version,
-                'remote_version' => $remote_version,
                 'local_device_id' => $local_device_id,
                 'remote_device_id' => $remote_device_id,
             );
