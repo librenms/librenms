@@ -126,7 +126,7 @@ echo "
         <td><i class='fa fa-fw fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
       </tr>
       <tr>
-        <td><i class='fa fa-fw fa-tag fa-lg icon-theme'  aria-hidden='true'></i> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
+        <td><i class='fa fa-fw fa-clone fa-lg icon-theme'  aria-hidden='true'></i> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
         <td><i class='fa fa-fw fa-bookmark fa-lg icon-theme'  aria-hidden='true'></i> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
       </tr>
       <tr>
