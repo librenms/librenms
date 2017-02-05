@@ -56,7 +56,7 @@ function poll_sensor($device, $class)
     $misc_sensors = array();
     $all_sensors = array();
 
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', array($class, $device['device_id'])) as $sensor) {
+    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = '?' AND `device_id` = ?", array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             $misc_sensors[] = $sensor;
         } elseif ($sensor['poller_type'] == 'ipmi') {
