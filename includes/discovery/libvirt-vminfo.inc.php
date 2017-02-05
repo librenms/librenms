@@ -95,7 +95,6 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                             break;
                         case 'M':
                         case 'MiB':
-                            $vmwVmMemSize = $vmwVmMemSize;
                             break;
                         case 'MB':
                             $vmwVmMemSize = $vmwVmMemSize * 1000000 / 1048576;

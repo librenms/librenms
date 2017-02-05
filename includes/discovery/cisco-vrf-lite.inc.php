@@ -34,7 +34,6 @@ if ($config['enable_vrf_lite_cisco']) {
         d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
         d_echo("\n[DEBUG List Vrf only name]\n$listVrf\n[/DEBUG]\n");
 
-        $tableVrf;
         foreach (explode("\n", $listVrf) as $lineVrf) {
             $tmpVrf = explode(" ", $lineVrf, 2);
             //the $tmpVrf[0] will be the context
