@@ -1093,6 +1093,9 @@ function version_info($remote = true)
             curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
             curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
             curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($api, CURLOPT_TIMEOUT, 5);
+            curl_setopt($api, CURLOPT_TIMEOUT_MS, 5000);
+            curl_setopt($api, CURLOPT_CONNECTTIMEOUT, 5);
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));

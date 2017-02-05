@@ -489,7 +489,7 @@ function location_to_latlng($device)
     $device_location = $device['location'];
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /", "+", $device_location);
-        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $device_location); // Removes special chars.
+        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
         // We have a location string for the device.
         $loc = parse_location($device_location);
         if (!is_array($loc)) {
@@ -513,6 +513,9 @@ function location_to_latlng($device)
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
             curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
+            curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
             switch ($config['geoloc']['engine']) {
