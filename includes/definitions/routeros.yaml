@@ -12,3 +12,5 @@ register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 poller_modules:
     wifi: 1
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.14988.1
