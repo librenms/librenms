@@ -273,16 +273,13 @@ function poll_device($device, $options)
                 $attribs['poll_'.$module] ||
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
                 ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
-                $start_memory = memory_get_usage();
                 $module_start = 0;
                 $module_time  = 0;
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                $end_memory = (memory_get_usage() - $startMemory);
-                printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $end_memory);
-                unset($end_memory, $start_memory);
+                printf("\n>> Runtime for poller module '%s': %.4f seconds\n", $module, $module_time);
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats

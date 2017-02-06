@@ -69,3 +69,23 @@ The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the op
 
 If your install uses hostnames for devices and you have quite a lot then it's advisable to setup a local recursive dns instance on the 
 LibreNMS server. Something like pdns-recursor can be used and then configure `/etc/resolv.conf` to use 127.0.0.1 for queries.
+
+#### Per port polling - experimental
+
+By default the polling ports module will walk ifXEntry + some items from ifEntry regardless of the port. So if a port is marked as deleted because you don't want to see them 
+or it's disabled then we still collect data. For the most part this is fine as the walks are quite quick. However for devices with a lot of ports and good % of those are 
+either deleted or disabled then this approach isn't optimal. So to counter this you can enable 'selected port polling' per device within the edit device -> misc section or by
+globally enabling it (not recommended): `$config['polling']['selected_ports'] = true;`.
+
+If you would like to see if you should turn this on then run this query in MySQL: `select device_id, count(*) as total from ports where deleted=1 group by device_id order by total desc;`. You will see output like the following:
+
++-----------+-------+
+| device_id | total |
++-----------+-------+
+|       128 |   339 |
+|        92 |    56 |
+|        41 |    41 |
+|        38 |     3 |
+|        81 |     2 |
+
+Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
