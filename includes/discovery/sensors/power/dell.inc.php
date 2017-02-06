@@ -46,4 +46,3 @@ unset(
     $index,
     $entry
 );
-
