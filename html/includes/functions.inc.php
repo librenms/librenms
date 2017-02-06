@@ -74,7 +74,7 @@ function nicecase($item)
             return 'NFS v3 Stats';
 
         case 'ntp':
-            return 'NTP':
+            return 'NTP';
 
         case 'ntp-client':
             return 'NTP Client';
