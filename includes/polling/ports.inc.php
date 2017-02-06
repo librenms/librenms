@@ -122,7 +122,7 @@ $ifmib_oids = array(
     'ifOutDiscards',
 );
 
-$single_base_oids = array(
+$table_base_oids = array(
     'ifName',
     'ifAlias',
     'ifDescr',
@@ -180,13 +180,17 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } else {
     if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo('Select ports polling');
-        $data = snmpwalk_cache_oid($device, 'ifName', $data, 'IF-MIB');
-        $data = snmpwalk_cache_oid($device, 'ifAlias', $data, 'IF-MIB');
-        $data = snmpwalk_cache_oid($device, 'ifDescr', $data, 'IF-MIB');
-        $data = snmpwalk_cache_oid($device, 'ifHighSpeed', $data, 'IF-MIB');
+        foreach ($table_base_oids as $oid) {
+            $data = snmpwalk_cache_oid($device, $oid, $data, 'IF-MIB');
+        }
+        unset(
+            $oid,
+            $table_base_oids
+        );
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
-            if (is_port_valid($port, $device)) {
+            if (is_port_valid($lport, $device)) {
+                echo 'valid';
                 $i = $lport['ifIndex'];
                 if (is_numeric($data[$i]['ifHighSpeed'])) {
                     $full_oids = array_merge($hc_oids, $shared_oids);
