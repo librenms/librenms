@@ -1,0 +1,14 @@
+os: toshiba
+group: printer
+text: 'Toshiba Printer'
+ifname: 1
+type: printer
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.1129.1.2.
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
