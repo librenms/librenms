@@ -6,10 +6,9 @@ type: printer
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Xerox Phaser
-        - Xerox WorkCentre
-        - DocuPrint
+    - sysObjectId:
+        - .1.3.6.1.4.1.253.8.62.1.
+        - .1.3.6.1.4.1.297.1.11.93.1.
 discovery_modules:
     toner: 1
 poller_modules:
