@@ -836,17 +836,21 @@ function get_all_ports()
 {
     global $config;
     $app = \Slim\Slim::getInstance();
-
-    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = 0");
+    if (isset($_GET['columns'])) {
+        $columns = $_GET['columns'];
+    } else {
+        $columns = 'ifName';
+    }
+    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0");
 
     $output = array(
         'status' => 'ok',
         'err-msg' => '',
-        'addresses' => $ports,
+        'addresses' => '$ports',
     );
     $app->response->setStatus('200');
     $app->response->headers->set('Content-Type', 'application/json');
-    echo _json_encode($outbut);
+    echo _json_encode($output);
 }
 
 function get_port_stack()
