@@ -22,16 +22,6 @@
     color: black;
 }
 
-.panel-default>.panel-heading {
-  background: black;
-  color: white;
-}
-
-.panel-default>.panel-heading .icon-theme,
-.panel-default>.panel-heading a:visited,
-.panel-default>.panel-heading a:link {
-  color: white;
-}
 
 .twitter-typeahead .tt-hint {
     border-color: #000 !important;
