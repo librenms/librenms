@@ -15,6 +15,7 @@ if (empty($hosts) && empty($ports)) {
     echo "-h <device hostname wildcard>    Device(s) to match\n";
     echo "-p <ifName widcard>              Port(s) to match using ifName\n";
     echo "\n";
+    exit;
 }
 
 foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `hostname` LIKE ?", array('%'.$hosts.'%')) as $device) {
