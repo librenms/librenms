@@ -1481,6 +1481,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('tomato');
     }
 
+    public function testToshibaTec()
+    {
+        $this->checkOS('toshiba-tec', 'toshiba-tec-ev4');
+        $this->checkOS('toshiba-tec', 'toshiba-tec-fv4');
+        $this->checkOS('toshiba-tec', 'toshiba-tec-sx5t');
+    }
+
     public function testTpconductor()
     {
         $this->checkOS('tpconductor');
