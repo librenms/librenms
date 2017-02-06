@@ -844,9 +844,9 @@ function get_all_ports()
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0");
 
     $output = array(
-        'status' => 'ok',
+        'status'  => 'ok',
         'err-msg' => '',
-        'addresses' => '$ports',
+        'ports'   => $ports,
     );
     $app->response->setStatus('200');
     $app->response->headers->set('Content-Type', 'application/json');
