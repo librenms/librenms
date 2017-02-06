@@ -1,4 +1,4 @@
-os: toshiba
+os: toshiba-printer
 group: printer
 text: 'Toshiba Printer'
 ifname: 1
