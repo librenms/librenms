@@ -1416,3 +1416,21 @@ function get_nagios_state($descr)
             break;
     }
 }
+
+/**
+ * @param $state
+ * @return int
+ */
+function apc_relay_state($state)
+{
+    switch ($state) {
+        case 'immediateCloseEMS':
+        case 'immediateOnEMS':
+            return 1;
+            break;
+        case 'immediateOpenEMS':
+        case 'immediateOffEMS':
+            return 2;
+            break;
+    }
+}

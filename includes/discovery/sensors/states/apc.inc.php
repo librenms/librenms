@@ -106,3 +106,71 @@ foreach ($cooling_unit as $index => $data) {
 }
 
 unset($cooling_unit);
+
+$relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', array(), 'PowerNet-MIB');
+foreach ($relays as $index => $data) {
+    $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
+    $state_name = $data['emsOutputRelayControlOutputRelayName'];
+    $state_index_id = create_state_index($state_name);
+
+    if ($state_index_id !== null) {
+        $states = array(
+            array($state_index_id,'immediateCloseEMS',0,1,2) ,
+            array($state_index_id,'immediateOpenEMS',0,2,0)
+        );
+        foreach ($states as $value) {
+            $insert = array(
+                'state_index_id' => $value[0],
+                'state_descr' => $value[1],
+                'state_draw_graph' => $value[2],
+                'state_value' => $value[3],
+                'state_generic_value' => $value[4]
+            );
+            dbInsert($insert, 'state_translations');
+        }
+    }
+    $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+}
+unset(
+    $relays,
+    $index,
+    $data
+);
+
+$switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', array(), 'PowerNet-MIB');
+foreach ($switched as $index => $data) {
+    $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
+    $state_name = $data['emsOutletControlOutletName'];
+    $state_index_id = create_state_index($state_name);
+
+    if ($state_index_id !== null) {
+        $states = array(
+            array($state_index_id,'immediateOnEMS',0,1,2) ,
+            array($state_index_id,'immediateOffEMS',0,2,0)
+        );
+        foreach ($states as $value) {
+            $insert = array(
+                'state_index_id' => $value[0],
+                'state_descr' => $value[1],
+                'state_draw_graph' => $value[2],
+                'state_value' => $value[3],
+                'state_generic_value' => $value[4]
+            );
+            dbInsert($insert, 'state_translations');
+        }
+    }
+    $current = apc_relay_state($data['emsOutletControlOutletCommand']);
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+}
+unset(
+    $switched,
+    $index,
+    $data
+);
