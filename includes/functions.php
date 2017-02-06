@@ -101,8 +101,9 @@ function getHostOS($device)
 
     $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    $sysMfgName  = snmp_get($device, "ENTITY-MIB::entPhysicalMfgName.1", "-Ovqn");
 
-    d_echo("| $sysDescr | $sysObjectId | \n");
+    d_echo("| $sysDescr | $sysObjectId | $sysMfgName\n");
 
     // check yaml files
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
@@ -113,7 +114,7 @@ function getHostOS($device)
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
-                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($item, $sysObjectId, $sysDescr, $sysMfgName)) {
                     return $tmp['os'];
                 }
             }
@@ -144,7 +145,7 @@ function getHostOS($device)
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($array, $sysObjectId, $sysDescr)
+function checkDiscovery($array, $sysObjectId, $sysDescr, $sysMfgName)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -162,6 +163,10 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             }
         } elseif ($key == 'sysObjectId_regex') {
             if (!preg_match_any($sysObjectId, $value)) {
+                return false;
+            }
+        } elseif ($key === 'sysMfgName') {
+            if (!preg_match_any($sysMfgName, $value)) {
                 return false;
             }
         }
