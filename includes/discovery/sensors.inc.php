@@ -20,6 +20,8 @@ if ($device['os'] == 'openbsd') {
 
 if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeeds/dell.inc.php';
+    include 'includes/discovery/sensors/power/dell.inc.php';
+    include 'includes/discovery/sensors/voltages/dell.inc.php';
     include 'includes/discovery/sensors/states/dell.inc.php';
     include 'includes/discovery/sensors/temperatures/dell.inc.php';
 }
