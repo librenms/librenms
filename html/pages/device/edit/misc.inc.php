@@ -27,7 +27,7 @@ echo '
         </div>
     </div>
     <div class="form-group">
-        <label for="selected_ports" class="col-sm-4 control-label">Enable select port polling?</label>
+        <label for="selected_ports" class="col-sm-4 control-label">Enable selected port polling?</label>
         <div class="col-sm-8">
             '.dynamic_override_config('checkbox', 'selected_ports', $device).'
         </div>
