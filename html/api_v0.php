@@ -57,6 +57,7 @@ $app->group(
                         // api/v0/devices/$hostname/ports/$ifName
                         $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName/$type
+                        $app->get('/:hostname/ip', 'authToken', 'get_device_ip_addresses')->name('get_device_ip_addresses');
                     }
                 );
                 $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');
@@ -70,6 +71,14 @@ $app->group(
                     }
                 );
                 $app->get('/devicegroups', 'authToken', 'get_device_groups')->name('get_devicegroups');
+                $app->group(
+                    '/ports',
+                    function () use ($app) {
+                        $app->get('/:portid', 'authToken', 'get_port_info')->name('get_port_info');
+                        $app->get('/:portid/ip', 'authToken', 'get_port_ip_info')->name('get_port_ip_info');
+                    }
+                );
+                $app->get('/ports', 'authToken', 'get_ports')->name('get_ports');
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
