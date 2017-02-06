@@ -78,7 +78,7 @@ $app->group(
                         $app->get('/:portid/ip', 'authToken', 'get_port_ip_info')->name('get_port_ip_info');
                     }
                 );
-                $app->get('/ports', 'authToken', 'get_ports')->name('get_ports');
+                $app->get('/ports', 'authToken', 'get_all_ports')->name('get_all_ports');
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
