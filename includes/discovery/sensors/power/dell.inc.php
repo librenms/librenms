@@ -39,3 +39,11 @@ foreach ((array)$temp as $index => $entry) {
         discover_sensor($valid['sensor'], 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }
+
+unset(
+    $temp,
+    $cur_oid,
+    $index,
+    $entry
+);
+

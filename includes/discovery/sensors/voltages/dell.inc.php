@@ -42,6 +42,7 @@ foreach ((array)$temp as $index => $entry) {
 
 unset(
     $temp,
+    $cur_oid,
     $index,
     $entry
 );
