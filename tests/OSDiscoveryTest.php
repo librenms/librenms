@@ -1031,6 +1031,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('netgear');
         $this->checkOS('netgear', 'netgear1');
+        $this->checkOS('netgear', 'netgear2');
     }
 
     public function testNetmanplus()
