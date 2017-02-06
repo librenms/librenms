@@ -701,7 +701,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHikvision()
     {
         $this->checkOS('hikvision');
-        $this->checkOS('hikvision', 'hikvision1');
     }
 
     public function testHp3par()
