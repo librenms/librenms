@@ -174,6 +174,7 @@ LibreNMS contributors:
 - Viktoria Rei Bauer <vbauer@stargazer.at> (ToeiRei)
 - Ryan Eno <ryaneno@gmail.com> (VimCommando)
 - Matt Peterson <matt@peterson.org> (dorkmatt)
+- William George <wrgeorge1983@gmail.com> (wrgeorge1983)
 
 Observium was written by:
 - Adam Armstrong
