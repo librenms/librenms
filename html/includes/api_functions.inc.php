@@ -781,8 +781,8 @@ function get_device_ip_addresses()
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-    $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `device_id` = ? AND `deleted` = 0", array($device_id));
-    $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `device_id` = ? AND `deleted` = 0", array($device_id));
+    $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+    $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
     $output = array(
         'status'    => 'ok',
         'err-msg'   => '',

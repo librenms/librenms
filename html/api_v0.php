@@ -43,6 +43,7 @@ $app->group(
                         $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
                         // api/v0/devices/$hostname/health
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
+                        $app->get('/:hostname/ip', 'authToken', 'get_device_ip_addresses')->name('get_device_ip_addresses');
                         $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
                         $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
@@ -57,7 +58,6 @@ $app->group(
                         // api/v0/devices/$hostname/ports/$ifName
                         $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName/$type
-                        $app->get('/:hostname/ip', 'authToken', 'get_device_ip_addresses')->name('get_device_ip_addresses');
                     }
                 );
                 $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');
