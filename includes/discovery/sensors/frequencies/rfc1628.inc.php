@@ -12,10 +12,9 @@ for ($i = 1; $i <= $numPhase; $i++) {
     if ($numPhase > 1) {
         $descr .= " Phase $i";
     }
-
-    $current = (snmp_get($device, $freq_oid, '-Oqv') / 10);
-    $type    = 'rfc1628';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'frequencies');
+    $current = (snmp_get($device, $freq_oid, '-Oqv') / $divisor);
+    $type    = 'rfc1628';
 
     $index = '3.2.0.'.$i;
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
@@ -23,18 +22,18 @@ for ($i = 1; $i <= $numPhase; $i++) {
 
 $freq_oid = '.1.3.6.1.2.1.33.1.4.2.0';
 $descr    = 'Output';
-$current  = (snmp_get($device, $freq_oid, '-Oqv') / 10);
-$type     = 'rfc1628';
 $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'frequencies');
+$current  = (snmp_get($device, $freq_oid, '-Oqv') / $divisor);
+$type     = 'rfc1628';
 
 $index = '4.2.0';
 discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 
 $freq_oid = '.1.3.6.1.2.1.33.1.5.1.0';
 $descr    = 'Bypass';
-$current  = (snmp_get($device, $freq_oid, '-Oqv') / 10);
-$type     = 'rfc1628';
 $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'frequencies');
+$current  = (snmp_get($device, $freq_oid, '-Oqv') / $divisor);
+$type     = 'rfc1628';
 
 $index = '5.1.0';
 discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
