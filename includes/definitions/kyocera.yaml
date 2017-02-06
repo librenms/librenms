@@ -7,4 +7,4 @@ ifname: 1
 type: printer
 discovery:
     - sysDescr:
-        - KYOCERA 
+        - '/^KYOCERA/'
