@@ -1572,6 +1572,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testXerox()
     {
+        $this->checkOS('xerox', 'xerox-color');
         $this->checkOS('xerox', 'xerox-phaser');
         $this->checkOS('xerox', 'xerox-workcentre');
         $this->checkOS('xerox', 'xerox-docuprint');
