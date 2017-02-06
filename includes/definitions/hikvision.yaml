@@ -4,3 +4,5 @@ type: network
 icon: hikvision
 over:
     - { graph: device_uptime, text: 'Device Uptime' }
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.50001

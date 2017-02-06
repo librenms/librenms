@@ -5,9 +5,7 @@ if (starts_with($sysDescr, 'Linux') || starts_with($sysObjectId, '.1.3.6.1.4.1.8
     $os = 'linux';
 
     // Specific Linux-derivatives
-    if (str_contains(snmp_get($device, 'ENTITY-MIB::entPhysicalMfgName.1', '-Osqnv'), 'QNAP')) {
-        $os = 'qnap';
-    } elseif (starts_with($sysObjectId, array('.1.3.6.1.4.1.10002.1', '.1.3.6.1.4.1.41112.1.4')) || str_contains(snmp_get($device, 'dot11manufacturerName.5', '-Osqnv', 'IEEE802dot11-MIB'), 'Ubiquiti')) {
+    if (starts_with($sysObjectId, array('.1.3.6.1.4.1.10002.1', '.1.3.6.1.4.1.41112.1.4')) || str_contains(snmp_get($device, 'dot11manufacturerName.5', '-Osqnv', 'IEEE802dot11-MIB'), 'Ubiquiti')) {
         $os = 'airos';
         if (str_contains(snmp_walk($device, 'dot11manufacturerProductName', '-Osqnv', 'IEEE802dot11-MIB'), 'UAP')) {
             $os = 'unifi';

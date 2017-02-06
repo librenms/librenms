@@ -701,7 +701,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHikvision()
     {
         $this->checkOS('hikvision');
-        $this->checkOS('hikvision', 'hikvision1');
     }
 
     public function testHp3par()
@@ -1032,6 +1031,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('netgear');
         $this->checkOS('netgear', 'netgear1');
+        $this->checkOS('netgear', 'netgear2');
     }
 
     public function testNetmanplus()
@@ -1454,9 +1454,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testSwos()
     {
-        $this->checkOS('swos', 'swos-rb250gs');
-        $this->checkOS('swos', 'swos-rb260gs');
-        $this->checkOS('swos', 'swos-rb260gsp');
+        $this->checkOS('swos');
     }
 
     public function testSymbol()
@@ -1574,6 +1572,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testXerox()
     {
+        $this->checkOS('xerox', 'xerox-color');
         $this->checkOS('xerox', 'xerox-phaser');
         $this->checkOS('xerox', 'xerox-workcentre');
         $this->checkOS('xerox', 'xerox-docuprint');
