@@ -684,6 +684,8 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
                 oxidized_reload_nodes();
                 return $device_id;
             }
+        } else {
+            throw new HostExistsException("Already have host $host ($snmphost)");
         }
     }
 
