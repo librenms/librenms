@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
+ * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
