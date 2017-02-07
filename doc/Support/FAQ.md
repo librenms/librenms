@@ -113,9 +113,12 @@ shouldn't be seeing this. If you are, please report this in [issue 443](https://
 #### <a name="faq15"> Why do I see traffic spikes in my graphs?</a>
 
 This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports.
+
+
 Before this all rrd files were set to 100G max values, now you can enable support to limit this to the actual port speed.
 
-rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (scripts/tune_port.php).
+
+rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (./scripts/tune_port.php) - see [RRDTune doc](../Extensions/RRDTune.md)
 
 #### <a name="faq17"> Why do I see gaps in my graphs?</a>
 
