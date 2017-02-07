@@ -1,0 +1,185 @@
+-- ============================================================================
+-- Copyright(c) 2008-2012 Shenzhen TP-LINK Technologies Co.,Ltd.
+-- 
+-- FileName    : tplink-sysMonitor.mib
+-- Description : 
+-- Reference   : 
+-- Version     : 1.0
+-- History     : 
+--   V1.0  11Dec12  Created by dengjianjun
+--     Original version.
+-- ============================================================================
+
+TPLINK-SYSMONITOR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        OBJECT-TYPE
+            FROM  SNMPv2-SMI
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        tplinkMgmt
+            FROM TPLINK-MIB;
+
+    tplinkSysMonitorMIB MODULE-IDENTITY
+        LAST-UPDATED
+            "201212110930Z"
+        ORGANIZATION
+            "TPLINK"
+        CONTACT-INFO
+            "www.tplink.com.cn"
+        DESCRIPTION
+            "Private MIB for System Monitor."
+        ::= { tplinkMgmt 4 }
+
+        tplinkSysMonitorMIBObjects OBJECT IDENTIFIER ::= { tplinkSysMonitorMIB 1 }
+            tpSysMonitorCpu  OBJECT IDENTIFIER ::= { tplinkSysMonitorMIBObjects 1 }
+                tpSysMonitorCpuTable OBJECT-TYPE
+                    SYNTAX  SEQUENCE OF TPSYSMONITORCPUENTRY
+                    MAX-ACCESS
+                        not-accessible
+                    STATUS
+                        current
+                    DESCRIPTION
+                        "Displays the CPU utilization of all UNITs."
+                    ::= { tpSysMonitorCpu 1 }
+            
+                    tpSysMonitorCpuEntry OBJECT-TYPE
+                        SYNTAX TPSYSMONITORCPUENTRY
+                        MAX-ACCESS
+                            not-accessible
+                        STATUS
+                            current
+                        DESCRIPTION
+                            "An entry contains of the information of CPU utilization."
+                        INDEX
+                            { tpSysMonitorCpuUnitNumber }
+                        ::= { tpSysMonitorCpuTable 1 }
+                  
+                        TPSYSMONITORCPUENTRY ::=
+                            SEQUENCE
+                            {
+                            tpSysMonitorCpuUnitNumber
+                                INTEGER,
+                            tpSysMonitorCpu5Seconds
+                                INTEGER,
+                            tpSysMonitorCpu1Minute
+                                INTEGER,
+                            tpSysMonitorCpu5Minutes
+                                INTEGER
+                            }
+                        
+                        tpSysMonitorCpuUnitNumber OBJECT-TYPE
+                            SYNTAX INTEGER
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the UNIT number."
+                            ::= { tpSysMonitorCpuEntry 1 }
+                        
+                        tpSysMonitorCpu5Seconds OBJECT-TYPE
+                            SYNTAX INTEGER
+                                (0..100)
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the CPU utilization in 5 seconds."
+                            ::= { tpSysMonitorCpuEntry 2 }
+                
+                        tpSysMonitorCpu1Minute OBJECT-TYPE
+                            SYNTAX INTEGER
+                                (0..100)
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the CPU utilization in 1 minute."
+                            ::= { tpSysMonitorCpuEntry 3 }
+                
+                        tpSysMonitorCpu5Minutes OBJECT-TYPE
+                            SYNTAX INTEGER
+                                (0..100)
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the CPU utilization in 5 minutes."
+                            ::= { tpSysMonitorCpuEntry 4 }
+            
+    
+            tpSysMonitorMemory  OBJECT IDENTIFIER ::= { tplinkSysMonitorMIBObjects 2 }
+                tpSysMonitorMemoryTable OBJECT-TYPE
+                    SYNTAX  SEQUENCE OF TPSYSMONITORMEMORYENTRY
+                    MAX-ACCESS
+                        not-accessible
+                    STATUS
+                        current
+                    DESCRIPTION
+                        "Displays the memory utilization of all UNITs."
+                    ::= { tpSysMonitorMemory 1 }
+            
+                    tpSysMonitorMemoryEntry OBJECT-TYPE
+                        SYNTAX TPSYSMONITORMEMORYENTRY
+                        MAX-ACCESS
+                            not-accessible
+                        STATUS
+                            current
+                        DESCRIPTION
+                            "An entry contains of the information of memory utilization."
+                        INDEX
+                            { tpSysMonitorMemoryUnitNumber }
+                        ::= { tpSysMonitorMemoryTable 1 }
+                  
+                        TPSYSMONITORMEMORYENTRY ::=
+                            SEQUENCE
+                            {
+                            tpSysMonitorMemoryUnitNumber
+                                INTEGER,
+                            tpSysMonitorMemoryUtilization
+                                INTEGER
+                            }
+                        
+                        tpSysMonitorMemoryUnitNumber OBJECT-TYPE
+                            SYNTAX INTEGER
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the UNIT number."
+                            ::= { tpSysMonitorMemoryEntry 1 }
+                        
+                        tpSysMonitorMemoryUtilization OBJECT-TYPE
+                            SYNTAX INTEGER
+                                (0..100)
+                            MAX-ACCESS
+                                read-only
+                            STATUS
+                                current
+                            DESCRIPTION
+                                "Displays the memory utilization."
+                            ::= { tpSysMonitorMemoryEntry 2 }
+
+
+
+        tplinkSysMonitorNotifications OBJECT IDENTIFIER ::= { tplinkSysMonitorMIB 2 }
+            tpSysMonitorCpuOverLoading NOTIFICATION-TYPE
+                STATUS current
+                DESCRIPTION
+                    "CPU utilization reached the threshold."
+                ::= { tplinkSysMonitorNotifications 1 }
+                
+            tpSysMonitorMemoryOverLoading NOTIFICATION-TYPE
+                STATUS current
+                DESCRIPTION
+                    "Memory utilization reached the threshold."
+                ::= { tplinkSysMonitorNotifications 2 }
+
+END
