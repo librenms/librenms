@@ -76,7 +76,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $excluded_os = array(
             'default',
             'generic',
-            'dragonfly',  // no detection
         );
 
         $all_os = array_diff(array_keys($config['os']), $excluded_os);
@@ -561,6 +560,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('drac');
         $this->checkOS('drac', 'drac1');
         $this->checkOS('drac', 'drac2');
+    }
+
+    public function testDragonfly()
+    {
+        $this->checkOS('dragonfly');
     }
 
     public function testDraytek()
