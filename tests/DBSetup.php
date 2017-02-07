@@ -32,6 +32,7 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
 
     private static $schema;
     private static $sql_mode;
+    private static $db_created;
     protected $backupGlobals = false;
 
     public static function setUpBeforeClass()
@@ -40,7 +41,7 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
             global $config;
 
             self::$sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
-            dbQuery("CREATE DATABASE " . $config['db_name']);
+            self::$db_created = dbQuery("CREATE DATABASE " . $config['db_name']);
             dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $build_base = $config['install_dir'] . '/build-base.php';
             exec($build_base, $schema);
@@ -54,7 +55,9 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
             global $config;
 
             dbQuery("SET GLOBAL sql_mode='" . self::$sql_mode . "'");
-            dbQuery("DROP DATABASE " . $config['db_name']);
+            if (self::$db_created) {
+                dbQuery("DROP DATABASE " . $config['db_name']);
+            }
         }
     }
 
