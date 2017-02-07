@@ -31,9 +31,10 @@ $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
-// Libraries
-require('Net/IPv4.php');
-require('Net/IPv6.php');
+if (!getenv('TRAVIS')) {
+    require('Net/IPv4.php');
+    require('Net/IPv6.php');
+}
 
 # composer autoload
 require $install_dir . '/vendor/autoload.php';
@@ -49,7 +50,11 @@ require $install_dir . '/includes/influxdb.inc.php';
 require $install_dir . '/includes/datastore.inc.php';
 require $install_dir . '/includes/billing.php';
 require $install_dir . '/includes/syslog.php';
-require $install_dir . '/includes/snmp.inc.php';
+if (module_selected('mocksnmp', $init_modules)) {
+    require $install_dir . '/tests/mocks/mock.snmp.inc.php';
+} else {
+    require $install_dir . '/includes/snmp.inc.php';
+}
 require $install_dir . '/includes/services.inc.php';
 require $install_dir . '/includes/mergecnf.inc.php';
 require $install_dir . '/includes/functions.php';
