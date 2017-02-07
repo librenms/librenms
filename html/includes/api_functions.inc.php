@@ -771,18 +771,23 @@ function get_port_graphs()
     echo _json_encode($output);
 }
 
-function get_device_ip_addresses()
+function get_ip_addresses()
 {
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
-    $hostname = $router['hostname'];
+    if (isset($router['hostname'])) {
+        $hostname = $router['hostname'];
+        // use hostname as device_id if it's all digits
+        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+        $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+        $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+    } elseif (isset($router['portid'])) {
+        $port_id = urldecode($router['portid']);
+        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
+        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
+    }
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
-    $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
     $output = array(
         'status'    => 'ok',
         'err-msg'   => '',
@@ -807,25 +812,6 @@ function get_port_info()
         'status'  => 'ok',
         'err-msg' => '',
         'port'    => $port,
-    );
-    $app->response->setStatus('200');
-    $app->response->headers->set('Content-Type', 'application/json');
-    echo _json_encode($output);
-}
-
-function get_port_ip_info()
-{
-    global $config;
-    $app     = \Slim\Slim::getInstance();
-    $router  = $app->router()->getCurrentRoute()->getParams();
-    $port_id = urldecode($router['portid']);
-
-    $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
-    $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
-    $output = array(
-        'status'    => 'ok',
-        'err-msg'   => '',
-        'addresses' => array_merge($ipv4, $ipv6),
     );
     $app->response->setStatus('200');
     $app->response->headers->set('Content-Type', 'application/json');
