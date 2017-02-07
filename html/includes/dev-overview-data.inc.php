@@ -30,10 +30,15 @@ echo '<tr>
         <td>'.$device['sysName'].' </td>
       </tr>';
 
-if (!empty($device['ip'])) {
+if (!empty($device['ip']) || (empty($device['ip']) && $config['force_ip_to_sysname'] === true)) {
+    if (empty($device['ip']) && $config['force_ip_to_sysname'] === true) {
+        $display_ip = $device['hostname'];
+    } else {
+        $display_ip = $device['ip'];
+    }
     echo '<tr>
              <td>Resolved IP</td>
-             <td>'.$device['ip'].'</td>
+             <td>'.$display_ip.'</td>
          </tr>';
 }
 
