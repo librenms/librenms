@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true" bootstrap="tests/bootstrap.php">
     <testsuites>
-        <testsuite name="Database Setup">
-            <file>tests/DBSetup.php</file>
-        </testsuite>
         <testsuite name="Application Test Suite">
             <directory>tests/</directory>
         </testsuite>
