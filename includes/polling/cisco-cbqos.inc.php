@@ -12,10 +12,10 @@
  */
 
 if ($device['os_group'] == "cisco") {
-    $module = 'Cisco-CBQOS';
+    $tmp_module = 'Cisco-CBQOS';
 
     $component = new LibreNMS\Component();
-    $options['filter']['type'] = array('=',$module);
+    $options['filter']['type'] = array('=',$tmp_module);
     $options['filter']['disabled'] = array('=',0);
     $options['filter']['ignore'] = array('=',0);
     $components = $component->getComponents($device['device_id'], $options);
@@ -66,5 +66,5 @@ if ($device['os_group'] == "cisco") {
     } // end if count components
 
     // Clean-up after yourself!
-    unset($type, $components, $component, $options, $module);
+    unset($type, $components, $component, $options, $tmp_module, $tblcbQosClassMapStats);
 }
