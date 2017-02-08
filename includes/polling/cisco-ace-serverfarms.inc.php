@@ -67,3 +67,8 @@ if ($device['os_group'] == 'cisco') {
 
     unset($rrd_name, $rrd_def, $oids, $oid, $vserver);
 }
+
+unset(
+    $serverfarm_array,
+    $serverfarm_db
+);

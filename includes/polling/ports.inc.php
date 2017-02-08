@@ -715,9 +715,8 @@ foreach ($ports as $port) {
     echo "\n";
 
     // Clear Per-Port Variables Here
-    unset($this_port);
+    unset($this_port, $port);
 } //end port update
 
 // Clear Variables Here
-unset($port_stats);
-unset($ports_found);
+unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $etherlike_oids, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);

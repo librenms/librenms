@@ -125,6 +125,9 @@ if (is_array($oids)) {
             }
         }//end if
     }//end foreach
+    unset(
+        $entity_array
+    );
 }//end if
 
 echo "\n";
