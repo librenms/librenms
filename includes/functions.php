@@ -806,8 +806,8 @@ function log_event($text, $device = null, $type = null, $reference = null, $seve
         'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
-	'datetime' => array("NOW()"),
-	'severity' => $severity,
+        'datetime' => array("NOW()"),
+        'severity' => $severity,
         'message' => $text);
 
     dbInsert($insert, 'eventlog');
