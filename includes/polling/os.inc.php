@@ -10,7 +10,7 @@ if (is_file($config['install_dir'].'/includes/polling/os/'.$device['os'].'.inc.p
     echo "Generic :(\n";
 }
 
-if ($version && $device['version'] != $version) {
+if ($device['version'] != $version) {
     $update_array['version'] = $version;
     log_event('OS Version -> '.$version, $device, 'system');
 }
@@ -20,17 +20,17 @@ if ($features != $device['features']) {
     log_event('OS Features -> '.$features, $device, 'system');
 }
 
-if ($hardware && $hardware != $device['hardware']) {
+if ($hardware != $device['hardware']) {
     $update_array['hardware'] = $hardware;
     log_event('Hardware -> '.$hardware, $device, 'system');
 }
 
-if ($serial && $serial != $device['serial']) {
+if ($serial != $device['serial']) {
     $update_array['serial'] = $serial;
     log_event('Serial -> '.$serial, $device, 'system');
 }
 
-if ($icon && $icon != $device['icon']) {
+if ($icon != $device['icon']) {
     $update_array['icon'] = $icon;
     log_event('Icon -> '.$icon, $device, 'system');
 }
