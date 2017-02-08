@@ -160,6 +160,10 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             if (!preg_match_any($sysDescr, $value)) {
                 return false;
             }
+        } elseif ($key == 'sysObjectId_regex') {
+            if (!preg_match_any($sysObjectId, $value)) {
+                return false;
+            }
         }
     }
 
@@ -316,6 +320,12 @@ function renamehost($id, $new, $source = 'console')
 function delete_device($id)
 {
     global $config, $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
     $ret = '';
 
     $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
@@ -674,6 +684,8 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
                 oxidized_reload_nodes();
                 return $device_id;
             }
+        } else {
+            throw new HostExistsException("Already have host $host ($snmphost)");
         }
     }
 
@@ -949,7 +961,10 @@ function is_port_valid($port, $device)
 
     global $config;
 
-    if (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
+    if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
+        // If these are all empty, we are just going to show blank names in the ui
+        $valid = 0;
+    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
         $valid = 0;
     } else {
         $valid = 1;
@@ -1493,6 +1508,7 @@ function oxidized_reload_nodes()
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);

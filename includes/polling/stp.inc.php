@@ -169,5 +169,20 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     }
 }
 
-unset($stp_raw, $stp, $stp_db, $stp_port);
+unset(
+    $stp_raw,
+    $stp,
+    $stp_db,
+    $stp_port,
+    $mac_array,
+    $stpprotocol,
+    $tm,
+    $mac_raw,
+    $time_since_change,
+    $dr,
+    $octet,
+    $port,
+    $db,
+    $dp
+);
 echo "\n";

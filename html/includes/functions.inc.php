@@ -73,6 +73,9 @@ function nicecase($item)
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
 
+        case 'ntp':
+            return 'NTP';
+
         case 'ntp-client':
             return 'NTP Client';
 
@@ -1038,6 +1041,19 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
+/**
+ * @param $string
+ * @param int $max
+ * @return string
+ */
+function shorten_text($string, $max = 30)
+{
+    if (strlen($string) > 50) {
+        return substr($string, 0, $max) . "...";
+    } else {
+        return $string;
+    }
+}
 
 function shorten_interface_type($string)
 {
@@ -1395,4 +1411,18 @@ function search_oxidized_config($search_in_conf_textbox)
     );
     $context  = stream_context_create($opts);
     return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+}
+
+/**
+ * @param $data
+ * @return bool|mixed
+ */
+function array_to_htmljson($data)
+{
+    if (is_array($data)) {
+        $data = htmlentities(json_encode($data));
+        return str_replace(',', ',<br />', $data);
+    } else {
+        return false;
+    }
 }

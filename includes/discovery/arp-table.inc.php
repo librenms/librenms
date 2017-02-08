@@ -82,7 +82,17 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 );
             }
         }
+
+        unset(
+            $interface
+        );
     }
+
+    unset(
+        $arp_data,
+        $ipv4_addresses,
+        $data
+    );
 
     // add new entries
     if (!empty($insert_data)) {
@@ -100,7 +110,15 @@ foreach ($vrfs_lite_cisco as $vrf) {
         }
     }
     echo PHP_EOL;
-    unset($existing_data, $arp_table, $insert_data, $sql, $params, $context);
-    unset($device['context_name']);
+    unset(
+        $existing_data,
+        $arp_table,
+        $insert_data,
+        $sql,
+        $params,
+        $context,
+        $entry,
+        $device['context_name']
+    );
 }
 unset($vrfs_lite_cisco);

@@ -18,56 +18,41 @@ ID=$(cut -d . -f 13 <<< $2)
 cache=$(ip l)
 
 if [ -z "$ID" ]; then
-	ID=0
-fi
-
-if [ "$1" = "-n" ]; then
-	IFS="
-"
-	for dev in $(grep mtu <<<"$cache" | cut -d : -f 1|sort -n); do
-		if [ "$LAST" == "$ID" ]; then
-			ID=$dev
-			BRK=1
-			break
-		else
-			LAST=$dev
-		fi
-	done
-	if [ -z "$BRK" ]; then
-		exit 0
-	fi
+	ID=1
+else
+    ID=$(($ID+1))
 fi
 
 IFACE=$(grep "^${ID}: " <<<"$cache" | sed 's/[:@]\s/ /g'| cut -d " " -f 2 | cut -d @ -f 1)
 
 echo ${BASE}.${ID}
 if [ "X${IFACE}" = "X" ]; then
-	echo noSuchName
+    echo noSuchName
 else
-	echo "string"
-	if [ -x /usr/bin/distro ]; then
-		case $(distro | cut -d " " -f 1) in
-			Debian)
-				cnf="/etc/network/interfaces"
-			;;
-			Gentoo)
-				cnf="/etc/conf.d/net"
-			;;
-			CentOS|RedHat|SuSE|Mandriva|Mandrake)
-				cnf="/etc/sysconfig/network-scripts/ifcfg-$IFACE"
-			;;
-			Archlinux)
-				cnf="/etc/conf.d/net-conf-$IFACE"
-			;;
-			*)
-				cnf=""
-			;;
-		esac
-	fi
-	if [ -n "$cnf" ]; then
-		echo $(grep -i "^# $IFACE:" $cnf | sed "s/^# $IFACE: //i")
-	else
-		echo
-	fi
+    echo "string"
+    if [ -x /usr/bin/distro ]; then
+        case $(distro | cut -d " " -f 1) in
+            Debian)
+                cnf="/etc/network/interfaces"
+            ;;
+            Gentoo)
+                cnf="/etc/conf.d/net"
+            ;;
+            CentOS|RedHat|SuSE|Mandriva|Mandrake)
+                cnf="/etc/sysconfig/network-scripts/ifcfg-$IFACE"
+            ;;
+            Archlinux)
+                cnf="/etc/conf.d/net-conf-$IFACE"
+            ;;
+            *)
+                cnf=""
+            ;;
+        esac
+    fi
+    if [ -n "$cnf" ]; then
+        echo $(grep -i "^# $IFACE:" $cnf | sed "s/^# $IFACE: //i")
+    else
+        echo
+    fi
 fi
 exit 0

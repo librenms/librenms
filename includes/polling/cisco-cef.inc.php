@@ -102,3 +102,10 @@ if ($device['os_group'] == 'cisco') {
 
     echo "\n";
 } //end if
+
+unset(
+    $cefs,
+    $polled,
+    $cefs_query,
+    $entity_array
+);

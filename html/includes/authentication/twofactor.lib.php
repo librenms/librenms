@@ -161,7 +161,7 @@ function verify_hotp($key, $otp, $counter = false)
 /**
  * Print TwoFactor Input-Form
  * @param boolean $form Include FORM-tags
- * @return void|string
+ * @return string
  */
 function twofactor_form($form = true)
 {
@@ -174,7 +174,7 @@ function twofactor_form($form = true)
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <img src="images/librenms_logo_light.svg">
+                <img src="' . $config['title_image'] . '">
               </h3>
             </div>
             <div class="panel-body">
@@ -189,7 +189,7 @@ function twofactor_form($form = true)
         </div>
         <div class="form-group">
           <div class="col-md-12">
-            <button type="submit" class="btn btn-default btn-block" name="submit" type="submit">Login</button>
+            <button type="submit" class="btn btn-default btn-block" name="submit">Login</button>
           </div>
          </div>
         </div>';

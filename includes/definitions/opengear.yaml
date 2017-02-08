@@ -1,0 +1,9 @@
+os: opengear
+text: Opengear
+type: OOB Management
+icon: opengear
+mib_dir:
+    - opengear
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.25049.1

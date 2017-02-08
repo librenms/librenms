@@ -36,7 +36,7 @@ $entries = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat'][
 
 echo '      <div class="panel panel-default panel-condensed">
               <div class="panel-heading">
-                <strong>Eventlog entries</strong>
+               <i class="fa fa-bookmark fa-lg icon-theme" aria-hidden="true"></i> <strong>Eventlog entries</strong>
               </div>
               <table class="table table-hover table-condensed table-striped">';
 

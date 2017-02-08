@@ -444,7 +444,17 @@ if ($_SESSION['userlevel'] != '10') {
                 <div class='col-sm-4'>
                   <select name='user_id' class='form-control input-sm'>";
         foreach ($user_list as $user_entry) {
-            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].'</option>';
+            switch ($user_entry['level']) {
+                case "10":
+                    $user_level = ' (admin)';
+                    break;
+                case "11":
+                    $user_level = ' (demo)';
+                    break;
+                default:
+                    $user_level = '';
+            }
+            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].$user_level.'</option>';
         }
 
         echo "</select>

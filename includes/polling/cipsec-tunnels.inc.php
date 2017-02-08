@@ -125,3 +125,10 @@ if ($device['os_group'] == 'cisco') {
 
     unset($rrd_name, $rrd_def, $fields, $oids, $data, $data, $oid, $tunnel);
 }
+
+unset(
+    $ipsec_array,
+    $ike_array,
+    $tunnels_db,
+    $valid_tunnels
+);
