@@ -127,7 +127,8 @@ $table_base_oids = array(
     'ifAlias',
     'ifDescr',
     'ifHighSpeed',
-
+    'ifOperStatus',
+    'ifAdminStatus',
 );
 
 $hc_oids = array(
@@ -164,8 +165,6 @@ $shared_oids = array(
     'ifInDiscards',
     'ifOutDiscards',
     'ifPhysAddress',
-    'ifAdminStatus',
-    'ifOperStatus',
     'ifLastChange',
     'ifType',
     'ifMtu',
@@ -190,19 +189,25 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
             if (is_port_valid($lport, $device)) {
-                echo 'valid';
                 $i = $lport['ifIndex'];
-                if (is_numeric($data[$i]['ifHighSpeed'])) {
-                    $full_oids = array_merge($hc_oids, $shared_oids);
+                if ($lport['ifAdminStatus_prev'] === 'down' && $port_stats[$i]['ifAdminStatus'] === 'down') {
+                    echo 'port is still admin down';
+                } elseif ($lport['ifOperStatus_prev'] === 'down' && $port_stats[$i]['ifOperStatus'] === 'down') {
+                    echo 'port is still down';
                 } else {
-                    $full_oids = array_merge($nonhc_oids, $shared_oids);
+                    echo 'valid';
+                    if (is_numeric($data[$i]['ifHighSpeed'])) {
+                        $full_oids = array_merge($hc_oids, $shared_oids);
+                    } else {
+                        $full_oids = array_merge($nonhc_oids, $shared_oids);
+                    }
+                    $oids = implode(".$i ", $full_oids) . ".$i";
+                    unset($full_oids);
+                    if (is_array($data[$i])) {
+                        $port_stats[$i] = $data[$i];
+                    }
+                    $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
                 }
-                $oids = implode(".$i ", $full_oids) . ".$i";
-                unset($full_oids);
-                if (is_array($data[$i])) {
-                    $port_stats[$i] = $data[$i];
-                }
-                $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
             }
         }
         unset($data);
