@@ -349,13 +349,13 @@ function ExtTransports($obj)
             $prefix[4] = &$prefix[0];
             if ($tmp === true) {
                 echo 'OK';
-                log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id'],'','',1);
+                log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             } elseif ($tmp === false) {
                 echo 'ERROR';
-                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id'],'','',5);
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             } else {
                 echo 'ERROR: '.$tmp."\r\n";
-                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."' Error: ".$tmp, $obj['device_id'],'','',5);
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."' Error: ".$tmp, $obj['device_id']);
             }
         }
 

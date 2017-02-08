@@ -3,9 +3,15 @@
 $hostname = gethostbyid($entry['host']);
 
 unset($icon);
-$severity_colour = eventlog_severity($entry['severity']);
+$icon_returned = geteventicon($entry['message']);
+$icon_type = $icon_returned['icon'];
+$icon_colour = $icon_returned['colour'];
 
-$icon = "<i class='fa fa-bookmark fa-lg' style='color:$severity_colour' aria-hidden='true'></i>";
+if ($icon_type) {
+    $icon = "<i class='fa $icon_type fa-lg' style='color:$icon_colour' aria-hidden='true'></i>";
+} else {
+    $icon = "<i class='fa fa-bookmark-o fa-lg' style='color:black' aria-hidden='true'></i>";
+}
 
 echo '<tr>
   <td>'.$icon.'&nbsp;
