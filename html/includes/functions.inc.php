@@ -1393,11 +1393,11 @@ function array_to_htmljson($data)
  */
 function eventlog_severity($eventlog_severity)
 {
-    switch($eventlog_severity) {
+    switch ($eventlog_severity) {
         case 1:
             return "green"; //OK
             break;
-	case 2:
+        case 2:
             return "royalblue"; //Informational
             break;
         case 3:
