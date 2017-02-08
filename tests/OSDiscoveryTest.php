@@ -464,6 +464,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cumulus');
     }
 
+    public function testCyberoamUtm()
+    {
+        $this->checkOS('cyberoam-utm');
+    }
+
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
