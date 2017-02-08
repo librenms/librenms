@@ -17,7 +17,7 @@ if ($oids) {
             $descr            = str_ireplace('temperature-', '', $descr);
             $descr            = str_ireplace('temp-', '', $descr);
             $descr            = trim($descr);
-            if ($temperature != '0' && $temperature <= '1000') {
+            if ($temperature >= 0 && $temperature <= 1000) {
                 discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'lmsensors', $descr, '1000', '1', null, null, null, null, $temperature);
             }
         }
