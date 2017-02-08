@@ -32,4 +32,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_multi.inc.php';
+require 'includes/graphs/generic_multi_line.inc.php';
