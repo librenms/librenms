@@ -1417,4 +1417,3 @@ function eventlog_severity($eventlog_severity)
             break;
     }
 } // end eventlog_severity
-
