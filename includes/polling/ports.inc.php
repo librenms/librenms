@@ -190,9 +190,9 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         foreach ($lports as $lport) {
             if (is_port_valid($lport, $device)) {
                 $i = $lport['ifIndex'];
-                if ($lport['ifAdminStatus_prev'] === 'down' && $port_stats[$i]['ifAdminStatus'] === 'down') {
+                if ($lport['ifAdminStatus_prev'] === 'down' && $data[$i]['ifAdminStatus'] === 'down') {
                     echo 'port is still admin down';
-                } elseif ($lport['ifOperStatus_prev'] === 'down' && $port_stats[$i]['ifOperStatus'] === 'down') {
+                } elseif ($lport['ifOperStatus_prev'] === 'down' && $data[$i]['ifOperStatus'] === 'down') {
                     echo 'port is still down';
                 } else {
                     echo 'valid';
