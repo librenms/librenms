@@ -128,15 +128,24 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     require_once 'ports/f5.inc.php';
 } else {
     if (!in_array(strtolower($device['hardware']), array_map('strtolower', $config['os'][$device['os']]['bad_ifXEntry']))) {
-        $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+        if ($config[$device['os']]['ports_snmptable'] || $config['ports_snmptable']) {
+            $port_stats = snmptable_cache_oid($device, 'ifXTable', $port_stats, 'IF-MIB');
+        }
+        if (!isset($port_stats) || $port_stats == false) {
+            $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+        }
     }
-    $hc_test = array_slice($port_stats, 0, 1);
-    if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
-        $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
+    if ($config[$device['os']]['ports_snmptable'] || $config['ports_snmptable']) {
+        $port_stats = snmptable_cache_oid($device, 'ifTable', $port_stats, 'IF-MIB');
     } else {
-        foreach ($ifmib_oids as $oid) {
-            echo "$oid ";
-            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
+        $hc_test = array_slice($port_stats, 0, 1);
+        if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
+            $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
+        } else {
+            foreach ($ifmib_oids as $oid) {
+                echo "$oid ";
+                $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
+            }
         }
     }
 }
@@ -715,8 +724,9 @@ foreach ($ports as $port) {
     echo "\n";
 
     // Clear Per-Port Variables Here
-    unset($this_port, $port);
+    unset($this_port);
 } //end port update
 
 // Clear Variables Here
-unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $etherlike_oids, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
+unset($port_stats);
+unset($ports_found);
