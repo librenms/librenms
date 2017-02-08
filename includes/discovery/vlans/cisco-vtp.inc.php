@@ -42,6 +42,9 @@ if ($device['os_group'] == 'cisco') {
                         }
                         $vlan_data[$base_to_index[$index]] = $array;
                     }
+                    unset(
+                        $tmp_vlan_data
+                    );
 
                     $per_vlan_data[$vlan_id] = $vlan_data;
                 }
@@ -59,6 +62,9 @@ if ($device['os_group'] == 'cisco') {
                 echo "Vlan: $vlan_id tagged on $base (ifIndex $ifIndex)\n";
                 $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = 1;
             }
+            unset(
+                $data
+            );
         }
     }
     echo PHP_EOL;

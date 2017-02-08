@@ -19,7 +19,6 @@ $mapping = array(
     'IDBLBSe' => 'cr',
     'IBLFh'   => 'ct',
     'IBLWn'   => 'cu',
-    'IBLWn'   => 'cu',
     'SRows'   => 'ck',
     'SRange'  => 'cj',
     'SMPs'    => 'ci',

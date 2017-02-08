@@ -11,11 +11,11 @@
  * the source code distribution for details.
  */
 
-$module = 'ntp';
+$tmp_module = 'ntp';
 
 $component = new LibreNMS\Component();
 $options = array();
-$options['filter']['type'] = array('=',$module);
+$options['filter']['type'] = array('=',$tmp_module);
 $options['filter']['disabled'] = array('=',0);
 $options['filter']['ignore'] = array('=',0);
 $components = $component->getComponents($device['device_id'], $options);
@@ -77,4 +77,4 @@ if (count($components > 0)) {
 } // end if count components
 
 // Clean-up after yourself!
-unset($type, $components, $component, $options, $module);
+unset($type, $components, $component, $options, $tmp_module);

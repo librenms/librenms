@@ -140,11 +140,13 @@ function discover_device($device, $options = null)
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
             ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
             $module_start = microtime(true);
+            $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds\n", $module, $module_time);
+            $module_mem  = (memory_get_usage() - $start_memory);
+            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
@@ -518,7 +520,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         } else {
             $update_data = array(
                 'remote_platform' => $remote_platform,
-                'remote_version' => $remote_version,
                 'remote_version' => $remote_version,
                 'local_device_id' => $local_device_id,
                 'remote_device_id' => $remote_device_id,
@@ -954,4 +955,34 @@ function ignore_storage($descr)
     }
 
     return $deny;
+}
+
+/**
+ * @param $types
+ * @param $device
+ * @param array $pre_cache
+ */
+function sensors($types, $device, $valid, $pre_cache = array())
+{
+    global $config;
+    foreach ((array)$types as $type) {
+        echo ucfirst($type) . ': ';
+
+        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
+
+        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+            include_once $dir . $device['os_group'] . '.inc.php';
+        }
+        if (is_file($dir . $device['os'] . '.inc.php')) {
+            include_once $dir . $device['os'] . '.inc.php';
+        }
+        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+            if (is_file($dir  . '/rfc1628.inc.php')) {
+                include_once $dir . '/rfc1628.inc.php';
+            }
+        }
+        d_echo($valid['sensor'][$type]);
+        check_valid_sensors($device, $type, $valid['sensor']);
+        echo "\n";
+    }
 }

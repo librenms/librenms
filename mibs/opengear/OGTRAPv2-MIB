@@ -1,0 +1,1177 @@
+OGTRAPv2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215
+	enterprises FROM 
+		RFC1155-SMI;
+
+opengear OBJECT IDENTIFIER ::= {
+	enterprises 25049
+}
+ogLegacyMgmt OBJECT IDENTIFIER ::= {
+	opengear 2
+}
+ogNotification OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 0
+}
+ogAlarmMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 101
+}
+ogSerialSignalMib OBJECT IDENTIFIER  ::= {
+	ogLegacyMgmt 102
+}
+ogSerialPatternMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 103
+}
+ogSerialUserMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 104
+}
+ogHostMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 105
+}
+ogWebMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 106
+}
+ogEmdMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 107
+}
+ogPowerSupplyMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 108
+}
+ogUpsMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 109
+}
+ogRpcMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 110
+}
+ogNetMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 111
+}
+ogCellMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 112
+}
+ogWifiMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 113
+}
+ogDialPoolMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 114
+}
+ogCustomMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 115
+}
+
+--
+-- v1 Trap contents
+--
+ogAlarmMibObjects OBJECT IDENTIFIER ::= {
+	ogAlarmMib 1
+}
+ogAlarm OBJECT IDENTIFIER ::= {
+	ogAlarmMibObjects 1
+}
+ogAlarmTable OBJECT IDENTIFIER ::= {
+	ogAlarm 1
+}
+ogAlarmEntry OBJECT IDENTIFIER ::= {
+	ogAlarmTable 1
+}
+
+ogAlarmIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The sequential index for this alarm."
+	::= { ogAlarmEntry 1 }
+
+ogAlarmEventId OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The unique ID for this alarm event."
+	::= { ogAlarmEntry 2 }
+
+ogAlarmName OBJECT-TYPE
+	SYNTAX OCTET STRING
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The check ID that this alarm pertains to."
+	::= { ogAlarmEntry 3 }
+
+ogAlarmCheck OBJECT-TYPE
+	SYNTAX INTEGER(0..2147483647)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The auto-response index this alarm relates to."
+	::= { ogAlarmEntry 4 }
+
+ogAlarmInstance OBJECT-TYPE
+	SYNTAX INTEGER(0..2147483647)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The reference index for this alarm instance."
+	::= { ogAlarmEntry 5 }
+
+ogAlarmTime OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (8 | 11))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The UTC date and time for when this alarm was created."
+	::= { ogAlarmEntry 6 }
+
+ogAlarmType OBJECT-TYPE
+ 	SYNTAX INTEGER {
+		serialSignalCts(1),
+		serialSignalDcd(2),
+		serialSignalDsr(3),
+		serialPatternTx(4),
+		serialPatternRx(5),
+		serialUserSession(6),
+		hostPingDown(7),
+		hostPingUp(8),
+		hostServiceDown(9),
+		hostServiceUp(10),
+		hostUserSession(11),
+		webUserSession(12),
+		envTemperatureLow(13),
+		envTemperatureHigh(14),
+		envHumidityLow(15),
+		envHumidityHigh(16),
+		dioSignalOpened(17),
+		dioSignalClosed(18),
+		netInterfaceDown(19),
+		netInterfaceStarting(20),
+		netInterfaceUp(21),
+		netInterfaceStopping(22),
+		powerSupplyInputVoltageLow(23),
+		powerSupplyInputVoltageHigh(24),
+		powerSupplyOutputCurrentLow(25),
+		powerSupplyOutputCurrentHigh(26),
+		powerSupplyTemperatureLow(27),
+		powerSupplyTemperatureHigh(28),
+		upsTemperatureHigh(29),
+		upsTemperatureLow(30),
+		upsHumidityHigh(31),
+		upsHumidityLow(32),
+		upsOnBattery(33),
+		upsLowBattery(34),
+		upsBatteryChargeLow(35),
+		upsBatteryChargeHigh(36),
+		upsBatteryVoltageLow(37),
+		upsBatteryVoltageHigh(38),
+		upsBatteryCurrentLow(39),
+		upsBatteryCurrentHigh(40),
+		upsBatteryTemperatureLow(41),
+		upsBatteryTemperatureHigh(42),
+		upsInputFrequencyLow(43),
+		upsInputFrequencyHigh(44),
+		upsInputVoltageLow(45),
+		upsInputVoltageHigh(46),
+		upsInputCurrentLow(47),
+		upsInputCurrentHigh(48),
+		upsOutputFrequencyLow(49),
+		upsOutputFrequencyHigh(50),
+		upsOutputVoltageLow(51),
+		upsOutputVoltageHigh(52),
+		upsOutputCurrentLow(53),
+		upsOutputCurrentHigh(54),
+		upsOutputLoadLow(55),
+		upsOutputLoadHigh(56),
+		upsOutputPowerLow(57),
+		upsOutputPowerHigh(58),
+		upsOutputTruePowerLow(59),
+		upsOutputTruePowerHigh(60),
+		rpcInputFrequencyLow(61),
+		rpcInputFrequencyHigh(62),
+		rpcInputVoltageLow(63),
+		rpcInputVoltageHigh(64),
+		rpcInputCurrentLow(65),
+		rpcInputCurrentHigh(66),
+		rpcOutletFrequencyHigh(67),
+		rpcOutletFrequencyLow(68),
+		rpcOutletVoltageHigh(69),
+		rpcOutletVoltageLow(70),
+		rpcOutletCurrentHigh(71),
+		rpcOutletCurrentLow(72),
+		rpcOutletStateOff(73),
+		rpcOutletStateOn(74),
+		cellDataUsage(75),
+		cellMessageReceived(76),
+		cellSignalLow(77),
+		cellSignalHigh(78),
+		cellApnChanged(79),
+		cellTowerChanged(80),
+		cellNetworkChanged(81),
+		wirelessClientConnected(82),
+		wirelessClientDisconnected(83),
+		wirelessClientSignalLow(84),
+		wirelessClientSignalHigh(85),
+		wirelessApAssociation(86),
+		wirelessApDisassociation(87),
+		wirelessApAuthenticationFailure(88),
+		dialPoolHealth(89),
+		customCheckFailure(255),
+		unknown(65535)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The alarm type."
+	::= { ogAlarmEntry 7 }
+
+ogAlarmSummary OBJECT-TYPE
+	SYNTAX OCTET STRING
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The human readable summary for this alarm."
+	::= { ogAlarmEntry 8 }
+
+ogAlarmDevice OBJECT-TYPE
+	SYNTAX OCTET STRING
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The device ID that this alarm pertains to."
+	::= { ogAlarmEntry 9 }
+
+ogAlarmUser OBJECT-TYPE
+	SYNTAX OCTET STRING
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+ 		"The user ID that this alarm pertains to."
+	::= { ogAlarmEntry 10 }
+
+ogAlarmTriggerValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The threshold value which triggers the alarm."
+	::= { ogAlarmEntry 11 }
+
+ogAlarmCurrentValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The current alarm value."
+	::= { ogAlarmEntry 12 }
+
+ogAlarmPreviousValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The former alarm value."
+	::= { ogAlarmEntry 13 }
+
+ogAlarmState OBJECT-TYPE
+	SYNTAX INTEGER {
+		normal(1),
+		triggered(2),
+		resolving(3),
+		waiting(4),
+		disabled(5),
+		unresolvable(6)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The effective alarm state."
+	::= { ogAlarmEntry 14 }
+
+-- Serial port signal trap
+ogSerialSignalMibObjects OBJECT IDENTIFIER ::= {
+	ogSerialSignalMib 1
+}
+ogSerialSignalAlarm OBJECT IDENTIFIER ::= {
+	ogSerialSignalMibObjects 1
+}
+ogSerialSignalAlarmTable OBJECT IDENTIFIER ::= {
+	ogSerialSignalAlarm 1
+}
+ogSerialSignalAlarmEntry OBJECT IDENTIFIER ::= {
+	ogSerialSignalAlarmTable 1
+}
+
+ogSerialSignalNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"The alert sent when a signal change occurs"
+	::= 1
+
+-- Serial console pattern Alarms
+ogSerialPatternMibObjects OBJECT IDENTIFIER ::= {
+	ogSerialPatternMib 1
+}
+ogSerialPatternAlarm OBJECT IDENTIFIER ::= { 
+	ogSerialPatternMibObjects 1
+}
+ogSerialPatternAlarmTable OBJECT IDENTIFIER ::= {
+	ogSerialPatternAlarm 1
+}
+ogSerialPatternAlarmEntry OBJECT IDENTIFIER ::= {
+	ogSerialPatternAlarmTable 1
+}
+
+ogSerialPatternNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"The alert sent when a pre-defined pattern was
+		matched text in a consoles serial character stream"
+	::= 2
+
+-- Serial port connection Alarms.
+ogSerialUserMibObjects OBJECT IDENTIFIER ::= {
+	ogSerialUserMib 1
+}
+ogSerialUserAlarm OBJECT IDENTIFIER ::= {
+	ogSerialUserMibObjects 1
+}
+ogSerialUserAlarmTable OBJECT IDENTIFIER ::= {
+	ogSerialUserAlarm 1
+}
+ogSerialUserAlarmEntry OBJECT IDENTIFIER ::= {
+	ogSerialUserAlarmTable 1
+}
+
+ogSerialUserNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"The alert sent when a user connection event occurs."
+	::= 3
+
+-- Network Host Alarms
+ogHostMibObjects OBJECT IDENTIFIER  ::= {
+	ogHostMib 1
+}
+ogHostEvent OBJECT IDENTIFIER ::= {
+	ogHostMibObjects 1
+}
+ogHostEventTable OBJECT IDENTIFIER ::= {
+	ogHostEvent 1
+}
+ogHostEventEntry OBJECT IDENTIFIER ::= {
+	ogHostEventTable 1
+}
+
+ogHostPingNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"An alarm sent when a Network Host occurs stops or resumes
+		responding to a ping."
+	::= 4
+
+ogHostServiceNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"An alarm sent when a service on a network host stops or starts
+		responding."
+	::= 5
+
+ogHostUserNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"An alarm sent when a user connection to a Network Host occurs"
+	::= 6
+
+-- Web Alarms
+ogWebMibObjects OBJECT IDENTIFIER  ::= {
+	ogWebMib 1
+}
+ogWebEvent OBJECT IDENTIFIER ::= {
+	ogWebMibObjects 1
+}
+ogWebEventTable OBJECT IDENTIFIER ::= {
+	ogWebEvent 1
+}
+ogWebEventEntry OBJECT IDENTIFIER ::= {
+	ogWebEventTable 1
+}
+
+ogWebUserNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"An alarm sent when a user connection to web interface occurs"
+	::= 7
+
+-- Environmental Monitoring Device (EMD) Alarms
+ogEmdMibObjects OBJECT IDENTIFIER ::= {
+	ogEmdMib 1
+}
+ogEmdAlarm OBJECT IDENTIFIER ::= {
+	ogEmdMibObjects 1
+}
+ogEmdAlarmTable OBJECT IDENTIFIER ::= {
+	ogEmdAlarm 1
+}
+ogEmdAlarmEntry OBJECT IDENTIFIER ::= {
+	ogEmdAlarmTable 1
+}
+
+ogEmdTemperatureNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a temperature event occurs"
+	::= 8
+
+ogEmdHumidityNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a humidity event occurs"
+	::= 9
+
+ogEmdDioNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"The alert sent when a DIO signal state changes"
+	::= 10
+
+-- Power Supply trap
+ogPowerSupplyMibObjects OBJECT IDENTIFIER ::= {
+	ogPowerSupplyMib 1
+}
+ogPowerSupplyAlarm OBJECT IDENTIFIER ::= {
+	ogPowerSupplyMibObjects 1
+}
+ogPowerSupplyAlarmTable OBJECT IDENTIFIER ::= {
+	ogPowerSupplyAlarm 1
+}
+ogPowerSupplyAlarmEntry OBJECT IDENTIFIER ::= {
+	ogPowerSupplyAlarmTable 1
+}
+
+ogPowerSupplyInputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a power supply voltage alarm occurs"
+	::= 11
+
+ogPowerSupplyOutputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a power supply rail current alarm occurs"
+	::= 12
+
+ogPowerSupplyTempNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a power supply temperature alarm occurs"
+	::= 13
+
+-- UPS Alarms
+ogUpsMibObjects OBJECT IDENTIFIER ::= {
+	ogUpsMib 1
+}
+ogUpsAlarm OBJECT IDENTIFIER ::= {
+	ogUpsMibObjects 1
+}
+ogUpsAlarmTable OBJECT IDENTIFIER ::= {
+	ogUpsAlarm 1
+}
+ogUpsAlarmEntry OBJECT IDENTIFIER ::= {
+	ogUpsAlarmTable 1
+}
+
+ogUpsNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a UPS alarm occurs"
+	::= 14
+
+ogUpsBatteryNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a UPS battery alarm occurs"
+	::= 15
+
+ogUpsInputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a UPS input alarm occurs"
+	::= 16
+
+ogUpsOutputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a UPS output alarm occurs"
+	::= 17
+
+-- RPC Alarms
+ogRpcMibObjects OBJECT IDENTIFIER ::= {
+	ogRpcMib 1
+}
+ogRpcAlarm OBJECT IDENTIFIER ::= {
+	ogRpcMibObjects 1
+}
+ogRpcAlarmTable OBJECT IDENTIFIER ::= {
+	ogRpcAlarm 1
+}
+ogRpcAlarmEntry OBJECT IDENTIFIER ::= {
+	ogRpcAlarmTable 1
+}
+
+ogRpcInputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when an RPC input alarm occurs"
+	::= 18
+
+ogRpcOutputNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when an RPC output alarm occurs"
+	::= 19
+
+ogRpcOutletNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when an RPC outlet alarm occurs"
+	::= 20
+
+-- Network Alarms
+ogNetMibObjects OBJECT IDENTIFIER ::= {
+	ogNetMib 1
+}
+ogNetAlarm OBJECT IDENTIFIER ::= {
+	ogNetMibObjects 1
+}
+ogNetAlarmTable OBJECT IDENTIFIER ::= {
+	ogNetAlarm 1
+}
+ogNetAlarmEntry OBJECT IDENTIFIER ::= {
+	ogNetAlarmTable 1
+}
+
+ogNetInterfaceNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"The alert sent when a network interface event occurs"
+	::= 21
+
+-- Cellular alarms
+ogCellMibObjects OBJECT IDENTIFIER ::= {
+	ogCellMib 1
+}
+ogCellAlarm OBJECT IDENTIFIER ::= {
+	ogCellMibObjects 1
+}
+ogCellAlarmTable OBJECT IDENTIFIER ::= {
+	ogCellAlarm 1
+}
+ogCellAlarmEntry OBJECT IDENTIFIER ::= {
+	ogCellAlarmTable 1
+}
+
+ogCellDataNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a cell data alarm occurs"
+	::= 22
+
+ogCellMessageNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a SMS command alarm occurs"
+	::= 23
+
+ogCellSignalNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a cellular signal alarm occurs."
+	::= 24
+
+ogCellApnNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when an APN change alarm occurs"
+	::= 25
+
+ogCellTowerNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a cell tower change alarm occurs"
+	::= 26
+
+ogCellNetworkNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"The notification sent when a cell network change alarm occurs"
+	::= 27
+
+-- Wifi alarms
+ogWifiMibObjects OBJECT IDENTIFIER ::= {
+	ogWifiMib 1
+}
+ogWifiAlarm OBJECT IDENTIFIER ::= {
+	ogWifiMibObjects 1
+}
+ogWifiAlarmTable OBJECT IDENTIFIER ::= {
+	ogWifiAlarm 1
+}
+ogWifiAlarmEntry OBJECT IDENTIFIER ::= {
+	ogWifiAlarmTable 1
+}
+
+ogWifiClientConnectNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a wireless client
+		connects/disconnects."
+	::= 28
+
+ogWifiClientSignalNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a wireless client
+		signal crosses a threshold."
+	::= 29
+
+ogWifiApAssociationNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a wireless client
+		associates/disassociates with this AP."
+	::= 30
+
+ogWifiApAuthNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a wireless client
+		fails to authenticate with this AP."
+	::= 31
+
+-- Dialpool alarms
+ogDialPoolMibObjects OBJECT IDENTIFIER ::= {
+	ogDialPoolMib 1
+}
+ogDialPoolAlarm OBJECT IDENTIFIER ::= {
+	ogDialPoolMibObjects 1
+}
+ogDialPoolAlarmTable OBJECT IDENTIFIER ::= {
+	ogDialPoolAlarm 1
+}
+ogDialPoolAlarmEntry OBJECT IDENTIFIER ::= {
+	ogDialPoolAlarmTable 1
+}
+
+ogDialPoolHealthNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a dial-pool health alarm occurs."
+	::= 32
+
+-- Custom alarms
+ogCustomMibObjects OBJECT IDENTIFIER ::= {
+	ogCustomMib 1
+}
+ogCustomAlarm OBJECT IDENTIFIER ::= {
+	ogCustomMibObjects 1
+}
+ogCustomAlarmTable OBJECT IDENTIFIER ::= {
+	ogCustomAlarm 1
+}
+ogCustomAlarmEntry OBJECT IDENTIFIER ::= {
+	ogCustomAlarmTable 1
+}
+
+ogCustomNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES { 
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+ 		"A notification sent when a custom check alarm occurs."
+	::= 33
+
+END

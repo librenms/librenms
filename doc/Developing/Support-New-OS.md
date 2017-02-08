@@ -329,31 +329,33 @@ We declare two specific graphs for users and sessions numbers. Theses two graphs
 ```php
 <?php
 
-$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hostname = trim($poll_device['sysName'], '"');
 
-$users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($users)) {
     $rrd_def = 'DS:users:GAUGE:600:0:U';
+
     $fields = array(
-        'users' => $users
-    )
+        'users' => $users,
+    );
+
     $tags = compact('rrd_def');
     data_update($device, 'pulse_users', $tags, $fields);
     $graphs['pulse_users'] = true;
 }
 
-$sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($sessions)) {
-    $rrd_def = array(
-        'DS:sessions:GAUGE:600:0:U',
-    }
+    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+
     $fields = array(
-        'sessions' => $sessions
+        'sessions' => $sessions,
     );
+
     $tags = compact('rrd_def');
     data_update($device, 'pulse_sessions', $tags, $fields);
     $graphs['pulse_sessions'] = true;
