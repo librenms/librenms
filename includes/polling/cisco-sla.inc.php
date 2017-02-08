@@ -123,3 +123,5 @@ if (count($slas) > 0) {
         }
     }
 }
+
+unset($slas);

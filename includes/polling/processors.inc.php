@@ -35,3 +35,5 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
 
     dbUpdate(array('processor_usage' => $proc), 'processors', '`processor_id` = ?', array($processor['processor_id']));
 }//end foreach
+
+unset($processor);

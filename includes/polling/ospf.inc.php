@@ -275,7 +275,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
             }//end if
         }//end foreach
     }//end if
-
+    unset($ospf_ports_poll);
 
 // OSPF-MIB::ospfNbrIpAddr.172.22.203.98.0 172.22.203.98
 // OSPF-MIB::ospfNbrAddressLessIndex.172.22.203.98.0 0
@@ -366,8 +366,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     unset($ospf_nbrs_poll);
     echo "\n";
 }
-unset($device['context_name']);
-unset($vrfs_lite_cisco);
+unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
 // Create device-wide statistics RRD
 $rrd_def = array(
     'DS:instances:GAUGE:600:0:1000000',
@@ -387,3 +386,19 @@ $tags = compact('rrd_def');
 data_update($device, 'ospf-statistics', $tags, $fields);
 
 echo "\n";
+
+unset(
+    $ospf_instance_count,
+    $ospf_port_count,
+    $ospf_area_count,
+    $ospf_neighbour_count,
+    $ospf_oids_db,
+    $ospf_area_oids,
+    $ospf_port_oids,
+    $ospf_nbr_oids_db,
+    $ospf_nbr_oids_rrd,
+    $ospf_nbr_oids,
+    $rrd_def,
+    $fields,
+    $tags
+);

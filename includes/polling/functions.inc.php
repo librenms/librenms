@@ -29,15 +29,34 @@ function sensor_precache($device)
     return $sensor_config;
 }
 
-function poll_sensor($device, $class, $unit)
+function poll_sensor($device, $class)
 {
     global $config, $memcache, $agent_sensors;
+
+    $supported_sensors = array(
+        'current'     => 'A',
+        'frequency'   => 'Hz',
+        'runtime'     => 'Min',
+        'humidity'    => '%',
+        'fanspeed'    => 'rpm',
+        'power'       => 'W',
+        'voltage'     => 'V',
+        'temperature' => 'C',
+        'dbm'         => 'dBm',
+        'charge'      => '%',
+        'load'        => '%',
+        'state'       => '#',
+        'signal'      => 'dBm',
+        'airflow'     => 'cfm',
+    );
+
+    $unit = $supported_sensors[$class];
 
     $sensors = array();
     $misc_sensors = array();
     $all_sensors = array();
 
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', array($class, $device['device_id'])) as $sensor) {
+    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = '?' AND `device_id` = ?", array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             $misc_sensors[] = $sensor;
         } elseif ($sensor['poller_type'] == 'ipmi') {
@@ -158,6 +177,7 @@ function poll_sensor($device, $class, $unit)
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
         }
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
+        unset($supported_sensors);
     }
 }//end poll_sensor()
 
@@ -273,13 +293,15 @@ function poll_device($device, $options)
                 $attribs['poll_'.$module] ||
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
                 ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
+                $start_memory = memory_get_usage();
                 $module_start = 0;
                 $module_time  = 0;
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                printf("\n>> Runtime for poller module '%s': %.4f seconds\n", $module, $module_time);
+                $module_mem  = (memory_get_usage() - $start_memory);
+                printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
@@ -298,6 +320,7 @@ function poll_device($device, $options)
                 if (is_file($oldrrd)) {
                     unlink($oldrrd);
                 }
+                unset($tags, $fields, $oldrrd);
             } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                 echo "Module [ $module ] disabled on host.\n\n";
             } elseif (isset($os_module_status) && $os_module_status == '0') {
