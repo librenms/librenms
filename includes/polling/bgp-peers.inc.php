@@ -337,5 +337,4 @@ if ($config['enable_bgp']) {
     } //end if
 } //end if
 
-unset($$peer_data_tmp);
-unset($j_prefixes);
+unset($peers, $peer_data_tmp, $j_prefixes);

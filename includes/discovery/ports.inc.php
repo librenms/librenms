@@ -77,6 +77,11 @@ foreach ($port_stats as $ifIndex => $port) {
     }//end if
 }//end foreach
 
+unset(
+    $ports_mapped,
+    $port
+);
+
 // End New interface detection
 // Interface Deletion
 // If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
