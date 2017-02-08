@@ -596,6 +596,12 @@ foreach ($ports as $port) {
                 } else {
                     echo $oid.' ';
                 }
+            } else {
+                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                    if ($port[$oid.'_prev'] == null) {
+                        $port['update'][$oid.'_prev'] = $this_port[$oid];
+                    }
+                }
             }
         }//end foreach
 
@@ -640,7 +646,7 @@ foreach ($ports as $port) {
 
             if ($config['slow_statistics'] == true) {
                 $port[$port_update][$oid]         = set_numeric($this_port[$oid]);
-                $port[$port_update][$oid.'_prev'] = $port[$oid];
+                $port[$port_update][$oid.'_prev'] = set_numeric($port[$oid]);
             }
 
             $oid_prev = $oid.'_prev';
