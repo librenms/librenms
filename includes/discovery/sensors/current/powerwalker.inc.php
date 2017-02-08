@@ -37,13 +37,13 @@ if ($device['os'] === 'powerwalker') {
 
     if (is_numeric($pw_oids['upsInputCurrent'][1])) {
         $descr = 'Input Voltage';
-        $oid = '.1.3.6.1.2.1.33.1.3.3.1.4.1';
+        $oid = '.1.3.6.1.2.1.33.1.3.3.1.4.1.0';
         discover_sensor($valid['sensor'], 'current', $device, $oid, 2, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
     }
 
     if (is_numeric($pw_oids['upsOutputCurrent'][1])) {
         $descr = 'Output Voltage';
-        $oid = '.1.3.6.1.2.1.33.1.4.4.1.3.1';
+        $oid = '.1.3.6.1.2.1.33.1.4.4.1.3.1.0';
         discover_sensor($valid['sensor'], 'current', $device, $oid, 3, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
     }
 }

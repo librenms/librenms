@@ -41,4 +41,8 @@ $run_sensors = array(
     'voltages',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
-unset($pre_cache);
+unset(
+    $pre_cache,
+    $run_sensors,
+    $entitysensor
+);

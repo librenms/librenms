@@ -68,6 +68,48 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testOSTestsExist()
+    {
+        global $config;
+        load_all_os();
+
+        $excluded_os = array(
+            'default',
+            'generic',
+        );
+
+        $all_os = array_diff(array_keys($config['os']), $excluded_os);
+
+        foreach ($all_os as $os) {
+            $function = 'test'.str_replace(' ', '', ucwords(str_replace(array('-', '_'), ' ', $os)));
+            $this->assertTrue(method_exists($this, $function), "Missing discovery tests for $os");
+        }
+    }
+
+    public function testFileTestsExist()
+    {
+        global $config;
+        $files = glob($config['install_dir'] . "/tests/snmpsim/*.snmprec");
+        preg_match_all(
+            '/checkOS\([\'"]([^\'")]+)[\'"][, \'"]*([^\'")]*)[\'"]*\)/',
+            file_get_contents(__FILE__),
+            $tests
+        );
+
+        foreach ($files as $file) {
+            $test_name = basename($file, '.snmprec');
+
+            $index = array_search($test_name, $tests[1]);
+
+            if ($test_name != 'skel' && $index === false) {
+                $next = array_search($test_name, $tests[2]);
+                if ($next === false) {
+                    $this->fail("No test for $file");
+                }
+            }
+        }
+    }
+
     public function test3com()
     {
         $this->checkOS('3com');
@@ -101,6 +143,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAen()
     {
         $this->checkOS('aen');
+        $this->checkOS('aen', 'aen1');
+        $this->checkOS('aen', 'aen2');
     }
 
     public function testAerohive()
@@ -139,6 +183,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('aos', 'aos1');
     }
 
+    public function testAosEmu2()
+    {
+        $this->checkOS('aos-emu2');
+    }
+
     public function testAllied()
     {
         $this->checkOS('allied');
@@ -161,6 +210,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAreca()
     {
         $this->checkOS('areca');
+        $this->checkOS('areca', 'areca1');
     }
 
     public function testAristaEos()
@@ -183,7 +233,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('asa');
     }
 
-    public function testAsusMerlin()
+    public function testAsuswrtMerlin()
     {
         $this->checkOS('asuswrt-merlin');
     }
@@ -229,6 +279,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAxiscam()
     {
         $this->checkOS('axiscam');
+        $this->checkOS('axiscam', 'axiscam-p1354');
         $this->checkOS('axiscam', 'axiscam-nve');
     }
 
@@ -313,6 +364,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('canonprinter', 'canonprinter-mf');
         $this->checkOS('canonprinter', 'canonprinter-ir-adv');
+        $this->checkOS('canonprinter', 'canonprinter-lbp');
         $this->checkOS('canonprinter', 'canon-d1180');
     }
 
@@ -368,12 +420,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCiscowap()
     {
         $this->checkOS('ciscowap');
-        $this->checkOS('ciscowap', 'ciscowap-wap321');
     }
 
     public function testCiscowlc()
     {
         $this->checkOS('ciscowlc');
+        $this->checkOS('ciscowlc', 'ciscowlc1');
+        $this->checkOS('ciscowlc', 'ciscowlc2');
     }
 
     public function testCmts()
@@ -409,6 +462,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCumulus()
     {
         $this->checkOS('cumulus');
+    }
+
+    public function testCyberoamUtm()
+    {
+        $this->checkOS('cyberoam-utm');
     }
 
     public function testDasanNos()
@@ -498,6 +556,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dnos', 'dnos7');
         $this->checkOS('dnos', 'dnos8');
         $this->checkOS('dnos', 'dnos9');
+        $this->checkOS('dnos', 'dnos10');
+        $this->checkOS('dnos', 'dnos11');
     }
 
     public function testDrac()
@@ -505,6 +565,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('drac');
         $this->checkOS('drac', 'drac1');
         $this->checkOS('drac', 'drac2');
+    }
+
+    public function testDragonfly()
+    {
+        $this->checkOS('dragonfly');
     }
 
     public function testDraytek()
@@ -526,6 +591,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testEatonups()
     {
+        $this->checkOS('eatonups');
         $this->checkOS('eatonups', 'eaton-5p');
         $this->checkOS('eatonups', 'eaton-5px');
         $this->checkOS('eatonups', 'eaton-powerxpert');
@@ -783,11 +849,17 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIes()
     {
         $this->checkOS('ies');
+        $this->checkOS('ies', 'ies1');
     }
 
     public function testInfinity()
     {
         $this->checkOS('infinity');
+    }
+
+    public function testInformos()
+    {
+        $this->checkOS('informos');
     }
 
     public function testIos()
@@ -918,6 +990,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLinux()
     {
         $this->checkOS('linux');
+        $this->checkOS('linux', 'linux1');
     }
 
     public function testMacosx()
@@ -1009,6 +1082,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMrvld()
     {
         $this->checkOS('mrvld');
+    }
+
+    public function testMypoweros()
+    {
+        $this->checkOS('mypoweros');
+    }
+
+    public function testNetagent2()
+    {
+        $this->checkOS('netagent2');
     }
 
     public function testNetapp()
@@ -1127,6 +1210,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('opengear');
     }
 
+    public function testOpenindiana()
+    {
+        $this->checkOS('openindiana');
+    }
+
     public function testOpensolaris()
     {
         $this->checkOS('opensolaris');
@@ -1158,7 +1246,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('pbn');
     }
 
-    public function testPbncpe()
+    public function testPbnCp()
     {
         $this->checkOS('pbn-cp');
     }
@@ -1178,7 +1266,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('pfsense');
     }
 
-    public function testPix()
+    public function testPixos()
     {
         $this->checkOS('pixos');
     }
@@ -1197,6 +1285,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('poweralert');
         $this->checkOS('poweralert', 'poweralert1');
+    }
+
+    public function testPowercode()
+    {
+        $this->checkOS('powercode');
     }
 
     public function testPowerconnect()
@@ -1291,6 +1384,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testRaisecom()
     {
         $this->checkOS('raisecom');
+        $this->checkOS('raisecom', 'raisecom-ros');
     }
 
     public function testRaritan()
@@ -1481,6 +1575,13 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('tomato');
     }
 
+    public function testToshibaTec()
+    {
+        $this->checkOS('toshiba-tec', 'toshiba-tec-ev4');
+        $this->checkOS('toshiba-tec', 'toshiba-tec-fv4');
+        $this->checkOS('toshiba-tec', 'toshiba-tec-sx5t');
+    }
+
     public function testTpconductor()
     {
         $this->checkOS('tpconductor');
@@ -1489,6 +1590,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testTplink()
     {
         $this->checkOS('tplink');
+        $this->checkOS('tplink', 'tplink1');
     }
 
     public function testTranzeo()
@@ -1544,7 +1646,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testVyos()
     {
         $this->checkOS('vyos');
-        $this->checkOS('vyos', 'vyos1');
         $this->checkOS('vyos', 'vyos-vyatta');
     }
 
@@ -1578,7 +1679,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('xerox', 'xerox-docuprint');
     }
 
-    public function testXirrus()
+    public function testXirrusAos()
     {
         $this->checkOS('xirrus_aos');
     }

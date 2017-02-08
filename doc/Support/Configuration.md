@@ -378,16 +378,24 @@ The above are examples, these will rewrite device snmp locations so you don't ne
 
 #### Interfaces to be ignored
 
+Examples:
+
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
+$config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 Numerous defaults exist for this array already (see includes/defaults.inc.php for the full list). You can expand this list
 by continuing the array.
+
 `bad_if` is matched against the ifDescr value.
+
 `bad_iftype` is matched against the ifType value.
+
 `bad_if_regexp` is matched against the ifDescr value as a regular expression.
+
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
+
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
 #### Interfaces to be rewritten

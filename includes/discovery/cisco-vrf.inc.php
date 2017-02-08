@@ -110,6 +110,10 @@ if ($config['enable_vrfs']) {
             }//end if
         }//end foreach
 
+        unset(
+            $descr_table,
+            $port_table
+        );
         echo "\n";
 
         $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
@@ -137,8 +141,12 @@ if ($config['enable_vrfs']) {
             }
         }
 
-        unset($valid_vrf_if);
-        unset($valid_vrf);
+        unset(
+            $valid_vrf_if,
+            $valid_vrf,
+            $row,
+            $sql
+        );
 
         echo "\n";
     } //end if
