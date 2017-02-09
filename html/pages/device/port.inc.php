@@ -97,6 +97,10 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
+if ($device['os'] == "routeros" && $port['ifType'] == "ieee80211") {
+    $menu_options['wifi'] = 'WiFi';
+}
+
 $sep = '';
 foreach ($menu_options as $option => $text) {
     echo $sep;
