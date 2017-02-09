@@ -1644,6 +1644,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('vrp', 'vrp4');
     }
 
+    public function testVubiq()
+    {
+        $this->checkOS('vubiq');
+    }
+
     public function testVyatta()
     {
         $this->checkOS('vyatta');
