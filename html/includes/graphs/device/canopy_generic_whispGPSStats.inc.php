@@ -8,6 +8,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+$scale_min = 0;
+
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-whispGPSStats');
 if (file_exists($rrdfilename)) {
