@@ -42,6 +42,7 @@ $run_sensors = array(
     'temperatures',
     'voltages',
     'wifi/connected-clients',
+    'wifi/noise-floor',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

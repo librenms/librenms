@@ -121,23 +121,6 @@ $config['graph_types']['device']['ubnt_unifi_RadioCu_1']['section'] = 'wireless'
 $config['graph_types']['device']['ubnt_unifi_RadioCu_1']['order'] = '1';
 $config['graph_types']['device']['ubnt_unifi_RadioCu_1']['descr'] = 'Radio1 Capacity Used';
 
-// RouterOS Support
-$config['graph_types']['device']['routeros_rate']['section'] = 'wireless';
-$config['graph_types']['device']['routeros_rate']['order'] = '0';
-$config['graph_types']['device']['routeros_rate']['descr'] = 'Tx/Rx Rate';
-
-$config['graph_types']['device']['routeros_clients']['section'] = 'wireless';
-$config['graph_types']['device']['routeros_clients']['order'] = '1';
-$config['graph_types']['device']['routeros_clients']['descr'] = 'Number of Clients';
-
-$config['graph_types']['device']['routeros_noisefloor']['section'] = 'wireless';
-$config['graph_types']['device']['routeros_noisefloor']['order'] = '2';
-$config['graph_types']['device']['routeros_noisefloor']['descr'] = 'AP Noise Floor';
-
-$config['graph_types']['device']['routeros_txccq']['section'] = 'wireless';
-$config['graph_types']['device']['routeros_txccq']['order'] = '3';
-$config['graph_types']['device']['routeros_txccq']['descr'] = 'Overall TxCCQ';
-
 // Siklu support
 $config['graph_types']['device']['siklu_rfAverageRssi']['section'] = 'wireless';
 $config['graph_types']['device']['siklu_rfAverageRssi']['order'] = '0';
