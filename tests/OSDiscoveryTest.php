@@ -389,6 +389,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ceraos');
     }
 
+    public function testCelvin()
+    {
+        $this->checkOS('celvin');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
@@ -1360,6 +1365,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testQnap()
     {
         $this->checkOS('qnap');
+        $this->checkOS('qnap', 'qnap-ts431');
     }
 
     public function testQuanta()

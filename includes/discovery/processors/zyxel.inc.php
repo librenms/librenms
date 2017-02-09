@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'zyxel') {
+if ($device['group'] == 'zyxel') {
     echo 'Zyxel : ';
 
     $oid = '.1.3.6.1.4.1.890.1.5.8.55.12.7.0';
@@ -19,5 +19,19 @@ if ($device['os'] == 'zyxel') {
 
     if (is_numeric($usage)) {
         discover_processor($valid['processor'], $device, $oid, '0', 'zyxel', $descr, '1', $usage);
+    } else {
+        $oid = '.1.3.6.1.4.1.890.1.15.3.2.7.0';
+        $descr = 'Processor';
+        $usage = snmp_get($device, $oid, '-Ovqn');
+
+        if (is_numeric($usage)) {
+            discover_processor($valid['processor'], $device, $oid, '0', 'zyxel', $descr, '1', $usage);
+        }
     }
 }
+
+unset(
+    $oid,
+    $descr,
+    $usage
+);

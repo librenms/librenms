@@ -84,10 +84,14 @@ if (extension_loaded('curl')) {
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed'>
-      <tr>
-        <td colspan='4'><span class='bg-danger'>$callback</span><br />
-        Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
       <tr>";
+
+if (is_admin() === true) {
+    echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
+          Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
+        <tr>
+    ";
+}
 
 if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' && $callback_status != 2) {
     echo "
