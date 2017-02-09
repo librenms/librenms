@@ -43,7 +43,7 @@ if ($config['autodiscovery']['snmpscan'] === false) {
 
 function perform_snmp_scan($net, $force_network, $force_broadcast)
 {
-    global $stats, $config, $debug, $vdebug;
+    global $stats, $config, $debug, $vdebug, $more_info;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
@@ -78,12 +78,12 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
         $stats['count']++;
         $host = long2ip($start);
 
-        if ($vdebug) {
+        if ($vdebug || $more_info === true) {
             echo "Scanning: ".$host.PHP_EOL;
         }
 
         if (match_network($config['autodiscovery']['nets-exclude'], $host)) {
-            if ($vdebug) {
+            if ($vdebug || $more_info === true) {
                 echo "Excluded by config.php".PHP_EOL.PHP_EOL;
             } else {
                 echo '|';
@@ -92,8 +92,8 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
         }
         $test = isPingable($host);
         if ($test['result'] === false) {
-            if ($vdebug) {
-                echo "Unpingable Device".PHP_EOL.PHP_EOL;
+            if ($vdebug || $more_info === true) {
+                echo "Unpingable Device $host".PHP_EOL.PHP_EOL;
             } else {
                 echo '.';
             }
@@ -101,8 +101,8 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
         }
         if (ip_exists($host)) {
             $stats['known']++;
-            if ($vdebug) {
-                echo "Known Device".PHP_EOL;
+            if ($vdebug || $more_info === true) {
+                echo "Known Device $host".PHP_EOL;
             } else {
                 echo '*';
             }
@@ -112,29 +112,29 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
             try {
                 addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $config['distributed_poller_group']);
                 $stats['added']++;
-                if ($vdebug) {
-                    echo "Added Device".PHP_EOL.PHP_EOL;
+                if ($vdebug || $more_info === true) {
+                    echo "Added Device $host".PHP_EOL.PHP_EOL;
                 } else {
                     echo '+';
                 }
                 break;
             } catch (HostExistsException $e) {
                 $stats['known']++;
-                if ($vdebug) {
-                    echo "Known Device".PHP_EOL.PHP_EOL;
+                if ($vdebug || $more_info === true) {
+                    echo "Known Device $host".PHP_EOL.PHP_EOL;
                 } else {
                     echo '*';
                 }
                 break;
             } catch (HostUnreachablePingException $e) {
-                if ($vdebug) {
-                    echo "Unpingable Device".PHP_EOL.PHP_EOL;
+                if ($vdebug || $more_info === true) {
+                    echo "Unpingable Device $host".PHP_EOL.PHP_EOL;
                 } else {
                     echo '.';
                 }
                 break;
             } catch (HostUnreachableException $e) {
-                if ($debug) {
+                if ($debug || $more_info === true) {
                     print_error($e->getMessage() . " over $transport");
                     foreach ($e->getReasons() as $reason) {
                         echo "  $reason".PHP_EOL;
@@ -143,8 +143,8 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
                 if ($transport === 'tcp') {
                     // tried both udp and tcp without success
                     $stats['failed']++;
-                    if ($vdebug) {
-                        echo "Failed to Add Device".PHP_EOL.PHP_EOL;
+                    if ($vdebug || $more_info === true) {
+                        echo "Failed to Add Device $host".PHP_EOL.PHP_EOL;
                     } else {
                         echo '-';
                     }
@@ -155,7 +155,7 @@ function perform_snmp_scan($net, $force_network, $force_broadcast)
     echo PHP_EOL;
 }
 
-$opts  = getopt('r:d::v::n::b::l::h::');
+$opts  = getopt('r:d::v::i::n::b::l::h::');
 $stats = array('count'=> 0, 'known'=>0, 'added'=>0, 'failed'=>0);
 $start = false;
 $debug = false;
@@ -174,6 +174,7 @@ if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($con
     echo '  -b                Force scan of broadcast address'.PHP_EOL;
     echo '  -d                Enable Debug'.PHP_EOL;
     echo '  -v                Enable verbose Debug'.PHP_EOL;
+    echo '  -i                Provide more information on actions'.PHP_EOL;
     echo '  -l                Show Legend'.PHP_EOL;
     echo '  -h                Print this text'.PHP_EOL;
     exit(0);
@@ -194,6 +195,10 @@ if (isset($opts['n'])) {
 
 if (isset($opts['b'])) {
     $force_broadcast = true;
+}
+
+if (isset($opts['i'])) {
+    $more_info = true;
 }
 
 if (isset($opts['r'])) {
