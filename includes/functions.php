@@ -144,7 +144,7 @@ function getHostOS($device)
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($array, $sysObjectId, $sysDescr, $sysMfgName)
+function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
