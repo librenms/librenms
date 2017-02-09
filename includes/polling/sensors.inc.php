@@ -27,6 +27,7 @@ $supported_sensors = array(
     'state'       => '#',
     'signal'      => 'dBm',
     'airflow'     => 'cfm',
+    'connected-clients'=> '',
 );
 
 foreach ($supported_sensors as $sensor_type => $sensor_unit) {

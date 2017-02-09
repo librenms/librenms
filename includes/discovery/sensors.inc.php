@@ -31,3 +31,4 @@ require 'includes/discovery/sensors/states.inc.php';
 require 'includes/discovery/sensors/dbm.inc.php';
 require 'includes/discovery/sensors/signal.inc.php';
 require 'includes/discovery/sensors/airflow.inc.php';
+require 'includes/discovery/sensors/wifi.inc.php';
