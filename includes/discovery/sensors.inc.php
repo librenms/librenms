@@ -43,6 +43,7 @@ $run_sensors = array(
     'voltages',
     'wifi/connected-clients',
     'wifi/noise-floor',
+    'wifi/txccq',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

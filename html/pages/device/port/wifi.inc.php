@@ -15,15 +15,20 @@ if (file_exists($rrd_filename)) {
 
     include 'includes/print-interface-graphs.inc.php';
 } 
+
+
 /*
     echo '<div class=graphhead>Tx/Rx Rate</div>';
     $graph_type = 'port_routeros_rate';
 
     include 'includes/print-interface-graphs.inc.php';
- 
+
+ */
+$rrd_filename = rrd_name($device['hostname'], 'sensor-txccq-wifi-' . $port['ifIndex']);
+if (file_exists($rrd_filename)) {
+
     echo '<div class=graphhead>TxCCQ</div>';
-    $graph_type = 'port_routeros_txccq';
+    $graph_type = 'port_wifi_txccq';
 
     include 'includes/print-interface-graphs.inc.php';
 }
- */

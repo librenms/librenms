@@ -13,11 +13,8 @@ if ($device['os'] == 'routeros') {
         $data = trim($data);
         if ($data) {
             list($oid,$val) = explode(' ', $data, 2);
-            d_echo("O: $oid\n");
-            d_echo("V: $val\n");
             $split_oid        = explode('.', $oid);
             $index            = $split_oid[(count($split_oid) - 1)];
-            d_echo("I: $index\n");
             $descr = "Radio $radio_index";
 
             discover_sensor($valid['sensor'], 'connected-clients', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $val);
