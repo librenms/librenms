@@ -1395,25 +1395,22 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "green"; //OK
+            return "severity-ok"; //OK
             break;
         case 2:
-            return "royalblue"; //Informational
+            return "severity-info"; //Informational
             break;
         case 3:
-            return "gold"; //Notice
+            return "severity-notice"; //Notice
             break;
         case 4:
-            return "darkorange"; //Warning
+            return "severity-warning"; //Warning
             break;
         case 5:
-            return "red"; //Critical
-            break;
-        case 0:
-            return "darkgrey"; //Unknown
+            return "severity-critical"; //Critical
             break;
         default:
-            return "black"; //Unset
+            return "severity-unknown"; //Unknown
             break;
     }
 } // end eventlog_severity
