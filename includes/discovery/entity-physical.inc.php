@@ -18,6 +18,13 @@ if ($config['enable_inventory']) {
             dbDelete('entPhysical', 'entPhysical_id = ?', array ($test['entPhysical_id']));
         }
     }
+
+    if (count($valid) > 0) {
+        $module_state = true;
+    } else {
+        $module_state = false;
+    }
+
     unset(
         $sql,
         $test,

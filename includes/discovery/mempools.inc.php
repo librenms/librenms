@@ -23,6 +23,12 @@ foreach (dbFetchRows($sql) as $test_mempool) {
     unset($mempool_type);
 }
 
+if (count($valid_mempool) > 0) {
+    $module_state = true;
+} else {
+    $module_state = false;
+}
+
 unset(
     $valid_mempool,
     $sql,
