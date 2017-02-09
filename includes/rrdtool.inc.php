@@ -304,22 +304,6 @@ function rrd_name($host, $extra, $extension = ".rrd")
     return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 
-
-/**
- * Glob a filename based on the hostname (or IP) and some extra items
- *
- * @param string $host Host name
- * @param array|string $extra Components of RRD filename - will be separated with "-", or a pre-formed rrdname
- * @param string $extension File extension (default is .rrd)
- * @return string the name of the rrd file for $host's $extra component
- */
-function rrd_glob($host, $extra, $extension = ".rrd")
-{
-    global $config;
-    $filename = safeglob(is_array($extra) ? implode("-", $extra) : $extra);
-    return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
-} // rrd_name
-
 /**
  * Generates a filename for a proxmox cluster rrd
  *
