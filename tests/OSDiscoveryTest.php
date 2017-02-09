@@ -389,6 +389,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ceraos');
     }
 
+    public function testCelvin()
+    {
+        $this->checkOS('celvin');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
