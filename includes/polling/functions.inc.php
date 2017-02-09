@@ -176,7 +176,7 @@ function poll_sensor($device, $class)
         if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
         }
-        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = '?' AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
         unset($supported_sensors);
     }
 }//end poll_sensor()
