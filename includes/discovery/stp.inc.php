@@ -97,7 +97,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
     if (!$stp_db['bridgeAddress'] && $stp['bridgeAddress']) {
         dbInsert($stp, 'stp');
-        log_event('STP added, bridge address: '.$stp['bridgeAddress'], $device, 'stp');
+        log_event('STP added, bridge address: ' . $stp['bridgeAddress'], $device, 'stp');
         echo '+';
     }
     
