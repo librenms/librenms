@@ -308,6 +308,9 @@ $config['graph_types']['device']['canopy_generic_errorCount']['descr']   = 'Erro
 $config['graph_types']['device']['canopy_generic_crcErrors']['section'] = 'wireless';
 $config['graph_types']['device']['canopy_generic_crcErrors']['order']   = '15';
 $config['graph_types']['device']['canopy_generic_crcErrors']['descr']   = 'CRC Errors';
+$config['graph_types']['device']['canopy-generic-frameUtilization']['section'] = 'wireless';
+$config['graph_types']['device']['canopy-generic-frameUtilization']['order']   = '16';
+$config['graph_types']['device']['canopy-generic-frameUtilization']['descr']   = 'Frame Utilization';
 
 $config['graph_types']['device']['cambium_epmp_RFStatus']['section'] = 'wireless';
 $config['graph_types']['device']['cambium_epmp_RFStatus']['order']   = '0';

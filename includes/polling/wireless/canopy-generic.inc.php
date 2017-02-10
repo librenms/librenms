@@ -290,4 +290,21 @@ if (strstr($version, 'AP')) {
         $graphs['canopy_generic_freq'] = true;
         unset($rrd_filename, $freq);
     }
+
+    $downlinkutilization = str_replace('"', "", snmp_get($device, "frUtlLowTotalDownlinkUtilization.0", "-Ovqn", "WHISP-APS-MIB"));
+    $uplinkutilization = str_replace('"', "", snmp_get($device, "frUtlLowTotalUplinkUtilization.0", "-Ovqn", "WHISP-APS-MIB"));
+    if (is_numeric($downlinkutilization) && is_numeric($uplinkutilization)) {
+    	$rrd_def = array(
+    			'DS:downlinkutilization:GAUGE:600:0:15000',
+    			'DS:uplinkutilization:GAUGE:600:0:15000'
+    	);
+    	$fields = array(
+    			'downlinkutilization' => $downlinkutilization,
+    			'uplinkutilization' => $uplinkutilization,
+    	);
+    	$tags = compact('rrd_def');
+    	data_update($device, 'canopy-generic-frameUtilization', $tags, $fields);
+    	$graphs['canopy-generic-frameUtilization'] = true;
+    	unset($rrd_filename, $downlinkutilization, $uplinkutilization);
+    }
 }
