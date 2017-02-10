@@ -4,6 +4,7 @@ type: wireless
 icon: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_cambium_epmp_registeredSM, text: 'Registered SMs' }
 group: cambium
 discovery:
     - sysObjectId:
@@ -12,4 +13,3 @@ discovery:
         - '/^Cambium PTP 50650/'
         - '/^PTP250/'
         - '/^Cambium/'
-
