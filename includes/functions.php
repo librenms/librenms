@@ -306,9 +306,9 @@ function renamehost($id, $new, $source = 'console')
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
-        log_event("Hostname changed -> $new ($source)", $id, 'system', null, 3);
+        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
-        log_event("Renaming of $host failed", $id, 'system', null, 5);
+        log_event("Renaming of $host failed", $id, 'system', 5);
         if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
             echo "Renaming of $host failed\n";
         } else {
@@ -362,7 +362,7 @@ function delete_device($id)
     }
 
     $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system', null, 3);
+    log_event("Device $host has been removed", 0, 'system', 3);
     return $ret;
 }
 
@@ -796,7 +796,7 @@ function get_astext($asn)
 }
 
 # Use this function to write to the eventlog table
-function log_event($text, $device = null, $type = null, $reference = null, $severity = 2)
+function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
