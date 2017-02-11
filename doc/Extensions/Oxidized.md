@@ -3,7 +3,7 @@ source: Extensions/Oxidized.md
 
 Integrating LibreNMS with [Oxidized](https://github.com/ytti/oxidized-web) brings the following benefits:
 
-  - Config viewing: Current, History, and Diffs all under the `Configs` tab of each device
+  - Config viewing: Current, History, and Diffs all under the Configs tab of each device
   - Automatic addition of devices to Oxidized: Including filtering and grouping to ease credential management
   - Configuration searching (Requires oxidized-web 0.8.0 or newer)
 
