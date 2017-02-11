@@ -61,7 +61,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
     $severity_colour = $eventlog['severity'];
     $response[] = array(
-        'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>", 
+        'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
         'datetime' => $eventlog['humandate'],
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type'     => $type,
