@@ -17,7 +17,8 @@ Table of Content:
     - [Palo Alto](#palo-alto)
         - [PANOS 6.x/7.x](#panos-6x7x)
 - [Operating systems](#operating-systems)
-    - [Linux (snmpd)](#linux-snmpd)
+    - [Linux (snmpd v2)](#linux-snmpd)
+    - [Linux (snmpd v3)](#linux-snmpd-v3)
     - [Windows Server 2008 R2](#windows-server-2008-r2)
     - [Windows Server 2012 R2](#windows-server-2012-r2)
 
@@ -103,7 +104,7 @@ Note that you need to allow SNMP on the needed interfaces. To do that you need t
 
 
 ## Operating systems
-### Linux (snmpd)
+### Linux (snmpd v2)
 
 Replace your snmpd.conf file by the example below and edit it with appropriate community in "RANDOMSTRINGGOESHERE".
 
@@ -137,6 +138,39 @@ The binary /usr/bin/distro must be copied from the original source repository:
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
 ```
+
+### Linux (snmpd v3)
+
+Go to /etc/snmp/snmpd.conf
+
+Open the file in vi or nano /etc/snmp/snmpd.conf and add the following line to create SNMPV3 User (replace username and passwords with your own):
+
+```
+createUser authPrivUser MD5 "authPassword" DES "privPassword"
+```
+
+Make sure the agent listens to all interfaces by adding the following line inside snmpd.conf:
+
+```
+agentAddress udp:161,udp6:[::1]:161
+```
+
+This line simply means listen to connections across all interfaces IPv4 and IPv6 respectively
+
+Uncomment and change the following line to give read access to the username created above (rouser is what LibreNMS uses) :
+
+```
+#rouser authPrivUser priv
+```
+
+Change the following details inside snmpd.conf
+
+```
+syslocation Rack, Room, Building, City, Country [GPSX,Y]
+syscontact Your Name <your@email.address>
+```
+
+Save and exit the file
 
 #### Restart the snmpd service:
 
