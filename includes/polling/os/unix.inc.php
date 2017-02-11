@@ -42,7 +42,6 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
     if ($hw) {
         $hardware = "Dell " . $hw;
     } else {
-
     # Try detect using the extended option (dmidecode)
         $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv", "NET-SNMP-EXTEND-MIB"));
         $version_dmide = trim(str_replace("\"", "", $version_dmide));
