@@ -14,6 +14,8 @@ Table of Content:
         - [NIOS 7.x](#nios-7x)
     - [Juniper](#juniper)
         - [Junos OS](#junos-os)
+    - [Mikrotik](#mikrotik)
+        - [RouterOS 6.x](#routeros-6x)
     - [Palo Alto](#palo-alto)
         - [PANOS 6.x/7.x](#panos-6x7x)
 - [Operating systems](#operating-systems)
