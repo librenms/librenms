@@ -896,7 +896,15 @@ function get_device_divisor($device, $serial, $sensor)
         if ($sensor == 'current' || $sensor == 'frequencies') {
             if (version_compare($serial, '12.06.0068', '>=')) {
                 $divisor = 10;
-            } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            } elseif (version_compare($serial, '12.04.0055', '=')) {
+                $divisor = 10;
+            } elseif (version_compare($serial, '12.04.0056', '>=')) {
+                $divisor = 1;
+            }
+        } elseif ($sensor == 'load') {
+            if (version_compare($serial, '12.06.0064', '=')) {
+                $divisor = 10;
+            } else {
                 $divisor = 1;
             }
         } elseif ($sensor == 'voltages') {
