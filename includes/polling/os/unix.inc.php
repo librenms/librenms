@@ -53,9 +53,9 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
         if ($hardware_dmide) {
             $hardware = $hardware_dmide;
             if ($version_dmide) {
-            $hardware = $hardware . " [" . $version_dmide . "]";
+                $hardware = $hardware . " [" . $version_dmide . "]";
             }
-       }
+        }
     }
 
     $serial = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.11.1", "-Oqv", "MIB-Dell-10892");
