@@ -176,6 +176,7 @@ LibreNMS contributors:
 - Ryan Eno <ryaneno@gmail.com> (VimCommando)
 - Matt Peterson <matt@peterson.org> (dorkmatt)
 - William George <wrgeorge1983@gmail.com> (wrgeorge1983)
+- Valentin Parmeland <naoko.vp@gmail.com> (NK74)
 
 Observium was written by:
 - Adam Armstrong
