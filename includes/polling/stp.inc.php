@@ -92,12 +92,12 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     if ($stp_db['bridgeAddress'] && $stp['bridgeAddress']) {
         // Logging if designated root changed since last db update
         if ($stp_db['designatedRoot'] != $stp['designatedRoot']) {
-            log_event('STP designated root changed: '.$stp_db['designatedRoot'].' > '.$stp['designatedRoot'], $device, 'stp');
+            log_event('STP designated root changed: ' . $stp_db['designatedRoot'] . ' > ' . $stp['designatedRoot'], $device, 'stp');
         }
         
         // Logging if designated root port changed since last db update
         if (isset($stp['rootPort']) && $stp_db['rootPort'] != $stp['rootPort']) {
-            log_event('STP root port changed: '.$stp_db['rootPort'].' > '.$stp['rootPort'], $device, 'stp');
+            log_event('STP root port changed: ' . $stp_db['rootPort'] . ' > ' . $stp['rootPort'], $device, 'stp');
         }
         
         // Logging if topology changed since last db update
@@ -110,7 +110,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             // ToDo fix log_event()
             //
             //log_event('STP topology changed after: '.formatUptime($stp['timeSinceTopologyChange']), $device, 'stp', $stp['timeSinceTopologyChange']);
-            log_event('STP topology changed after: '.formatUptime($stp['timeSinceTopologyChange']), $device, 'stp');
+            log_event('STP topology changed after: ' . formatUptime($stp['timeSinceTopologyChange']), $device, 'stp');
         }
         // Write to db
         dbUpdate($stp, 'stp', 'device_id = ?', array($device['device_id']));

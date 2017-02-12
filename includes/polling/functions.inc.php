@@ -168,10 +168,10 @@ function poll_sensor($device, $class)
         // FIXME also warn when crossing WARN level!!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' under threshold: '.$sensor_value." $unit (< ".$sensor['sensor_limit_low']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' under threshold: ' . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' above threshold: ' . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
@@ -203,7 +203,7 @@ function poll_device($device, $options)
     $ip = dnslookup($device);
 
     if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
-        log_event('Device IP changed to '.$ip, $device, 'system');
+        log_event('Device IP changed to ' . $ip, $device, 'system');
         $db_ip = inet_pton($ip);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
@@ -264,7 +264,7 @@ function poll_device($device, $options)
 
         dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
 
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
+        log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down') . ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
     }
 
     if ($status == '1') {
