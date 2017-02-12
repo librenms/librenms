@@ -12,27 +12,27 @@ if (is_file($config['install_dir'].'/includes/polling/os/'.$device['os'].'.inc.p
 
 if ($device['version'] != $version) {
     $update_array['version'] = $version;
-    log_event('OS Version -> '.$version, $device, 'system');
+    log_event('OS Version -> ' . $version, $device, 'system');
 }
 
 if ($features != $device['features']) {
     $update_array['features'] = $features;
-    log_event('OS Features -> '.$features, $device, 'system');
+    log_event('OS Features -> ' . $features, $device, 'system');
 }
 
 if ($hardware != $device['hardware']) {
     $update_array['hardware'] = $hardware;
-    log_event('Hardware -> '.$hardware, $device, 'system');
+    log_event('Hardware -> ' . $hardware, $device, 'system');
 }
 
 if ($serial != $device['serial']) {
     $update_array['serial'] = $serial;
-    log_event('Serial -> '.$serial, $device, 'system');
+    log_event('Serial -> ' . $serial, $device, 'system');
 }
 
 if ($icon != $device['icon']) {
     $update_array['icon'] = $icon;
-    log_event('Icon -> '.$icon, $device, 'system');
+    log_event('Icon -> ' . $icon, $device, 'system');
 }
 
 echo 'Hardware: ' . $hardware . PHP_EOL;

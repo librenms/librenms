@@ -52,7 +52,7 @@ if ($config['os'][$device['os']]['bad_snmpEngineTime'] !== true) {
 
 if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
+        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(
