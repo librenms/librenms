@@ -20,7 +20,7 @@ foreach (dbFetchRows($sql) as $test_processor) {
     if (!$valid['processor'][$processor_type][$processor_index]) {
         echo '-';
         dbDelete('processors', '`processor_id` = ?', array($test_processor['processor_id']));
-        log_event('Processor removed: type '.$processor_type.' index '.$processor_index.' descr '.$test_processor['processor_descr'], $device, 'processor', $test_processor['processor_id']);
+        log_event('Processor removed: type ' . $processor_type . ' index ' . $processor_index . ' descr ' . $test_processor['processor_descr'], $device, 'processor', $test_processor['processor_id']);
     }
 
     unset($processor_oid);

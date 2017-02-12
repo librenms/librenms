@@ -32,7 +32,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         // $ip isn't a valid IP so it must be a name.
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
-            log_event("$method discovery of " . $hostname  . " failed - Check name lookup", $device['device_id'], 'discovery');
+            log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery');
  
             return false;
         }

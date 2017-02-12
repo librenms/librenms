@@ -2164,3 +2164,27 @@ label {
 .device-icon-48h img {
   height: 48px;
 }
+
+.severity-ok {
+  color: green;
+}
+
+.severity-info {
+  color: royalblue;
+}
+
+.severity-notice {
+  color: gold;
+}
+
+.severity-warning {
+  color: darkorange;
+}
+
+.severity-critical {
+  color: red;
+}
+
+.severity-unknown {
+  color: darkgrey;
+}

@@ -357,7 +357,7 @@ class Component
                     dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
 
                     // Add the modification to the Eventlog.
-                    log_event("Component: ".$AVP[$COMPONENT]['type']."(".$COMPONENT."). Attribute: ".$ATTR.", was modified from: ".$OLD[$COMPONENT][$ATTR].", to: ".$VALUE, $device_id, 'component', $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', $COMPONENT);
                 }
             } // End Foreach AVP
 
