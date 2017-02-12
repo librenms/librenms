@@ -65,14 +65,7 @@ function array_sort($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    $r = substr($mac, 0, 2);
-    $r .= ":".substr($mac, 2, 2);
-    $r .= ":".substr($mac, 4, 2);
-    $r .= ":".substr($mac, 6, 2);
-    $r .= ":".substr($mac, 8, 2);
-    $r .= ":".substr($mac, 10, 2);
-
-    return($r);
+    return rtrim(chunk_split($mac, 2, ':'), ':');
 }
 
 function only_alphanumeric($string)
@@ -910,13 +903,12 @@ function formatCiscoHardware(&$device, $short = false)
     }
 }
 
-# from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
 function hex2str($hex)
 {
     $string='';
 
     for ($i = 0; $i < strlen($hex)-1; $i+=2) {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        $string .= chr(hexdec(substr($hex, $i, 2)));
     }
 
     return $string;
