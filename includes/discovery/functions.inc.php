@@ -102,78 +102,83 @@ function discover_device($device, $options = null)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    if ($device['os'] == 'generic') {
-        // verify if OS has changed from generic
-        $device['os'] = getHostOS($device);
+    $response = device_is_up($device, true);
 
-        if ($device['os'] != 'generic') {
-            echo "\nDevice os was updated to " . $device['os'] . '!';
-            dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
-        }
-    }
+    if ($response['status'] == '1') {
+        if ($device['os'] == 'generic') {
+            // verify if OS has changed from generic
+            $device['os'] = getHostOS($device);
 
-    load_os($device);
-    if (is_array($config['os'][$device['os']]['register_mibs'])) {
-        register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
-    }
-
-    echo "\n";
-
-    // If we've specified modules, use them, else walk the modules array
-    $force_module = false;
-    if ($options['m']) {
-        $config['discovery_modules'] = array();
-        foreach (explode(',', $options['m']) as $module) {
-            if (is_file("includes/discovery/$module.inc.php")) {
-                $config['discovery_modules'][$module] = 1;
-                $force_module = true;
+            if ($device['os'] != 'generic') {
+                echo "\nDevice os was updated to " . $device['os'] . '!';
+                dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
             }
         }
-    }
-    foreach ($config['discovery_modules'] as $module => $module_status) {
-        $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
-        d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-        d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
-        if ($force_module === true ||
-            $attribs['discover_' . $module] ||
-            ($os_module_status && !isset($attribs['discover_' . $module])) ||
-            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
-            $module_start = microtime(true);
-            $start_memory = memory_get_usage();
-            echo "\n#### Load disco module $module ####\n";
-            include "includes/discovery/$module.inc.php";
-            $module_time = microtime(true) - $module_start;
-            $module_time = substr($module_time, 0, 5);
-            $module_mem  = (memory_get_usage() - $start_memory);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            echo "#### Unload disco module $module ####\n\n";
-        } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
-            echo "Module [ $module ] disabled on host.\n\n";
-        } elseif (isset($os_module_status) && $os_module_status == '0') {
-            echo "Module [ $module ] disabled on os.\n\n";
-        } else {
-            echo "Module [ $module ] disabled globally.\n\n";
+
+        load_os($device);
+        if (is_array($config['os'][$device['os']]['register_mibs'])) {
+            register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
         }
+
+        echo "\n";
+
+        // If we've specified modules, use them, else walk the modules array
+        $force_module = false;
+        if ($options['m']) {
+            $config['discovery_modules'] = array();
+            foreach (explode(',', $options['m']) as $module) {
+                if (is_file("includes/discovery/$module.inc.php")) {
+                    $config['discovery_modules'][$module] = 1;
+                    $force_module = true;
+                }
+            }
+        }
+        foreach ($config['discovery_modules'] as $module => $module_status) {
+            $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
+            d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+            d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+            d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
+            if ($force_module === true ||
+                $attribs['discover_' . $module] ||
+                ($os_module_status && !isset($attribs['discover_' . $module])) ||
+                ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))
+            ) {
+                $module_start = microtime(true);
+                $start_memory = memory_get_usage();
+                echo "\n#### Load disco module $module ####\n";
+                include "includes/discovery/$module.inc.php";
+                $module_time = microtime(true) - $module_start;
+                $module_time = substr($module_time, 0, 5);
+                $module_mem = (memory_get_usage() - $start_memory);
+                printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
+                echo "#### Unload disco module $module ####\n\n";
+            } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
+                echo "Module [ $module ] disabled on host.\n\n";
+            } elseif (isset($os_module_status) && $os_module_status == '0') {
+                echo "Module [ $module ] disabled on os.\n\n";
+            } else {
+                echo "Module [ $module ] disabled globally.\n\n";
+            }
+        }
+
+        if (is_mib_poller_enabled($device)) {
+            $devicemib = array($device['sysObjectID'] => 'all');
+            register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
+        }
+
+        $device_end = microtime(true);
+        $device_run = ($device_end - $device_start);
+        $device_time = substr($device_run, 0, 5);
+
+        dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
+
+        echo "Discovered in $device_time seconds\n";
+
+        global $discovered_devices;
+
+        echo "\n";
+        $discovered_devices++;
     }
-
-    if (is_mib_poller_enabled($device)) {
-        $devicemib = array($device['sysObjectID'] => 'all');
-        register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
-    }
-
-    $device_end = microtime(true);
-    $device_run = ($device_end - $device_start);
-    $device_time = substr($device_run, 0, 5);
-
-    dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
-
-    echo "Discovered in $device_time seconds\n";
-
-    global $discovered_devices;
-
-    echo "\n";
-    $discovered_devices++;
 }
 
 //end discover_device()

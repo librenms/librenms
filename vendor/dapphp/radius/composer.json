@@ -2,13 +2,16 @@
     "name": "dapphp/radius",
     "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
     "type": "library",
-    "keywords": ["radius","authentication","authorization"],
+    "keywords": ["radius","authentication","authorization","pap","chap","ms-chap","ms-chap v2","rfc2865","rfc1994","rfc2284","rfc2869","rfc2759"],
     "homepage": "https://github.com/dapphp/radius",
     "require": {
         "php": ">=5.3"
     },
     "require-dev": {
         "phpunit/phpunit": "dev-master"
+    },
+    "suggest": {
+        "ext-mcrypt": "*"
     },
     "license": "LGPL-3.0",
     "authors": [

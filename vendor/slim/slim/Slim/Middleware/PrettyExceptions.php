@@ -3,10 +3,10 @@
  * Slim - a micro PHP 5 framework
  *
  * @author      Josh Lockhart <info@slimframework.com>
- * @copyright   2011 Josh Lockhart
+ * @copyright   2011-2017 Josh Lockhart
  * @link        http://www.slimframework.com
  * @license     http://www.slimframework.com/license
- * @version     2.6.1
+ * @version     2.6.3
  * @package     Slim
  *
  * MIT LICENSE
@@ -86,10 +86,10 @@ class PrettyExceptions extends \Slim\Middleware
     {
         $title = 'Slim Application Error';
         $code = $exception->getCode();
-        $message = $exception->getMessage();
+        $message = htmlspecialchars($exception->getMessage());
         $file = $exception->getFile();
         $line = $exception->getLine();
-        $trace = str_replace(array('#', "\n"), array('<div>#', '</div>'), $exception->getTraceAsString());
+        $trace = str_replace(array('#', "\n"), array('<div>#', '</div>'), htmlspecialchars($exception->getTraceAsString()));
         $html = sprintf('<h1>%s</h1>', $title);
         $html .= '<p>The application could not run because of the following error:</p>';
         $html .= '<h2>Details</h2>';

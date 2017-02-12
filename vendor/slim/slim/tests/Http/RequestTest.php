@@ -3,10 +3,10 @@
  * Slim - a micro PHP 5 framework
  *
  * @author      Josh Lockhart <info@slimframework.com>
- * @copyright   2011 Josh Lockhart
+ * @copyright   2011-2017 Josh Lockhart
  * @link        http://www.slimframework.com
  * @license     http://www.slimframework.com/license
- * @version     2.6.1
+ * @version     2.6.3
  *
  * MIT LICENSE
  *
@@ -669,6 +669,34 @@ class RequestTest extends PHPUnit_Framework_TestCase
         ));
         $req = new \Slim\Http\Request($env);
         $this->assertEquals('slimframework.com', $req->getHost()); //Uses HTTP_HOST if available
+    }
+
+    /**
+     * Test get host if HTTP_HOST is an IPv6 address.
+     */
+    public function testGetIPv6Host()
+    {
+        $env = \Slim\Environment::mock(array(
+            'SERVER_NAME' => 'slim',
+            'HTTP_HOST' => '[2001:db8::1]'
+        ));
+
+        $req = new \Slim\Http\Request($env);
+        $this->assertEquals('[2001:db8::1]', $req->getHost()); //Uses HTTP_HOST if available
+    }
+
+    /**
+     * Test get host if HTTP_HOST is an IPv6 address with appended port.
+     */
+    public function testGetIPv6HostWithoutPortIfPortAppended()
+    {
+        $env = \Slim\Environment::mock(array(
+            'SERVER_NAME' => 'slim',
+            'HTTP_HOST' => '[2001:db8::1]:80'
+        ));
+
+        $req = new \Slim\Http\Request($env);
+        $this->assertEquals('[2001:db8::1]', $req->getHost()); //Uses HTTP_HOST if available
     }
 
     /**
