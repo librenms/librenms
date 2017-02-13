@@ -4,6 +4,8 @@ group: zyxel
 type: firewall
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 icon: zyxel
 discovery:
     -
@@ -12,4 +14,5 @@ discovery:
           - .1.3.6.1.4.1.890.1.15
       sysDescr_regex:
           - '/^ZyWALL/'
+          - '/^USG60/'
     - sysDescr_regex: '/^ZyWALL 2X/'
