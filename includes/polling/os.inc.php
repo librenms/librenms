@@ -30,10 +30,7 @@ if ($serial != $device['serial']) {
     log_event('Serial -> ' . $serial, $device, 'system');
 }
 
-if ($icon != $device['icon']) {
-    $update_array['icon'] = $icon;
-    log_event('Icon -> ' . $icon, $device, 'system');
-}
+update_device_logo($device);
 
 echo 'Hardware: ' . $hardware . PHP_EOL;
 echo 'Version: ' . $version . PHP_EOL;
