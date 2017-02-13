@@ -375,7 +375,7 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 SNMP extend script to get your exim stats data into your host.
 
 ##### SNMP Extend
-1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/1c091800b713e26395796b5d5379421fc268a39b/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
+1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/master/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
 2. Make the script executable: `chmod +x /etc/snmp/exim-stats.sh`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 ```
