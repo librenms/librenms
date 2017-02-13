@@ -177,6 +177,7 @@ LibreNMS contributors:
 - Matt Peterson <matt@peterson.org> (dorkmatt)
 - William George <wrgeorge1983@gmail.com> (wrgeorge1983)
 - Valentin Parmeland <naoko.vp@gmail.com> (NK74)
+- Michał Margula <michal@margula.pl> (alchemyx)
 
 Observium was written by:
 - Adam Armstrong
