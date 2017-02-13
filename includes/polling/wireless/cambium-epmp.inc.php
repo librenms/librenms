@@ -111,12 +111,13 @@ $ulWLanTotalUsedFrameTimePerSecond = snmp_get($device, "ulWLanTotalUsedFrameTime
 $dlWLanTotalAvailableFrameTimePerSecond = snmp_get($device, "dlWLanTotalAvailableFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $dlWLanTotalUsedFrameTimePerSecond = snmp_get($device, "dlWLanTotalUsedFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) ) {
-    $ulWlanFrameUtilization = (($ulWLanTotalUsedFrameTimePerSecond/$ulWLanTotalAvailableFrameTimePerSecond)*100);
-    $dlWlanFrameUtilization = (($dlWLanTotalUsedFrameTimePerSecond/$dlWLanTotalAvailableFrameTimePerSecond)*100);
-	
+    $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond/$ulWLanTotalAvailableFrameTimePerSecond)*100), 2);
+    $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond/$dlWLanTotalAvailableFrameTimePerSecond)*100), 2);
+	d_echo($dlWlanFrameUtilization);
+	d_echo($ulWlanFrameUtilization);
 	$rrd_def = array(
-			'DS:ulwlanframeutilization:GAUGE:600:0:100000',
-			'DS:dlwlanframeutilization:GAUGE:600:0:100000'
+			'DS:ulwlanfrut:GAUGE:600:0:100000',
+			'DS:dlwlanfrut:GAUGE:600:0:100000'
 	);
 	$fields = array(
 			'ulwlanframeutilization' => $ulWlanFrameUtilization,
