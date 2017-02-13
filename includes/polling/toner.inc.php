@@ -19,13 +19,13 @@ foreach ($toner_data as $toner) {
 
     // Log empty supplies (but only once)
     if ($tonerperc == 0 && $toner['toner_current'] > 0) {
-        log_event('Toner ' . $toner['toner_descr'] . ' is empty', $device, 'toner', $toner['toner_id']);
+        log_event('Toner ' . $toner['toner_descr'] . ' is empty', $device, 'toner', 5, $toner['toner_id']);
     }
 
     // Log toner swap
     if ($tonerperc > $toner['toner_current']) {
-        log_event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', $toner['toner_id']);
+        log_event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', 3, $toner['toner_id']);
     }
 
-    dbUpdate(array('toner_current' => $tonerperc, 'toner_capacity' => $toner['toner_capacity']), 'toner', '`toner_id` = ?', array($toner['toner_id']));
+    dbUpdate(array('toner_current' => $tonerperc, 'toner_capacity' => $toner['toner_capacity']), 'toner', '`toner_id` = ?', 4, array($toner['toner_id']));
 }//end foreach

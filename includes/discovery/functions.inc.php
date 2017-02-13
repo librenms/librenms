@@ -32,7 +32,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         // $ip isn't a valid IP so it must be a name.
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
-            log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery');
+            log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery', 5);
  
             return false;
         }
@@ -40,7 +40,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         // gethostbyname returned a valid $ip, was $dst_host an IP?
         if ($config['discovery_by_ip'] === false) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
-            log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery');
+            log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
  
             return false;
         }
@@ -70,16 +70,16 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
                     $extra_log = ' (port ' . $int['label'] . ') ';
                 }
 
-                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
+                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery', 1);
             } else {
-                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery');
+                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', 5);
             }
 
             return $remote_device_id;
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage());
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), null, null, 5);
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
@@ -247,7 +247,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         d_echo("( $inserted inserted )\n");
 
         echo '+';
-        log_event('Sensor Added: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', $inserted);
+        log_event('Sensor Added: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', 3, $inserted);
     } else {
         $sensor_entry = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', array($class, $device['device_id'], $type, $index));
 
@@ -282,7 +282,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'H';
-            log_event('Sensor High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $high_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -291,7 +291,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'L';
-            log_event('Sensor Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
@@ -300,7 +300,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WH';
-            log_event('Sensor Warn High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $warn_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Warn High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -309,7 +309,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WL';
-            log_event('Sensor Warn Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_warn_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Warn Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'] && $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] && $entPhysicalIndex == $sensor_entry['entPhysicalIndex']) {
@@ -325,7 +325,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
-            log_event('Sensor Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', $sensor_id);
+            log_event('Sensor Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', 3, $sensor_id);
             d_echo("( $updated updated )\n");
         }
     }//end if
@@ -449,7 +449,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
                     dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', array($entry['sensor_id']));
                 }
                 dbDelete('sensors', '`sensor_id` =  ?', array($entry['sensor_id']));
-                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', $sensor_id);
+                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $sensor_id);
             }
 
             unset($oid);
@@ -469,7 +469,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
         d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), 'juniAtmVp', $inserted);
+        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
@@ -602,7 +602,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
             $inserted = dbInsert($insert_data, 'processors');
             echo '+';
-            log_event('Processor added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'processor', $inserted);
+            log_event('Processor added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'processor', 3, $inserted);
         } else {
             echo '.';
             $update_data = array(
@@ -648,7 +648,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
 
             $inserted = dbInsert($insert_data, 'mempools');
             echo '+';
-            log_event('Memory pool added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'mempool', $inserted);
+            log_event('Memory pool added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'mempool', 3, $inserted);
         } else {
             echo '.';
             $update_data = array(
@@ -678,7 +678,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
     if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_oid` =?', array($device['device_id'], $type, $index, $oid)) == '0') {
         $inserted = dbInsert(array('device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current), 'toner');
         echo '+';
-        log_event('Toner added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'toner', $inserted);
+        log_event('Toner added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'toner', 3, $inserted);
     } else {
         $toner_entry = dbFetchRow('SELECT * FROM `toner` WHERE `device_id` = ? AND `toner_type` = ? AND `toner_index` =?', array($device['device_id'], $type, $index));
         if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'] && $capacity_oid == $toner_entry['toner_capacity_oid']) {
