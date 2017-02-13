@@ -69,7 +69,7 @@ foreach ($port_stats as $ifIndex => $port) {
     else {
         if (is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != '1') {
-                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
+                dbUpdate(array('deleted' => '1'), 'ports', "`port_id` = ?, `ifName` => '?', `ifAlias` => '?', `ifDescr` => '?'", array($port_id, $ifName, $ifAlias, $ifDescr));
                 $ports_db[$port_id]['deleted'] = '1';
                 echo '-';
             }
