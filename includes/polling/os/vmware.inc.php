@@ -83,7 +83,7 @@ foreach ($db_info_list as $db_info) {
             // FIXME - this should loop building a query and then run the query after the loop (bad geert!)
             dbUpdate(array($property => $vm_info[$property]), 'vminfo', '`id` = ?', array($db_info['id']));
             if ($db_info['vmwVmDisplayName'] != null) {
-                log_event($db_info['vmwVmDisplayName'] . ' (' . preg_replace('/^vmwVm/', '', $property) . ') -> ' . $vm_info[$property], $device);
+                log_event($db_info['vmwVmDisplayName'] . ' (' . preg_replace('/^vmwVm/', '', $property) . ') -> ' . $vm_info[$property], $device, null, 3);
             }
         }
     }
