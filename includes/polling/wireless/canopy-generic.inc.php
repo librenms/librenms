@@ -257,8 +257,14 @@ if (strstr($version, 'AP') == false) {
 
 //AP Equipment
 if (strstr($version, 'AP')) {
-    $registered = str_replace('"', "", snmp_get($device, "regCount.0", "-Ovqn", "WHISP-APS-MIB"));
-    $failed = str_replace('"', "", snmp_get($device, "regFailureCount.0", "-Ovqn", "WHISP-APS-MIB"));
+    $multi_get_array = snmp_get_multi($device, "regCount.0 regFailureCount.0 currentRadioFreqCarrier.0 frUtlLowTotalDownlinkUtilization.0 frUtlLowTotalUplinkUtilization.0", "-OQU", "WHISP-APS-MIB");
+    d_echo($multi_get_array);
+    $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
+    $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];
+    $freq = $multi_get_array[0]["WHISP-APS-MIB::currentRadioFreqCarrier"];
+    $downlinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization"];
+    $uplinkutilization = $multi_get_array[0]["WHISP-APS-MIB::frUtlLowTotalUplinkUtilization"];
+    
     if (is_numeric($registered) && is_numeric($failed)) {
         $rrd_def = array(
             'DS:regCount:GAUGE:600:0:15000',
@@ -274,7 +280,6 @@ if (strstr($version, 'AP')) {
         unset($rrd_filename, $registered, $failed);
     }
 
-    $freq = str_replace('"', "", snmp_get($device, "currentRadioFreqCarrier.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($freq)) {
         $rrd_def = 'DS:freq:GAUGE:600:0:100000';
         if ($freq > 99999) {
@@ -291,8 +296,6 @@ if (strstr($version, 'AP')) {
         unset($rrd_filename, $freq);
     }
 
-    $downlinkutilization = str_replace('"', "", snmp_get($device, "frUtlLowTotalDownlinkUtilization.0", "-Ovqn", "WHISP-APS-MIB"));
-    $uplinkutilization = str_replace('"', "", snmp_get($device, "frUtlLowTotalUplinkUtilization.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($downlinkutilization) && is_numeric($uplinkutilization)) {
         $rrd_def = array(
             'DS:downlinkutilization:GAUGE:600:0:15000',
