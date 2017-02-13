@@ -65,14 +65,7 @@ function array_sort($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    $r = substr($mac, 0, 2);
-    $r .= ":".substr($mac, 2, 2);
-    $r .= ":".substr($mac, 4, 2);
-    $r .= ":".substr($mac, 6, 2);
-    $r .= ":".substr($mac, 8, 2);
-    $r .= ":".substr($mac, 10, 2);
-
-    return($r);
+    return rtrim(chunk_split($mac, 2, ':'), ':');
 }
 
 function only_alphanumeric($string)
@@ -306,9 +299,9 @@ function renamehost($id, $new, $source = 'console')
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
-        log_event("Hostname changed -> $new ($source)", $id, 'system');
+        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
-        log_event("Renaming of $host failed", $id, 'system');
+        log_event("Renaming of $host failed", $id, 'system', 5);
         if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
             echo "Renaming of $host failed\n";
         } else {
@@ -362,7 +355,7 @@ function delete_device($id)
     }
 
     $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system');
+    log_event("Device $host has been removed", 0, 'system', 3);
     return $ret;
 }
 
@@ -796,7 +789,7 @@ function get_astext($asn)
 }
 
 # Use this function to write to the eventlog table
-function log_event($text, $device = null, $type = null, $reference = null)
+function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
@@ -807,6 +800,7 @@ function log_event($text, $device = null, $type = null, $reference = null)
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
+        'severity' => $severity,
         'message' => $text);
 
     dbInsert($insert, 'eventlog');
@@ -910,13 +904,12 @@ function formatCiscoHardware(&$device, $short = false)
     }
 }
 
-# from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
 function hex2str($hex)
 {
     $string='';
 
     for ($i = 0; $i < strlen($hex)-1; $i+=2) {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        $string .= chr(hexdec(substr($hex, $i, 2)));
     }
 
     return $string;

@@ -476,7 +476,7 @@ foreach ($ports as $port) {
 
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
-                log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);
+                log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> NULL ');
                 } else {
@@ -504,7 +504,7 @@ foreach ($ports as $port) {
                     $port['update'][$oid.'_prev'] = $port[$oid];
                 }
 
-                log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
+                log_event($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
                 } else {
@@ -536,7 +536,7 @@ foreach ($ports as $port) {
                     }
 
                     $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    log_event($attrib.': '.$port[$attrib_key].' -> '.$log_port, $device, 'interface', $port['port_id']);
+                    log_event($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device, 'interface', $port['port_id']);
                     unset($log_port);
                 }
             }
@@ -605,7 +605,7 @@ foreach ($ports as $port) {
             $saturation_threshold = ($this_port['ifSpeed'] * ( $config['alerts']['port_util_perc'] / 100 ));
             echo 'IN: '.$port['stats']['ifInBits_rate'].' OUT: '.$port['stats']['ifOutBits_rate'].' THRESH: '.$saturation_threshold;
             if (($port['stats']['ifInBits_rate'] >= $saturation_threshold || $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0) {
-                log_event('Port reached saturation threshold: '.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).' - ifspeed: '.formatRates($this_port['stats']['ifSpeed']), $device, 'interface', $port['port_id']);
+                log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates($this_port['stats']['ifSpeed']), $device, 'interface', $port['port_id']);
             }
         }
 
@@ -675,7 +675,7 @@ foreach ($ports as $port) {
                     // If data has changed, build a query
                     $port['update'][$oid] = $this_port[$oid];
                     echo 'PAgP ';
-                    log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']);
+                    log_event("$oid -> " . $this_port[$oid], $device, 'interface', $port['port_id']);
                 }
             }
         }
