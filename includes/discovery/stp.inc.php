@@ -97,13 +97,13 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
     if (!$stp_db['bridgeAddress'] && $stp['bridgeAddress']) {
         dbInsert($stp, 'stp');
-        log_event('STP added, bridge address: ' . $stp['bridgeAddress'], $device, 'stp');
+        log_event('STP added, bridge address: ' . $stp['bridgeAddress'], $device, 'stp', 3);
         echo '+';
     }
     
     if ($stp_db['bridgeAddress'] && !$stp['bridgeAddress']) {
         dbDelete('stp', 'device_id = ?', array($device['device_id']));
-        log_event('STP removed', $device, 'stp');
+        log_event('STP removed', $device, 'stp', 4);
         echo '-';
     }
 
