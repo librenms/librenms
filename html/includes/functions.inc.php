@@ -1128,6 +1128,11 @@ function alert_details($details)
             $fallback      = false;
         }
 
+        if ($tmp_alerts['accesspoint_id']) {
+            $fault_detail .= generate_ap_url($tmp_alerts) . ';&nbsp;';
+            $fallback      = false;
+        }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
