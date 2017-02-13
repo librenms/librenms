@@ -42,6 +42,8 @@ foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
     $ifName = $port['ifName'];
+    $ifAlias = $port['ifAlias'];
+    $ifDescr = $port['ifDescr'];
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
@@ -49,12 +51,12 @@ foreach ($port_stats as $ifIndex => $port) {
     if (is_port_valid($port, $device)) {
         // Port newly discovered?
         if (! is_array($ports_db[$port_id])) {
-            $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
+            $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName, 'ifDescr' => $ifDescr, 'ifAlias' => $ifAlias), 'ports');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
         } // Port re-discovered after previous deletion?
         elseif ($ports_db[$port_id]['deleted'] == '1') {
-            dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($port_id));
+            dbUpdate(array('deleted' => '0'), 'ports', "`port_id` = ?, `ifName` => '?', `ifDescr` => '?', `ifAlias` => '?'", array($port_id, $ifName, $ifDescr, $ifAlias));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
         } else {

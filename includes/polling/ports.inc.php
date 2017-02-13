@@ -303,8 +303,10 @@ foreach ($port_stats as $ifIndex => $port) {
     } // Port vanished (mark as deleted)
     else {
         if ($ports[$port_id]['deleted'] != '1') {
-            dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
-            $ports[$port_id]['deleted'] = '1';
+            if (is_numeric($port_id)) {
+                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
+                $ports[$port_id]['deleted'] = '1';
+            }
         }
     }
 } // End new interface detection
