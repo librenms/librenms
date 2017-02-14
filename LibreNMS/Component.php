@@ -337,7 +337,7 @@ class Component
                     $MSG .= $k." => ".$v.",";
                 }
                 $MSG = substr($MSG, 0, -1);
-                log_event($MSG, $device_id, 'component', $COMPONENT);
+                log_event($MSG, $device_id, 'component', 3, $COMPONENT);
             }
 
             // Process our AVP Adds and Updates
@@ -350,14 +350,14 @@ class Component
                     dbInsert($DATA, 'component_prefs');
 
                     // Log the addition to the Eventlog.
-                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);
                     dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
 
                     // Add the modification to the Eventlog.
-                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 }
             } // End Foreach AVP
 
@@ -368,7 +368,7 @@ class Component
                 dbDelete('component_prefs', "`component` = ? AND `attribute` = ?", array($COMPONENT,$KEY));
 
                 // Log the addition to the Eventlog.
-                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", $COMPONENT);
+                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);
             }
         }
 
