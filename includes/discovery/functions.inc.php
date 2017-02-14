@@ -460,7 +460,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 
 //end check_valid_sensors()
 
-function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
 {
     d_echo("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 
@@ -469,7 +469,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
         d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), 'juniAtmVp', 3, $inserted);
+        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), $device, 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
