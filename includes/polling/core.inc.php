@@ -93,13 +93,13 @@ foreach (array('sysLocation', 'sysContact') as $elem) {
 foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
-        log_event("$elem -> " . $poll_device[$elem], $device, 'system');
+        log_event("$elem -> " . $poll_device[$elem], $device, 'system', 3);
     }
 }
 
 if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
     $update_array['location'] = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system');
+    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
 }
 
 if ($config['geoloc']['latlng'] === true) {
