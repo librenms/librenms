@@ -41,10 +41,29 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
     $hw = trim(str_replace("\"", "", $hw));
     if ($hw) {
         $hardware = "Dell " . $hw;
+    } else {
+    # Try detect using the extended option (dmidecode)
+        $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv"));
+        $version_dmide = trim(str_replace("\"", "", $version_dmide));
+
+        $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv"));
+        $hardware_dmide = trim(str_replace("\"", "", $hardware_dmide));
+        if ($hardware_dmide) {
+            $hardware = $hardware_dmide;
+            if ($version_dmide) {
+                $hardware = $hardware . " [" . $version_dmide . "]";
+            }
+        }
     }
 
     $serial = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.11.1", "-Oqv", "MIB-Dell-10892");
     $serial = trim(str_replace("\"", "", $serial));
+
+    # Try detect using the SNMP Extend option (dmidecode)
+    if (!$serial) {
+        $serial = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1", "-Oqv"));
+        $serial = trim(str_replace("\"", "", $serial));
+    }
 
     # Use agent DMI data if available
     if (isset($agent_data['dmi'])) {
