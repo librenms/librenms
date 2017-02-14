@@ -2163,6 +2163,22 @@ label {
 
 .device-icon-48h img {
   height: 48px;
+  max-width: 250px;
+}
+
+.device-title-bar-1 {
+  width: 25%;
+  max-width: 25%;
+}
+
+.device-title-bar-2 {
+  width: 25%;
+  max-width: 25%;
+ }
+
+.device-title-bar-3 {
+  width: 50%;
+  max-width: 50%;
 }
 
 .severity-ok {
