@@ -1993,3 +1993,14 @@ function recordSnmpStatistic($stat, $start_time)
     $snmp_stats["${stat}_sec"] += $runtime;
     return $runtime;
 }
+
+function update_device_logo($device)
+{
+    $icon = getImageName($device, false);
+    if ($icon != $device['icon']) {
+        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
+        $device['icon'] = $icon;
+        $sql = dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
+        echo "Changed Icon! : $icon\n";
+    }
+}
