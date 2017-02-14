@@ -56,7 +56,7 @@ foreach ($port_stats as $ifIndex => $port) {
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
         } // Port re-discovered after previous deletion?
         elseif ($ports_db[$port_id]['deleted'] == '1') {
-            dbUpdate(array('deleted' => '0'), 'ports', "`port_id` = ?, `ifName` => '?', `ifDescr` => '?', `ifAlias` => '?'", array($port_id, $ifName, $ifDescr, $ifAlias));
+            dbUpdate(array('deleted' => '0'), 'ports', "`port_id` = ?, `ifName` = '?', `ifDescr` = '?', `ifAlias` = '?'", array($port_id, $ifName, $ifDescr, $ifAlias));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
         } else {
