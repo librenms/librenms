@@ -105,3 +105,29 @@ if (is_numeric($freq)) {
     data_update($device, 'cambium-epmp-freq', $tags, $fields);
     $graphs['cambium_epmp_freq'] = true;
 }
+
+$multi_get_array = snmp_get_multi($device, "ulWLanTotalAvailableFrameTimePerSecond.0 ulWLanTotalUsedFrameTimePerSecond.0 dlWLanTotalAvailableFrameTimePerSecond.0 dlWLanTotalUsedFrameTimePerSecond.0", "-OQU", "CAMBIUM-PMP80211-MIB");
+
+$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond"];
+$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond"];
+$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond"];
+$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond"];
+
+if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
+    $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond/$ulWLanTotalAvailableFrameTimePerSecond)*100), 2);
+    $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond/$dlWLanTotalAvailableFrameTimePerSecond)*100), 2);
+    d_echo($dlWlanFrameUtilization);
+    d_echo($ulWlanFrameUtilization);
+    $rrd_def = array(
+            'DS:ulwlanfrut:GAUGE:600:0:100000',
+            'DS:dlwlanfrut:GAUGE:600:0:100000'
+    );
+    $fields = array(
+            'ulwlanframeutilization' => $ulWlanFrameUtilization,
+            'dlwlanframeutilization' => $dlWlanFrameUtilization
+    );
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-epmp-frameUtilization', $tags, $fields);
+    $graphs['cambium-epmp-frameUtilization'] = true;
+}
+unset($multi_get_array, $ulWlanFrameUtilization, $ulWLanTotalAvailableFrameTimePerSecond, $ulWLanTotalUsedFrameTimePerSecond, $dlWlanFrameUtilization, $dlWLanTotalAvailableFrameTimePerSecond, $dlWLanTotalUsedFrameTimePerSecond);
