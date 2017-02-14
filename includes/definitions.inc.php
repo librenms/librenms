@@ -333,6 +333,9 @@ $config['graph_types']['device']['cambium_epmp_gpsSync']['descr']   = 'GPS Sync 
 $config['graph_types']['device']['cambium_epmp_freq']['section'] = 'wireless';
 $config['graph_types']['device']['cambium_epmp_freq']['order']   = '6';
 $config['graph_types']['device']['cambium_epmp_freq']['descr']   = 'Frequency';
+$config['graph_types']['device']['cambium-epmp-frameUtilization']['section'] = 'wireless';
+$config['graph_types']['device']['ccambium-epmp-frameUtilization']['order']   = '7';
+$config['graph_types']['device']['cambium-epmp-frameUtilization']['descr']   = 'Frame Utilization';
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order']   = '0';
