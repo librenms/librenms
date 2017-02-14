@@ -1129,7 +1129,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['accesspoint_id']) {
-            $fault_detail .= generate_ap_url($tmp_alerts) . ';&nbsp;';
+            $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
             $fallback      = false;
         }
 
