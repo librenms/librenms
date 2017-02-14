@@ -29,18 +29,6 @@ $mib_oids = array(
         'Tx Power',
         'GAUGE',
     ),
-    'rxPower0'                 => array(
-        '1',
-        'rxPower0',
-        'Rx Chain0 Power',
-        'GAUGE',
-    ),
-    'rxPower1'                 => array(
-        '1',
-        'rxPower1',
-        'Rx Chain1 Power',
-        'GAUGE',
-    ),
     'radioLinkDistM'          => array(
         '1',
         'radioLinkDistM',
@@ -203,7 +191,6 @@ $mib_oids = array(
 $mib_graphs = array(
     'ubnt_airfiber_RadioFreqs',
     'ubnt_airfiber_TxPower',
-    'ubnt_airfiber_RxPower',
     'ubnt_airfiber_LinkDist',
     'ubnt_airfiber_Capacity',
     'ubnt_airfiber_RadioTemp',
@@ -221,5 +208,5 @@ $mib_graphs = array(
 unset($graph, $oids, $oid);
 
 poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs);
-
+unset($mib_graphs, $mib_oids);
 // EOF
