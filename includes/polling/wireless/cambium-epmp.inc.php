@@ -106,24 +106,28 @@ if (is_numeric($freq)) {
     $graphs['cambium_epmp_freq'] = true;
 }
 
-$ulWLanTotalAvailableFrameTimePerSecond = snmp_get($device, "ulWLanTotalAvailableFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$ulWLanTotalUsedFrameTimePerSecond = snmp_get($device, "ulWLanTotalUsedFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$dlWLanTotalAvailableFrameTimePerSecond = snmp_get($device, "dlWLanTotalAvailableFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$dlWLanTotalUsedFrameTimePerSecond = snmp_get($device, "dlWLanTotalUsedFrameTimePerSecond.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) ) {
+$multi_get_array = snmp_get_multi($device, "ulWLanTotalAvailableFrameTimePerSecond.0 ulWLanTotalUsedFrameTimePerSecond.0 dlWLanTotalAvailableFrameTimePerSecond.0 dlWLanTotalUsedFrameTimePerSecond.0", "-OQU", "CAMBIUM-PMP80211-MIB");
+
+$ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond"];
+$ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond"];
+$dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalAvailableFrameTimePerSecond"];
+$dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond"];
+
+if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
     $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond/$ulWLanTotalAvailableFrameTimePerSecond)*100), 2);
     $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond/$dlWLanTotalAvailableFrameTimePerSecond)*100), 2);
-	d_echo($dlWlanFrameUtilization);
-	d_echo($ulWlanFrameUtilization);
-	$rrd_def = array(
-			'DS:ulwlanfrut:GAUGE:600:0:100000',
-			'DS:dlwlanfrut:GAUGE:600:0:100000'
-	);
-	$fields = array(
-			'ulwlanframeutilization' => $ulWlanFrameUtilization,
-			'dlwlanframeutilization' => $dlWlanFrameUtilization
-	);
-	$tags = compact('rrd_def');
-	data_update($device, 'cambium-epmp-frameUtilization', $tags, $fields);
-	$graphs['cambium-epmp-frameUtilization'] = true;
+    d_echo($dlWlanFrameUtilization);
+    d_echo($ulWlanFrameUtilization);
+    $rrd_def = array(
+            'DS:ulwlanfrut:GAUGE:600:0:100000',
+            'DS:dlwlanfrut:GAUGE:600:0:100000'
+    );
+    $fields = array(
+            'ulwlanframeutilization' => $ulWlanFrameUtilization,
+            'dlwlanframeutilization' => $dlWlanFrameUtilization
+    );
+    $tags = compact('rrd_def');
+    data_update($device, 'cambium-epmp-frameUtilization', $tags, $fields);
+    $graphs['cambium-epmp-frameUtilization'] = true;
 }
+unset($multi_get_array, $ulWlanFrameUtilization, $ulWLanTotalAvailableFrameTimePerSecond, $ulWLanTotalUsedFrameTimePerSecond, $dlWlanFrameUtilization, $dlWLanTotalAvailableFrameTimePerSecond, $dlWLanTotalUsedFrameTimePerSecond);
