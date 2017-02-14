@@ -4,6 +4,7 @@
 $port_stats = array();
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
 
 // End Building SNMP Cache Array
@@ -42,14 +43,15 @@ foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
     $ifName = $port['ifName'];
+    $ifAlias = $port['ifAlias'];
+    $ifDescr = $port['ifDescr'];
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
-
     if (is_port_valid($port, $device)) {
         // Port newly discovered?
         if (! is_array($ports_db[$port_id])) {
-            $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
+            $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName, 'ifAlias' => $ifAlias, 'ifDescr' => $ifDescr), 'ports');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
         } // Port re-discovered after previous deletion?
@@ -67,7 +69,7 @@ foreach ($port_stats as $ifIndex => $port) {
     else {
         if (is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != '1') {
-                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
+                dbUpdate(array('deleted' => '1'), 'ports', "`port_id` = ?, `ifName` => '?', `ifAlias` => '?', `ifDescr` => '?'", array($port_id, $ifName, $ifAlias, $ifDescr));
                 $ports_db[$port_id]['deleted'] = '1';
                 echo '-';
             }
