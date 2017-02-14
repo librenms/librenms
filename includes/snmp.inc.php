@@ -121,6 +121,23 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
 } // end gen_snmpget_cmd()
 
 /**
+ * Generate an snmptable command
+ *
+ * @param array $device the we will be connecting to
+ * @param string $oids the oids to fetch, separated by spaces
+ * @param string $options extra snmp options, includes '-Ci -Cf ,' for indexed csv output
+ * @param string $mib an additional mib to add to this command
+ * @param string $mibdir a mib directory to search for mibs, usually prepended with +
+ * @return string the fully assembled command, ready to run
+ */
+function gen_snmptable_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
+{
+    global $config;
+    $snmpcmd  = $config['snmptable'];
+    return gen_snmp_cmd($snmpcmd, $device, $oids, $options . ' -Ci -Cf ,', $mib, $mibdir);
+} // end gen_snmptable_cmd()
+
+/**
  * Generate an snmpwalk command
  *
  * @param array $device the we will be connecting to
@@ -257,6 +274,42 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }//end snmp_get()
 
+function snmp_table($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    $time_start = microtime(true);
+
+    if (strstr($oid, ' ')) {
+        echo report_this_text("snmp_table called for multiple OIDs: $oid");
+    }
+
+    $cmd = gen_snmptable_cmd($device, $oid, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd));
+
+    recordSnmpStatistic('snmptable', $time_start);
+    if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure|No entries)/i', $data))) {
+        return false;
+    } elseif ($data || $data === '0') {
+        $data = explode("\n", $data);
+        $table = array();
+        // Data headers are on row 2
+        $oids = explode(',', $data[2]);
+        // Row 0 is the requested MIB, row 1 is blank
+        foreach (array_splice($data, 3) as $row) {
+            $cells = explode(',', $row);
+            foreach ($oids as $columnId => $oid) {
+                // assign each cell value keyed to it's header name
+                // so values are available by $table[row]['name']
+                if ($oid != 'index') {
+                    $table[$cells[0]][$oid] = $cells[$columnId];
+                }
+            }
+        }
+        return $table;
+    } else {
+        return false;
+    }
+}//end snmp_table()
+
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -356,6 +409,21 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
 
     return $array;
 }//end snmpwalk_cache_oid()
+
+function snmptable_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '')
+{
+    $data = snmp_table($device, $oid, $snmpflags, $mib, $mibdir);
+    if ($data == false) {
+        return $array;
+    }
+    if (!isset($array) || $array == false) {
+        return $data;
+    }
+    foreach ($data as $index => $row) {
+        $array[$index] = $array[$index] + $row;
+    }
+    return $array;
+}//end snmptable_cache_oid()
 
 function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQnU')
 {
