@@ -339,7 +339,7 @@ server:
 
 remote-control:
         control-enable: yes
-	control-interface: 127.0.0.1
+        control-interface: 127.0.0.1
 
 ```
 
