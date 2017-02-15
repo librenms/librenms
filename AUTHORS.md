@@ -180,6 +180,7 @@ LibreNMS contributors:
 - Michał Margula <michal@margula.pl> (alchemyx)
 - Maclin Fuehr-Bush <macfuehrbush@gmail.com> (mobilemaclin)
 - Robert Penziol <rpenziol@pdx.edu> (rpenziol)
+- Stefan Behte <craig at haquarter.de> (craig)
 
 Observium was written by:
 - Adam Armstrong
