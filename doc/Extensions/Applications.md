@@ -334,12 +334,16 @@ Unbound configuration:
 ```text
 # Enable extended statistics.
 server:
-        statistics-interval: 0
         extended-statistics: yes
         statistics-cumulative: yes
+
+remote-control:
+        control-enable: yes
+	control-interface: 127.0.0.1
+
 ```
 
-Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+Restart your unbound after changing the configuration, verify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
 
 
 
