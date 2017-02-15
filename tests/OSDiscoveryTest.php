@@ -1598,6 +1598,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('tplink');
         $this->checkOS('tplink', 'tplink1');
+        $this->checkOS('tplink', 'tplink-t1600g-28ts');
     }
 
     public function testTranzeo()
