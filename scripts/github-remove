@@ -1,0 +1,28 @@
+#!/bin/sh
+
+LIBRENMS_DIR=`dirname "$(readlink -f "$0/..")"`
+cd $LIBRENMS_DIR
+
+if [ "$1" == "-d" ]; then
+    # removing all uncommited changes
+    # git status
+    read -p "Are you sure you want to delete your changes? " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+
+    git reset
+    git checkout --progress
+    git clean -d -f contrib/ doc/ html/ includes/ lib/ LibreNMS/ licenses/ mibs/ misc/ scripts/ sql-schema/ tests/
+    if [ "$2" == "-v" ]; then
+        git clean -x -d -f vendor/
+    fi
+elif [ "$1" == "-h" ]; then
+    echo "Usage: $0 [-d [-v]]"
+    echo " Stashes changes by default. git stash list to see stashes"
+    echo "  -d discard all uncommited changes"
+    echo "  -v discard vendor directory changes too"
+else
+   git stash
+fi
