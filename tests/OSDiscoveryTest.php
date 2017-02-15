@@ -1304,6 +1304,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('powerconnect', 'powerconnect-3011');
         $this->checkOS('powerconnect', 'powerconnect-3019');
         $this->checkOS('powerconnect', 'powerconnect-3031');
+        $this->checkOS('powerconnect', 'powerconnect-3041');
     }
 
     public function testPowervault()
