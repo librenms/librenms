@@ -16,3 +16,8 @@ if ($config['enable_inventory']) {
 } else {
     echo 'Disabled!';
 }//end if
+
+unset(
+    $mod_stats,
+    $chan_stats
+);

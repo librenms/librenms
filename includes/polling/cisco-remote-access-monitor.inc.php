@@ -60,5 +60,5 @@ if ($device['os_group'] == 'cisco') {
         $graphs['cras_sessions'] = true;
     }
 
-    unset($data, $rrd_def, $fields);
+    unset($data, $rrd_def, $fields, $oid_list);
 }//end if

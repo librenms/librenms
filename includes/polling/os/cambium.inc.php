@@ -9,8 +9,8 @@
  * the source code distribution for details.
  */
 
-$cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
-$is_epmp = snmp_get($device, 'sysObjectID.0', '-Oqv', '');
+$cambium_type = $poll_device['sysDescr'];
+$is_epmp = $poll_device['sysObjectID'];
 $version = $cambium_type;
 if (strstr($cambium_type, 'Cambium PTP 50650')) {
     $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP650-MIB"));

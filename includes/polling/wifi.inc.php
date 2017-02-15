@@ -111,6 +111,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         unset(${'wificlients'.$i});
         $i++;
     }
+    unset($i);
 } else {
     echo 'Unsupported type: ' . $device['type'] . PHP_EOL;
 }

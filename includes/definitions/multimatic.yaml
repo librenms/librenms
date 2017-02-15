@@ -1,8 +1,0 @@
-os: multimatic
-text: 'Multimatic UPS'
-type: power
-icon: multimatic
-poller_modules:
-    ospf: 0
-    ntp: 0
-    services: 0

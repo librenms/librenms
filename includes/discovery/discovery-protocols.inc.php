@@ -107,8 +107,10 @@ if ($config['autodiscovery']['xdp'] === true) {
     }//end if
 }//end if
 
-
-unset($lldp_array);
+unset(
+    $lldp_array,
+    $cdp_array
+);
 
 if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
     echo ' NMS-LLDP-MIB: ';
@@ -217,7 +219,14 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
             }//end foreach
         }//end foreach
     }//end if
+    unset(
+        $dot1d_array
+    );
 }//end elseif
+
+unset(
+    $lldp_array
+);
 
 echo ' OSPF Discovery: ';
 
@@ -258,5 +267,8 @@ foreach (dbFetchRows($sql) as $test) {
     }
 }
 
-unset($link_exists);
+unset(
+    $link_exists,
+    $sql
+);
 echo "\n";

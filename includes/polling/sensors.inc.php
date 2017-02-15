@@ -11,24 +11,9 @@
  * See COPYING for more details.
  */
 
-// Call poll_sensor for each sensor type that we support.
-$supported_sensors = array(
-    'current'     => 'A',
-    'frequency'   => 'Hz',
-    'runtime'     => 'Min',
-    'humidity'    => '%',
-    'fanspeed'    => 'rpm',
-    'power'       => 'W',
-    'voltage'     => 'V',
-    'temperature' => 'C',
-    'dbm'         => 'dBm',
-    'charge'      => '%',
-    'load'        => '%',
-    'state'       => '#',
-    'signal'      => 'dBm',
-    'airflow'     => 'cfm',
-);
-
-foreach ($supported_sensors as $sensor_type => $sensor_unit) {
-    poll_sensor($device, $sensor_type, $sensor_unit);
+$sensors = dbFetchRows("SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? GROUP BY `sensor_class`", array($device['device_id']));
+foreach ($sensors as $sensor_type) {
+    poll_sensor($device, $sensor_type);
 }
+
+unset($sensors, $sensor_type);

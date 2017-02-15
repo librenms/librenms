@@ -45,6 +45,6 @@ after_failure:
 script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
-  - SNMPSIM=1 phpunit --stop-on-failure
+  - SNMPSIM=1 DBTEST=1 phpunit --stop-on-failure
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py poller-service.py

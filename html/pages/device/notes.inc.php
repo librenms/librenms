@@ -26,7 +26,7 @@ if (is_admin() === false) {
     <hr>
     <div class="form-group">
         <div class="col-sm-12">
-            <textarea class="form-control" rows="6" name="notes" id="device-notes" <?php echo $disabled; ?>><?php echo htmlentities($data['notes']); ?></textarea>
+            <textarea class="form-control" rows="6" name="notes" id="device-notes" <?php echo $disabled; ?>><?php echo htmlentities(urldecode($data['notes'])); ?></textarea>
         </div>
     </div>
     <div class="row">

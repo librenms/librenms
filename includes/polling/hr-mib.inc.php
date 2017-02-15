@@ -34,3 +34,5 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
 }
 
 echo "\n";
+
+unset($oid_list, $hrSystem);

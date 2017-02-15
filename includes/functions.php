@@ -65,14 +65,7 @@ function array_sort($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    $r = substr($mac, 0, 2);
-    $r .= ":".substr($mac, 2, 2);
-    $r .= ":".substr($mac, 4, 2);
-    $r .= ":".substr($mac, 6, 2);
-    $r .= ":".substr($mac, 8, 2);
-    $r .= ":".substr($mac, 10, 2);
-
-    return($r);
+    return rtrim(chunk_split($mac, 2, ':'), ':');
 }
 
 function only_alphanumeric($string)
@@ -158,6 +151,10 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             }
         } elseif ($key == 'sysDescr_regex') {
             if (!preg_match_any($sysDescr, $value)) {
+                return false;
+            }
+        } elseif ($key == 'sysObjectId_regex') {
+            if (!preg_match_any($sysObjectId, $value)) {
                 return false;
             }
         }
@@ -302,9 +299,9 @@ function renamehost($id, $new, $source = 'console')
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
-        log_event("Hostname changed -> $new ($source)", $id, 'system');
+        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
-        log_event("Renaming of $host failed", $id, 'system');
+        log_event("Renaming of $host failed", $id, 'system', 5);
         if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
             echo "Renaming of $host failed\n";
         } else {
@@ -358,7 +355,7 @@ function delete_device($id)
     }
 
     $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system');
+    log_event("Device $host has been removed", 0, 'system', 3);
     return $ret;
 }
 
@@ -680,6 +677,8 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
                 oxidized_reload_nodes();
                 return $device_id;
             }
+        } else {
+            throw new HostExistsException("Already have host $host ($snmphost)");
         }
     }
 
@@ -790,7 +789,7 @@ function get_astext($asn)
 }
 
 # Use this function to write to the eventlog table
-function log_event($text, $device = null, $type = null, $reference = null)
+function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
@@ -801,6 +800,7 @@ function log_event($text, $device = null, $type = null, $reference = null)
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
+        'severity' => $severity,
         'message' => $text);
 
     dbInsert($insert, 'eventlog');
@@ -904,13 +904,12 @@ function formatCiscoHardware(&$device, $short = false)
     }
 }
 
-# from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
 function hex2str($hex)
 {
     $string='';
 
     for ($i = 0; $i < strlen($hex)-1; $i+=2) {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        $string .= chr(hexdec(substr($hex, $i, 2)));
     }
 
     return $string;
@@ -955,7 +954,10 @@ function is_port_valid($port, $device)
 
     global $config;
 
-    if (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
+    if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
+        // If these are all empty, we are just going to show blank names in the ui
+        $valid = 0;
+    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
         $valid = 0;
     } else {
         $valid = 1;
@@ -1499,6 +1501,7 @@ function oxidized_reload_nodes()
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -1989,4 +1992,55 @@ function recordSnmpStatistic($stat, $start_time)
     $snmp_stats[$stat]++;
     $snmp_stats["${stat}_sec"] += $runtime;
     return $runtime;
+}
+
+/**
+ * @param $device
+ * @param bool $record_perf
+ * @return array
+ */
+function device_is_up($device, $record_perf = false)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $ping_response = isPingable($device['hostname'], $address_family, $device['attribs']);
+    $device_perf              = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+
+    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+        dbInsert($device_perf, 'device_perf');
+    }
+    $response              = array();
+    $response['ping_time'] = $ping_response['last_ping_timetaken'];
+    if ($ping_response['result']) {
+        if (isSNMPable($device)) {
+            $response['status']        = '1';
+            $response['status_reason'] = '';
+        } else {
+            echo 'SNMP Unreachable';
+            $response['status']        = '0';
+            $response['status_reason'] = 'snmp';
+        }
+    } else {
+        echo 'Unpingable';
+        $response['status']        = '0';
+        $response['status_reason'] = 'icmp';
+    }
+
+    if ($device['status'] != $response['status']) {
+        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
+        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+    }
+    return $response;
+}
+
+function update_device_logo(&$device)
+{
+    $icon = getImageName($device, false);
+    if ($icon != $device['icon']) {
+        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
+        $device['icon'] = $icon;
+        dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
+        echo "Changed Icon! : $icon\n";
+    }
 }

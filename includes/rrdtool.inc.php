@@ -424,10 +424,10 @@ function rrd_file_rename($device, $oldname, $newname)
     $newrrd = rrd_name($device['hostname'], $newname);
     if (is_file($oldrrd) && !is_file($newrrd)) {
         if (rename($oldrrd, $newrrd)) {
-            log_event("Renamed $oldrrd to $newrrd", $device, "poller");
+            log_event("Renamed $oldrrd to $newrrd", $device, "poller", 1);
             return true;
         } else {
-            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller");
+            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller", 5);
             return false;
         }
     } else {

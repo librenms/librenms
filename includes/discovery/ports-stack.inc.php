@@ -5,6 +5,10 @@ $sql = "SELECT * FROM `ports_stack` WHERE `device_id` = '".$device['device_id'].
 foreach (dbFetchRows($sql) as $entry) {
     $stack_db_array[$entry['port_id_high']][$entry['port_id_low']]['ifStackStatus'] = $entry['ifStackStatus'];
 }
+unset(
+    $sql,
+    $entry
+);
 
 $stack_poll_array = snmpwalk_cache_twopart_oid($device, 'ifStackStatus', array());
 
@@ -25,7 +29,12 @@ foreach ($stack_poll_array as $port_id_high => $entry_high) {
             echo '+';
         }
     }//end foreach
+    unset(
+        $port_id_low,
+        $entry_low
+    );
 }//end foreach
+unset($stack_poll_array);
 
 foreach ($stack_db_array as $port_id_high => $array) {
     foreach ($array as $port_id_low => $blah) {
@@ -36,3 +45,9 @@ foreach ($stack_db_array as $port_id_high => $array) {
 }
 
 echo "\n";
+unset(
+    $stack_db_array,
+    $array,
+    $port_id_high,
+    $entry_high
+);

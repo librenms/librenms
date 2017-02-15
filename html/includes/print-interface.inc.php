@@ -1,3 +1,8 @@
+<script>
+$(function () {
+    $('[data-toggle="popover"]').popover()
+})
+</script>
 <?php
 
 // This file prints a table row for each interface
@@ -35,16 +40,14 @@ if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', arr
 echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
     <td valign=top width=350>";
 
-// Don't echo out ports ifIndex if it's a NOS device since their ifIndex is, for lack of better words....different
-if ($device['os'] == 'nos') {
+if (is_admin() || is_read()) {
+    $port_data = array_to_htmljson($port);
+    echo '<i class="fa fa-tag" data-toggle="popover" data-content="'.$port_data.'" data-html="true"></i>';
+}
+
     echo '        <span class=list-large>
         '.generate_port_link($port, $port['label'])." $error_img $mac
         </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
-} else {
-    echo '        <span class=list-large>
-    '.generate_port_link($port, $port['ifIndex'].'. '.$port['label'])." $error_img $mac
-    </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
-}
 
 if ($port['ifAlias']) {
     echo '<br />';

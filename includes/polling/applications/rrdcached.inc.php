@@ -38,9 +38,11 @@ if ($agent_data['app'][$name]) {
 
     $sock = fsockopen($device['hostname'], 42217, $errno, $errstr, 5);
 
-    if (!$sock && $device['hostname'] == 'localhost') {
+    if (!$sock) {
         if (file_exists('/var/run/rrdcached.sock')) {
             $sock = fsockopen('unix:///var/run/rrdcached.sock');
+        } elseif (file_exists('/var/run/rrdcached/rrdcached.sock')) {
+            $sock = fsockopen('unix:///var/run/rrdcached/rrdcached.sock');
         } elseif (file_exists('/run/rrdcached.sock')) {
             $sock = fsockopen('unix:///run/rrdcached.sock');
         } elseif (file_exists('/tmp/rrdcached.sock')) {

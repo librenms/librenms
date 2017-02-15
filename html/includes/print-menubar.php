@@ -88,25 +88,25 @@ if ($config['title_image']) {
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
            <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-chevron-right fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
+           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
 <?php
 if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
-    echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
+    echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
 }
 
 ?>
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-bookmark fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
 <?php
 
 if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
 }
 
 if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
-    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
 }
 
 ?>

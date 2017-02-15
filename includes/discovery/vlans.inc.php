@@ -5,6 +5,9 @@ $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', array
 foreach ($vlans_db_raw as $vlan_db) {
     $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
 }
+unset(
+    $vlans_db_raw
+);
 
 // Create an empty array to record what VLANs we discover this session.
 $device['vlans'] = array();

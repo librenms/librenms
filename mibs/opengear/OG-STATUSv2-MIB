@@ -1,0 +1,4084 @@
+-- =====================================================================
+-- == OG-STATUSv2-MIB:                                                  ==
+-- == Opengear status Management Information Base                    ==
+-- ==                                                                 ==
+-- == (c) Copyright 2013-2014 Opengear Inc.                                ==
+-- =====================================================================
+
+OG-STATUSv2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	opengear
+		FROM OG-SMI-MIB
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	Integer32, Unsigned32, Counter32, Counter64
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	DateAndTime, DisplayString
+		FROM SNMPv2-TC;
+
+ogStatus2 MODULE-IDENTITY
+	LAST-UPDATED "201401280000Z"
+	ORGANIZATION "Opengear Inc."
+	CONTACT-INFO
+		"Opengear Inc.
+		 630 West 9560 South, Suite A,
+		 Sandy, UT 84070
+		 support@opengear.com"
+	DESCRIPTION
+		"Opengear extended status and alert MIB"
+	REVISION "201401280000Z"
+	DESCRIPTION
+		"Initial revision"
+       ::= { opengear 17 }
+
+ogSystem OBJECT IDENTIFIER
+       ::= { ogStatus2 1 }
+
+ogFirmwareVersion OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current device firmware."
+	::= { ogSystem 1 }
+
+ogSerialNumber OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current serial number (if applicable)."
+	::= { ogSystem 2 }
+
+ogSerialPortTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SerialPortEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "The devices serial port status table."
+	::= { ogStatus2 2 }
+
+ogSerialPortEntry OBJECT-TYPE
+	SYNTAX SerialPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A serial port status entry."
+	INDEX { ogSerialPortIndex }
+	::= { ogSerialPortTable 1 }
+
+SerialPortEntry ::= SEQUENCE {
+        ogSerialPortIndex         Integer32,
+        ogSerialPortLabel         DisplayString,
+        ogSerialPortSpeed         Integer32,
+        ogSerialPortDataBits      Integer32,
+        ogSerialPortParity        INTEGER,
+        ogSerialPortStopBits      INTEGER,
+        ogSerialPortFlowControl   INTEGER,
+        ogSerialPortMode          INTEGER,
+        ogSerialPortLogLevel      INTEGER,
+ 	ogSerialPortRxBytes       Counter64,
+ 	ogSerialPortTxBytes       Counter64,
+ 	ogSerialPortFramingErrors Counter64,
+ 	ogSerialPortParityErrors  Counter64,
+ 	ogSerialPortOverrunErrors Counter64,
+ 	ogSerialPortBreaks        Counter64,
+        ogSerialPortDCD           INTEGER,
+        ogSerialPortDTR           INTEGER,
+        ogSerialPortDSR           INTEGER,
+        ogSerialPortCTS           INTEGER,
+        ogSerialPortRTS           INTEGER
+}
+
+ogSerialPortIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the serial port table of this status"
+	::= { ogSerialPortEntry 1 }
+
+ogSerialPortLabel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port descriptive name"
+	::= { ogSerialPortEntry 2 }
+
+ogSerialPortSpeed OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port speed in bits per second"
+	::= { ogSerialPortEntry 3 }
+
+ogSerialPortDataBits OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port character size"
+	::= { ogSerialPortEntry 4 }
+
+ogSerialPortParity OBJECT-TYPE
+        SYNTAX INTEGER {
+            none(1),
+            odd(2),
+            even(3),
+            mark(4),
+            space(5)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port parity"
+	::= { ogSerialPortEntry 5 }
+
+ogSerialPortStopBits OBJECT-TYPE
+	SYNTAX INTEGER {
+	    one(1),
+	    two(2),
+	    oneAndAHalf(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port number of stop bits"
+	::= { ogSerialPortEntry 6 }
+
+ogSerialPortFlowControl OBJECT-TYPE
+	SYNTAX INTEGER {
+	    none(1),
+	    hardware(2),
+	    software(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port flow control type"
+	::= { ogSerialPortEntry 7 }
+
+ogSerialPortMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	    none(1),
+	    console(2),
+	    sdt(3),
+	    terminal(4),
+	    bridge(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port operational mode type"
+	::= { ogSerialPortEntry 8 }
+
+ogSerialPortLogLevel OBJECT-TYPE
+	SYNTAX INTEGER {
+	    disabled(1),
+	    connect(2),
+	    inputAndOutput(3),
+	    inputOnly(4),
+	    outputOnly(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port logging level"
+	::= { ogSerialPortEntry 9 }
+
+ogSerialPortRxBytes OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port bytes received"
+	::= { ogSerialPortEntry 10 }
+
+ogSerialPortTxBytes OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port bytes transmitted"
+	::= { ogSerialPortEntry 11 }
+
+ogSerialPortFramingErrors OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port framing error total."
+	::= { ogSerialPortEntry 12 }
+
+ogSerialPortParityErrors OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port parity error total."
+	::= { ogSerialPortEntry 13 }
+
+ogSerialPortOverrunErrors OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port Overrun Error total."
+	::= { ogSerialPortEntry 14 }
+
+ogSerialPortBreaks OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port break total"
+	::= { ogSerialPortEntry 15 }
+
+ogSerialPortDCD OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the DCD signal."
+	::= { ogSerialPortEntry 16 }
+
+ogSerialPortDTR OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the DTR signal."
+	::= { ogSerialPortEntry 17 }
+
+ogSerialPortDSR OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the DSR signal."
+	::= { ogSerialPortEntry 18 }
+
+ogSerialPortCTS OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the CTS signal."
+	::= { ogSerialPortEntry 19 }
+
+ogSerialPortRTS OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the RTS signal."
+	::= { ogSerialPortEntry 20 }
+
+ogSerialUserTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SerialUserEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This entity's serial port users table."
+	::= { ogStatus2 3 }
+
+ogSerialUserEntry OBJECT-TYPE
+	SYNTAX SerialUserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A user logged in on the serial port"
+	INDEX { ogSerialUserIndex }
+	::= { ogSerialUserTable 1 }
+
+SerialUserEntry ::= SEQUENCE {
+        ogSerialUserIndex      Integer32,
+        ogSerialUserStartTime  DateAndTime,
+        ogSerialUserPort       Integer32,
+        ogSerialUserLabel      DisplayString,
+        ogSerialUserName       DisplayString
+}
+
+ogSerialUserIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the serial port active users table"
+	::= { ogSerialUserEntry 1 }
+
+ogSerialUserStartTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The time and date the user session started."
+	::= { ogSerialUserEntry 2 }
+
+ogSerialUserPort OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial port number"
+	::= { ogSerialUserEntry 3 }
+
+ogSerialUserLabel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The readable label for the serial port."
+	::= { ogSerialUserEntry 4 }
+
+ogSerialUserName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the user logged in on the port."
+	::= { ogSerialUserEntry 5 }
+
+ogHostTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF HostEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "A table of monitored network hosts."
+	::= { ogStatus2 4 }
+
+ogHostEntry OBJECT-TYPE
+	SYNTAX HostEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A monitored network host."
+	INDEX { ogHostIndex }
+	::= { ogHostTable 1 }
+
+HostEntry ::= SEQUENCE {
+        ogHostIndex        Integer32,
+        ogHostName         DisplayString,
+        ogHostIpV4Address  DisplayString,
+        ogHostIpV6Address  DisplayString
+}
+
+ogHostIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the network host active users table"
+	::= { ogHostEntry 1 }
+
+ogHostName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of this monitored network host."
+	::= { ogHostEntry 2 }
+
+ogHostIpV4Address OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IPv4 Address of this monitored network host."
+	::= { ogHostEntry 3 }
+
+ogHostIpV6Address OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IPv6 Address of this monitored network host."
+	::= { ogHostEntry 4 }
+
+ogHostServiceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HostServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "A table of services belonging to a monitored host."
+	::= { ogStatus2 5 }
+
+ogHostServiceEntry OBJECT-TYPE
+	SYNTAX HostServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A monitored host service."
+	INDEX { ogHostIndex,
+		ogHostServiceIndex }
+	::= { ogHostServiceTable 1 }
+
+HostServiceEntry ::= SEQUENCE {
+        ogHostServiceIndex       Integer32,
+        ogHostServiceHost        OBJECT IDENTIFIER,
+        ogHostServiceType        INTEGER,
+        ogHostServicePort        Unsigned32,
+        ogHostServiceStatus      INTEGER,
+        ogHostServiceCounter     Counter32
+}
+
+ogHostServiceIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the RPC outlet table"
+	::= { ogHostServiceEntry 1 }
+
+ogHostServiceHost OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The monitored host this service belongs to"
+	::= { ogHostServiceEntry 2 }
+
+ogHostServiceType OBJECT-TYPE
+	SYNTAX INTEGER {
+		tcp(1),
+		udp(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of service this is."
+	::= { ogHostServiceEntry 3 }
+
+ogHostServicePort OBJECT-TYPE
+	SYNTAX Unsigned32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The TCP Port this service is on."
+	::= { ogHostServiceEntry 4 }
+
+ogHostServiceStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		unknown(1),
+		available(2),
+		unavailable(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The availabalilty of this service."
+	::= { ogHostServiceEntry 5 }
+
+ogHostServiceCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of alerts related to this service."
+	::= { ogHostServiceEntry 6 }
+
+ogHostUserTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF HostUserEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This entity's serial port users table."
+	::= { ogStatus2 6 }
+
+ogHostUserEntry OBJECT-TYPE
+	SYNTAX HostUserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A user logged in on the serial port"
+	INDEX { ogHostUserIndex }
+	::= { ogHostUserTable 1 }
+
+HostUserEntry ::= SEQUENCE {
+        ogHostUserIndex        Integer32,
+        ogHostUserHost         OBJECT IDENTIFIER,
+        ogHostUserStartTime    DateAndTime,
+        ogHostUserAddress      DisplayString,
+        ogHostUserHostName     DisplayString,
+        ogHostUserName         DisplayString
+}
+
+ogHostUserIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the network host active users table"
+	::= { ogHostUserEntry 1 }
+
+ogHostUserHost OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The monitored host this user is associated with."
+	::= { ogHostUserEntry 2 }
+
+ogHostUserStartTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The date and time the user session started."
+	::= { ogHostUserEntry 3 }
+
+ogHostUserAddress OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The network host address."
+	::= { ogHostUserEntry 4 }
+
+ogHostUserHostName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The network host's host name."
+	::= { ogHostUserEntry 5 }
+
+ogHostUserName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The network host's active username."
+	::= { ogHostUserEntry 6 }
+
+ogWebUserTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF WebUserEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This entity's serial port users table."
+	::= { ogStatus2 7 }
+
+ogWebUserEntry OBJECT-TYPE
+	SYNTAX WebUserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A user logged in on the serial port"
+	INDEX { ogWebUserIndex }
+	::= { ogWebUserTable 1 }
+
+WebUserEntry ::= SEQUENCE {
+        ogWebUserIndex         Integer32,
+        ogWebUserStartTime     DateAndTime,
+        ogWebUserName          DisplayString,
+        ogWebUserSourceAddress DisplayString,
+        ogWebUserSourcePort    Integer32
+}
+
+ogWebUserIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the network host active users table"
+	::= { ogWebUserEntry 1 }
+
+ogWebUserStartTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The web users session start date and time."
+	::= { ogWebUserEntry 2 }
+
+ogWebUserName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The web users active username."
+	::= { ogWebUserEntry 3 }
+
+ogWebUserSourceAddress OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The web users source address."
+	::= { ogWebUserEntry 4 }
+
+ogWebUserSourcePort OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The web users source tcp port."
+	::= { ogWebUserEntry 5 }
+
+ogEmdTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EmdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This devices temperature monitoring table."
+	::= { ogStatus2 8 }
+
+ogEmdEntry OBJECT-TYPE
+	SYNTAX EmdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"EMD status entry"
+	INDEX { ogEmdIndex }
+	::= { ogEmdTable 1 }
+
+EmdEntry ::= SEQUENCE {
+        ogEmdIndex             Integer32,
+        ogEmdName              DisplayString,
+        ogEmdDescription       DisplayString,
+        ogEmdEnabled           INTEGER,
+        ogEmdLogEnabled        INTEGER,
+        ogEmdConnectType       INTEGER,
+        ogEmdTemperatureTotal  Counter32,
+        ogEmdHumidityTotal     Counter32,
+        ogEmdDioInputTotal     Counter32
+}
+
+ogEmdIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the EMD status table"
+	::= { ogEmdEntry 1 }
+
+ogEmdName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the EMD device."
+	::= { ogEmdEntry 2 }
+
+ogEmdDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of the EMD device."
+	::= { ogEmdEntry 3 }
+
+ogEmdEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The enabled status of the EMD"
+	::= { ogEmdEntry 4 }
+
+ogEmdLogEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The logging status of the EMD"
+	::= { ogEmdEntry 5 }
+
+ogEmdConnectType OBJECT-TYPE
+	SYNTAX INTEGER {
+		internal(1),
+		serial(2),
+		network(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"How the EMD device is connected."
+	::= { ogEmdEntry 6 }
+
+ogEmdTemperatureTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of temperature sensors contained in this EMD."
+	::= { ogEmdEntry 7 }
+
+ogEmdHumidityTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of humidity sensors contained in this EMD."
+	::= { ogEmdEntry 8 }
+
+ogEmdDioInputTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of DIOs contained in this EMD."
+	::= { ogEmdEntry 9 }
+
+ogEmdTemperatureTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EmdTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "A table of temperature sensors belonging to EMDs"
+	::= { ogStatus2 9 }
+
+ogEmdTemperatureEntry OBJECT-TYPE
+	SYNTAX EmdTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"EMD status entry"
+	INDEX { ogEmdIndex, 
+		ogEmdTemperatureIndex }
+	::= { ogEmdTemperatureTable 1 }
+
+EmdTemperatureEntry ::= SEQUENCE {
+        ogEmdTemperatureIndex        Integer32,
+        ogEmdTemperatureEmd          OBJECT IDENTIFIER,
+        ogEmdTemperatureName         DisplayString,
+        ogEmdTemperatureDescription  DisplayString,
+        ogEmdTemperatureValue        Integer32,
+        ogEmdTemperatureCounter      Counter32
+}
+
+ogEmdTemperatureIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the EMD status table"
+	::= { ogEmdTemperatureEntry 1 }
+
+ogEmdTemperatureEmd OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The EMD this temperature sensor is related to."
+	::= { ogEmdTemperatureEntry 2 }
+
+ogEmdTemperatureName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the EMD temperature sensor."
+	::= { ogEmdTemperatureEntry 3 }
+
+ogEmdTemperatureDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of the EMD device."
+	::= { ogEmdTemperatureEntry 4 }
+
+ogEmdTemperatureValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current temperature reading on the EMD."
+	::= { ogEmdTemperatureEntry 5 }
+
+ogEmdTemperatureCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of alerts triggered on the EMD."
+	::= { ogEmdTemperatureEntry 6 }
+
+ogEmdHumidityTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EmdHumidityEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "A table of humidity sensors belonging to EMDs."
+	::= { ogStatus2 10 }
+
+ogEmdHumidityEntry OBJECT-TYPE
+	SYNTAX EmdHumidityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"EMD Humidity sensor status entry."
+	INDEX { ogEmdIndex,
+		ogEmdHumidityIndex }
+	::= { ogEmdHumidityTable 1 }
+
+EmdHumidityEntry ::= SEQUENCE {
+        ogEmdHumidityIndex        Integer32,
+        ogEmdHumidityEmd          OBJECT IDENTIFIER,
+        ogEmdHumidityName         DisplayString,
+        ogEmdHumidityDescription  DisplayString,
+        ogEmdHumidityValue        Integer32,
+        ogEmdHumidityCounter      Counter32
+}
+
+ogEmdHumidityIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the EMD status table"
+	::= { ogEmdHumidityEntry 1 }
+
+ogEmdHumidityEmd OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The EMD this humidity sensor is related to."
+	::= { ogEmdHumidityEntry 2 }
+
+ogEmdHumidityName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the EMD."
+	::= { ogEmdHumidityEntry 3 }
+
+ogEmdHumidityDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of the EMD device."
+	::= { ogEmdHumidityEntry 4 }
+
+ogEmdHumidityValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current humidity value on the EMD"
+	::= { ogEmdHumidityEntry 5 }
+
+ogEmdHumidityCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of alerts triggered on the EMD"
+	::= { ogEmdHumidityEntry 6 }
+
+ogEmdDioTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EmdDioEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths Digital I/O status table."
+	::= { ogStatus2 11 }
+
+ogEmdDioEntry OBJECT-TYPE
+	SYNTAX EmdDioEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Digital I/O status entry"
+	INDEX { ogEmdIndex, 
+		ogEmdDioIndex }
+	::= { ogEmdDioTable 1 }
+
+EmdDioEntry ::= SEQUENCE {
+        ogEmdDioIndex        Integer32,
+        ogEmdDioEmd          OBJECT IDENTIFIER,
+        ogEmdDioName         DisplayString,
+        ogEmdDioDescription  DisplayString, 
+        ogEmdDioType         INTEGER,
+        ogEmdDioDirection    INTEGER,
+        ogEmdDioState        INTEGER,
+        ogEmdDioTriggerMode  INTEGER,
+        ogEmdDioCounter      Counter32
+}
+
+ogEmdDioIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the Digital I/O status table"
+	::= { ogEmdDioEntry 1 }
+
+ogEmdDioEmd OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The EMD this Digital I/O relates to."
+	::= { ogEmdDioEntry 2 }
+
+ogEmdDioName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The ID of this Digital I/O."
+	::= { ogEmdDioEntry 3 }
+
+ogEmdDioDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of this Digital I/O."
+	::= { ogEmdDioEntry 4 }
+
+ogEmdDioType OBJECT-TYPE
+	SYNTAX INTEGER {
+		ttlInputOutput(1),
+		highVoltageOutput(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Digital I/O type (TTL Input/Output or High-Voltage Output)."
+	::= { ogEmdDioEntry 5 }
+
+ogEmdDioDirection OBJECT-TYPE
+	SYNTAX INTEGER {
+		output(1),
+		input(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The direction of the Digital I/O (Input or Output)"
+	::= { ogEmdDioEntry 6 }
+
+ogEmdDioState OBJECT-TYPE
+	SYNTAX INTEGER {
+		high(1),
+		low(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The electrical state value of the Digital I/O (Low or High)"
+	::= { ogEmdDioEntry 7 }
+
+ogEmdDioTriggerMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		invalid(1),
+		risingEdge(2),
+		fallingEdge(3),
+		risingFallingEdge(4)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Trigger Mode of the Digital I/O"
+	::= { ogEmdDioEntry 8 }
+
+ogEmdDioCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The trigger counter of this Digital I/O"
+	::= { ogEmdDioEntry 9 }
+
+ogNetInterfaceTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NetInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This devices network interface status table."
+	::= { ogStatus2 12 }
+
+ogNetInterfaceEntry OBJECT-TYPE
+	SYNTAX NetInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"EMD status entry"
+	INDEX { ogNetInterfaceIndex }
+	::= { ogNetInterfaceTable 1 }
+
+NetInterfaceEntry ::= SEQUENCE {
+        ogNetInterfaceIndex Integer32,
+        ogNetInterfaceName  DisplayString,
+        ogNetInterfaceType  INTEGER,
+        ogNetInterfaceState INTEGER
+}
+
+ogNetInterfaceIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the network interface status table"
+	::= { ogNetInterfaceEntry 1 }
+
+ogNetInterfaceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a network interface."
+	::= { ogNetInterfaceEntry 2 }
+
+ogNetInterfaceType OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		ethernet(2),
+		wifi(3),
+		cellModem(4),
+		v92Modem(5),
+		vpn(6)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of this network interface entry."
+	::= { ogNetInterfaceEntry 3 }
+
+ogNetInterfaceState OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		down(2),
+		starting(3),
+		up(4),
+		stopping(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current status of this network interface entry."
+	::= { ogNetInterfaceEntry 4 }
+
+ogPowerSupplyTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PowerSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This entity's Power Supply table."
+	::= { ogStatus2 13 }
+
+ogPowerSupplyEntry OBJECT-TYPE
+	SYNTAX PowerSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Power Supply status entry"
+	INDEX { ogPowerSupplyIndex }
+	::= { ogPowerSupplyTable 1 }
+
+PowerSupplyEntry ::= SEQUENCE {
+        ogPowerSupplyIndex          Integer32,
+        ogPowerSupplyName           DisplayString,
+        ogPowerSupplyInputVoltage   Integer32,
+        ogPowerSupplyOutputCurrent  Integer32,
+        ogPowerSupplyTemperature    Integer32
+}
+
+ogPowerSupplyIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the Power Supply status table"
+	::= { ogPowerSupplyEntry 1 }
+
+ogPowerSupplyName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the Power Supply."
+	::= { ogPowerSupplyEntry 2 }
+
+ogPowerSupplyInputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current temperature of the Power Supply"
+	::= { ogPowerSupplyEntry 3 }
+
+ogPowerSupplyOutputCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "milliamps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current temperature of the Power Supply"
+	::= { ogPowerSupplyEntry 4 }
+
+ogPowerSupplyTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees celsius"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current temperature of the Power Supply"
+	::= { ogPowerSupplyEntry 5 }
+
+ogUpsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF UpsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths Uninterruptable Power Supply (UPS) status table."
+	::= { ogStatus2 14 }
+
+ogUpsEntry OBJECT-TYPE
+	SYNTAX UpsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Digital I/O status entry"
+	INDEX { ogUpsIndex }
+	::= { ogUpsTable 1 }
+
+UpsEntry ::= SEQUENCE {
+        ogUpsIndex                   Integer32,
+        ogUpsName                    DisplayString,
+        ogUpsDescription             DisplayString,
+        ogUpsType                    DisplayString,
+        ogUpsLogEnabled              INTEGER,
+        ogUpsConnectType             INTEGER,
+        ogUpsState                   INTEGER,
+        ogUpsTemperature             Integer32,
+        ogUpsHumidity                Integer32,
+        ogUpsBatteryState            INTEGER,
+        ogUpsBatteryRunTime          Integer32,
+        ogUpsBatteryRunTimeLow       Integer32,
+        ogUpsBatteryRunTimeRestart   Integer32,
+        ogUpsBatteryCharge           Integer32,
+        ogUpsBatteryVoltage          Integer32,
+        ogUpsBatteryNominalVoltage   Integer32,
+        ogUpsBatteryCurrent          Integer32,
+        ogUpsBatteryNominalCurrent   Integer32,
+        ogUpsBatteryTemperature      Integer32,
+        ogUpsInputFrequency          Integer32,
+        ogUpsInputNominalFrequency   Integer32,
+        ogUpsInputVoltage            Integer32,
+        ogUpsInputNominalVoltage     Integer32,
+        ogUpsInputCurrent            Integer32,
+        ogUpsInputNominalCurrent     Integer32,
+        ogUpsOutputFrequency         Integer32,
+        ogUpsOutputNominalFrequency  Integer32,
+        ogUpsOutputVoltage           Integer32,
+        ogUpsOutputNominalVoltage    Integer32,
+        ogUpsOutputCurrent           Integer32,
+        ogUpsOutputNominalCurrent    Integer32,
+        ogUpsOutputLoad              Integer32,
+        ogUpsOutputPower             Integer32,
+        ogUpsOutputTruePower         Integer32,
+        ogUpsCounter                 Counter32
+}
+
+ogUpsIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the UPS status table."
+	::= { ogUpsEntry 1 }
+
+ogUpsName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The ID of this UPS."
+	::= { ogUpsEntry 2 }
+
+ogUpsDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of this UPS."
+	::= { ogUpsEntry 3 }
+
+ogUpsType OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The UPS driver type."
+	::= { ogUpsEntry 4 }
+
+ogUpsLogEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The logging status of the UPS"
+	::= { ogUpsEntry 5 }
+
+ogUpsConnectType OBJECT-TYPE
+	SYNTAX INTEGER {
+		unknown(1),
+		usb(2),
+		http(3),
+		https(4),
+		snmp(5),
+		serial(6)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"How the UPS device is being monitored."
+	::= { ogUpsEntry 6 }
+
+ogUpsState OBJECT-TYPE
+	SYNTAX INTEGER {
+		unknown(1),
+		onLine(2),
+		onBattery(3),
+		lowBattery(4),
+		onBypass(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current state the UPS is running in."
+	::= { ogUpsEntry 7 }
+
+ogUpsTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The UPS temperature. Negative if unavailable."
+	::= { ogUpsEntry 8 }
+
+ogUpsHumidity OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The UPS humidity. Negative if unavailable."
+	::= { ogUpsEntry 9 }
+
+ogUpsBatteryState OBJECT-TYPE
+	SYNTAX INTEGER {
+		unknown(1),
+		normal(2),
+		warning(3),
+		low(4),
+		depleted(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current state of the UPS battery."
+	::= { ogUpsEntry 10 }
+
+ogUpsBatteryRunTime OBJECT-TYPE
+	SYNTAX Integer32 (-1..31449600)
+	UNITS "seconds"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery runtime (seconds). Negative if unavailable"
+	::= { ogUpsEntry 11 }
+
+ogUpsBatteryRunTimeLow OBJECT-TYPE
+	SYNTAX Integer32 (-1..31449600)
+	UNITS "seconds"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Estimated remaining battery runtime when UPS switches to Low
+		Battery. Negative if unavailable."
+	::= { ogUpsEntry 12 }
+
+ogUpsBatteryRunTimeRestart OBJECT-TYPE
+	SYNTAX Integer32 (-1..31449600)
+	UNITS "seconds"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Minimum battery runtime for UPS restart after power-off
+		(seconds). Negative if unavailable."
+	::= { ogUpsEntry 13 }
+
+ogUpsBatteryCharge OBJECT-TYPE
+	SYNTAX Integer32 (-1..100)
+	UNITS "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Estimated percent of Battery charge remaining. Negative if
+		unavailable."
+	::= { ogUpsEntry 14 }
+
+ogUpsBatteryVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 Volt DC"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The magnitude of the current battery voltage. Negative if
+		unavailable."
+	::= { ogUpsEntry 15 }
+
+ogUpsBatteryNominalVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 Volt DC"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Nominal battery voltage (V). Negative if unavailable."
+	::= { ogUpsEntry 16 }
+
+ogUpsBatteryCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 Amp DC"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The UPS battery current. Negative if unavailable."
+	::= { ogUpsEntry 17 }
+
+ogUpsBatteryNominalCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 Amp DC"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The nominal UPS battery current. Negative if unavailable."
+	::= { ogUpsEntry 18 }
+
+ogUpsBatteryTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The UPS battery temperature. Negative if unavailable."
+	::= { ogUpsEntry 19 }
+
+ogUpsInputFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input line frequency (Hz). Negative if unavailable."
+	::= { ogUpsEntry 20 }
+
+ogUpsInputNominalFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Nominal input line frequency (Hz). Negative if unavailable."
+	::= { ogUpsEntry 21 }
+
+ogUpsInputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "RMS Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The magnitude of the UPS input voltage. Negative if
+		unavailable."
+	::= { ogUpsEntry 22 }
+
+ogUpsInputNominalVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "RMS Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The nominal input voltage. Negative if unavailable."
+	::= { ogUpsEntry 23 }
+
+ogUpsInputCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 RMS Amp"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The input current. Negative if unavailable."
+	::= { ogUpsEntry 24 }
+
+ogUpsInputNominalCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 RMS Amp"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The nominal input current. Negative if unavailable."
+	::= { ogUpsEntry 25 }
+
+ogUpsOutputFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Output line frequency (Hz). Negative if unavailable."
+	::= { ogUpsEntry 26 }
+
+ogUpsOutputNominalFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Nominal output line frequency (Hz). Negative if unavailable."
+	::= { ogUpsEntry 27 }
+
+ogUpsOutputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "RMS Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The magnitude of the UPS output voltage. Negative if 
+		unavailable."
+	::= { ogUpsEntry 28 }
+
+ogUpsOutputNominalVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "RMS Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The nominal magnitude of the UPS output voltage. Negative if 
+		unavailable."
+	::= { ogUpsEntry 29 }
+
+ogUpsOutputCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 RMS Amp"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The magnitude of the UPS input current. Negative if
+		unavailable."
+	::= { ogUpsEntry 30 }
+
+ogUpsOutputNominalCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 RMS Amp"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The nominal magnitude of the UPS input current. Negative if
+		unavailable."
+	::= { ogUpsEntry 31 }
+
+ogUpsOutputLoad OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	UNITS "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Estimated percent of UPS power capacity being used."
+	::= { ogUpsEntry 32 }
+
+ogUpsOutputPower OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Volt-Amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current value of apparent power (Volt-Amps).
+		Negative if unavailable."
+	::= { ogUpsEntry 33 }
+
+ogUpsOutputTruePower OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current value of real power (Watts).
+		Negative if unavailable."
+	::= { ogUpsEntry 34 }
+
+ogUpsCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of alerts triggered on the UPS"
+	::= { ogUpsEntry 35 }
+
+ogRpcTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RpcEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This entity's Remote Power Controller (RPC) table."
+	::= { ogStatus2 15 }
+
+ogRpcEntry OBJECT-TYPE
+	SYNTAX RpcEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"RPC status entry"
+	INDEX { ogRpcIndex }
+	::= { ogRpcTable 1 }
+
+RpcEntry ::= SEQUENCE {
+        ogRpcIndex          Integer32,
+        ogRpcName           DisplayString,
+        ogRpcDescription    DisplayString,
+        ogRpcType           DisplayString,
+        ogRpcLogEnabled     INTEGER,
+        ogRpcOutletTotal    Counter32,
+        ogRpcMaxTemperature Integer32,
+        ogRpcConnectType    INTEGER,
+        ogRpcInputFrequency Integer32,
+        ogRpcInputVoltage   Integer32,
+        ogRpcInputCurrent   Integer32,
+        ogRpcCounter        Counter32
+}
+
+ogRpcIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the RPC status table"
+	::= { ogRpcEntry 1 }
+
+ogRpcName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the RPC device."
+	::= { ogRpcEntry 2 }
+
+ogRpcDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description for the RPC device."
+	::= { ogRpcEntry 3 }
+
+ogRpcType OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A type for the RPC device."
+	::= { ogRpcEntry 4 }
+
+ogRpcLogEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The logging status of the RPC"
+	::= { ogRpcEntry 5 }
+
+ogRpcOutletTotal OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of outlets on this RPC"
+	::= { ogRpcEntry 6 }
+
+ogRpcMaxTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum temperature on the RPC"
+	::= { ogRpcEntry 7 }
+
+ogRpcConnectType OBJECT-TYPE
+	SYNTAX INTEGER {
+		serial(1),
+		network(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"How the RPC device is connected."
+	::= { ogRpcEntry 8 }
+
+ogRpcInputFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input line frequency (Hz). Negative if unavailable."
+	::= { ogRpcEntry 9 }
+
+ogRpcInputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "RMS Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The magnitude of the RPC input voltage. Negative if
+		unavailable."
+	::= { ogRpcEntry 10 }
+
+ogRpcInputCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "0.1 RMS Amp"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The input current. Negative if unavailable."
+	::= { ogRpcEntry 11 }
+
+ogRpcCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of alerts triggered on the RPC"
+	::= { ogRpcEntry 12 }
+
+ogRpcOutletTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF RpcOutletEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This RPC's outlet table."
+	::= { ogStatus2 16 }
+
+ogRpcOutletEntry OBJECT-TYPE
+	SYNTAX RpcOutletEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"RPC Outlet status entry"
+	INDEX { ogRpcIndex,
+		ogRpcOutletIndex }
+	::= { ogRpcOutletTable 1 }
+
+RpcOutletEntry ::= SEQUENCE {
+        ogRpcOutletIndex       Integer32,
+        ogRpcOutletRpc         OBJECT IDENTIFIER,
+        ogRpcOutletName        DisplayString,
+        ogRpcOutletState       INTEGER,
+        ogRpcOutletFrequency   Integer32,
+        ogRpcOutletVoltage     Integer32,
+        ogRpcOutletCurrent     Integer32,
+        ogRpcOutletLoad        Integer32
+}
+
+ogRpcOutletIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the RPC outlet table"
+	::= { ogRpcOutletEntry 1 }
+
+ogRpcOutletRpc OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The RPC this outlet belongs to"
+	::= { ogRpcOutletEntry 2 }
+
+ogRpcOutletName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the RPC outlet."
+	::= { ogRpcOutletEntry 3 }
+
+ogRpcOutletState OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2),
+		transitioning(3),
+		unavailable(4)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The power status of the RPC outlet"
+	::= { ogRpcOutletEntry 4 }
+
+ogRpcOutletFrequency OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "Hz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Output line frequency (Hz). Negative if unavailable."
+	::= { ogRpcOutletEntry 5 }
+
+ogRpcOutletVoltage OBJECT-TYPE
+	SYNTAX Integer32 (-1..2640)
+        UNITS "0.01 Amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The voltage on this outlet. Negative if unavailable."
+	::= { ogRpcOutletEntry 6 }
+
+ogRpcOutletCurrent OBJECT-TYPE
+	SYNTAX Integer32 (-1..25500)
+        UNITS "0.01 Amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current measured on this outlet. Negative if unavailable."
+	::= { ogRpcOutletEntry 7 }
+
+ogRpcOutletLoad OBJECT-TYPE
+	SYNTAX Integer32 (-1..100)
+	UNITS "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Estimated percent of RPC outlet power capacity being used."
+	::= { ogRpcOutletEntry 8 }
+
+ogCellModemTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CellModemEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths cellular modem status table."
+	::= { ogStatus2 17 }
+
+ogCellModemEntry OBJECT-TYPE
+	SYNTAX CellModemEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A cellular modem status entry."
+	INDEX { ogCellModemIndex }
+	::= { ogCellModemTable 1 }
+
+CellModemEntry ::= SEQUENCE {
+        ogCellModemIndex           Integer32,
+        ogCellModemVendor          DisplayString,
+        ogCellModemModel           DisplayString,
+        ogCellModemEnabled         INTEGER,
+        ogCellModemConnected       INTEGER,
+        ogCellModemNetwork         DisplayString,
+        ogCellModemRegistered      INTEGER,
+        ogCellModemTower           Integer32,
+        ogCellModemRadioTechnology INTEGER,
+        ogCellModemApn             DisplayString,
+        ogCellModem3gRssi          Integer32,
+        ogCellModem4gRssi          Integer32,
+        ogCellModemSessionTime     Counter32,
+        ogCellModemSelectedSimCard Counter32,
+        ogCellModemTemperature     Integer32,
+        ogCellModemCounter         Counter32
+}
+
+ogCellModemIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index of the cellular modem status entry."
+	::= { ogCellModemEntry 1 }
+
+ogCellModemVendor OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Manufacturer ID of Cellular Modem."
+	::= { ogCellModemEntry 2 }
+
+ogCellModemModel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Cellular Modem model name."
+	::= { ogCellModemEntry 3 }
+
+ogCellModemEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The enabled state of the modem."
+	::= { ogCellModemEntry 4 }
+
+ogCellModemConnected OBJECT-TYPE
+	SYNTAX INTEGER {
+		connected(1),
+		disconnected(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The connected state of the modem."
+	::= { ogCellModemEntry 5 }
+
+ogCellModemNetwork OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the network provider."
+	::= { ogCellModemEntry 6 }
+
+ogCellModemRegistered OBJECT-TYPE
+	SYNTAX INTEGER {
+		registered(1),
+		unregistered(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The registration state of the modem."
+	::= { ogCellModemEntry 7 }
+
+ogCellModemTower OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current cellular tower ID."
+	::= { ogCellModemEntry 8 }
+
+ogCellModemRadioTechnology OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		cdma(2),
+		evdo(3),
+		gsm(4),
+		umts(5),
+		lte(6)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current Radio Access Technology being used"
+	::= { ogCellModemEntry 9 }
+
+ogCellModemApn OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The APN configured for this cellmodem."
+	::= { ogCellModemEntry 10 }
+
+ogCellModem3gRssi OBJECT-TYPE
+	SYNTAX Integer32 (-99..99)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current 3G Received Signal Strength (RSSI) if applicable."
+	::= { ogCellModemEntry 11 }
+
+ogCellModem4gRssi OBJECT-TYPE
+	SYNTAX Integer32 (-99..99)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current 4G Received Signal Strength (RSSI) if applicable."
+	::= { ogCellModemEntry 12 }
+
+ogCellModemSessionTime OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of seconds the modem session has been up for."
+	::= { ogCellModemEntry 13 }
+
+ogCellModemSelectedSimCard OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The SIM card currently being used by this modem."
+	::= { ogCellModemEntry 14 }
+
+ogCellModemTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS "degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current temperature of the Cellular Modem."
+	::= { ogCellModemEntry 15 }
+
+ogCellModemCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of alerts the modem has triggered."
+	::= { ogCellModemEntry 16 }
+
+ogWifiClientTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF WifiClientEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths wireless client status table."
+	::= { ogStatus2 18 }
+
+ogWifiClientEntry OBJECT-TYPE
+	SYNTAX WifiClientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A wireless client status entry."
+	INDEX { ogWifiClientIndex }
+	::= { ogWifiClientTable 1 }
+
+WifiClientEntry ::= SEQUENCE {
+        ogWifiClientIndex            Integer32,
+        ogWifiClientInterface        DisplayString,
+        ogWifiClientEnabled          INTEGER,
+        ogWifiClientEssid            DisplayString,
+        ogWifiClientIeeeMode         INTEGER,
+        ogWifiClientMode             INTEGER,
+        ogWifiClientFrequency        Unsigned32,
+        ogWifiClientApMac            DisplayString,
+        ogWifiClientBitRate          Unsigned32,
+        ogWifiClientTxPower          Integer32,
+        ogWifiClientLinkQuality      Unsigned32,
+        ogWifiClientRssi             Integer32,
+        ogWifiClientRxInvalidNwid    Counter32,
+        ogWifiClientRxInvalidCrypt   Counter32,
+        ogWifiClientRxInvalidFrag    Counter32,
+        ogWifiClientRxInvalidRetries Counter32,
+        ogWifiClientRxInvalidMisc    Counter32,
+        ogWifiClientMissedBeacon     Counter32,
+        ogWifiClientCounter          Counter32
+}
+
+ogWifiClientIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index of the wireless client status entry."
+	::= { ogWifiClientEntry 1 }
+
+ogWifiClientInterface OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The wireless client network interface name."
+	::= { ogWifiClientEntry 2 }
+
+ogWifiClientEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The wireless client enabled state"
+	::= { ogWifiClientEntry 3 }
+
+ogWifiClientEssid OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The ESSID this wireless client is currently associated with."
+	::= { ogWifiClientEntry 4 }
+
+ogWifiClientIeeeMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		ieee802Dot11B(2),
+		ieee802Dot11BG(3),
+		ieee802Dot11BGN(4),
+		ieee802Dot11ABGN(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IEEE 802.11 mode of this wireless client."
+	::= { ogWifiClientEntry 5 }
+
+ogWifiClientMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		managed(2),
+		adhoc(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The operating mode of this wireless client."
+	::= { ogWifiClientEntry 6 }
+
+ogWifiClientFrequency OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS  "0.0001 THz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current frequency of this wireless client."
+	::= { ogWifiClientEntry 7 }
+
+ogWifiClientApMac OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Access Point ID this wireless client is associated with."
+	::= { ogWifiClientEntry 8 }
+
+ogWifiClientBitRate OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS  "Mb/s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current bit-rate of this wireless client."
+	::= { ogWifiClientEntry 9 }
+
+ogWifiClientTxPower OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS  "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current Tx-Power of this wireless client."
+	::= { ogWifiClientEntry 10 }
+
+ogWifiClientLinkQuality OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS  "percent"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The normalized link quality of this wireless client."
+	::= { ogWifiClientEntry 11 }
+
+ogWifiClientRssi OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS  "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current Signal Level of this wireless client."
+	::= { ogWifiClientEntry 12 }
+
+ogWifiClientRxInvalidNwid OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of invalid Network ID's for this wireless client."
+	::= { ogWifiClientEntry 13 }
+
+ogWifiClientRxInvalidCrypt OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of invalid crypt's for this wireless client."
+	::= { ogWifiClientEntry 14 }
+
+ogWifiClientRxInvalidFrag OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of invalid frag's for this wireless client."
+	::= { ogWifiClientEntry 15 }
+
+ogWifiClientRxInvalidRetries OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of invalid retries for this wireless client."
+	::= { ogWifiClientEntry 16 }
+
+ogWifiClientRxInvalidMisc OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of invalid misc's for this wireless client."
+	::= { ogWifiClientEntry 17 }
+
+ogWifiClientMissedBeacon OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The count of missed beacon's for this wireless client."
+	::= { ogWifiClientEntry 18 }
+
+ogWifiClientCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of alerts triggered by this wireless client."
+	::= { ogWifiClientEntry 19 }
+
+ogWifiApTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF WifiApEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths wireless interface status table."
+	::= { ogStatus2 19 }
+
+ogWifiApEntry OBJECT-TYPE
+	SYNTAX WifiApEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A wireless interface status entry"
+	INDEX { ogWifiApIndex }
+	::= { ogWifiApTable 1 }
+
+WifiApEntry ::= SEQUENCE {
+        ogWifiApIndex     Integer32,
+        ogWifiApInterface DisplayString,
+        ogWifiApEnabled   INTEGER,
+        ogWifiApSsid      DisplayString,
+        ogWifiApIeeeMode  INTEGER,
+        ogWifiApFrequency Unsigned32,
+        ogWifiApTxPower   Integer32,
+        ogWifiApCounter   Counter32
+}
+
+ogWifiApIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index of the wireless server status entry."
+	::= { ogWifiApEntry 1 }
+
+ogWifiApInterface OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The wireless access point network interface name."
+	::= { ogWifiApEntry 2 }
+
+ogWifiApEnabled OBJECT-TYPE
+	SYNTAX INTEGER {
+		on(1),
+		off(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The enabled status of the wireless server."
+	::= { ogWifiApEntry 3 }
+
+ogWifiApSsid OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The SSID for this wireless access point."
+	::= { ogWifiApEntry 4 }
+
+ogWifiApIeeeMode OBJECT-TYPE
+	SYNTAX INTEGER {
+		unavailable(1),
+		ieee802Dot11B(2),
+		ieee802Dot11BG(3),
+		ieee802Dot11BGN(4),
+		ieee802Dot11ABGN(5)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IEEE 802.11 mode of this wireless access point."
+	::= { ogWifiApEntry 5 }
+
+ogWifiApFrequency OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS  "0.0001 THz"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current frequency of this wireless access point."
+	::= { ogWifiApEntry 6 }
+
+ogWifiApTxPower OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS  "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current Tx-Power of this wireless access point."
+	::= { ogWifiApEntry 7 }
+
+ogWifiApCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of alerts triggered by this wireless access point."
+	::= { ogWifiApEntry 8 }
+
+ogWifiApClientTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF WifiApClientEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "This RPC's outlet table."
+	::= { ogStatus2 20 }
+
+ogWifiApClientEntry OBJECT-TYPE
+	SYNTAX WifiApClientEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"RPC Outlet status entry"
+	INDEX { ogWifiApIndex,
+		ogWifiApClientIndex }
+	::= { ogWifiApClientTable 1 }
+
+WifiApClientEntry ::= SEQUENCE {
+        ogWifiApClientIndex        Integer32,
+        ogWifiApClientAp           OBJECT IDENTIFIER,
+        ogWifiApClientMac          DisplayString,
+        ogWifiApClientInactiveTime Counter32,
+        ogWifiApClientRxBytes      Counter32,
+        ogWifiApClientRxPackets    Counter32,
+        ogWifiApClientTxBytes      Counter32,
+        ogWifiApClientTxPackets    Counter32,
+        ogWifiApClientRssi         Integer32,
+        ogWifiApClientTxBitRate    Unsigned32
+}
+
+ogWifiApClientIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the wireless AP client table"
+	::= { ogWifiApClientEntry 1 }
+
+ogWifiApClientAp OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The wireless AP this client is assiciated with."
+	::= { ogWifiApClientEntry 2 }
+
+ogWifiApClientMac OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The MAC address of the Access Point this wireless client is associated with."
+	::= { ogWifiApClientEntry 3 }
+
+ogWifiApClientInactiveTime OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS  "milliseconds"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Inactive Time for this wireless client."
+	::= { ogWifiApClientEntry 4 }
+
+ogWifiApClientRxBytes OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS  "bytes"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of received bytes for this wireless client."
+	::= { ogWifiApClientEntry 5 }
+
+ogWifiApClientRxPackets OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS  "packets"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of received packets for this wireless client."
+	::= { ogWifiApClientEntry 6 }
+
+ogWifiApClientTxBytes OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS  "bytes"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of transmitted bytes for this wireless client."
+	::= { ogWifiApClientEntry 7 }
+
+ogWifiApClientTxPackets OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS  "packets"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of transmitted packets for this wireless client."
+	::= { ogWifiApClientEntry 8 }
+
+ogWifiApClientRssi OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS  "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current Signal Level of this wireless client."
+	::= { ogWifiApClientEntry 9 }
+
+ogWifiApClientTxBitRate OBJECT-TYPE
+	SYNTAX Unsigned32
+	UNITS  "Mb/s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current transmission bit-rate of this wireless client."
+	::= { ogWifiApClientEntry 10 }
+
+ogCheckTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CheckEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "Ths auto-response check table."
+	::= { ogStatus2 21 }
+
+ogCheckEntry OBJECT-TYPE
+	SYNTAX CheckEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An auto-response check entry"
+	INDEX { ogCheckIndex }
+	::= { ogCheckTable 1 }
+
+CheckEntry ::= SEQUENCE {
+        ogCheckIndex          Integer32,
+        ogCheckName           DisplayString,
+        ogCheckRepeatTimeout  Integer32,
+        ogCheckResetTimeout   Integer32,
+        ogCheckType           INTEGER,
+        ogCheckTriggerActions Counter32,
+        ogCheckResolveActions Counter32
+}
+
+ogCheckIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index of the auto-response rule"
+	::= { ogCheckEntry 1 }
+
+ogCheckName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The ID of this auto-response rule."
+	::= { ogCheckEntry 2 }
+
+ogCheckRepeatTimeout OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The minimum seconds before trigger actions can be repeated
+		for  this auto-response."
+	::= { ogCheckEntry 3 }
+
+ogCheckResetTimeout OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The minimum seconds after resolution before this
+		auto-response can be triggered again."
+	::= { ogCheckEntry 4 }
+
+ogCheckType OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 		unknown(1),
+ 		serialSignal(2),
+ 		serialUser(3),
+ 		serialPattern(4),
+		hostPing(5),
+		hostService(6),
+		hostUser(7),
+ 		webUser(8),
+ 		envTemperature(9),
+ 		envHumidity(10),
+ 		dioInput(11),
+ 		netInterface(12),
+ 		powerSupplyInputVoltage(13),
+ 		powerSupplyOutputCurrent(14),
+ 		powerSupplyTemperature(15),
+ 		upsInputVoltage(16),
+ 		upsBatteryCharge(17),
+ 		upsBatteryTemperature(18),
+ 		upsOutputLoad(19),
+ 		upsInputFrequency(20),
+ 		upsStateOnBattery(21),
+ 		upsStateLowBattery(22),
+ 		rpcInput(23),
+ 		rpcOutletState(24),
+ 		rpcOutletOutput(25),
+ 		cellMessage(26),
+ 		cellData(27),
+ 		cellSignal(28),
+ 		cellApn(29),
+ 		cellTower(30),
+ 		cellNetwork(31),
+ 		wirelessClientConnect(32),
+ 		wirelessClientSignal(33),
+ 		wirelessApAssociation(34),
+ 		wirelessApAuthentication(35),
+ 		dialPoolHealth(36),
+		custom(255)
+ 	}
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 	        "The auto-response check type"
+ 	::= { ogCheckEntry 5 }
+
+ogCheckTriggerActions OBJECT-TYPE
+ 	SYNTAX Counter32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The number of Trigger Actions configured for the auto-response."
+ 	::= { ogCheckEntry 6 }
+
+ogCheckResolveActions OBJECT-TYPE
+ 	SYNTAX Counter32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The number of Resolve Actions configured for the auto-response."
+ 	::= { ogCheckEntry 7 }
+
+ogCheckDeviceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CheckDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+           "The auto-response device reference table."
+	::= { ogStatus2 22 }
+
+ogCheckDeviceEntry OBJECT-TYPE
+	SYNTAX CheckDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"RPC Outlet status entry"
+	INDEX { ogCheckIndex,
+		ogCheckDeviceIndex }
+	::= { ogCheckDeviceTable 1 }
+
+CheckDeviceEntry ::= SEQUENCE {
+        ogCheckDeviceIndex Integer32,
+        ogCheckDeviceCheck OBJECT IDENTIFIER,
+        ogCheckDeviceName  DisplayString,
+        ogCheckDeviceRef   DisplayString
+}
+
+ogCheckDeviceIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the auto-response device outlet table"
+	::= { ogCheckDeviceEntry 1 }
+
+ogCheckDeviceCheck OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The check this device is associated with."
+	::= { ogCheckDeviceEntry 2 }
+
+
+ogCheckDeviceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a device pertaining to the auto-reponse."
+	::= { ogCheckDeviceEntry 3 }
+
+ogCheckDeviceRef OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The reference ID of the device pertaining to the auto-reponse."
+	::= { ogCheckDeviceEntry 4 }
+
+--
+-- The Alarm Group
+--
+ogAlarm OBJECT IDENTIFIER ::= { ogStatus2 23 }
+
+ogAlarmLogTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlarmLogEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+ 	DESCRIPTION
+            "The alarm history table."
+ 	::= { ogAlarm 1 }
+
+ ogAlarmLogEntry OBJECT-TYPE
+ 	SYNTAX AlarmLogEntry
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"An alarm entry."
+ 	INDEX { ogAlarmLogIndex }
+ 	::= { ogAlarmLogTable 1 }
+
+AlarmLogEntry ::= SEQUENCE {
+ 	ogAlarmLogIndex      Integer32,
+ 	ogAlarmEventId       Integer32,
+ 	ogAlarmName          DisplayString,
+ 	ogAlarmCheck         Integer32,
+ 	ogAlarmInstance      Integer32,
+ 	ogAlarmTime          DateAndTime,
+ 	ogAlarmType          INTEGER,
+ 	ogAlarmSummary       DisplayString,
+ 	ogAlarmDevice        DisplayString,
+ 	ogAlarmUser          DisplayString,
+ 	ogAlarmTriggerValue  Integer32,
+ 	ogAlarmCurrentValue  Integer32,
+ 	ogAlarmPreviousValue Integer32,
+	ogAlarmState         INTEGER
+}
+
+ogAlarmLogIndex OBJECT-TYPE
+ 	SYNTAX Integer32 (0..65535)
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"Index within the current alarm table of this alarm."
+ 	::= { ogAlarmLogEntry 1 }
+
+ogAlarmEventId OBJECT-TYPE
+ 	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"Unique event ID for this alarm."
+ 	::= { ogAlarmLogEntry 2 }
+
+ogAlarmName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The check ID that this alarm pertains to."
+ 	::= { ogAlarmLogEntry 3 }
+
+ogAlarmCheck OBJECT-TYPE
+	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The auto-response index this alarm relates to."
+ 	::= { ogAlarmLogEntry 4 }
+
+ogAlarmInstance OBJECT-TYPE
+	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The reference index for this alarm instance."
+ 	::= { ogAlarmLogEntry 5 }
+
+ogAlarmTime OBJECT-TYPE
+ 	SYNTAX DateAndTime
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The UTC date and time for when this alarm was created."
+ 	::= { ogAlarmLogEntry 6 }
+
+ogAlarmType OBJECT-TYPE
+ 	SYNTAX INTEGER {
+		serialSignalCts(1),
+		serialSignalDcd(2),
+		serialSignalDsr(3),
+		serialPatternTx(4),
+		serialPatternRx(5),
+		serialUserSession(6),
+		hostPingDown(7),
+		hostPingUp(8),
+		hostServiceDown(9),
+		hostServiceUp(10),
+		hostUserSession(11),
+		webUserSession(12),
+		envTemperatureLow(13),
+		envTemperatureHigh(14),
+		envHumidityLow(15),
+		envHumidityHigh(16),
+		dioSignalOpened(17),
+		dioSignalClosed(18),
+		netInterfaceDown(19),
+		netInterfaceStarting(20),
+		netInterfaceUp(21),
+		netInterfaceStopping(22),
+		powerSupplyInputVoltageLow(23),
+		powerSupplyInputVoltageHigh(24),
+		powerSupplyOutputCurrentLow(25),
+		powerSupplyOutputCurrentHigh(26),
+		powerSupplyTemperatureLow(27),
+		powerSupplyTemperatureHigh(28),
+		upsTemperatureHigh(29),
+		upsTemperatureLow(30),
+		upsHumidityHigh(31),
+		upsHumidityLow(32),
+		upsOnBattery(33),
+		upsLowBattery(34),
+		upsBatteryChargeLow(35),
+		upsBatteryChargeHigh(36),
+		upsBatteryVoltageLow(37),
+		upsBatteryVoltageHigh(38),
+		upsBatteryCurrentLow(39),
+		upsBatteryCurrentHigh(40),
+		upsBatteryTemperatureLow(41),
+		upsBatteryTemperatureHigh(42),
+		upsInputFrequencyLow(43),
+		upsInputFrequencyHigh(44),
+		upsInputVoltageLow(45),
+		upsInputVoltageHigh(46),
+		upsInputCurrentLow(47),
+		upsInputCurrentHigh(48),
+		upsOutputFrequencyLow(49),
+		upsOutputFrequencyHigh(50),
+		upsOutputVoltageLow(51),
+		upsOutputVoltageHigh(52),
+		upsOutputCurrentLow(53),
+		upsOutputCurrentHigh(54),
+		upsOutputLoadLow(55),
+		upsOutputLoadHigh(56),
+		upsOutputPowerLow(57),
+		upsOutputPowerHigh(58),
+		upsOutputTruePowerLow(59),
+		upsOutputTruePowerHigh(60),
+		rpcInputFrequencyLow(61),
+		rpcInputFrequencyHigh(62),
+		rpcInputVoltageLow(63),
+		rpcInputVoltageHigh(64),
+		rpcInputCurrentLow(65),
+		rpcInputCurrentHigh(66),
+		rpcOutletFrequencyHigh(67),
+		rpcOutletFrequencyLow(68),
+		rpcOutletVoltageHigh(69),
+		rpcOutletVoltageLow(70),
+		rpcOutletCurrentHigh(71),
+		rpcOutletCurrentLow(72),
+		rpcOutletStateOff(73),
+		rpcOutletStateOn(74),
+		cellDataUsage(75),
+		cellMessageReceived(76),
+		cellSignalLow(77),
+		cellSignalHigh(78),
+		cellApnChanged(79),
+		cellTowerChanged(80),
+		cellNetworkChanged(81),
+		wirelessClientConnected(82),
+		wirelessClientDisconnected(83),
+		wirelessClientSignalLow(84),
+		wirelessClientSignalHigh(85),
+		wirelessApAssociation(86),
+		wirelessApDisassociation(87),
+		wirelessApAuthenticationFailure(88),
+		dialPoolHealth(89),
+		customCheckFailure(255),
+		unknown(65535)
+	}
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"A reference to an Alarm Type Object."
+ 	::= { ogAlarmLogEntry 7 }
+
+ogAlarmSummary OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The human readable summary of this alarm."
+ 	::= { ogAlarmLogEntry 8 }
+
+ogAlarmDevice OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The device ID that this alarm pertains to."
+ 	::= { ogAlarmLogEntry 9 }
+
+ogAlarmUser OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The user ID that this alarm pertains to."
+ 	::= { ogAlarmLogEntry 10 }
+
+ogAlarmTriggerValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The threshold value which triggers the alarm."
+	::= { ogAlarmLogEntry 11 }
+
+ogAlarmCurrentValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value as of the time of this entry."
+	::= { ogAlarmLogEntry 12 }
+
+ogAlarmPreviousValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The former value of this entry."
+	::= { ogAlarmLogEntry 13 }
+
+ogAlarmState OBJECT-TYPE
+ 	SYNTAX INTEGER {
+		normal(1),
+		triggered(2),
+		resolving(3),
+		waiting(4),
+		disabled(5),
+		unresolvable(6)
+	}
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The effective alarm state."
+ 	::= { ogAlarmLogEntry 14 }
+
+ogCurrentAlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CurrentAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+ 	DESCRIPTION
+            "The alarm history table."
+ 	::= { ogAlarm 2 }
+
+ogCurrentAlarmEntry OBJECT-TYPE
+ 	SYNTAX CurrentAlarmEntry
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"An alarm entry."
+ 	INDEX { ogCurrentAlarmIndex }
+ 	::= { ogCurrentAlarmTable 1 }
+
+CurrentAlarmEntry ::= SEQUENCE {
+ 	ogCurrentAlarmIndex         Integer32,
+ 	ogCurrentAlarmEventId       Integer32,
+ 	ogCurrentAlarmName          DisplayString,
+ 	ogCurrentAlarmCheck         Integer32,
+ 	ogCurrentAlarmInstance      Integer32,
+ 	ogCurrentAlarmTime          DateAndTime,
+ 	ogCurrentAlarmType          INTEGER,
+ 	ogCurrentAlarmSummary       DisplayString,
+ 	ogCurrentAlarmDevice        DisplayString,
+ 	ogCurrentAlarmUser          DisplayString,
+ 	ogCurrentAlarmTriggerValue  Integer32,
+ 	ogCurrentAlarmCurrentValue  Integer32,
+ 	ogCurrentAlarmPreviousValue Integer32,
+ 	ogCurrentAlarmState         INTEGER
+}
+
+ogCurrentAlarmIndex OBJECT-TYPE
+ 	SYNTAX Integer32 (0..65535)
+ 	MAX-ACCESS not-accessible
+ 	STATUS current
+ 	DESCRIPTION
+ 		"Index within the current alarm table of this alarm."
+ 	::= { ogCurrentAlarmEntry 1 }
+
+ogCurrentAlarmEventId OBJECT-TYPE
+ 	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"Unique event ID for this alarm."
+ 	::= { ogCurrentAlarmEntry 2 }
+
+ogCurrentAlarmName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The ID of the check this alarm pertains to."
+ 	::= { ogCurrentAlarmEntry 3 }
+
+ogCurrentAlarmCheck OBJECT-TYPE
+	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The auto-response index this alarm relates to."
+ 	::= { ogCurrentAlarmEntry 4 }
+
+ogCurrentAlarmInstance OBJECT-TYPE
+	SYNTAX Integer32
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The reference index for this alarm instance."
+ 	::= { ogCurrentAlarmEntry 5 }
+
+ogCurrentAlarmTime OBJECT-TYPE
+ 	SYNTAX DateAndTime
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The UTC date and time for when this alarm was created."
+ 	::= { ogCurrentAlarmEntry 6 }
+
+ogCurrentAlarmType OBJECT-TYPE
+ 	SYNTAX INTEGER {
+		serialSignalCts(1),
+		serialSignalDcd(2),
+		serialSignalDsr(3),
+		serialPatternTx(4),
+		serialPatternRx(5),
+		serialUserSession(6),
+		hostPingDown(7),
+		hostPingUp(8),
+		hostServiceDown(9),
+		hostServiceUp(10),
+		hostUserSession(11),
+		webUserSession(12),
+		envTemperatureLow(13),
+		envTemperatureHigh(14),
+		envHumidityLow(15),
+		envHumidityHigh(16),
+		dioSignalOpened(17),
+		dioSignalClosed(18),
+		netInterfaceDown(19),
+		netInterfaceStarting(20),
+		netInterfaceUp(21),
+		netInterfaceStopping(22),
+		powerSupplyInputVoltageLow(23),
+		powerSupplyInputVoltageHigh(24),
+		powerSupplyOutputCurrentLow(25),
+		powerSupplyOutputCurrentHigh(26),
+		powerSupplyTemperatureLow(27),
+		powerSupplyTemperatureHigh(28),
+		upsTemperatureHigh(29),
+		upsTemperatureLow(30),
+		upsHumidityHigh(31),
+		upsHumidityLow(32),
+		upsOnBattery(33),
+		upsLowBattery(34),
+		upsBatteryChargeLow(35),
+		upsBatteryChargeHigh(36),
+		upsBatteryVoltageLow(37),
+		upsBatteryVoltageHigh(38),
+		upsBatteryCurrentLow(39),
+		upsBatteryCurrentHigh(40),
+		upsBatteryTemperatureLow(41),
+		upsBatteryTemperatureHigh(42),
+		upsInputFrequencyLow(43),
+		upsInputFrequencyHigh(44),
+		upsInputVoltageLow(45),
+		upsInputVoltageHigh(46),
+		upsInputCurrentLow(47),
+		upsInputCurrentHigh(48),
+		upsOutputFrequencyLow(49),
+		upsOutputFrequencyHigh(50),
+		upsOutputVoltageLow(51),
+		upsOutputVoltageHigh(52),
+		upsOutputCurrentLow(53),
+		upsOutputCurrentHigh(54),
+		upsOutputLoadLow(55),
+		upsOutputLoadHigh(56),
+		upsOutputPowerLow(57),
+		upsOutputPowerHigh(58),
+		upsOutputTruePowerLow(59),
+		upsOutputTruePowerHigh(60),
+		rpcInputFrequencyLow(61),
+		rpcInputFrequencyHigh(62),
+		rpcInputVoltageLow(63),
+		rpcInputVoltageHigh(64),
+		rpcInputCurrentLow(65),
+		rpcInputCurrentHigh(66),
+		rpcOutletFrequencyHigh(67),
+		rpcOutletFrequencyLow(68),
+		rpcOutletVoltageHigh(69),
+		rpcOutletVoltageLow(70),
+		rpcOutletCurrentHigh(71),
+		rpcOutletCurrentLow(72),
+		rpcOutletStateOff(73),
+		rpcOutletStateOn(74),
+		cellDataUsage(75),
+		cellMessageReceived(76),
+		cellSignalLow(77),
+		cellSignalHigh(78),
+		cellApnChanged(79),
+		cellTowerChanged(80),
+		cellNetworkChanged(81),
+		wirelessClientConnected(82),
+		wirelessClientDisconnected(83),
+		wirelessClientSignalLow(84),
+		wirelessClientSignalHigh(85),
+		wirelessApAssociation(86),
+		wirelessApDisassociation(87),
+		wirelessApAuthenticationFailure(88),
+		dialPoolHealth(89),
+		customCheckFailure(255),
+		unknown(65535)
+	}
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The specific Alarm Type."
+ 	::= { ogCurrentAlarmEntry 7 }
+
+ogCurrentAlarmSummary OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"A readable summary of this alarm."
+ 	::= { ogCurrentAlarmEntry 8 }
+
+ogCurrentAlarmDevice OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The ID of the device this alarm pertains to."
+ 	::= { ogCurrentAlarmEntry 9 }
+
+ogCurrentAlarmUser OBJECT-TYPE
+ 	SYNTAX DisplayString
+ 	MAX-ACCESS read-only
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The ID of the user this alarm pertains to."
+ 	::= { ogCurrentAlarmEntry 10 }
+
+ogCurrentAlarmTriggerValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The threshold value which triggers the alarm."
+	::= { ogCurrentAlarmEntry 11 }
+
+ogCurrentAlarmCurrentValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value as of the time of this entry."
+	::= { ogCurrentAlarmEntry 12 }
+
+ogCurrentAlarmPreviousValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The former value of this entry."
+	::= { ogCurrentAlarmEntry 13 }
+
+ogCurrentAlarmState OBJECT-TYPE
+ 	SYNTAX INTEGER {
+		normal(1),
+		triggered(2),
+		resolving(3),
+		waiting(4),
+		disabled(5),
+		unresolvable(6)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The effective alarm state."
+	::= { ogCurrentAlarmEntry 14 }
+
+-- Notifications
+ogStatus2NotificationPrefix OBJECT IDENTIFIER ::= {
+ 	ogStatus2 100
+}
+
+ogMibNotifications OBJECT IDENTIFIER ::= {
+	ogStatus2NotificationPrefix 0
+}
+
+ogSerialSignalNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	STATUS current
+	DESCRIPTION
+		"The notification sent when a serial signal changes."
+	::= { ogMibNotifications 1 }
+
+ogSerialPatternNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a pattern is matched on a serial
+		port ."
+ 	::= { ogMibNotifications 2 }
+
+ogSerialUserNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	STATUS current
+	DESCRIPTION
+ 		"The notification sent when a user logs in or out of a serial
+		console."
+	::= { ogMibNotifications 3 }
+
+ogHostPingNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a host stops or resumes responding
+		to a ping."
+ 	::= { ogMibNotifications 4 }
+
+ogHostServiceNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a host service stops or resumes."
+ 	::= { ogMibNotifications 5 }
+
+ogHostUserNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a user logs in or out of a network
+		host."
+ 	::= { ogMibNotifications 6 }
+
+ogWebUserNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a user logs in or out of the web
+		interface."
+ 	::= { ogMibNotifications 7 }
+
+
+ogEmdTemperatureNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a temperature event occurs"
+ 	::= { ogMibNotifications 8 }
+
+ogEmdHumidityNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a humidity event occurs"
+ 	::= { ogMibNotifications 9 }
+
+ogEmdDioNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a Digital I/O input event occurs"
+ 	::= { ogMibNotifications 10 }
+
+ogPowerSupplyInputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a power supply voltage alarm occurs"
+ 	::= { ogMibNotifications 11 }
+
+ogPowerSupplyOutputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a power supply voltage alarm occurs"
+ 	::= { ogMibNotifications 12 }
+
+ogPowerSupplyTempNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a power supply voltage alarm occurs"
+ 	::= { ogMibNotifications 13 }
+
+ogUpsNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a UPS alarm occurs"
+ 	::= { ogMibNotifications 14 }
+
+ogUpsBatteryNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a UPS battery alarm occurs"
+ 	::= { ogMibNotifications 15 }
+
+ogUpsInputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a UPS input alarm occurs"
+ 	::= { ogMibNotifications 16 }
+
+ogUpsOutputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a UPS output alarm occurs"
+ 	::= { ogMibNotifications 17 }
+
+ogRpcInputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a RPC input alarm occurs"
+ 	::= { ogMibNotifications 18 }
+
+ogRpcOutputNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a RPC output alarm occurs"
+ 	::= { ogMibNotifications 19 }
+
+ogRpcOutletNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a RPC output alarm occurs"
+ 	::= { ogMibNotifications 20 }
+
+
+ogNetInterfaceNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a network interface event occurs."
+ 	::= { ogMibNotifications 21 }
+
+ogCellDataNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a cellular data alarm occurs."
+ 	::= { ogMibNotifications 22 }
+
+ogCellMessageNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when an SMS command alarm occurs."
+ 	::= { ogMibNotifications 23 }
+
+ogCellSignalNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a cellular signal alarm occurs."
+ 	::= { ogMibNotifications 24 }
+
+ogCellApnNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a cellular APN alarm occurs."
+ 	::= { ogMibNotifications 25 }
+
+ogCellTowerNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a cellular tower alarm occurs."
+ 	::= { ogMibNotifications 26 }
+
+ogCellNetworkNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a cellular network alarm occurs."
+ 	::= { ogMibNotifications 27 }
+
+ogWifiClientConnectNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a wireless client connects or
+		disconnects."
+ 	::= { ogMibNotifications 28 }
+
+ogWifiClientSignalNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a wireless client signal changes."
+ 	::= { ogMibNotifications 29 }
+
+ogWifiApAssociationNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a wireless client connects or
+		disconnects to this AP."
+ 	::= { ogMibNotifications 30 }
+
+ogWifiApAuthNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a wireless client fails to 
+		authenticate with this AP."
+ 	::= { ogMibNotifications 31 }
+
+ogDialPoolHealthNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when dial-pool health alarm occurs."
+ 	::= { ogMibNotifications 32 }
+
+ogCustomNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a custom check is triggered."
+ 	::= { ogMibNotifications 33 }
+
+-- End notifications
+
+-- conformance information
+
+ogStatus2Conformance OBJECT IDENTIFIER ::= { ogStatus2 65535 }
+ogStatus2Compliances OBJECT IDENTIFIER ::= {
+	ogStatus2Conformance 1 }
+ogStatus2Groups OBJECT IDENTIFIER ::= {
+	ogStatus2Conformance 2 }
+
+-- compliance statements
+
+ogStatus2Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for the Opengear status MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+	    ogBasicStatusGroup,
+	    ogBasicAlarmGroup,
+	    ogBasicNotificationGroup
+    }
+
+   ::= { ogStatus2Compliances 1 }
+
+-- units of conformance
+
+ogBasicStatusGroup OBJECT-GROUP
+    OBJECTS {
+	ogFirmwareVersion,
+	ogSerialNumber,
+	ogSerialPortLabel,
+	ogSerialPortSpeed,
+	ogSerialPortDataBits,
+	ogSerialPortParity,
+	ogSerialPortStopBits,
+	ogSerialPortFlowControl,
+	ogSerialPortMode,
+	ogSerialPortLogLevel,
+	ogSerialPortRxBytes,
+	ogSerialPortTxBytes,
+	ogSerialPortFramingErrors,
+	ogSerialPortParityErrors,
+	ogSerialPortOverrunErrors,
+	ogSerialPortBreaks,
+	ogSerialPortDCD,
+	ogSerialPortDTR,
+	ogSerialPortDSR,
+	ogSerialPortCTS,
+	ogSerialPortRTS,
+	ogSerialUserStartTime,
+	ogSerialUserPort,
+	ogSerialUserLabel,
+	ogSerialUserName,
+        ogHostName,
+        ogHostIpV4Address,
+        ogHostIpV6Address,
+        ogHostServiceHost,
+        ogHostServiceType,
+        ogHostServicePort,
+        ogHostServiceStatus,
+        ogHostServiceCounter,
+        ogHostUserHost,
+	ogHostUserStartTime,
+	ogHostUserAddress,
+	ogHostUserHostName,
+	ogHostUserName,
+	ogWebUserStartTime,
+	ogWebUserName,
+	ogWebUserSourceAddress,
+	ogWebUserSourcePort,
+	ogEmdName,
+	ogEmdDescription,
+	ogEmdEnabled,
+	ogEmdLogEnabled,
+	ogEmdConnectType,
+	ogEmdTemperatureTotal,
+	ogEmdHumidityTotal,
+	ogEmdDioInputTotal,
+	ogEmdTemperatureEmd,
+	ogEmdTemperatureName,
+	ogEmdTemperatureDescription,
+	ogEmdTemperatureValue,
+	ogEmdTemperatureCounter,
+	ogEmdHumidityEmd,
+	ogEmdHumidityName,
+	ogEmdHumidityDescription,
+	ogEmdHumidityValue,
+	ogEmdHumidityCounter,
+        ogEmdDioEmd,
+        ogEmdDioName,
+        ogEmdDioDescription,
+        ogEmdDioType,
+        ogEmdDioDirection,
+        ogEmdDioState,
+        ogEmdDioTriggerMode,
+        ogEmdDioCounter,
+	ogNetInterfaceName,
+	ogNetInterfaceType,
+	ogNetInterfaceState,
+	ogPowerSupplyName,
+	ogPowerSupplyInputVoltage,
+	ogPowerSupplyOutputCurrent,
+	ogPowerSupplyTemperature,
+	ogUpsName,
+        ogUpsDescription,
+        ogUpsType,
+        ogUpsLogEnabled,
+        ogUpsConnectType,
+        ogUpsState,
+        ogUpsTemperature,
+        ogUpsHumidity,
+        ogUpsBatteryState,
+        ogUpsBatteryRunTime,
+        ogUpsBatteryRunTimeLow,
+        ogUpsBatteryRunTimeRestart,
+        ogUpsBatteryCharge,
+        ogUpsBatteryVoltage,
+        ogUpsBatteryNominalVoltage,
+        ogUpsBatteryCurrent,
+        ogUpsBatteryNominalCurrent,
+        ogUpsBatteryTemperature,
+        ogUpsInputFrequency,
+        ogUpsInputNominalFrequency,
+        ogUpsInputVoltage,
+        ogUpsInputNominalVoltage,
+        ogUpsInputCurrent,
+        ogUpsInputNominalCurrent,
+        ogUpsOutputFrequency,
+        ogUpsOutputNominalFrequency,
+        ogUpsOutputVoltage,
+        ogUpsOutputNominalVoltage,
+        ogUpsOutputCurrent,
+        ogUpsOutputNominalCurrent,
+        ogUpsOutputLoad,
+        ogUpsOutputPower,
+        ogUpsOutputTruePower,
+        ogUpsCounter,
+	ogRpcName,
+	ogRpcDescription,
+	ogRpcType,
+	ogRpcLogEnabled,
+	ogRpcOutletTotal,
+	ogRpcMaxTemperature,
+	ogRpcConnectType,
+	ogRpcInputFrequency,
+	ogRpcInputVoltage,
+	ogRpcInputCurrent,
+	ogRpcCounter,
+	ogRpcOutletRpc,
+	ogRpcOutletName,
+	ogRpcOutletState,
+	ogRpcOutletFrequency,
+	ogRpcOutletCurrent,
+	ogRpcOutletVoltage,
+	ogRpcOutletLoad,
+        ogCellModemVendor,
+        ogCellModemModel,
+        ogCellModemEnabled,
+        ogCellModemConnected,
+        ogCellModemNetwork,
+        ogCellModemRegistered,
+        ogCellModemTower,
+        ogCellModemRadioTechnology,
+        ogCellModemApn,
+        ogCellModem3gRssi,
+        ogCellModem4gRssi,
+        ogCellModemSessionTime,
+        ogCellModemSelectedSimCard,
+        ogCellModemTemperature,
+        ogCellModemCounter,
+        ogWifiClientInterface,
+        ogWifiClientEnabled,
+        ogWifiClientEssid,
+        ogWifiClientIeeeMode,
+        ogWifiClientMode,
+        ogWifiClientFrequency,
+        ogWifiClientApMac,
+        ogWifiClientBitRate,
+        ogWifiClientTxPower,
+        ogWifiClientLinkQuality,
+        ogWifiClientRssi,
+        ogWifiClientRxInvalidNwid,
+        ogWifiClientRxInvalidCrypt,
+        ogWifiClientRxInvalidFrag,
+        ogWifiClientRxInvalidRetries,
+        ogWifiClientRxInvalidMisc,
+        ogWifiClientMissedBeacon,
+        ogWifiClientCounter,
+        ogWifiApInterface,
+        ogWifiApEnabled,
+        ogWifiApSsid,
+        ogWifiApIeeeMode,
+        ogWifiApFrequency,
+        ogWifiApTxPower,
+        ogWifiApCounter,
+        ogWifiApClientAp,
+        ogWifiApClientMac,
+        ogWifiApClientInactiveTime,
+        ogWifiApClientRxBytes,
+        ogWifiApClientRxPackets,
+        ogWifiApClientTxBytes,
+        ogWifiApClientTxPackets,
+        ogWifiApClientRssi,
+        ogWifiApClientTxBitRate,
+	ogCheckName,
+	ogCheckRepeatTimeout,
+	ogCheckResetTimeout,
+	ogCheckType,
+	ogCheckTriggerActions,
+	ogCheckResolveActions,
+	ogCheckDeviceCheck,
+	ogCheckDeviceName,
+	ogCheckDeviceRef
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to retrieve Opengear statistics."
+    ::= { ogStatus2Groups 1 }
+
+ogBasicAlarmGroup OBJECT-GROUP
+    OBJECTS {
+	ogAlarmEventId,
+	ogAlarmName,
+	ogAlarmCheck,
+	ogAlarmInstance,
+	ogAlarmTime,
+	ogAlarmType,
+	ogAlarmSummary,
+	ogAlarmDevice,
+	ogAlarmUser,
+	ogAlarmTriggerValue,
+	ogAlarmCurrentValue,
+	ogAlarmPreviousValue,
+	ogAlarmState,
+	ogCurrentAlarmEventId,
+	ogCurrentAlarmName,
+	ogCurrentAlarmCheck,
+	ogCurrentAlarmInstance,
+	ogCurrentAlarmTime,
+	ogCurrentAlarmType,
+	ogCurrentAlarmSummary,
+	ogCurrentAlarmDevice,
+	ogCurrentAlarmUser,
+	ogCurrentAlarmTriggerValue,
+	ogCurrentAlarmCurrentValue,
+	ogCurrentAlarmPreviousValue,
+	ogCurrentAlarmState
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to report Opengear alarms."
+    ::= { ogStatus2Groups 2 }
+
+ogBasicNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+               ogSerialSignalNotification,
+               ogSerialPatternNotification,
+               ogSerialUserNotification,
+               ogHostPingNotification,
+               ogHostServiceNotification,
+               ogHostUserNotification,
+               ogWebUserNotification,
+               ogEmdDioNotification,
+               ogEmdTemperatureNotification,
+               ogEmdHumidityNotification,
+               ogPowerSupplyInputNotification,
+               ogPowerSupplyOutputNotification,
+               ogPowerSupplyTempNotification,
+               ogUpsNotification,
+               ogUpsInputNotification,
+               ogUpsBatteryNotification,
+               ogUpsOutputNotification,
+               ogRpcInputNotification,
+               ogRpcOutputNotification,
+               ogRpcOutletNotification,
+               ogNetInterfaceNotification,
+               ogCellDataNotification,
+               ogCellMessageNotification,
+               ogCellSignalNotification,
+               ogCellApnNotification,
+               ogCellTowerNotification,
+               ogCellNetworkNotification,
+               ogWifiClientConnectNotification,
+               ogWifiClientSignalNotification,
+               ogWifiApAssociationNotification,
+               ogWifiApAuthNotification,
+               ogDialPoolHealthNotification,
+               ogCustomNotification
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of notifications for the status system."
+       ::= { ogStatus2Groups 3 }
+
+END
