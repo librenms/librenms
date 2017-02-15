@@ -278,11 +278,13 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
-        echo '<li class="'.$select['services'].'">
-            <a href="'.generate_device_url($device, array('tab' => 'services')).'">
-            <i class="fa fa-cogs fa-lg icon-theme"  aria-hidden="true"></i> Services
-            </a>
-            </li>';
+        if ($config['show_services']) {
+            echo '<li class="'.$select['services'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'services')).'">
+                <i class="fa fa-cogs fa-lg icon-theme"  aria-hidden="true"></i> Services
+                </a>
+                </li>';
+        }
 
         if (@dbFetchCell("SELECT COUNT(toner_id) FROM toner WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['toner'].'">
