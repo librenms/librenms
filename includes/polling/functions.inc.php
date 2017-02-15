@@ -193,7 +193,6 @@ function poll_device($device, $options)
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
     $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
-    $status = 0;
     unset($array);
     $device_start = microtime(true);
     // Start counting device poll time
@@ -227,47 +226,9 @@ function poll_device($device, $options)
         echo "Created directory : $host_rrd\n";
     }
 
-    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $response = device_is_up($device, true);
 
-    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
-
-    $device_perf              = $ping_response['db'];
-    $device_perf['device_id'] = $device['device_id'];
-    $device_perf['timestamp'] = array('NOW()');
-    if (can_ping_device($attribs) === true && is_array($device_perf)) {
-        dbInsert($device_perf, 'device_perf');
-    }
-
-    $device['pingable'] = $ping_response['result'];
-    $ping_time          = $ping_response['last_ping_timetaken'];
-    $response           = array();
-    $status_reason      = '';
-    if ($device['pingable']) {
-        $device['snmpable'] = isSNMPable($device);
-        if ($device['snmpable']) {
-            $status                    = '1';
-            $response['status_reason'] = '';
-        } else {
-            echo 'SNMP Unreachable';
-            $status                    = '0';
-            $response['status_reason'] = 'snmp';
-        }
-    } else {
-        echo 'Unpingable';
-        $status                    = '0';
-        $response['status_reason'] = 'icmp';
-    }
-
-    if ($device['status'] != $status) {
-        $poll_update   .= $poll_separator."`status` = '$status'";
-        $poll_separator = ', ';
-
-        dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-
-        log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down') . ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'), 4);
-    }
-
-    if ($status == '1') {
+    if ($response['status'] == '1') {
         $graphs    = array();
         $oldgraphs = array();
 
@@ -374,16 +335,16 @@ function poll_device($device, $options)
         }
 
         // Ping response
-        if (can_ping_device($attribs) === true  &&  !empty($ping_time)) {
+        if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
                 'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
             );
             $fields = array(
-                'ping' => $ping_time,
+                'ping' => $response['ping_time'],
             );
 
             $update_array['last_ping']             = array('NOW()');
-            $update_array['last_ping_timetaken']   = $ping_time;
+            $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
         }
