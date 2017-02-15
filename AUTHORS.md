@@ -178,6 +178,9 @@ LibreNMS contributors:
 - William George <wrgeorge1983@gmail.com> (wrgeorge1983)
 - Valentin Parmeland <naoko.vp@gmail.com> (NK74)
 - Michał Margula <michal@margula.pl> (alchemyx)
+- Maclin Fuehr-Bush <macfuehrbush@gmail.com> (mobilemaclin)
+- Robert Penziol <rpenziol@pdx.edu> (rpenziol)
+- Stefan Behte <craig at haquarter.de> (craig)
 
 Observium was written by:
 - Adam Armstrong

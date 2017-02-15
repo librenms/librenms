@@ -1017,6 +1017,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMellanox()
     {
         $this->checkOS('mellanox');
+        $this->checkOS('mellanox', 'mellanox-i5035');
     }
 
     public function testMerakimr()

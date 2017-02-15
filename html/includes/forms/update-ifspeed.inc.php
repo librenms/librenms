@@ -32,10 +32,10 @@ if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
         $device = device_by_id_cache($device_id);
         if (is_array($speed)) {
             del_dev_attrib($device, 'ifSpeed:'.$ifName);
-            log_event("$ifName Port speed cleared manually", $device, 'interface', $port_id);
+            log_event("$ifName Port speed cleared manually", $device, 'interface', 3, $port_id);
         } else {
             set_dev_attrib($device, 'ifSpeed:'.$ifName, 1);
-            log_event("$ifName Port speed set manually: $speed", $device, 'interface', $port_id);
+            log_event("$ifName Port speed set manually: $speed", $device, 'interface', 3, $port_id);
             $port_tune = get_dev_attrib($device, 'ifName_tune:'.$ifName);
             $device_tune = get_dev_attrib($device, 'override_rrdtool_tune');
             if ($port_tune == "true" ||
