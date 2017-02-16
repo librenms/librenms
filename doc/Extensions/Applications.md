@@ -27,6 +27,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Munin](#munin) - Agent
+1. [PHP-FPM](#php-fpm) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
