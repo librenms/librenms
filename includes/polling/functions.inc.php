@@ -33,25 +33,6 @@ function poll_sensor($device, $class)
 {
     global $config, $memcache, $agent_sensors;
 
-    $supported_sensors = array(
-        'current'     => 'A',
-        'frequency'   => 'Hz',
-        'runtime'     => 'Min',
-        'humidity'    => '%',
-        'fanspeed'    => 'rpm',
-        'power'       => 'W',
-        'voltage'     => 'V',
-        'temperature' => 'C',
-        'dbm'         => 'dBm',
-        'charge'      => '%',
-        'load'        => '%',
-        'state'       => '#',
-        'signal'      => 'dBm',
-        'airflow'     => 'cfm',
-    );
-
-    $unit = $supported_sensors[$class];
-
     $sensors = array();
     $misc_sensors = array();
     $all_sensors = array();
@@ -139,7 +120,25 @@ function poll_sensor($device, $class)
  */
 function record_sensor_data($device, $all_sensors)
 {
+    $supported_sensors = array(
+        'current'     => 'A',
+        'frequency'   => 'Hz',
+        'runtime'     => 'Min',
+        'humidity'    => '%',
+        'fanspeed'    => 'rpm',
+        'power'       => 'W',
+        'voltage'     => 'V',
+        'temperature' => 'C',
+        'dbm'         => 'dBm',
+        'charge'      => '%',
+        'load'        => '%',
+        'state'       => '#',
+        'signal'      => 'dBm',
+        'airflow'     => 'cfm',
+    );
+
     foreach ($all_sensors as $sensor) {
+        $unit         = $supported_sensors[$sensor['sensor_class']];
         $sensor_value = $sensor['new_value'];
         if ($sensor_value == -32768) {
             echo 'Invalid (-32768) ';
@@ -185,7 +184,6 @@ function record_sensor_data($device, $all_sensors)
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, 3, $sensor['sensor_id']);
         }
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = '?' AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
-        unset($supported_sensors);
     }
 }
 
