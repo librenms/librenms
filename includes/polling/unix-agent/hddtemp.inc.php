@@ -13,14 +13,9 @@ if ($agent_data['haddtemp'] != '|') {
             list($blockdevice,$descr,$temperature,$unit) = explode('|', $disk, 4);
             $diskcount++;
             discover_sensor($valid['sensor'], 'temperature', $device, '', $diskcount, 'hddtemp', "$blockdevice: $descr", '1', '1', null, null, null, null, $temperature, 'agent');
-
-            $agent_sensors['temperature']['hddtemp'][$diskcount] = array(
-                'description' => "$blockdevice: $descr",
-                'current'     => $temperature,
-                'index'       => $diskcount,
-            );
         }
 
         echo "\n";
+        $agent_sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = 'temperature' AND `poller_type` = 'agent' AND `sensor_deleted` = 0", array($device['device_id']));
     }
 }//end if

@@ -58,7 +58,7 @@ function poll_sensor($device, $class)
 
     foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = '?' AND `device_id` = ?", array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
-            $misc_sensors[] = $sensor;
+            // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
             $misc_sensors[] = $sensor;
         } else {
@@ -130,7 +130,15 @@ function poll_sensor($device, $class)
             continue;
         }//end if
     }
+    record_sensor_data($device, $all_sensors);
+}//end poll_sensor()
 
+/**
+ * @param $device
+ * @param $all_sensors
+ */
+function record_sensor_data($device, $all_sensors)
+{
     foreach ($all_sensors as $sensor) {
         $sensor_value = $sensor['new_value'];
         if ($sensor_value == -32768) {
@@ -179,7 +187,7 @@ function poll_sensor($device, $class)
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = '?' AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
         unset($supported_sensors);
     }
-}//end poll_sensor()
+}
 
 function poll_device($device, $options)
 {
