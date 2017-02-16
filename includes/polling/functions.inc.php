@@ -138,7 +138,8 @@ function record_sensor_data($device, $all_sensors)
     );
 
     foreach ($all_sensors as $sensor) {
-        $unit         = $supported_sensors[$sensor['sensor_class']];
+        $class        = $sensor['sensor_class'];
+        $unit         = $supported_sensors[$class];
         $sensor_value = $sensor['new_value'];
         if ($sensor_value == -32768) {
             echo 'Invalid (-32768) ';
