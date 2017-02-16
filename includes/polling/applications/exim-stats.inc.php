@@ -36,8 +36,8 @@ $rrd_def = array(
 );
 
 $fields = array(
-    'frozen' => intval($frozen),
-    'queue' => intval($queue)
+    'frozen' => intval(trim($frozen, '"')),
+    'queue' => intval(trim($queue, '"'))
 );
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
