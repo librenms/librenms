@@ -157,14 +157,14 @@ var greenMarker = L.AwesomeMarkers.icon({
         // Checking user permissions
         if (is_admin() || is_read()) {
         // Admin or global read-only - show all devices
-            $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+            $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                       AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
         } else {
         // Normal user - grab devices that user has permissions to
-            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng`
+            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
                     FROM `devices_perms`, `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
@@ -185,8 +185,8 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $icon = 'redMarker';
                 $z_offset = 10000;  // move marker to foreground
             }
-            $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".$map_devices['hostname']."</a>';
-var tooltip = '".$map_devices['hostname']."';
+            $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".ip_to_sysname($map_devices, $map_devices['hostname'])."</a>';
+var tooltip = '".ip_to_sysname($map_devices, $map_devices['hostname'])."';
 var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
 marker.bindPopup(title);
     markers.addLayer(marker);\n";

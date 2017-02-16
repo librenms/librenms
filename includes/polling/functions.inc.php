@@ -168,15 +168,15 @@ function poll_sensor($device, $class)
         // FIXME also warn when crossing WARN level!!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' under threshold: '.$sensor_value." $unit (< ".$sensor['sensor_limit_low']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' under threshold: ' . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' above threshold: ' . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
-            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
+            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, 3, $sensor['sensor_id']);
         }
-        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = '?' AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
         unset($supported_sensors);
     }
 }//end poll_sensor()
@@ -193,7 +193,6 @@ function poll_device($device, $options)
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
     $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
-    $status = 0;
     unset($array);
     $device_start = microtime(true);
     // Start counting device poll time
@@ -203,7 +202,7 @@ function poll_device($device, $options)
     $ip = dnslookup($device);
 
     if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
-        log_event('Device IP changed to '.$ip, $device, 'system');
+        log_event('Device IP changed to ' . $ip, $device, 'system', 3);
         $db_ip = inet_pton($ip);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
@@ -227,47 +226,9 @@ function poll_device($device, $options)
         echo "Created directory : $host_rrd\n";
     }
 
-    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $response = device_is_up($device, true);
 
-    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
-
-    $device_perf              = $ping_response['db'];
-    $device_perf['device_id'] = $device['device_id'];
-    $device_perf['timestamp'] = array('NOW()');
-    if (can_ping_device($attribs) === true && is_array($device_perf)) {
-        dbInsert($device_perf, 'device_perf');
-    }
-
-    $device['pingable'] = $ping_response['result'];
-    $ping_time          = $ping_response['last_ping_timetaken'];
-    $response           = array();
-    $status_reason      = '';
-    if ($device['pingable']) {
-        $device['snmpable'] = isSNMPable($device);
-        if ($device['snmpable']) {
-            $status                    = '1';
-            $response['status_reason'] = '';
-        } else {
-            echo 'SNMP Unreachable';
-            $status                    = '0';
-            $response['status_reason'] = 'snmp';
-        }
-    } else {
-        echo 'Unpingable';
-        $status                    = '0';
-        $response['status_reason'] = 'icmp';
-    }
-
-    if ($device['status'] != $status) {
-        $poll_update   .= $poll_separator."`status` = '$status'";
-        $poll_separator = ', ';
-
-        dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
-    }
-
-    if ($status == '1') {
+    if ($response['status'] == '1') {
         $graphs    = array();
         $oldgraphs = array();
 
@@ -374,16 +335,16 @@ function poll_device($device, $options)
         }
 
         // Ping response
-        if (can_ping_device($attribs) === true  &&  !empty($ping_time)) {
+        if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
                 'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
             );
             $fields = array(
-                'ping' => $ping_time,
+                'ping' => $response['ping_time'],
             );
 
             $update_array['last_ping']             = array('NOW()');
-            $update_array['last_ping_timetaken']   = $ping_time;
+            $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
         }

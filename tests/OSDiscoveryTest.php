@@ -389,6 +389,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ceraos');
     }
 
+    public function testCelvin()
+    {
+        $this->checkOS('celvin');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
@@ -789,6 +794,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hpe-msl');
     }
 
+    public function testHpeMsa()
+    {
+        $this->checkOS('hpe-msa');
+    }
+
     public function testHpmsm()
     {
         $this->checkOS('hpmsm');
@@ -1012,6 +1022,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testMellanox()
     {
         $this->checkOS('mellanox');
+        $this->checkOS('mellanox', 'mellanox-i5035');
     }
 
     public function testMerakimr()
@@ -1299,6 +1310,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('powerconnect', 'powerconnect-3011');
         $this->checkOS('powerconnect', 'powerconnect-3019');
         $this->checkOS('powerconnect', 'powerconnect-3031');
+        $this->checkOS('powerconnect', 'powerconnect-3041');
     }
 
     public function testPowervault()
@@ -1360,6 +1372,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testQnap()
     {
         $this->checkOS('qnap');
+        $this->checkOS('qnap', 'qnap-ts431');
     }
 
     public function testQuanta()
@@ -1591,6 +1604,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('tplink');
         $this->checkOS('tplink', 'tplink1');
+        $this->checkOS('tplink', 'tplink-t1600g-28ts');
     }
 
     public function testTranzeo()
@@ -1636,6 +1650,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('vrp', 'vrp2');
         $this->checkOS('vrp', 'vrp3');
         $this->checkOS('vrp', 'vrp4');
+    }
+
+    public function testVubiq()
+    {
+        $this->checkOS('vubiq');
     }
 
     public function testVyatta()
@@ -1706,6 +1725,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('zywall');
         $this->checkOS('zywall', 'zywall1');
+        $this->checkOS('zywall', 'zywall2');
     }
 
     public function testZyxelnwa()

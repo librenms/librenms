@@ -12,4 +12,3 @@ discovery:
         - '/^Cambium PTP 50650/'
         - '/^PTP250/'
         - '/^Cambium/'
-

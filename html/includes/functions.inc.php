@@ -711,46 +711,6 @@ function print_optionbar_end()
 }//end print_optionbar_end()
 
 
-function geteventicon($message)
-{
-    if ($message == 'Device status changed to Down from check') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'red';
-    }
-
-    if ($message == 'Device status changed to Up from check') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'green';
-    }
-
-    if ($message == 'Interface went down' || $message == 'Interface changed state to Down' || $message == 'ifOperStatus: up -> down') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'red';
-    }
-
-    if ($message == 'Interface went up' || $message == 'Interface changed state to Up' || $message == 'ifOperStatus: down -> up') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'green';
-    }
-
-    if ($message == 'Interface disabled' || $message == 'ifAdminStatus: up -> down') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'grey';
-    }
-
-    if ($message == 'Interface enabled' || $message == 'ifAdminStatus: down -> up') {
-        $icon = 'fa-bookmark';
-        $icon_colour = 'green';
-    }
-
-    if (isset($icon)) {
-        return array('icon' => $icon,'colour' => $icon_colour);
-    } else {
-        return false;
-    }
-}//end geteventicon()
-
-
 function overlibprint($text)
 {
     return "onmouseover=\"return overlib('".$text."');\" onmouseout=\"return nd();\"";
@@ -1168,6 +1128,11 @@ function alert_details($details)
             $fallback      = false;
         }
 
+        if ($tmp_alerts['accesspoint_id']) {
+            $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
+            $fallback      = false;
+        }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
@@ -1426,3 +1391,31 @@ function array_to_htmljson($data)
         return false;
     }
 }
+
+/**
+ * @param $eventlog_severity
+ * @return $eventlog_severity_icon
+ */
+function eventlog_severity($eventlog_severity)
+{
+    switch ($eventlog_severity) {
+        case 1:
+            return "severity-ok"; //OK
+            break;
+        case 2:
+            return "severity-info"; //Informational
+            break;
+        case 3:
+            return "severity-notice"; //Notice
+            break;
+        case 4:
+            return "severity-warning"; //Warning
+            break;
+        case 5:
+            return "severity-critical"; //Critical
+            break;
+        default:
+            return "severity-unknown"; //Unknown
+            break;
+    }
+} // end eventlog_severity
