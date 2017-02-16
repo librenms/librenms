@@ -4,7 +4,7 @@ $app_id = $app['app_id'];
 
 $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull.8.112.104.112.102.112.109.115.112';
+$oid          = 'nsExtendOutputFull.8.112.104.112.102.112.109.115.112';
 $phpfpm = snmp_walk($device, $oid, $options, $mib);
 
 list($pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_queue,$listen_queue_len,$idle_processes,
