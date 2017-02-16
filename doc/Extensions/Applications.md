@@ -28,6 +28,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Fail2ban](#fail2ban) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -487,3 +488,17 @@ extend phpfpmsp /etc/snmp/phpfpm-sp
 7. On the device page in Librenms, edit your host and check `PHP-FPM` under the Applications tab.
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
+
+#### Fail2ban
+
+##### SNMP Extend
+
+1. Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/phpfpm-sp)
+2. Make the script executable (chmod +x /etc/snmp/fail2ban)
+3. Edit your snmpd.conf file (usually /etc/snmp/fail2ban) and add:
+```
+extend fail2ban /etc/snmp/fail2ban
+```
+5: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults.
+6. Restart snmpd on your host
+7. On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
