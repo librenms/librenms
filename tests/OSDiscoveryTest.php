@@ -415,6 +415,14 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosb', 'ciscosb6');
         $this->checkOS('ciscosb', 'ciscosb7');
         $this->checkOS('ciscosb', 'ciscosb8');
+        $this->checkOS('ciscosb', 'ciscosb9');
+        $this->checkOS('ciscosb', 'ciscosb10');
+        $this->checkOS('ciscosb', 'ciscosb11');
+        $this->checkOS('ciscosb', 'ciscosb12');
+        $this->checkOS('ciscosb', 'ciscosb-srw2008');
+        $this->checkOS('ciscosb', 'ciscosb-srw2008p');
+        $this->checkOS('ciscosb', 'ciscosb-srw208');
+        $this->checkOS('ciscosb', 'ciscosb-srw208mp');
     }
 
     public function testCiscosmblinux()
