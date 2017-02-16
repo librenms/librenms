@@ -476,7 +476,7 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 
 ##### SNMP Extend
 
-1. Copy the shell script, phpfpm-sp, to the desired host (the host must be added to LibreNMS devices)
+1. Copy the shell script, phpfpm-sp, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpm-sp -O /etc/snmp/phpfpm-sp)
 2. Make the script executable (chmod +x /etc/snmp/phpfpm-sp)
 3. Edit your snmpd.conf file (usually /etc/snmp/phpfpm-sp) and add:
 ```
