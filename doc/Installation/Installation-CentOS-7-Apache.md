@@ -102,7 +102,7 @@ Add the following config:
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
-    sesetbool -P httpd_can_network_connect=1
+    setsebool -P httpd_can_network_connect=1
 ```
 
 #### Restart Web server
