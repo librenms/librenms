@@ -469,3 +469,20 @@ if [ "$1" = "config" ]; then
 fi
 echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 ```
+
+
+#### PHP-FPM
+
+##### SNMP Extend
+
+1. Copy the shell script, phpfpm-sp, to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable (chmod +x /etc/snmp/phpfpm-sp)
+3. Edit your snmpd.conf file (usually /etc/snmp/phpfpm-sp) and add:
+```
+extend phpfpmsp /etc/snmp/phpfpm-sp
+```
+5: Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
+6. Restart snmpd on your host
+7. On the device page in Librenms, edit your host and check `PHP-FPM` under the Applications tab.
+
+It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
