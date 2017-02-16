@@ -102,6 +102,12 @@ function discover_device($device, $options = null)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
+    $response = device_is_up($device, true);
+
+    if ($response['status'] !== '1') {
+        return;
+    }
+
     if ($device['os'] == 'generic') {
         // verify if OS has changed from generic
         $device['os'] = getHostOS($device);
@@ -138,14 +144,15 @@ function discover_device($device, $options = null)
         if ($force_module === true ||
             $attribs['discover_' . $module] ||
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
-            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
+            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))
+        ) {
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            $module_mem  = (memory_get_usage() - $start_memory);
+            $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {

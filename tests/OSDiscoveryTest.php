@@ -794,6 +794,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hpe-msl');
     }
 
+    public function testHpeMsa()
+    {
+        $this->checkOS('hpe-msa');
+    }
+
     public function testHpmsm()
     {
         $this->checkOS('hpmsm');
@@ -1305,6 +1310,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('powerconnect', 'powerconnect-3011');
         $this->checkOS('powerconnect', 'powerconnect-3019');
         $this->checkOS('powerconnect', 'powerconnect-3031');
+        $this->checkOS('powerconnect', 'powerconnect-3041');
     }
 
     public function testPowervault()
@@ -1598,6 +1604,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('tplink');
         $this->checkOS('tplink', 'tplink1');
+        $this->checkOS('tplink', 'tplink-t1600g-28ts');
     }
 
     public function testTranzeo()

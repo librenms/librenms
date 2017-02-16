@@ -924,7 +924,7 @@ function snmp_hexstring($hex)
 # Check if the supplied string is an SNMP hex string
 function isHexString($str)
 {
-    return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
+    return (bool)preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
 }
 
 # Include all .inc.php files in $dir
@@ -1992,6 +1992,46 @@ function recordSnmpStatistic($stat, $start_time)
     $snmp_stats[$stat]++;
     $snmp_stats["${stat}_sec"] += $runtime;
     return $runtime;
+}
+
+/**
+ * @param $device
+ * @param bool $record_perf
+ * @return array
+ */
+function device_is_up($device, $record_perf = false)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $ping_response = isPingable($device['hostname'], $address_family, $device['attribs']);
+    $device_perf              = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+
+    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+        dbInsert($device_perf, 'device_perf');
+    }
+    $response              = array();
+    $response['ping_time'] = $ping_response['last_ping_timetaken'];
+    if ($ping_response['result']) {
+        if (isSNMPable($device)) {
+            $response['status']        = '1';
+            $response['status_reason'] = '';
+        } else {
+            echo 'SNMP Unreachable';
+            $response['status']        = '0';
+            $response['status_reason'] = 'snmp';
+        }
+    } else {
+        echo 'Unpingable';
+        $response['status']        = '0';
+        $response['status_reason'] = 'icmp';
+    }
+
+    if ($device['status'] != $response['status']) {
+        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
+        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+    }
+    return $response;
 }
 
 function update_device_logo(&$device)
