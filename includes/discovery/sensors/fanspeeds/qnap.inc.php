@@ -24,7 +24,9 @@ if (is_array($fans_speed) && !empty($fans_speed)) {
         $fan_oid = $fan_descr_oid . '.' . $index;
         $fan_speed = $entry[$oid];
         $fan_serial = $fans_descr[$index][$fan_oid];
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $fan_serial, '1', '1', null, null, null, null, $fan_speed);
+        if ($fan_speed) {
+            discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $fan_serial, '1', '1', null, null, null, null, $fan_speed);
+        }
     }
 }
 

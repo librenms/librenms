@@ -33,7 +33,9 @@ if (is_array($hdd_temps) && !empty($hdd_temps)) {
         } else {
             $disk_descr = "HDD $index $disk_serial";
         }
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'snmp', $disk_descr, '1', '1', null, null, null, null, $disk_temperature);
+        if ($disk_temperature) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'snmp', $disk_descr, '1', '1', null, null, null, null, $disk_temperature);
+        }
     }
 }
 
