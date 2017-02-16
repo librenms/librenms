@@ -1,0 +1,122 @@
+-- ====================================================================
+-- = OG-SMI-MIB: Enterprise structure of management information =
+-- =                                                                  =
+-- = (c) Copyright 2005-2014 Opengear Inc.                       =
+-- ====================================================================
+
+OG-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+-- =============================================================
+-- Top Level for Opengear Enterprise
+
+opengear MODULE-IDENTITY
+	LAST-UPDATED "201311150000Z"
+	ORGANIZATION "Opengear Inc."
+	CONTACT-INFO
+		"Opengear Inc.
+		 630 West 9560 South,
+		 Sandy, UT 84070
+		 support@opengear.com"
+	DESCRIPTION
+		"Opengear Structure of Management Information MIB"
+	REVISION "201311150000Z"
+	DESCRIPTION
+		"Re-structured MIB adding more information
+		pertaining to monitored/managed devices."
+	REVISION "201308110000Z"
+	DESCRIPTION
+		"Renamed from OPENGEAR-SMI-MIB to OG-SMI-MIB to
+		fix naming discrepancy."
+	REVISION "201003221127Z"
+	DESCRIPTION
+		"Renamed from OPENGEAR-SMI to OPENGEAR-SMI-MIB and
+		fixed imports."
+	REVISION "200502240100Z"
+	DESCRIPTION
+		"Initial Version."
+        ::= { enterprises 25049 }
+
+
+-- =============================================================
+
+ogProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ogProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in OG-PRODUCTS-MIB."
+	::= { opengear 1 }
+
+ogLegacyMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree reserved for legacy MIBS."
+	::= { opengear 2 }
+
+ogExperimental OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree reserved for experimental MIBS."
+	::= { opengear 3 }
+
+ogInternal OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree reserved for use by Opengear internal groups"
+	::= { opengear 4 }
+
+ogReserved1 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Reserved for future use"
+	::= { opengear 5 }
+
+ogReserved2 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Reserved for future use"
+	::= { opengear 6 }
+
+otherEnterprises OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"otherEnterprises provides a root object identifier
+		from which mibs produced by other companies may be
+		placed.  mibs produced by other enterprises are
+		typicially implemented with the object identifiers
+		as defined in the mib, but if the mib is deemed to
+		be uncontrolled, we may reroot the mib at this
+		subtree in order to have a controlled version."
+	::= { opengear 7 }
+
+ogAgentCapability OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ogAgentCapability provides a root object identifier
+		from which AGENT-CAPABILITIES values may be assigned."
+	::= { opengear 8 }
+
+ogConfig OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ogConfig is the main subtree for configuration mibs."
+	::= { opengear 9 }
+
+ogMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The main subtree for MIB development."
+	::= { opengear 10 }
+
+ogModules OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "ogModules provides a root object identifier
+                from which MODULE-IDENTITY values may be assigned."
+        ::= { opengear 11 }
+
+END

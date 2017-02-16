@@ -23,36 +23,34 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'netagent2') {
-    $load_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.3.0';
-    $output_load = snmp_get($device, $load_oid, '-Oqv');
+$load_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.3.0';
+$output_load = snmp_get($device, $load_oid, '-Oqv');
 
-    if (!empty($output_load) || $output_load == 0) {
-        $type           = 'netagent2';
-        $index          = 0;
-        $limit          = 100;
-        $warnlimit      = 80;
-        $lowlimit       = 0;
-        $lowwarnlimit   = null;
-        $divisor        = 1;
-        $load           = $output_load / $divisor;
-        $descr          = 'Output load';
+if (!empty($output_load) || $output_load == 0) {
+    $type           = 'netagent2';
+    $index          = 0;
+    $limit          = 100;
+    $warnlimit      = 80;
+    $lowlimit       = 0;
+    $lowwarnlimit   = null;
+    $divisor        = 1;
+    $load           = $output_load / $divisor;
+    $descr          = 'Output load';
 
-        discover_sensor(
-            $valid['sensor'],
-            'load',
-            $device,
-            $load_oid,
-            $index,
-            $type,
-            $descr,
-            $divisor,
-            '1',
-            $lowlimit,
-            $lowwarnlimit,
-            $warnlimit,
-            $limit,
-            $load
-        );
-    }
-}//end if
+    discover_sensor(
+        $valid['sensor'],
+        'load',
+        $device,
+        $load_oid,
+        $index,
+        $type,
+        $descr,
+        $divisor,
+        '1',
+        $lowlimit,
+        $lowwarnlimit,
+        $warnlimit,
+        $limit,
+        $load
+    );
+}

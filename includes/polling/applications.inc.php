@@ -14,3 +14,5 @@ if (count($app_rows) > 0) {
 
     echo "\n";
 }
+
+unset($app_rows);

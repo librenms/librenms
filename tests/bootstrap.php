@@ -23,35 +23,26 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-// get the current LibreNMS install directory
 $install_dir = realpath(__DIR__ . '/..');
 
-require $install_dir . '/includes/defaults.inc.php';
+$init_modules = array('web');
 
-// definitions, don't want to initialize mysql...
+if (!getenv('SNMPSIM')) {
+    $init_modules[] = 'mocksnmp';
+}
+
+if (getenv('DBTEST')) {
+    if (!is_file($install_dir . '/config.php')) {
+        exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
+    }
+}
+
+require $install_dir . '/includes/init.php';
+chdir($install_dir);
+
 $config['install_dir'] = $install_dir;
 $config['mib_dir'] = $install_dir . '/mibs';
 $config['snmpget'] = 'snmpget';
 
-// initialize the class loader
-require $install_dir . '/vendor/autoload.php';
-
-require $install_dir . '/includes/common.php';
-require $install_dir . '/html/includes/functions.inc.php';
-require $install_dir . '/includes/definitions.inc.php';
-require $install_dir . '/includes/rrdtool.inc.php';
-require $install_dir . '/includes/syslog.php';
-require $install_dir . '/includes/dbFacile.php';
-require $install_dir . '/includes/functions.php';
-
-if (getenv('SNMPSIM')) {
-    require $install_dir . '/includes/snmp.inc.php';
-} else {
-    require $install_dir . '/tests/mocks/mock.snmp.inc.php';
-}
-
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
-//error_reporting(E_ALL);
-//$debug=true;
-//$vdebug=true;

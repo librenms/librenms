@@ -3,6 +3,7 @@
 
 // MYSQL Check - FIXME
 // 1 UNKNOWN
+$config['db_port'] = null;
 include 'config.php';
 
 if (!isset($sql_file)) {

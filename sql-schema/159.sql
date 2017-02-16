@@ -1,0 +1,4 @@
+UPDATE `config` SET `config_value`='((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100', `config_default`='((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100' WHERE `config_name`='alert.macros.rule.port_in_usage_perc';
+UPDATE `config` SET `config_value`='((%ports.ifOutOctets_rate*8) / %ports.ifSpeed)*100', `config_default`='((%ports.ifOutOctets_rate*8) / %ports.ifSpeed)*100' WHERE `config_name`='alert.macros.rule.port_out_usage_perc';
+UPDATE `config` SET `config_value`='((%bills.total_data / %bills.bill_quota)*100) && %bills.bill_type = "quota"', `config_default`='((%bills.total_data / %bills.bill_quota)*100) && %bills.bill_type = "quota"' WHERE `config_name`='alert.macros.rule.bill_quota_over_quota';
+UPDATE `config` SET `config_value`='((%bills.rate_95th / %bills.bill_cdr)*100) && %bills.bill_type = "cdr"', `config_default`='((%bills.rate_95th / %bills.bill_cdr)*100) && %bills.bill_type = "cdr"' WHERE `config_name`='alert.macros.rule.bill_cdr_over_quota';

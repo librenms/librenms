@@ -52,7 +52,7 @@ if ($config['os'][$device['os']]['bad_snmpEngineTime'] !== true) {
 
 if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
+        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(
@@ -91,15 +91,15 @@ foreach (array('sysLocation', 'sysContact') as $elem) {
 
 // Save results of various polled values to the database
 foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
-    if ($poll_device[$elem] && $poll_device[$elem] != $device[$elem]) {
+    if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
-        log_event("$elem -> " . $poll_device[$elem], $device, 'system');
+        log_event("$elem -> " . $poll_device[$elem], $device, 'system', 3);
     }
 }
 
 if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
     $update_array['location'] = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system');
+    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
 }
 
 if ($config['geoloc']['latlng'] === true) {

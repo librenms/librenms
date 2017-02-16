@@ -6,7 +6,7 @@ if ($service['service_param']) {
 } else {
     $dbname = "mysql";
 }
-$check_cmd = $config['nagios_plugins'] . "/check_mysql -H ".$service['hostname']." ".$dbname;
+$check_cmd = $config['nagios_plugins'] . "/check_mysql -H ".$service['hostname']." ".$dbname." ".$service['service_param'];
 
 // Check DS is a json array of the graphs that are available
 $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';

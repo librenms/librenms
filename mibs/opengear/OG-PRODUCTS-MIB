@@ -1,0 +1,67 @@
+-- =====================================================================
+-- == OG-PRODUCTS-MIB:                                          ==
+-- == Opengear Product Management Information Base              ==
+-- ==                                                                 ==
+-- == (c) Copyright 2005-2014 Opengear Inc.                           ==
+-- =====================================================================
+
+OG-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ogProducts, ogModules
+		FROM OG-SMI-MIB
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI;
+
+ogProductsMib MODULE-IDENTITY
+	LAST-UPDATED "201602100000Z"
+	ORGANIZATION "Opengear Inc."
+	CONTACT-INFO
+		"Opengear Inc.
+		 630 West 9560 South,
+		 Sandy, UT 84070
+		 support@opengear.com"
+	DESCRIPTION
+		"Opengear Product MIB"
+	REVISION "201602100000Z"
+	DESCRIPTION
+		"Add CM71xx target to the MIB."
+	REVISION "201506020000Z"
+	DESCRIPTION
+		"Add ACM700x target to the MIB."
+	REVISION "201308110000Z"
+	DESCRIPTION
+		"Renamed from OPENGEAR-PRODUCTS-MIB to OG-PRODUCTS-MIB to
+		fix naming discrepancy."
+	REVISION "201108150123Z"
+	DESCRIPTION
+		"Add ACM550x target to the MIB."
+	REVISION "201004151127Z"
+	DESCRIPTION
+		"Initial version."
+      ::= { ogModules 2 }
+
+ogCM4001 OBJECT IDENTIFIER ::= { ogProducts 1 }
+ogCM4002 OBJECT IDENTIFIER ::= { ogProducts 2 }
+ogCM4008 OBJECT IDENTIFIER ::= { ogProducts 3 }
+ogCM41xx OBJECT IDENTIFIER ::= { ogProducts 10 }
+ogCM71xx OBJECT IDENTIFIER ::= { ogProducts 11 }
+ogSD4001 OBJECT IDENTIFIER ::= { ogProducts 20 }
+ogSD4002 OBJECT IDENTIFIER ::= { ogProducts 21 }
+ogSD4008 OBJECT IDENTIFIER ::= { ogProducts 22 }
+ogSD4001DW OBJECT IDENTIFIER ::= { ogProducts 23 }
+ogSD4002DX OBJECT IDENTIFIER ::= { ogProducts 24 }
+ogCD OBJECT IDENTIFIER ::= { ogProducts 30 }
+ogCMx86 OBJECT IDENTIFIER ::= { ogProducts 31 }
+ogCMS61xx OBJECT IDENTIFIER ::= { ogProducts 40 }
+ogLighthouse OBJECT IDENTIFIER ::= { ogProducts 41 }
+ogIM4004 OBJECT IDENTIFIER ::= { ogProducts 50 }
+ogIM42xx OBJECT IDENTIFIER ::= { ogProducts 60 }
+ogIM72xx OBJECT IDENTIFIER ::= { ogProducts 61 }
+ogKCS61xx OBJECT IDENTIFIER ::= { ogProducts 70 }
+ogACM500x OBJECT IDENTIFIER ::= { ogProducts 80 }
+ogACM550x OBJECT IDENTIFIER ::= { ogProducts 81 }
+ogACM700x OBJECT IDENTIFIER ::= { ogProducts 90 }
+ogACM70045 OBJECT IDENTIFIER ::= { ogProducts 91 }
+
+END

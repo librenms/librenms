@@ -49,7 +49,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate $sql";
+$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate,severity $sql";
 
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['host']);
@@ -59,8 +59,9 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     } else {
         $type = $eventlog['type'];
     }
-
+    $severity_colour = $eventlog['severity'];
     $response[] = array(
+        'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
         'datetime' => $eventlog['humandate'],
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type'     => $type,

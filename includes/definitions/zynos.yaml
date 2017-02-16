@@ -10,3 +10,4 @@ discovery:
         - '/^ES/'
         - '/^GS/'
         - '/^MES/'
+        - '/^XS/'

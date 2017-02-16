@@ -6,5 +6,5 @@ over:
 ifname: 1
 type: printer
 discovery:
-    - sysDescr:
-        - KYOCERA 
+    - sysDescr_regex:
+        - '/^KYOCERA/'
