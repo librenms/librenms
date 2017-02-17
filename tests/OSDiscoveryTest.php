@@ -849,6 +849,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ibmnos');
         $this->checkOS('ibmnos', 'ibmnos1');
         $this->checkOS('ibmnos', 'ibmnos-flex');
+        $this->checkOS('ibmnos', 'ibmnos-flex-lenovo-en4093r');
     }
 
     public function testIbmtl()
