@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array(
-    'fail2ban' => 'Fail2ban',
+    'fail2ban_banned' => 'Fail2ban',
 );
 
 foreach ($graphs as $key => $text) {
