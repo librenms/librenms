@@ -133,7 +133,7 @@ $graphs['exim-stats'] = array(
 );
 
 $graphs['php-fpm'] = array(
-    ''
+    'stats'
 );
 
 print_optionbar_start();
