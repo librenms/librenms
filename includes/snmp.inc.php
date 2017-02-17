@@ -355,6 +355,22 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
     return $array;
 }//end snmpwalk_cache_oid()
 
+function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
+{
+    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        list($index,) = explode('.', strrev($oid), 2);
+        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+            $array[$index][$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_oid()
+
 function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQnU')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
