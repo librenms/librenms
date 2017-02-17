@@ -43,7 +43,7 @@ $rrd_def = array(
 );
 
 $fields = array(
-                'access'       => $total_access,
+                'access'       => intval(trim($total_access, '"')),
                 'kbyte'        => $total_kbyte,
                 'cpu'          => $cpuload,
                 'uptime'       => $uptime,
@@ -62,7 +62,7 @@ $fields = array(
                 'sb_logging'   => $score_logging,
                 'sb_graceful'  => $score_graceful,
                 'sb_idle'      => $score_idle,
-                'sb_open'      => $score_open,
+                'sb_open'      => intval(trim($score_open, '"')),
 );
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
