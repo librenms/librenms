@@ -730,6 +730,7 @@ Input:
     - ipv4: search by IPv4 address
     - ipv6: search by IPv6 address (compressed or uncompressed)
     - location: search by location
+    - group: list devices that are member of a group
   - query: If searching by, then this will be used as the input.
 Example:
 ```curl
