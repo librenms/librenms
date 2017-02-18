@@ -118,13 +118,13 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
         $head=true;
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param) as $service) {
         if ($service['service_status'] == '2') {
-            $status = "<span class='col-sm-12 label label-danger label-border'><b>".$service['service_type']."</b></span>";
+            $status = "<span class='col-sm-12 label label-danger threeqtr-width'><b>".$service['service_type']."</b></span>";
         } elseif ($service['service_status'] == '1') {
-            $status = "<span class='col-sm-12 label label-warning label-border'><b>".$service['service_type']."</b></span>";
+            $status = "<span class='col-sm-12 label label-warning threeqtr-width'><b>".$service['service_type']."</b></span>";
         } elseif ($service['service_status'] == '0') {
-            $status = "<span class='col-sm-12 label label-success label-border'><b>".$service['service_type']."</b></span>";
+            $status = "<span class='col-sm-12 label label-success threeqtr-width'><b>".$service['service_type']."</b></span>";
         } else {
-            $status = "<span class='col-sm-12 label label-info label-border'><b>".$service['service_type']."</b></span>";
+            $status = "<span class='col-sm-12 label label-info threeqtr-width'><b>".$service['service_type']."</b></span>";
         }
         if ($head) {
             echo '
@@ -138,7 +138,7 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
         $head=false;
 ?>
         <div class="row">
-            <div class="col-md-1"><?php echo $status?></div>
+            <div class="col-md-1"><h4><?php echo $status?></h4></div>
             <div class="col-md-2"><div class="text-muted"><?php echo formatUptime(time() - $service['service_changed'])?></div></div>
             <div class="col-md-3"><div class="text-muted"><span class='box-desc'><?php echo nl2br(display($service['service_desc']))?></div></span></div>
             <div class="col-md-5"><span class='box-desc'><?php echo nl2br(display($service['service_message']))?></span></div>
