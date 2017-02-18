@@ -1006,6 +1006,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ligoos');
     }
 
+    public function testLinksysSS()
+    {
+        $this->checkOS('linksys-ss', 'linksys-lgs308p');
+    }
+
     public function testLinux()
     {
         $this->checkOS('linux');
