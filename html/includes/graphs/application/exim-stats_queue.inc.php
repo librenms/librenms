@@ -35,7 +35,7 @@ $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
 
 $array = array(
-    'frozen' => array('descr' => 'Queue emails','colour' => 'c13a38',),
+    'queue' => array('descr' => 'Queue emails','colour' => 'c13a38',),
 );
 
 $i = 0;
