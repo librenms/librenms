@@ -493,7 +493,7 @@ It is worth noting that this only monitors a single pool. If you want to monitor
 
 ##### SNMP Extend
 
-1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/phpfpm-sp)
+1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/fail2ban)
 
 2: Make the script executable (chmod +x /etc/snmp/fail2ban)
 
