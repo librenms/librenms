@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array(
-    'php-fpm' => 'PHP-FPM',
+    'php-fpm_stats' => 'PHP-FPM',
 );
 
 
