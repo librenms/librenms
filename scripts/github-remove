@@ -18,7 +18,6 @@ def confirm(question):
             sys.stdout.write("Please respond with 'yes' or 'no'  (or 'y' or 'n').\n")
 
 
-
 librenms_dir = dirname(dirname(abspath(__file__)))
 
 parser = argparse.ArgumentParser()
@@ -27,12 +26,7 @@ group.add_argument("-d", "--discard", action="store_true", help="Discard all cha
 group.add_argument("-s", "--save", action="store_true", help="Save and remove changes by stashing them. (git stash)")
 group.add_argument("-r", "--restore", action="store_true", help="Attempt to restore saved changes (git stash pop)")
 parser.add_argument("-v", "--vendor", action="store_true", help="Also discard changes to ./vendor (requires --discard)")
-
 args = parser.parse_args()
-
-if args.vendor and not args.discard:
-    print(__file__ + ": error: argument -v/--vendor requires -d/--discard")
-    exit(1)
 
 
 if args.discard:
