@@ -126,7 +126,7 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
         } else {
             $status = "<span class='col-sm-12 label label-info label-border'><b>".$service['service_type']."</b></span>";
         }
-        if($head) {
+        if ($head) {
             echo '
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -144,10 +144,10 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
             <div class="col-md-5"><span class='box-desc'><?php echo nl2br(display($service['service_message']))?></span></div>
             <div class="col-md-1">
 <?php
-            if (is_admin() === true) {
-                echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
+if (is_admin() === true) {
+    echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
                 <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>";
-            }
+}
 ?>
             </div>
         </div>
