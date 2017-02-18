@@ -30,26 +30,26 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     echo ' tinydns';
     $rrd_name = array('app', $name, $app_id);
     $rrd_def = array(
-        'DS:a:COUNTER:600:0:125000000000',
-        'DS:ns:COUNTER:600:0:125000000000',
-        'DS:cname:COUNTER:600:0:125000000000',
-        'DS:soa:COUNTER:600:0:125000000000',
-        'DS:ptr:COUNTER:600:0:125000000000',
-        'DS:hinfo:COUNTER:600:0:125000000000',
-        'DS:mx:COUNTER:600:0:125000000000',
-        'DS:txt:COUNTER:600:0:125000000000',
-        'DS:rp:COUNTER:600:0:125000000000',
-        'DS:sig:COUNTER:600:0:125000000000',
-        'DS:key:COUNTER:600:0:125000000000',
-        'DS:aaaa:COUNTER:600:0:125000000000',
-        'DS:axfr:COUNTER:600:0:125000000000',
-        'DS:any:COUNTER:600:0:125000000000',
-        'DS:total:COUNTER:600:0:125000000000',
-        'DS:other:COUNTER:600:0:125000000000',
-        'DS:notauth:COUNTER:600:0:125000000000',
-        'DS:notimpl:COUNTER:600:0:125000000000',
-        'DS:badclass:COUNTER:600:0:125000000000',
-        'DS:noquery:COUNTER:600:0:125000000000'
+        'DS:a:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:ns:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:cname:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:soa:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:ptr:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:hinfo:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:mx:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:txt:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:rp:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:sig:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:key:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:aaaa:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:axfr:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:any:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:total:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:other:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:notauth:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:notimpl:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:badclass:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:noquery:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000'
     );
 
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');

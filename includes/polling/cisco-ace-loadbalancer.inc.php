@@ -41,7 +41,7 @@ if ($device['os_group'] == 'cisco') {
         $rrd_def = array();
         foreach ($oids as $oid) {
             $oid_ds = substr(str_replace('cesServerFarm', '', $oid), 0, 19);
-            $rrd_def[] = "DS:$oid_ds:GAUGE:600:-1:100000000";
+            $rrd_def[] = "DS:$oid_ds:GAUGE:{$config['rrd']['heartbeat']}:-1:100000000";
         }
 
         $fields = array();

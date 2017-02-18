@@ -31,13 +31,13 @@ list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nom
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:charge:GAUGE:600:0:100',
-    'DS:time_remaining:GAUGE:600:0:U',
-    'DS:battery_nominal:GAUGE:600:0:U',
-    'DS:battery_voltage:GAUGE:600:0:U',
-    'DS:input_voltage:GAUGE:600:0:U',
-    'DS:nominal_voltage:GAUGE:600:0:U',
-    'DS:load:GAUGE:600:0:100'
+    'DS:charge:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+    'DS:time_remaining:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:battery_nominal:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:battery_voltage:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:input_voltage:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:nominal_voltage:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:load:GAUGE:'.$config['rrd']['heartbeat'].':0:100'
 );
 
 $fields = array(

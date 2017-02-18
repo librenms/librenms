@@ -61,10 +61,10 @@ if ($device['os_group'] == 'cisco') {
 
             $rrd_name = array('cip', $ifIndex, $mac);
             $rrd_dev = array(
-                'DS:IN:COUNTER:600:0:12500000000',
-                'DS:OUT:COUNTER:600:0:12500000000',
-                'DS:PIN:COUNTER:600:0:12500000000',
-                'DS:POUT:COUNTER:600:0:12500000000'
+                'DS:IN:COUNTER:'.$config['rrd']['heartbeat'].':0:12500000000',
+                'DS:OUT:COUNTER:'.$config['rrd']['heartbeat'].':0:12500000000',
+                'DS:PIN:COUNTER:'.$config['rrd']['heartbeat'].':0:12500000000',
+                'DS:POUT:COUNTER:'.$config['rrd']['heartbeat'].':0:12500000000'
             );
 
             // FIXME - use memcached to make sure these values don't go backwards?

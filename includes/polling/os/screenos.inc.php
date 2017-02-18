@@ -9,9 +9,9 @@ $sess_data = shell_exec($sess_cmd);
 list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
 
 $rrd_def = array(
-    'DS:allocate:GAUGE:600:0:3000000',
-    'DS:max:GAUGE:600:0:3000000',
-    'DS:failed:GAUGE:600:0:1000'
+    'DS:allocate:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000',
+    'DS:max:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000',
+    'DS:failed:GAUGE:'.$config['rrd']['heartbeat'].':0:1000'
 );
 
 $fields = array(

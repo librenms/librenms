@@ -35,10 +35,10 @@ if (count($components > 0)) {
         // Let's make sure the rrd is setup for this class.
         $rrd_name = array('ntp', $peer);
         $rrd_def = array(
-            'DS:stratum:GAUGE:600:0:U',
-            'DS:offset:GAUGE:600:0:U',
-            'DS:delay:GAUGE:600:0:U',
-            'DS:dispersion:GAUGE:600:0:U',
+            'DS:stratum:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:delay:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:dispersion:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
         );
 
         $array['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$array['UID']];

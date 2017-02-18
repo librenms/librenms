@@ -36,7 +36,7 @@ if (is_array($ipmi_rows)) {
             echo $sensor . " $unit\n";
 
             $rrd_name = get_sensor_rrd_name($device, $ipmisensors);
-            $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
+            $rrd_def = 'DS:sensor:GAUGE:'.$config['rrd']['heartbeat'].':-20000:20000';
 
             $fields = array(
                 'sensor' => $sensor,

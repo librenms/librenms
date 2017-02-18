@@ -19,8 +19,8 @@ $data = snmp_get_multi($device, $oids, '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTIC
 
 if (is_numeric($data)) {
     $rrd_def = array(
-        'DS:activesessions:GAUGE:600:0:U',
-        'DS:maxsessions:GAUGE:600:0:U',
+        'DS:activesessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:maxsessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
     );
     $fields = array(
         'activesessions' => $data[0]['sonicCurrentConnCacheEntries'],

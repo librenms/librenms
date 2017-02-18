@@ -25,8 +25,8 @@ if ($device['os_group'] == "cisco") {
         $active = $total - $available;
 
         $rrd_def = array(
-            'DS:total:GAUGE:600:0:U',
-            'DS:active:GAUGE:600:0:U'
+            'DS:total:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:active:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
         );
 
         $fields = array(

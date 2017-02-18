@@ -11,7 +11,7 @@
 
 $transmitPower = snmp_get($device, "transmitPower.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
 if (is_numeric($transmitPower)) {
-    $rrd_def = 'DS:transmitPower:GAUGE:600:0:100';
+    $rrd_def = 'DS:transmitPower:GAUGE:'.$config['rrd']['heartbeat'].':0:100';
     $fields = array(
         'transmitPower' => $transmitPower / 10,
     );
@@ -25,8 +25,8 @@ $receivePower = snmp_get($device, "receivePower.0", "-Ovqn", "CAMBIUM-PTP250-MIB
 $noiseFloor = snmp_get($device, "noiseFloor.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
 if (is_numeric($receivePower)) {
     $rrd_def = array(
-        'DS:receivePower:GAUGE:600:-150:0',
-        'DS:noiseFloor:GAUGE:600:-150:0'
+        'DS:receivePower:GAUGE:'.$config['rrd']['heartbeat'].':-150:0',
+        'DS:noiseFloor:GAUGE:'.$config['rrd']['heartbeat'].':-150:0'
     );
     $fields = array(
         'receivePower' => $receivePower / 10,
@@ -42,8 +42,8 @@ $txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.250.5.9.0", "-Ovqn", "");
 $rxModulation = snmp_get($device, ".1.3.6.1.4.1.17713.250.5.8.0", "-Ovqn", "");
 if (is_numeric($txModulation) && is_numeric($rxModulation)) {
     $rrd_def = array(
-        'DS:txModulation:GAUGE:600:0:24',
-        'DS:rxModulation:GAUGE:600:0:24'
+        'DS:txModulation:GAUGE:'.$config['rrd']['heartbeat'].':0:24',
+        'DS:rxModulation:GAUGE:'.$config['rrd']['heartbeat'].':0:24'
     );
     $fields = array(
         'txModuation' => $txModulation,
@@ -60,9 +60,9 @@ $transmitDataRate = snmp_get($device, "transmitDataRate.0", "-Ovqn", "CAMBIUM-PT
 $aggregateDataRate = snmp_get($device, "aggregateDataRate.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
 if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric($aggregateDataRate)) {
     $rrd_def = array(
-        'DS:receiveDataRate:GAUGE:600:0:10000',
-        'DS:transmitDataRate:GAUGE:600:0:10000',
-        'DS:aggregateDataRate:GAUGE:600:0:10000'
+        'DS:receiveDataRate:GAUGE:'.$config['rrd']['heartbeat'].':0:10000',
+        'DS:transmitDataRate:GAUGE:'.$config['rrd']['heartbeat'].':0:10000',
+        'DS:aggregateDataRate:GAUGE:'.$config['rrd']['heartbeat'].':0:10000'
     );
     $fields = array(
         'receiveDataRate' => $receiveDataRate / 100,
@@ -77,7 +77,7 @@ if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric(
 
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
 if (is_numeric($ssr)) {
-    $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
+    $rrd_def = 'DS:ssr:GAUGE:'.$config['rrd']['heartbeat'].':-150:150';
     $fields = array(
         'ssr' => $ssr,
     );

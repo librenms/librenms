@@ -56,7 +56,7 @@ if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)
     }
 
     $tags = array(
-        'rrd_def' => 'DS:uptime:GAUGE:600:0:U',
+        'rrd_def' => 'DS:uptime:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
     );
     data_update($device, 'uptime', $tags, $uptime);
 

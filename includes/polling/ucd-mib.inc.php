@@ -31,10 +31,10 @@ $ss = $ss[0];
 
 if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) {
     $rrd_def = array(
-        'DS:user:COUNTER:600:0:U',
-        'DS:system:COUNTER:600:0:U',
-        'DS:nice:COUNTER:600:0:U',
-        'DS:idle:COUNTER:600:0:U'
+        'DS:user:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:system:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:nice:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:idle:COUNTER:'.$config['rrd']['heartbeat'].':0:U'
     );
 
     $fields = array(
@@ -71,7 +71,7 @@ $collect_oids = array(
 foreach ($collect_oids as $oid) {
     if (is_numeric($ss[$oid])) {
         $rrd_name = 'ucd_'.$oid;
-        $rrd_def = 'DS:value:COUNTER:600:0:U';
+        $rrd_def = 'DS:value:COUNTER:'.$config['rrd']['heartbeat'].':0:U';
 
         $fields = array(
             'value' => $ss[$oid],
@@ -128,14 +128,14 @@ $snmpdata = $snmpdata[0];
 
 if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree)) {
     $rrd_def = array(
-        'DS:totalswap:GAUGE:600:0:10000000000',
-        'DS:availswap:GAUGE:600:0:10000000000',
-        'DS:totalreal:GAUGE:600:0:10000000000',
-        'DS:availreal:GAUGE:600:0:10000000000',
-        'DS:totalfree:GAUGE:600:0:10000000000',
-        'DS:shared:GAUGE:600:0:10000000000',
-        'DS:buffered:GAUGE:600:0:10000000000',
-        'DS:cached:GAUGE:600:0:10000000000'
+        'DS:totalswap:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:availswap:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:totalreal:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:availreal:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:totalfree:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:shared:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:buffered:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000',
+        'DS:cached:GAUGE:'.$config['rrd']['heartbeat'].':0:10000000000'
     );
 
     $fields = array(
@@ -165,9 +165,9 @@ $load_raw = snmp_get_multi($device, 'laLoadInt.1 laLoadInt.2 laLoadInt.3', '-OQU
 // Check to see that the 5-min OID is actually populated before we make the rrd
 if (is_numeric($load_raw[2]['laLoadInt'])) {
     $rrd_def = array(
-        'DS:1min:GAUGE:600:0:5000',
-        'DS:5min:GAUGE:600:0:5000',
-        'DS:15min:GAUGE:600:0:5000'
+        'DS:1min:GAUGE:'.$config['rrd']['heartbeat'].':0:5000',
+        'DS:5min:GAUGE:'.$config['rrd']['heartbeat'].':0:5000',
+        'DS:15min:GAUGE:'.$config['rrd']['heartbeat'].':0:5000'
     );
 
     $fields = array(

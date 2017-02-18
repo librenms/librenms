@@ -15,7 +15,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
     $snmpstring = '';
     foreach ($oids as $oid) {
         $oid_ds      = substr($oid, 0, 19);
-        $rrd_def[]   = " DS:$oid_ds:COUNTER:600:U:1000000"; // Limit to 1MPPS?
+        $rrd_def[]   = " DS:$oid_ds:COUNTER:{$config['rrd']['heartbeat']}:U:1000000"; // Limit to 1MPPS?
         $snmpstring .= ' UDP-MIB::'.$oid.'.0';
     }
 

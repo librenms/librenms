@@ -44,7 +44,7 @@ if (count($slas) > 0) {
 
         // The base RRD
         $rrd_name = array('sla', $sla_nr);
-        $rrd_def = 'DS:rtt:GAUGE:600:0:300000';
+        $rrd_def = 'DS:rtt:GAUGE:'.$config['rrd']['heartbeat'].':0:300000';
         $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
         data_update($device, 'sla', $tags, $fields);
 
@@ -66,17 +66,17 @@ if (count($slas) > 0) {
                 );
                 $rrd_name = array('sla', $sla_nr, $rtt_type);
                 $rrd_def = array(
-                    'DS:PacketLossSD:GAUGE:600:0:U',
-                    'DS:PacketLossDS:GAUGE:600:0:U',
-                    'DS:PacketOutOfSequence:GAUGE:600:0:U',
-                    'DS:PacketMIA:GAUGE:600:0:U',
-                    'DS:PacketLateArrival:GAUGE:600:0:U',
-                    'DS:MOS:GAUGE:600:0:U',
-                    'DS:ICPIF:GAUGE:600:0:U',
-                    'DS:OWAvgSD:GAUGE:600:0:U',
-                    'DS:OWAvgDS:GAUGE:600:0:U',
-                    'DS:AvgSDJ:GAUGE:600:0:U',
-                    'DS:AvgDSJ:GAUGE:600:0:U',
+                    'DS:PacketLossSD:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketLossDS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketOutOfSequence:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketMIA:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketLateArrival:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:MOS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:ICPIF:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:OWAvgSD:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:OWAvgDS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:AvgSDJ:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:AvgDSJ:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
                 );
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $jitter);
@@ -97,16 +97,16 @@ if (count($slas) > 0) {
                 );
                 $rrd_name = array('sla', $sla_nr, $rtt_type);
                 $rrd_def = array(
-                    'DS:PacketLoss:GAUGE:600:0:U',
-                    'DS:PacketOosSD:GAUGE:600:0:U',
-                    'DS:PacketOosDS:GAUGE:600:0:U',
-                    'DS:PacketLateArrival:GAUGE:600:0:U',
-                    'DS:JitterAvgSD:GAUGE:600:0:U',
-                    'DS:JitterAvgDS:GAUGE:600:0:U',
-                    'DS:LatencyOWAvgSD:GAUGE:600:0:U',
-                    'DS:LatencyOWAvgDS:GAUGE:600:0:U',
-                    'DS:JitterIAJOut:GAUGE:600:0:U',
-                    'DS:JitterIAJIn:GAUGE:600:0:U',
+                    'DS:PacketLoss:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketOosSD:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketOosDS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:PacketLateArrival:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:JitterAvgSD:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:JitterAvgDS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:LatencyOWAvgSD:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:LatencyOWAvgDS:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:JitterIAJOut:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:JitterIAJIn:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
                 );
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $icmpjitter);

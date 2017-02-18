@@ -17,13 +17,13 @@ foreach ($lines as $line) {
 # Freeswitch stats
 $rrd_name =  array('app', $name, 'stats', $app_id);
 $rrd_def = array(
-    'DS:calls:GAUGE:600:0:10000',
-    'DS:channels:GAUGE:600:0:10000',
-    'DS:peak:GAUGE:600:0:10000',
-    'DS:in_failed:COUNTER:600:0:4294967295',
-    'DS:in_okay:COUNTER:600:0:4294967295',
-    'DS:out_failed:COUNTER:600:0:4294967295',
-    'DS:out_okay:COUNTER:600:0:4294967295'
+    'DS:calls:GAUGE:'.$config['rrd']['heartbeat'].':0:10000',
+    'DS:channels:GAUGE:'.$config['rrd']['heartbeat'].':0:10000',
+    'DS:peak:GAUGE:'.$config['rrd']['heartbeat'].':0:10000',
+    'DS:in_failed:COUNTER:'.$config['rrd']['heartbeat'].':0:4294967295',
+    'DS:in_okay:COUNTER:'.$config['rrd']['heartbeat'].':0:4294967295',
+    'DS:out_failed:COUNTER:'.$config['rrd']['heartbeat'].':0:4294967295',
+    'DS:out_okay:COUNTER:'.$config['rrd']['heartbeat'].':0:4294967295'
 );
 $fields = array (
         'calls' => $freeswitch['Calls'],

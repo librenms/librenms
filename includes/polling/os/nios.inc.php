@@ -17,10 +17,10 @@ $oids =
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $rrd_def = array(
-    'DS:success:DERIVE:600:0:U',
-    'DS:failure:DERIVE:600:0:U',
-    'DS:reject:DERIVE:600:0:U',
-    'DS:prereq_reject:DERIVE:600:0:U'
+    'DS:success:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:failure:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:reject:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:prereq_reject:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(
@@ -47,8 +47,8 @@ $oids =
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $rrd_def = array(
-        'DS:PerfAA:GAUGE:600:0:U',
-        'DS:PerfnonAA:GAUGE:600:0:U'
+        'DS:PerfAA:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:PerfnonAA:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(
@@ -73,10 +73,10 @@ $oids =
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $rrd_def = array(
-    'DS:success:DERIVE:600:0:U',
-    'DS:failure:DERIVE:600:0:U',
-    'DS:nxdomain:DERIVE:600:0:U',
-    'DS:nxrrset:DERIVE:600:0:U'
+    'DS:success:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:failure:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:nxdomain:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:nxrrset:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(
@@ -109,15 +109,15 @@ $oids =
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $rrd_def = array(
-    'DS:ack:DERIVE:600:0:U',
-    'DS:decline:DERIVE:600:0:U',
-    'DS:discover:DERIVE:600:0:U',
-    'DS:inform:DERIVE:600:0:U',
-    'DS:nack:DERIVE:600:0:U',
-    'DS:offer:DERIVE:600:0:U',
-    'DS:other:DERIVE:600:0:U',
-    'DS:release:DERIVE:600:0:U',
-    'DS:request:DERIVE:600:0:U'
+    'DS:ack:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:decline:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:discover:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:inform:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:nack:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:offer:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:other:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:release:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:request:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(

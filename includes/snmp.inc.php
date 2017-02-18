@@ -881,15 +881,15 @@ function oid_rrd_type($oid, $mibdef)
 
         case 'INTEGER':
         case 'Integer32':
-            return 'GAUGE:600:U:U';
+            return 'GAUGE:'.$config['rrd']['heartbeat'].':U:U';
 
         case 'Counter32':
         case 'Counter64':
-            return 'COUNTER:600:0:U';
+            return 'COUNTER:'.$config['rrd']['heartbeat'].':0:U';
 
         case 'Gauge32':
         case 'Unsigned32':
-            return 'GAUGE:600:0:U';
+            return 'GAUGE:'.$config['rrd']['heartbeat'].':0:U';
     }
 
     return false;

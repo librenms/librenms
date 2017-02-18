@@ -12,7 +12,7 @@ if (empty($hardware)) {
 
 $sessions = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:3000000';
+    $rrd_def = 'DS:sessions:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000';
 
     print "Sessions: $sessions\n";
     $fields = array(
@@ -26,7 +26,7 @@ if (is_numeric($sessions)) {
 
 $cpu_usage = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
 if (is_numeric($cpu_usage)) {
-    $rrd_def = 'DS:LOAD:GAUGE:600:-1:100';
+    $rrd_def = 'DS:LOAD:GAUGE:'.$config['rrd']['heartbeat'].':-1:100';
 
     echo "CPU: $cpu_usage%\n";
     $fields = array(

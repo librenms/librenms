@@ -40,9 +40,9 @@ if ($device['os_group'] == "cisco") {
                 $spobj = $array['sp-obj'];
                 $rrd_name = array('port', $ifIndex, 'cbqos', $spid, $spobj);
                 $rrd_def = array(
-                    'DS:postbits:COUNTER:600:0:U',
-                    'DS:bufferdrops:COUNTER:600:0:U',
-                    'DS:qosdrops:COUNTER:600:0:U'
+                    'DS:postbits:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:bufferdrops:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                    'DS:qosdrops:COUNTER:'.$config['rrd']['heartbeat'].':0:U'
                 );
 
                 // Let's print some debugging info.

@@ -102,7 +102,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     $i = 1;
     while (is_numeric(${'wificlients'.$i})) {
         $tags = array(
-            'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
+            'rrd_def'   => 'DS:wificlients:GAUGE:'.$config['rrd']['heartbeat'].':-273:1000',
             'rrd_name'  => array('wificlients', "radio$i"),
             'radio'     => $i,
         );

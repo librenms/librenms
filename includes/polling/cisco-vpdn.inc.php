@@ -14,9 +14,9 @@ if ($device['os_group'] == 'cisco') {
         if ($vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal']) {
             $rrd_name = array('vpdn', $type);
             $rrd_def = array(
-                'DS:tunnels:GAUGE:600:0:U',
-                'DS:sessions:GAUGE:600:0:U',
-                'DS:denied:COUNTER:600:0:100000'
+                'DS:tunnels:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:sessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:denied:COUNTER:'.$config['rrd']['heartbeat'].':0:100000'
             );
 
             $fields = array(

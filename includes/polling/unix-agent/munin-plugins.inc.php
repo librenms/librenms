@@ -92,7 +92,7 @@ if (!empty($agent_data['munin'])) {
 
                 $tags = array(
                     'plugin'   => $plugin_type,
-                    'rrd_def'  => 'DS:val:' . $data['type'] . ':600:U:U',
+                    'rrd_def'  => 'DS:val:' . $data['type'] . ':'.$config['rrd']['heartbeat'].':U:U',
                     'rrd_name' => $base_rrd_name . '_' . $name
                 );
                 data_update($device, 'munin-plugins', $tags, $fields);

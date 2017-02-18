@@ -23,11 +23,11 @@ foreach ($chan_stats as $index => $entry) {
 
     $rrd_name = array('c6kxbar', $index, $subindex);
     $rrd_def = array(
-        'DS:inutil:GAUGE:600:0:100',
-        'DS:oututil:GAUGE:600:0:100',
-        'DS:outdropped:DERIVE:600:0:125000000000',
-        'DS:outerrors:DERIVE:600:0:125000000000',
-        'DS:inerrors:DERIVE:600:0:125000000000'
+        'DS:inutil:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+        'DS:oututil:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+        'DS:outdropped:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:outerrors:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:inerrors:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
     );
 
     $fields = array(

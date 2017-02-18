@@ -46,8 +46,8 @@ foreach ($APstats as $key => $value) {
 }
 
 $rrd_def = array(
-    'DS:NUMAPS:GAUGE:600:0:12500000000',
-    'DS:NUMCLIENTS:GAUGE:600:0:12500000000'
+    'DS:NUMAPS:GAUGE:'.$config['rrd']['heartbeat'].':0:12500000000',
+    'DS:NUMCLIENTS:GAUGE:'.$config['rrd']['heartbeat'].':0:12500000000'
 );
 
 $fields = array(
@@ -61,7 +61,7 @@ data_update($device, 'ciscowlc', $tags, $fields);
 // also save the info about how many clients in the same place as the wireless module
 $radio = 1;
 $rrd_name = 'wificlients-radio'.$radio;
-$rrd_def = 'DS:wificlients:GAUGE:600:-273:10000';
+$rrd_def = 'DS:wificlients:GAUGE:'.$config['rrd']['heartbeat'].':-273:10000';
 
 $fields = array(
     'wificlients' => $numClients
@@ -110,13 +110,13 @@ foreach ($radios as $key => $value) {
 
     $rrd_name = array('arubaap', $name.$radionum);
     $rrd_def = array(
-        'DS:channel:GAUGE:600:0:200',
-        'DS:txpow:GAUGE:600:0:200',
-        'DS:radioutil:GAUGE:600:0:100',
-        'DS:nummonclients:GAUGE:600:0:500',
-        'DS:nummonbssid:GAUGE:600:0:200',
-        'DS:numasoclients:GAUGE:600:0:500',
-        'DS:interference:GAUGE:600:0:2000'
+        'DS:channel:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
+        'DS:txpow:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
+        'DS:radioutil:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+        'DS:nummonclients:GAUGE:'.$config['rrd']['heartbeat'].':0:500',
+        'DS:nummonbssid:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
+        'DS:numasoclients:GAUGE:'.$config['rrd']['heartbeat'].':0:500',
+        'DS:interference:GAUGE:'.$config['rrd']['heartbeat'].':0:2000'
     );
 
     $fields = array(

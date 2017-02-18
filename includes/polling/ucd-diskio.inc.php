@@ -18,10 +18,10 @@ if (count($diskio_data)) {
         $tags = array(
             'rrd_name'  => array('ucd_diskio', $diskio['diskio_descr']),
             'rrd_def'   => array(
-                'DS:read:DERIVE:600:0:125000000000',
-                'DS:written:DERIVE:600:0:125000000000',
-                'DS:reads:DERIVE:600:0:125000000000',
-                'DS:writes:DERIVE:600:0:125000000000',
+                'DS:read:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+                'DS:written:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+                'DS:reads:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+                'DS:writes:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
             ),
             'descr'     => $diskio['diskio_descr'],
         );

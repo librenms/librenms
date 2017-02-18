@@ -41,7 +41,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
         $fields = array();
         foreach ($oids as $oid) {
             $oid_ds    = substr($oid, 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $rrd_def[] = "DS:$oid_ds:COUNTER:{$config['rrd']['heartbeat']}:U:100000000000";
             $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
 

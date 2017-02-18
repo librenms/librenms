@@ -12,9 +12,9 @@ if (!empty($agent_data['app'][$name])) {
 
         if ($section == "poolstats") {
             $rrd_def = array(
-                'DS:ops:GAUGE:600:0:U',
-                'DS:wrbytes:GAUGE:600:0:U',
-                'DS:rbytes:GAUGE:600:0:U'
+                'DS:ops:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:wrbytes:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:rbytes:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
             );
 
             foreach (explode("\n", $data) as $line) {
@@ -35,8 +35,8 @@ if (!empty($agent_data['app'][$name])) {
             }
         } elseif ($section == "osdperformance") {
             $rrd_def = array(
-                'DS:apply_ms:GAUGE:600:0:U',
-                'DS:commit_ms:GAUGE:600:0:U'
+                'DS:apply_ms:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:commit_ms:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
             );
 
             foreach (explode("\n", $data) as $line) {
@@ -56,9 +56,9 @@ if (!empty($agent_data['app'][$name])) {
             }
         } elseif ($section == "df") {
             $rrd_def = array(
-                'DS:avail:GAUGE:600:0:U',
-                'DS:used:GAUGE:600:0:U',
-                'DS:objects:GAUGE:600:0:U'
+                'DS:avail:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:used:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:objects:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
             );
 
             foreach (explode("\n", $data) as $line) {

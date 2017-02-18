@@ -12,14 +12,14 @@ list($pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_que
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:lq:GAUGE:600:0:U',
-    'DS:mlq:GAUGE:600:0:U',
-    'DS:ip:GAUGE:600:0:U',
-    'DS:ap:GAUGE:600:0:U',
-    'DS:tp:GAUGE:600:0:U',
-    'DS:map:GAUGE:600:0:U',
-    'DS:mcr:GAUGE:600:0:U',
-    'DS:sr:GAUGE:600:0:U'
+    'DS:lq:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:mlq:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:ip:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:ap:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:tp:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:map:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:mcr:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:sr:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(

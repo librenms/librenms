@@ -10,8 +10,8 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
 
     $rrd_name = array('storage', $mib, $descr);
     $rrd_def = array(
-        'DS:used:GAUGE:600:0:U',
-        'DS:free:GAUGE:600:0:U'
+        'DS:used:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:free:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
     );
 
     $file = $config['install_dir'].'/includes/polling/storage/'. $mib .'.inc.php';

@@ -71,15 +71,15 @@ if ($agent_data['app'][$name]) {
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:queue_length:GAUGE:600:0:U',
-    'DS:updates_received:COUNTER:600:0:U',
-    'DS:flushes_received:COUNTER:600:0:U',
-    'DS:updates_written:COUNTER:600:0:U',
-    'DS:data_sets_written:COUNTER:600:0:U',
-    'DS:tree_nodes_number:GAUGE:600:0:U',
-    'DS:tree_depth:GAUGE:600:0:U',
-    'DS:journal_bytes:COUNTER:600:0:U',
-    'DS:journal_rotate:COUNTER:600:0:U'
+    'DS:queue_length:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:updates_received:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:flushes_received:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:updates_written:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:data_sets_written:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:tree_nodes_number:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:tree_depth:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:journal_bytes:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:journal_rotate:COUNTER:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array();

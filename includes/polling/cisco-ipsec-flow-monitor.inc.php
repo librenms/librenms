@@ -54,27 +54,27 @@ if ($device['os_group'] == 'cisco') {
 
     if ($data['cipSecGlobalActiveTunnels']) {
         $rrd_def = array(
-            'DS:Tunnels:GAUGE:600:0:U',
-            'DS:InOctets:COUNTER:600:0:100000000000',
-            'DS:OutOctets:COUNTER:600:0:100000000000',
-            'DS:InDecompOctets:COUNTER:600:0:100000000000',
-            'DS:OutUncompOctets:COUNTER:600:0:100000000000',
-            'DS:InPkts:COUNTER:600:0:100000000000',
-            'DS:OutPkts:COUNTER:600:0:100000000000',
-            'DS:InDrops:COUNTER:600:0:100000000000',
-            'DS:InReplayDrops:COUNTER:600:0:100000000000',
-            'DS:OutDrops:COUNTER:600:0:100000000000',
-            'DS:InAuths:COUNTER:600:0:100000000000',
-            'DS:OutAuths:COUNTER:600:0:100000000000',
-            'DS:InAuthFails:COUNTER:600:0:100000000000',
-            'DS:OutAuthFails:COUNTER:600:0:100000000000',
-            'DS:InDencrypts:COUNTER:600:0:100000000000',
-            'DS:OutEncrypts:COUNTER:600:0:100000000000',
-            'DS:InDecryptFails:COUNTER:600:0:100000000000',
-            'DS:OutEncryptFails:COUNTER:600:0:100000000000',
-            'DS:ProtocolUseFails:COUNTER:600:0:100000000000',
-            'DS:NoSaFails:COUNTER:600:0:100000000000',
-            'DS:SysCapFails:COUNTER:600:0:100000000000'
+            'DS:Tunnels:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:InOctets:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutOctets:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InDecompOctets:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutUncompOctets:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InPkts:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutPkts:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InDrops:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InReplayDrops:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutDrops:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InAuths:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutAuths:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InAuthFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutAuthFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InDencrypts:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutEncrypts:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:InDecryptFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:OutEncryptFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:ProtocolUseFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:NoSaFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000',
+            'DS:SysCapFails:COUNTER:'.$config['rrd']['heartbeat'].':0:100000000000'
         );
 
         $fields = array(

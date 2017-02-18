@@ -42,7 +42,7 @@ if ($device['os_group'] == 'unix') {
         echo 'execution time: '.$agent_time.'ms';
 
         $tags = array(
-            'rrd_def' => 'DS:time:GAUGE:600:0:U',
+            'rrd_def' => 'DS:time:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
         );
         $fields = array(
             'time' => $agent_time,

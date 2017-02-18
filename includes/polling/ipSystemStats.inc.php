@@ -100,7 +100,7 @@ if ($data) {
         foreach ($oids as $oid) {
             $oid_ds      = str_replace('ipSystemStats', '', $oid);
             $oid_ds      = substr($oid_ds, 0, 19);
-            $rrd_def[]   = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $rrd_def[]   = "DS:$oid_ds:COUNTER:{$config['rrd']['heartbeat']}:U:100000000000";
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
                 $stats[$oid] = '0';
             }

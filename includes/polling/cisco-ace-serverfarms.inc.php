@@ -46,7 +46,7 @@ if ($device['os_group'] == 'cisco') {
         $rrd_def = array();
         foreach ($oids as $oid) {
             $oid_ds = substr(str_replace('slbVServer', '', $oid), 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
+            $rrd_def[] = "DS:$oid_ds:COUNTER:{$config['rrd']['heartbeat']}:U:1000000000";
         }
 
         $fields = array();

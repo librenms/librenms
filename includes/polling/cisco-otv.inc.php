@@ -127,7 +127,7 @@ if ($device['os_group'] == "cisco") {
 
                 $label = $array['label'];
                 $rrd_name = array('cisco', 'otv', $label, 'vlan');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = 'DS:count:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
 
                 $fields = array(
                     'count' => $count_vlan
@@ -174,7 +174,7 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    MAC Count: ".$count."\n");
 
                 $rrd_name = array('cisco', 'otv', $endpoint, 'mac');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = 'DS:count:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
                 $fields = array(
                     'count' => $count
                 );

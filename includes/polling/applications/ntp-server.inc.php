@@ -10,20 +10,20 @@ echo ' '.$name;
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:stratum:GAUGE:600:0:1000',
-    'DS:offset:GAUGE:600:-1000:1000',
-    'DS:frequency:GAUGE:600:-1000:1000',
-    'DS:jitter:GAUGE:600:-1000:1000',
-    'DS:noise:GAUGE:600:-1000:1000',
-    'DS:stability:GAUGE:600:-1000:1000',
-    'DS:uptime:GAUGE:600:0:125000000000',
-    'DS:buffer_recv:GAUGE:600:0:100000',
-    'DS:buffer_free:GAUGE:600:0:100000',
-    'DS:buffer_used:GAUGE:600:0:100000',
-    'DS:packets_drop:DERIVE:600:0:125000000000',
-    'DS:packets_ignore:DERIVE:600:0:125000000000',
-    'DS:packets_recv:DERIVE:600:0:125000000000',
-    'DS:packets_sent:DERIVE:600:0:125000000000'
+    'DS:stratum:GAUGE:'.$config['rrd']['heartbeat'].':0:1000',
+    'DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:frequency:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:jitter:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:noise:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:stability:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:uptime:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:buffer_recv:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+    'DS:buffer_free:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+    'DS:buffer_used:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+    'DS:packets_drop:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:packets_ignore:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:packets_recv:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:packets_sent:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
 );
 
 

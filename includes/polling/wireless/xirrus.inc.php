@@ -12,9 +12,9 @@ foreach ($radios as $idx => $radio) {
     $measurement = 'xirrus_stats';
     $rrd_name = array($measurement, $radioName);
     $rrd_def = array(
-        'DS:rssi:GAUGE:600:-150:0',
-        'DS:dataRate:GAUGE:600:0:1400',
-        'DS:noiseFloor:GAUGE:600:-150:0'
+        'DS:rssi:GAUGE:'.$config['rrd']['heartbeat'].':-150:0',
+        'DS:dataRate:GAUGE:'.$config['rrd']['heartbeat'].':0:1400',
+        'DS:noiseFloor:GAUGE:'.$config['rrd']['heartbeat'].':-150:0'
     );
     $fields = array(
         'rssi' => $rssi[$idx]['realtimeMonitorAverageRSSI'],
@@ -42,7 +42,7 @@ if ($config['xirrus_disable_stations']!=true) {
     foreach ($associations as $radio => $count) {
         $measurement = 'xirrus_users';
         $rrd_name = array($measurement, $radio);
-        $rrd_def = 'DS:stations:GAUGE:600:0:3200';
+        $rrd_def = 'DS:stations:GAUGE:'.$config['rrd']['heartbeat'].':0:3200';
         $fields = array(
             'stations' => $count
         );

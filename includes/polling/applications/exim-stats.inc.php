@@ -31,8 +31,8 @@ list ($frozen, $queue) = explode("\n", $stats);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:frozen:GAUGE:600:0:U',
-    'DS:queue:GAUGE:600:0:U'
+    'DS:frozen:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:queue:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
 );
 
 $fields = array(

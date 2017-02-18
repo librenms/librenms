@@ -9,21 +9,21 @@ $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:total:GAUGE:600:0:U',
-    'DS:null:GAUGE:600:0:U',
-    'DS:getattr:GAUGE:600:0:U',
-    'DS:setattr:GAUGE:600:0:U',
-    'DS:lookup:GAUGE:600:0:U',
-    'DS:access:GAUGE:600:0:U',
-    'DS:read:GAUGE:600:0:U',
-    'DS:write:GAUGE:600:0:U',
-    'DS:create:GAUGE:600:0:U',
-    'DS:mkdir:GAUGE:600:0:U',
-    'DS:remove:GAUGE:600:0:U',
-    'DS:rmdir:GAUGE:600:0:U',
-    'DS:rename:GAUGE:600:0:U',
-    'DS:readdirplus:GAUGE:600:0:U',
-    'DS:fsstat:GAUGE:600:0:U',
+    'DS:total:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:null:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:getattr:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:setattr:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:lookup:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:access:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:read:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:write:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:create:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:mkdir:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:remove:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:rmdir:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:rename:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:readdirplus:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    'DS:fsstat:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
 );
 
 $data = explode("\n", $nfsstats);

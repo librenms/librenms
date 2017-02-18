@@ -27,7 +27,7 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
 $connections = snmp_get($device, 'CISCO-WAN-OPTIMIZATION-MIB::cwoTfoStatsActiveOptConn.0', '-OQv');
 
 if (is_numeric($connections)) {
-    $rrd_def = 'DS:connections:GAUGE:600:0:U';
+    $rrd_def = 'DS:connections:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
 
     $fields = array(
         'connections' => $connections

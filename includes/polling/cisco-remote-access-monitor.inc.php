@@ -37,12 +37,12 @@ if ($device['os_group'] == 'cisco') {
 
     if (is_numeric($data['crasEmailNumSessions']) && is_numeric($data['crasIPSecNumSessions']) && is_numeric($data['crasL2LNumSessions']) && is_numeric($data['crasLBNumSessions']) && is_numeric($data['crasSVCNumSessions']) && is_numeric($data['crasWebvpnNumSessions'])) {
         $rrd_def = array(
-            'DS:email:GAUGE:600:0:U',
-            'DS:ipsec:GAUGE:600:0:U',
-            'DS:l2l:GAUGE:600:0:U',
-            'DS:lb:GAUGE:600:0:U',
-            'DS:svc:GAUGE:600:0:U',
-            'DS:webvpn:GAUGE:600:0:U'
+            'DS:email:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:ipsec:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:l2l:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:lb:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:svc:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+            'DS:webvpn:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
         );
 
         $fields = array(

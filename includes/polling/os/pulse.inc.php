@@ -17,7 +17,7 @@ $hostname = trim($poll_device['sysName'], '"');
 $users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($users)) {
-    $rrd_def = 'DS:users:GAUGE:600:0:U';
+    $rrd_def = 'DS:users:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
 
     $fields = array(
         'users' => $users,
@@ -31,7 +31,7 @@ if (is_numeric($users)) {
 $sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+    $rrd_def = 'DS:sessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
 
     $fields = array(
         'sessions' => $sessions,

@@ -161,10 +161,10 @@ function poll_service($service)
         foreach ($perf as $k => $v) {
             if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
-                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+                $rrd_def[] = "DS:".$k.":COUNTER:{$config['rrd']['rrd']['heartbeat']}:0:U";
             } else {
                 // Not a counter, must be a gauge
-                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+                $rrd_def[] = "DS:".$k.":GAUGE:{$config['rrd']['rrd']['heartbeat']}:0:U";
             }
         }
 

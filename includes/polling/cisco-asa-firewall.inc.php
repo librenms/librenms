@@ -29,7 +29,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
     }
 
     if ($data['currentInUse']) {
-        $rrd_def = 'DS:connections:GAUGE:600:0:U';
+        $rrd_def = 'DS:connections:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
         $fields = array(
             'connections' => $data['currentInUse']['data'],
         );

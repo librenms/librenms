@@ -74,8 +74,8 @@ if ($proxmox) {
                 'vmport' => $vmport
             );
             $rrd_def = array(
-                'DS:INOCTETS:DERIVE:600:0:12500000000',
-                'DS:OUTOCTETS:DERIVE:600:0:12500000000'
+                'DS:INOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+                'DS:OUTOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000'
             );
             $fields = array(
                 'INOCTETS' => $vmpin,

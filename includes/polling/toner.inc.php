@@ -10,7 +10,7 @@ foreach ($toner_data as $toner) {
     echo $tonerperc." %\n";
 
     $tags = array(
-        'rrd_def'     => 'DS:toner:GAUGE:600:0:20000',
+        'rrd_def'     => 'DS:toner:GAUGE:'.$config['rrd']['heartbeat'].':0:20000',
         'rrd_name'    => array('toner', $toner['toner_index']),
         'rrd_oldname' => array('toner', $toner['toner_descr']),
         'index'       => $toner['toner_index'],

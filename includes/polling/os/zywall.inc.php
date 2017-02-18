@@ -8,7 +8,7 @@ $serial = trim(snmp_get($device, '.1.3.6.1.4.1.890.1.15.3.1.12.0', '-Oqv'), '"')
 
 $sessions = snmp_get($device, '.1.3.6.1.4.1.890.1.6.22.1.6.0', '-Ovq');
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:3000000';
+    $rrd_def = 'DS:sessions:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000';
     $fields = array(
         'sessions' => $sessions,
     );

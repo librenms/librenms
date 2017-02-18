@@ -13,8 +13,8 @@ if (strstr($hardware, 'CMM') == false) {
     $fecOutErrorsCount = snmp_get($device, "fecOutErrorsCount.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
     if (is_numeric($fecInErrorsCount) && is_numeric($fecOutErrorsCount)) {
         $rrd_def = array(
-            'DS:fecInErrorsCount:GAUGE:600:0:100000',
-            'DS:fecOutErrorsCount:GAUGE:600:0:100000'
+            'DS:fecInErrorsCount:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+            'DS:fecOutErrorsCount:GAUGE:'.$config['rrd']['heartbeat'].':0:100000'
         );
         $fields = array(
             'fecInErrorsCount' => $fecInErrorsCount,
@@ -28,7 +28,7 @@ if (strstr($hardware, 'CMM') == false) {
 
     $crcErrors = snmp_get($device, "fecCRCError.0", "-Ovqn", "WHISP-BOX-MIBV2-MIB");
     if (is_numeric($crcErrors)) {
-        $rrd_def = 'DS:crcErrors:GAUGE:600:0:100000';
+        $rrd_def = 'DS:crcErrors:GAUGE:'.$config['rrd']['heartbeat'].':0:100000';
         $fields = array(
             'crcErrors' => $crcErrors,
         );
@@ -42,9 +42,9 @@ if (strstr($hardware, 'CMM') == false) {
     $combined = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.21.0", "-Ovqn", "");
     if (is_numeric($vertical) && is_numeric($horizontal) && is_numeric($combined)) {
         $rrd_def = array(
-            'DS:vertical:GAUGE:600:-150:0',
-            'DS:horizontal:GAUGE:600:-150:0',
-            'DS:combined:GAUGE:600:-150:0'
+            'DS:vertical:GAUGE:'.$config['rrd']['heartbeat'].':-150:0',
+            'DS:horizontal:GAUGE:'.$config['rrd']['heartbeat'].':-150:0',
+            'DS:combined:GAUGE:'.$config['rrd']['heartbeat'].':-150:0'
         );
         $fields = array(
             'vertical' => floatval($vertical),
@@ -59,7 +59,7 @@ if (strstr($hardware, 'CMM') == false) {
 
     $rssi = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.2.0", "-Ovqn", "");
     if (is_numeric($rssi)) {
-        $rrd_def = 'DS:rssi:GAUGE:600:0:5000';
+        $rrd_def = 'DS:rssi:GAUGE:'.$config['rrd']['heartbeat'].':0:5000';
         $fields = array(
             'rssi' => $rssi,
         );
@@ -71,7 +71,7 @@ if (strstr($hardware, 'CMM') == false) {
 
     $jitter = snmp_get($device, "jitter.0", "-Ovqn", "WHISP-SM-MIB");
     if (is_numeric($jitter)) {
-        $rrd_def = 'DS:jitter:GAUGE:600:0:20';
+        $rrd_def = 'DS:jitter:GAUGE:'.$config['rrd']['heartbeat'].':0:20';
         $fields = array(
             'jitter' => $jitter,
         );
@@ -85,8 +85,8 @@ if (strstr($hardware, 'CMM') == false) {
     $vertical = str_replace('"', "", snmp_get($device, "radioDbmVertical.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
-            'DS:horizontal:GAUGE:600:-100:100',
-            'DS:vertical:GAUGE:600:-100:100'
+            'DS:horizontal:GAUGE:'.$config['rrd']['heartbeat'].':-100:100',
+            'DS:vertical:GAUGE:'.$config['rrd']['heartbeat'].':-100:100'
         );
         $fields = array(
             'horizontal' => $horizontal,
@@ -100,7 +100,7 @@ if (strstr($hardware, 'CMM') == false) {
 
     $ssr = str_replace('"', "", snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($ssr)) {
-        $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
+        $rrd_def = 'DS:ssr:GAUGE:'.$config['rrd']['heartbeat'].':-150:150';
         $fields = array(
             'ssr' => $ssr,
         );
@@ -114,8 +114,8 @@ if (strstr($hardware, 'CMM') == false) {
     $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioSMVertical.0", "-Ovqn", "WHISP-SM-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
-            'DS:horizontal:GAUGE:600:0:100',
-            'DS:vertical:GAUGE:600:0:100'
+            'DS:horizontal:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+            'DS:vertical:GAUGE:'.$config['rrd']['heartbeat'].':0:100'
         );
         $fields = array(
             'horizontal' => $horizontal,
@@ -138,7 +138,7 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         $gpsStatus = 1;
     }
     if (is_numeric($gpsStatus)) {
-        $rrd_def = 'DS:whispGPSStats:GAUGE:600:0:4';
+        $rrd_def = 'DS:whispGPSStats:GAUGE:'.$config['rrd']['heartbeat'].':0:4';
         $fields = array(
             'whispGPSStats' => $gpsStatus,
         );
@@ -152,8 +152,8 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     $tracked = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
     if (is_numeric($visible) && is_numeric($tracked)) {
         $rrd_def = array(
-            'DS:visible:GAUGE:600:0:1000',
-            'DS:tracked:GAUGE:600:0:1000'
+            'DS:visible:GAUGE:'.$config['rrd']['heartbeat'].':0:1000',
+            'DS:tracked:GAUGE:'.$config['rrd']['heartbeat'].':0:1000'
         );
         $fields = array(
             'visible' => floatval($visible),
@@ -168,7 +168,7 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
 //PTP Equipment
     $lastLevel = str_replace('"', "", snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
 if (is_numeric($lastLevel)) {
-    $rrd_def = 'DS:last:GAUGE:600:-100:0';
+    $rrd_def = 'DS:last:GAUGE:'.$config['rrd']['heartbeat'].':-100:0';
     $fields = array(
     'last' => $lastLevel,
     );
@@ -183,8 +183,8 @@ if (strstr($version, 'AP') == false) {
     $vertical = str_replace('"', "", snmp_get($device, "linkRadioDbmVertical.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
-            'DS:horizontal:GAUGE:600:-100:0',
-            'DS:vertical:GAUGE:600:-100:0'
+            'DS:horizontal:GAUGE:'.$config['rrd']['heartbeat'].':-100:0',
+            'DS:vertical:GAUGE:'.$config['rrd']['heartbeat'].':-100:0'
         );
         $fields = array(
             'horizontal' => $horizontal,
@@ -200,8 +200,8 @@ if (strstr($version, 'AP') == false) {
     $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($horizontal) && is_numeric($vertical)) {
         $rrd_def = array(
-            'DS:horizontal:GAUGE:600:0:100',
-            'DS:vertical:GAUGE:600:0:100'
+            'DS:horizontal:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
+            'DS:vertical:GAUGE:'.$config['rrd']['heartbeat'].':0:100'
         );
         $fields = array(
             'horizontal' => $horizontal,
@@ -215,7 +215,7 @@ if (strstr($version, 'AP') == false) {
 
     $ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($ssr)) {
-        $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
+        $rrd_def = 'DS:ssr:GAUGE:'.$config['rrd']['heartbeat'].':-150:150';
         $fields = array(
         'ssr' => $ssr,
         );
@@ -233,10 +233,10 @@ if (strstr($version, 'AP') == false) {
 
         if (is_numeric($dbmRadio) && is_numeric($minRadio) && is_numeric($maxRadio) && is_numeric($avgRadio)) {
             $rrd_def = array(
-                'DS:dbm:GAUGE:600:-100:0',
-                'DS:min:GAUGE:600:-100:0',
-                'DS:max:GAUGE:600:-100:0',
-                'DS:avg:GAUGE:600:-100:0'
+                'DS:dbm:GAUGE:'.$config['rrd']['heartbeat'].':-100:0',
+                'DS:min:GAUGE:'.$config['rrd']['heartbeat'].':-100:0',
+                'DS:max:GAUGE:'.$config['rrd']['heartbeat'].':-100:0',
+                'DS:avg:GAUGE:'.$config['rrd']['heartbeat'].':-100:0'
             );
             $fields = array(
                 'dbm' => $dbmRadio,
@@ -258,8 +258,8 @@ if (strstr($version, 'AP')) {
     $failed = str_replace('"', "", snmp_get($device, "regFailureCount.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($registered) && is_numeric($failed)) {
         $rrd_def = array(
-            'DS:regCount:GAUGE:600:0:15000',
-            'DS:failed:GAUGE:600:0:15000'
+            'DS:regCount:GAUGE:'.$config['rrd']['heartbeat'].':0:15000',
+            'DS:failed:GAUGE:'.$config['rrd']['heartbeat'].':0:15000'
         );
         $fields = array(
             'regCount' => $registered,
@@ -273,7 +273,7 @@ if (strstr($version, 'AP')) {
     
     $freq = str_replace('"', "", snmp_get($device, "currentRadioFreqCarrier.0", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($freq)) {
-        $rrd_def = 'DS:freq:GAUGE:600:0:100000';
+        $rrd_def = 'DS:freq:GAUGE:'.$config['rrd']['heartbeat'].':0:100000';
         if ($freq > 99999) {
             $freq = $freq / 100000;
         } else {

@@ -146,11 +146,11 @@ if ($config['enable_bgp']) {
 
             $peer_rrd_name = safename('bgp-'.$peer['bgpPeerIdentifier']);
             $peer_rrd_def = array(
-                'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerOutTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerEstablished:GAUGE:600:0:U'
+                'DS:bgpPeerOutUpdates:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
+                'DS:bgpPeerInUpdates:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
+                'DS:bgpPeerOutTotal:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
+                'DS:bgpPeerInTotal:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
+                'DS:bgpPeerEstablished:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
             );
 
             $fields = array(
@@ -307,11 +307,11 @@ if ($config['enable_bgp']) {
 
                     $cbgp_rrd_name = safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi");
                     $cbgp_rrd_def = array(
-                        'DS:AcceptedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:DeniedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:AdvertisedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:SuppressedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:WithdrawnPrefixes:GAUGE:600:U:100000000000'
+                        'DS:AcceptedPrefixes:GAUGE:'.$config['rrd']['heartbeat'].':U:100000000000',
+                        'DS:DeniedPrefixes:GAUGE:'.$config['rrd']['heartbeat'].':U:100000000000',
+                        'DS:AdvertisedPrefixes:GAUGE:'.$config['rrd']['heartbeat'].':U:100000000000',
+                        'DS:SuppressedPrefixes:GAUGE:'.$config['rrd']['heartbeat'].':U:100000000000',
+                        'DS:WithdrawnPrefixes:GAUGE:'.$config['rrd']['heartbeat'].':U:100000000000'
                     );
 
                     $fields = array(

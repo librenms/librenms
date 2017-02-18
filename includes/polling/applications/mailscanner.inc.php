@@ -15,13 +15,13 @@ $name = 'mailscannerV2';
 $app_id = $app['app_id'];
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:msg_recv:COUNTER:600:0:125000000000',
-    'DS:msg_rejected:COUNTER:600:0:12500000000',
-    'DS:msg_relay:COUNTER:600:0:125000000000',
-    'DS:msg_sent:COUNTER:600:0:125000000000',
-    'DS:msg_waiting:COUNTER:600:0:125000000000',
-    'DS:spam:COUNTER:600:0:125000000000',
-    'DS:virus:COUNTER:600:0:125000000000'
+    'DS:msg_recv:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:msg_rejected:COUNTER:'.$config['rrd']['heartbeat'].':0:12500000000',
+    'DS:msg_relay:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:msg_sent:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:msg_waiting:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:spam:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:virus:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000'
 );
 
 $fields = array(

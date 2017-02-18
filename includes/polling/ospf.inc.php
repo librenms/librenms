@@ -369,10 +369,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
 // Create device-wide statistics RRD
 $rrd_def = array(
-    'DS:instances:GAUGE:600:0:1000000',
-    'DS:areas:GAUGE:600:0:1000000',
-    'DS:ports:GAUGE:600:0:1000000',
-    'DS:neighbours:GAUGE:600:0:1000000'
+    'DS:instances:GAUGE:'.$config['rrd']['heartbeat'].':0:1000000',
+    'DS:areas:GAUGE:'.$config['rrd']['heartbeat'].':0:1000000',
+    'DS:ports:GAUGE:'.$config['rrd']['heartbeat'].':0:1000000',
+    'DS:neighbours:GAUGE:'.$config['rrd']['heartbeat'].':0:1000000'
 );
 
 $fields = array(

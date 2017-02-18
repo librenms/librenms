@@ -79,11 +79,11 @@ if (count($components > 0)) {
 
         if ($type == 'f5-ltm-vs') {
             $rrd_def = array(
-                'DS:pktsin:COUNTER:600:0:U',
-                'DS:pktsout:COUNTER:600:0:U',
-                'DS:bytesin:COUNTER:600:0:U',
-                'DS:bytesout:COUNTER:600:0:U',
-                'DS:totconns:COUNTER:600:0:U',
+                'DS:pktsin:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:pktsout:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:bytesin:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:bytesout:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:totconns:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
             );
 
             $fields = array(
@@ -112,8 +112,8 @@ if (count($components > 0)) {
             }
         } elseif ($type == 'f5-ltm-pool') {
             $rrd_def = array(
-                'DS:minup:GAUGE:600:0:U',
-                'DS:currup:GAUGE:600:0:U',
+                'DS:minup:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:currup:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
             );
 
             $array['minup'] = $ltmPoolEntryMinup['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
@@ -143,11 +143,11 @@ if (count($components > 0)) {
             }
         } elseif ($type == 'f5-ltm-poolmember') {
             $rrd_def = array(
-                'DS:pktsin:COUNTER:600:0:U',
-                'DS:pktsout:COUNTER:600:0:U',
-                'DS:bytesin:COUNTER:600:0:U',
-                'DS:bytesout:COUNTER:600:0:U',
-                'DS:totconns:COUNTER:600:0:U',
+                'DS:pktsin:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:pktsout:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:bytesin:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:bytesout:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+                'DS:totconns:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
             );
 
             $array['state'] = $ltmPoolMbrStatusEntryState['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];

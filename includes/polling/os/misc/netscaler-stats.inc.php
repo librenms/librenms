@@ -100,11 +100,11 @@ if ($device['os'] == 'netscaler') {
     $rrd_def = array();
     foreach ($oids_gauge as $oid) {
         $oid_ds    = substr(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 0, 19);
-        $rrd_def[] = "DS:$oid_ds:GAUGE:600:U:100000000000";
+        $rrd_def[] = "DS:$oid_ds:GAUGE:{$config['rrd']['heartbeat']}:U:100000000000";
     }
     foreach ($oids_counter as $oid) {
         $oid_ds    = substr(str_replace('tcp', '', str_replace('Active', 'Ac', str_replace('Passive', 'Ps', str_replace('Zombie', 'Zom', $oid)))), 0, 19);
-        $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+        $rrd_def[] = "DS:$oid_ds:COUNTER:{$config['rrd']['heartbeat']}:U:100000000000";
     }
 
     $fields = array();

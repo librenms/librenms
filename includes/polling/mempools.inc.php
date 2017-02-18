@@ -21,8 +21,8 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
 
     $rrd_name = array('mempool', $mempool_type, $mempool_index);
     $rrd_def = array(
-        'DS:used:GAUGE:600:0:U',
-        'DS:free:GAUGE:600:0:U'
+        'DS:used:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:free:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
     );
 
     $fields = array(

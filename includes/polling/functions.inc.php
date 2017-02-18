@@ -147,7 +147,7 @@ function poll_sensor($device, $class)
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
-        $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
+        $rrd_def = 'DS:sensor:GAUGE:'.$config['rrd']['heartbeat'].':-20000:20000';
 
         echo "$sensor_value $unit\n";
 
@@ -268,7 +268,7 @@ function poll_device($device, $options)
                 // save per-module poller stats
                 $tags = array(
                     'module'      => $module,
-                    'rrd_def'     => 'DS:poller:GAUGE:600:0:U',
+                    'rrd_def'     => 'DS:poller:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
                     'rrd_name'    => array('poller-perf', $module),
                 );
                 $fields = array(
@@ -324,7 +324,7 @@ function poll_device($device, $options)
         // Poller performance
         if (!empty($device_time)) {
             $tags = array(
-                'rrd_def' => 'DS:poller:GAUGE:600:0:U',
+                'rrd_def' => 'DS:poller:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
                 'module'  => 'ALL',
             );
             $fields = array(
@@ -337,7 +337,7 @@ function poll_device($device, $options)
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
-                'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
+                'rrd_def' => 'DS:ping:GAUGE:'.$config['rrd']['heartbeat'].':0:65535',
             );
             $fields = array(
                 'ping' => $response['ping_time'],

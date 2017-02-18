@@ -13,17 +13,17 @@ foreach (explode('|', $agent_data['app'][$name][$app_instance]) as $part) {
 
 $rrd_name = array('app', $name, $app_instance);
 $rrd_def = array(
-    'DS:ns:DERIVE:600:0:125000000000',
-    'DS:nr:DERIVE:600:0:125000000000',
-    'DS:dw:DERIVE:600:0:125000000000',
-    'DS:dr:DERIVE:600:0:125000000000',
-    'DS:al:DERIVE:600:0:125000000000',
-    'DS:bm:DERIVE:600:0:125000000000',
-    'DS:lo:GAUGE:600:0:125000000000',
-    'DS:pe:GAUGE:600:0:125000000000',
-    'DS:ua:GAUGE:600:0:125000000000',
-    'DS:ap:GAUGE:600:0:125000000000',
-    'DS:oos:GAUGE:600:0:125000000000'
+    'DS:ns:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:nr:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:dw:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:dr:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:al:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:bm:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:lo:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:pe:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:ua:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:ap:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:oos:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000'
 );
 
 

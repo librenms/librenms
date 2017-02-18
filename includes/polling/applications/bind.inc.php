@@ -70,16 +70,16 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
 
     $rrd_name = array('app', $name, $app_id);
     $rrd_def = array(
-        'DS:any:COUNTER:600:0:125000000000',
-        'DS:a:COUNTER:600:0:125000000000',
-        'DS:aaaa:COUNTER:600:0:125000000000',
-        'DS:cname:COUNTER:600:0:125000000000',
-        'DS:mx:COUNTER:600:0:125000000000',
-        'DS:ns:COUNTER:600:0:125000000000',
-        'DS:ptr:COUNTER:600:0:125000000000',
-        'DS:soa:COUNTER:600:0:125000000000',
-        'DS:srv:COUNTER:600:0:125000000000',
-        'DS:spf:COUNTER:600:0:125000000000'
+        'DS:any:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:a:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:aaaa:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:cname:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:mx:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:ns:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:ptr:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:soa:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:srv:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
+        'DS:spf:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000'
     );
 
     $fields = array(

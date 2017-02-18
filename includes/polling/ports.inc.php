@@ -705,21 +705,21 @@ foreach ($ports as $port) {
         $rrd_name = getPortRrdName($port_id);
         $rrdfile = rrd_name($device['hostname'], $rrd_name);
         $rrd_def = array(
-            'DS:INOCTETS:DERIVE:600:0:12500000000',
-            'DS:OUTOCTETS:DERIVE:600:0:12500000000',
-            'DS:INERRORS:DERIVE:600:0:12500000000',
-            'DS:OUTERRORS:DERIVE:600:0:12500000000',
-            'DS:INUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INNUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTNUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INDISCARDS:DERIVE:600:0:12500000000',
-            'DS:OUTDISCARDS:DERIVE:600:0:12500000000',
-            'DS:INUNKNOWNPROTOS:DERIVE:600:0:12500000000',
-            'DS:INBROADCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INMULTICASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000'
+            'DS:INOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INERRORS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTERRORS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INNUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTNUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INDISCARDS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTDISCARDS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INUNKNOWNPROTOS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INBROADCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTBROADCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:INMULTICASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
+            'DS:OUTMULTICASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000'
         );
 
         $fields = array(

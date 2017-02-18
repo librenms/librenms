@@ -47,9 +47,9 @@ if ($device['os_group'] == 'cisco') {
 
                     $rrd_name = array('cefswitching', $entity, $afi, $index);
                     $rrd_def = array(
-                        'DS:drop:DERIVE:600:0:1000000',
-                        'DS:punt:DERIVE:600:0:1000000',
-                        'DS:hostpunt:DERIVE:600:0:1000000'
+                        'DS:drop:DERIVE:'.$config['rrd']['heartbeat'].':0:1000000',
+                        'DS:punt:DERIVE:'.$config['rrd']['heartbeat'].':0:1000000',
+                        'DS:hostpunt:DERIVE:'.$config['rrd']['heartbeat'].':0:1000000'
                     );
 
                     // Copy HC to non-HC if they exist

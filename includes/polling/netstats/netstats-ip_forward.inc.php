@@ -4,7 +4,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
 
     $oid = 'ipCidrRouteNumber';
     $fields = array();
-    $rrd_def = "DS:$oid:GAUGE:600:U:5000000";
+    $rrd_def = "DS:$oid:GAUGE:{$config['rrd']['heartbeat']}:U:5000000";
     $data = snmp_get($device, 'IP-FORWARD-MIB::' . $oid . '.0', '-OQv');
     if (is_numeric($data)) {
         $value = $data;

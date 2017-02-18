@@ -10,8 +10,8 @@ $cambiumSTADLRSSI = snmp_get($device, "cambiumSTADLRSSI.0", "-Ovqn", "CAMBIUM-PM
 $cambiumSTADLSNR = snmp_get($device, "cambiumSTADLSNR.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($cambiumSTADLRSSI) && is_numeric($cambiumSTADLSNR)) {
     $rrd_def = array(
-        'DS:cambiumSTADLRSSI:GAUGE:600:-150:0',
-        'DS:cambiumSTADLSNR:GAUGE:600:0:150'
+        'DS:cambiumSTADLRSSI:GAUGE:'.$config['rrd']['heartbeat'].':-150:0',
+        'DS:cambiumSTADLSNR:GAUGE:'.$config['rrd']['heartbeat'].':0:150'
     );
     $fields = array(
         'cambiumSTADLRSSI' => $cambiumSTADLRSSI,
@@ -26,8 +26,8 @@ $cambiumGPSNumTrackedSat = snmp_get($device, "cambiumGPSNumTrackedSat.0", "-Ovqn
 $cambiumGPSNumVisibleSat = snmp_get($device, "cambiumGPSNumVisibleSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($cambiumGPSNumTrackedSat) && is_numeric($cambiumGPSNumVisibleSat)) {
     $rrd_def = array(
-        'DS:numTracked:GAUGE:600:0:100000',
-        'DS:numVisible:GAUGE:600:0:100000'
+        'DS:numTracked:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+        'DS:numVisible:GAUGE:'.$config['rrd']['heartbeat'].':0:100000'
     );
     $fields = array(
         'numTracked' => $cambiumGPSNumTrackedSat,
@@ -42,8 +42,8 @@ $cambiumSTAUplinkMCSMode = snmp_get($device, "cambiumSTAUplinkMCSMode.0", "-Ovqn
 $cambiumSTADownlinkMCSMode = snmp_get($device, "cambiumSTADownlinkMCSMode.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMode)) {
     $rrd_def = array(
-        'DS:uplinkMCSMode:GAUGE:600:-30:30',
-        'DS:downlinkMCSMode:GAUGE:600:-30:30'
+        'DS:uplinkMCSMode:GAUGE:'.$config['rrd']['heartbeat'].':-30:30',
+        'DS:downlinkMCSMode:GAUGE:'.$config['rrd']['heartbeat'].':-30:30'
     );
     $fields = array(
         'uplinkMCSMode' => $cambiumSTAUplinkMCSMode,
@@ -56,7 +56,7 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
 
 $registeredSM = snmp_get($device, "cambiumAPNumberOfConnectedSTA.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($registeredSM)) {
-    $rrd_def = 'DS:regSM:GAUGE:600:0:10000';
+    $rrd_def = 'DS:regSM:GAUGE:'.$config['rrd']['heartbeat'].':0:10000';
     $fields = array(
         'regSM' => $registeredSM,
     );
@@ -70,9 +70,9 @@ $sysNetworkEntrySuccess = snmp_get($device, "sysNetworkEntrySuccess.0", "-Ovqn",
 $sysNetworkEntryAuthenticationFailure = snmp_get($device, "sysNetworkEntryAuthenticationFailure.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) && is_numeric($sysNetworkEntryAuthenticationFailure)) {
     $rrd_def = array(
-        'DS:entryAttempt:GAUGE:600:0:100000',
-        'DS:entryAccess:GAUGE:600:0:100000',
-        'DS:authFailure:GAUGE:600:0:100000'
+        'DS:entryAttempt:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+        'DS:entryAccess:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+        'DS:authFailure:GAUGE:'.$config['rrd']['heartbeat'].':0:100000'
     );
     $fields = array(
         'entryAttempt' => $sysNetworkEntryAttempt,
@@ -86,7 +86,7 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
 
 $gpsSync = snmp_get($device, "cambiumEffectiveSyncSource.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($gpsSync)) {
-    $rrd_def = 'DS:gpsSync:GAUGE:600:0:4';
+    $rrd_def = 'DS:gpsSync:GAUGE:'.$config['rrd']['heartbeat'].':0:4';
     $fields = array(
         'gpsSync' => $gpsSync,
     );
@@ -97,7 +97,7 @@ if (is_numeric($gpsSync)) {
 
 $freq = snmp_get($device, "cambiumSTAConnectedRFFrequency.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 if (is_numeric($freq)) {
-    $rrd_def = 'DS:freq:GAUGE:600:0:100000';
+    $rrd_def = 'DS:freq:GAUGE:'.$config['rrd']['heartbeat'].':0:100000';
     $fields = array(
         'freq' => $freq,
     );
@@ -119,8 +119,8 @@ if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTot
     d_echo($dlWlanFrameUtilization);
     d_echo($ulWlanFrameUtilization);
     $rrd_def = array(
-            'DS:ulwlanfrut:GAUGE:600:0:100000',
-            'DS:dlwlanfrut:GAUGE:600:0:100000'
+            'DS:ulwlanfrut:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
+            'DS:dlwlanfrut:GAUGE:'.$config['rrd']['heartbeat'].':0:100000'
     );
     $fields = array(
             'ulwlanframeutilization' => $ulWlanFrameUtilization,

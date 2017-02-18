@@ -11,7 +11,7 @@
 
 $rssi = snmp_get($device, "CISCO-WAN-3G-MIB::c3gCurrentGsmRssi.13", "-Ovqn", "CISCO-WAN-3G-MIB");
 if (is_numeric($rssi)) {
-    $rrd_def = 'DS:rssi:GAUGE:600:-150:5000';
+    $rrd_def = 'DS:rssi:GAUGE:'.$config['rrd']['heartbeat'].':-150:5000';
     $fields = array(
         'rssi' => $rssi,
     );
@@ -22,7 +22,7 @@ if (is_numeric($rssi)) {
 
 $mnc = snmp_get($device, "CISCO-WAN-3G-MIB::c3gGsmMnc.13", "-Ovqn", "CISCO-WAN-3G-MIB");
 if (is_numeric($mnc)) {
-    $rrd_def = 'DS:mnc:GAUGE:600:0:U';
+    $rrd_def = 'DS:mnc:GAUGE:'.$config['rrd']['heartbeat'].':0:U';
     $fields = array(
         'mnc' => $mnc,
     );

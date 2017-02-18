@@ -17,24 +17,24 @@ foreach ($lines as $line) {
 #Unbound Queries
 $rrd_name =  array('app', $name,'queries',$app_id);
 $rrd_def = array(
-    'DS:type0:DERIVE:600:0:125000000000',
-    'DS:A:DERIVE:600:0:125000000000',
-    'DS:NS:DERIVE:600:0:125000000000',
-    'DS:CNAME:DERIVE:600:0:125000000000',
-    'DS:SOA:DERIVE:600:0:125000000000',
-    'DS:NULL:DERIVE:600:0:125000000000',
-    'DS:WKS:DERIVE:600:0:125000000000',
-    'DS:PTR:DERIVE:600:0:125000000000',
-    'DS:MX:DERIVE:600:0:125000000000',
-    'DS:TXT:DERIVE:600:0:125000000000',
-    'DS:AAAA:DERIVE:600:0:125000000000',
-    'DS:SRV:DERIVE:600:0:125000000000',
-    'DS:NAPTR:DERIVE:600:0:125000000000',
-    'DS:DS:DERIVE:600:0:125000000000',
-    'DS:DNSKEY:DERIVE:600:0:125000000000',
-    'DS:SPF:DERIVE:600:0:125000000000',
-    'DS:ANY:DERIVE:600:0:125000000000',
-    'DS:other:DERIVE:600:0:125000000000'
+    'DS:type0:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:A:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:NS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:CNAME:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:SOA:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:NULL:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:WKS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:PTR:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:MX:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:TXT:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:AAAA:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:SRV:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:NAPTR:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:DS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:DNSKEY:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:SPF:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:ANY:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:other:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
     );
 $fields = array (
     'type0' => $unbound['num.query.type.TYPE0'],

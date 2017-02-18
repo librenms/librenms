@@ -38,10 +38,10 @@ $peth_oids = array(
 if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
     $rrd_name = getPortRrdName($port_id, 'poe');
     $rrd_def = array(
-        'DS:PortPwrAllocated:GAUGE:600:0:U',
-        'DS:PortPwrAvailable:GAUGE:600:0:U',
-        'DS:PortConsumption:DERIVE:600:0:U',
-        'DS:PortMaxPwrDrawn:GAUGE:600:0:U'
+        'DS:PortPwrAllocated:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:PortPwrAvailable:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:PortConsumption:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
+        'DS:PortMaxPwrDrawn:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
     );
 
     $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.$port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];

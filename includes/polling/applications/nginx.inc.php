@@ -16,11 +16,11 @@ d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Re
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:Requests:DERIVE:600:0:125000000000',
-    'DS:Active:GAUGE:600:0:125000000000',
-    'DS:Reading:GAUGE:600:0:125000000000',
-    'DS:Writing:GAUGE:600:0:125000000000',
-    'DS:Waiting:GAUGE:600:0:125000000000'
+    'DS:Requests:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:Active:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:Reading:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:Writing:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+    'DS:Waiting:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000'
 );
 
 $fields = array(

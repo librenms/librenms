@@ -21,14 +21,14 @@ foreach ($servers as $item => $server) {
 
         $rrd_name = array('app', $name, $app_id, $host . '_' . $port);
         $rrd_def = array(
-            'DS:bitrate:GAUGE:600:0:125000000000',
-            'DS:traf_in:GAUGE:600:0:125000000000',
-            'DS:traf_out:GAUGE:600:0:125000000000',
-            'DS:current:GAUGE:600:0:125000000000',
-            'DS:status:GAUGE:600:0:125000000000',
-            'DS:peak:GAUGE:600:0:125000000000',
-            'DS:max:GAUGE:600:0:125000000000',
-            'DS:unique:GAUGE:600:0:125000000000'
+            'DS:bitrate:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:traf_in:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:traf_out:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:current:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:status:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:peak:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:max:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
+            'DS:unique:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000'
         );
 
         $fields = array(

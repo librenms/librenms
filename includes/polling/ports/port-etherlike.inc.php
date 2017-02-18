@@ -8,7 +8,7 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     $rrd_create = $config['rrd_rra'];
     foreach ($etherlike_oids as $oid) {
         $oid       = substr(str_replace('dot3Stats', '', $oid), 0, 19);
-        $rrd_def[] = "DS:$oid:COUNTER:600:U:100000000000";
+        $rrd_def[] = "DS:$oid:COUNTER:{$config['rrd']['heartbeat']}:U:100000000000";
     }
 
     $fields = array();

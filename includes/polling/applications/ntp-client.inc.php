@@ -11,11 +11,11 @@ list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclie
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
-    'DS:offset:GAUGE:600:-1000:1000',
-    'DS:frequency:GAUGE:600:-1000:1000',
-    'DS:jitter:GAUGE:600:-1000:1000',
-    'DS:noise:GAUGE:600:-1000:1000',
-    'DS:stability:GAUGE:600:-1000:1000'
+    'DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:frequency:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:jitter:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:noise:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
+    'DS:stability:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000'
 );
 
 $fields = array(

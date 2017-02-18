@@ -34,7 +34,7 @@ $serial = trim(str_replace('"', '', $serial));
 $FdbAddressCount = snmp_get($device, 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
 
 if (is_numeric($FdbAddressCount)) {
-    $rrd_def = 'DS:value:GAUGE:600:-1:100000';
+    $rrd_def = 'DS:value:GAUGE:'.$config['rrd']['heartbeat'].':-1:100000';
 
     $fields = array(
         'value' => $FdbAddressCount,

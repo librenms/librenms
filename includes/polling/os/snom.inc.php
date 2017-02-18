@@ -25,12 +25,12 @@ echo "$rxbytes, $rxpkts, $txbytes, $txpkts, $calls, $registrations";
 
 $rrd_name = 'data';
 $rrd_def = array(
-    'DS:INOCTETS:COUNTER:600:U:100000000000',
-    'DS:OUTOCTETS:COUNTER:600:U:10000000000',
-    'DS:INPKTS:COUNTER:600:U:10000000000',
-    'DS:OUTPKTS:COUNTER:600:U:10000000000',
-    'DS:CALLS:COUNTER:600:U:10000000000',
-    'DS:REGISTRATIONS:COUNTER:600:U:10000000000'
+    'DS:INOCTETS:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
+    'DS:OUTOCTETS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
+    'DS:INPKTS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
+    'DS:OUTPKTS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
+    'DS:CALLS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
+    'DS:REGISTRATIONS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000'
 );
 
 $fields = array(
