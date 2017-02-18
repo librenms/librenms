@@ -22,11 +22,11 @@ def confirm(question):
 librenms_dir = dirname(dirname(abspath(__file__)))
 
 parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group()
+group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-d", "--discard", action="store_true", help="Discard all changes clean extra files")
 group.add_argument("-s", "--save", action="store_true", help="Save and remove changes by stashing them. (git stash)")
 group.add_argument("-r", "--restore", action="store_true", help="Attempt to restore saved changes (git stash pop)")
-parser.add_argument("-v", "--vendor", action="store_true", help="Also Discard changes to the vendor directory (requires --discard)")
+parser.add_argument("-v", "--vendor", action="store_true", help="Also discard changes to ./vendor (requires --discard)")
 
 args = parser.parse_args()
 
