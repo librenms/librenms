@@ -156,7 +156,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         // ---- PAM ----
         $this->checkSyslog(
             "1.1.1.1||authpriv||info||info||56||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
-            array('device_id'=>1, 'program'=>'PAM_UNIX(CRON:SESSION)', 'msg'=>'session opened for user librenms by (uid=0)')
+            array('device_id'=>1, 'program'=>'CRON', 'msg'=>'pam_unix(cron:session): session opened for user librenms by (uid=0)')
         );
         $this->checkSyslog(
             "1.1.1.1||authpriv||info||info||55||2016-02-28 00:23:34||pam_unix(sudo:session): session opened for user librenms by root (uid=0)||sudo",
