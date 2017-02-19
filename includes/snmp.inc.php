@@ -269,6 +269,9 @@ function snmp_check($device)
     $cmd = gen_snmpget_cmd($device, $oid, $options);
     exec($cmd, $data, $code);
     d_echo("SNMP Check response code: $code".PHP_EOL);
+
+    recordSnmpStatistic('snmpget', $time_start);
+
     if ($code === 0) {
         return true;
     }
