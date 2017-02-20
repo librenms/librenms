@@ -50,7 +50,6 @@ if ($agent_data['app'][$name]) {
 }
 
 if (!empty($data)) {
-
     $ds_list = array(
         'all-outqueries' => 'DERIVE',
         'answers-slow' => 'DERIVE',

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 echo "Polling SNOM device...\n";
 
 // Get SNOM specific version string from silly SNOM location. Silly SNOM!

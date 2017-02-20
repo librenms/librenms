@@ -10,6 +10,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\RRD\RrdDefinition;
+
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.1.0', '-OQv'), '"');
 $serial   = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.2.0', '-OQv'), '"');
 $version  = trim(snmp_get($device, '.1.3.6.1.4.1.17163.1.1.1.3.0', '-OQv'), '"');
@@ -46,8 +49,7 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
         ->addDataset('half_closed', 'GAUGE', 0)
         ->addDataset('established', 'GAUGE', 0)
         ->addDataset('active', 'GAUGE', 0)
-        ->addDataset('total', 'GAUGE', 0)
-    );
+        ->addDataset('total', 'GAUGE', 0);
 
     $fields = array(
         'half_open'   => $conn_half_open,
@@ -81,8 +83,7 @@ $datastore_miss = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.2.0'];
 if ($datastore_hits >= 0 && $datastore_miss >= 0) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('datastore_hits', 'GAUGE', 0)
-        ->addDataset('datastore_miss', 'GAUGE', 0)
-    );
+        ->addDataset('datastore_miss', 'GAUGE', 0);
 
     $fields = array(
         'datastore_hits' => $datastore_hits,
@@ -114,8 +115,7 @@ $conn_passthrough = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.2.0'];
 if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('conn_optimized', 'GAUGE', 0)
-        ->addDataset('conn_passthrough', 'GAUGE', 0)
-    );
+        ->addDataset('conn_passthrough', 'GAUGE', 0);
 
     $fields = array(
         'conn_optimized' => $conn_optimized,
@@ -152,8 +152,7 @@ if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('bw_in', 'COUNTER', 0)
         ->addDataset('bw_out', 'COUNTER', 0)
-        ->addDataset('bw_total', 'COUNTER', 0)
-    );
+        ->addDataset('bw_total', 'COUNTER', 0);
 
     $fields = array(
         'bw_in' => $bw_in,

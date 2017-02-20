@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device['device_id'])) as $mempool) {
     echo 'Mempool '.$mempool['mempool_descr'].': ';
 
