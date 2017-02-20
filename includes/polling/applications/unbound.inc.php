@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'unbound';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
@@ -16,26 +19,25 @@ foreach ($lines as $line) {
 }
 #Unbound Queries
 $rrd_name =  array('app', $name,'queries',$app_id);
-$rrd_def = array(
-    'DS:type0:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:A:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:NS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CNAME:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SOA:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:NULL:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:WKS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:PTR:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:MX:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:TXT:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:AAAA:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SRV:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:NAPTR:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:DS:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:DNSKEY:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SPF:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:ANY:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:other:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-    );
+$rrd_def = RrdDefinition::make()
+    ->addDataset('type0', 'DERIVE', 0, 125000000000)
+    ->addDataset('A', 'DERIVE', 0, 125000000000)
+    ->addDataset('NS', 'DERIVE', 0, 125000000000)
+    ->addDataset('CNAME', 'DERIVE', 0, 125000000000)
+    ->addDataset('SOA', 'DERIVE', 0, 125000000000)
+    ->addDataset('NULL', 'DERIVE', 0, 125000000000)
+    ->addDataset('WKS', 'DERIVE', 0, 125000000000)
+    ->addDataset('PTR', 'DERIVE', 0, 125000000000)
+    ->addDataset('MX', 'DERIVE', 0, 125000000000)
+    ->addDataset('TXT', 'DERIVE', 0, 125000000000)
+    ->addDataset('AAAA', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRV', 'DERIVE', 0, 125000000000)
+    ->addDataset('NAPTR', 'DERIVE', 0, 125000000000)
+    ->addDataset('DS', 'DERIVE', 0, 125000000000)
+    ->addDataset('DNSKEY', 'DERIVE', 0, 125000000000)
+    ->addDataset('SPF', 'DERIVE', 0, 125000000000)
+    ->addDataset('ANY', 'DERIVE', 0, 125000000000)
+    ->addDataset('other', 'DERIVE', 0, 125000000000);
 $fields = array (
     'type0' => $unbound['num.query.type.TYPE0'],
     'a' => $unbound['num.query.type.A'],

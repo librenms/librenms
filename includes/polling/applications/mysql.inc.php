@@ -1,6 +1,8 @@
 <?php
 
 // FIXME - this is lame
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'mysql';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
@@ -111,87 +113,86 @@ foreach ($mapping as $k => $v) {
 }
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:IDBLBSe:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBLFh:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBLWn:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SRows:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SRange:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SMPs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SScan:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIRd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIWr:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBILg:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIFSc:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IDBRDd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IDBRId:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IDBRRd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IDBRUd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBRd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBCd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBWr:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:TLIe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:TLWd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBPse:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBPDBp:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBPFe:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBPMps:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:TOC:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:OFs:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:OTs:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:OdTs:COUNTER:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBSRs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBSWs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBOWs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCs:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCeFy:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:MaCs:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:MUCs:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:ACs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:AdCs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:TCd:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:Cs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBTNx:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:KRRs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:KRs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:KWR:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:KWs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCQICe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCHs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCIs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCNCd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:QCLMPs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CTMPDTs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CTMPTs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CTMPFs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIIs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIMRd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIMs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBILog:DERIVE:602:0:125000000000',
-    'DS:IBISc:DERIVE:602:0:125000000000',
-    'DS:IBIFLg:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBFBl:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIIAo:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIAd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:IBIAe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SFJn:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SFRJn:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SRe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SRCk:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SSn:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:SQs:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:BRd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:BSt:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CDe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CIt:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CISt:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CLd:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CRe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CRSt:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CSt:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CUe:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:CUMi:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('IDBLBSe', 'GAUGE', 0, 125000000000)
+    ->addDataset('IBLFh', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBLWn', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRows', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRange', 'DERIVE', 0, 125000000000)
+    ->addDataset('SMPs', 'DERIVE', 0, 125000000000)
+    ->addDataset('SScan', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIRd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIWr', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBILg', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIFSc', 'DERIVE', 0, 125000000000)
+    ->addDataset('IDBRDd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IDBRId', 'DERIVE', 0, 125000000000)
+    ->addDataset('IDBRRd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IDBRUd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBRd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBCd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBWr', 'DERIVE', 0, 125000000000)
+    ->addDataset('TLIe', 'DERIVE', 0, 125000000000)
+    ->addDataset('TLWd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBPse', 'GAUGE', 0, 125000000000)
+    ->addDataset('IBPDBp', 'GAUGE', 0, 125000000000)
+    ->addDataset('IBPFe', 'GAUGE', 0, 125000000000)
+    ->addDataset('IBPMps', 'GAUGE', 0, 125000000000)
+    ->addDataset('TOC', 'GAUGE', 0, 125000000000)
+    ->addDataset('OFs', 'GAUGE', 0, 125000000000)
+    ->addDataset('OTs', 'GAUGE', 0, 125000000000)
+    ->addDataset('OdTs', 'COUNTER', 0, 125000000000)
+    ->addDataset('IBSRs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBSWs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBOWs', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCs', 'GAUGE', 0, 125000000000)
+    ->addDataset('QCeFy', 'GAUGE', 0, 125000000000)
+    ->addDataset('MaCs', 'GAUGE', 0, 125000000000)
+    ->addDataset('MUCs', 'GAUGE', 0, 125000000000)
+    ->addDataset('ACs', 'DERIVE', 0, 125000000000)
+    ->addDataset('AdCs', 'DERIVE', 0, 125000000000)
+    ->addDataset('TCd', 'GAUGE', 0, 125000000000)
+    ->addDataset('Cs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBTNx', 'DERIVE', 0, 125000000000)
+    ->addDataset('KRRs', 'DERIVE', 0, 125000000000)
+    ->addDataset('KRs', 'DERIVE', 0, 125000000000)
+    ->addDataset('KWR', 'DERIVE', 0, 125000000000)
+    ->addDataset('KWs', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCQICe', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCHs', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCIs', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCNCd', 'DERIVE', 0, 125000000000)
+    ->addDataset('QCLMPs', 'DERIVE', 0, 125000000000)
+    ->addDataset('CTMPDTs', 'DERIVE', 0, 125000000000)
+    ->addDataset('CTMPTs', 'DERIVE', 0, 125000000000)
+    ->addDataset('CTMPFs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIIs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIMRd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIMs', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBILog', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBISc', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIFLg', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBFBl', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIIAo', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIAd', 'DERIVE', 0, 125000000000)
+    ->addDataset('IBIAe', 'DERIVE', 0, 125000000000)
+    ->addDataset('SFJn', 'DERIVE', 0, 125000000000)
+    ->addDataset('SFRJn', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRe', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRCk', 'DERIVE', 0, 125000000000)
+    ->addDataset('SSn', 'DERIVE', 0, 125000000000)
+    ->addDataset('SQs', 'DERIVE', 0, 125000000000)
+    ->addDataset('BRd', 'DERIVE', 0, 125000000000)
+    ->addDataset('BSt', 'DERIVE', 0, 125000000000)
+    ->addDataset('CDe', 'DERIVE', 0, 125000000000)
+    ->addDataset('CIt', 'DERIVE', 0, 125000000000)
+    ->addDataset('CISt', 'DERIVE', 0, 125000000000)
+    ->addDataset('CLd', 'DERIVE', 0, 125000000000)
+    ->addDataset('CRe', 'DERIVE', 0, 125000000000)
+    ->addDataset('CRSt', 'DERIVE', 0, 125000000000)
+    ->addDataset('CSt', 'DERIVE', 0, 125000000000)
+    ->addDataset('CUe', 'DERIVE', 0, 125000000000)
+    ->addDataset('CUMi', 'DERIVE', 0, 125000000000);
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
@@ -217,11 +218,12 @@ $mapping_status = array(
 );
 
 $rrd_name = array('app', $name, $app_id, 'status');
-$rrd_def = array();
+$rrd_def = new RrdDefinition();
 unset($fields);
+$fields = array();
 foreach ($mapping_status as $desc => $id) {
     $fields[$desc] = isset($map[$id]) ? $map[$id] : (-1);
-    $rrd_def[] = 'DS:'.$id.':GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000';
+    $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $status = true;
 $tags = compact('name', 'app_id', 'status', 'rrd_name', 'rrd_def');

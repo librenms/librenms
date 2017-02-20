@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'memcached';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app']['memcached'])) {
@@ -14,26 +16,25 @@ if (!empty($agent_data['app']['memcached'])) {
 echo ' memcached('.$app['app_instance'].')';
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:uptime:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:threads:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:rusage_user_ms:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:rusage_system_ms:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:curr_items:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:total_items:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:limit_maxbytes:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:curr_connections:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:total_connections:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:conn_structures:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:bytes:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:cmd_get:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:cmd_set:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:get_hits:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:get_misses:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:evictions:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:bytes_read:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:bytes_written:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('uptime', 'GAUGE', 0, 125000000000)
+    ->addDataset('threads', 'GAUGE', 0, 125000000000)
+    ->addDataset('rusage_user_ms', 'DERIVE', 0, 125000000000)
+    ->addDataset('rusage_system_ms', 'DERIVE', 0, 125000000000)
+    ->addDataset('curr_items', 'GAUGE', 0, 125000000000)
+    ->addDataset('total_items', 'DERIVE', 0, 125000000000)
+    ->addDataset('limit_maxbytes', 'GAUGE', 0, 125000000000)
+    ->addDataset('curr_connections', 'GAUGE', 0, 125000000000)
+    ->addDataset('total_connections', 'DERIVE', 0, 125000000000)
+    ->addDataset('conn_structures', 'GAUGE', 0, 125000000000)
+    ->addDataset('bytes', 'GAUGE', 0, 125000000000)
+    ->addDataset('cmd_get', 'DERIVE', 0, 125000000000)
+    ->addDataset('cmd_set', 'DERIVE', 0, 125000000000)
+    ->addDataset('get_hits', 'DERIVE', 0, 125000000000)
+    ->addDataset('get_misses', 'DERIVE', 0, 125000000000)
+    ->addDataset('evictions', 'DERIVE', 0, 125000000000)
+    ->addDataset('bytes_read', 'DERIVE', 0, 125000000000)
+    ->addDataset('bytes_written', 'DERIVE', 0, 125000000000);
 
 $fields = array(
     'uptime'            => $data['uptime'],

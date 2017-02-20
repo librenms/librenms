@@ -1,6 +1,9 @@
 <?php
 
 // Polls powerdns statistics from script via SNMP
+
+use LibreNMS\RRD\RrdDefinition;
+
 $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.112.111.119.101.114.100.110.115';
@@ -22,30 +25,29 @@ list ($corrupt, $def_cacheInserts, $def_cacheLookup, $latency, $pc_hit,
     $udp6_queries) = explode("\n", $powerdns);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:corruptPackets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:def_cacheInserts:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:def_cacheLookup:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:latency:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:pc_hit:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:pc_miss:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:pc_size:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:qsize:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:qc_hit:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:qc_miss:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:rec_answers:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:rec_questions:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:servfailPackets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_tcpAnswers:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_tcpQueries:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_timedout:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udpAnswers:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udpQueries:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udp4Answers:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udp4Queries:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udp6Answers:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:q_udp6Queries:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('corruptPackets', 'DERIVE', 0, 125000000000)
+    ->addDataset('def_cacheInserts', 'DERIVE', 0, 125000000000)
+    ->addDataset('def_cacheLookup', 'DERIVE', 0, 125000000000)
+    ->addDataset('latency', 'DERIVE', 0, 125000000000)
+    ->addDataset('pc_hit', 'DERIVE', 0, 125000000000)
+    ->addDataset('pc_miss', 'DERIVE', 0, 125000000000)
+    ->addDataset('pc_size', 'DERIVE', 0, 125000000000)
+    ->addDataset('qsize', 'DERIVE', 0, 125000000000)
+    ->addDataset('qc_hit', 'DERIVE', 0, 125000000000)
+    ->addDataset('qc_miss', 'DERIVE', 0, 125000000000)
+    ->addDataset('rec_answers', 'DERIVE', 0, 125000000000)
+    ->addDataset('rec_questions', 'DERIVE', 0, 125000000000)
+    ->addDataset('servfailPackets', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_tcpAnswers', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_tcpQueries', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_timedout', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udpAnswers', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udpQueries', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udp4Answers', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udp4Queries', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udp6Answers', 'DERIVE', 0, 125000000000)
+    ->addDataset('q_udp6Queries', 'DERIVE', 0, 125000000000);
 
 $fields = array(
     'corruptPackets'     => $corrupt,

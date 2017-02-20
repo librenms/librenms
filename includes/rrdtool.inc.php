@@ -371,7 +371,7 @@ function rrdtool_tune($type, $filename, $max)
  * rrdtool backend implementation of data_update
  *
  * Tags:
- *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_def     RrdDefinition
  *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
  *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
  *   rrd_step             int: rrd step, defaults to 300
@@ -399,10 +399,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
         $rrd = rrd_name($device['hostname'], $rrd_name);
     }
 
-    if ($tags['rrd_def'] && !rrdtool_check_rrd_exists($rrd)) {
-        $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
-        // add the --step and the rra definitions to the command
-        $newdef = "--step $step " . implode(' ', $rrd_def) . $config['rrd_rra'];
+    if (isset($tags['rrd_def']) && !rrdtool_check_rrd_exists($rrd)) {
+        $newdef = "--step $step " . $tags['rrd_def'] . $config['rrd_rra'];
         rrdtool('create', $rrd, $newdef);
     }
 

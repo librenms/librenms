@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     global $config;
 
@@ -49,10 +52,9 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     echo "\n";
 
     $rrd_name = 'aruba-controller';
-    $rrd_def = array(
-        'DS:NUMAPS:GAUGE:'.$config['rrd']['heartbeat'].':0:12500000000',
-        'DS:NUMCLIENTS:GAUGE:'.$config['rrd']['heartbeat'].':0:12500000000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
+        ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
     $fields = array(
         'NUMAPS'     => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
@@ -114,15 +116,14 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         if (is_numeric($channel)) {
             $rrd_name = array('arubaap',  $name.$radionum);
 
-            $rrd_def = array(
-                'DS:channel:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
-                'DS:txpow:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
-                'DS:radioutil:GAUGE:'.$config['rrd']['heartbeat'].':0:100',
-                'DS:nummonclients:GAUGE:'.$config['rrd']['heartbeat'].':0:500',
-                'DS:nummonbssid:GAUGE:'.$config['rrd']['heartbeat'].':0:200',
-                'DS:numasoclients:GAUGE:'.$config['rrd']['heartbeat'].':0:500',
-                'DS:interference:GAUGE:'.$config['rrd']['heartbeat'].':0:2000'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('channel', 'GAUGE', 0, 200)
+                ->addDataset('txpow', 'GAUGE', 0, 200)
+                ->addDataset('radioutil', 'GAUGE', 0, 100)
+                ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                ->addDataset('interference', 'GAUGE', 0, 2000);
 
             $fields = array(
                 'channel'         => $channel,

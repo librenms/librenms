@@ -1,6 +1,8 @@
 <?php
 
 // Polls Apache statistics from script via SNMP
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'apache';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
@@ -19,28 +21,27 @@ list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $score_closing, $score_logging, $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:access:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:kbyte:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:cpu:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:uptime:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:reqpersec:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:bytespersec:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:byesperreq:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:busyworkers:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:idleworkers:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_wait:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_start:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_reading:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_writing:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_keepalive:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_dns:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_closing:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_logging:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_graceful:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_idle:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:sb_open:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('access', 'DERIVE', 0, 125000000000)
+    ->addDataset('kbyte', 'DERIVE', 0, 125000000000)
+    ->addDataset('cpu', 'GAUGE', 0, 125000000000)
+    ->addDataset('uptime', 'GAUGE', 0, 125000000000)
+    ->addDataset('reqpersec', 'GAUGE', 0, 125000000000)
+    ->addDataset('bytespersec', 'GAUGE', 0, 125000000000)
+    ->addDataset('byesperreq', 'GAUGE', 0, 125000000000)
+    ->addDataset('busyworkers', 'GAUGE', 0, 125000000000)
+    ->addDataset('idleworkers', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_wait', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_start', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_reading', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_writing', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_keepalive', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_dns', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_closing', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_logging', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_graceful', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_idle', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_open', 'GAUGE', 0, 125000000000);
 
 $fields = array(
                 'access'       => intval(trim($total_access, '"')),

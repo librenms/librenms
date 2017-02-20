@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'ceph';
 if (!empty($agent_data['app'][$name])) {
     $app_id = $app['app_id'];
@@ -11,11 +13,10 @@ if (!empty($agent_data['app'][$name])) {
         list($section, $data) = explode('>', $section);
 
         if ($section == "poolstats") {
-            $rrd_def = array(
-                'DS:ops:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-                'DS:wrbytes:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-                'DS:rbytes:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('ops', 'GAUGE', 0)
+                ->addDataset('wrbytes', 'GAUGE', 0)
+                ->addDataset('rbytes', 'GAUGE', 0);
 
             foreach (explode("\n", $data) as $line) {
                 if (empty($line)) {
@@ -34,10 +35,9 @@ if (!empty($agent_data['app'][$name])) {
                 data_update($device, 'app', $tags, $fields);
             }
         } elseif ($section == "osdperformance") {
-            $rrd_def = array(
-                'DS:apply_ms:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-                'DS:commit_ms:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('apply_ms', 'GAUGE', 0)
+                ->addDataset('commit_ms', 'GAUGE', 0);
 
             foreach (explode("\n", $data) as $line) {
                 if (empty($line)) {
@@ -55,11 +55,10 @@ if (!empty($agent_data['app'][$name])) {
                 data_update($device, 'app', $tags, $fields);
             }
         } elseif ($section == "df") {
-            $rrd_def = array(
-                'DS:avail:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-                'DS:used:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-                'DS:objects:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('avail', 'GAUGE', 0)
+                ->addDataset('used', 'GAUGE', 0)
+                ->addDataset('objects', 'GAUGE', 0);
 
             foreach (explode("\n", $data) as $line) {
                 if (empty($line)) {

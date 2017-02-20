@@ -41,12 +41,12 @@ $conn_active      = $connections['.1.3.6.1.4.1.17163.1.1.5.2.6.0'];
 $conn_total       = $connections['.1.3.6.1.4.1.17163.1.1.5.2.7.0'];
 
 if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && $conn_active >= 0 && $conn_total >= 0) {
-    $rrd_def = array(
-        'DS:half_open:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:half_closed:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:established:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:active:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:total:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('half_open', 'GAUGE', 0)
+        ->addDataset('half_closed', 'GAUGE', 0)
+        ->addDataset('established', 'GAUGE', 0)
+        ->addDataset('active', 'GAUGE', 0)
+        ->addDataset('total', 'GAUGE', 0)
     );
 
     $fields = array(
@@ -79,9 +79,9 @@ $datastore_hits = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.1.0'];
 $datastore_miss = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.2.0'];
 
 if ($datastore_hits >= 0 && $datastore_miss >= 0) {
-    $rrd_def = array(
-        'DS:datastore_hits:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:datastore_miss:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('datastore_hits', 'GAUGE', 0)
+        ->addDataset('datastore_miss', 'GAUGE', 0)
     );
 
     $fields = array(
@@ -112,9 +112,9 @@ $conn_optimized   = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.1.0'];
 $conn_passthrough = $optimizations['.1.3.6.1.4.1.17163.1.1.5.2.2.0'];
 
 if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
-    $rrd_def = array(
-        'DS:conn_optimized:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:conn_passthrough:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('conn_optimized', 'GAUGE', 0)
+        ->addDataset('conn_passthrough', 'GAUGE', 0)
     );
 
     $fields = array(
@@ -149,10 +149,10 @@ $bw_out = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.2.0'];
 $bw_total = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.3.0'];
 
 if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
-    $rrd_def = array(
-        'DS:bw_in:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:bw_out:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:bw_total:COUNTER:'.$config['rrd']['heartbeat'].':0:U',
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('bw_in', 'COUNTER', 0)
+        ->addDataset('bw_out', 'COUNTER', 0)
+        ->addDataset('bw_total', 'COUNTER', 0)
     );
 
     $fields = array(

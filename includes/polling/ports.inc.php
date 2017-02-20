@@ -1,6 +1,8 @@
 <?php
 
 // Build SNMP Cache Array
+use LibreNMS\RRD\RrdDefinition;
+
 $data_oids = array(
     'ifName',
     'ifDescr',
@@ -704,23 +706,22 @@ foreach ($ports as $port) {
         // Update data stores
         $rrd_name = getPortRrdName($port_id);
         $rrdfile = rrd_name($device['hostname'], $rrd_name);
-        $rrd_def = array(
-            'DS:INOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTOCTETS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INERRORS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTERRORS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INNUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTNUCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INDISCARDS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTDISCARDS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INUNKNOWNPROTOS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INBROADCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTBROADCASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:INMULTICASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000',
-            'DS:OUTMULTICASTPKTS:DERIVE:'.$config['rrd']['heartbeat'].':0:12500000000'
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INERRORS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTERRORS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INNUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INDISCARDS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTDISCARDS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
         $fields = array(
             'INOCTETS'         => $this_port['ifInOctets'],

@@ -16,12 +16,11 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:success:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:failure:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:reject:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:prereq_reject:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('success', 'DERIVE', 0)
+    ->addDataset('failure', 'DERIVE', 0)
+    ->addDataset('reject', 'DERIVE', 0)
+    ->addDataset('prereq_reject', 'DERIVE', 0);
 
 $fields = array(
     'success'       => $data[0]['ibDDNSUpdateSuccess'],
@@ -46,10 +45,9 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-        'DS:PerfAA:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:PerfnonAA:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
-);
+$rrd_def = RrdDefinition::make()
+        ->addDataset('PerfAA', 'GAUGE', 0)
+        ->addDataset('PerfnonAA', 'GAUGE', 0);
 
 $fields = array(
     'PerfAA'    => $data[0]['ibNetworkMonitorDNSAAT1AvgLatency'],
@@ -72,12 +70,11 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:success:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:failure:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:nxdomain:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:nxrrset:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('success', 'DERIVE', 0)
+    ->addDataset('failure', 'DERIVE', 0)
+    ->addDataset('nxdomain', 'DERIVE', 0)
+    ->addDataset('nxrrset', 'DERIVE', 0);
 
 $fields = array(
     'success'       => $data['"summary"']['ibBindZoneSuccess'],
@@ -108,17 +105,16 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:ack:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:decline:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:discover:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:inform:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:nack:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:offer:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:other:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:release:DERIVE:'.$config['rrd']['heartbeat'].':0:U',
-    'DS:request:DERIVE:'.$config['rrd']['heartbeat'].':0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('ack', 'DERIVE', 0)
+    ->addDataset('decline', 'DERIVE', 0)
+    ->addDataset('discover', 'DERIVE', 0)
+    ->addDataset('inform', 'DERIVE', 0)
+    ->addDataset('nack', 'DERIVE', 0)
+    ->addDataset('offer', 'DERIVE', 0)
+    ->addDataset('other', 'DERIVE', 0)
+    ->addDataset('release', 'DERIVE', 0)
+    ->addDataset('request', 'DERIVE', 0);
 
 $fields = array(
     'ack'      => $data[0]['ibDhcpTotalNoOfAcks'],

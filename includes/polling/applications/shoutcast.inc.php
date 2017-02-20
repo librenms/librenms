@@ -1,6 +1,9 @@
 <?php
 
 // Polls shoutcast statistics from script via SNMP
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'shoutcast';
 $app_id = $app['app_id'];
 
@@ -20,16 +23,15 @@ foreach ($servers as $item => $server) {
         list($host, $port) = explode(':', $data['0'], 2);
 
         $rrd_name = array('app', $name, $app_id, $host . '_' . $port);
-        $rrd_def = array(
-            'DS:bitrate:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:traf_in:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:traf_out:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:current:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:status:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:peak:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:max:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-            'DS:unique:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000'
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('bitrate', 'GAUGE', 0, 125000000000)
+            ->addDataset('traf_in', 'GAUGE', 0, 125000000000)
+            ->addDataset('traf_out', 'GAUGE', 0, 125000000000)
+            ->addDataset('current', 'GAUGE', 0, 125000000000)
+            ->addDataset('status', 'GAUGE', 0, 125000000000)
+            ->addDataset('peak', 'GAUGE', 0, 125000000000)
+            ->addDataset('max', 'GAUGE', 0, 125000000000)
+            ->addDataset('unique', 'GAUGE', 0, 125000000000);
 
         $fields = array(
             'bitrate'  => $data['1'],

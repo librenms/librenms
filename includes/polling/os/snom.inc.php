@@ -24,14 +24,13 @@ $rxbytes = (0 - $rxbytes * 8);
 echo "$rxbytes, $rxpkts, $txbytes, $txpkts, $calls, $registrations";
 
 $rrd_name = 'data';
-$rrd_def = array(
-    'DS:INOCTETS:COUNTER:'.$config['rrd']['heartbeat'].':U:100000000000',
-    'DS:OUTOCTETS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
-    'DS:INPKTS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
-    'DS:OUTPKTS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
-    'DS:CALLS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000',
-    'DS:REGISTRATIONS:COUNTER:'.$config['rrd']['heartbeat'].':U:10000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('INOCTETS', 'COUNTER', null, 100000000000)
+    ->addDataset('OUTOCTETS', 'COUNTER', null, 10000000000)
+    ->addDataset('INPKTS', 'COUNTER', null, 10000000000)
+    ->addDataset('OUTPKTS', 'COUNTER', null, 10000000000)
+    ->addDataset('CALLS', 'COUNTER', null, 10000000000)
+    ->addDataset('REGISTRATIONS', 'COUNTER', null, 10000000000);
 
 $fields = array(
     'INOCTETS'      => $rxbytes,

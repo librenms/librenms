@@ -13,16 +13,15 @@ if (count($vp_rows)) {
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'junose');
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', 'junose');
 
-    $rrd_def = array(
-        'DS:incells:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:outcells:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:inpackets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:outpackets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:inpacketoctets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:outpacketoctets:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:inpacketerrors:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-        'DS:outpacketerrors:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('incells', 'DERIVE', 0, 125000000000)
+        ->addDataset('outcells', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpackets', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpackets', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpacketoctets', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpacketoctets', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpacketerrors', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpacketerrors', 'DERIVE', 0, 125000000000);
 
     foreach ($vp_rows as $vp) {
         echo '.';

@@ -20,10 +20,9 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     echo $percent.'% ';
 
     $rrd_name = array('mempool', $mempool_type, $mempool_index);
-    $rrd_def = array(
-        'DS:used:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:free:GAUGE:'.$config['rrd']['heartbeat'].':0:U'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('used', 'GAUGE', 0)
+        ->addDataset('free', 'GAUGE', 0);
 
     $fields = array(
         'used' => $mempool['used'],

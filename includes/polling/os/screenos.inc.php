@@ -8,11 +8,10 @@ $sess_cmd .= ' .1.3.6.1.4.1.3224.16.3.2.0 .1.3.6.1.4.1.3224.16.3.3.0 .1.3.6.1.4.
 $sess_data = shell_exec($sess_cmd);
 list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
 
-$rrd_def = array(
-    'DS:allocate:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000',
-    'DS:max:GAUGE:'.$config['rrd']['heartbeat'].':0:3000000',
-    'DS:failed:GAUGE:'.$config['rrd']['heartbeat'].':0:1000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('allocate', 'GAUGE', 0, 3000000)
+    ->addDataset('max', 'GAUGE', 0, 3000000)
+    ->addDataset('failed', 'GAUGE', 0, 1000);
 
 $fields = array(
     'allocate'  => $sessalloc,

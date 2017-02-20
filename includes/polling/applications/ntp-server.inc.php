@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ntp-server"
 $name = 'ntp-server';
 $app_id = $app['app_id'];
@@ -9,22 +12,21 @@ list ($stratum, $offset, $frequency, $jitter, $noise, $stability, $uptime, $buff
 echo ' '.$name;
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:stratum:GAUGE:'.$config['rrd']['heartbeat'].':0:1000',
-    'DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
-    'DS:frequency:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
-    'DS:jitter:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
-    'DS:noise:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
-    'DS:stability:GAUGE:'.$config['rrd']['heartbeat'].':-1000:1000',
-    'DS:uptime:GAUGE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:buffer_recv:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
-    'DS:buffer_free:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
-    'DS:buffer_used:GAUGE:'.$config['rrd']['heartbeat'].':0:100000',
-    'DS:packets_drop:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:packets_ignore:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:packets_recv:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000',
-    'DS:packets_sent:DERIVE:'.$config['rrd']['heartbeat'].':0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('stratum', 'GAUGE', 0, 1000)
+    ->addDataset('offset', 'GAUGE', -1000, 1000)
+    ->addDataset('frequency', 'GAUGE', -1000, 1000)
+    ->addDataset('jitter', 'GAUGE', -1000, 1000)
+    ->addDataset('noise', 'GAUGE', -1000, 1000)
+    ->addDataset('stability', 'GAUGE', -1000, 1000)
+    ->addDataset('uptime', 'GAUGE', 0, 125000000000)
+    ->addDataset('buffer_recv', 'GAUGE', 0, 100000)
+    ->addDataset('buffer_free', 'GAUGE', 0, 100000)
+    ->addDataset('buffer_used', 'GAUGE', 0, 100000)
+    ->addDataset('packets_drop', 'DERIVE', 0, 125000000000)
+    ->addDataset('packets_ignore', 'DERIVE', 0, 125000000000)
+    ->addDataset('packets_recv', 'DERIVE', 0, 125000000000)
+    ->addDataset('packets_sent', 'DERIVE', 0, 125000000000);
 
 
 $fields = array(

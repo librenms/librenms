@@ -18,9 +18,9 @@ $oids = 'sonicCurrentConnCacheEntries.0 sonicMaxConnCacheEntries.0';
 $data = snmp_get_multi($device, $oids, '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTICS-MIB');
 
 if (is_numeric($data)) {
-    $rrd_def = array(
-        'DS:activesessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
-        'DS:maxsessions:GAUGE:'.$config['rrd']['heartbeat'].':0:U',
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('activesessions', 'GAUGE', 0)
+        ->addDataset('maxsessions', 'GAUGE', 0)
     );
     $fields = array(
         'activesessions' => $data[0]['sonicCurrentConnCacheEntries'],
