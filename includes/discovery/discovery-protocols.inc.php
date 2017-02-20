@@ -157,6 +157,10 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
     d_echo($lldp_array);
     $dot1d_array = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
     d_echo($dot1d_array);
+    if ($config['discovery_by_ip'] == true) {
+        $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
+        d_echo($ptopo_array);
+    }
     if ($lldp_array) {
         $lldp_links = '';
         foreach (array_keys($lldp_array) as $key) {
@@ -186,7 +190,24 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         }
 
                         if ($skip_discovery === false) {
-                            $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+                            if ($config['discovery_by_ip'] == true) {
+                                echo "Finding IP address for MAC ${lldp['lldpRemChassisId']}\n";
+                                foreach (array_keys($ptopo_array) as $ptopo_key) {
+                                    if (strcmp($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis'], $lldp['lldpRemChassisId']) == 0) {
+                                        $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
+                                        
+                                        $a = hexdec($ip_arr[0]);
+                                        $b = hexdec($ip_arr[1]);
+                                        $c = hexdec($ip_arr[2]);
+                                        $d = hexdec($ip_arr[3]);
+                                        
+                                        $discover_hostname = "$a.$b.$c.$d";
+                                    }
+                                 }
+                            } else {
+                                $discover_hostname = $lldp['lldpRemSysName'];
+                            }
+                            $remote_device_id = discover_new_device($discover_hostname, $device, 'LLDP', $interface);
                         }
                     }
                     // normalize MAC address if present
@@ -211,7 +232,6 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     } else {
                         $remote_port_id = '0';
                     }
-
                     if (is_numeric($interface['port_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId'])) {
                         discover_link($interface['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], null, $lldp['lldpRemSysDesc'], $device['device_id'], $remote_device_id);
                     }
