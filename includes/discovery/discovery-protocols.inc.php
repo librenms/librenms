@@ -188,8 +188,8 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         $discover_hostname = $lldp['lldpRemSysName'];
                         if ($skip_discovery === false) {
                             if ($config['discovery_by_ip'] == true) {
-                            $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
-                            d_echo($ptopo_array);
+                                $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
+                                d_echo($ptopo_array);
                                 echo "Finding IP address for MAC ${lldp['lldpRemChassisId']}\n";
                                 foreach (array_keys($ptopo_array) as $ptopo_key) {
                                     if (strcmp($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis'], $lldp['lldpRemChassisId']) == 0) {
