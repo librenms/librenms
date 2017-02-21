@@ -501,8 +501,16 @@ It is worth noting that this only monitors a single pool. If you want to monitor
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
+
 4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults.
 
 5: Restart snmpd on your host
 
-6: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
+6: Add the following to /etc/crontab and restart cron.
+```
+*/3    *    *    *    *    root    /root/snmp-extends/fail2ban.pl -u 
+```
+
+7: Restart or reload cron on your system.
+
+8: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
