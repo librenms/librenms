@@ -1096,7 +1096,7 @@ if (!defined('JSON_UNESCAPED_UNICODE')) {
 
 function _json_encode($data, $options = 448)
 {
-    array_walk_recursive($data, function(&$val) {
+    array_walk_recursive($data, function (&$val) {
         $val = utf8_encode($val);
     });
     if (version_compare(PHP_VERSION, '5.4', '>=')) {
