@@ -194,8 +194,7 @@ function QueryDevicesFromGroup($group_id)
 function GetDevicesFromGroup($group_id, $nested = false, $full = false)
 {
     if ($full){
-      $query = "SELECT `device_groups`.`name`, `devices`.* FROM `device_groups` INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id` WHERE `device_groups`.`id` = ?";
-      logfile($query);
+      $query = 'SELECT `device_groups`.`name`, `devices`.* FROM `device_groups` INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id` WHERE `device_groups`.`id`=?';
     }
     else {
       $query = 'SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=?';
@@ -203,6 +202,8 @@ function GetDevicesFromGroup($group_id, $nested = false, $full = false)
     if ($nested) {
         return dbFetchRows($query, array($group_id));
     } else {
+        logfile($query);
+        logfile(print_r($group_id));
         return dbFetchColumn($query, array($group_id));
     }
 }//end GetDevicesFromGroup()
