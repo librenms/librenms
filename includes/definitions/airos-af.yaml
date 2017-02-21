@@ -7,3 +7,5 @@ group: ubnt
 over:
     - { graph: device_bits }
     - { graph: device_processor }
+poller_modules:
+    wifi: 1

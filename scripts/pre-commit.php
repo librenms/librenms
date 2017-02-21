@@ -9,11 +9,12 @@ chdir($install_dir);
 
 require $install_dir . '/vendor/autoload.php';
 
-$short_opts = 'lsupch';
+$short_opts = 'lsufpch';
 $long_opts = array(
     'lint',
     'style',
     'unit',
+    'fail-fast',
     'passthru',
     'snmpsim',
     'commands',
@@ -24,13 +25,14 @@ $options = getopt($short_opts, $long_opts);
 if (check_opt($options, 'h', 'help')) {
     echo "LibreNMS Code Tests Script
 Running $filename without options runs all checks.
-  -l, --lint     Run php lint checks to test for valid syntax
-  -s, --style    Run phpcs check to check for PSR-2 compliance
-  -u, --unit     Run phpunit tests
-  -p, --passthru Display output from checks as it comes
-      --snmpsim  Use snmpsim on 127.0.0.1:11161 for unit tests
-  -c, --commands Print commands only, no checks
-  -h, --help     Show this help text.\n";
+  -l, --lint      Run php lint checks to test for valid syntax
+  -s, --style     Run phpcs check to check for PSR-2 compliance
+  -u, --unit      Run phpunit tests
+  -f, --fail-fast Quit when any failure is encountered
+  -p, --passthru  Display output from checks as it comes
+      --snmpsim   Use snmpsim on 127.0.0.1:11161 for unit tests
+  -c, --commands  Print commands only, no checks
+  -h, --help      Show this help text.\n";
     exit();
 }
 
@@ -38,7 +40,8 @@ Running $filename without options runs all checks.
 $passthru = check_opt($options, 'p', 'passthru');
 $command_only = check_opt($options, 'c', 'commands');
 $snmpsim = check_opt($options, 'snmpsim');
-$ret = 0;
+$fail_fast = check_opt($options, 'f', 'fail-fast');
+$return = 0;
 $completed_tests = array(
     'lint' => false,
     'style' => false,
@@ -53,20 +56,27 @@ if ($all) {
 
 // run tests in the order they were specified
 foreach (array_keys($options) as $opt) {
+    $ret = 0;
     if ($opt == 'l' || $opt == 'lint') {
-        $ret += run_check('lint', $passthru, $command_only);
+        $ret = run_check('lint', $passthru, $command_only);
     } elseif ($opt == 's' || $opt == 'style') {
-        $ret += run_check('style', $passthru, $command_only);
+        $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
-        $ret += run_check('unit', $passthru, $command_only, $snmpsim);
+        $ret = run_check('unit', $passthru, $command_only, $fail_fast, $snmpsim);
+    }
+
+    if ($fail_fast && $ret !== 0 && $ret !== 250) {
+        exit($ret);
+    } else {
+        $return += $ret;
     }
 }
 
 // output Tests ok, if no arguments passed
-if ($all && $ret === 0) {
+if ($all && $return === 0) {
     echo "\033[32mTests ok, submit away :)\033[0m \n";
 }
-exit($ret); //return the combined/single return value of tests
+exit($return); //return the combined/single return value of tests
 
 
 /**
@@ -76,10 +86,11 @@ exit($ret); //return the combined/single return value of tests
  * @param string $type type of check lint, style, or unit
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
+ * @param bool $fail_fast Quit as soon as possible if error or failure
  * @param bool $snmpsim Use snmpsim
  * @return int the return value from the check (0 = success)
  */
-function run_check($type, $passthru, $command_only, $snmpsim = false)
+function run_check($type, $passthru, $command_only, $fail_fast = false, $snmpsim = false)
 {
     global $completed_tests;
     if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $completed_tests[$type]) {
@@ -90,7 +101,7 @@ function run_check($type, $passthru, $command_only, $snmpsim = false)
     $function = 'check_' . $type;
     if (function_exists($function)) {
         $completed_tests[$type] = true;
-        return $function($passthru, $command_only, $snmpsim);
+        return $function($passthru, $command_only, $fail_fast, $snmpsim);
     }
 
     return 1;
@@ -190,10 +201,11 @@ function check_style($passthru = false, $command_only = false)
  *
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
+ * @param bool $fail_fast Stop when any error or failure is encountered
  * @param bool $snmpsim send snmp requests to snmpsim listening on 127.0.0.1:11161
  * @return int the return value from phpunit (0 = success)
  */
-function check_unit($passthru = false, $command_only = false, $snmpsim = false)
+function check_unit($passthru = false, $command_only = false, $fail_fast = false, $snmpsim = false)
 {
     $phpunit_bin = check_exec('phpunit');
 
@@ -203,6 +215,10 @@ function check_unit($passthru = false, $command_only = false, $snmpsim = false)
     } else {
         $phpunit_cmd = "$phpunit_bin --colors=always";
         $snmpsim_cmd = '';
+    }
+
+    if ($fail_fast) {
+        $phpunit_cmd .= ' --stop-on-error --stop-on-failure';
     }
 
 

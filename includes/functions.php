@@ -65,14 +65,7 @@ function array_sort($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    $r = substr($mac, 0, 2);
-    $r .= ":".substr($mac, 2, 2);
-    $r .= ":".substr($mac, 4, 2);
-    $r .= ":".substr($mac, 6, 2);
-    $r .= ":".substr($mac, 8, 2);
-    $r .= ":".substr($mac, 10, 2);
-
-    return($r);
+    return rtrim(chunk_split($mac, 2, ':'), ':');
 }
 
 function only_alphanumeric($string)
@@ -160,6 +153,10 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             if (!preg_match_any($sysDescr, $value)) {
                 return false;
             }
+        } elseif ($key == 'sysObjectId_regex') {
+            if (!preg_match_any($sysObjectId, $value)) {
+                return false;
+            }
         }
     }
 
@@ -212,52 +209,87 @@ function interface_errors($rrd_file, $period = '-1d')
     return $errors;
 }
 
-function getImage($device)
+/**
+ * @param $device
+ * @return string the logo image path for this device. Images are often wide, not square.
+ */
+function getLogo($device)
 {
-    $title = $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
-    return '<img src="' . getImageSrc($device) . '" title="' . $title . '"/>';
+    $img = getImageName($device, true, 'images/logos/');
+    if (!starts_with($img, 'generic')) {
+        return 'images/logos/' . $img;
+    }
+
+    return getIcon($device);
 }
 
-function getImageSrc($device)
+/**
+ * @param $device
+ * @return string an image tag with the logo for this device. Images are often wide, not square.
+ */
+function getLogoTag($device)
+{
+    return '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"/>';
+}
+
+/**
+ * @param $device
+ * @return string the path to the icon image for this device.  Close to square.
+ */
+function getIcon($device)
 {
     return 'images/os/' . getImageName($device);
 }
 
-function getImageName($device, $use_database = true)
+/**
+ * @param $device
+ * @return string an image tag with the icon for this device.  Close to square.
+ */
+function getIconTag($device)
+{
+    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
+}
+
+function getImageTitle($device)
+{
+    return $device['icon'] ? str_replace(array('.svg', '.png'), '', $device['icon']) : $device['os'];
+}
+
+function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
     global $config;
 
-    $device['os'] = strtolower($device['os']);
+    $os = strtolower($device['os']);
 
     // fetch from the database
-    if ($use_database && is_file($config['html_dir'] . '/images/os/' . $device['icon'])) {
+    if ($use_database && is_file($config['html_dir'] . "/$dir" . $device['icon'])) {
         return $device['icon'];
     }
 
     // linux specific handling, distro icons
     $distro = null;
-    if ($device['os'] == "linux") {
+    if ($os == "linux") {
         $features = strtolower(trim($device['features']));
         list($distro) = explode(" ", $features);
     }
 
     $possibilities = array(
         $distro,
-        $config['os'][$device['os']]['icon'],
-        $device['os'],
+        $config['os'][$os]['icon'],
+        $os,
     );
 
     foreach ($possibilities as $basename) {
         foreach (array('.svg', '.png') as $ext) {
             $name = $basename . $ext;
-            if (is_file($config['html_dir'] . '/images/os/' . $name)) {
+            if (is_file($config['html_dir'] . "/$dir" . $name)) {
                 return $name;
             }
         }
     }
 
     // fallback to the generic icon
-    return 'generic.png';
+    return 'generic.svg';
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -267,9 +299,9 @@ function renamehost($id, $new, $source = 'console')
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
-        log_event("Hostname changed -> $new ($source)", $id, 'system');
+        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
-        log_event("Renaming of $host failed", $id, 'system');
+        log_event("Renaming of $host failed", $id, 'system', 5);
         if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
             echo "Renaming of $host failed\n";
         } else {
@@ -281,6 +313,12 @@ function renamehost($id, $new, $source = 'console')
 function delete_device($id)
 {
     global $config, $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
     $ret = '';
 
     $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
@@ -317,7 +355,7 @@ function delete_device($id)
     }
 
     $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system');
+    log_event("Device $host has been removed", 0, 'system', 3);
     return $ret;
 }
 
@@ -639,6 +677,8 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
                 oxidized_reload_nodes();
                 return $device_id;
             }
+        } else {
+            throw new HostExistsException("Already have host $host ($snmphost)");
         }
     }
 
@@ -648,7 +688,12 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
 
 function isDomainResolves($domain)
 {
-    return (gethostbyname($domain) != $domain || count(dns_get_record($domain)) != 0);
+    if (gethostbyname($domain) != $domain) {
+        return true;
+    }
+
+    $records = dns_get_record($domain);  // returns array or false
+    return !empty($records);
 }
 
 function hoststatus($id)
@@ -744,7 +789,7 @@ function get_astext($asn)
 }
 
 # Use this function to write to the eventlog table
-function log_event($text, $device = null, $type = null, $reference = null)
+function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
@@ -755,6 +800,7 @@ function log_event($text, $device = null, $type = null, $reference = null)
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
+        'severity' => $severity,
         'message' => $text);
 
     dbInsert($insert, 'eventlog');
@@ -858,13 +904,12 @@ function formatCiscoHardware(&$device, $short = false)
     }
 }
 
-# from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
 function hex2str($hex)
 {
     $string='';
 
     for ($i = 0; $i < strlen($hex)-1; $i+=2) {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        $string .= chr(hexdec(substr($hex, $i, 2)));
     }
 
     return $string;
@@ -879,7 +924,7 @@ function snmp_hexstring($hex)
 # Check if the supplied string is an SNMP hex string
 function isHexString($str)
 {
-    return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
+    return (bool)preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
 }
 
 # Include all .inc.php files in $dir
@@ -909,7 +954,10 @@ function is_port_valid($port, $device)
 
     global $config;
 
-    if (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
+    if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
+        // If these are all empty, we are just going to show blank names in the ui
+        $valid = 0;
+    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
         $valid = 0;
     } else {
         $valid = 1;
@@ -1453,6 +1501,7 @@ function oxidized_reload_nodes()
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -1473,7 +1522,7 @@ function oxidized_reload_nodes()
 function dnslookup($device, $type = false, $return = false)
 {
     if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return '';
+        return false;
     }
     if (empty($type)) {
         // We are going to use the transport to work out the record type
@@ -1486,7 +1535,7 @@ function dnslookup($device, $type = false, $return = false)
         }
     }
     if (empty($return)) {
-        return '';
+        return false;
     }
     $record = dns_get_record($device['hostname'], $type);
     return $record[0][$return];
@@ -1781,8 +1830,13 @@ function get_toner_levels($device, $raw_value, $capacity)
         return 50;
     }
 
-    // -2 means unknown, -1 mean no restrictions
-    if ($raw_value == '-2' || $raw_value == '-1') {
+    // -2 means unknown
+    if ($raw_value == '-2') {
+        return false;
+    }
+
+    // -1 mean no restrictions
+    if ($raw_value == '-1') {
         return 0;  // FIXME: is 0 what we should return?
     }
 
@@ -1938,4 +1992,55 @@ function recordSnmpStatistic($stat, $start_time)
     $snmp_stats[$stat]++;
     $snmp_stats["${stat}_sec"] += $runtime;
     return $runtime;
+}
+
+/**
+ * @param $device
+ * @param bool $record_perf
+ * @return array
+ */
+function device_is_up($device, $record_perf = false)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $ping_response = isPingable($device['hostname'], $address_family, $device['attribs']);
+    $device_perf              = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+
+    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+        dbInsert($device_perf, 'device_perf');
+    }
+    $response              = array();
+    $response['ping_time'] = $ping_response['last_ping_timetaken'];
+    if ($ping_response['result']) {
+        if (isSNMPable($device)) {
+            $response['status']        = '1';
+            $response['status_reason'] = '';
+        } else {
+            echo 'SNMP Unreachable';
+            $response['status']        = '0';
+            $response['status_reason'] = 'snmp';
+        }
+    } else {
+        echo 'Unpingable';
+        $response['status']        = '0';
+        $response['status_reason'] = 'icmp';
+    }
+
+    if ($device['status'] != $response['status']) {
+        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
+        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+    }
+    return $response;
+}
+
+function update_device_logo(&$device)
+{
+    $icon = getImageName($device, false);
+    if ($icon != $device['icon']) {
+        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
+        $device['icon'] = $icon;
+        dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
+        echo "Changed Icon! : $icon\n";
+    }
 }

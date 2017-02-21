@@ -6,3 +6,4 @@ over:
 discovery:
     - sysDescr:
         - SensorProbe
+        - sensorProbe4

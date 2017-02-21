@@ -60,7 +60,7 @@ echo '<table class="table table-striped">
         <th>95th %ile</th>
         <th style="text-align: center;">Overusage</th>
         <th colspan="2" style="text-align: right;"><a href="'.generate_url($vars, array('detail' => 'all')).'">
-            <img src="images/16/chart_curve.png" border="0" align="absmiddle" alt="Show details" title="Show details" /> Show all details</a>
+            <i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i> Show details</a>
         </th>
     </tr>
     </thead>
@@ -111,7 +111,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                 <td style=\"text-align: center;\">$overuse</td>
                 <td width=\"250\">".print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
                 <td>
-                    <a href="'.$url.'"><img src="images/16/chart_curve.png" border="0" align="absmiddle" alt="Show details" title="Show details"/></a>
+                    <a href="'.$url.'"><i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i></a>
                 </td>
             </tr>';
 

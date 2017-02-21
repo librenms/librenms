@@ -197,7 +197,7 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
-function get_all_devices($device, $type = "")
+function get_all_devices()
 {
     global $cache;
     $devices = array();
@@ -1041,7 +1041,7 @@ function print_mib_poller_disabled()
 {
     echo '<h4>MIB polling is not enabled</h4>
 <p>
-Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> or enable for this device specifically to enable.
+Set <code>$config[\'poller_modules\'][\'mib\'] = 1;</code> in <code>config.php</code> or enable for this device specifically to enable.
 </p>';
 } // print_mib_poller_disabled
 
@@ -1073,7 +1073,7 @@ function ceph_rrd($gtype)
 function parse_location($location)
 {
     preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (!empty($tmp_loc[2]) && !empty($tmp_loc[3])) {
+    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
 }//end parse_location()
@@ -1093,6 +1093,9 @@ function version_info($remote = true)
             curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
             curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
             curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($api, CURLOPT_TIMEOUT, 5);
+            curl_setopt($api, CURLOPT_TIMEOUT_MS, 5000);
+            curl_setopt($api, CURLOPT_CONNECTTIMEOUT, 5);
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
@@ -1503,9 +1506,15 @@ function clean($value)
  */
 function display($value)
 {
-    $purifier = new HTMLPurifier(
-        HTMLPurifier_Config::createDefault()
-    );
+    /** @var HTMLPurifier $purifier */
+    global $config, $purifier;
+    if (!isset($purifier)) {
+        // initialize HTML Purifier here since this is the only user
+        $p_config = HTMLPurifier_Config::createDefault();
+        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        $purifier = new HTMLPurifier($p_config);
+    }
+
     return $purifier->purify(stripslashes($value));
 }
 
@@ -1534,7 +1543,7 @@ function load_os(&$device)
 
     // Set type to a predefined type for the OS if it's not already set
     if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
-        log_event('Device type changed '.$device['type'].' => '.$config['os'][$device['os']]['type'], $device, 'system');
+        log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
         echo "Device type changed to " . $device['type'] . "!\n";
@@ -1609,6 +1618,7 @@ function set_numeric($value, $default = 0)
     }
     return $value;
 }
+
 function check_git_exists()
 {
     if (`which git`) {
@@ -1616,4 +1626,15 @@ function check_git_exists()
     } else {
         return false;
     }
+}
+
+function get_vm_parent_id($device)
+{
+    global $config;
+
+    if (empty($device['hostname'])) {
+        return false;
+    }
+
+    return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 }

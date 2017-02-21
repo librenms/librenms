@@ -23,30 +23,28 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'vrp') {
-    echo 'Huawei VRP ';
-    $data = $vrp_oids['hwEntityOpticalBiasCurrent'];
+echo 'Huawei VRP ';
+$data = $pre_cache['vrp_oids']['hwEntityOpticalBiasCurrent'];
 
-    foreach ($data as $index => $value) {
-        if (is_numeric($value) && $value >= 0) {
-            $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.' . $index;
-            $descr = $vrp_oids['entPhysicalName'][$index];
-            discover_sensor(
-                $valid['sensor'],
-                'current',
-                $device,
-                $oid,
-                $index,
-                'vrp',
-                $descr,
-                1000,
-                1,
-                0,
-                0,
-                70,
-                75,
-                $value
-            );
-        }
+foreach ($data as $index => $value) {
+    if (is_numeric($value) && $value >= 0) {
+        $oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.' . $index;
+        $descr = $pre_cache['vrp_oids']['entPhysicalName'][$index];
+        discover_sensor(
+            $valid['sensor'],
+            'current',
+            $device,
+            $oid,
+            $index,
+            'vrp',
+            $descr,
+            1000,
+            1,
+            0,
+            0,
+            70,
+            75,
+            $value
+        );
     }
 }

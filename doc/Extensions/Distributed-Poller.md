@@ -22,7 +22,7 @@ It is a requirement that all pollers can access the central memcached to communi
 
 By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`. One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.
 
-A standard configuration for a distrinuted poller would look like:
+A standard configuration for a distributed poller would look like:
 
 ```php
 // Distributed Poller-Settings

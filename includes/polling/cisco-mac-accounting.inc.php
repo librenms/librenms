@@ -93,3 +93,11 @@ if ($device['os_group'] == 'cisco') {
 
     echo "\n";
 }//end if
+
+unset(
+    $cip_oids,
+    $oid,
+    $polled,
+    $mac_entries,
+    $acc_rows
+);

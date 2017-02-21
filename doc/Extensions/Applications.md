@@ -5,6 +5,7 @@ You can use Application support to graph performance statistics from many applic
 
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or the agent.
 
+1. [Agent Setup](#agent-setup)
 1. [Apache](#apache) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
@@ -25,9 +26,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
-1. [Agent Setup](#agent-setup)
-
-
+1. [Munin](#munin) - Agent
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -335,12 +334,16 @@ Unbound configuration:
 ```text
 # Enable extended statistics.
 server:
-        statistics-interval: 0
         extended-statistics: yes
         statistics-cumulative: yes
+
+remote-control:
+        control-enable: yes
+        control-interface: 127.0.0.1
+
 ```
 
-Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+Restart your unbound after changing the configuration, verify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
 
 
 
@@ -376,7 +379,7 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 SNMP extend script to get your exim stats data into your host.
 
 ##### SNMP Extend
-1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/1c091800b713e26395796b5d5379421fc268a39b/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
+1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/master/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
 2. Make the script executable: `chmod +x /etc/snmp/exim-stats.sh`
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 ```
@@ -440,3 +443,29 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 8. Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 9. Then under Applications, enable the apps that you plan to monitor.
 10. Wait for around 10 minutes and you should start seeing data in your graphs under Apps for the device.
+
+### Munin
+
+#### Agent
+1. Install the script to your agent: `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin -O /usr/lib/check_mk_agent/local/munin`
+2. Make the script executable (`chmod +x /usr/lib/check_mk_agent/local/munin`)
+3. Create the munin scripts dir: `mkdir -p /usr/share/munin`
+4. Install your munin scripts into the above directory.
+
+To create your own custom munin scripts, please see this example:
+
+```
+#!/bin/bash
+if [ "$1" = "config" ]; then
+    echo 'graph_title Some title'
+    echo 'graph_args --base 1000 -l 0' #not required
+    echo 'graph_vlabel Some label'
+    echo 'graph_scale no' #not required, can be yes/no
+    echo 'graph_category system' #Choose something meaningful, can be anything
+    echo 'graph_info This graph shows something awesome.' #Short desc
+    echo 'foobar.label Label for your unit' # Repeat these two lines as much as you like
+    echo 'foobar.info Desc for your unit.'
+    exit 0
+fi
+echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
+```

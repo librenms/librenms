@@ -38,15 +38,25 @@ discovery:
         - VA-SPE
 ```
 
-#### Icon
+#### Icon and Logo
 
-Put a SVG vector image to **html/images/os/$os.svg**. Legacy PNG bitmaps (32x32 px) are also supported.
-
-- Square icons are prefered to a name.
-- A vector image should not contain padding.
+Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.
+- A vector image should not contain padding.  
 - The file should not be larger than 20 Kb. Simplify paths to reduce large files.
+- Use plain SVG without gzip compression.
+
+##### Icon
+- Save the icon SVG to **html/images/os/$os.svg**.
+- Icons should look good when viewed at 32x32 px.
+- Square icons are preferred to full logos with text.
 - Remove small ornaments that are almost not visible when displayed with 32px width (e.g. ® or ™).
-- Use plain SVG without compression.
+
+##### Logo
+- Save the logo SVG to **html/images/logos/$os.svg**.
+- Logos can be any dimension, but often are wide and contain the company name.
+- If a logo is not present, the icon will be used.
+
+##### Hints
 
 Hints for [Inkscape](https://inkscape.org/):
 
@@ -57,8 +67,8 @@ Hints for [Inkscape](https://inkscape.org/):
 - Use `File -> Clean up document` to remove unused gradients, patterns, or markers.
 - Use `File -> Save As -> Plain SVG` to save the final image.
 
-By optimizing the SVG you can shrink the filesize in some cases to less than 20 %.
-[SVG Optimizer](https://github.com/svg/svgo) does a great job.
+By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
+[SVG Optimizer](https://github.com/svg/svgo) does a great job. There is also an [online version](https://jakearchibald.github.io/svgomg/).
 
 #### Discovery OS
 
@@ -319,31 +329,33 @@ We declare two specific graphs for users and sessions numbers. Theses two graphs
 ```php
 <?php
 
-$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hostname = trim($poll_device['sysName'], '"');
 
-$users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($users)) {
     $rrd_def = 'DS:users:GAUGE:600:0:U';
+
     $fields = array(
-        'users' => $users
-    )
+        'users' => $users,
+    );
+
     $tags = compact('rrd_def');
     data_update($device, 'pulse_users', $tags, $fields);
     $graphs['pulse_users'] = true;
 }
 
-$sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($sessions)) {
-    $rrd_def = array(
-        'DS:sessions:GAUGE:600:0:U',
-    }
+    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+
     $fields = array(
-        'sessions' => $sessions
+        'sessions' => $sessions,
     );
+
     $tags = compact('rrd_def');
     data_update($device, 'pulse_sessions', $tags, $fields);
     $graphs['pulse_sessions'] = true;

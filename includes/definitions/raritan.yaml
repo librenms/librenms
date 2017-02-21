@@ -5,6 +5,4 @@ over:
     - { graph: device_current, text: Current }
 icon: raritan
 discovery:
-    - sysDescr:
-        - Raritan
-        - PX2
+    - sysObjectId: .1.3.6.1.4.1.13742

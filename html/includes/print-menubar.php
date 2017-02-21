@@ -88,25 +88,25 @@ if ($config['title_image']) {
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
            <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-chevron-right fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
+           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
 <?php
 if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
-    echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
+    echo '<li><a href="'.generate_url(array('page'=>'oxidized')).'"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>';
 }
 
 ?>
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-bookmark fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
 <?php
 
 if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>';
 }
 
 if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
-    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
+    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>';
 }
 
 ?>
@@ -341,7 +341,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 <?php
 
 if ($deleted_ports) {
-    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-col-primary fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
+    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
 }
 
 ?>
@@ -422,8 +422,6 @@ if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 foreach ($app_list as $app) {
     if (isset($app['app_type'])) {
         $app_i_list = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ? ORDER BY `app_instance`", array($app['app_type']));
-        $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
-        $icon = (file_exists($image) ? $app['app_type'] : "apps");
         if (count($app_i_list) > 1) {
             echo '<li class="dropdown-submenu">';
             echo '<a href="apps/app='.$app['app_type'].'/"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($app['app_type']).' </a>';
@@ -766,7 +764,7 @@ $('#gsearch').typeahead({
   valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;Ports</strong></h5>',
-        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>{{name}}</strong> – {{hostname}}<br /><i>{{description}}</i></small></a></p>')
     }
 },
 {

@@ -403,7 +403,7 @@ if ($format == "graph") {
     }
 
     echo '
-                    <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
+                    <th data-column-id="actions" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
         </table>

@@ -3,7 +3,12 @@ text: 'Generex UPS SNMP adapter'
 type: power
 icon: generex-ups
 discovery:
-    - { sysObjectId: .1.3.6.1.2.1.33, sysDescr: [CS121, CS141]}
+    -
+      sysObjectId:
+        - .1.3.6.1.2.1.33
+      sysDescr_regex:
+        - '/CS121/i'
+        - '/CS141/i'
 discovery_modules:
     storage: 0
     bgp-peers: 0

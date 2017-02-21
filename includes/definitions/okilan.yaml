@@ -9,3 +9,8 @@ icon: oki
 discovery:
     - sysDescr:
         - OKI OkiLAN
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

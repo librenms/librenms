@@ -437,7 +437,7 @@ class IRCBot
     private function chkdb()
     {
         if (!is_resource($this->sql)) {
-            if (($this->sql = mysqli_connect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'])) != false && mysqli_select_db($this->sql, $this->config['db_name'])) {
+            if (($this->sql = mysqli_connect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'], null, $this->config['db_port'])) != false && mysqli_select_db($this->sql, $this->config['db_name'])) {
                 return true;
             } else {
                 $this->log('Cannot connect to MySQL');

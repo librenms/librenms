@@ -13,3 +13,8 @@ discovery:
         - 'Dell Color Laser'
         - 'Dell Laser Printer'
     - sysDescr_regex: '/^Dell.*(MFP|Printer|Laser)/'
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

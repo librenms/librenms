@@ -17,14 +17,16 @@ if ($device['disabled'] == '1') {
     $class = 'alert-info';
 }
 
-$type = strtolower($device['os']);
-
-$image = getImage($device);
-$host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
+$host_id = get_vm_parent_id($device);
 
 echo '
+	    <colgroup>
+	    <col class="device-title-bar-1">
+	    <col class="device-title-bar-2">
+	    <col class="device-title-bar-3">
+            </colgroup>
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td><span class="device-icon-48h">'.$image.'</span></td>
+             <td><span class="device-icon-48h">'.getLogoTag($device).'</span></td>
              <td>';
 if ($host_id > 0) {
     echo '

@@ -29,15 +29,34 @@ function sensor_precache($device)
     return $sensor_config;
 }
 
-function poll_sensor($device, $class, $unit)
+function poll_sensor($device, $class)
 {
     global $config, $memcache, $agent_sensors;
+
+    $supported_sensors = array(
+        'current'     => 'A',
+        'frequency'   => 'Hz',
+        'runtime'     => 'Min',
+        'humidity'    => '%',
+        'fanspeed'    => 'rpm',
+        'power'       => 'W',
+        'voltage'     => 'V',
+        'temperature' => 'C',
+        'dbm'         => 'dBm',
+        'charge'      => '%',
+        'load'        => '%',
+        'state'       => '#',
+        'signal'      => 'dBm',
+        'airflow'     => 'cfm',
+    );
+
+    $unit = $supported_sensors[$class];
 
     $sensors = array();
     $misc_sensors = array();
     $all_sensors = array();
 
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', array($class, $device['device_id'])) as $sensor) {
+    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = '?' AND `device_id` = ?", array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             $misc_sensors[] = $sensor;
         } elseif ($sensor['poller_type'] == 'ipmi') {
@@ -149,15 +168,16 @@ function poll_sensor($device, $class, $unit)
         // FIXME also warn when crossing WARN level!!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' under threshold: '.$sensor_value." $unit (< ".$sensor['sensor_limit_low']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' under threshold: ' . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
+            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' above threshold: ' . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
-            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
+            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, 3, $sensor['sensor_id']);
         }
-        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = '?' AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
+        unset($supported_sensors);
     }
 }//end poll_sensor()
 
@@ -173,7 +193,6 @@ function poll_device($device, $options)
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
     $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
-    $status = 0;
     unset($array);
     $device_start = microtime(true);
     // Start counting device poll time
@@ -183,7 +202,7 @@ function poll_device($device, $options)
     $ip = dnslookup($device);
 
     if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
-        log_event('Device IP changed to '.$ip, $device, 'system');
+        log_event('Device IP changed to ' . $ip, $device, 'system', 3);
         $db_ip = inet_pton($ip);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
@@ -201,53 +220,15 @@ function poll_device($device, $options)
     $poll_update_array = array();
     $update_array = array();
 
-    $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
+    $host_rrd = rrd_name($device['hostname'], '', '');
     if ($config['norrd'] !== true && !is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
     }
 
-    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $response = device_is_up($device, true);
 
-    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
-
-    $device_perf              = $ping_response['db'];
-    $device_perf['device_id'] = $device['device_id'];
-    $device_perf['timestamp'] = array('NOW()');
-    if (can_ping_device($attribs) === true && is_array($device_perf)) {
-        dbInsert($device_perf, 'device_perf');
-    }
-
-    $device['pingable'] = $ping_response['result'];
-    $ping_time          = $ping_response['last_ping_timetaken'];
-    $response           = array();
-    $status_reason      = '';
-    if ($device['pingable']) {
-        $device['snmpable'] = isSNMPable($device);
-        if ($device['snmpable']) {
-            $status                    = '1';
-            $response['status_reason'] = '';
-        } else {
-            echo 'SNMP Unreachable';
-            $status                    = '0';
-            $response['status_reason'] = 'snmp';
-        }
-    } else {
-        echo 'Unpingable';
-        $status                    = '0';
-        $response['status_reason'] = 'icmp';
-    }
-
-    if ($device['status'] != $status) {
-        $poll_update   .= $poll_separator."`status` = '$status'";
-        $poll_separator = ', ';
-
-        dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
-    }
-
-    if ($status == '1') {
+    if ($response['status'] == '1') {
         $graphs    = array();
         $oldgraphs = array();
 
@@ -273,13 +254,15 @@ function poll_device($device, $options)
                 $attribs['poll_'.$module] ||
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
                 ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
+                $start_memory = memory_get_usage();
                 $module_start = 0;
                 $module_time  = 0;
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                printf("\n>> Runtime for poller module '%s': %.4f seconds\n", $module, $module_time);
+                $module_mem  = (memory_get_usage() - $start_memory);
+                printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
@@ -298,6 +281,7 @@ function poll_device($device, $options)
                 if (is_file($oldrrd)) {
                     unlink($oldrrd);
                 }
+                unset($tags, $fields, $oldrrd);
             } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                 echo "Module [ $module ] disabled on host.\n\n";
             } elseif (isset($os_module_status) && $os_module_status == '0') {
@@ -351,16 +335,16 @@ function poll_device($device, $options)
         }
 
         // Ping response
-        if (can_ping_device($attribs) === true  &&  !empty($ping_time)) {
+        if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
                 'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
             );
             $fields = array(
-                'ping' => $ping_time,
+                'ping' => $response['ping_time'],
             );
 
             $update_array['last_ping']             = array('NOW()');
-            $update_array['last_ping_timetaken']   = $ping_time;
+            $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
         }
@@ -489,6 +473,7 @@ function location_to_latlng($device)
     $device_location = $device['location'];
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /", "+", $device_location);
+        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
         // We have a location string for the device.
         $loc = parse_location($device_location);
         if (!is_array($loc)) {
@@ -512,6 +497,9 @@ function location_to_latlng($device)
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
             curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
+            curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
+            curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
             switch ($config['geoloc']['engine']) {

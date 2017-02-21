@@ -260,7 +260,7 @@ function transferOverview($bill_id, $history)
 
 
 // Html template
-$logo  = $pdf->serializeTCPDFtagParameters(array('images/dummy-logo.png', 15, 18, 100, '', '', 'www.example.com', 'T'));
+$logo  = $pdf->serializeTCPDFtagParameters(array('images/librenms_logo.png', 15, 18, 100, '', '', 'www.example.com', 'T'));
 $html .= '<tcpdf method="Image" params="'.$logo.'" />';
 $html .= '<h1 class="right">Billing Report</h1>';
 $html .= '<p></p>';

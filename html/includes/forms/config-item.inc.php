@@ -37,7 +37,7 @@ $config_token     = mres($_POST['config_token']);
 $status           = 'error';
 $message          = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar' || $action == 'remove-clickatell' || $action == 'remove-playsms') {
+if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocket' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar' || $action == 'remove-clickatell' || $action == 'remove-playsms') {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -45,6 +45,8 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
         if (dbDelete('config', '`config_id`=?', array($config_id))) {
             if ($action == 'remove-slack') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.slack.$config_id.%'");
+            } elseif ($action == 'remove-rocket') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.rocket.$config_id.%'");
             } elseif ($action == 'remove-hipchat') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.hipchat.$config_id.%'");
             } elseif ($action == 'remove-pushover') {
@@ -56,7 +58,6 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
             } elseif ($action == 'remove-playsms') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.playsms.$config_id.%'");
             }
-
             $status  = 'ok';
             $message = 'Config item removed';
         } else {
@@ -77,6 +78,26 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
                 list($k,$v) = explode('=', $option, 2);
                 if (!empty($k) || !empty($v)) {
                     dbInsert(array('config_name' => 'alert.transports.slack.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Slack Transport'), 'config');
+                }
+            }
+        } else {
+            $message = 'Could not create config item';
+        }
+    }
+} elseif ($action == 'add-rocket') {
+    if (empty($config_value)) {
+        $message = 'No Rocket.Chat url provided';
+    } else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.rocket.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Rocket.Chat Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.rocket.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
+            $status  = 'ok';
+            $message = 'Config item created';
+            $extras  = explode('\n', $config_extra);
+            foreach ($extras as $option) {
+                list($k,$v) = explode('=', $option, 2);
+                if (!empty($k) || !empty($v)) {
+                    dbInsert(array('config_name' => 'alert.transports.rocket.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Rocket.Chat Transport'), 'config');
                 }
             }
         } else {

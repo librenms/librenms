@@ -4,6 +4,7 @@ type: wireless
 icon: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_canopy_generic_regCount, text: 'Registered SMs' }
 group: cambium
 discovery:
     - sysDescr_regex:

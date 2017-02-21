@@ -26,6 +26,7 @@ These are the configuration options you will need to use to specify to get start
 
 ```php
 $config['db_host'] = '127.0.0.1';
+$config['db_port'] = 3306;
 $config['db_user'] = '';
 $config['db_pass'] = '';
 $config['db_name'] = '';
@@ -130,6 +131,11 @@ $config['webui']['custom_css'][]       = "css/custom/styles.css";
 You can override a large number of visual elements by creating your own css stylesheet and referencing it here, place any custom css files into 
 `html/css/custom` so they will be ignored by auto updates. You can specify as many css files as you like, the order they are within your config 
 will be the order they are loaded in the browser.
+
+```php
+$config['title_image'] = "images/custom/yourlogo.png";
+```
+You can override the default logo with yours, place any custom images files into `html/images/custom` so they will be ignored by auto updates.
 
 ```php
 $config['page_refresh']     = "300";
@@ -372,16 +378,24 @@ The above are examples, these will rewrite device snmp locations so you don't ne
 
 #### Interfaces to be ignored
 
+Examples:
+
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
+$config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 Numerous defaults exist for this array already (see includes/defaults.inc.php for the full list). You can expand this list
 by continuing the array.
+
 `bad_if` is matched against the ifDescr value.
+
 `bad_iftype` is matched against the ifType value.
+
 `bad_if_regexp` is matched against the ifDescr value as a regular expression.
+
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
+
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
 #### Interfaces to be rewritten

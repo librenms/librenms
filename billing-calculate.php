@@ -126,8 +126,6 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                     'bill_used'        => $used,
                     'bill_overuse'     => $overuse,
                     'bill_percent'     => $percent,
-                    'bill_datefrom'    => $datefrom,
-                    'bill_dateto'      => $dateto,
                     'bill_id'          => $bill['bill_id'],
                 );
                 dbInsert($update, 'bill_history');

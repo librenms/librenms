@@ -154,7 +154,7 @@ if (isset($config['user'])) {
 }
 
 // Run test on MySQL
-$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
+$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
 if (mysqli_connect_error()) {
     print_fail('Error connecting to your database '.mysqli_connect_error());
 } else {
@@ -218,7 +218,7 @@ $suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
-        print_fail("$bin location is incorrect or bin not installed");
+        print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
     } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
         print_fail("$bin should be suid, please chmod u+s $cmd");
     }

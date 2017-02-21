@@ -1,13 +1,11 @@
 <?php
 
-if ($device['os'] == 'siklu') {
-    $oid  = 'rbSysVoltage.0';
-    $oids = snmp_walk($device, "$oid", '-OsqnU', 'RADIO-BRIDGE-MIB');
-    d_echo($oids."\n");
+$oid  = 'rbSysVoltage.0';
+$oids = snmp_walk($device, "$oid", '-OsqnU', 'RADIO-BRIDGE-MIB');
+d_echo($oids."\n");
 
-    if (!empty($oids)) {
-        echo 'Siklu Voltage ';
-    }
+if (!empty($oids)) {
+    echo 'Siklu Voltage ';
 
     $divisor = 1;
     $type    = 'siklu';

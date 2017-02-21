@@ -1,3 +1,8 @@
+<script>
+$(function () {
+    $('[data-toggle="popover"]').popover()
+})
+</script>
 <?php
 
 // This file prints a table row for each interface
@@ -21,7 +26,7 @@ if ($int_colour) {
 $port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', array($port['port_id']));
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
-    $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", 'port_errors');
+    $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
 } else {
     $error_img = '';
 }
@@ -35,16 +40,14 @@ if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', arr
 echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
     <td valign=top width=350>";
 
-// Don't echo out ports ifIndex if it's a NOS device since their ifIndex is, for lack of better words....different
-if ($device['os'] == 'nos') {
+if (is_admin() || is_read()) {
+    $port_data = array_to_htmljson($port);
+    echo '<i class="fa fa-tag" data-toggle="popover" data-content="'.$port_data.'" data-html="true"></i>';
+}
+
     echo '        <span class=list-large>
         '.generate_port_link($port, $port['label'])." $error_img $mac
         </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
-} else {
-    echo '        <span class=list-large>
-    '.generate_port_link($port, $port['ifIndex'].'. '.$port['label'])." $error_img $mac
-    </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
-}
 
 if ($port['ifAlias']) {
     echo '<br />';
@@ -175,8 +178,6 @@ $neighborsCount=0;
 $nbLinks=0;
 if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', array($if_id)) as $link) {
-        // echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
-        // $br = "<br />";
         $int_links[$link['port_id']]      = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
         $nbLinks++;

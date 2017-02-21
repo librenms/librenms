@@ -23,100 +23,98 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'netagent2') {
-    $in_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
-    $in_voltage = snmp_get($device, $in_voltage_oid, '-Oqv');
+$in_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.3.2.1.0';
+$in_voltage = snmp_get($device, $in_voltage_oid, '-Oqv');
 
-    if (!empty($in_voltage) || $in_voltage == 0) {
-        $type           = 'netagent2';
-        $index          = 0;
-        $limit          = 300;
-        $warnlimit      = 253;
-        $lowlimit       = 0;
-        $lowwarnlimit   = 216;
-        $divisor        = 10;
-        $voltage        = $in_voltage / $divisor;
-        $descr          = 'Input Voltage';
+if (!empty($in_voltage) || $in_voltage == 0) {
+    $type           = 'netagent2';
+    $index          = 0;
+    $limit          = 300;
+    $warnlimit      = 253;
+    $lowlimit       = 0;
+    $lowwarnlimit   = 216;
+    $divisor        = 10;
+    $voltage        = $in_voltage / $divisor;
+    $descr          = 'Input Voltage';
 
-        discover_sensor(
-            $valid['sensor'],
-            'voltage',
-            $device,
-            $in_voltage_oid,
-            $index,
-            $type,
-            $descr,
-            $divisor,
-            '1',
-            $lowlimit,
-            $lowwarnlimit,
-            $warnlimit,
-            $limit,
-            $voltage
-        );
-    }
+    discover_sensor(
+        $valid['sensor'],
+        'voltage',
+        $device,
+        $in_voltage_oid,
+        $index,
+        $type,
+        $descr,
+        $divisor,
+        '1',
+        $lowlimit,
+        $lowwarnlimit,
+        $warnlimit,
+        $limit,
+        $voltage
+    );
+}
 
-    $out_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.1.0';
-    $out_voltage = snmp_get($device, $out_voltage_oid, '-Oqv');
+$out_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.1.0';
+$out_voltage = snmp_get($device, $out_voltage_oid, '-Oqv');
 
-    if (!empty($out_voltage) || $out_voltage == 0) {
-        $type           = 'netagent2';
-        $index          = 1;
-        $limit          = 300;
-        $warnlimit      = 253;
-        $lowlimit       = 0;
-        $lowwarnlimit   = 216;
-        $divisor        = 10;
-        $voltage        = $out_voltage / $divisor;
-        $descr          = 'Output Voltage';
+if (!empty($out_voltage) || $out_voltage == 0) {
+    $type           = 'netagent2';
+    $index          = 1;
+    $limit          = 300;
+    $warnlimit      = 253;
+    $lowlimit       = 0;
+    $lowwarnlimit   = 216;
+    $divisor        = 10;
+    $voltage        = $out_voltage / $divisor;
+    $descr          = 'Output Voltage';
 
-        discover_sensor(
-            $valid['sensor'],
-            'voltage',
-            $device,
-            $out_voltage_oid,
-            $index,
-            $type,
-            $descr,
-            $divisor,
-            '1',
-            $lowlimit,
-            $lowwarnlimit,
-            $warnlimit,
-            $limit,
-            $voltage
-        );
-    }
+    discover_sensor(
+        $valid['sensor'],
+        'voltage',
+        $device,
+        $out_voltage_oid,
+        $index,
+        $type,
+        $descr,
+        $divisor,
+        '1',
+        $lowlimit,
+        $lowwarnlimit,
+        $warnlimit,
+        $limit,
+        $voltage
+    );
+}
 
-    $battery_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
-    $battery_voltage = snmp_get($device, $battery_voltage_oid, '-Oqv');
+$battery_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
+$battery_voltage = snmp_get($device, $battery_voltage_oid, '-Oqv');
 
-    if (!empty($battery_voltage) || $battery_voltage == 0) {
-        $type           = 'netagent2';
-        $index          = 2;
-        $limit          = 100;
-        $warnlimit      = null;
-        $lowlimit       = null;
-        $lowwarnlimit   = null;
-        $divisor        = 10;
-        $voltage        = $battery_voltage / $divisor;
-        $descr          = 'Battery Voltage';
+if (!empty($battery_voltage) || $battery_voltage == 0) {
+    $type           = 'netagent2';
+    $index          = 2;
+    $limit          = 100;
+    $warnlimit      = null;
+    $lowlimit       = null;
+    $lowwarnlimit   = null;
+    $divisor        = 10;
+    $voltage        = $battery_voltage / $divisor;
+    $descr          = 'Battery Voltage';
 
-        discover_sensor(
-            $valid['sensor'],
-            'voltage',
-            $device,
-            $battery_voltage_oid,
-            $index,
-            $type,
-            $descr,
-            $divisor,
-            '1',
-            $lowlimit,
-            $lowwarnlimit,
-            $warnlimit,
-            $limit,
-            $voltage
-        );
-    }
-}//end if
+    discover_sensor(
+        $valid['sensor'],
+        'voltage',
+        $device,
+        $battery_voltage_oid,
+        $index,
+        $type,
+        $descr,
+        $divisor,
+        '1',
+        $lowlimit,
+        $lowwarnlimit,
+        $warnlimit,
+        $limit,
+        $voltage
+    );
+}

@@ -32,7 +32,9 @@ if (is_array($cefs)) {
             }
         }
     }
+    unset($cefs);
 }//end if
 
 // FIXME - need to delete old ones. FIXME REALLY.
 echo "\n";
+unset($entity_array);

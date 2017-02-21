@@ -53,7 +53,7 @@ if ($conn_half_open >= 0 && $conn_half_closed >= 0 && $conn_established >= 0 && 
         'half_open'   => $conn_half_open,
         'half_closed' => $conn_half_closed,
         'established' => $conn_established,
-        'active'      => $conn_established,
+        'active'      => $conn_active,
         'total'       => $conn_total,
     );
 
@@ -73,7 +73,7 @@ $datastore_array = array(
     '.1.3.6.1.4.1.17163.1.1.5.4.1.0',
     '.1.3.6.1.4.1.17163.1.1.5.4.2.0',
 );
-$datastore = snmp_get_multi_oid($device, $conn_array);
+$datastore = snmp_get_multi_oid($device, $datastore_array);
 
 $datastore_hits = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.1.0'];
 $datastore_miss = $datastore['.1.3.6.1.4.1.17163.1.1.5.4.2.0'];
@@ -124,8 +124,8 @@ if ($conn_optimized >= 0 && $conn_passthrough >= 0) {
 
     $tags = compact('rrd_def');
 
-    data_update($device, 'riverbed_optimisation', $tags, $fields);
-    $graphs['riverbed_optimisation'] = true;
+    data_update($device, 'riverbed_optimization', $tags, $fields);
+    $graphs['riverbed_optimization'] = true;
 }
 
 /* bandwidth passthrough
@@ -150,9 +150,9 @@ $bw_total = $bandwidth['.1.3.6.1.4.1.17163.1.1.5.3.3.3.0'];
 
 if ($bw_in >= 0 && $bw_out >= 0 && $bw_total >= 0) {
     $rrd_def = array(
-        'DS:bw_in:GAUGE:600:0:U',
-        'DS:bw_out:GAUGE:600:0:U',
-        'DS:bw_total:GAUGE:600:0:U',
+        'DS:bw_in:COUNTER:600:0:U',
+        'DS:bw_out:COUNTER:600:0:U',
+        'DS:bw_total:COUNTER:600:0:U',
     );
 
     $fields = array(

@@ -147,12 +147,8 @@ $link_array = array(
 foreach ($app_list as $app) {
     echo $sep;
 
-    // if (!$vars['app']) { $vars['app'] = $app['app_type']; }
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
-        // echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
-    } else {
-        // echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
     }
 
     echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));

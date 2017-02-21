@@ -23,5 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$emu2_temp_scale = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
-$emu2_temp       = snmpwalk_cache_oid($device, 'emsProbeStatusEntry', array(), 'PowerNet-MIB');
+if ($device['os'] === 'aos-emu2') {
+    $pre_cache['emu2_temp_scale'] = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
+    $pre_cache['emu2_temp'] = snmpwalk_cache_oid($device, 'emsProbeStatusEntry', array(), 'PowerNet-MIB');
+    d_echo($pre_cache);
+}

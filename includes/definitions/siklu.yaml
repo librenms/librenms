@@ -4,3 +4,5 @@ type: wireless
 icon: siklu
 over:
     - { graph: device_bits, text: Traffic }
+poller_modules:
+    wifi: 1

@@ -4,11 +4,6 @@ type: network
 icon: junos
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-poller_modules:
-    wifi: 0
-    toner: 0
-discovery_modules:
-    toner: 0
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.1411.102
