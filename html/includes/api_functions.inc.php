@@ -1381,9 +1381,9 @@ function get_devices_by_group()
     $status   = 'error';
     $code     = 404;
     $count    = 0;
-    $full     = $_GET['full'];
     $name     = urldecode($router['name']);
     $devices  = array();
+    $full     = $_GET['full'];
     if (empty($name)) {
         $message = 'No device group name provided';
     } else {
