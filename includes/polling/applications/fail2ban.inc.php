@@ -27,11 +27,10 @@ $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_
 data_update($device, 'app', $tags, $fields);
 
 $int=2;
-while ( isset( $bannedStuff[$int] ) ){
-      list( $jail, $banned )=explode( " ", $bannedStuff[$int] );
+while (isset($bannedStuff[$int])){
+    list( $jail, $banned )=explode(" ", $bannedStuff[$int]);
 
-      if ( isset($jail) && isset($banned) ){
-
+    if (isset($jail) && isset($banned)){
         $rrd_name = array('app', $name, $app_id, $jail);
         $rrd_def = array(
             'DS:banned:GAUGE:600:0:U'
@@ -43,7 +42,7 @@ while ( isset( $bannedStuff[$int] ) ){
 
         $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
         data_update($device, 'app', $tags, $fields);
-      }
+    }
 
     $int++;
 }
