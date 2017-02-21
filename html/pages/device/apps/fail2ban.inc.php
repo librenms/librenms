@@ -1,7 +1,6 @@
 <?php
 
 global $config;
-
 $graphs = array(
     'fail2ban_banned' => 'Total Banned',
 );
@@ -30,9 +29,9 @@ foreach ($graphs as $key => $text) {
 $baseName=$config['rrd_dir'].'/'.$device['hostname'].'/app-fail2ban-'.$app['app_id'].'-';
 $jails=array();
 $jailGlob=$baseName.'*.rrd';
-foreach( glob($jailGlob) as $jailrrd ){
-    $jail=str_replace( $baseName, '', $jailrrd );
-    $jail=str_replace( '.rrd', '', $jail );
+foreach (glob($jailGlob) as $jailrrd) {
+    $jail=str_replace($baseName, '', $jailrrd);
+    $jail=str_replace('.rrd', '', $jail);
     $jails[]=$jail;
 }
 
