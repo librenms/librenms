@@ -514,3 +514,5 @@ extend fail2ban /etc/snmp/fail2ban
 7: Restart or reload cron on your system.
 
 8: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
+
+In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
