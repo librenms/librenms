@@ -184,28 +184,30 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         if ($skip_discovery === false) {
                             $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName']);
                         }
-
-                        $discover_hostname = $lldp['lldpRemSysName'];
                         if ($skip_discovery === false) {
-                            if ($config['discovery_by_ip'] == true) {
+                            $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+                            if (is_numeric($remote_device_id) === false) {
                                 $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
                                 d_echo($ptopo_array);
-                                echo "Finding IP address for MAC ${lldp['lldpRemChassisId']}\n";
                                 foreach (array_keys($ptopo_array) as $ptopo_key) {
                                     if (strcmp($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis'], $lldp['lldpRemChassisId']) == 0) {
                                         $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
-                                        
+
                                         $a = hexdec($ip_arr[0]);
                                         $b = hexdec($ip_arr[1]);
                                         $c = hexdec($ip_arr[2]);
                                         $d = hexdec($ip_arr[3]);
-                                        
+
                                         $discover_hostname = "$a.$b.$c.$d";
                                     }
                                 }
+                                unset(
+                                    $ptopo_array,
+                                    $ip_arr
+                                );
                             }
+                            $remote_device_id = discover_new_device($discover_hostname, $device, 'LLDP', $interface);
                         }
-                        $remote_device_id = discover_new_device($discover_hostname, $device, 'LLDP', $interface);
                     }
                     // normalize MAC address if present
                     $remote_port_mac_address = '';
