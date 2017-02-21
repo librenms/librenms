@@ -200,6 +200,7 @@ function GetDevicesFromGroup($group_id, $nested = false, $full = false)
       $query = 'SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=?';
     }
     logfile($query);
+    logfile(print_r($group_id));
     if ($nested) {
         return dbFetchRows($query, array($group_id));
     } else {
