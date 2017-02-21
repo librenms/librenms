@@ -212,10 +212,6 @@ function list_devices()
         $sql = '1';
     } elseif ($type == 'location') {
         $sql = "`location` LIKE '%".$query."%'";
-    } elseif ($type == 'group' ) {
-        //lafJsL: if I was you I'd update GetDevicesFromGroup() function to accept something like $full = true and adjust the sql query to return full devices.*
-        $join = "INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id`";
-        $sql = "`device_groups.name`='".$query."'";
     } elseif ($type == 'ignored') {
         $sql = "`ignore`='1' AND `disabled`='0'";
     } elseif ($type == 'up') {
