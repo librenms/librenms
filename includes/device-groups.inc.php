@@ -194,7 +194,7 @@ function QueryDevicesFromGroup($group_id)
 function GetDevicesFromGroup($group_id, $nested = false, $full = false)
 {
     if ($full){
-      $query = 'SELECT `device_groups`.`name`, `devices`.* FROM `device_groups` INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id` WHERE `device_groups`.`id` = ?';
+      $query = "SELECT `device_groups`.`name`, `devices`.* FROM `device_groups` INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id` WHERE `device_groups`.`id` = ?";
       logfile($query);
     }
     else {
