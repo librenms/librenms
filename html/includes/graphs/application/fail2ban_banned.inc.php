@@ -17,6 +17,7 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
 
 $array = array(
     'banned' => array('descr' => 'Banned','colour' => '582A72',),
+    'firewalled' => array('descr' => 'Firewalled','colour' => '28774F',),
 );
 
 $i = 0;
