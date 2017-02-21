@@ -22,6 +22,7 @@ if (is_array($ipmi_rows)) {
 
         foreach (explode("\n", $results) as $row) {
             list($desc, $value, $type, $status) = explode(',', $row);
+            $desc = trim($desc, ' ');
             $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['value'] = $value;
             $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['unit'] = $type;
         }

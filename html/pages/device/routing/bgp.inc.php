@@ -220,8 +220,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
         <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."<span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
         <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
-        Updates <i class='fa fa-arrow-down fa-lg icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerInUpdates']."
-        <i class='fa fa-arrow-up fa-lg icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerOutUpdates'].'</td>
+        Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerInUpdates']."
+        <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerOutUpdates'].'</td>
         </tr>
         <tr height=5></tr>';
 

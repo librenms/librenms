@@ -132,6 +132,10 @@ $graphs['exim-stats'] = array(
     'queue'
 );
 
+$graphs['php-fpm'] = array(
+    'stats'
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

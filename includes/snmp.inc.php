@@ -184,7 +184,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     return $cmd;
 } // end gen_snmp_cmd()
 
-function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null)
+function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = array())
 {
     $time_start = microtime(true);
 
@@ -195,8 +195,6 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
 
-
-    $array = array();
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);
@@ -349,6 +347,22 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
         $oid               = trim($oid);
         $value             = trim($value);
         list($oid, $index) = explode('.', $oid, 2);
+        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+            $array[$index][$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_oid()
+
+function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
+{
+    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        list($index,) = explode('.', strrev($oid), 2);
         if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }
