@@ -13,7 +13,7 @@
 if ($device['os'] == 'seos') {
     echo 'Redback SEOS : ';
 
-    $oid = '.1.3.6.1.4.1.2352.2.6.1.1';
+    $oid = '.1.3.6.1.4.1.2352.2.6.1.1.0';
     $descr = 'Processor';
     $usage = snmp_get($device, $oid, '-Ovqn');
 
