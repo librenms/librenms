@@ -16,27 +16,30 @@ $system_temperature_oid = '.1.3.6.1.4.1.24681.1.3.6.0';
 $system_temperature = snmp_get($device, $system_temperature_oid, '-Oqv');
 discover_sensor($valid['sensor'], 'temperature', $device, $system_temperature_oid, '99', 'snmp', 'System Temperature', '1', '1', null, null, null, null, $system_temperature);
 
-$temps_oid = '24681.1.2.11.1.3.';
-$serials_oid = '24681.1.2.11.1.5.';
-
 $disk_temperature_oid = '.1.3.6.1.4.1.24681.1.2.11.1.3';
-$disk_serial_oid = '1.3.6.1.4.1.24681.1.2.11.1.5';
+$disk_serial_oid = '.1.3.6.1.4.1.24681.1.2.11.1.5';
 
-$hdd_temps = snmpwalk_cache_multi_oid($device, $disk_temperature_oid, array());
-$hdd_serials = snmpwalk_cache_multi_oid($device, $disk_serial_oid, array());
+$hdd_temps = snmpwalk_cache_numerical_oid($device, $disk_temperature_oid, array(), null, null, '-OQUsn');
+$hdd_serials = snmpwalk_cache_numerical_oid($device, $disk_serial_oid, array(), null, null, '-OQUsn');
 
 if (is_array($hdd_temps) && !empty($hdd_temps)) {
     foreach ($hdd_temps as $index => $entry) {
-        $index = str_replace($temps_oid, '', $index);
-        $disk_temperature = $entry['enterprises'];
-        $disk_serial = str_replace('"', '', $hdd_serials[$serials_oid . $index]['enterprises']);
-
+        $oid = $disk_temperature_oid . '.' . $index;
+        $disk_oid = $disk_serial_oid . '.' . $index;
+        $disk_temperature   = $entry[$oid];
+        $disk_serial = $hdd_serials[$index][$disk_oid];
         if ($disk_serial == '--') {
             $disk_descr = "HDD $index empty bay";
         } else {
             $disk_descr = "HDD $index $disk_serial";
         }
-
-        discover_sensor($valid['sensor'], 'temperature', $device, $disk_temperature_oid . '.' . $index, $index, 'snmp', $disk_descr, '1', '1', null, null, null, null, $disk_temperature);
+        if ($disk_temperature) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'snmp', $disk_descr, '1', '1', null, null, null, null, $disk_temperature);
+        }
     }
 }
+
+unset(
+    $hdd_temps,
+    $hdd_serials
+);

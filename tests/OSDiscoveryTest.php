@@ -415,6 +415,14 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscosb', 'ciscosb6');
         $this->checkOS('ciscosb', 'ciscosb7');
         $this->checkOS('ciscosb', 'ciscosb8');
+        $this->checkOS('ciscosb', 'ciscosb9');
+        $this->checkOS('ciscosb', 'ciscosb10');
+        $this->checkOS('ciscosb', 'ciscosb11');
+        $this->checkOS('ciscosb', 'ciscosb12');
+        $this->checkOS('ciscosb', 'ciscosb-srw2008');
+        $this->checkOS('ciscosb', 'ciscosb-srw2008p');
+        $this->checkOS('ciscosb', 'ciscosb-srw208');
+        $this->checkOS('ciscosb', 'ciscosb-srw208mp');
     }
 
     public function testCiscosmblinux()
@@ -794,6 +802,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hpe-msl');
     }
 
+    public function testHpeMsa()
+    {
+        $this->checkOS('hpe-msa');
+    }
+
     public function testHpmsm()
     {
         $this->checkOS('hpmsm');
@@ -844,6 +857,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ibmnos');
         $this->checkOS('ibmnos', 'ibmnos1');
         $this->checkOS('ibmnos', 'ibmnos-flex');
+        $this->checkOS('ibmnos', 'ibmnos-flex-lenovo-en4093r');
     }
 
     public function testIbmtl()
@@ -990,6 +1004,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLigoos()
     {
         $this->checkOS('ligoos');
+    }
+
+    public function testLinksysSS()
+    {
+        $this->checkOS('linksys-ss', 'linksys-lgs308p');
     }
 
     public function testLinux()
