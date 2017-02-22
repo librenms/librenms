@@ -191,8 +191,8 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                                 $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
                                 d_echo($ptopo_array);
                                 foreach (array_keys($ptopo_array) as $ptopo_key) {
-                                    d_echo("Testing '" . $ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']. "' == '${lldp['lldpRemChassisId']}'\n");
-                                    if (strcmp($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis'], $lldp['lldpRemChassisId']) == 0) {
+                                    d_echo("Testing '" . trim($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']). "' == '" . trim($lldp['lldpRemChassisId']) . "'\n");
+                                    if (strcmp(trim($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
                                         $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
 
                                         $a = hexdec($ip_arr[0]);
