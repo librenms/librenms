@@ -638,7 +638,7 @@ function getpollergroup($poller_group = '0')
 }
 
 /**
- * Add a host to teh database
+ * Add a host to the database
  *
  * @param string $host The IP or hostname to add
  * @param string $community The snmp community
