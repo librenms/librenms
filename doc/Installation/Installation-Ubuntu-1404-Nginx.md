@@ -123,6 +123,8 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ gzip on;
+ gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
  location / {
   try_files $uri $uri/ @librenms;
  }

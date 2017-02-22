@@ -31,7 +31,7 @@ $period = ($to - $from);
 
 $prev_from = ($from - $period);
 
-$graphfile = $config['temp_dir'].'/'.strgen().'.png';
+$graphfile = $config['temp_dir'].'/'.strgen();
 
 $type    = $graphtype['type'];
 $subtype = $graphtype['subtype'];
@@ -102,6 +102,10 @@ if ($error_msg) {
     }
 } else {
     // $rrd_options .= " HRULE:0#999999";
+    if ($config['webui']['graph_type'] === 'svg') {
+        $rrd_options .= " --imgformat=SVG -m 0.75";
+    }
+
     if ($no_file) {
         if ($width < 200) {
             graph_error('No RRD');
@@ -125,8 +129,8 @@ if ($error_msg) {
 
             if (is_file($graphfile)) {
                 if (!$debug) {
-                    header('Content-type: image/png');
-                    if ($config['trim_tobias']) {
+                    set_image_type();
+                    if ($config['trim_tobias'] && $config['webui']['graph_type'] !== 'svg') {
                         list($w, $h, $type, $attr) = getimagesize($graphfile);
                         $src_im                    = imagecreatefrompng($graphfile);
                         $src_x = '0';
@@ -156,7 +160,7 @@ if ($error_msg) {
                     }
                 } else {
                     echo `ls -l $graphfile`;
-                    echo '<img src="'.data_uri($graphfile, 'image/png').'" alt="graph" />';
+                    echo '<img src="'.data_uri($graphfile, 'image/svg+xml').'" alt="graph" />';
                 }
                 unlink($graphfile);
             } else {
