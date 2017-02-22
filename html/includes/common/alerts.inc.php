@@ -264,6 +264,17 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         }
       });
     });
+    if(sessionStorage.getItem("refresh")) {
+        sessionStorage.removeItem("refresh");
+        var $sortDictionary = JSON.parse(sessionStorage.getItem("sortDictionary"));
+        alerts_grid.bootgrid("sort", $sortDictionary);
+    }
+    alerts_grid.find("[data-column-id=rule], [data-column-id=hostname], [data-column-id=timestamp], [data-column-id=severity]").on("click", function(e) {
+        setTimeout(function() {
+            var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
+            window.sessionStorage.setItem("sortDictionary", JSON.stringify($sortDictionary));
+        }, 0);
+    });
     alerts_grid.find(".command-open-proc").on("click", function(e) {
         e.preventDefault();
         var alert_id = $(this).data("alert_id");
@@ -294,7 +305,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
                 toastr.success(msg);
                 if(msg.indexOf("ERROR:") <= -1) {
                     var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
-                    alerts_grid.bootgrid("sort", $sortDictionary); 
+                    alerts_grid.bootgrid("sort", $sortDictionary);
                 }
             },
             error: function(){
@@ -302,6 +313,10 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             }
         });
     });
+});
+$(document).ready(function() {
+    var $sortDictionary = JSON.parse(sessionStorage.getItem("sortDictionary"));
+    alerts_grid.bootgrid("sort", $sortDictionary);
 });
 </script>';
 }

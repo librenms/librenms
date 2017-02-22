@@ -607,6 +607,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         new_refresh = refresh * 1000;
         setTimeout(function() {
             grab_data(id,refresh,data_type);
+            sessionStorage.setItem('refresh', 'true');
         },
         new_refresh);
     }
