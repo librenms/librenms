@@ -3,6 +3,9 @@
 
 Options FollowSymlinks Multiviews
 
+AddType image/svg+xml .svg
+AddOutputFilterByType DEFLATE image/svg+xml
+
 RewriteEngine on
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
