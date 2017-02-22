@@ -1381,13 +1381,14 @@ function get_devices_by_group()
     $status   = 'error';
     $code     = 404;
     $count    = 0;
-    $name = urldecode($router['name']);
-    $devices = array();
+    $name     = urldecode($router['name']);
+    $devices  = array();
+    $full     = $_GET['full'];
     if (empty($name)) {
         $message = 'No device group name provided';
     } else {
         $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?", array($name));
-        $devices = GetDevicesFromGroup($group_id, true);
+        $devices = GetDevicesFromGroup($group_id, true, $full);
         $count = count($devices);
         if (empty($devices)) {
             $message = 'No devices found in group ' . $name;
@@ -1404,6 +1405,7 @@ function get_devices_by_group()
         'devices' => $devices,
     );
 
+    logfile(var_dump($output));
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
