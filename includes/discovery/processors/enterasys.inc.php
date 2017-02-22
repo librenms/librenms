@@ -16,7 +16,7 @@ if ($device['os'] == 'enterasys') {
     $oids = snmp_walk($device, 'etsysResourceCpuLoad5sec', '-Osqn', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
 
     foreach (explode("\n", $oids) as $data) {
-        list($oid, $usage) = split(" ", $data);
+        list($oid, $usage) = explode(" ", $data);
         if (is_numeric($usage)) {
             discover_processor($valid['processor'], $device, $oid, '0', 'enterasys', $descr, $divisor, $usage);
         }
