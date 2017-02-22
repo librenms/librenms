@@ -187,9 +187,11 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         if ($skip_discovery === false) {
                             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                             if (is_numeric($remote_device_id) === false) {
+                                d_echo("Trying to find IP address for ${lldp['lldpRemSysName']}\n");
                                 $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
                                 d_echo($ptopo_array);
                                 foreach (array_keys($ptopo_array) as $ptopo_key) {
+                                    d_echo("Testing '" . $ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']. "' == '${lldp['lldpRemChassisId']}'\n");
                                     if (strcmp($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis'], $lldp['lldpRemChassisId']) == 0) {
                                         $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
 
@@ -199,6 +201,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                                         $d = hexdec($ip_arr[3]);
 
                                         $discover_hostname = "$a.$b.$c.$d";
+                                        d_echo("Constructed IP $discover_hostname\n");
                                     }
                                 }
                                 unset(
@@ -206,6 +209,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                                     $ip_arr
                                 );
                             }
+                            d_echo("Discovering $discover_hostname\n");
                             $remote_device_id = discover_new_device($discover_hostname, $device, 'LLDP', $interface);
                         }
                     }
