@@ -637,9 +637,35 @@ function getpollergroup($poller_group = '0')
     }
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '', $force_add = false)
-{
-    global $config;
+/**
+ * Add a host to the database
+ *
+ * @param string $host The IP or hostname to add
+ * @param string $community The snmp community
+ * @param string $snmpver snmp version: v1 | v2c | v3
+ * @param int $port SNMP port number
+ * @param string $transport SNMP transport: udp | udp6 | udp | tcp6
+ * @param array $v3 SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
+ * @param int $poller_group distributed poller group to assign this host to
+ * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
+ * @param string $snmphost device sysName to check for duplicates
+ * @param bool $force_add Do not detect the host os
+ * @return int the id of the added host
+ * @throws HostExistsException Throws this exception if the host already exists
+ * @throws Exception Throws this exception if insertion into the database fails
+ */
+function createHost(
+    $host,
+    $community,
+    $snmpver,
+    $port = 161,
+    $transport = 'udp',
+    $v3 = array(),
+    $poller_group = 0,
+    $port_assoc_mode = 'ifIndex',
+    $snmphost = '',
+    $force_add = false
+) {
     $host = trim(strtolower($host));
 
     $poller_group=getpollergroup($poller_group);
@@ -650,8 +676,10 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
         $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
     }
 
-    $device = array('hostname' => $host,
+    $device = array(
+        'hostname' => $host,
         'sysName' => $host,
+        'os' => 'generic',
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
@@ -662,28 +690,23 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
         'port_association_mode' => $port_assoc_mode,
     );
 
-    $device = array_merge($device, $v3);
+    $device = array_merge($device, $v3);  // merge v3 settings
 
     if ($force_add !== true) {
         $device['os'] = getHostOS($device);
-    } else {
-        $device['os'] = 'generic';
     }
 
-    if ($device['os']) {
-        if (host_exists($host, $snmphost) === false) {
-            $device_id = dbInsert($device, 'devices');
-            if ($device_id) {
-                oxidized_reload_nodes();
-                return $device_id;
-            }
-        } else {
-            throw new HostExistsException("Already have host $host ($snmphost)");
-        }
+    if (host_exists($host, $snmphost)) {
+        throw new HostExistsException("Already have host $host ($snmphost)");
     }
 
-    // couldn't add the device
-    return false;
+    $device_id = dbInsert($device, 'devices');
+    if ($device_id) {
+        oxidized_reload_nodes();
+        return $device_id;
+    }
+
+    throw new \Exception("Failed to add host to the database, please run ./validate.php");
 }
 
 function isDomainResolves($domain)
@@ -1438,10 +1461,10 @@ function snmpTransportToAddressFamily($transport)
  * Checks if the $hostname provided exists in the DB already
  *
  * @param string $hostname The hostname to check for
- *
+ * @param string $snmphost The sysName to check
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
-**/
+ */
 function host_exists($hostname, $snmphost = '')
 {
     global $config;
