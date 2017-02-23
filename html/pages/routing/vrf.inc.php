@@ -201,17 +201,11 @@ if ($_SESSION['userlevel'] >= '5') {
         $devices = dbFetchRows('SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = ? AND D.device_id = V.device_id', array($vrf['mplsVpnVrfRouteDistinguisher']));
         foreach ($devices as $device) {
             $hostname = $device['hostname'];
-            if (($x % 2)) {
-                $device_colour = $list_colour_a;
-            } else {
-                $device_colour = $list_colour_b;
-            }
 
-            echo '<table cellpadding=10 cellspacing=0 class=devicetable width=100%>';
-
+            echo '<div>';
             include 'includes/device-header.inc.php';
+            echo '</div>';
 
-            echo '</table>';
             unset($seperator);
             echo '<div style="margin: 0 0 0 60px;"><table cellspacing=0 cellpadding=7>';
             $i = 1;

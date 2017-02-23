@@ -224,12 +224,18 @@ function getLogo($device)
 }
 
 /**
- * @param $device
+ * @param array $device
+ * @param string $class to apply to the image tag
  * @return string an image tag with the logo for this device. Images are often wide, not square.
  */
-function getLogoTag($device)
+function getLogoTag($device, $class = null)
 {
-    return '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"/>';
+    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    if (isset($class)) {
+        $tag .= " class=\"$class\" ";
+    }
+    $tag .= ' />';
+    return  $tag;
 }
 
 /**

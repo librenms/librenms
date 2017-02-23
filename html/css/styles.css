@@ -1830,16 +1830,6 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device-icon .device-icon-48h img {
-       max-width: 20px;
-       max-height: 20px;
-    }
-    .device-header-table img {
-       max-width: 115px;
-       max-height: 40px;
-    }
-    .device-header-table {font-size : 8px;}
-    .device-header-table a {font-size : 11px;}
 }
 
 @media only screen and (max-width: 768px) and (min-width: 481px) {
@@ -1848,12 +1838,6 @@ label {
         max-width: 60px;
         max-height: 55px;
     }
-    .device-header-table img {
-       max-width: 150px;
-       max-height: 50px;
-    }
-    .device-header-table {font-size : 10px;}
-    .device-header-table a {font-size : 17px;}
 }
 
 
@@ -2161,9 +2145,10 @@ label {
   width: 40px;
 }
 
-.device-icon-48h img {
-  height: 48px;
+.device-icon-header {
+  height: 52px;
   max-width: 250px;
+  margin-right: 15px;
 }
 
 .device-title-bar-1 {
