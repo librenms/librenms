@@ -8,7 +8,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
     $descr = $storage['storage_descr'];
     $mib = $storage['storage_mib'];
 
-    echo 'Storage '. $descr .': ';
+    echo 'Storage '. $descr .': ' . $mib . "\n\n\n\n";
 
     $rrd_name = array('storage', $mib, $descr);
     $rrd_def = RrdDefinition::make()
