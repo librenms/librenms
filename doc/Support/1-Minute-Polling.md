@@ -11,5 +11,5 @@ We now have support for polling data at intervals to fit your needs.
   
 To make the changes, please navigate to `/settings/sub=external/` within your WebUI. Select RRDTool Setup and then update the two values for step and heartbeat intervals:
 
-  - Step is how often you want to insert data, so if you change to 1 minute polling then this should be 300.
+  - Step is how often you want to insert data, so if you change to 1 minute polling then this should be 60.
   - Heartbeat is how long to wait for data before registering a null value, i.e 120 seconds.
