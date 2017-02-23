@@ -184,9 +184,30 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                         if ($skip_discovery === false) {
                             $skip_discovery = can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName']);
                         }
-
                         if ($skip_discovery === false) {
                             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+                            if (is_numeric($remote_device_id) === false) {
+                                $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
+                                d_echo($ptopo_array);
+                                foreach (array_keys($ptopo_array) as $ptopo_key) {
+                                    if (strcmp(trim($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
+                                        $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
+
+                                        $a = hexdec($ip_arr[0]);
+                                        $b = hexdec($ip_arr[1]);
+                                        $c = hexdec($ip_arr[2]);
+                                        $d = hexdec($ip_arr[3]);
+
+                                        $discover_hostname = "$a.$b.$c.$d";
+                                    }
+                                }
+                                unset(
+                                    $ptopo_array,
+                                    $ip_arr
+                                );
+                            }
+                            d_echo("Discovering $discover_hostname\n");
+                            $remote_device_id = discover_new_device($discover_hostname, $device, 'LLDP', $interface);
                         }
                     }
                     // normalize MAC address if present
@@ -211,7 +232,6 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     } else {
                         $remote_port_id = '0';
                     }
-
                     if (is_numeric($interface['port_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId'])) {
                         discover_link($interface['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], null, $lldp['lldpRemSysDesc'], $device['device_id'], $remote_device_id);
                     }
