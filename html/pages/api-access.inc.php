@@ -146,7 +146,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
         <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
           <td>'.$api['token_hash'].'</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api['token_hash'].'"><i class="glyphicon glyphicon-qrcode" ></i></button></td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api['token_hash'].'"><i class="fa fa-qrcode" ></i></button></td>
           <td>'.$api['description'].'</td>
           <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
           <td><button type="button" class="btn btn-danger btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
