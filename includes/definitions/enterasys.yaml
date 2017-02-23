@@ -4,6 +4,8 @@ type: network
 mib_dir: enterasys
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 icon: enterasys
 ifname: 1
 discovery:
