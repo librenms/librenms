@@ -163,6 +163,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
     <?php
     if ($config['enable_lazy_load'] === true) {
     ?>
