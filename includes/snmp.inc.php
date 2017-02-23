@@ -257,6 +257,27 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }//end snmp_get()
 
+/**
+ * @param $device
+ * @return bool
+ */
+function snmp_check($device)
+{
+    $time_start = microtime(true);
+
+    $oid = '.1.3.6.1.2.1.1.2.0';
+    $options = '-Oqvn';
+    $cmd = gen_snmpget_cmd($device, $oid, $options);
+    exec($cmd, $data, $code);
+    d_echo("SNMP Check response code: $code".PHP_EOL);
+
+    recordSnmpStatistic('snmpget', $time_start);
+
+    if ($code === 0) {
+        return true;
+    }
+    return false;
+}//end snmp_check()
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
