@@ -502,13 +502,13 @@ It is worth noting that this only monitors a single pool. If you want to monitor
 extend fail2ban /etc/snmp/fail2ban
 ```
 
-4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults.
+4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
 
 5: Restart snmpd on your host
 
 6: Add the following to /etc/crontab and restart cron.
 ```
-*/3    *    *    *    *    root    /root/snmp-extends/fail2ban.pl -u 
+*/3    *    *    *    *    root    /etc/snmp/fail2ban -u 
 ```
 
 7: Restart or reload cron on your system.
