@@ -26,7 +26,7 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-$baseName=$config['rrd_dir'].'/'.$device['hostname'].'/app-fail2ban-'.$app['app_id'].'-';
+$baseName=rrd_name($device['hostname'], 'app-fail2ban-', $app['app_id'].'-');
 $jails=array();
 $jailGlob=$baseName.'*.rrd';
 foreach (glob($jailGlob) as $jailrrd) {
