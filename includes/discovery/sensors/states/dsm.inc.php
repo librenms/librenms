@@ -7,7 +7,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'systemStatus', array(), 'SYNOLOGY-SYS
 $cur_oid = '.1.3.6.1.4.1.6574.1.1.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'systemStatusState';
     $state_index_id = create_state_index($state_name);
@@ -18,7 +17,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -44,7 +43,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'powerStatus', array(), 'SYNOLOGY-SYST
 $cur_oid = '.1.3.6.1.4.1.6574.1.3.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'powerStatusState';
     $state_index_id = create_state_index($state_name);
@@ -55,7 +53,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -81,7 +79,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'systemFanStatus', array(), 'SYNOLOGY-
 $cur_oid = '.1.3.6.1.4.1.6574.1.4.1.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'systemFanStatusState';
     $state_index_id = create_state_index($state_name);
@@ -92,7 +89,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -118,7 +115,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'cpuFanStatus', array(), 'SYNOLOGY-SYS
 $cur_oid = '.1.3.6.1.4.1.6574.1.4.2.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'cpuFanStatusState';
     $state_index_id = create_state_index($state_name);
@@ -129,7 +125,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -159,7 +155,6 @@ if (is_array($oids)) {
     //Create State Index
     $state_name = 'upgradeAvailableState';
     $state_index_id = create_state_index($state_name);
-
     //Create State Translation
     if ($state_index_id) {
         $states = array(
@@ -169,7 +164,7 @@ if (is_array($oids)) {
              array($state_index_id,'Disconnected',0,4,3) ,
              array($state_index_id,'Others',0,5,3) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -194,7 +189,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'raidTable', array(), 'SYNOLOGY-RAID-M
 $cur_oid = '.1.3.6.1.4.1.6574.3.1.1.3.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'raidStatusState';
     $state_index_id = create_state_index($state_name);
@@ -215,7 +209,7 @@ if (is_array($oids)) {
              array($state_index_id,'Degrade',0,11,2) ,
              array($state_index_id,'Crashed',0,12,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -240,7 +234,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'diskTable', array(), 'SYNOLOGY-DISK-M
 $cur_oid = '.1.3.6.1.4.1.6574.2.1.1.5.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'diskStatusState';
     $state_index_id = create_state_index($state_name);
@@ -254,7 +247,7 @@ if (is_array($oids)) {
              array($state_index_id,'System Partition Failed',0,4,2) ,
              array($state_index_id,'Crashed',0,5,2) ,
          );
-        foreach($states as $value){ 
+        foreach($states as $value){
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
