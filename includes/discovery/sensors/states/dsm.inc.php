@@ -17,7 +17,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -53,7 +53,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -89,7 +89,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -125,7 +125,7 @@ if (is_array($oids)) {
              array($state_index_id,'Normal',0,1,0) ,
              array($state_index_id,'Failed',0,2,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -164,7 +164,7 @@ if (is_array($oids)) {
              array($state_index_id,'Disconnected',0,4,3) ,
              array($state_index_id,'Others',0,5,3) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -209,7 +209,7 @@ if (is_array($oids)) {
              array($state_index_id,'Degrade',0,11,2) ,
              array($state_index_id,'Crashed',0,12,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
@@ -247,7 +247,7 @@ if (is_array($oids)) {
              array($state_index_id,'System Partition Failed',0,4,2) ,
              array($state_index_id,'Crashed',0,5,2) ,
          );
-        foreach($states as $value){
+        foreach ($states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
