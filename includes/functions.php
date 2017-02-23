@@ -337,6 +337,11 @@ function delete_device($id)
         $ret .= "Removed interface $int_id ($int_if)\n";
     }
 
+    // Remove sensors manually due to constraints
+    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ?", array($id)) as $sensor) {
+        $sensor_id = $sensor['sensor_id'];
+        dbDelete('sensors_to_state_indexes', "`sensor_id` = ?", array($sensor));
+    }
     $fields = array('device_id','host');
     foreach ($fields as $field) {
         foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", array($config['db_name'],$field)) as $table) {
