@@ -37,4 +37,6 @@ curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 $ret  = curl_exec($curl);
 if (substr($ret,0,2) == "OK") {
 	return true;
-} else return false;
+} else {
+    return false;
+}
