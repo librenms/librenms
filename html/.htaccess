@@ -4,7 +4,9 @@
 Options FollowSymlinks Multiviews
 
 AddType image/svg+xml .svg
+<IfModule mod_filter.c>
 AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
 
 RewriteEngine on
 RewriteBase /
