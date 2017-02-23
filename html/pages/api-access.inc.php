@@ -92,6 +92,10 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
    <div class="modal fade" id="display-qr" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
      <div class="modal-dialog modal-sm">
        <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+           <h5 class="modal-title" id="Create">Scan the QR code below</h5>
+         </div>
          <div class="modal-body">
            <div id="qrcode"></div>
          </div>
