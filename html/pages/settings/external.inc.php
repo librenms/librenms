@@ -55,6 +55,15 @@ $rrdtool_conf = array(
           'descr'              => 'Tune all rrd port files to use max values',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'rrd.step',
+        'descr'                => 'Change the rrd step value (default 300)',
+        'type'                 => 'text',
+    ),
+    array('name'               => 'rrd.heartbeat',
+        'descr'                => 'Change the rrd heartbeat value (default 600)',
+
+        'type'                 => 'text',
+    ),
 );
 
 echo '

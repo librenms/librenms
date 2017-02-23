@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 function bulk_sensor_snmpget($device, $sensors)
 {
     $oid_per_pdu = get_device_oid_limit($device);
@@ -147,7 +149,7 @@ function poll_sensor($device, $class)
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
-        $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
+        $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
 
         echo "$sensor_value $unit\n";
 
@@ -268,7 +270,7 @@ function poll_device($device, $options)
                 // save per-module poller stats
                 $tags = array(
                     'module'      => $module,
-                    'rrd_def'     => 'DS:poller:GAUGE:600:0:U',
+                    'rrd_def'     => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
                     'rrd_name'    => array('poller-perf', $module),
                 );
                 $fields = array(
@@ -324,7 +326,7 @@ function poll_device($device, $options)
         // Poller performance
         if (!empty($device_time)) {
             $tags = array(
-                'rrd_def' => 'DS:poller:GAUGE:600:0:U',
+                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
                 'module'  => 'ALL',
             );
             $fields = array(
@@ -337,7 +339,7 @@ function poll_device($device, $options)
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
-                'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
+                'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
             );
             $fields = array(
                 'ping' => $response['ping_time'],
@@ -383,7 +385,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         $measurement_name = strtolower($file);
     }
 
-    $rrd_def = array();
+    $rrd_def = new RrdDefinition();
     $oidglist  = array();
     $oidnamelist = array();
     foreach ($mib_oids as $oid => $param) {
@@ -393,15 +395,14 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         $oiddstype = $param[3];
         $oiddsopts = $param[4];
 
-        if (strlen($oiddsname) > 19) {
-            $oiddsname = substr($oiddsname, 0, 19);
-        }
-
         if (empty($oiddsopts)) {
-            $oiddsopts = '600:U:100000000000';
+            $rrd_def->addDataset($oiddsname, $oiddstype, null, 100000000000);
+        } else {
+            $min = array_key_exists('min', $oiddsopts) ? $oiddsopts['min'] : null;
+            $max = array_key_exists('max', $oiddsopts) ? $oiddsopts['max'] : null;
+            $heartbeat = array_key_exists('heartbeat', $oiddsopts) ? $oiddsopts['heartbeat'] : null;
+            $rrd_def->addDataset($oiddsname, $oiddstype, $min, $max, $heartbeat);
         }
-
-        $rrd_def[] = 'DS:'.$oiddsname.':'.$oiddstype.':'.$oiddsopts;
 
         if ($oidindex != '') {
             $fulloid = $oid.'.'.$oidindex;

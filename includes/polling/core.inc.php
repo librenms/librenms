@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 unset($poll_device);
 
 $snmpdata = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
@@ -56,7 +58,7 @@ if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)
     }
 
     $tags = array(
-        'rrd_def' => 'DS:uptime:GAUGE:600:0:U',
+        'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
     );
     data_update($device, 'uptime', $tags, $uptime);
 

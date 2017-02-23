@@ -15,6 +15,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 function string_to_oid($string)
 {
     $oid = strlen($string);
@@ -860,11 +862,15 @@ function snmp_translate($oid, $module, $mibdir = null, $device = array())
 } // snmp_translate
 
 
-/*
+/**
  * check if the type of the oid is a numeric type, and if so,
- * @return the name of RRD type that is best suited to saving it
+ * return the correct RrdDefinition
+ *
+ * @param string $oid
+ * @param array $mibdef
+ * @return RrdDefinition|false
  */
-function oid_rrd_type($oid, $mibdef)
+function oid_rrd_def($oid, $mibdef)
 {
     if (!isset($mibdef[$oid])) {
         return false;
@@ -881,15 +887,15 @@ function oid_rrd_type($oid, $mibdef)
 
         case 'INTEGER':
         case 'Integer32':
-            return 'GAUGE:600:U:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE');
 
         case 'Counter32':
         case 'Counter64':
-            return 'COUNTER:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'COUNTER', 0);
 
         case 'Gauge32':
         case 'Unsigned32':
-            return 'GAUGE:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE', 0);
     }
 
     return false;
@@ -971,15 +977,15 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
                 'numvalue'      => $numvalue,
             );
 
-            $type = oid_rrd_type($obj, $mibdef);
-            if ($type === false) {
+            $rrd_def = oid_rrd_def($obj, $mibdef);
+            if ($rrd_def === false) {
                 continue;
             }
 
             $usedoids[$index][$obj] = $val;
 
             $tags = array(
-                'rrd_def'       => array("DS:mibval:$type"),
+                'rrd_def'       => $rrd_def,
                 'rrd_name'      => array($mibname, $mibdef[$obj]['shortname'], $index),
                 'rrd_oldname'   => array($mibname, $mibdef[$obj]['object_type'], $index),
                 'index'         => $index,

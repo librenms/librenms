@@ -20,7 +20,7 @@ $config['log_dir'] = "/opt/librenms/logs";
 ```
 Log files created by LibreNMS will be stored within this directory.
 
-#### Database config
+### Database config
 
 These are the configuration options you will need to use to specify to get started.
 
@@ -32,15 +32,24 @@ $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
-#### Programs
+### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
 documentation page will be linked to rather than having the config provided.
+
+#### RRDTool
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
+> Settings -> External Settings -> RRDTool Setup
 
 ```php
 $config['rrdtool'] = "/usr/bin/rrdtool";
 ```
 
+Please see [1 Minute polling]((1-Minute-Polling.md)) for information on configuring your install to record data more frequently.
+
+#### fping
 ```php
 $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "fping6";
@@ -67,6 +76,8 @@ $config['icmp_check'] = false;
 
 If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
 
+#### SNMP
+
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
 $config['snmpget']          = "/usr/bin/snmpget";
@@ -88,7 +99,7 @@ $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
 
-#### Proxy support
+### Proxy support
 
 For alerting and the callback functionality, we support the use of a http proxy setting. 
 These can be any one of the following:
@@ -105,15 +116,15 @@ http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
 
-#### Memcached
+### Memcached
 
 [Memcached](../Extensions/Memcached.md)
 
-#### RRDCached
+### RRDCached
 
 [RRDCached](../Extensions/RRDCached.md)
 
-#### WebUI Settings
+### WebUI Settings
 
 ```php
 $config['base_url'] = "http://demo.librenms.org";
@@ -237,7 +248,7 @@ You can enable the old style network map (only available for individual devices 
 $config['gui']['network-map']['style'] = 'old';
 ```
 
-#### Add host settings
+### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
 ```php
@@ -251,7 +262,7 @@ By default we allow hosts to be added with duplicate sysName's, you can disable 
 $config['allow_duplicate_sysName'] = false;
 ```
 
-#### SNMP Settings
+### SNMP Settings
 
 ```php
 $config['snmp']['timeout'] = 1;            # timeout in seconds
@@ -277,11 +288,11 @@ $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 ```
 The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
-#### Auto discovery settings
+### Auto discovery settings
 
 [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
-#### Email configuration
+### Email configuration
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -301,15 +312,15 @@ $config['email_smtp_password']        = NULL;
 What type of mail transport to use for delivering emails. Valid options for `email_backend` are mail, sendmail or smtp.
 The varying options after that are to support the different transports.
 
-#### Alerting
+### Alerting
 
 [Alerting](../Extensions/Alerting.md)
 
-#### Billing
+### Billing
 
 [Billing](../Extensions/Billing-Module.md)
 
-#### Global module support
+### Global module support
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
@@ -320,7 +331,7 @@ $config['enable_vrfs']                  = 1; # Enable VRFs
 $config['enable_sla']                   = 0; # Enable Cisco SLA collection and display
 ```
 
-#### Port extensions
+### Port extensions
 
 [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
 
@@ -364,7 +375,7 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 
 [NFSen](../Extensions/NFSen.md)
 
-#### Location mapping
+### Location mapping
 
 Exact Matching:
 ```php
@@ -376,7 +387,7 @@ $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, U
 ```
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
-#### Interfaces to be ignored
+### Interfaces to be ignored
 
 Examples:
 
@@ -398,7 +409,7 @@ by continuing the array.
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
-#### Interfaces to be rewritten
+### Interfaces to be rewritten
 
 ```php
 $config['rewrite_if']['cpu'] = 'Management Interface';
@@ -408,7 +419,7 @@ Entries defined in `rewrite_if` are being replaced completely.
 Entries defined in `rewrite_if_regexp` only replace the match.
 Matches are compared case-insensitive.
 
-#### Entity sensors to be ignored
+### Entity sensors to be ignored
 
 Some devices register bogus sensors as they are returned via SNMP but either don't exist or just don't return data.
 This allows you to ignore those based on the descr field in the database. You can either ignore globally or on a per 
@@ -419,7 +430,7 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
-#### Storage configuration
+### Storage configuration
 
 ```php
 $config['ignore_mount_removable']  = 1;
@@ -450,15 +461,15 @@ $config['ignore_mount_regexp'][] = "/UMA/";
 ```
 Mounted storage / mount points to ignore in discovery and polling.
 
-#### IRC Bot
+### IRC Bot
 
 [IRC Bot](../Extensions/IRC-Bot.md)
 
-#### Authentication
+### Authentication
 
 [Authentication](../Extensions/Authentication.md)
 
-#### Cleanup options
+### Cleanup options
 
 These options rely on daily.sh running from cron as per the installation instructions.
 
@@ -476,11 +487,11 @@ values are in days.
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 
 the rrd directory automatically - only enable this if you are comfortable with that happening.
 
-#### Syslog options
+### Syslog options
 
 [Syslog](../Extensions/Syslog.md)
 
-#### Virtualization
+### Virtualization
 
 ```php
 $config['enable_libvirt'] = 1;
@@ -502,18 +513,18 @@ to indicate how you connect to libvirt.  You also need to:
 To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
 `virsh -c xen+ssh://vmhost list` as your librenms polling user.
 
-#### BGP Support
+### BGP Support
 
 ```php
-$config['astext'][65332] = "Cymru FullBogon Feed";
+$config['astext']['65332'] = "Cymru FullBogon Feed";
 ```
 You can use this array to rewrite the description of ASes that you have discovered.
 
-#### Auto updates
+### Auto updates
 
 [Updating](../General/Updating.md)
 
-#### IPMI
+### IPMI
 Setup the types of IPMI protocols to test a host for and it what order.
 
 ```php
@@ -524,6 +535,6 @@ $config['ipmi']['type'][] = "imb";
 $config['ipmi']['type'][] = "open";
 ```
 
-#### Distributed poller settings
+### Distributed poller settings
 
 [Distributed Poller](../Extensions/Distributed-Poller.md)

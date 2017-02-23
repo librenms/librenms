@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $storage_cache = array();
 
 foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device['device_id'])) as $storage) {
@@ -9,10 +11,9 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
     echo 'Storage '. $descr .': ';
 
     $rrd_name = array('storage', $mib, $descr);
-    $rrd_def = array(
-        'DS:used:GAUGE:600:0:U',
-        'DS:free:GAUGE:600:0:U'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('used', 'GAUGE', 0)
+        ->addDataset('free', 'GAUGE', 0);
 
     $file = $config['install_dir'].'/includes/polling/storage/'. $mib .'.inc.php';
     if (is_file($file)) {

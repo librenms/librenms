@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 // CISCO-VPDN-MGMT-MIB::cvpdnTunnelTotal.0 = Gauge32: 0 tunnels
 // CISCO-VPDN-MGMT-MIB::cvpdnSessionTotal.0 = Gauge32: 0 users
 // CISCO-VPDN-MGMT-MIB::cvpdnDeniedUsersTotal.0 = Counter32: 0 attempts
@@ -13,11 +15,10 @@ if ($device['os_group'] == 'cisco') {
     foreach ($data as $type => $vpdn) {
         if ($vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal']) {
             $rrd_name = array('vpdn', $type);
-            $rrd_def = array(
-                'DS:tunnels:GAUGE:600:0:U',
-                'DS:sessions:GAUGE:600:0:U',
-                'DS:denied:COUNTER:600:0:100000'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('tunnels', 'GAUGE', 0)
+                ->addDataset('sessions', 'GAUGE', 0)
+                ->addDataset('denied', 'COUNTER', 0, 100000);
 
             $fields = array(
                 'tunnels'   => $vpdn['cvpdnSystemTunnelTotal'],
