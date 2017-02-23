@@ -24,6 +24,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 global $config;
 $data = '';
 $name = 'powerdns-recursor';
@@ -48,65 +50,65 @@ if ($agent_data['app'][$name]) {
 }
 
 if (!empty($data)) {
-    $rrd_def = array(
-        'all-outqueries' => 'DS:all-outqueries:DERIVE:600:0:U',
-        'answers-slow' => 'DS:answers-slow:DERIVE:600:0:U',
-        'answers0-1' => 'DS:answers0-1:DERIVE:600:0:U',
-        'answers1-10' => 'DS:answers1-10:DERIVE:600:0:U',
-        'answers10-100' => 'DS:answers10-100:DERIVE:600:0:U',
-        'answers100-1000' => 'DS:answers100-1000:DERIVE:600:0:U',
-        'cache-entries' => 'DS:cache-entries:GAUGE:600:0:U',
-        'cache-hits' => 'DS:cache-hits:DERIVE:600:0:U',
-        'cache-misses' => 'DS:cache-misses:DERIVE:600:0:U',
-        'case-mismatches' => 'DS:case-mismatches:DERIVE:600:0:U',
-        'chain-resends' => 'DS:chain-resends:DERIVE:600:0:U',
-        'client-parse-errors' => 'DS:client-parse-errors:DERIVE:600:0:U',
-        'concurrent-queries' => 'DS:concurrent-queries:GAUGE:600:0:U',
-        'dlg-only-drops' => 'DS:dlg-only-drops:DERIVE:600:0:U',
-        'dont-outqueries' => 'DS:dont-outqueries:DERIVE:600:0:U',
-        'edns-ping-matches' => 'DS:edns-ping-matches:DERIVE:600:0:U',
-        'edns-ping-mismatches' => 'DS:edns-ping-mismatche:DERIVE:600:0:U',
-        'failed-host-entries' => 'DS:failed-host-entries:GAUGE:600:0:U',
-        'ipv6-outqueries' => 'DS:ipv6-outqueries:DERIVE:600:0:U',
-        'ipv6-questions' => 'DS:ipv6-questions:DERIVE:600:0:U',
-        'malloc-bytes' => 'DS:malloc-bytes:GAUGE:600:0:U',
-        'max-mthread-stack' => 'DS:max-mthread-stack:GAUGE:600:0:U',
-        'negcache-entries' => 'DS:negcache-entries:GAUGE:600:0:U',
-        'no-packet-error' => 'DS:no-packet-error:DERIVE:600:0:U',
-        'noedns-outqueries' => 'DS:noedns-outqueries:DERIVE:600:0:U',
-        'noerror-answers' => 'DS:noerror-answers:DERIVE:600:0:U',
-        'noping-outqueries' => 'DS:noping-outqueries:DERIVE:600:0:U',
-        'nsset-invalidations' => 'DS:nsset-invalidations:DERIVE:600:0:U',
-        'nsspeeds-entries' => 'DS:nsspeeds-entries:GAUGE:600:0:U',
-        'nxdomain-answers' => 'DS:nxdomain-answers:DERIVE:600:0:U',
-        'outgoing-timeouts' => 'DS:outgoing-timeouts:DERIVE:600:0:U',
-        'over-capacity-drops' => 'DS:over-capacity-drops:DERIVE:600:0:U',
-        'packetcache-entries' => 'DS:packetcache-entries:GAUGE:600:0:U',
-        'packetcache-hits' => 'DS:packetcache-hits:DERIVE:600:0:U',
-        'packetcache-misses' => 'DS:packetcache-misses:DERIVE:600:0:U',
-        'policy-drops' => 'DS:policy-drops:DERIVE:600:0:U',
-        'qa-latency' => 'DS:qa-latency:GAUGE:600:0:U',
-        'questions' => 'DS:questions:DERIVE:600:0:U',
-        'resource-limits' => 'DS:resource-limits:DERIVE:600:0:U',
-        'security-status' => 'DS:security-status:GAUGE:600:0:U',
-        'server-parse-errors' => 'DS:server-parse-errors:DERIVE:600:0:U',
-        'servfail-answers' => 'DS:servfail-answers:DERIVE:600:0:U',
-        'spoof-prevents' => 'DS:spoof-prevents:DERIVE:600:0:U',
-        'sys-msec' => 'DS:sys-msec:DERIVE:600:0:U',
-        'tcp-client-overflow' => 'DS:tcp-client-overflow:DERIVE:600:0:U',
-        'tcp-clients' => 'DS:tcp-clients:GAUGE:600:0:U',
-        'tcp-outqueries' => 'DS:tcp-outqueries:DERIVE:600:0:U',
-        'tcp-questions' => 'DS:tcp-questions:DERIVE:600:0:U',
-        'throttle-entries' => 'DS:throttle-entries:GAUGE:600:0:U',
-        'throttled-out' => 'DS:throttled-out:DERIVE:600:0:U',
-        'throttled-outqueries' => 'DS:throttled-outquerie:DERIVE:600:0:U',
-        'too-old-drops' => 'DS:too-old-drops:DERIVE:600:0:U',
-        'unauthorized-tcp' => 'DS:unauthorized-tcp:DERIVE:600:0:U',
-        'unauthorized-udp' => 'DS:unauthorized-udp:DERIVE:600:0:U',
-        'unexpected-packets' => 'DS:unexpected-packets:DERIVE:600:0:U',
-        'unreachables' => 'DS:unreachables:DERIVE:600:0:U',
-        'uptime' => 'DS:uptime:DERIVE:600:0:U',
-        'user-msec' => 'DS:user-msec:DERIVE:600:0:U',
+    $ds_list = array(
+        'all-outqueries' => 'DERIVE',
+        'answers-slow' => 'DERIVE',
+        'answers0-1' => 'DERIVE',
+        'answers1-10' => 'DERIVE',
+        'answers10-100' => 'DERIVE',
+        'answers100-1000' => 'DERIVE',
+        'cache-entries' => 'GAUGE',
+        'cache-hits' => 'DERIVE',
+        'cache-misses' => 'DERIVE',
+        'case-mismatches' => 'DERIVE',
+        'chain-resends' => 'DERIVE',
+        'client-parse-errors' => 'DERIVE',
+        'concurrent-queries' => 'GAUGE',
+        'dlg-only-drops' => 'DERIVE',
+        'dont-outqueries' => 'DERIVE',
+        'edns-ping-matches' => 'DERIVE',
+        'edns-ping-mismatches' => 'DERIVE',
+        'failed-host-entries' => 'GAUGE',
+        'ipv6-outqueries' => 'DERIVE',
+        'ipv6-questions' => 'DERIVE',
+        'malloc-bytes' => 'GAUGE',
+        'max-mthread-stack' => 'GAUGE',
+        'negcache-entries' => 'GAUGE',
+        'no-packet-error' => 'DERIVE',
+        'noedns-outqueries' => 'DERIVE',
+        'noerror-answers' => 'DERIVE',
+        'noping-outqueries' => 'DERIVE',
+        'nsset-invalidations' => 'DERIVE',
+        'nsspeeds-entries' => 'GAUGE',
+        'nxdomain-answers' => 'DERIVE',
+        'outgoing-timeouts' => 'DERIVE',
+        'over-capacity-drops' => 'DERIVE',
+        'packetcache-entries' => 'GAUGE',
+        'packetcache-hits' => 'DERIVE',
+        'packetcache-misses' => 'DERIVE',
+        'policy-drops' => 'DERIVE',
+        'qa-latency' => 'GAUGE',
+        'questions' => 'DERIVE',
+        'resource-limits' => 'DERIVE',
+        'security-status' => 'GAUGE',
+        'server-parse-errors' => 'DERIVE',
+        'servfail-answers' => 'DERIVE',
+        'spoof-prevents' => 'DERIVE',
+        'sys-msec' => 'DERIVE',
+        'tcp-client-overflow' => 'DERIVE',
+        'tcp-clients' => 'GAUGE',
+        'tcp-outqueries' => 'DERIVE',
+        'tcp-questions' => 'DERIVE',
+        'throttle-entries' => 'GAUGE',
+        'throttled-out' => 'DERIVE',
+        'throttled-outqueries' => 'DERIVE',
+        'too-old-drops' => 'DERIVE',
+        'unauthorized-tcp' => 'DERIVE',
+        'unauthorized-udp' => 'DERIVE',
+        'unexpected-packets' => 'DERIVE',
+        'unreachables' => 'DERIVE',
+        'uptime' => 'DERIVE',
+        'user-msec' => 'DERIVE',
     );
 
     //decode and flatten the data
@@ -117,8 +119,11 @@ if (!empty($data)) {
     d_echo($stats);
 
     // only the stats we store in rrd
+    $rrd_def = new RrdDefinition();
     $fields = array();
-    foreach ($rrd_def as $key => $value) {
+    foreach ($ds_list as $key => $type) {
+        $rrd_def->addDataset($key, $type, 0);
+
         if (isset($stats[$key])) {
             $fields[$key] = $stats[$key];
         } else {

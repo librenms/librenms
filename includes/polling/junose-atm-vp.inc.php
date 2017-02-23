@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $vp_rows = dbFetchRows('SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.port_id = P.port_id', array($device['device_id']));
 
 if (count($vp_rows)) {
@@ -13,16 +15,15 @@ if (count($vp_rows)) {
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'junose');
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', 'junose');
 
-    $rrd_def = array(
-        'DS:incells:DERIVE:600:0:125000000000',
-        'DS:outcells:DERIVE:600:0:125000000000',
-        'DS:inpackets:DERIVE:600:0:125000000000',
-        'DS:outpackets:DERIVE:600:0:125000000000',
-        'DS:inpacketoctets:DERIVE:600:0:125000000000',
-        'DS:outpacketoctets:DERIVE:600:0:125000000000',
-        'DS:inpacketerrors:DERIVE:600:0:125000000000',
-        'DS:outpacketerrors:DERIVE:600:0:125000000000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('incells', 'DERIVE', 0, 125000000000)
+        ->addDataset('outcells', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpackets', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpackets', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpacketoctets', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpacketoctets', 'DERIVE', 0, 125000000000)
+        ->addDataset('inpacketerrors', 'DERIVE', 0, 125000000000)
+        ->addDataset('outpacketerrors', 'DERIVE', 0, 125000000000);
 
     foreach ($vp_rows as $vp) {
         echo '.';

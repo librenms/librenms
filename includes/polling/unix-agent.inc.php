@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'unix') {
     echo $config['project_name'].' UNIX Agent: ';
 
@@ -42,7 +44,7 @@ if ($device['os_group'] == 'unix') {
         echo 'execution time: '.$agent_time.'ms';
 
         $tags = array(
-            'rrd_def' => 'DS:time:GAUGE:600:0:U',
+            'rrd_def' => RrdDefinition::make()->addDataset('time', 'GAUGE', 0),
         );
         $fields = array(
             'time' => $agent_time,
