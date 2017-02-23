@@ -103,7 +103,10 @@ if ($error_msg) {
 } else {
     // $rrd_options .= " HRULE:0#999999";
     if ($config['webui']['graph_type'] === 'svg') {
-        $rrd_options .= " --imgformat=SVG -m 0.75";
+        $rrd_options .= " --imgformat=SVG";
+        if ($width < 350) {
+            $rrd_options .= " -m 0.75 -R light";
+        }
     }
 
     if ($no_file) {
