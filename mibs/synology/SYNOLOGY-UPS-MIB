@@ -1,0 +1,1336 @@
+SYNOLOGY-UPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+	Float 
+		FROM NET-SNMP-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+synoUPS MODULE-IDENTITY
+    LAST-UPDATED "201309110000Z"
+    ORGANIZATION "www.synology.com"
+    CONTACT-INFO
+         "postal:   Jay Pan
+          email:    jaypan@synology.com"
+    DESCRIPTION
+        "Characteristics of the ups information"
+    REVISION     "201309110000Z"
+    DESCRIPTION
+        "Second draft."
+    ::= { synology 4 }		
+
+synology	 OBJECT IDENTIFIER 
+	::= { enterprises 6574 }
+
+NonNegativeInteger ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This data type is a non-negative value."
+    SYNTAX       Integer32 (0..2147483647)
+
+--
+-- The Device Identification group.
+--      All objects in this group except for upsIdentName and
+--      upsIdentAttachedDevices are set at device initialization
+--      and remain static.
+--
+
+--
+-- Device Group
+--
+
+upsDevice              OBJECT IDENTIFIER ::= { synoUPS 1 }
+
+upsDeviceModel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device model"
+    ::= { upsDevice 1 }
+
+upsDeviceManufacturer OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device manufacturer"
+    ::= { upsDevice 2 }
+
+upsDeviceSerial OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device serial number."
+    ::= { upsDevice 3 }
+
+upsDeviceType OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device type (ups, pdu, scd, psu)"
+    ::= { upsDevice 4 }
+
+upsDeviceDescription OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device description."
+    ::= { upsDevice 5 }
+
+upsDeviceContact OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device administrator name."
+    ::= { upsDevice 6 }
+
+upsDeviceLocation OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device physical location."
+    ::= { upsDevice 7 }
+
+upsDevicePart OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Device part number."
+    ::= { upsDevice 8 }
+
+upsDeviceMACAddr OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Physical network address of the device."
+    ::= { upsDevice 9 }
+
+--
+-- UPS Group
+--
+
+upsInfo              OBJECT IDENTIFIER ::= { synoUPS 2 }
+
+upsInfoStatus OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS status."
+    ::= { upsInfo 1 }
+
+upsInfoAlarm OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS alarms"
+    ::= { upsInfo 2 }
+
+upsInfoTime OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Internal UPS clock time"
+    ::= { upsInfo 3 }
+
+upsInfoDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Internal UPS clock date"
+    ::= { upsInfo 4 }
+
+upsInfoModel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS model"
+    ::= { upsInfo 5 }
+
+upsInfoMfr              OBJECT IDENTIFIER ::= { upsInfo 6 }
+
+upsInfoMfrName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS manufacturer"
+    ::= { upsInfoMfr 1 }
+
+upsInfoMfrDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS manufacturing date"
+    ::= { upsInfoMfr 2 }
+
+upsInfoSerial OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS serial number"
+    ::= { upsInfo 7 }
+
+upsInfoVendorID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Vendor ID for USB devices"
+    ::= { upsInfo 8 }
+
+upsInfoProductID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Product ID for USB devices"
+    ::= { upsInfo 9 }
+
+upsInfoFirmware              OBJECT IDENTIFIER ::= { upsInfo 10 }
+
+upsInfoFirmwareName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS firmware"
+    ::= { upsInfoFirmware 1 }
+
+upsInfoFirmwareAux OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Auxiliary device firmware"
+    ::= { upsInfoFirmware 2 }
+
+upsInfoTemperature OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "degree C"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS temperature (degrees C)"
+    ::= { upsInfo 11 }
+
+upsInfoLoad              OBJECT IDENTIFIER ::= { upsInfo 12 }
+
+upsInfoLoadValue OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "percentage"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Load on UPS (percent)"
+    ::= { upsInfoLoad 1 }
+
+upsInfoLoadHigh OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "percentage"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Load when UPS switches to overload condition (OVER) (percent)"
+    ::= { upsInfoLoad 2 }
+
+upsInfoID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS system identifier"
+    ::= { upsInfo 13 }
+
+upsInfoDelay              OBJECT IDENTIFIER ::= { upsInfo 14 }
+
+upsInfoDelayStart OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Interval to wait before restarting the load (seconds)"
+    ::= { upsInfoDelay 1 }
+
+upsInfoDelayReboot OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Interval to wait before rebooting the UPS (seconds)"
+    ::= { upsInfoDelay 2 }
+
+upsInfoDelayShutdown OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Interval to wait after shutdown with delay command (seconds)"
+    ::= { upsInfoDelay 3 }
+
+upsInfoTimer              OBJECT IDENTIFIER ::= { upsInfo 15 }
+
+upsInfoTimerStart OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Time before the load will be started (seconds)"
+    ::= { upsInfoTimer 1 }
+
+upsInfoTimerReboot OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Time before the load will be rebooted (seconds)"
+    ::= { upsInfoTimer 2 }
+
+upsInfoTimerShutdown OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Time before the load will be shutdown (seconds)"
+    ::= { upsInfoTimer 3 }
+
+upsInfoTest              OBJECT IDENTIFIER ::= { upsInfo 16 }
+
+upsInfoTestInterval OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Interval between self tests"
+    ::= { upsInfoTest 1 }
+
+upsInfoTestResult OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Results of last self test"
+    ::= { upsInfoTest 2 }
+
+upsInfoDisplayLanguage OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Language to use on front panel"
+    ::= { upsInfo 17 }
+
+upsInfoContacts OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS external contact sensors"
+    ::= { upsInfo 18 }
+
+upsInfoEffciency OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Efficiency of the UPS (ratio of the output current on the input current) (percent)"
+    ::= { upsInfo 19 }
+
+upsInfoPower              OBJECT IDENTIFIER ::= { upsInfo 20 }
+
+upsInfoPowerValue OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "Volt-Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Current value of apparent power (Volt-Amps)"
+    ::= { upsInfoPower 1 }
+
+upsInfoPowerNominal OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "Volt-Amps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal value of apparent power (Volt-Amps)"
+    ::= { upsInfoPower 2 }
+
+upsInfoRealPower              OBJECT IDENTIFIER ::= { upsInfo 21 }
+
+upsInfoRealPowerValue OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Current value of real power (Watts)"
+    ::= { upsInfoRealPower 1 }
+
+upsInfoRealPowerNominal OBJECT-TYPE
+    SYNTAX     Float
+	UNITS      "Watts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal value of real power (Watts)"
+    ::= { upsInfoRealPower 2 }
+
+upsInfoBeeperStatus OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS beeper status (enabled, disabled or muted)"
+    ::= { upsInfo 22 }
+
+upsInfoType OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS type"
+    ::= { upsInfo 23 }
+
+upsInfoWatchdogStatus OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS watchdog status (enabled or disabled)"
+    ::= { upsInfo 24 }
+
+upsInfoStart              OBJECT IDENTIFIER ::= { upsInfo 25 }
+
+upsInfoStartAuto OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS starts when mains is (re)applied"
+    ::= { upsInfoStart 1 }
+
+upsInfoStartBattery OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Allow to start UPS from battery"
+    ::= { upsInfoStart 2 }
+
+upsInfoStartReboot OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "UPS coldstarts from battery (enabled or disabled)"
+    ::= { upsInfoStart 3 }
+
+
+--
+-- Battery Group
+--
+
+upsBattery            OBJECT IDENTIFIER ::= { synoUPS 3 }
+
+upsBatteryCharge            OBJECT IDENTIFIER ::= { upsBattery 1 }
+
+upsBatteryChargeValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery charge"
+    ::= { upsBatteryCharge 1 }
+
+upsBatteryChargeLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Remaining battery level when UPS switches to LB (percent)"
+    ::= { upsBatteryCharge 2 }
+
+upsBatteryChargeRestart OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Minimum battery level for UPS restart after power-off"
+    ::= { upsBatteryCharge 3 }
+
+upsBatteryChargeWarning OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery level when UPS switches to Warning state (percent)"
+    ::= { upsBatteryCharge 4 }
+
+upsBatteryVoltage            OBJECT IDENTIFIER ::= { upsBattery 2 }
+
+upsBatteryVoltageValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volt DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The magnitude of the present battery voltage."
+    ::= { upsBatteryVoltage 1 }
+
+upsBatteryVoltageNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volt DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal battery voltage."
+    ::= { upsBatteryVoltage 2 }
+
+upsBatteryVoltageLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volt DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Minimum battery voltage, that triggers FSD status ."
+    ::= { upsBatteryVoltage 3 }
+
+upsBatteryVoltageHigh OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volt DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Maximum battery voltage (Ie battery.charge = 100)."
+    ::= { upsBatteryVoltage 4 }
+
+upsBatteryCapacity OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "A"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery capacity (Ah)"
+    ::= { upsBattery 3 }
+
+upsBatteryCurrent OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Amp DC"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The present battery current."
+    ::= { upsBattery 4 }
+
+upsBatteryTemperature OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ambient temperature at or near the UPS Battery
+            casing."
+    ::= { upsBattery 5 }
+
+upsBatteryRuntime            OBJECT IDENTIFIER ::= { upsBattery 6 }
+
+upsBatteryRuntimeValue OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+    UNITS      "Seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery runtime (seconds)"
+    ::= { upsBatteryRuntime 1 }
+
+upsBatteryRuntimeLow OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+    UNITS      "Seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Remaining battery runtime when UPS switches to LB (seconds)"
+    ::= { upsBatteryRuntime 2 }
+
+upsBatteryRuntimeRestart OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+    UNITS      "Seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Minimum battery runtime for UPS restart after power-off (seconds)"
+    ::= { upsBatteryRuntime 3 }
+
+upsBatteryAlarmThreshold OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery alarm threshold"
+    ::= { upsBattery 7 }
+
+upsBatteryDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery change date"
+    ::= { upsBattery 8 }
+
+upsBatteryMfrDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery manufacturing date"
+    ::= { upsBattery 9 }
+
+upsBatteryPacks OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Number of battery packs"
+    ::= { upsBattery 10 }
+
+upsBatteryPacksBad OBJECT-TYPE
+    SYNTAX     NonNegativeInteger
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Number of bad battery packs"
+    ::= { upsBattery 11 }
+
+upsBatteryType OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Battery chemistry"
+    ::= { upsBattery 12 }
+
+upsBatteryProtection OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Prevent deep discharge of battery"
+    ::= { upsBattery 13 }
+
+upsBatteryEnergySave OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Switch off when running on battery and no/low load"
+    ::= { upsBattery 14 }
+
+--
+-- Input Group
+--
+
+upsInput              OBJECT IDENTIFIER ::= { synoUPS 4 }
+
+upsInputVoltage  OBJECT IDENTIFIER ::= { upsInput 1 }
+
+upsInputVoltageValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input voltage"
+    ::= { upsInputVoltage 1 }
+
+upsInputVoltageMax OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Maximum incoming voltage seen"
+    ::= { upsInputVoltage 2 }
+
+upsInputVoltageMin OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Minimum incoming voltage seen"
+    ::= { upsInputVoltage 3 }
+
+upsInputVoltageNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal input voltage"
+    ::= { upsInputVoltage 4 }
+
+upsInputVoltageExtend OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Extended input voltage range"
+    ::= { upsInputVoltage 5 }
+
+upsInputVoltageFault OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input voltage Fault"
+    ::= { upsInputVoltage 6 }
+
+
+upsInputTransfer  OBJECT IDENTIFIER ::= { upsInput 2 }
+
+upsInputTransferReason OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..63))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Reason for last transfer to battery"
+	::= { upsInputTransfer 1 }
+
+upsInputTransferLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Low voltage transfer point"
+    ::= { upsInputTransfer 2 }
+
+upsInputTransferHigh OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "High voltage transfer point"
+    ::= { upsInputTransfer 3 }
+
+upsInputTransferLowMin OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "smallest settable low voltage transfer point"
+    ::= { upsInputTransfer 4 }
+
+upsInputTransferLowMax OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "greatest settable low voltage transfer point"
+    ::= { upsInputTransfer 5 }
+
+upsInputTransferHighMin OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "smallest settable high voltage transfer point"
+    ::= { upsInputTransfer 6 }
+
+upsInputTransferHighMax OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "greatest settable high voltage transfer point"
+    ::= { upsInputTransfer 7 }
+
+upsInputTransferBoostLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Low voltage boosting transfer point"
+    ::= { upsInputTransfer 8 }
+
+upsInputTransferBoostHigh OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "High voltage boosting transfer point"
+    ::= { upsInputTransfer 9 }
+
+upsInputTransferTrimLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Low voltage trimming transfer point"
+    ::= { upsInputTransfer 10 }
+
+upsInputTransferTrimHigh OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "High voltage trimming transfer point"
+    ::= { upsInputTransfer 11 }
+
+upsInputSensitivity OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..63))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Input power sensitivity"
+	::= { upsInput 3 }
+
+upsInputQuality OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..63))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Input power quality"
+	::= { upsInput 4 }
+
+upsInputCurrent  OBJECT IDENTIFIER ::= { upsInput 5 }
+
+upsInputCurrentValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Amp"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input current (A)"
+    ::= { upsInputCurrent 1 }
+
+upsInputCurrentNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Amp"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal input current (A)"
+    ::= { upsInputCurrent 2 }
+
+upsInputFrequency  OBJECT IDENTIFIER ::= { upsInput 6 }
+
+upsInputFrequencyValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input line frequency (Hz)"
+    ::= { upsInputFrequency 1 }
+
+upsInputFrequencyNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal input line frequency (Hz)"
+    ::= { upsInputFrequency 2 }
+
+upsInputFrequencyLow OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input line frequency low (Hz)"
+    ::= { upsInputFrequency 3 }
+
+upsInputFrequencyHigh OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Input line frequency high (Hz)"
+    ::= { upsInputFrequency 4 }
+
+upsInputFrequencyExtend OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Extended input frequency range"
+    ::= { upsInputFrequency 5 }
+
+--
+-- The Output group.
+--
+
+upsOutput             OBJECT IDENTIFIER ::= { synoUPS 5 }
+
+upsOutputVoltage  OBJECT IDENTIFIER ::= { upsOutput 1 }
+
+upsOutputVoltageValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Output voltage (V)"
+    ::= { upsOutputVoltage 1 }
+
+upsOutputVoltageNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Volts"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal output voltage (V)"
+    ::= { upsOutputVoltage 2 }
+
+upsOutputFrequency  OBJECT IDENTIFIER ::= { upsOutput 2 }
+
+upsOutputFrequencyValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Output frequency (Hz)"
+    ::= { upsOutputFrequency 1 }
+
+upsOutputFrequencyNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Hz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal output frequency (Hz)"
+    ::= { upsOutputFrequency 2 }
+
+upsOutputCurrent  OBJECT IDENTIFIER ::= { upsOutput 3 }
+
+upsOutputCurrentValue OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Amp"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Output current (A)"
+    ::= { upsOutputCurrent 1 }
+
+upsOutputCurrentNominal OBJECT-TYPE
+    SYNTAX     Float
+    UNITS      "Amp"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Nominal output current (A)"
+    ::= { upsOutputCurrent 2 }
+
+--
+-- The ambient group.
+--
+
+upsAmbient             OBJECT IDENTIFIER ::= { synoUPS 6 }
+
+upsAmbientTemperature  OBJECT IDENTIFIER ::= { upsAmbient 1 }
+
+upsAmbientTemperatureValue OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Ambient temperature (degrees C)"
+	::= { upsAmbientTemperature 1 }
+
+upsAmbientTemperatureAlarm OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+ 	UNITS      "enabled/disabled"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Temperature alarm (enabled/disabled)"
+	::= { upsAmbientTemperature 2 }
+
+upsAmbientTemperatureHigh OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Temperature threshold high (degrees C)"
+	::= { upsAmbientTemperature 3 }
+
+upsAmbientTemperatureLow OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Temperature threshold low (degrees C)"
+	::= { upsAmbientTemperature 4 }
+
+upsAmbientTemperatureMax OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Maximum temperature seen (degrees C)"
+	::= { upsAmbientTemperature 5 }
+
+upsAmbientTemperatureMin OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "degrees Centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Minimum temperature seen (degrees C)"
+	::= { upsAmbientTemperature 6 }
+
+upsAmbientHumidity  OBJECT IDENTIFIER ::= { upsAmbient 2 }
+
+upsAmbientHumidityValue OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Ambient relative humidity (percent)"
+	::= { upsAmbientHumidity 1 }
+
+upsAmbientHumidityAlarm OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+ 	UNITS      "enabled/disabled"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Relative humidity alarm (enabled/disabled)"
+	::= { upsAmbientHumidity 2 }
+
+upsAmbientHumidityHigh OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Relative humidity threshold high (percent)"
+	::= { upsAmbientHumidity 3 }
+
+upsAmbientHumidityLow OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Relative humidity threshold low (percent)"
+	::= { upsAmbientHumidity 4 }
+
+upsAmbientHumidityMax OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Maximum relative humidity seen (percent)"
+	::= { upsAmbientHumidity 5 }
+
+upsAmbientHumidityMin OBJECT-TYPE
+    SYNTAX     Float
+ 	UNITS      "percent"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Minimum relative humidity seen (percent)"
+	::= { upsAmbientHumidity 6 }
+
+--
+-- The Driver group.
+--
+
+upsDriver             OBJECT IDENTIFIER ::= { synoUPS 7 }
+
+upsDriverName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Driver name"
+	::= { upsDriver 1 }
+
+upsDriverVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Driver version (NUT release)"
+	::= { upsDriver 2 }
+
+upsDriverVersionData OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Driver version data"
+	::= { upsDriver 3 }
+
+
+upsDriverVersionInternal OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Internal driver version (if tracked separately)"
+	::= { upsDriver 4 }
+
+upsDriverPollInterval OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "second"
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Poll interval setup in configuration file"
+	::= { upsDriver 5 }
+
+upsDriverPort OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Port setup in configuration file"
+	::= { upsDriver 6 }
+
+upsDriverPollFrequency OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Poll frequency"
+	::= { upsDriver 7 }
+
+upsDriverProductID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Product ID"
+	::= { upsDriver 8 }
+
+upsDriverSnmpVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Snmp version"
+	::= { upsDriver 9 }
+
+--
+-- The server group.
+--
+
+upsServer             OBJECT IDENTIFIER ::= { synoUPS 8 }
+
+upsServerInfo OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Server information"
+	::= { upsServer 1 }
+
+upsServerVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+	DESCRIPTION
+	"Server version"
+	::= { upsServer 2 }
+
+
+upsConformance OBJECT IDENTIFIER ::= { synoUPS 9 }
+upsCompliances OBJECT IDENTIFIER ::= { upsConformance 1 }
+upsGroups 			OBJECT IDENTIFIER ::= { upsConformance 2 }
+
+upsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for synoSystem entities which
+            implement the SYNOLOGY SYSTEM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { upsGroup }
+
+    ::= { upsCompliances 1 }
+
+upsGroup OBJECT-GROUP
+    OBJECTS {
+    					upsDeviceModel,
+							upsDeviceManufacturer,
+							upsDeviceSerial,
+							upsDeviceType,
+							upsDeviceDescription,
+							upsDeviceContact,
+							upsDeviceLocation,
+							upsDevicePart,
+							upsDeviceMACAddr,
+							upsInfoStatus,
+							upsInfoAlarm,
+							upsInfoTime,
+							upsInfoDate,
+							upsInfoModel,
+							upsInfoMfrName,
+							upsInfoMfrDate,
+							upsInfoSerial,
+							upsInfoVendorID,
+							upsInfoProductID,
+							upsInfoFirmwareName,
+							upsInfoFirmwareAux,
+							upsInfoTemperature,
+							upsInfoLoadValue,
+							upsInfoLoadHigh,
+							upsInfoID,
+							upsInfoDelayStart,
+							upsInfoDelayReboot,
+							upsInfoDelayShutdown,
+							upsInfoTimerStart,
+							upsInfoTimerReboot,
+							upsInfoTimerShutdown,
+							upsInfoTestInterval,
+							upsInfoTestResult,
+							upsInfoDisplayLanguage,
+							upsInfoContacts,
+							upsInfoEffciency,
+							upsInfoPowerValue,
+							upsInfoPowerNominal,
+							upsInfoRealPowerValue,
+							upsInfoRealPowerNominal,
+							upsInfoBeeperStatus,
+							upsInfoType,
+							upsInfoWatchdogStatus,
+							upsInfoStartAuto,
+							upsInfoStartBattery,
+							upsInfoStartReboot,
+							upsBatteryChargeValue,
+							upsBatteryChargeLow,
+							upsBatteryChargeRestart,
+							upsBatteryChargeWarning,
+							upsBatteryVoltageValue,
+							upsBatteryVoltageNominal,
+							upsBatteryVoltageLow,
+							upsBatteryVoltageHigh,
+							upsBatteryCapacity,
+							upsBatteryCurrent,
+							upsBatteryTemperature,
+							upsBatteryRuntimeValue,
+							upsBatteryRuntimeLow,
+							upsBatteryRuntimeRestart,
+							upsBatteryAlarmThreshold,
+							upsBatteryDate,
+							upsBatteryMfrDate,
+							upsBatteryPacks,
+							upsBatteryPacksBad,
+							upsBatteryType,
+							upsBatteryProtection,
+							upsBatteryEnergySave,
+							upsInputVoltageValue,
+							upsInputVoltageMax,
+							upsInputVoltageMin,
+							upsInputVoltageNominal,
+							upsInputVoltageExtend,
+							upsInputVoltageFault,
+							upsInputTransferReason,
+							upsInputTransferLow,
+							upsInputTransferHigh,
+							upsInputTransferLowMin,
+							upsInputTransferLowMax,
+							upsInputTransferHighMin,
+							upsInputTransferHighMax,
+							upsInputTransferBoostLow,
+							upsInputTransferBoostHigh,
+							upsInputTransferTrimLow,
+							upsInputTransferTrimHigh,
+							upsInputSensitivity,
+							upsInputQuality,
+							upsInputCurrentValue,
+							upsInputCurrentNominal,
+							upsInputFrequencyValue,
+							upsInputFrequencyNominal,
+							upsInputFrequencyLow,
+							upsInputFrequencyHigh,
+							upsInputFrequencyExtend,
+							upsOutputVoltageValue,
+							upsOutputVoltageNominal,
+							upsOutputFrequencyValue,
+							upsOutputFrequencyNominal,
+							upsOutputCurrentValue,
+							upsOutputCurrentNominal,
+							upsAmbientTemperatureValue,
+							upsAmbientTemperatureAlarm,
+							upsAmbientTemperatureHigh,
+							upsAmbientTemperatureLow,
+							upsAmbientTemperatureMax,
+							upsAmbientTemperatureMin,
+							upsAmbientHumidityValue,
+							upsAmbientHumidityAlarm,
+							upsAmbientHumidityHigh,
+							upsAmbientHumidityLow,
+							upsAmbientHumidityMax,
+							upsAmbientHumidityMin,
+							upsDriverName,
+							upsDriverVersion,
+							upsDriverVersionData,
+							upsDriverVersionInternal,
+							upsDriverPollInterval,
+							upsDriverPort,
+							upsDriverPollFrequency,
+							upsDriverProductID,
+							upsDriverSnmpVersion,
+							upsServerInfo,
+							upsServerVersion}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic information
+             of an synology ups entity."
+    ::= { upsGroups 1 }
+
+END
