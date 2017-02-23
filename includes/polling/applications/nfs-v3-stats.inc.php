@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'nfs-v3-stats';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.110.102.115.115.116.97.116';
@@ -8,61 +11,60 @@ echo ' ' . $name;
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 $rrd_name = array('app', 'nfs-stats', $app_id);
-$rrd_def = array(
-    'DS:rc_hits:GAUGE:600:0:U',
-    'DS:rc_misses:GAUGE:600:0:U',
-    'DS:rc_nocache:GAUGE:600:0:U',
-    'DS:fh_lookup:GAUGE:600:0:U',
-    'DS:fh_anon:GAUGE:600:0:U',
-    'DS:fh_ncachedir:GAUGE:600:0:U',
-    'DS:fh_ncachenondir:GAUGE:600:0:U',
-    'DS:fh_stale:GAUGE:600:0:U',
-    'DS:io_read:GAUGE:600:0:U',
-    'DS:io_write:GAUGE:600:0:U',
-    'DS:ra_size:GAUGE:600:0:U',
-    'DS:ra_range01:GAUGE:600:0:U',
-    'DS:ra_range02:GAUGE:600:0:U',
-    'DS:ra_range03:GAUGE:600:0:U',
-    'DS:ra_range04:GAUGE:600:0:U',
-    'DS:ra_range05:GAUGE:600:0:U',
-    'DS:ra_range06:GAUGE:600:0:U',
-    'DS:ra_range07:GAUGE:600:0:U',
-    'DS:ra_range08:GAUGE:600:0:U',
-    'DS:ra_range09:GAUGE:600:0:U',
-    'DS:ra_range10:GAUGE:600:0:U',
-    'DS:ra_notfound:GAUGE:600:0:U',
-    'DS:net_all:GAUGE:600:0:U',
-    'DS:net_udp:GAUGE:600:0:U',
-    'DS:net_tcp:GAUGE:600:0:U',
-    'DS:net_tcpconn:GAUGE:600:0:U',
-    'DS:rpc_calls:GAUGE:600:0:U',
-    'DS:rpc_badcalls:GAUGE:600:0:U',
-    'DS:rpc_badfmt:GAUGE:600:0:U',
-    'DS:rpc_badauth:GAUGE:600:0:U',
-    'DS:rpc_badclnt:GAUGE:600:0:U',
-    'DS:proc3_null:GAUGE:600:0:U',
-    'DS:proc3_getattr:GAUGE:600:0:U',
-    'DS:proc3_setattr:GAUGE:600:0:U',
-    'DS:proc3_lookup:GAUGE:600:0:U',
-    'DS:proc3_access:GAUGE:600:0:U',
-    'DS:proc3_readlink:GAUGE:600:0:U',
-    'DS:proc3_read:GAUGE:600:0:U',
-    'DS:proc3_write:GAUGE:600:0:U',
-    'DS:proc3_create:GAUGE:600:0:U',
-    'DS:proc3_mkdir:GAUGE:600:0:U',
-    'DS:proc3_symlink:GAUGE:600:0:U',
-    'DS:proc3_mknod:GAUGE:600:0:U',
-    'DS:proc3_remove:GAUGE:600:0:U',
-    'DS:proc3_rmdir:GAUGE:600:0:U',
-    'DS:proc3_rename:GAUGE:600:0:U',
-    'DS:proc3_link:GAUGE:600:0:U',
-    'DS:proc3_readdir:GAUGE:600:0:U',
-    'DS:proc3_readdirplus:GAUGE:600:0:U',
-    'DS:proc3_fsstat:GAUGE:600:0:U',
-    'DS:proc3_fsinfo:GAUGE:600:0:U',
-    'DS:proc3_pathconf:GAUGE:600:0:U',
-    'DS:proc3_commit:GAUGE:600:0:U',
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('rc_hits', 'GAUGE', 0)
+    ->addDataset('rc_misses', 'GAUGE', 0)
+    ->addDataset('rc_nocache', 'GAUGE', 0)
+    ->addDataset('fh_lookup', 'GAUGE', 0)
+    ->addDataset('fh_anon', 'GAUGE', 0)
+    ->addDataset('fh_ncachedir', 'GAUGE', 0)
+    ->addDataset('fh_ncachenondir', 'GAUGE', 0)
+    ->addDataset('fh_stale', 'GAUGE', 0)
+    ->addDataset('io_read', 'GAUGE', 0)
+    ->addDataset('io_write', 'GAUGE', 0)
+    ->addDataset('ra_size', 'GAUGE', 0)
+    ->addDataset('ra_range01', 'GAUGE', 0)
+    ->addDataset('ra_range02', 'GAUGE', 0)
+    ->addDataset('ra_range03', 'GAUGE', 0)
+    ->addDataset('ra_range04', 'GAUGE', 0)
+    ->addDataset('ra_range05', 'GAUGE', 0)
+    ->addDataset('ra_range06', 'GAUGE', 0)
+    ->addDataset('ra_range07', 'GAUGE', 0)
+    ->addDataset('ra_range08', 'GAUGE', 0)
+    ->addDataset('ra_range09', 'GAUGE', 0)
+    ->addDataset('ra_range10', 'GAUGE', 0)
+    ->addDataset('ra_notfound', 'GAUGE', 0)
+    ->addDataset('net_all', 'GAUGE', 0)
+    ->addDataset('net_udp', 'GAUGE', 0)
+    ->addDataset('net_tcp', 'GAUGE', 0)
+    ->addDataset('net_tcpconn', 'GAUGE', 0)
+    ->addDataset('rpc_calls', 'GAUGE', 0)
+    ->addDataset('rpc_badcalls', 'GAUGE', 0)
+    ->addDataset('rpc_badfmt', 'GAUGE', 0)
+    ->addDataset('rpc_badauth', 'GAUGE', 0)
+    ->addDataset('rpc_badclnt', 'GAUGE', 0)
+    ->addDataset('proc3_null', 'GAUGE', 0)
+    ->addDataset('proc3_getattr', 'GAUGE', 0)
+    ->addDataset('proc3_setattr', 'GAUGE', 0)
+    ->addDataset('proc3_lookup', 'GAUGE', 0)
+    ->addDataset('proc3_access', 'GAUGE', 0)
+    ->addDataset('proc3_readlink', 'GAUGE', 0)
+    ->addDataset('proc3_read', 'GAUGE', 0)
+    ->addDataset('proc3_write', 'GAUGE', 0)
+    ->addDataset('proc3_create', 'GAUGE', 0)
+    ->addDataset('proc3_mkdir', 'GAUGE', 0)
+    ->addDataset('proc3_symlink', 'GAUGE', 0)
+    ->addDataset('proc3_mknod', 'GAUGE', 0)
+    ->addDataset('proc3_remove', 'GAUGE', 0)
+    ->addDataset('proc3_rmdir', 'GAUGE', 0)
+    ->addDataset('proc3_rename', 'GAUGE', 0)
+    ->addDataset('proc3_link', 'GAUGE', 0)
+    ->addDataset('proc3_readdir', 'GAUGE', 0)
+    ->addDataset('proc3_readdirplus', 'GAUGE', 0)
+    ->addDataset('proc3_fsstat', 'GAUGE', 0)
+    ->addDataset('proc3_fsinfo', 'GAUGE', 0)
+    ->addDataset('proc3_pathconf', 'GAUGE', 0)
+    ->addDataset('proc3_commit', 'GAUGE', 0);
 
 $data = explode("\n", $nfsstats);
 $fields = array(

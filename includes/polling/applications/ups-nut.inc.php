@@ -20,6 +20,8 @@
 *
 */
 
+use LibreNMS\RRD\RrdDefinition;
+
 // (2016-11-25, R.Morris) ups-nut, try "extend" -> if not, fall back to "exec" support.
 // -> Similar to approach used by Distro, but skip "legacy UCD-MIB shell support"
 //
@@ -44,17 +46,15 @@ echo ' '.$name;
 list ($charge, $battery_low, $remaining, $bat_volt, $bat_nom, $line_nom, $input_volt, $load) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:charge:GAUGE:600:0:100',
-    'DS:battery_low:GAUGE:600:0:100',
-    'DS:time_remaining:GAUGE:600:0:U',
-    'DS:battery_voltage:GAUGE:600:0:U',
-    'DS:battery_nominal:GAUGE:600:0:U',
-    'DS:line_nominal:GAUGE:600:0:U',
-    'DS:input_voltage:GAUGE:600:0:U',
-    'DS:load:GAUGE:600:0:100'
-);
-//print_r(array_values($rrd_def));
+$rrd_def = RrdDefinition::make()
+    ->addDataset('charge', 'GAUGE', 0, 100)
+    ->addDataset('battery_low', 'GAUGE', 0, 100)
+    ->addDataset('time_remaining', 'GAUGE', 0)
+    ->addDataset('battery_voltage', 'GAUGE', 0)
+    ->addDataset('battery_nominal', 'GAUGE', 0)
+    ->addDataset('line_nominal', 'GAUGE', 0)
+    ->addDataset('input_voltage', 'GAUGE', 0)
+    ->addDataset('load', 'GAUGE', 0, 100);
 
 $fields = array(
     'charge' => $charge,
@@ -66,7 +66,6 @@ $fields = array(
     'input_voltage' => $input_volt,
     'load' => $load
 );
-//print_r(array_values($fields));
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

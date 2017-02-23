@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 echo "Cisco Cat6xxx/76xx Crossbar : \n";
 
 $mod_stats  = snmpwalk_cache_oid($device, 'cc6kxbarModuleModeTable', array(), 'CISCO-CAT6K-CROSSBAR-MIB');
@@ -22,13 +24,12 @@ foreach ($chan_stats as $index => $entry) {
     }
 
     $rrd_name = array('c6kxbar', $index, $subindex);
-    $rrd_def = array(
-        'DS:inutil:GAUGE:600:0:100',
-        'DS:oututil:GAUGE:600:0:100',
-        'DS:outdropped:DERIVE:600:0:125000000000',
-        'DS:outerrors:DERIVE:600:0:125000000000',
-        'DS:inerrors:DERIVE:600:0:125000000000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('inutil', 'GAUGE', 0, 100)
+        ->addDataset('oututil', 'GAUGE', 0, 100)
+        ->addDataset('outdropped', 'DERIVE', 0, 125000000000)
+        ->addDataset('outerrors', 'DERIVE', 0, 125000000000)
+        ->addDataset('inerrors', 'DERIVE', 0, 125000000000);
 
     $fields = array(
         'inutil'      => $entry['cc6kxbarStatisticsInUtil'],
