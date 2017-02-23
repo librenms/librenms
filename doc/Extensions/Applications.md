@@ -502,11 +502,11 @@ It is worth noting that this only monitors a single pool. If you want to monitor
 extend fail2ban /etc/snmp/fail2ban
 ```
 
-4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
+4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set if you wish to use caching. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
 
 5: Restart snmpd on your host
 
-6: Add the following to /etc/crontab and restart cron.
+6: If you wish to use caching, add the following to /etc/crontab and restart cron.
 ```
 */3    *    *    *    *    root    /etc/snmp/fail2ban -u 
 ```
@@ -516,3 +516,5 @@ extend fail2ban /etc/snmp/fail2ban
 8: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
 
 In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
+
+If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
