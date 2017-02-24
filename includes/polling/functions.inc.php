@@ -35,32 +35,13 @@ function poll_sensor($device, $class)
 {
     global $config, $memcache, $agent_sensors;
 
-    $supported_sensors = array(
-        'current'     => 'A',
-        'frequency'   => 'Hz',
-        'runtime'     => 'Min',
-        'humidity'    => '%',
-        'fanspeed'    => 'rpm',
-        'power'       => 'W',
-        'voltage'     => 'V',
-        'temperature' => 'C',
-        'dbm'         => 'dBm',
-        'charge'      => '%',
-        'load'        => '%',
-        'state'       => '#',
-        'signal'      => 'dBm',
-        'airflow'     => 'cfm',
-    );
-
-    $unit = $supported_sensors[$class];
-
     $sensors = array();
     $misc_sensors = array();
     $all_sensors = array();
 
     foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?", array($class, $device['device_id'])) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
-            $misc_sensors[] = $sensor;
+            // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
             $misc_sensors[] = $sensor;
         } else {
@@ -132,8 +113,35 @@ function poll_sensor($device, $class)
             continue;
         }//end if
     }
+    record_sensor_data($device, $all_sensors);
+}//end poll_sensor()
+
+/**
+ * @param $device
+ * @param $all_sensors
+ */
+function record_sensor_data($device, $all_sensors)
+{
+    $supported_sensors = array(
+        'current'     => 'A',
+        'frequency'   => 'Hz',
+        'runtime'     => 'Min',
+        'humidity'    => '%',
+        'fanspeed'    => 'rpm',
+        'power'       => 'W',
+        'voltage'     => 'V',
+        'temperature' => 'C',
+        'dbm'         => 'dBm',
+        'charge'      => '%',
+        'load'        => '%',
+        'state'       => '#',
+        'signal'      => 'dBm',
+        'airflow'     => 'cfm',
+    );
 
     foreach ($all_sensors as $sensor) {
+        $class        = $sensor['sensor_class'];
+        $unit         = $supported_sensors[$class];
         $sensor_value = $sensor['new_value'];
         if ($sensor_value == -32768) {
             echo 'Invalid (-32768) ';
@@ -167,7 +175,7 @@ function poll_sensor($device, $class)
         );
         data_update($device, 'sensor', $tags, $fields);
 
-        // FIXME also warn when crossing WARN level!!
+        // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
             log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' under threshold: ' . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
@@ -179,9 +187,8 @@ function poll_sensor($device, $class)
             log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, 3, $sensor['sensor_id']);
         }
         dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = ? AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
-        unset($supported_sensors);
     }
-}//end poll_sensor()
+}
 
 function poll_device($device, $options)
 {
