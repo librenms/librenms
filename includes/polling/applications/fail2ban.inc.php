@@ -13,10 +13,9 @@ $banned=$bannedStuff[0];
 $firewalled=$bannedStuff[1];
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:banned:GAUGE:600:0:U',
-    'DS:firewalled:GAUGE:600:0:U',
-);
+$rrd_def = RrdDefinition::make()
+        ->addDataset('banned', 'GAUGE', 0)
+        ->addDataset('firewalled', 'GAUGE', 0);
 
 $fields = array(
     'banned' =>$banned,
