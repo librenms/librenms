@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'fail2ban';
 $app_id = $app['app_id'];
 
