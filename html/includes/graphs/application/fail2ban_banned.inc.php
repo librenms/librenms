@@ -1,7 +1,5 @@
 <?php
 require 'includes/graphs/common.inc.php';
-$name = 'fail2ban';
-$app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Banned IPs';
@@ -13,22 +11,23 @@ $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
 
-$array = array(
-    'banned' => array('descr' => 'Banned','colour' => '582A72',),
-    'firewalled' => array('descr' => 'Firewalled','colour' => '28774F',),
-);
-
-$i = 0;
 if (is_file($rrd_filename)) {
-    foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
-        $i++;
-    }
+    $rrd_list = array(
+        array(
+            'filename' => $rrd_filename,
+            'descr'    => 'Banned',
+            'ds'       => 'banned',
+            'colour'   => '582A72'
+        ),
+        array(
+            'filename' => $rrd_filename,
+            'descr'    => 'Firewalled',
+            'ds'       => 'firewalled',
+            'colour'   => '28774F'
+        )
+    );
 } else {
     echo "file missing: $rrd_filename";
 }
