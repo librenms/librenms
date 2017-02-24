@@ -47,6 +47,9 @@ if (!is_numeric($config_id)) {
             } elseif ($config_type == 'playsms') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.playsms.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'PlaySMS Transport'), 'config');
                 $x++;
+            } elseif ($config_type == 'smseagle') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.smseagle.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'SMSEagle Transport'), 'config');
+                $x++;
             }
         }
     }
@@ -71,6 +74,8 @@ if (!is_numeric($config_id)) {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.clickatell.to.%' AND `config_id` NOT IN ($db_inserts))");
         } elseif ($config_type == 'playsms') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.playsms.to.%' AND `config_id` NOT IN ($db_inserts))");
+        } elseif ($config_type == 'smseagle') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.smseagle.to.%' AND `config_id` NOT IN ($db_inserts))");
         }
     }
 
