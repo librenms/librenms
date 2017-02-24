@@ -17,8 +17,8 @@ $firewalled=$bannedStuff[1];
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
-        ->addDataset('banned', 'GAUGE', 0)
-        ->addDataset('firewalled', 'GAUGE', 0);
+    ->addDataset('banned', 'GAUGE', 0)
+    ->addDataset('firewalled', 'GAUGE', 0);
 
 $fields = array(
     'banned' =>$banned,
@@ -34,13 +34,8 @@ while (isset($bannedStuff[$int])) {
 
     if (isset($jail) && isset($banned)) {
         $rrd_name = array('app', $name, $app_id, $jail);
-        $rrd_def = array(
-            'DS:banned:GAUGE:600:0:U'
-        );
-
-        $fields = array(
-            'banned' =>$banned,
-        );
+        $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
+        $fields = array('banned' =>$banned);
 
         $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
         data_update($device, 'app', $tags, $fields);
