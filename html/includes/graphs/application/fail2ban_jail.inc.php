@@ -3,7 +3,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrd = rrd_name($device['hostname'], array('app',  $app['app_type'], $app['app_id'], $vars['jail']));
 if (rrdtool_check_rrd_exists($rrd)) {
-$rrd_filename = $rrd;
+    $rrd_filename = $rrd;
 }
 
 $ds  = 'banned';
