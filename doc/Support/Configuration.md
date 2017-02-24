@@ -47,7 +47,7 @@ documentation page will be linked to rather than having the config provided.
 $config['rrdtool'] = "/usr/bin/rrdtool";
 ```
 
-Please see [1 Minute polling]((1-Minute-Polling.md)) for information on configuring your install to record data more frequently.
+Please see [1 Minute polling](1-Minute-Polling.md) for information on configuring your install to record data more frequently.
 
 #### fping
 ```php
