@@ -40,12 +40,18 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongType()
     {
+        global $config;
+        $config['rrd']['step'] = 300;
+        $config['rrd']['heartbeat'] = 600;
         $def = new RrdDefinition();
         $def->addDataset('badtype', 'Something unexpected');
     }
 
     public function testNameEscaping()
     {
+        global $config;
+        $config['rrd']['step'] = 300;
+        $config['rrd']['heartbeat'] = 600;
         $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100 ';
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
@@ -54,6 +60,9 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreation()
     {
+        global $config;
+        $config['rrd']['step'] = 300;
+        $config['rrd']['heartbeat'] = 600;
         $expected = 'DS:pos:COUNTER:600:0:125000000000 ' .
                     'DS:unbound:DERIVE:600:U:U ';
 
