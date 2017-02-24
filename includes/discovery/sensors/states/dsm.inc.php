@@ -151,7 +151,6 @@ $oids = snmpwalk_cache_multi_oid($device, 'upgradeAvailable', array(), 'SYNOLOGY
 $cur_oid = '.1.3.6.1.4.1.6574.1.5.4.';
 
 if (is_array($oids)) {
-
     //Create State Index
     $state_name = 'upgradeAvailableState';
     $state_index_id = create_state_index($state_name);
