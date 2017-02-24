@@ -28,6 +28,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Fail2ban](#fail2ban) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -487,3 +488,33 @@ extend phpfpmsp /etc/snmp/phpfpm-sp
 7. On the device page in Librenms, edit your host and check `PHP-FPM` under the Applications tab.
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
+
+#### Fail2ban
+
+##### SNMP Extend
+
+1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/fail2ban)
+
+2: Make the script executable (chmod +x /etc/snmp/fail2ban)
+
+3: Edit your snmpd.conf file (usually /etc/snmp/fail2ban) and add:
+```
+extend fail2ban /etc/snmp/fail2ban
+```
+
+4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set if you wish to use caching. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
+
+5: Restart snmpd on your host
+
+6: If you wish to use caching, add the following to /etc/crontab and restart cron.
+```
+*/3    *    *    *    *    root    /etc/snmp/fail2ban -u 
+```
+
+7: Restart or reload cron on your system.
+
+8: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
+
+In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
+
+If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
