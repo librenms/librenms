@@ -89,6 +89,7 @@ pages:
     - Developing/Creating-Release.md
 - API: API/API-Docs.md
 - Support:
+    - Support/1-Minute-Polling.md
     - Support/Configuration.md
     - Support/Discovery Support.md
     - Support/Example-Hardware-Setup.md
