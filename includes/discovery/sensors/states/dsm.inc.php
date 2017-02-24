@@ -3,10 +3,11 @@
 echo 'DSM States';
 
 // System Status (Value : 1 Normal, 2 Failed)
-$oids = snmpwalk_cache_multi_oid($device, 'systemStatus', array(), 'SYNOLOGY-SYSTEM-MIB');
-$cur_oid = '.1.3.6.1.4.1.6574.1.1.';
+$state = snmp_get($device, "systemStatus.0", "-Ovqe", 'SYNOLOGY-SYSTEM-MIB');
+$cur_oid = '.1.3.6.1.4.1.6574.1.1.0';
+$index = '0';
 
-if (is_array($oids)) {
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'systemStatusState';
     $state_index_id = create_state_index($state_name);
@@ -29,20 +30,19 @@ if (is_array($oids)) {
         }
     }
 
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'System Status', '1', '1', null, null, null, null, $entry['systemStatus'], 'snmp', $index);
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'System Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
 
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
-    }
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // Power Status OID (Value : 1 Normal, 2 Failed)
-$oids = snmpwalk_cache_multi_oid($device, 'powerStatus', array(), 'SYNOLOGY-SYSTEM-MIB');
-$cur_oid = '.1.3.6.1.4.1.6574.1.3.';
+$state = snmp_get($device, "powerStatus.0", "-Ovqe", 'SYNOLOGY-SYSTEM-MIB');
+$cur_oid = '.1.3.6.1.4.1.6574.1.3.0';
+$index = '0';
 
-if (is_array($oids)) {
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'powerStatusState';
     $state_index_id = create_state_index($state_name);
@@ -65,20 +65,19 @@ if (is_array($oids)) {
         }
     }
 
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'Power Status', '1', '1', null, null, null, null, $entry['powerStatus'], 'snmp', $index);
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Power Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
 
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
-    }
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // System Fan Status OID (Value : 1 Normal, 2 Failed)
-$oids = snmpwalk_cache_multi_oid($device, 'systemFanStatus', array(), 'SYNOLOGY-SYSTEM-MIB');
-$cur_oid = '.1.3.6.1.4.1.6574.1.4.1.';
+$state = snmp_get($device, "systemFanStatus.0", "-Ovqe", 'SYNOLOGY-SYSTEM-MIB');
+$cur_oid = '.1.3.6.1.4.1.6574.1.4.1.0';
+$index = '0';
 
-if (is_array($oids)) {
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'systemFanStatusState';
     $state_index_id = create_state_index($state_name);
@@ -101,20 +100,20 @@ if (is_array($oids)) {
         }
     }
 
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'System Fan Status', '1', '1', null, null, null, null, $entry['systemFanStatus'], 'snmp', $index);
 
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
-    }
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'System Fan Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
+
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // CPU Fan Status OID (Value : 1 Normal, 2 Failed)
-$oids = snmpwalk_cache_multi_oid($device, 'cpuFanStatus', array(), 'SYNOLOGY-SYSTEM-MIB');
-$cur_oid = '.1.3.6.1.4.1.6574.1.4.2.';
+$state = snmp_get($device, "cpuFanStatus.0", "-Ovqe", 'SYNOLOGY-SYSTEM-MIB');
+$cur_oid = '.1.3.6.1.4.1.6574.1.4.2.0';
+$index = '0';
 
-if (is_array($oids)) {
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'cpuFanStatusState';
     $state_index_id = create_state_index($state_name);
@@ -137,20 +136,19 @@ if (is_array($oids)) {
         }
     }
 
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'CPU Fan Status', '1', '1', null, null, null, null, $entry['cpuFanStatus'], 'snmp', $index);
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'CPU Fan Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
 
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
-    }
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // DSM Upgrade Available OID (Value : 1 Available, 2 Unavailable, 3 Connecting, 4 Disconnected, 5 Others)
-$oids = snmpwalk_cache_multi_oid($device, 'upgradeAvailable', array(), 'SYNOLOGY-SYSTEM-MIB');
-$cur_oid = '.1.3.6.1.4.1.6574.1.5.4.';
+$state = snmp_get($device, "upgradeAvailable.0", "-Ovqe", 'SYNOLOGY-SYSTEM-MIB');
+$cur_oid = '.1.3.6.1.4.1.6574.1.5.4.0';
+$index = '0';
 
-if (is_array($oids)) {
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upgradeAvailableState';
     $state_index_id = create_state_index($state_name);
@@ -174,13 +172,12 @@ if (is_array($oids)) {
             dbInsert($insert, 'state_translations');
         }
     }
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'Upgrade Availability', '1', '1', null, null, null, null, $entry['upgradeAvailable'], 'snmp', $index);
 
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
-    }
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Upgrade Availability', '1', '1', null, null, null, null, $state, 'snmp', $index);
+
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // RAID Status OID (Value : 1 Normal, 2 Repairing, 3 Migrating, 4 Expanding, 5 Deleting, 6 Creating, 7 RaidSyncing, 8 RaidParityChecking, 9 RaidAssembling, 10 Canceling, 11 Degrade, 12 Crashed)
