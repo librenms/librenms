@@ -1208,7 +1208,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="smseagle_to" class="col-sm-4 control-label">Mobiles</label>
                         <div class="col-sm-4">
-                            <textarea class="form-control" name="global-config-textarea" id="smseagle_to" placeholder="Enter the config options" data-config_id="'.$smseagle_url['config_id'].'" data-type="smseagle">'.$upd_mobiles.'</textarea>
+                            <textarea class="form-control" name="global-config-textarea" id="smseagle_to" placeholder="Enter mobile phone numbers, one per line" data-config_id="'.$smseagle_url['config_id'].'" data-type="smseagle">'.$upd_mobiles.'</textarea>
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>

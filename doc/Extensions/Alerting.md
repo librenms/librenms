@@ -29,6 +29,7 @@ Table of Content:
     - [osTicket](#transports-osticket)
     - [Microsoft Teams](#transports-msteams)
     - [Cisco Spark](#transports-ciscospark)
+    - [SMSEagle](#transports-smseagle)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -597,6 +598,24 @@ $config['alert']['transports']['ciscospark']['token'] = '1234567890QWERTYUIOP';
 $config['alert']['transports']['ciscospark']['roomid'] = '1234567890QWERTYUIOP';
 ```
 ~
+
+## <a name="transports-smseagle">SMSEagle</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+SMSEagle is a hardware SMS Gateway that can be used via their HTTP-API using a Username and password
+Please consult their documentation at [www.smseagle.eu](http://www.smseagle.eu)
+Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
+
+~~
+```php
+$config['alert']['transports']['smseagle']['url']   = 'ip.add.re.ss';
+$config['alert']['transports']['smseagle']['user']  = 'smseagle_user';
+$config['alert']['transports']['smseagle']['token'] = 'smseagle_user_password';
+$config['alert']['transports']['smseagle']['to'][]  = '+3534567890';
+$config['alert']['transports']['smseagle']['to'][]  = '0834567891';
+```
+~~
 
 # <a name="entities">Entities
 
