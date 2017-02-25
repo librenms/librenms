@@ -25,8 +25,8 @@ if (is_file($rrd_filename)) {
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'fetch',
-            'ds'       => 'Fetched',
+            'descr'    => 'Fetched',
+            'ds'       => 'fetch',
             'colour'   => 'AA6C39'
         ),
         array(
