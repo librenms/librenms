@@ -182,6 +182,7 @@ LibreNMS contributors:
 - Robert Penziol <rpenziol@pdx.edu> (rpenziol)
 - Stefan Behte <craig at haquarter.de> (craig)
 - Zane C. Bowers-Hadley <vvelox@vvelox.net> (vvelox)
+- Valentin Polonuyer <valik.vicious@gmail.com> (ValikVicious)
 
 Observium was written by:
 - Adam Armstrong

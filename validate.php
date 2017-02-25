@@ -164,7 +164,12 @@ if (mysqli_connect_error()) {
 // Test for MySQL Strict mode
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
 if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
-    print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+    //FIXME - Come back to this once other MySQL modes are fixed
+    //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+if (empty($strict_mode) === false) {
+    print_fail("You have not set sql_mode='' in your mysql config");
 }
 
 $ini_tz = ini_get('date.timezone');

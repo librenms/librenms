@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'dhcp-stats';
 $app_id = $app['app_id'];
 $options      = '-O qv';
@@ -9,17 +12,16 @@ $dhcpstats = snmp_walk($device, $oid, $options, $mib);
 list($dhcp_total,$dhcp_active,$dhcp_expired,$dhcp_released,$dhcp_abandoned,$dhcp_reset,$dhcp_bootp,$dhcp_backup,$dhcp_free) = explode("\n", $dhcpstats);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:dhcp_total:GAUGE:600:0:U',
-    'DS:dhcp_active:GAUGE:600:0:U',
-    'DS:dhcp_expired:GAUGE:600:0:U',
-    'DS:dhcp_released:GAUGE:600:0:U',
-    'DS:dhcp_abandoned:GAUGE:600:0:U',
-    'DS:dhcp_reset:GAUGE:600:0:U',
-    'DS:dhcp_bootp:GAUGE:600:0:U',
-    'DS:dhcp_backup:GAUGE:600:0:U',
-    'DS:dhcp_free:GAUGE:600:0:U',
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('dhcp_total', 'GAUGE', 0)
+    ->addDataset('dhcp_active', 'GAUGE', 0)
+    ->addDataset('dhcp_expired', 'GAUGE', 0)
+    ->addDataset('dhcp_released', 'GAUGE', 0)
+    ->addDataset('dhcp_abandoned', 'GAUGE', 0)
+    ->addDataset('dhcp_reset', 'GAUGE', 0)
+    ->addDataset('dhcp_bootp', 'GAUGE', 0)
+    ->addDataset('dhcp_backup', 'GAUGE', 0)
+    ->addDataset('dhcp_free', 'GAUGE', 0);
 
 $fields = array(
     'dhcp_total' => $dhcp_total,

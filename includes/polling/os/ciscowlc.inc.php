@@ -12,6 +12,8 @@
 
 global $config;
 
+use LibreNMS\RRD\RrdDefinition;
+
 $oids = 'entPhysicalModelName.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1';
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
@@ -45,10 +47,9 @@ foreach ($APstats as $key => $value) {
     $numClients += $value['bsnApIfNoOfUsers'];
 }
 
-$rrd_def = array(
-    'DS:NUMAPS:GAUGE:600:0:12500000000',
-    'DS:NUMCLIENTS:GAUGE:600:0:12500000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
+    ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
 $fields = array(
     'NUMAPS'     => $numAccessPoints,
@@ -61,7 +62,7 @@ data_update($device, 'ciscowlc', $tags, $fields);
 // also save the info about how many clients in the same place as the wireless module
 $radio = 1;
 $rrd_name = 'wificlients-radio'.$radio;
-$rrd_def = 'DS:wificlients:GAUGE:600:-273:10000';
+$rrd_def = RrdDefinition::make()->addDataset('wificlients', 'GAUGE', -273, 10000);
 
 $fields = array(
     'wificlients' => $numClients
@@ -109,15 +110,14 @@ foreach ($radios as $key => $value) {
     }
 
     $rrd_name = array('arubaap', $name.$radionum);
-    $rrd_def = array(
-        'DS:channel:GAUGE:600:0:200',
-        'DS:txpow:GAUGE:600:0:200',
-        'DS:radioutil:GAUGE:600:0:100',
-        'DS:nummonclients:GAUGE:600:0:500',
-        'DS:nummonbssid:GAUGE:600:0:200',
-        'DS:numasoclients:GAUGE:600:0:500',
-        'DS:interference:GAUGE:600:0:2000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('channel', 'GAUGE', 0, 200)
+        ->addDataset('txpow', 'GAUGE', 0, 200)
+        ->addDataset('radioutil', 'GAUGE', 0, 100)
+        ->addDataset('nummonclients', 'GAUGE', 0, 500)
+        ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+        ->addDataset('numasoclients', 'GAUGE', 0, 500)
+        ->addDataset('interference', 'GAUGE', 0, 2000);
 
     $fields = array(
         'channel'         => $channel,
