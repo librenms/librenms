@@ -24,6 +24,8 @@
  * @subpackage Polling
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'gpsd';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name]) && $app_id > 0) {
@@ -37,13 +39,12 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     }
 
     $rrd_name = array('app', $name, $app_id);
-    $rrd_def = array(
-        'DS:mode:GAUGE:600:0:4',
-        'DS:hdop:GAUGE:600:0:100',
-        'DS:vdop:GAUGE:600:0:100',
-        'DS:satellites:GAUGE:600:0:40',
-        'DS:satellites_used:GAUGE:600:0:40',
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('mode', 'GAUGE', 0, 4)
+        ->addDataset('hdop', 'GAUGE', 0, 100)
+        ->addDataset('vdop', 'GAUGE', 0, 100)
+        ->addDataset('satellites', 'GAUGE', 0, 40)
+        ->addDataset('satellites_used', 'GAUGE', 0, 40);
 
     $check_fields = array(
         'mode',

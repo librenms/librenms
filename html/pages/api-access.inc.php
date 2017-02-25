@@ -89,6 +89,19 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
       </div>
     </div>
   </div>
+   <div class="modal fade" id="display-qr" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
+     <div class="modal-dialog modal-sm">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+           <h5 class="modal-title" id="Create">Scan the QR code below</h5>
+         </div>
+         <div class="modal-body">
+           <div id="qrcode"></div>
+         </div>
+       </div>
+     </div>
+   </div>
 <?php
 echo '
   <div class="row">
@@ -116,6 +129,7 @@ echo '
         <tr>
           <th>User</th>
           <th>Token Hash</th>
+          <th>QR Code</th>
           <th>Description</th>
           <th>Disabled</th>
           <th>Remove</th>
@@ -132,6 +146,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
         <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
           <td>'.$api['token_hash'].'</td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api['token_hash'].'"><i class="fa fa-qrcode" ></i></button></td>
           <td>'.$api['description'].'</td>
           <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
           <td><button type="button" class="btn btn-danger btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
@@ -169,6 +184,14 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     token_id = $(event.relatedTarget).data('token_id');
     $("#token_id").val(token_id);
   });
+   $('#display-qr').on('show.bs.modal', function(event) {
+     token_hash = $(event.relatedTarget).data('token_hash');
+     if ($('#qrcode').length) {
+         $('#qrcode').empty();
+     }
+     new QRCode(document.getElementById("qrcode"), token_hash);
+   });
+
   $('#token-removal').click('', function(event) {
     event.preventDefault();
     token_id = $("#token_id").val();

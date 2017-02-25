@@ -1,6 +1,8 @@
 <?php
 
 // Plugins
+use LibreNMS\RRD\RrdDefinition;
+
 if (!empty($agent_data['munin'])) {
     echo 'Munin Plugins:';
     d_echo($agent_data['munin']);
@@ -92,7 +94,7 @@ if (!empty($agent_data['munin'])) {
 
                 $tags = array(
                     'plugin'   => $plugin_type,
-                    'rrd_def'  => 'DS:val:' . $data['type'] . ':600:U:U',
+                    'rrd_def'  => RrdDefinition::make()->addDataset('val', $data['type']),
                     'rrd_name' => $base_rrd_name . '_' . $name
                 );
                 data_update($device, 'munin-plugins', $tags, $fields);

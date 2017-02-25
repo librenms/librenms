@@ -9,7 +9,7 @@ if ($_GET['to']) {
 }
 
 if ($_GET['width']) {
-    $width = mres($_GET['width']);
+    $width = mres($vars['width']);
 }
 
 if ($config['trim_tobias']) {
@@ -17,7 +17,7 @@ if ($config['trim_tobias']) {
 }
 
 if ($_GET['height']) {
-    $height = mres($_GET['height']);
+    $height = mres($vars['height']);
 }
 
 if ($_GET['inverse']) {

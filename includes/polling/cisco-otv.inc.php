@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == "cisco") {
     // Define some error messages
     $error_vpn = array();
@@ -127,7 +129,7 @@ if ($device['os_group'] == "cisco") {
 
                 $label = $array['label'];
                 $rrd_name = array('cisco', 'otv', $label, 'vlan');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = RrdDefinition::make()->addDataset('count', 'GAUGE', 0);
 
                 $fields = array(
                     'count' => $count_vlan
@@ -174,7 +176,7 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    MAC Count: ".$count."\n");
 
                 $rrd_name = array('cisco', 'otv', $endpoint, 'mac');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = RrdDefinition::make()->addDataset('count', 'GAUGE', 0);
                 $fields = array(
                     'count' => $count
                 );

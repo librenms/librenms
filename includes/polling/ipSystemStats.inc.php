@@ -47,6 +47,8 @@
 // IP-MIB::ipSystemStatsRefreshRate.ipv4 = Gauge32: 30000 milli-seconds
 // IP-MIB::ipSystemStatsRefreshRate.ipv6 = Gauge32: 30000 milli-seconds
 
+use LibreNMS\RRD\RrdDefinition;
+
 $data = snmpwalk_cache_oid($device, 'ipSystemStats', null, 'IP-MIB');
 
 if ($data) {
@@ -94,13 +96,12 @@ if ($data) {
         }
 
         $rrd_name = array('ipSystemStats', $af);
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         $fields  = array();
 
         foreach ($oids as $oid) {
             $oid_ds      = str_replace('ipSystemStats', '', $oid);
-            $oid_ds      = substr($oid_ds, 0, 19);
-            $rrd_def[]   = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $rrd_def->addDataset($oid_ds, 'COUNTER');
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
                 $stats[$oid] = '0';
             }

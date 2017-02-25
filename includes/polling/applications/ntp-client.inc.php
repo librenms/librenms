@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ntp-client"
 $name = 'ntp-client';
 $app_id = $app['app_id'];
@@ -10,13 +13,12 @@ echo ' '.$name;
 list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclient);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:offset:GAUGE:600:-1000:1000',
-    'DS:frequency:GAUGE:600:-1000:1000',
-    'DS:jitter:GAUGE:600:-1000:1000',
-    'DS:noise:GAUGE:600:-1000:1000',
-    'DS:stability:GAUGE:600:-1000:1000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('offset', 'GAUGE', -1000, 1000)
+    ->addDataset('frequency', 'GAUGE', -1000, 1000)
+    ->addDataset('jitter', 'GAUGE', -1000, 1000)
+    ->addDataset('noise', 'GAUGE', -1000, 1000)
+    ->addDataset('stability', 'GAUGE', -1000, 1000);
 
 $fields = array(
     'offset' => $offset,

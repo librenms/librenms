@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 function get_service_status($device = null)
 {
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
@@ -157,14 +159,14 @@ function poll_service($service)
         }
 
         // rrd definition
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
             if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
-                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+                $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
                 // Not a counter, must be a gauge
-                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+                $rrd_def->addDataset($k, 'GAUGE', 0);
             }
         }
 

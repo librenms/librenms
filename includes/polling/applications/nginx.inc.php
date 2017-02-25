@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'nginx';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
@@ -15,13 +17,12 @@ list($active, $reading, $writing, $waiting, $req) = explode("\n", $nginx);
 d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req");
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:Requests:DERIVE:600:0:125000000000',
-    'DS:Active:GAUGE:600:0:125000000000',
-    'DS:Reading:GAUGE:600:0:125000000000',
-    'DS:Writing:GAUGE:600:0:125000000000',
-    'DS:Waiting:GAUGE:600:0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('Requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('Active', 'GAUGE', 0, 125000000000)
+    ->addDataset('Reading', 'GAUGE', 0, 125000000000)
+    ->addDataset('Writing', 'GAUGE', 0, 125000000000)
+    ->addDataset('Waiting', 'GAUGE', 0, 125000000000);
 
 $fields = array(
     'Requests' => $req,

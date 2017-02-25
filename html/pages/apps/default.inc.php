@@ -9,7 +9,7 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?', array($vars['app']));
+$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ? ORDER BY hostname', array($vars['app']));
 
 foreach ($app_devices as $app_device) {
     echo '<div class="panel panel-default">

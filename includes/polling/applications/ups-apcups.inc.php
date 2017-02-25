@@ -19,6 +19,8 @@
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
+use LibreNMS\RRD\RrdDefinition;
+
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-apcups"
 $name = 'ups-apcups';
 $app_id = $app['app_id'];
@@ -30,15 +32,14 @@ echo ' '.$name;
 list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nominal) = explode("\n", $ups_apcups);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:charge:GAUGE:600:0:100',
-    'DS:time_remaining:GAUGE:600:0:U',
-    'DS:battery_nominal:GAUGE:600:0:U',
-    'DS:battery_voltage:GAUGE:600:0:U',
-    'DS:input_voltage:GAUGE:600:0:U',
-    'DS:nominal_voltage:GAUGE:600:0:U',
-    'DS:load:GAUGE:600:0:100'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('charge', 'GAUGE', 0, 100)
+    ->addDataset('time_remaining', 'GAUGE', 0)
+    ->addDataset('battery_nominal', 'GAUGE', 0)
+    ->addDataset('battery_voltage', 'GAUGE', 0)
+    ->addDataset('input_voltage', 'GAUGE', 0)
+    ->addDataset('nominal_voltage', 'GAUGE', 0)
+    ->addDataset('load', 'GAUGE', 0, 100);
 
 $fields = array(
     'charge' => $charge,
