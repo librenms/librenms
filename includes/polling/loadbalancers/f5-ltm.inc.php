@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 // Define some error messages
 $error_poolaction = array();
 $error_poolaction[0] = "Unused";
@@ -78,13 +80,12 @@ if (count($components > 0)) {
         $rrd_name = array($type, $label, $hash);
 
         if ($type == 'f5-ltm-vs') {
-            $rrd_def = array(
-                'DS:pktsin:COUNTER:600:0:U',
-                'DS:pktsout:COUNTER:600:0:U',
-                'DS:bytesin:COUNTER:600:0:U',
-                'DS:bytesout:COUNTER:600:0:U',
-                'DS:totconns:COUNTER:600:0:U',
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('pktsin', 'COUNTER', 0)
+                ->addDataset('pktsout', 'COUNTER', 0)
+                ->addDataset('bytesin', 'COUNTER', 0)
+                ->addDataset('bytesout', 'COUNTER', 0)
+                ->addDataset('totconns', 'COUNTER', 0);
 
             $fields = array(
                 'pktsin' => $ltmVirtualServStatEntryPktsin['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.'.$UID],
@@ -111,10 +112,9 @@ if (count($components > 0)) {
                 $array['error'] = '';
             }
         } elseif ($type == 'f5-ltm-pool') {
-            $rrd_def = array(
-                'DS:minup:GAUGE:600:0:U',
-                'DS:currup:GAUGE:600:0:U',
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('minup', 'GAUGE', 0)
+                ->addDataset('currup', 'GAUGE', 0);
 
             $array['minup'] = $ltmPoolEntryMinup['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
             $array['minupstatus'] = $ltmPoolEntryMinupstatus['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$UID];
@@ -142,13 +142,12 @@ if (count($components > 0)) {
                 $array['error'] = '';
             }
         } elseif ($type == 'f5-ltm-poolmember') {
-            $rrd_def = array(
-                'DS:pktsin:COUNTER:600:0:U',
-                'DS:pktsout:COUNTER:600:0:U',
-                'DS:bytesin:COUNTER:600:0:U',
-                'DS:bytesout:COUNTER:600:0:U',
-                'DS:totconns:COUNTER:600:0:U',
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('pktsin', 'COUNTER', 0)
+                ->addDataset('pktsout', 'COUNTER', 0)
+                ->addDataset('bytesin', 'COUNTER', 0)
+                ->addDataset('bytesout', 'COUNTER', 0)
+                ->addDataset('totconns', 'COUNTER', 0);
 
             $array['state'] = $ltmPoolMbrStatusEntryState['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];
             $array['available'] = $ltmPoolMbrStatusEntryAvail['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$UID];

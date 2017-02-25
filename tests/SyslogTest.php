@@ -156,19 +156,19 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         // ---- PAM ----
         $this->checkSyslog(
             "1.1.1.1||authpriv||info||info||56||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
-            array('device_id'=>1, 'program'=>'PAM_UNIX(CRON:SESSION)', 'msg'=>'session opened for user librenms by (uid=0)')
+            array('device_id'=>1, 'program'=>'CRON', 'msg'=>'pam_unix(cron:session): session opened for user librenms by (uid=0)')
         );
         $this->checkSyslog(
             "1.1.1.1||authpriv||info||info||55||2016-02-28 00:23:34||pam_unix(sudo:session): session opened for user librenms by root (uid=0)||sudo",
-            array('device_id'=>1, 'program'=>'PAM_UNIX(SUDO:SESSION)', 'msg'=>'session opened for user librenms by root (uid=0)')
+            array('device_id'=>1, 'program'=>'SUDO', 'msg'=>'pam_unix(sudo:session): session opened for user librenms by root (uid=0)')
         );
         $this->checkSyslog(
             "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231||sshd",
-            array('device_id'=>1, 'program'=>'PAM_KRB5(SSHD:AUTH)', 'msg'=>'authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
+            array('device_id'=>1, 'program'=>'SSHD', 'msg'=>'pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
         );
         $this->checkSyslog(
             "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231||sshd",
-            array('device_id'=>1, 'program'=>'PAM_KRB5[SSHD:AUTH]', 'msg'=>'authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
+            array('device_id'=>1, 'program'=>'SSHD', 'msg'=>'pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
         );
 
         // ---- Postfix ----

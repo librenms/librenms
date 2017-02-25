@@ -99,6 +99,10 @@ $graphs['dhcp-stats'] = array(
      'stats',
 );
 
+$graphs['fail2ban'] = array(
+    'banned',
+);
+
 $graphs['freeswitch'] = array(
     'peak',
     'callsIn',
@@ -130,6 +134,10 @@ $graphs['gpsd'] = array(
 $graphs['exim-stats'] = array(
     'frozen',
     'queue'
+);
+
+$graphs['php-fpm'] = array(
+    'stats'
 );
 
 print_optionbar_start();

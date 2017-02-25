@@ -15,6 +15,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 function string_to_oid($string)
 {
     $oid = strlen($string);
@@ -255,6 +257,27 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }//end snmp_get()
 
+/**
+ * @param $device
+ * @return bool
+ */
+function snmp_check($device)
+{
+    $time_start = microtime(true);
+
+    $oid = '.1.3.6.1.2.1.1.2.0';
+    $options = '-Oqvn';
+    $cmd = gen_snmpget_cmd($device, $oid, $options);
+    exec($cmd, $data, $code);
+    d_echo("SNMP Check response code: $code".PHP_EOL);
+
+    recordSnmpStatistic('snmpget', $time_start);
+
+    if ($code === 0) {
+        return true;
+    }
+    return false;
+}//end snmp_check()
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -347,6 +370,22 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
         $oid               = trim($oid);
         $value             = trim($value);
         list($oid, $index) = explode('.', $oid, 2);
+        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+            $array[$index][$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_oid()
+
+function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
+{
+    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        list($index,) = explode('.', strrev($oid), 2);
         if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }
@@ -844,11 +883,15 @@ function snmp_translate($oid, $module, $mibdir = null, $device = array())
 } // snmp_translate
 
 
-/*
+/**
  * check if the type of the oid is a numeric type, and if so,
- * @return the name of RRD type that is best suited to saving it
+ * return the correct RrdDefinition
+ *
+ * @param string $oid
+ * @param array $mibdef
+ * @return RrdDefinition|false
  */
-function oid_rrd_type($oid, $mibdef)
+function oid_rrd_def($oid, $mibdef)
 {
     if (!isset($mibdef[$oid])) {
         return false;
@@ -865,15 +908,15 @@ function oid_rrd_type($oid, $mibdef)
 
         case 'INTEGER':
         case 'Integer32':
-            return 'GAUGE:600:U:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE');
 
         case 'Counter32':
         case 'Counter64':
-            return 'COUNTER:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'COUNTER', 0);
 
         case 'Gauge32':
         case 'Unsigned32':
-            return 'GAUGE:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE', 0);
     }
 
     return false;
@@ -955,15 +998,15 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
                 'numvalue'      => $numvalue,
             );
 
-            $type = oid_rrd_type($obj, $mibdef);
-            if ($type === false) {
+            $rrd_def = oid_rrd_def($obj, $mibdef);
+            if ($rrd_def === false) {
                 continue;
             }
 
             $usedoids[$index][$obj] = $val;
 
             $tags = array(
-                'rrd_def'       => array("DS:mibval:$type"),
+                'rrd_def'       => $rrd_def,
                 'rrd_name'      => array($mibname, $mibdef[$obj]['shortname'], $index),
                 'rrd_oldname'   => array($mibname, $mibdef[$obj]['object_type'], $index),
                 'index'         => $index,

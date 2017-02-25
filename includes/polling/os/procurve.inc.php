@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 list($hardware, $version, ) = explode(',', str_replace(', ', ',', $poll_device['sysDescr']));
 
 // Clean up hardware
@@ -34,7 +36,7 @@ $serial = trim(str_replace('"', '', $serial));
 $FdbAddressCount = snmp_get($device, 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
 
 if (is_numeric($FdbAddressCount)) {
-    $rrd_def = 'DS:value:GAUGE:600:-1:100000';
+    $rrd_def = RrdDefinition::make()->addDataset('value', 'GAUGE', -1, 100000);
 
     $fields = array(
         'value' => $FdbAddressCount,

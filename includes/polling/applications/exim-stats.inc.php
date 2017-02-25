@@ -19,6 +19,8 @@
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
+use LibreNMS\RRD\RrdDefinition;
+
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."exim-stats"
 $name = 'exim-stats';
 $app_id = $app['app_id'];
@@ -30,14 +32,13 @@ echo ' '.$name;
 list ($frozen, $queue) = explode("\n", $stats);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:frozen:GAUGE:600:0:U',
-    'DS:queue:GAUGE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('frozen', 'GAUGE', 0)
+    ->addDataset('queue', 'GAUGE', 0);
 
 $fields = array(
-    'frozen' => $frozen,
-    'queue' => $queue
+    'frozen' => intval(trim($frozen, '"')),
+    'queue' => intval(trim($queue, '"'))
 );
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
