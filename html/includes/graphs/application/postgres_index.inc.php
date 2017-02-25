@@ -43,8 +43,8 @@ if (is_file($rrd_filename)) {
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'idxblkshit',
-            'ds'       => 'Buffer Hits',
+            'descr'    => 'Buffer Hits',
+            'ds'       => 'idxblkshit',
             'colour'   => '28536C'
         )
     );
