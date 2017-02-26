@@ -520,7 +520,7 @@ In regards to the totals graphed there are two variables banned and firewalled. 
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
 
-#### Fail2ban
+#### Squid
 
 ##### SNMP Extend
 
