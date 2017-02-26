@@ -18,7 +18,6 @@ foreach ($config['nfsen_rrds'] as $nfsenrrds) {
     $rrd_filename=$nfsenrrds.$nfsenHostname.'/'.$vars['channel'].'.rrd';
 
     if (is_file($rrd_filename)) {
-
         $flowtypes = array('tcp', 'udp', 'icmp', 'other');
 
         $rrd_list   = array();
