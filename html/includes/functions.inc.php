@@ -103,6 +103,9 @@ function nicecase($item)
         case 'exim-stats':
             return 'EXIM Stats';
 
+        case 'php-fpm':
+            return 'PHP-FPM';
+
         default:
             return ucfirst($item);
     }
