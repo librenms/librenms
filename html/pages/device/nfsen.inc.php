@@ -23,7 +23,7 @@ foreach ($config['nfsen_rrds'] as $nfsenDir) {
             if (!$printedChannel) {
                 echo '|Channels:';
                 $printedChannel=1;
-            }else{
+            } else {
                 echo ',';
             }
             
@@ -45,7 +45,7 @@ if (!$vars['nfsen']) {
 
 if (is_file('pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php')) {
     include 'pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php';
-}else{
+} else {
     include 'pages/device/nfsen/general.inc.php';
 }
 
