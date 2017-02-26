@@ -140,6 +140,23 @@ $graphs['php-fpm'] = array(
     'stats'
 );
 
+$graphs['squid'] = array(
+    'memory',
+    'clients',
+    'cpuusage',
+    'objcount',
+    'filedescr',
+    'httpbw',
+    'http',
+    'server',
+    'serverbw',
+    'reqhit',
+    'bytehit',
+    'sysnumread',
+    'pagefaults',
+    'cputime',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
