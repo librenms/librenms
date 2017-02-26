@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device['device_id'])) as $mempool) {
     echo 'Mempool '.$mempool['mempool_descr'].': ';
 
@@ -20,10 +22,9 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     echo $percent.'% ';
 
     $rrd_name = array('mempool', $mempool_type, $mempool_index);
-    $rrd_def = array(
-        'DS:used:GAUGE:600:0:U',
-        'DS:free:GAUGE:600:0:U'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('used', 'GAUGE', 0)
+        ->addDataset('free', 'GAUGE', 0);
 
     $fields = array(
         'used' => $mempool['used'],
@@ -41,11 +42,11 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
                         );
 
     if (!empty($mempool['largestfree'])) {
-        $mempool['state']['mempool_largestfree'] = $mempool['largestfree'];
+        $mempool['state']['mempool_largestfree'] = set_numeric($mempool['largestfree']);
     }
 
     if (!empty($mempool['lowestfree'])) {
-        $mempool['state']['mempool_lowestfree'] = $mempool['lowestfree'];
+        $mempool['state']['mempool_lowestfree'] = set_numeric($mempool['lowestfree']);
     }
 
     dbUpdate($mempool['state'], 'mempools', '`mempool_id` = ?', array($mempool['mempool_id']));

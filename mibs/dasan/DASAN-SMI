@@ -1,0 +1,196 @@
+-- *****************************************************************
+-- DASAN-SMI.my:  Dasan Enterprise Structure of Management Information
+--
+-- April 2001, Seungdong Lee
+-- Nov 2001, Wonhee Lee 
+--
+-- Copyright (c) 2001 by Dasan Co., Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+DASAN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+	
+dasan MODULE-IDENTITY
+	LAST-UPDATED "200104190000Z"
+	ORGANIZATION "Dasan Co., Ltd."
+	CONTACT-INFO
+		"Dasan Co., Ltd."
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Dasan enterprise."
+	REVISION      "0104190000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 6296 } -- assigned by IANA
+
+dasanEvents OBJECT-IDENTITY
+  STATUS current
+	DESCRIPTION
+    "dasanEvents is the root OBJECT IDENTIFIER of EVENTS(or TRAPS).
+     Each EVENT(TRAP) is defined in Each Product MIB file." 
+  ::= { dasan 0 }
+
+dasanProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in DASAN-PRODUCTS-MIB."
+	::= { dasan 1 }
+
+local OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 MIBS were built."
+	::= { dasan 2 }
+
+temporary OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 experiments were
+		placed."
+	::= { dasan 3 }
+
+pakmon OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"reserved for pakmon"
+	::= { dasan 4 }
+
+workgroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by the Workgroup Business Unit"
+	::= { dasan 5 }
+
+otherEnterprises OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"otherEnterprises provides a root object identifier
+		from which mibs produced by other companies may be
+		placed.  mibs produced by other enterprises are
+		typicially implemented with the object identifiers
+		as defined in the mib, but if the mib is deemed to
+		be uncontrolled, we may reroot the mib at this
+		subtree in order to have a controlled version."
+	::= { dasan 6 }
+
+dasanAgentCapability OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanAgentCapability provides a root object identifier
+		from which AGENT-CAPABILITIES values may be assigned."
+	::= { dasan 7 }
+
+dasanConfig OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanConfig is the main subtree for configuration mibs."
+	::= { dasan 8 }
+
+dasanMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanMgmt is the main subtree for new mib development."
+	::= { dasan 9 }
+
+dasanExperiment OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanExperiment provides a root object identifier
+		from which experimental mibs may be temporarily
+		based.  mibs are typicially based here if they
+		fall in one of two categories
+		1) are IETF work-in-process mibs which have not
+		been assigned a permanent object identifier by
+		the IANA.
+		2) are dasan work-in-process which has not been
+		assigned a permanent object identifier by the
+		dasan assigned number authority, typicially because
+		the mib is not ready for deployment.
+
+		NOTE WELL:  support for mibs in the dasanExperiment
+		subtree will be deleted when a permanent object
+		identifier assignment is made."
+	::= { dasan 10 }
+
+dasanAdmin OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanAdmin is reserved for administratively assigned
+		OBJECT IDENTIFIERS, i.e. those not associated with MIB
+		objects"
+	::= { dasan 11 }
+
+dasanModules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanModules provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { dasan 12 }
+
+lightstream OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by Lightstream"
+	::= { dasan 13 }
+
+dasanworks OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"dasanworks provides a root object identifier beneath
+		which mibs applicable to the dasanWorks family of network
+		management products are defined."
+	::= { dasan 14 }
+
+newport OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by the former Newport Systems
+		Solutions, now a portion of the Access Business Unit."
+	::= { dasan 15 }
+
+dasanPartnerProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+		"dasanPartnerProducts is the root OBJECT IDENTIFIER from
+		which partner sysObjectID values may be assigned. Such 
+		sysObjectID values are composed of the dasanPartnerProducts
+		prefix, followed by a single identifier that is unique for 
+		each partner, followed by the value of sysObjectID of the
+		dasan product from which partner product is derived.  Note
+		that the chassisPartner MIB object defines the value of the
+		identifier assigned to each partner."
+        ::= { dasan 16 }
+
+dasanPolicy OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "dasanPolicy is the root of the dasan-assigned OID
+                subtree for use with Policy Management."
+         ::= { dasan 17 }         
+         
+         
+sleMgmt OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "SLE Mgmt."
+         ::= { dasan 101 }         
+
+sleV2Mgmt OBJECT-IDENTITY
+	 STATUS  current
+	 DESCRIPTION
+	 "sleV2Management."
+	 ::= { dasan 102 }
+
+dsShe OBJECT IDENTIFIER ::= { otherEnterprises 2 }
+
+END

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 function get_service_status($device = null)
 {
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
@@ -43,7 +45,7 @@ function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ign
         $ip = $device['hostname'];
     }
 
-    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked');
+    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}');
     return dbInsert($insert, 'services');
 }
 
@@ -105,7 +107,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
         add_service($device, $service, "(Auto discovered) $service");
-        log_event('Autodiscovered service: type '.mres($service), $device, 'service');
+        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
     }
     echo "$service ";
@@ -152,19 +154,19 @@ function poll_service($service)
             $DS[$k] = $v['uom'];
         }
         d_echo("Service DS: "._json_encode($DS)."\n");
-        if ($service['service_ds'] == "") {
+        if (($service['service_ds'] == "{}") || ($service['service_ds'] == "")) {
             $update['service_ds'] = json_encode($DS);
         }
 
         // rrd definition
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
             if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
-                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+                $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
                 // Not a counter, must be a gauge
-                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+                $rrd_def->addDataset($k, 'GAUGE', 0);
             }
         }
 
@@ -206,7 +208,7 @@ function check_service($command)
     $valid_uom = array ('us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B');
 
     // Make our command safe.
-    $command = escapeshellcmd($command);
+    $command = 'LC_NUMERIC="C" '. escapeshellcmd($command);
 
     // Run the command and return its response.
     exec($command, $response_array, $status);

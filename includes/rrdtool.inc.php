@@ -275,7 +275,6 @@ function rrdtool_escape($string, $length = null)
 {
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
-    $result = str_replace('%', '%%', $result);          # double percent signs
     if (is_numeric($length)) {
         $extra = substr_count($string, ':', 0, $length);
         $result = substr(str_pad($result, $length), 0, ($length + $extra));
@@ -301,6 +300,7 @@ function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    $host = str_replace(':', '_', trim($host, '[]'));
     return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 
@@ -371,7 +371,7 @@ function rrdtool_tune($type, $filename, $max)
  * rrdtool backend implementation of data_update
  *
  * Tags:
- *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_def     RrdDefinition
  *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
  *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
  *   rrd_step             int: rrd step, defaults to 300
@@ -386,7 +386,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
     global $config;
 
     $rrd_name = $tags['rrd_name'] ?: $measurement;
-    $step = $tags['rrd_step'] ?: 300;
+    $step = $tags['rrd_step'] ?: $config['rrd']['step'];
     $oldname = $tags['rrd_oldname'];
     if (!empty($oldname)) {
         rrd_file_rename($device, $oldname, $rrd_name);
@@ -399,10 +399,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
         $rrd = rrd_name($device['hostname'], $rrd_name);
     }
 
-    if ($tags['rrd_def'] && !rrdtool_check_rrd_exists($rrd)) {
-        $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
-        // add the --step and the rra definitions to the command
-        $newdef = "--step $step " . implode(' ', $rrd_def) . $config['rrd_rra'];
+    if (isset($tags['rrd_def']) && !rrdtool_check_rrd_exists($rrd)) {
+        $newdef = "--step $step " . $tags['rrd_def'] . $config['rrd_rra'];
         rrdtool('create', $rrd, $newdef);
     }
 
@@ -424,10 +422,10 @@ function rrd_file_rename($device, $oldname, $newname)
     $newrrd = rrd_name($device['hostname'], $newname);
     if (is_file($oldrrd) && !is_file($newrrd)) {
         if (rename($oldrrd, $newrrd)) {
-            log_event("Renamed $oldrrd to $newrrd", $device, "poller");
+            log_event("Renamed $oldrrd to $newrrd", $device, "poller", 1);
             return true;
         } else {
-            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller");
+            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller", 5);
             return false;
         }
     } else {

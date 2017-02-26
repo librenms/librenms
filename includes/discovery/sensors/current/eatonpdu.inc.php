@@ -10,14 +10,12 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'eatonpdu') {
-    $data = snmpwalk_cache_multi_oid($device, 'outletCurrent', array(), 'EATON-EPDU-MIB');
-    $descr = snmpwalk_cache_multi_oid($device, 'outletName', array(), 'EATON-EPDU-MIB');
-    if (is_array($data)) {
-        $cur_oid = '.1.3.6.1.4.1.534.6.6.7.6.4.1.3.';
-        foreach ($data as $index => $entry) {
-            $i++;
-            discover_sensor($valid['sensor'], 'current', $device, $cur_oid.$index, $i, 'eatonpdu', $descr[$index]['outletName'], '1000', '1', null, null, null, null, $data[$index]['outletCurrent'], 'snmp', $index);
-        }
+$data = snmpwalk_cache_multi_oid($device, 'outletCurrent', array(), 'EATON-EPDU-MIB');
+$descr = snmpwalk_cache_multi_oid($device, 'outletName', array(), 'EATON-EPDU-MIB');
+if (is_array($data)) {
+    $cur_oid = '.1.3.6.1.4.1.534.6.6.7.6.4.1.3.';
+    foreach ($data as $index => $entry) {
+        $i++;
+        discover_sensor($valid['sensor'], 'current', $device, $cur_oid.$index, $i, 'eatonpdu', $descr[$index]['outletName'], '1000', '1', null, null, null, null, $data[$index]['outletCurrent'], 'snmp', $index);
     }
 }

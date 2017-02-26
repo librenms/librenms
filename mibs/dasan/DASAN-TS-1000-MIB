@@ -1,0 +1,312 @@
+DASAN-TS-1000-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Integer32, TimeTicks, mib-2, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, PhysAddress, TruthValue, RowStatus, TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF 
+	--NetworkAddress, IpAddress  FROM RFC1155-SMI 
+	dasanMgmt       FROM DASAN-SMI
+	ifIndex 		FROM IF-MIB
+	dsSwitchModules,dsPortModuleIndex FROM DASAN-SWITCH-MIB;
+
+
+-- Definition Grammer
+
+dsTs1000MIB MODULE-IDENTITY
+    	LAST-UPDATED	"200603210000Z"
+    	ORGANIZATION	"DASAN Co., Ltd."
+    	CONTACT-INFO	"DASAN Co., Ltd."
+    	DESCRIPTION     "."
+    ::= { dsSwitchModules 15 }     
+    
+    
+--
+-- Info Tables
+--
+ 
+dsTs1000Info OBJECT IDENTIFIER ::= { dsTs1000MIB 1 }
+
+--
+-- Base ID
+--
+dsTs1000InfoTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsTs1000InfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsTs1000Info 1 }
+
+dsTs1000InfoEntry	OBJECT-TYPE
+		SYNTAX		DsTs1000InfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsTs1000InfoTable 1 }        
+		
+		
+		-- OCTET STRING (SIZE (6))
+		
+
+DsTs1000InfoEntry ::= SEQUENCE {
+		dsTs1000TPLinkStatus		INTEGER,
+		dsTs1000FiberLinkStatus		INTEGER,
+		dsTs1000PowerStatus			INTEGER,
+		dsTs1000LoopbackStatus		INTEGER,
+		dsTs1000TroubleStatus		INTEGER,
+		dsTs1000FEFIStatus			INTEGER,
+		dsTs1000OptionBStatus		INTEGER,
+		dsTs1000SpeedStatus			INTEGER,
+		dsTs1000DuplexStatus		INTEGER,
+		dsTs1000NegoStatus			INTEGER,
+		dsTs1000IFNumStatus			INTEGER,
+		dsTs1000VendorCode			OCTET STRING,
+		dsTs1000ModelNumber			OCTET STRING				
+	}
+
+dsTs1000TPLinkStatus OBJECT-TYPE
+       SYNTAX	   INTEGER  { unknown(0), up(1), down(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of Tx link."
+       ::= { dsTs1000InfoEntry 1 }
+
+dsTs1000FiberLinkStatus OBJECT-TYPE
+       SYNTAX	   INTEGER   { unknown(0), up(1), down(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of Fiber."
+       ::= { dsTs1000InfoEntry 2 }
+
+dsTs1000PowerStatus OBJECT-TYPE
+       SYNTAX	   INTEGER   { up(1), down(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of power."
+       ::= { dsTs1000InfoEntry 3 }
+
+dsTs1000LoopbackStatus OBJECT-TYPE
+       SYNTAX	   INTEGER   { unknown(0), test(1), inactive(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of loopback test."
+       ::= { dsTs1000InfoEntry 4 }
+ 
+dsTs1000TroubleStatus OBJECT-TYPE
+       SYNTAX      INTEGER    { unknown(0), normal(1), abnormal(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of media converter."
+       ::= { dsTs1000InfoEntry 5 }
+
+dsTs1000FEFIStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { unknown(0), alarm-fefi(1), oam-frame(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Whether support of not about Fefi."
+       ::= { dsTs1000InfoEntry 6 }	   
+       
+dsTs1000OptionBStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { unknown(0), support(1), not-support(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Whether support of net about the option B of media converter."
+       ::= { dsTs1000InfoEntry 7 }
+	    
+dsTs1000SpeedStatus OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The speed. bps "
+       ::= { dsTs1000InfoEntry 8 }
+	    
+dsTs1000DuplexStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { unknown(0), full(1), half(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The duplex."
+       ::= { dsTs1000InfoEntry 9 }
+      
+dsTs1000NegoStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { unknown(0), auto(1), force(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The status of nego."
+       ::= { dsTs1000InfoEntry 10 }
+       
+
+dsTs1000IFNumStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { unknown(0), one(1), greater(2) }
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The number of terminal ports."
+       ::= { dsTs1000InfoEntry 11 }       
+      
+dsTs1000VendorCode OBJECT-TYPE
+	   SYNTAX      OCTET STRING
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The OUI of vendor."
+       ::= { dsTs1000InfoEntry 12 }
+
+dsTs1000ModelNumber OBJECT-TYPE
+	   SYNTAX      OCTET STRING
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "The number of model."
+       ::= { dsTs1000InfoEntry 13 }   
+       
+       
+--
+-- Loopback
+--
+-- dsTs1000Loopback  OBJECT IDENTIFIER ::=  { dsTs1000Info 2 }     
+
+dsTs1000LoopbackTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsTs1000LoopbackEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsTs1000Info 2 }
+
+dsTs1000LoopbackEntry	OBJECT-TYPE
+		SYNTAX		DsTs1000LoopbackEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsTs1000LoopbackTable 1 }        
+		
+
+DsTs1000LoopbackEntry ::= SEQUENCE {
+		dsTs1000LpMode		INTEGER,
+		dsTs1000LpStart		OCTET STRING,
+		dsTs1000LpEnd		OCTET STRING,
+		dsTs1000LpCount		INTEGER,
+		dsTs1000LpSuccess	INTEGER,
+		dsTs1000LpFail		INTEGER,
+		dsTs1000LpStatus	INTEGER
+	}
+
+dsTs1000LpMode OBJECT-TYPE
+	   SYNTAX      INTEGER { unknown(0), available(1), unavailable(2) }
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 1 }   
+       
+       
+dsTs1000LpStart OBJECT-TYPE
+	   SYNTAX      OCTET STRING
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 2 }   
+       
+dsTs1000LpEnd OBJECT-TYPE
+	   SYNTAX      OCTET STRING
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 3 }   
+       
+dsTs1000LpCount OBJECT-TYPE
+	   SYNTAX      INTEGER
+	   MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 4 }
+
+dsTs1000LpSuccess OBJECT-TYPE
+	   SYNTAX      INTEGER
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 5 }
+
+dsTs1000LpFail OBJECT-TYPE
+	   SYNTAX      INTEGER
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 6 }
+       
+dsTs1000LpStatus OBJECT-TYPE
+	   SYNTAX      INTEGER  { test(1) }
+	   MAX-ACCESS  read-write   
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsTs1000LoopbackEntry 7 }
+              
+dsTs1000Notification  OBJECT IDENTIFIER ::=  { dsTs1000Info 3 }   
+
+
+dsTs1000TpLinkStatusChanged NOTIFICATION-TYPE
+    OBJECTS {
+      dsTs1000TPLinkStatus 
+    }
+    STATUS current   
+    DESCRIPTION
+             "."
+    ::= { dsTs1000Notification 1 }
+    
+dsTs1000PowerStatusChanged NOTIFICATION-TYPE
+    OBJECTS {
+      dsTs1000PowerStatus 
+    }
+    STATUS current   
+    DESCRIPTION
+             "."
+    ::= { dsTs1000Notification 2 }
+    
+dsTs1000LoopbackStatusChanged NOTIFICATION-TYPE
+    OBJECTS {
+      dsTs1000LoopbackStatus 
+    }
+    STATUS current   
+    DESCRIPTION
+             "."
+    ::= { dsTs1000Notification 3 }
+
+
+dsTs1000FEFIChanged NOTIFICATION-TYPE
+    OBJECTS {
+      dsTs1000FEFIStatus 
+    }
+    STATUS current   
+    DESCRIPTION
+             "."
+    ::= { dsTs1000Notification 4 }
+
+
+dsTs1000OptionBStatusChanged NOTIFICATION-TYPE
+    OBJECTS {
+      dsTs1000OptionBStatus 
+    }
+    STATUS current   
+    DESCRIPTION
+             "."
+    ::= { dsTs1000Notification 5 }
+
+
+END

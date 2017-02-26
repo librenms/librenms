@@ -23,22 +23,19 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+$oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.5', array());
 
-if ($device['os'] == 'sinetica') {
-    $oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.5', array());
+foreach ($oids as $oid => $data) {
+    $current_id = substr($oid, strrpos($oid, '.') + 1);
 
-    foreach ($oids as $oid => $data) {
-        $current_id = substr($oid, strrpos($oid, '.') + 1);
-
-        $current_oid = ".$oid";
-        $descr = 'Output';
-        if (count($oids) > 1) {
-            $descr .= " $current_id";
-        }
-        $current = current($data);
-        $type = 'sinetica';
-        $index = '4.4.1.5.' . $current_id;
-
-        discover_sensor($valid['sensor'], 'load', $device, $current_oid, $index, $type, $descr, 1, 1, null, null, null, null, $current);
+    $current_oid = ".$oid";
+    $descr = 'Output';
+    if (count($oids) > 1) {
+        $descr .= " $current_id";
     }
+    $current = current($data);
+    $type = 'sinetica';
+    $index = '4.4.1.5.' . $current_id;
+
+    discover_sensor($valid['sensor'], 'load', $device, $current_oid, $index, $type, $descr, 1, 1, null, null, null, null, $current);
 }

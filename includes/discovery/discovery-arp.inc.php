@@ -53,7 +53,7 @@ foreach (dbFetchRows($sql, array($deviceid)) as $entry) {
 
     if (!match_network($config['nets'], $ip)) {
         echo 'i';
-        log_event("Ignored $ip", $deviceid, 'interface', $if);
+        log_event("Ignored $ip", $deviceid, 'interface', 3, $if);
         continue;
     }
 

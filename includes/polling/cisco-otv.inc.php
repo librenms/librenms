@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == "cisco") {
     // Define some error messages
     $error_vpn = array();
@@ -56,10 +58,10 @@ if ($device['os_group'] == "cisco") {
     $error_overlay[5] = "createAndWait";
     $error_overlay[6] = "destroy";
 
-    $module = 'Cisco-OTV';
+    $tmp_module = 'Cisco-OTV';
 
     $component = new LibreNMS\Component();
-    $options['filter']['type'] = array('=',$module);
+    $options['filter']['type'] = array('=',$tmp_module);
     $options['filter']['disabled'] = array('=',0);
     $components = $component->getComponents($device['device_id'], $options);
 
@@ -127,7 +129,7 @@ if ($device['os_group'] == "cisco") {
 
                 $label = $array['label'];
                 $rrd_name = array('cisco', 'otv', $label, 'vlan');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = RrdDefinition::make()->addDataset('count', 'GAUGE', 0);
 
                 $fields = array(
                     'count' => $count_vlan
@@ -174,7 +176,7 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    MAC Count: ".$count."\n");
 
                 $rrd_name = array('cisco', 'otv', $endpoint, 'mac');
-                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $rrd_def = RrdDefinition::make()->addDataset('count', 'GAUGE', 0);
                 $fields = array(
                     'count' => $count
                 );
@@ -189,5 +191,12 @@ if ($device['os_group'] == "cisco") {
     } // end if count components
 
     // Clean-up after yourself!
-    unset($components, $component, $module);
+    unset(
+        $components,
+        $component,
+        $tmp_module,
+        $error_vpn,
+        $error_aed,
+        $error_overlay
+    );
 }

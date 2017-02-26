@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'cisco') {
     $cefs   = array();
     $cefs   = snmpwalk_cache_threepart_oid($device, 'CISCO-CEF-MIB::cefSwitchingStatsEntry', $cefs, 'CISCO-CEF-MIB');
@@ -46,11 +48,10 @@ if ($device['os_group'] == 'cisco') {
                     $cef_entry = dbFetchRow('SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?', array($device['device_id'], $entity, $afi, $index));
 
                     $rrd_name = array('cefswitching', $entity, $afi, $index);
-                    $rrd_def = array(
-                        'DS:drop:DERIVE:600:0:1000000',
-                        'DS:punt:DERIVE:600:0:1000000',
-                        'DS:hostpunt:DERIVE:600:0:1000000'
-                    );
+                    $rrd_def = RrdDefinition::make()
+                        ->addDataset('drop', 'DERIVE', 0, 1000000)
+                        ->addDataset('punt', 'DERIVE', 0, 1000000)
+                        ->addDataset('hostpunt', 'DERIVE', 0, 1000000);
 
                     // Copy HC to non-HC if they exist
                     if (is_numeric($cef_stat['cefSwitchingHCDrop'])) {
@@ -102,3 +103,10 @@ if ($device['os_group'] == 'cisco') {
 
     echo "\n";
 } //end if
+
+unset(
+    $cefs,
+    $polled,
+    $cefs_query,
+    $entity_array
+);

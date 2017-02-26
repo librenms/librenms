@@ -75,6 +75,11 @@ if (!file_exists($config['install_dir'].'/config.php')) {
     exit;
 }
 
+$git_found = check_git_exists();
+if ($git_found !== true) {
+    print_warn('Unable to locate git. This should probably be installed.');
+}
+
 $versions = version_info();
 $cur_sha = $versions['local_sha'];
 
@@ -103,9 +108,11 @@ if (!($username === 'root' || (isset($config['user']) && $username === $config['
     print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
-if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
-    $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-    print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
+if ($git_found === true) {
+    if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
+        $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
+        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
+    }
 }
 
 // Check php modules we use to make sure they are loaded
@@ -147,7 +154,7 @@ if (isset($config['user'])) {
 }
 
 // Run test on MySQL
-$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
+$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
 if (mysqli_connect_error()) {
     print_fail('Error connecting to your database '.mysqli_connect_error());
 } else {
@@ -157,7 +164,12 @@ if (mysqli_connect_error()) {
 // Test for MySQL Strict mode
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
 if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
-    print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+    //FIXME - Come back to this once other MySQL modes are fixed
+    //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+if (empty($strict_mode) === false) {
+    print_fail("You have not set sql_mode='' in your mysql config");
 }
 
 $ini_tz = ini_get('date.timezone');
@@ -206,10 +218,14 @@ if ($space_check < 1) {
 }
 
 // Check programs
-$bins = array('fping','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
+$bins = array('fping','fping6','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
+$suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
-    if (!is_file($config[$bin])) {
-        print_fail("$bin location is incorrect or bin not installed");
+    $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
+    if (!$cmd) {
+        print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
+    } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
+        print_fail("$bin should be suid, please chmod u+s $cmd");
     }
 }
 
@@ -229,42 +245,45 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
 }
 
 // check discovery last run
-if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
+if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
     print_fail('Discovery has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 hours) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
-    print_fail("Discovery has not run in the last 24 hours, check the cron job");
+} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 hour) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+    print_fail("Discovery has not completed in the last 24 hours, check the cron job");
 }
 
 // check poller
-if (dbFetchCell('SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
+if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
     print_fail('The poller has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` >= DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") == 0) {
     print_fail("The poller has not run in the last 5 minutes, check the cron job");
 } elseif (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
-    print_warn("Some devices have not been polled in the last 5 minutes, check your poll log");
+    print_warn("Some devices have not been polled in the last 5 minutes.
+        You may have performance issues. Check your poll log and see: http://docs.librenms.org/Support/Performance/");
     print_list($devices, "\t %s\n");
 }
 
 if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
-    print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.\n        Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
+    print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.
+        Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
     print_list($devices, "\t %s\n");
 }
 
-if ($versions['local_branch'] != 'master') {
-    print_warn("Your local git branch is not master, this will prevent automatic updates.");
-}
+if ($git_found === true) {
+    if ($versions['local_branch'] != 'master') {
+        print_warn("Your local git branch is not master, this will prevent automatic updates.");
+    }
 
-// check for modified files
-$modifiedcmd = 'git diff --name-only --exit-code';
-if ($username === 'root') {
-    $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+    // check for modified files
+    $modifiedcmd = 'git diff --name-only --exit-code';
+    if ($username === 'root') {
+        $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+    }
+    exec($modifiedcmd, $cmdoutput, $code);
+    if ($code !== 0 && !empty($cmdoutput)) {
+        print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
+        print_list($cmdoutput, "\t %s\n");
+    }
 }
-exec($modifiedcmd, $cmdoutput, $code);
-if ($code !== 0 && !empty($cmdoutput)) {
-    print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-    print_list($cmdoutput, "\t %s\n");
-}
-
 // Modules test
 $modules = explode(',', $options['m']);
 foreach ($modules as $module) {

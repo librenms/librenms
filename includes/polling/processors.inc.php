@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($device['device_id'])) as $processor) {
     echo 'Processor '.$processor['processor_descr'].'... ';
 
@@ -14,7 +16,7 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
     }
 
     $rrd_name = array('processor', $processor_type, $processor_index);
-    $rrd_def = 'DS:usage:GAUGE:600:-273:1000';
+    $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
     $proc       = trim(str_replace('"', '', $proc));
     list($proc) = preg_split('@\ @', $proc);
@@ -35,3 +37,5 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
 
     dbUpdate(array('processor_usage' => $proc), 'processors', '`processor_id` = ?', array($processor['processor_id']));
 }//end foreach
+
+unset($processor);

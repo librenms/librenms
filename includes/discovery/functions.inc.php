@@ -18,28 +18,29 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 {
     global $config;
 
-    if (!empty($config['mydomain']) && isDomainResolves($hostname . '.' . $config['mydomain'])) {
-        $dst_host = $hostname . '.' . $config['mydomain'];
-    } else {
-        $dst_host = $hostname;
+    if (!empty($config['mydomain'])) {
+        $full_host = rtrim($hostname, '.') . '.' . $config['mydomain'];
+        if (isDomainResolves($full_host)) {
+            $hostname = $full_host;
+        }
     }
 
-    d_echo("discovering $dst_host\n");
+    d_echo("discovering $hostname\n");
 
-    $ip = gethostbyname($dst_host);
+    $ip = gethostbyname($hostname);
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
         // $ip isn't a valid IP so it must be a name.
-        if ($ip == $dst_host) {
-            d_echo("name lookup of $dst_host failed\n");
-            log_event("$method discovery of " . $dst_host  . " failed - Check name lookup", $device['device_id'], 'discovery');
+        if ($ip == $hostname) {
+            d_echo("name lookup of $hostname failed\n");
+            log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery', 5);
  
             return false;
         }
-    } elseif (filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
+    } elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
         // gethostbyname returned a valid $ip, was $dst_host an IP?
         if ($config['discovery_by_ip'] === false) {
-            d_echo('Discovery by IP disabled, skipping ' . $dst_host);
-            log_event("$method discovery of " . $dst_host . " failed - Discovery by IP disabled", $device['device_id'], 'discovery');
+            d_echo('Discovery by IP disabled, skipping ' . $hostname);
+            log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
  
             return false;
         }
@@ -47,7 +48,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
     d_echo("ip lookup result: $ip\n");
 
-    $dst_host = rtrim($dst_host, '.');
+    $hostname = rtrim($hostname, '.');
     // remove trailing dot
     if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
         d_echo("$ip in an excluded network - skipping\n");
@@ -57,7 +58,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
     if (match_network($config['nets'], $ip)) {
         try {
-            $remote_device_id = addHost($dst_host, '', '161', 'udp', $config['distributed_poller_group']);
+            $remote_device_id = addHost($hostname, '', '161', 'udp', $config['distributed_poller_group']);
             $remote_device = device_by_id_cache($remote_device_id, 1);
             echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
             discover_device($remote_device);
@@ -69,16 +70,16 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
                     $extra_log = ' (port ' . $int['label'] . ') ';
                 }
 
-                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
+                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery', 1);
             } else {
-                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery');
+                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', 5);
             }
 
             return $remote_device_id;
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $dst_host . " ($ip) failed - " . $e->getMessage());
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), null, null, 5);
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
@@ -94,31 +95,32 @@ function discover_device($device, $options = null)
     $valid = array();
     // Reset $valid array
     $attribs = get_dev_attribs($device['device_id']);
+    $device['attribs'] = $attribs;
     $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
+    $response = device_is_up($device, true);
+
+    if ($response['status'] !== '1') {
+        return;
+    }
+
     if ($device['os'] == 'generic') {
         // verify if OS has changed from generic
         $device['os'] = getHostOS($device);
+
         if ($device['os'] != 'generic') {
             echo "\nDevice os was updated to " . $device['os'] . '!';
             dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
         }
     }
 
-    // Set type to a predefined type for the OS if it's not already set
-    if ($device['type'] == 'unknown' || $device['type'] == '') {
-        if ($config['os'][$device['os']]['type']) {
-            $device['type'] = $config['os'][$device['os']]['type'];
-        }
-    }
-
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
-        echo ' (' . $device['os_group'] . ')';
+    load_os($device);
+    if (is_array($config['os'][$device['os']]['register_mibs'])) {
+        register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
     }
 
     echo "\n";
@@ -142,13 +144,16 @@ function discover_device($device, $options = null)
         if ($force_module === true ||
             $attribs['discover_' . $module] ||
             ($os_module_status && !isset($attribs['discover_' . $module])) ||
-            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))) {
+            ($module_status && !isset($os_module_status) && !isset($attribs['discover_' . $module]))
+        ) {
             $module_start = microtime(true);
+            $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds\n", $module, $module_time);
+            $module_mem = (memory_get_usage() - $start_memory);
+            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
@@ -168,7 +173,7 @@ function discover_device($device, $options = null)
     $device_run = ($device_end - $device_start);
     $device_time = substr($device_run, 0, 5);
 
-    dbUpdate(array('last_discovered' => array('NOW()'), 'type' => $device['type'], 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
+    dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
 
     echo "Discovered in $device_time seconds\n";
 
@@ -184,6 +189,16 @@ function discover_device($device, $options = null)
 
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
 {
+
+    $low_limit      = set_null($low_limit);
+    $low_warn_limit = set_null($low_warn_limit);
+    $warn_limit     = set_null($warn_limit);
+    $high_limit     = set_null($high_limit);
+
+    if (!is_numeric($divisor)) {
+        $divisor  = 1;
+    }
+
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n");
 
     if (is_null($low_warn_limit) && !is_null($warn_limit)) {
@@ -239,7 +254,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         d_echo("( $inserted inserted )\n");
 
         echo '+';
-        log_event('Sensor Added: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', $inserted);
+        log_event('Sensor Added: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', 3, $inserted);
     } else {
         $sensor_entry = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', array($class, $device['device_id'], $type, $index));
 
@@ -274,7 +289,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'H';
-            log_event('Sensor High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $high_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -283,7 +298,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'L';
-            log_event('Sensor Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
@@ -292,7 +307,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WH';
-            log_event('Sensor Warn High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $warn_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Warn High Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
@@ -301,7 +316,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             d_echo("( $updated updated )\n");
 
             echo 'WL';
-            log_event('Sensor Warn Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_warn_limit . ')', $device, 'sensor', $sensor_id);
+            log_event('Sensor Warn Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
         if ($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'] && $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] && $entPhysicalIndex == $sensor_entry['entPhysicalIndex']) {
@@ -317,7 +332,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
-            log_event('Sensor Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', $sensor_id);
+            log_event('Sensor Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr), $device, 'sensor', 3, $sensor_id);
             d_echo("( $updated updated )\n");
         }
     }//end if
@@ -441,7 +456,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
                     dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', array($entry['sensor_id']));
                 }
                 dbDelete('sensors', '`sensor_id` =  ?', array($entry['sensor_id']));
-                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', $sensor_id);
+                log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', 3, $sensor_id);
             }
 
             unset($oid);
@@ -452,7 +467,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 
 //end check_valid_sensors()
 
-function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
 {
     d_echo("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 
@@ -461,7 +476,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
         d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), 'juniAtmVp', $inserted);
+        log_event('Juniper ATM VP Added: port ' . mres($port_id) . ' vp ' . mres($vp_id) . ' descr' . mres($vp_descr), $device, 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
@@ -512,7 +527,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         } else {
             $update_data = array(
                 'remote_platform' => $remote_platform,
-                'remote_version' => $remote_version,
                 'remote_version' => $remote_version,
                 'local_device_id' => $local_device_id,
                 'remote_device_id' => $remote_device_id,
@@ -595,7 +609,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
             $inserted = dbInsert($insert_data, 'processors');
             echo '+';
-            log_event('Processor added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'processor', $inserted);
+            log_event('Processor added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'processor', 3, $inserted);
         } else {
             echo '.';
             $update_data = array(
@@ -641,7 +655,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
 
             $inserted = dbInsert($insert_data, 'mempools');
             echo '+';
-            log_event('Memory pool added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'mempool', $inserted);
+            log_event('Memory pool added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'mempool', 3, $inserted);
         } else {
             echo '.';
             $update_data = array(
@@ -668,10 +682,10 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 {
     d_echo("Discover Toner: $oid, $index, $type, $descr, $capacity_oid, $capacity, $current\n");
 
-    if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_capacity_oid` =?', array($device['device_id'], $type, $index, $capacity_oid)) == '0') {
+    if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_oid` =?', array($device['device_id'], $type, $index, $oid)) == '0') {
         $inserted = dbInsert(array('device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current), 'toner');
         echo '+';
-        log_event('Toner added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'toner', $inserted);
+        log_event('Toner added: type ' . mres($type) . ' index ' . mres($index) . ' descr ' . mres($descr), $device, 'toner', 3, $inserted);
     } else {
         $toner_entry = dbFetchRow('SELECT * FROM `toner` WHERE `device_id` = ? AND `toner_type` = ? AND `toner_index` =?', array($device['device_id'], $type, $index));
         if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'] && $capacity_oid == $toner_entry['toner_capacity_oid']) {
@@ -682,7 +696,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
         }
     }
 
-    $valid[$type][$index] = 1;
+    $valid[$type][$oid] = 1;
 }
 
 //end discover_toner()
@@ -707,7 +721,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
             echo 'N';
         } else {
             //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_network', '`ipv6_network` = ?', array($ipv6_network));
+            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
             echo 'n';
         }
 
@@ -719,7 +733,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
             echo '+';
         } else {
             //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_address', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
+            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
             echo '.';
         }
 
@@ -889,7 +903,15 @@ function get_device_divisor($device, $serial, $sensor)
         if ($sensor == 'current' || $sensor == 'frequencies') {
             if (version_compare($serial, '12.06.0068', '>=')) {
                 $divisor = 10;
-            } elseif (version_compare($serial, '12.04.0055', '>=')) {
+            } elseif (version_compare($serial, '12.04.0055', '=')) {
+                $divisor = 10;
+            } elseif (version_compare($serial, '12.04.0056', '>=')) {
+                $divisor = 1;
+            }
+        } elseif ($sensor == 'load') {
+            if (version_compare($serial, '12.06.0064', '=')) {
+                $divisor = 10;
+            } else {
                 $divisor = 1;
             }
         } elseif ($sensor == 'voltages') {
@@ -948,4 +970,34 @@ function ignore_storage($descr)
     }
 
     return $deny;
+}
+
+/**
+ * @param $types
+ * @param $device
+ * @param array $pre_cache
+ */
+function sensors($types, $device, $valid, $pre_cache = array())
+{
+    global $config;
+    foreach ((array)$types as $type) {
+        echo ucfirst($type) . ': ';
+
+        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
+
+        if (is_file($dir . $device['os_group'] . '.inc.php')) {
+            include_once $dir . $device['os_group'] . '.inc.php';
+        }
+        if (is_file($dir . $device['os'] . '.inc.php')) {
+            include_once $dir . $device['os'] . '.inc.php';
+        }
+        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+            if (is_file($dir  . '/rfc1628.inc.php')) {
+                include_once $dir . '/rfc1628.inc.php';
+            }
+        }
+        d_echo($valid['sensor'][$type]);
+        check_valid_sensors($device, $type, $valid['sensor']);
+        echo "\n";
+    }
 }

@@ -23,5 +23,9 @@ foreach (dbFetchRows($sql) as $test_mempool) {
     unset($mempool_type);
 }
 
-unset($valid_mempool);
+unset(
+    $valid_mempool,
+    $sql,
+    $test_mempool
+);
 echo "\n";

@@ -14,7 +14,7 @@ foreach ($ports as $port) {
     $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
 
     if ($port['in_errors'] > 0 || $port['out_errors'] > 0) {
-        $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", errors);
+        $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", errors);
     } else {
         $error_img = '';
     }

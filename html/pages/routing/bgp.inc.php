@@ -240,14 +240,6 @@ if ($_SESSION['userlevel'] < '5') {
             }
         }
 
-        $peerhost = dbFetchRow('SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', array($peer['bgpPeerIdentifier']));
-
-        if ($peerhost) {
-            $peername = generate_device_link($peerhost, shorthost($peerhost['hostname']));
-        } else {
-            unset($peername);
-        }
-
         if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
             $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
         } else {
@@ -307,8 +299,8 @@ if ($_SESSION['userlevel'] < '5') {
             <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
             <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
             <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
-            Updates <img src='images/16/arrow_down.png' align=absmiddle /> ".format_si($peer['bgpPeerInUpdates'])."
-            <img src='images/16/arrow_up.png' align=absmiddle /> ".format_si($peer['bgpPeerOutUpdates']).'</td></tr>';
+            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."
+            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerOutUpdates']).'</td></tr>';
 
         unset($invalid);
         switch ($vars['graph']) {

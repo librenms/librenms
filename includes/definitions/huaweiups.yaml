@@ -1,0 +1,7 @@
+os: huaweiups
+text: 'Huawei UPS'
+group: ups
+type: power
+icon: huawei
+over:
+    - { graph: device_current, text: Current }

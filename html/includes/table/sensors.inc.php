@@ -51,7 +51,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         $sensor['sensor_current'] = 'NaN';
     } else {
         if ($sensor['sensor_current'] >= $sensor['sensor_limit']) {
-            $alert = '<img src="images/16/flag_red.png" alt="alert" />';
+            $alert = '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>';
         } else {
             $alert = '';
         }

@@ -39,7 +39,9 @@ foreach ($menu_options as $option => $text) {
     $sep = ' | ';
 }
 unset($sep);
-echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><img src="images/16/add.png" border="0" align="absmiddle"> Add Service</a></div>';
+if (is_admin() === true) {
+    echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
+}
 print_optionbar_end();
 ?>
     <div class="row col-sm-12"><span id="message"></span></div>
@@ -51,31 +53,32 @@ if (count($services) > '0') {
 <?php
 foreach ($services as $service) {
     $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
-    if ($service['service_status'] == 0) {
-        $status = "<span class='green'>Ok</span>";
-    } elseif ($service['service_status'] == 1) {
-        $status = "<span class='red'>Warning</span>";
-    } elseif ($service['service_status'] == 2) {
-        $status = "<span class='red'>Critical</span>";
+    if ($service['service_status'] == '2') {
+        $status = "<span class='col-sm-12 label label-danger label-border'><b>".$service['service_type']."</b></span>";
+    } elseif ($service['service_status'] == '1') {
+        $status = "<span class='col-sm-12 label label-warning label-border'><b>".$service['service_type']."</b></span>";
+    } elseif ($service['service_status'] == '0') {
+        $status = "<span class='col-sm-12 label label-success label-border'><b>".$service['service_type']."</b></span>";
     } else {
-        $status = "<span class='grey'>Unknown</span>";
+        $status = "<span class='col-sm-12 label label-info label-border'><b>".$service['service_type']."</b></span>";
     }
 ?>
     <tr id="row_<?php echo $service['service_id']?>">
-        <td>
-            <div class="col-sm-12">
-                <div class="col-sm-2"><?php echo $service['service_type']?></div>
-                <div class="col-sm-6"><?php echo $service['service_desc']?></div>
-                <div class="col-sm-2"><?php echo $status?></div>
-                <div class="pull-right">
-                    <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
-                </div>
+    <td class="col-sm-12">
+        <div class="col-sm-1"><?php echo $status?></div>
+        <div class="col-sm-2 text-muted"><?php echo formatUptime(time() - $service['service_changed'])?></div>
+        <div class="col-sm-2 text-muted"><?php echo $service['service_desc']?></div>
+        <div class="col-sm-5"><?php echo nl2br(trim($service['service_message']))?></div>
+        <div class="col-sm-2">
+            <div class="pull-right">
+<?php
+if (is_admin() === true) {
+    echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
+        <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+}
+?>
             </div>
-            <div class="col-sm-12">
-                <div class="col-sm-8"><?php echo nl2br(trim($service['service_message']))?></div>
-                <div class="col-sm-4"><?php echo formatUptime(time() - $service['service_changed'])?></div>
-            </div>
+        </div>
 <?php
 if ($vars['view'] == 'details') {
     // if we have a script for this check, use it.
@@ -96,18 +99,18 @@ if ($vars['view'] == 'details') {
         $graph_array['service'] = $service['service_id'];
         $graph_array['ds'] = $k;
 ?>
+        <tr><td colspan="5">
             <div class="col-sm-12">
 <?php
         include 'includes/print-graphrow.inc.php';
 ?>
             </div>
+        </td></tr>
 <?php
     }
 }
 }
 ?>
-                </td>
-            </tr>
         </table>
 <?php
 } else {

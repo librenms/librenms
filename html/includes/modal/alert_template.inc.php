@@ -102,10 +102,6 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = button.data('template_id');
     var action = button.data('template_action');
-    $('#template').val('');
-    $('#line').val('');
-    $('#value').val('');
-    $('#name').val('');
     if(action == 'edit') {
         $('#template_id').val(template_id);
         $.ajax({
@@ -124,6 +120,10 @@ $('#alert-template').on('show.bs.modal', function (event) {
 });
 $('#alert-template').on('hide.bs.modal', function(event) {
     $('#template_id').val('');
+    $('#template').val('');
+    $('#line').val('');
+    $('#value').val('');
+    $('#name').val('');
 });
 
 $('#create-template').click('', function(e) {

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", array($device['device_id']));
 
 if (is_array($ipmi_rows)) {
@@ -22,6 +24,7 @@ if (is_array($ipmi_rows)) {
 
         foreach (explode("\n", $results) as $row) {
             list($desc, $value, $type, $status) = explode(',', $row);
+            $desc = trim($desc, ' ');
             $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['value'] = $value;
             $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['unit'] = $type;
         }
@@ -35,7 +38,7 @@ if (is_array($ipmi_rows)) {
             echo $sensor . " $unit\n";
 
             $rrd_name = get_sensor_rrd_name($device, $ipmisensors);
-            $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
 
             $fields = array(
                 'sensor' => $sensor,

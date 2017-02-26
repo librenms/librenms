@@ -76,7 +76,7 @@ if ($callback_status == 1) {
 }
 
 if (extension_loaded('curl')) {
-    $callback = 'Opt in to send anonymous usage statistics to LibreNMS? <input type="checkbox" data-on-text="Yes" data-off-text="No" data-size="mini" name="statistics" '.$stats_checked.'>';
+    $callback = '<label for="callback"> Opt in to send anonymous usage statistics to LibreNMS?</label><br /><input type="checkbox" id="callback" data-size="normal" name="statistics" '.$stats_checked.'>';
 } else {
     $callback = "PHP Curl module isn't installed, please install this, restart your web service and refresh this page.";
 }
@@ -84,10 +84,14 @@ if (extension_loaded('curl')) {
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed'>
-      <tr>
-        <td colspan='4'><span class='bg-danger'>$callback</span><br />
-        Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
       <tr>";
+
+if (is_admin() === true) {
+    echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
+          Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
+        <tr>
+    ";
+}
 
 if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' && $callback_status != 2) {
     echo "
@@ -98,40 +102,40 @@ if (dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'") != '' &&
 }
 
 echo "
-        <td><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td class='text-right'>$stat_devices</td>
-        <td><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td class='text-right'>$stat_ports</td>
+        <td><i class='fa fa-fw fa-server fa-lg icon-theme'  aria-hidden='true'></i> <b>Devices</b></td><td class='text-right'>$stat_devices</td>
+        <td><i class='fa fa-fw fa-link fa-lg icon-theme'  aria-hidden='true'></i> <b>Ports</b></td><td class='text-right'>$stat_ports</td>
       </tr>
       <tr>
-        <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td class='text-right'>$stat_ipv4_addy</td>
-        <td><img src='images/icons/ipv4.png' class='optionicon'> <b>IPv4 Networks</b></td><td class='text-right'>$stat_ipv4_nets</td>
+        <td><i class='fa fa-fw fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Addresses<b></td><td class='text-right'>$stat_ipv4_addy</td>
+        <td><i class='fa fa-fw fa-battery-empty fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv4 Networks</b></td><td class='text-right'>$stat_ipv4_nets</td>
       </tr>
       <tr>
-        <td><img src='images/icons/ipv6.png'  class='optionicon'> <b>IPv6 Addresses<b></td><td class='text-right'>$stat_ipv6_addy</td>
-        <td><img src='images/icons/ipv6.png' class='optionicon'> <b>IPv6 Networks</b></td><td class='text-right'>$stat_ipv6_nets</td>
+        <td><i class='fa fa-fw fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Addresses<b></td><td class='text-right'>$stat_ipv6_addy</td>
+        <td><i class='fa fa-fw fa-battery-full fa-lg icon-theme'  aria-hidden='true'></i> <b>IPv6 Networks</b></td><td class='text-right'>$stat_ipv6_nets</td>
        </tr>
      <tr>
-        <td><img src='images/icons/services.png'  class='optionicon'> <b>Services<b></td><td class='text-right'>$stat_services</td>
-        <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td class='text-right'>$stat_apps</td>
+        <td><i class='fa fa-fw fa-cogs fa-lg icon-theme'  aria-hidden='true'></i> <b>Services<b></td><td class='text-right'>$stat_services</td>
+        <td><i class='fa fa-fw fa-cubes fa-lg icon-theme'  aria-hidden='true'></i> <b>Applications</b></td><td class='text-right'>$stat_apps</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/processor.png' class='optionicon'> <b>Processors</b></td><td class='text-right'>$stat_processors</td>
-        <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td class='text-right'>$stat_memory</td>
+        <td><i class='fa fa-fw fa-microchip fa-lg icon-theme'  aria-hidden='true'></i> <b>Processors</b></td><td class='text-right'>$stat_processors</td>
+        <td><i class='fa fa-fw fa-braille fa-lg icon-theme'  aria-hidden='true'></i> <b>Memory</b></td><td class='text-right'>$stat_memory</td>
       </tr>
       <tr>
-        <td><img src='images/icons/storage.png' class='optionicon'> <b>Storage</b></td><td class='text-right'>$stat_storage</td>
-        <td><img src='images/icons/diskio.png' class='optionicon'> <b>Disk I/O</b></td><td class='text-right'>$stat_diskio</td>
+        <td><i class='fa fa-fw fa-database fa-lg icon-theme'  aria-hidden='true'></i> <b>Storage</b></td><td class='text-right'>$stat_storage</td>
+        <td><i class='fa fa-fw fa-hdd-o fa-lg icon-theme'  aria-hidden='true'></i> <b>Disk I/O</b></td><td class='text-right'>$stat_diskio</td>
       </tr>
       <tr>
-        <td><img src='images/icons/inventory.png' class='optionicon'> <b>HR-MIB</b></td><td class='text-right'>$stat_hrdev</td>
-        <td><img src='images/icons/inventory.png' class='optionicon'> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
+        <td><i class='fa fa-fw fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>HR-MIB</b></td><td class='text-right'>$stat_hrdev</td>
+        <td><i class='fa fa-fw fa-cube fa-lg icon-theme'  aria-hidden='true'></i> <b>Entity-MIB</b></td><td class='text-right'>$stat_entphys</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/syslog.png' class='optionicon'> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
-        <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
+        <td><i class='fa fa-fw fa-clone fa-lg icon-theme'  aria-hidden='true'></i> <b>Syslog Entries</b></td><td class='text-right'>$stat_syslog</td>
+        <td><i class='fa fa-fw fa-bookmark fa-lg icon-theme'  aria-hidden='true'></i> <b>Eventlog Entries</b></td><td class='text-right'>$stat_events</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/sensors.png' class='optionicon'> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
-        <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
+        <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme'  aria-hidden='true'></i> <b>Sensors</b></td><td class='text-right'>$stat_sensors</td>
+        <td><i class='fa fa-fw fa-print fa-lg icon-theme'  aria-hidden='true'></i> <b>Toner</b></td><td class='text-right'>$stat_toner</td>
       </tr>
     </table>
 </div>
@@ -176,7 +180,7 @@ echo "
       <a href="http://www.librenms.org/">Web site</a> |
       <a href="https://github.com/librenms/">GitHub</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
+      <a href="https://community.librenms.org">Community Forum</a> |
       <a href="http://twitter.com/librenms">Twitter</a> |
       <a href="http://www.librenms.org/changelog.html">Changelog</a> |
       <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>

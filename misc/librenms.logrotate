@@ -1,0 +1,9 @@
+# /etc/logrotate.d/librenms
+/opt/librenms/logs/*.log {
+    weekly
+    rotate 6
+    compress
+    delaycompress
+    missingok
+    notifempty
+}

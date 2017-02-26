@@ -111,15 +111,14 @@ if (isset($config['page_title'])) {
 <?php
 if (empty($config['favicon'])) {
 ?>
-  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/favicon-152.png">
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/favicon-144.png">
-  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/favicon-120.png">
-  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/favicon-114.png">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
-  <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
-  <link rel="icon" href="images/favicon-32.png" sizes="32x32">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="msapplication-TileImage" content="images/favicon-144.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="images/manifest.json">
+  <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <meta name="msapplication-config" content="images/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
 <?php
 } else {
     echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
@@ -140,8 +139,8 @@ if (empty($config['favicon'])) {
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
+  <link href="<?php echo($config['stylesheet']);  ?>?ver=291727419" rel="stylesheet" type="text/css" />
+  <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417639" rel="stylesheet" type="text/css" />
 <?php
 
 foreach ((array)$config['webui']['custom_css'] as $custom_css) {
@@ -164,6 +163,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
     <?php
     if ($config['enable_lazy_load'] === true) {
     ?>
@@ -299,7 +299,7 @@ if ($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "
     <div class="row">
       <div class="col-md-12 text-center">
 <?php
-echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" class="red">' . $config['project_name'].'</a>.</h5>');
+echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" rel="noopener" class="red">' . $config['project_name'].'</a>.</h5>');
 ?>
       </div>
     </div>
@@ -335,28 +335,28 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
     echo('<script type="text/javascript">
         $(document).ready(function() {
 
-           $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
+           $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
            var Countdown = {
                sec: '. $config['page_refresh'] .',
 
                Start: function() {
                    var cur = this;
                    this.interval = setInterval(function() {
-                       $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
+                       $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
                        cur.sec -= 1;
                        display_time = cur.sec;
                        if (display_time == 0) {
                            location.reload();
                        }
                        if (display_time % 1 === 0 && display_time <= 300) {
-                           $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw\"></i> Refresh in " + display_time);
+                           $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + display_time);
                        }
                    }, 1000);
                },
 
                Pause: function() {
                    clearInterval(this.interval);
-                   $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw\"></i> Resume");
+                   $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw fa-lg\"></i> Resume");
                    delete this.interval;
                },
 
@@ -387,7 +387,7 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
     var no_refresh = ' . var_export((bool)$no_refresh, true) . ';
     $(document).ready(function() {
         $("#countdown_timer").html("Refresh disabled");
-        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i>");
+        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i>");
         $("#countdown_timer_status").click("", function(event) {
             event.preventDefault();
         });

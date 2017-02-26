@@ -1,0 +1,66 @@
+PEAR PACKAGE: Console_Color
+Version: 0.0.2
+Author: Stefan Walk <post@fuer-et.de>
+License: PHP License
+
+Console_Color is a simple class to use ANSI Colorcodes.
+Of all the functions, you probably only want to use convert() and escape(). 
+They are easier to use. However, if you want to access colorcodes more
+directly, look into the other functions.
+
+Class method list:
+color   - Returns an ANSI-Controlcode
+fgcolor - Returns an ANSI-Controlcode for foreground color
+bgcolor - Returns an ANSI-Controlcode for background color
+style   - Returns an ANSI-Controlcode for text style (bold, underlined...)
+convert - Transforms Colorcodes like %y into ANSI Control codes
+escape  - Escape %s in text so they don't get interpreted as colorcodes
+
+
+Console_Color::color() - Returns an ANSI-Controlcode
+  Takes 1 to 3 Arguments: either 1 to 3 strings containing the name of the
+  FG Color, style and BG color, or one array with the indices color, style
+  or background.
+
+Console_Color::fgcolor() - Returns an ANSI-Controlcode for foreground color
+  Takes the name of a foreground color as an argument and returns the ANSI
+  control code.
+  
+Console_Color:bfgcolor() - Returns an ANSI-Controlcode for background color
+  Takes the name of a background color as an argument and returns the ANSI
+  control code.
+  
+Console_Color::fgcolor() - Returns an ANSI-Controlcode for text style
+  Takes the name of a text style as an argument and returns the ANSI
+  control code.
+
+Console_Color::convert() - Transform Colorcodes into ANSI Control Codes  
+  Converts colorcodes in the format %y (for yellow) into ansi-control
+  codes. The conversion table is: ('bold' meaning 'light' on some
+  terminals). It's almost the same conversion table irssi uses.
+  
+                 text      text            background
+     ------------------------------------------------
+     %k %K %0    black     dark grey       black
+     %r %R %1    red       bold red        red
+     %g %G %2    green     bold green      green
+     %y %Y %3    yellow    bold yellow     yellow
+     %b %B %4    blue      bold blue       blue
+     %m %M %5    magenta   bold magenta    magenta
+     %p %P       magenta (think: purple)
+     %c %C %6    cyan      bold cyan       cyan
+     %w %W %7    white     bold white      white
+     %F     Blinking, Flashing
+     %U     Underline
+     %8     Reverse
+     %_,%9  Bold
+     %n     Resets the color
+     %%     A single %
+
+  First param is the string to convert, second is an optional flag if
+  colors should be used. It defaults to true, if set to false, the
+  colorcodes will just be removed (And %% will be transformed into %)
+  The transformed string is returned.
+  
+Console_Color::escape() - Escapes % so they don't get interpreted as color codes
+  Takes a string as an argument and returns the escaped string.

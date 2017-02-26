@@ -17,6 +17,9 @@ $features = 'build-'.$data[0]['vmwProdBuild'];
 $hardware = snmp_get($device, 'entPhysicalDescr.1', '-OsvQU', 'ENTITY-MIB');
 $serial   = snmp_get($device, 'entPhysicalSerialNum.1', '-OsvQU', 'ENTITY-MIB');
 
+# Clean up Generic hardware descriptions
+$hardware = rewrite_generic_hardware($hardware);
+
 /*
  * CONSOLE: Start the VMware discovery process.
  */
@@ -79,7 +82,9 @@ foreach ($db_info_list as $db_info) {
         if ($vm_info[$property] != $db_info[$property]) {
             // FIXME - this should loop building a query and then run the query after the loop (bad geert!)
             dbUpdate(array($property => $vm_info[$property]), 'vminfo', '`id` = ?', array($db_info['id']));
-            log_event($db_info['vmwVmDisplayName'].' ('.preg_replace('/^vmwVm/', '', $property).') -> '.$vm_info[$property], $device);
+            if ($db_info['vmwVmDisplayName'] != null) {
+                log_event($db_info['vmwVmDisplayName'] . ' (' . preg_replace('/^vmwVm/', '', $property) . ') -> ' . $vm_info[$property], $device, null, 3);
+            }
         }
     }
 }//end foreach

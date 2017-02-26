@@ -1,5 +1,6 @@
 <?php
 
+use Phpass\PasswordHash;
 
 function authenticate($username, $password)
 {
@@ -138,21 +139,21 @@ function get_userid($username)
 }//end get_userid()
 
 
-function deluser($username)
+function deluser($userid)
 {
-    dbDelete('bill_perms', '`user_name` =  ?', array($username));
-    dbDelete('devices_perms', '`user_name` =  ?', array($username));
-    dbDelete('ports_perms', '`user_name` =  ?', array($username));
-    dbDelete('users_prefs', '`user_name` =  ?', array($username));
-    dbDelete('users', '`user_name` =  ?', array($username));
+    dbDelete('bill_perms', '`user_id` =  ?', array($userid));
+    dbDelete('devices_perms', '`user_id` =  ?', array($userid));
+    dbDelete('ports_perms', '`user_id` =  ?', array($userid));
+    dbDelete('users_prefs', '`user_id` =  ?', array($userid));
+    dbDelete('users', '`user_id` =  ?', array($userid));
 
-    return dbDelete('users', '`username` =  ?', array($username));
+    return dbDelete('users', '`user_id` =  ?', array($userid));
 }//end deluser()
 
 
 function get_userlist()
 {
-    return dbFetchRows('SELECT * FROM `users`');
+    return dbFetchRows('SELECT * FROM `users` ORDER BY `username`');
 }//end get_userlist()
 
 

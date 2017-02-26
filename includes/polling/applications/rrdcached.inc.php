@@ -25,6 +25,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 echo ' rrdcached';
 
 $data = "";
@@ -38,9 +40,11 @@ if ($agent_data['app'][$name]) {
 
     $sock = fsockopen($device['hostname'], 42217, $errno, $errstr, 5);
 
-    if (!$sock && $device['hostname'] == 'localhost') {
+    if (!$sock) {
         if (file_exists('/var/run/rrdcached.sock')) {
             $sock = fsockopen('unix:///var/run/rrdcached.sock');
+        } elseif (file_exists('/var/run/rrdcached/rrdcached.sock')) {
+            $sock = fsockopen('unix:///var/run/rrdcached/rrdcached.sock');
         } elseif (file_exists('/run/rrdcached.sock')) {
             $sock = fsockopen('unix:///run/rrdcached.sock');
         } elseif (file_exists('/tmp/rrdcached.sock')) {
@@ -68,17 +72,16 @@ if ($agent_data['app'][$name]) {
 
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:queue_length:GAUGE:600:0:U',
-    'DS:updates_received:COUNTER:600:0:U',
-    'DS:flushes_received:COUNTER:600:0:U',
-    'DS:updates_written:COUNTER:600:0:U',
-    'DS:data_sets_written:COUNTER:600:0:U',
-    'DS:tree_nodes_number:GAUGE:600:0:U',
-    'DS:tree_depth:GAUGE:600:0:U',
-    'DS:journal_bytes:COUNTER:600:0:U',
-    'DS:journal_rotate:COUNTER:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('queue_length', 'GAUGE', 0)
+    ->addDataset('updates_received', 'COUNTER', 0)
+    ->addDataset('flushes_received', 'COUNTER', 0)
+    ->addDataset('updates_written', 'COUNTER', 0)
+    ->addDataset('data_sets_written', 'COUNTER', 0)
+    ->addDataset('tree_nodes_number', 'GAUGE', 0)
+    ->addDataset('tree_depth', 'GAUGE', 0)
+    ->addDataset('journal_bytes', 'COUNTER', 0)
+    ->addDataset('journal_rotate', 'COUNTER', 0);
 
 $fields = array();
 foreach (explode("\n", $data) as $line) {

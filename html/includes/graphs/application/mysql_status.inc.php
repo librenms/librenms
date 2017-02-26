@@ -25,12 +25,12 @@ $array = array(
 
 $i = 0;
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $vars => $ds) {
+    foreach ($array as $var => $ds) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        if (is_array($vars)) {
-            $rrd_list[$i]['descr'] = $vars['descr'];
+        if (is_array($var)) {
+            $rrd_list[$i]['descr'] = $var['descr'];
         } else {
-            $rrd_list[$i]['descr'] = $vars;
+            $rrd_list[$i]['descr'] = $var;
         }
 
         $rrd_list[$i]['descr'] = str_replace('_', ' ', $rrd_list[$i]['descr']);

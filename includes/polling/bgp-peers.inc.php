@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($config['enable_bgp']) {
     $peers = dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id']));
 
@@ -135,23 +137,22 @@ if ($config['enable_bgp']) {
             if ($bgpPeerFsmEstablishedTime) {
                 if (!(is_array($config['alerts']['bgp']['whitelist']) && !in_array($peer['bgpPeerRemoteAs'], $config['alerts']['bgp']['whitelist'])) && ($bgpPeerFsmEstablishedTime < $peer['bgpPeerFsmEstablishedTime'] || $bgpPeerState != $peer['bgpPeerState'])) {
                     if ($peer['bgpPeerState'] == $bgpPeerState) {
-                        log_event('BGP Session Flap: '.$peer['bgpPeerIdentifier'].' (AS'.$peer['bgpPeerRemoteAs'].')', $device, 'bgpPeer', $bgpPeer_id);
+                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 4, $bgpPeer_id);
                     } elseif ($bgpPeerState == 'established') {
-                        log_event('BGP Session Up: '.$peer['bgpPeerIdentifier'].' (AS'.$peer['bgpPeerRemoteAs'].')', $device, 'bgpPeer', $bgpPeer_id);
+                        log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 1, $bgpPeer_id);
                     } elseif ($peer['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Down: '.$peer['bgpPeerIdentifier'].' (AS'.$peer['bgpPeerRemoteAs'].')', $device, 'bgpPeer', $bgpPeer_id);
+                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 5, $bgpPeer_id);
                     }
                 }
             }
 
             $peer_rrd_name = safename('bgp-'.$peer['bgpPeerIdentifier']);
-            $peer_rrd_def = array(
-                'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerOutTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerEstablished:GAUGE:600:0:U'
-            );
+            $peer_rrd_def = RrdDefinition::make()
+                ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerOutTotal', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerInTotal', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerEstablished', 'GAUGE', 0);
 
             $fields = array(
                 'bgpPeerOutUpdates'    => $bgpPeerOutUpdates,
@@ -170,10 +171,10 @@ if ($config['enable_bgp']) {
 
             $peer['update']['bgpPeerState']              = $bgpPeerState;
             $peer['update']['bgpPeerAdminStatus']        = $bgpPeerAdminStatus;
-            $peer['update']['bgpPeerFsmEstablishedTime'] = $bgpPeerFsmEstablishedTime;
-            $peer['update']['bgpPeerInUpdates']          = $bgpPeerInUpdates;
+            $peer['update']['bgpPeerFsmEstablishedTime'] = set_numeric($bgpPeerFsmEstablishedTime);
+            $peer['update']['bgpPeerInUpdates']          = set_numeric($bgpPeerInUpdates);
             $peer['update']['bgpLocalAddr']              = $bgpLocalAddr;
-            $peer['update']['bgpPeerOutUpdates']         = $bgpPeerOutUpdates;
+            $peer['update']['bgpPeerOutUpdates']         = set_numeric($bgpPeerOutUpdates);
 
             dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
 
@@ -281,14 +282,14 @@ if ($config['enable_bgp']) {
 
                     // FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
                     $update = 'UPDATE bgpPeers_cbgp SET';
-                    $peer['c_update']['AcceptedPrefixes']     = $cbgpPeerAcceptedPrefixes;
-                    $peer['c_update']['DeniedPrefixes']       = $cbgpPeerDeniedPrefixes;
-                    $peer['c_update']['PrefixAdminLimit']     = $cbgpPeerAdminLimit;
-                    $peer['c_update']['PrefixThreshold']      = $cbgpPeerPrefixThreshold;
-                    $peer['c_update']['PrefixClearThreshold'] = $cbgpPeerPrefixClearThreshold;
-                    $peer['c_update']['AdvertisedPrefixes']   = $cbgpPeerAdvertisedPrefixes;
-                    $peer['c_update']['SuppressedPrefixes']   = $cbgpPeerSuppressedPrefixes;
-                    $peer['c_update']['WithdrawnPrefixes']    = $cbgpPeerWithdrawnPrefixes;
+                    $peer['c_update']['AcceptedPrefixes']     = set_numeric($cbgpPeerAcceptedPrefixes);
+                    $peer['c_update']['DeniedPrefixes']       = set_numeric($cbgpPeerDeniedPrefixes);
+                    $peer['c_update']['PrefixAdminLimit']     = set_numeric($cbgpPeerAdminLimit);
+                    $peer['c_update']['PrefixThreshold']      = set_numeric($cbgpPeerPrefixThreshold);
+                    $peer['c_update']['PrefixClearThreshold'] = set_numeric($cbgpPeerPrefixClearThreshold);
+                    $peer['c_update']['AdvertisedPrefixes']   = set_numeric($cbgpPeerAdvertisedPrefixes);
+                    $peer['c_update']['SuppressedPrefixes']   = set_numeric($cbgpPeerSuppressedPrefixes);
+                    $peer['c_update']['WithdrawnPrefixes']    = set_numeric($cbgpPeerWithdrawnPrefixes);
 
                     $oids = array(
                         'AcceptedPrefixes',
@@ -299,20 +300,19 @@ if ($config['enable_bgp']) {
                     );
 
                     foreach ($oids as $oid) {
-                        $peer['c_update'][$oid.'_delta'] = $peer['c_update'][$oid] - $peer_afi[$oid];
-                        $peer['c_update'][$oid.'_prev'] = $peer_afi[$oid];
+                        $peer['c_update'][$oid.'_delta'] = set_numeric($peer['c_update'][$oid] - $peer_afi[$oid]);
+                        $peer['c_update'][$oid.'_prev'] = set_numeric($peer_afi[$oid]);
                     }
 
                     dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
 
                     $cbgp_rrd_name = safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi");
-                    $cbgp_rrd_def = array(
-                        'DS:AcceptedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:DeniedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:AdvertisedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:SuppressedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:WithdrawnPrefixes:GAUGE:600:U:100000000000'
-                    );
+                    $cbgp_rrd_def = RrdDefinition::make()
+                        ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('AdvertisedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('SuppressedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('WithdrawnPrefixes', 'GAUGE', null, 100000000000);
 
                     $fields = array(
                         'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
@@ -337,5 +337,4 @@ if ($config['enable_bgp']) {
     } //end if
 } //end if
 
-unset($$peer_data_tmp);
-unset($j_prefixes);
+unset($peers, $peer_data_tmp, $j_prefixes);

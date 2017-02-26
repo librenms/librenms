@@ -73,6 +73,9 @@ function nicecase($item)
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
 
+        case 'ntp':
+            return 'NTP';
+
         case 'ntp-client':
             return 'NTP Client';
 
@@ -96,6 +99,9 @@ function nicecase($item)
 
         case 'gpsd':
             return 'GPSD';
+
+        case 'exim-stats':
+            return 'EXIM Stats';
 
         default:
             return ucfirst($item);
@@ -298,13 +304,18 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 }//end generate_device_link()
 
 
-function overlib_link($url, $text, $contents, $class)
+function overlib_link($url, $text, $contents, $class = null)
 {
     global $config;
 
     $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
     $contents = str_replace('"', "\'", $contents);
-    $output   = '<a class="'.$class.'" href="'.$url.'"';
+    if ($class === null) {
+        $output   = '<a href="'.$url.'"';
+    } else {
+        $output   = '<a class="'.$class.'" href="'.$url.'"';
+    }
+
     if ($config['web_mouseover'] === false) {
         $output .= '>';
     } else {
@@ -605,7 +616,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
     if ($port['ifAlias']) {
-        $content .= escape_quotes($port['ifAlias']).'<br />';
+        $content .= display($port['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -700,40 +711,6 @@ function print_optionbar_end()
 }//end print_optionbar_end()
 
 
-function geteventicon($message)
-{
-    if ($message == 'Device status changed to Down') {
-        $icon = 'server_connect.png';
-    }
-
-    if ($message == 'Device status changed to Up') {
-        $icon = 'server_go.png';
-    }
-
-    if ($message == 'Interface went down' || $message == 'Interface changed state to Down') {
-        $icon = 'if-disconnect.png';
-    }
-
-    if ($message == 'Interface went up' || $message == 'Interface changed state to Up') {
-        $icon = 'if-connect.png';
-    }
-
-    if ($message == 'Interface disabled') {
-        $icon = 'if-disable.png';
-    }
-
-    if ($message == 'Interface enabled') {
-        $icon = 'if-enable.png';
-    }
-
-    if (isset($icon)) {
-        return $icon;
-    } else {
-        return false;
-    }
-}//end geteventicon()
-
-
 function overlibprint($text)
 {
     return "onmouseover=\"return overlib('".$text."');\" onmouseout=\"return nd();\"";
@@ -788,9 +765,9 @@ function getlocations()
 
     // Fetch regular locations
     if ($_SESSION['userlevel'] >= '5') {
-        $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D GROUP BY location ORDER BY location');
+        $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT D.device_id,location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
     }
 
     foreach ($rows as $row) {
@@ -856,7 +833,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
     $content = '<div class=list-large>'.$args['text'].' - '.fixifName($args['label']).'</div>';
     if ($args['ifAlias']) {
-        $content .= $args['ifAlias'].'<br />';
+        $content .= display($args['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1024,6 +1001,19 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
+/**
+ * @param $string
+ * @param int $max
+ * @return string
+ */
+function shorten_text($string, $max = 30)
+{
+    if (strlen($string) > 50) {
+        return substr($string, 0, $max) . "...";
+    } else {
+        return $string;
+    }
+}
 
 function shorten_interface_type($string)
 {
@@ -1135,6 +1125,11 @@ function alert_details($details)
 
         if ($tmp_alerts['port_id']) {
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
+            $fallback      = false;
+        }
+
+        if ($tmp_alerts['accesspoint_id']) {
+            $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
             $fallback      = false;
         }
 
@@ -1361,4 +1356,80 @@ function get_rules_from_json()
 {
     global $config;
     return json_decode(file_get_contents($config['install_dir'] . '/misc/alert_rules.json'), true);
+}
+
+function search_oxidized_config($search_in_conf_textbox)
+{
+    global $config;
+    $oxidized_search_url = $config['oxidized']['url'] . '/nodes/conf_search?format=json';
+    $postdata = http_build_query(
+        array(
+            'search_in_conf_textbox' => $search_in_conf_textbox,
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context  = stream_context_create($opts);
+    return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+}
+
+/**
+ * @param $data
+ * @return bool|mixed
+ */
+function array_to_htmljson($data)
+{
+    if (is_array($data)) {
+        $data = htmlentities(json_encode($data));
+        return str_replace(',', ',<br />', $data);
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @param $eventlog_severity
+ * @return $eventlog_severity_icon
+ */
+function eventlog_severity($eventlog_severity)
+{
+    switch ($eventlog_severity) {
+        case 1:
+            return "severity-ok"; //OK
+            break;
+        case 2:
+            return "severity-info"; //Informational
+            break;
+        case 3:
+            return "severity-notice"; //Notice
+            break;
+        case 4:
+            return "severity-warning"; //Warning
+            break;
+        case 5:
+            return "severity-critical"; //Critical
+            break;
+        default:
+            return "severity-unknown"; //Unknown
+            break;
+    }
+} // end eventlog_severity
+
+/**
+ *
+ */
+function set_image_type()
+{
+    global $config;
+
+    if ($config['webui']['graph_type'] === 'svg') {
+        return header('Content-type: image/svg+xml');
+    } else {
+        return header('Content-type: image/png');
+    }
 }

@@ -1,0 +1,9 @@
+os: ericsson-es
+text: Ericsson iPECS ES
+type: network
+icon: ericsson
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.572.17389.204

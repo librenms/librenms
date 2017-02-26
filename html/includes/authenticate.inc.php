@@ -1,5 +1,7 @@
 <?php
 
+use Phpass\PasswordHash;
+
 @ini_set('session.use_only_cookies', 1);
 @ini_set('session.cookie_httponly', 1);
 
@@ -42,6 +44,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 } elseif (isset($_GET['username']) && isset($_GET['password'])) {
     $_SESSION['username'] = clean($_GET['username']);
     $_SESSION['password'] = $_GET['password'];
+} elseif (isset($_SERVER['REMOTE_USER'])) {
+    $_SESSION['username'] = $_SERVER['REMOTE_USER'];
 }
 
 if (!isset($config['auth_mechanism'])) {

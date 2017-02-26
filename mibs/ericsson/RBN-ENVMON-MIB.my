@@ -1,0 +1,790 @@
+-- *****************************************************************
+-- RBN-ENVMON-MIB	Environmental Monitor MIB
+--
+-- Copyright (c) 1999-2007, 2010-2011 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString,
+	TruthValue,
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	entPhysicalIndex
+		FROM ENTITY-MIB
+	rbnMgmt
+		FROM RBN-SMI;
+
+rbnEnvMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "201210030000Z" -- October 3, 2012
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+		"	Ericsson AB.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+
+		"
+	DESCRIPTION
+		"The MIB used to genericially manage Environmental
+		Monitor functionality on network devices."
+               
+        REVISION        "201210030000Z" -- October 3, 2012
+        DESCRIPTION
+                "Removed DISPLAY-HINT from RbnVoltage and RbnFanSpeed."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION        "201011110000Z" -- Nov 11, 2010
+        DESCRIPTION
+                "Add new Table rbnEntityTempSensorTable. This will display 
+                the TempSensor Details for all the entities. "
+
+	REVISION	"200601160000Z" -- January 16, 2006
+	DESCRIPTION
+		"Add textual convention RbnFanSpeed.  Add new OIDs:
+			rbnFanUnitID
+			rbnFanUnitDescr
+			rbnFanSpeedCurrent
+			rbnEnvMonFanSpeedObjectGroup
+			rbnEnvMonMIBComplianceV4
+		"
+	REVISION	"200206050000Z" -- June 5, 2002
+	DESCRIPTION
+		"Update/correct CONTACT-INFO. Fix syntax errors on IMPORTS list,
+		ranges on Integer32, and size for DisplayString types.
+		Restore the incorrectly deprecated OIDs to current, since they
+		are still supported."
+	REVISION        "200107250000Z" -- July 25, 2001
+	DESCRIPTION
+		"Added new OIDs:
+			rbnFanStatus
+			rbnPowerStatus
+			rbnFanStatusChange
+			rbnPowerStatusChange
+			rbnEnvMonMIBObjectGroupV2
+			rbnEnvMonMIBNotificationGroupV2
+			rbnEnvMonMIBComplianceV3
+		 Deprecated the OIDs:
+			rbnFanFail
+			rbnPowerFail
+			rbnFanFailChange
+			rbnPowerFailChange
+			rbnEnvMonMIBObjectGroup
+			rbnEnvMonMIBNotificationGroup
+			rbnEnvMonMIBComplianceV2
+		"
+	REVISION	"200004240000Z" -- May 24, 2000
+	DESCRIPTION
+		"Added voltage and temperature sensor tables."
+
+	REVISION	"199903100000Z" -- Mar 10, 1999
+	DESCRIPTION
+            "Initial version."
+	::= { rbnMgmt 4 }
+
+rbnEnvMonMIBNotifications OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 0 }
+
+rbnEnvMonMIBObjects OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 1 }
+
+rbnEnvMonMIBConformance OBJECT IDENTIFIER
+	::= { rbnEnvMonMIB 2 }
+
+
+-- Textual Conventions
+
+RbnVoltage ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"Represents a voltage value. The value is millivolts.
+		 For example, a voltage of 5.5V would be represented
+		 by the value 5500."
+	SYNTAX       Unsigned32 (0..50000)
+
+RbnTemperature ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "d"
+	STATUS       current
+	DESCRIPTION
+		"Represents a temperature, in degrees Celsius. In the
+		 unlikely event that the temperature to be reported is
+		 less than 0 degrees Celsius, a value of 0 will be
+		 used. Likewise, if the temperature is greater than
+		 100, a value of 100 will be used."
+	SYNTAX       Unsigned32 (0..100)
+
+RbnFanSpeed ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"Represents a fan speed value in units of Revolutions Per
+		Minute(RPM)."
+	SYNTAX       Unsigned32
+
+-- MIB Objects
+
+rbnFanStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per fan test point.
+		Note that there is not necessarily a one-to-one
+		relationship between fan test points and fan
+		assemblies; a single test point may be used to
+		monitor the status of multiple fans."
+	::= { rbnEnvMonMIBObjects 1 }
+
+rbnFanStatusEntry OBJECT-TYPE
+	SYNTAX	    RbnFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular fan test point"
+	INDEX	{ rbnFanIndex }
+	::= { rbnFanStatusTable 1 }
+
+RbnFanStatusEntry ::= SEQUENCE {
+	rbnFanIndex	Integer32,
+	rbnFanDescr	DisplayString,
+	rbnFanFail	TruthValue,
+	rbnFanStatus	INTEGER
+}
+
+rbnFanIndex OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a fan test point."
+	::= { rbnFanStatusEntry 1 }
+
+rbnFanDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a fan test point.  If an instance of
+		this object is associated with a single fan assembly,
+		then the value of this object should be the same as the
+		name by which the assembly is normally referenced.  If
+		an instance is associated with multiple fan assemblies,
+		then the value of this object should contain the names
+		of all of the fan assemblies being monitored."
+	::= { rbnFanStatusEntry 2 }
+
+rbnFanFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The status of a fan test point.  If an instance of
+		this object has the value true, then a fan monitored
+		by the test point has failed.  If an instance of
+		this object has the value false, then the fan (or fans)
+		monitored by the test point are operational."
+	::= { rbnFanStatusEntry 3 }
+
+rbnFanStatus OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			normal(1),
+			failed(2),
+			absent(3),
+			unknown(4)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a fan test point.  If an instance of
+		this object has the value normal, then the fan (or 
+		fans) monitored by the test point is operational.  If
+		an instance of this object has the value failed, then 
+		the fan (or fans) monitored by the test point has 
+		failed. If an instance of this object has the value 
+		absent, then the fan (or fans) monitored by this test 
+		point is not present. If an instance of this object has
+		the value unknown, then the test point is unable to
+		monitor the fan (or fans)."
+	::= { rbnFanStatusEntry 4 }
+
+rbnPowerStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per power test point.
+		Note that there is not necessarily a one-to-one
+		relationship between power test points and power
+		supply assemblies; a single test point may be used
+		to monitor the status of multiple power supplies."
+	::= { rbnEnvMonMIBObjects 2 }
+
+rbnPowerStatusEntry OBJECT-TYPE
+	SYNTAX	    RbnPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular power test point"
+	INDEX	{ rbnPowerIndex }
+	::= { rbnPowerStatusTable 1 }
+
+RbnPowerStatusEntry ::= SEQUENCE {
+	rbnPowerIndex	Integer32,
+	rbnPowerDescr	DisplayString,
+	rbnPowerFail	TruthValue,
+	rbnPowerStatus	INTEGER
+}
+
+rbnPowerIndex OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a power test point."
+	::= { rbnPowerStatusEntry 1 }
+
+rbnPowerDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a power supply test point.  If an
+		instance of this object is associated with a single
+		power supply assembly, then the value of this object
+		should be the same as the name by which the assembly
+		is normally referenced.  If an instance is associated
+		with multiple power supply assemblies, then the value
+		of this object should contain the names of all of the
+		power supply assemblies being monitored."
+	::= { rbnPowerStatusEntry 2 }
+
+rbnPowerFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The status of a power test point.  If an instance of
+		this object has the value true, then a power supply
+		monitored by the test point has failed.  If an instance
+		of this object has the value false, then the power
+		supply (or supplies) monitored by the test point are
+		operational."
+	::= { rbnPowerStatusEntry 3 }
+
+rbnPowerStatus OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			normal(1),
+			failed(2),
+			absent(3),
+			unknown(4)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a power test point.  If an instance of
+		this object has the value normal, then the power 
+		supply (or supplies) monitored by the test point is 
+		operational.  If an instance of this object has the 
+		value failed, then the power supply (or supplies)
+		monitored by the test point has failed. If an instance
+		of this object has the value absent, then the power
+		supply (or supplies) monitored by this test point is 
+		not present. If an instance of this object has
+		the value unknown, then the test point is unable to
+		monitor the power supply (or supplies)."
+	::= { rbnPowerStatusEntry 4 }
+
+rbnVoltageSensorTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnVoltageSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per voltage test point.
+		 Each physical entity (e.g. cards) in the system may
+		 contain zero or more voltage test points."
+	::= { rbnEnvMonMIBObjects 3 }
+
+rbnVoltageSensorEntry OBJECT-TYPE
+	SYNTAX	RbnVoltageSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular voltage test point."
+	INDEX	{ entPhysicalIndex, rbnVoltageIndex }
+	::= { rbnVoltageSensorTable 1 }
+
+RbnVoltageSensorEntry ::= SEQUENCE {
+	rbnVoltageIndex   Integer32,
+	rbnVoltageDescr   DisplayString,
+	rbnVoltageDesired RbnVoltage,
+	rbnVoltageCurrent RbnVoltage
+}
+
+rbnVoltageIndex OBJECT-TYPE
+	SYNTAX      Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An arbitrary value which uniquely identifies a
+		 voltage test point on a particular physical entity.
+		 Index values for different test points are not
+		 necessarily contiguous."
+	::= { rbnVoltageSensorEntry 1 }
+
+rbnVoltageDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..48))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The description of a voltage test point. Typically
+		 an instance of this object will hold a user-friendly
+		 description of the physical entity and the level of
+		 voltage being monitored by this test point."
+	::= { rbnVoltageSensorEntry 2 }
+
+rbnVoltageDesired OBJECT-TYPE
+	SYNTAX      RbnVoltage
+	UNITS	    "millivolts"
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The desired voltage level for this test point. If
+		 the monitored voltage level (rbnVoltageCurrent) is
+		 equal to this value, then the system is performing
+		 as designed."
+	::= { rbnVoltageSensorEntry 3 }
+
+rbnVoltageCurrent OBJECT-TYPE
+	SYNTAX      RbnVoltage
+	UNITS	    "millivolts"
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current voltage level at this test point."
+	::= { rbnVoltageSensorEntry 4 }
+
+rbnCpuTempSensorTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbnCpuTempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated 
+	DESCRIPTION
+		"This table contains one row per CPU temperature
+		 sensor. Each physical entity in the system may have
+		 zero or more CPUs. Each of those CPUs that has a
+		 temperature sensor will show up here."
+	::= { rbnEnvMonMIBObjects 4 }
+
+rbnCpuTempSensorEntry OBJECT-TYPE
+	SYNTAX      RbnCpuTempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated 
+	DESCRIPTION
+		"Information about a particular CPU temperature test
+		 point."
+	INDEX   { entPhysicalIndex, rbnCpuTempIndex }
+	::= { rbnCpuTempSensorTable 1 }
+
+RbnCpuTempSensorEntry ::= SEQUENCE {
+	rbnCpuTempIndex   Integer32,
+	rbnCpuTempDescr   DisplayString,
+	rbnCpuTempCurrent RbnTemperature
+}
+
+rbnCpuTempIndex OBJECT-TYPE
+	SYNTAX      Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated
+	DESCRIPTION
+		"An arbitrary value which uniquely identifies a CPU on
+		 a particular physical entity.  Index values for
+		 different CPUs are not necessarily contiguous."
+	::= { rbnCpuTempSensorEntry 1 }
+
+rbnCpuTempDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..48))
+	MAX-ACCESS  read-only
+	STATUS	    deprecated
+	DESCRIPTION
+		"The description of a CPU temperature test
+		 point. Typically an instance of this object will hold
+		 a user-friendly description of the physical entity
+		 and a description of the CPU being monitored by this
+		 test point."
+	::= { rbnCpuTempSensorEntry 2 }
+
+rbnCpuTempCurrent OBJECT-TYPE
+	SYNTAX      RbnTemperature
+	UNITS	    "degrees"
+	MAX-ACCESS  read-only
+	STATUS	    deprecated
+	DESCRIPTION
+		"The current temperature of this CPU."
+	::= { rbnCpuTempSensorEntry 3 }
+
+rbnFanSpeedTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RbnFanSpeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per fan unit within a fan
+		test point."
+	::= { rbnEnvMonMIBObjects 5 }
+
+rbnFanSpeedEntry OBJECT-TYPE
+	SYNTAX	    RbnFanSpeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular fan unit within a fan
+                test point."
+	INDEX	{ rbnFanIndex, rbnFanUnitID }
+	::= { rbnFanSpeedTable 1 }
+
+RbnFanSpeedEntry ::= SEQUENCE {
+	rbnFanUnitID	    Integer32,
+	rbnFanUnitDescr	    DisplayString,
+	rbnFanSpeedCurrent  RbnFanSpeed
+}
+
+rbnFanUnitID OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This is the fan identification number that describes the
+		specific location of the fan unit within a fan test point."
+	::= { rbnFanSpeedEntry 1 }
+
+rbnFanUnitDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of the fan unit within a fan test point."
+	::= { rbnFanSpeedEntry 2 }
+
+rbnFanSpeedCurrent OBJECT-TYPE
+	SYNTAX	    RbnFanSpeed
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current speed of this fan unit."
+	::= { rbnFanSpeedEntry 3 }
+
+rbnEntityTempSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RbnEntityTempSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains one row per temperature
+                 sensor on the physical entity."
+        ::= { rbnEnvMonMIBObjects 6 }
+
+rbnEntityTempSensorEntry OBJECT-TYPE
+        SYNTAX      RbnEntityTempSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Information about a particular temperature test
+                 point."
+        INDEX   { entPhysicalIndex, rbnEntityTempIndex }
+        ::= { rbnEntityTempSensorTable 1 }
+
+RbnEntityTempSensorEntry ::= SEQUENCE {
+        rbnEntityTempIndex   Integer32,
+        rbnEntityTempDescr   DisplayString,
+        rbnEntityTempCurrent RbnTemperature
+}
+
+rbnEntityTempIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An arbitrary value which uniquely identifies a
+                 particular physical entity.  Index values are 
+                 not necessarily contiguous."
+        ::= { rbnEntityTempSensorEntry 1 }
+
+rbnEntityTempDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..48))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The description of a temperature test
+                 point. Typically an instance of this object will hold
+                 a user-friendly description of the physical entity
+                 being monitored by this test point."
+        ::= { rbnEntityTempSensorEntry 2 }
+
+rbnEntityTempCurrent OBJECT-TYPE
+        SYNTAX      RbnTemperature
+        UNITS       "degrees Celsius"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The current temperature of this entity in degrees Celsius."
+        ::= { rbnEntityTempSensorEntry 3 }
+
+-- Notifications
+
+rbnFanFailChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnFanFail }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A rbnFanFailChange notification signifies
+		that the value of an instance of rbnFanFail
+		has changed."
+	::= { rbnEnvMonMIBNotifications 1 }
+
+rbnPowerFailChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnPowerFail }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A rbnPowerFailChange notification signifies
+		that the value of an instance of rbnPowerFail
+		has changed"
+	::= { rbnEnvMonMIBNotifications 2 }
+
+rbnFanStatusChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnFanStatus }
+	STATUS	    current
+	DESCRIPTION
+		"A rbnFanStatusChange notification signifies
+		that the value of an instance of rbnFanStatus
+		has changed."
+	::= { rbnEnvMonMIBNotifications 3 }
+
+rbnPowerStatusChange NOTIFICATION-TYPE
+	OBJECTS	    { rbnPowerStatus }
+	STATUS	    current
+	DESCRIPTION
+		"A rbnPowerStatusChange notification signifies
+		that the value of an instance of rbnPowerStatus
+		has changed"
+	::= { rbnEnvMonMIBNotifications 4 }
+
+-- Conformance Statements
+
+rbnEnvMonMIBGroups OBJECT IDENTIFIER
+	::= { rbnEnvMonMIBConformance 1 }
+
+rbnEnvMonMIBCompliances OBJECT IDENTIFIER
+	::= { rbnEnvMonMIBConformance 2 }
+
+rbnEnvMonMIBObjectGroup OBJECT-GROUP
+	OBJECTS	    {	rbnFanDescr, rbnFanFail,
+			rbnPowerDescr, rbnPowerFail
+		    }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A collection of objects providing
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 1 }
+
+rbnEnvMonMIBNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {	rbnFanFailChange,
+			rbnPowerFailChange
+		    }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A collection of notifications providing
+		fan and power environmental monitor information."
+	::= { rbnEnvMonMIBGroups 2 }
+
+rbnEnvMonVoltageObjectGroup OBJECT-GROUP
+	OBJECTS	    {	rbnVoltageDescr, rbnVoltageDesired,
+			rbnVoltageCurrent
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing voltage
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 3 }
+
+rbnEnvMonTempObjectGroup OBJECT-GROUP
+	OBJECTS	    {	rbnCpuTempDescr, rbnCpuTempCurrent
+		    }
+	STATUS	   deprecated   
+	DESCRIPTION
+		"A collection of objects providing temperature
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 4 }
+
+rbnEnvMonMIBObjectGroupV2 OBJECT-GROUP
+	OBJECTS	    {	rbnFanDescr, rbnFanStatus,
+			rbnPowerDescr, rbnPowerStatus
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 5 }
+
+rbnEnvMonMIBNotificationGroupV2 NOTIFICATION-GROUP
+	NOTIFICATIONS {	rbnFanStatusChange,
+			rbnPowerStatusChange
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of notifications providing
+		fan and power environmental monitor information."
+	::= { rbnEnvMonMIBGroups 6 }
+
+rbnEnvMonFanSpeedObjectGroup OBJECT-GROUP
+	OBJECTS	    {	rbnFanUnitDescr, rbnFanSpeedCurrent
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing fan speed
+		environmental monitor information."
+	::= { rbnEnvMonMIBGroups 7 }
+
+rbnEnvMonEntityObjectGroup OBJECT-GROUP
+        OBJECTS     {   rbnEntityTempDescr, rbnEntityTempCurrent
+                    }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing fan speed
+                environmental monitor information."
+        ::= { rbnEnvMonMIBGroups 8 }
+
+rbnEnvMonMIBCompliance MODULE-COMPLIANCE
+	STATUS	    obsolete
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    rbnEnvMonMIBObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonMIBNotificationGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	::= { rbnEnvMonMIBCompliances 1 }
+
+rbnEnvMonMIBComplianceV2 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+
+	MODULE	    -- this module
+	GROUP	    rbnEnvMonMIBObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonMIBNotificationGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    rbnEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	::= { rbnEnvMonMIBCompliances 2 }
+
+rbnEnvMonMIBComplianceV3 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    rbnEnvMonMIBObjectGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonMIBNotificationGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    rbnEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	::= { rbnEnvMonMIBCompliances 3 }
+
+rbnEnvMonMIBComplianceV4 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    rbnEnvMonMIBObjectGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonMIBNotificationGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    rbnEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    rbnEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	GROUP	    rbnEnvMonFanSpeedObjectGroup
+	DESCRIPTION
+		"This group is mandatory for SNMP entities which are
+                capable of sensing fan speeds."
+	::= { rbnEnvMonMIBCompliances 4 }
+
+
+rbnEnvMonMIBComplianceV5 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The compliance statement for the EnvMon MIB"
+        MODULE      -- this module
+        GROUP       rbnEnvMonMIBObjectGroupV2
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities"
+        GROUP       rbnEnvMonMIBNotificationGroupV2
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities"
+        GROUP       rbnEnvMonVoltageObjectGroup
+        DESCRIPTION
+                "This group is mandatory for devices which are capable
+                 of sensing system voltages."
+        GROUP       rbnEnvMonFanSpeedObjectGroup
+        DESCRIPTION
+                "This group is mandatory for SNMP entities which are
+                capable of sensing fan speeds."
+        GROUP       rbnEnvMonEntityObjectGroup
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities, also applicable to SSE
+                card and disks"
+
+        ::= { rbnEnvMonMIBCompliances 5 }
+
+END

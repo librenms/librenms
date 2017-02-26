@@ -24,14 +24,14 @@ if ($services['total']) {
         <div class="row col-md-12">
             <div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
-                    <img src='images/16/cog.png'><strong> Services</strong>
+                <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong>
                 </div>
                 <table class="table table-hover table-condensed table-striped">
                     <tr>
-                        <td title="Total"><img src='images/16/cog.png'> <?php echo $services['total']?></td>
-                        <td title="Status - Ok"><img src='images/16/cog_add.png'> <?php echo $services[0]?></td>
-                        <td title="Status - Warning"><img src='images/16/cog_error.png'> <?php echo $services[1]?></td>
-                        <td title="Status - Critical"><img src='images/16/cog_delete.png'> <?php echo $services[2]?></td>
+                        <td title="Total"><i class="fa fa-cog" style="color:#0080FF" aria-hidden="true"></i> <?php echo $services['total']?></td>
+                        <td title="Status - Ok"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> <?php echo $services[0]?></td>
+                        <td title="Status - Warning"><i class="fa fa-cog" style="color:orange" aria-hidden="true"></i> <?php echo $services[1]?></td>
+                        <td title="Status - Critical"><i class="fa fa-cog" style="color:red" aria-hidden="true"></i> <?php echo $services[2]?></td>
                     </tr>
                     <tr>
                         <td colspan='4'><?php echo $string?></td>

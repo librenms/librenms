@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 unset($poll_device);
 
 $snmpdata = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
@@ -43,7 +45,7 @@ if (empty($uptime)) {
     }//end if
 }//end if
 
-if ($device["os"] != "edgeswitch") {
+if ($config['os'][$device['os']]['bad_snmpEngineTime'] !== true) {
     if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
         $uptime = $snmp_uptime;
         d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
@@ -52,11 +54,11 @@ if ($device["os"] != "edgeswitch") {
 
 if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
+        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(
-        'rrd_def' => 'DS:uptime:GAUGE:600:0:U',
+        'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
     );
     data_update($device, 'uptime', $tags, $uptime);
 
@@ -91,15 +93,15 @@ foreach (array('sysLocation', 'sysContact') as $elem) {
 
 // Save results of various polled values to the database
 foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
-    if ($poll_device[$elem] && $poll_device[$elem] != $device[$elem]) {
+    if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
-        log_event("$elem -> " . $poll_device[$elem], $device, 'system');
+        log_event("$elem -> " . $poll_device[$elem], $device, 'system', 3);
     }
 }
 
 if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
     $update_array['location'] = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system');
+    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
 }
 
 if ($config['geoloc']['latlng'] === true) {

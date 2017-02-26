@@ -19,7 +19,7 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || (empty($_POST['data']) || !isset($_POST['data']))) {
+if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !isset($_POST['data'])) {
     echo 'error with data';
     exit;
 } else {

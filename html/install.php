@@ -28,10 +28,12 @@ $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
 $dbname = @$_POST['dbname'] ?: 'librenms';
+$dbport = @$_POST['dbport'] ?: 3306;
 $config['db_host']=$dbhost;
 $config['db_user']=$dbuser;
 $config['db_pass']=$dbpass;
 $config['db_name']=$dbname;
+$config['db_port']=$dbport;
 
 $add_user = @$_POST['add_user'] ?: '';
 $add_pass = @$_POST['add_pass'] ?: '';
@@ -40,7 +42,7 @@ $add_email = @$_POST['add_email'] ?: '';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
-    $database_link = mysqli_connect('p:'.$dbhost, $dbuser, $dbpass, $dbname);
+    $database_link = mysqli_connect('p:'.$dbhost, $dbuser, $dbpass, $dbname, $dbport);
     if (mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
@@ -254,6 +256,12 @@ if ($ext_loaded == 'no') {
             </div>
           </div>
           <div class="form-group">
+            <label for="dbport" class="col-sm-4" control-label">DB Port: </label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="dbport" id="dbport" value="<?php echo $dbport; ?>">
+            </div>
+          </div>
+          <div class="form-group">
             <label for="dbuser" class="col-sm-4" control-label">DB User: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbuser" id="dbuser" value="<?php echo $dbuser; ?>">
@@ -292,6 +300,7 @@ if ($ext_loaded == 'no') {
     $config['db_user'] = $dbuser;
     $config['db_pass'] = $dbpass;
     $config['db_name'] = $dbname;
+    $config['db_port'] = $dbport;
     $sql_file = '../build.sql';
     $_SESSION['last'] = time();
     ob_end_flush();
@@ -322,6 +331,7 @@ if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
+          <input type="hidden" name="dbport" value="<?php echo $dbport; ?>">
           <button type="submit" class="btn btn-success">Goto Add User</button>
         </form>
       </div>
@@ -343,6 +353,7 @@ $config_file = <<<"EOD"
 
 ### Database config
 \$config\['db_host'\] = '$dbhost';
+\$config\['db_port'\] = '$dbport';
 \$config\['db_user'\] = '$dbuser';
 \$config\['db_pass'\] = '$dbpass';
 \$config\['db_name'\] = '$dbname';

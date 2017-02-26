@@ -66,7 +66,7 @@ if ($_SESSION['userlevel'] != '10') {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', array($vars['user_id']));
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a></strong></td></tr>";
+            echo '<tr><td><strong>'.$device_perm['hostname']."</td><td> <a href='edituser/action=deldevperm/user_id=".$vars['user_id'].'/device_id='.$device_perm['device_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone      = 'yes';
         }
@@ -121,10 +121,10 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($interface_perms as $interface_perm) {
             echo '<tr>
               <td>
-                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.$interface_perm['ifAlias']."
+                <strong>'.$interface_perm['hostname'].' - '.$interface_perm['ifDescr'].'</strong>'.''.display($interface_perm['ifAlias'])."
               </td>
               <td>
-                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=".$vars['user_id'].'/port_id='.$interface_perm['port_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $ipermdone = 'yes';
@@ -196,7 +196,7 @@ if ($_SESSION['userlevel'] != '10') {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><img src='images/16/cross.png' align=absmiddle border=0></a>
+                <strong>'.$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=".$vars['user_id'].'/bill_id='.$bill_perm['bill_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];
@@ -359,7 +359,7 @@ if ($_SESSION['userlevel'] != '10') {
           <input type='checkbox' ";
                     if ($vars['can_modify_passwd'] == '1') {
                         echo "checked='checked'";
-                    } echo " name='can_modify_passwd'> Allow the user to change his password.
+                    } echo " name='can_modify_passwd'> Allow the user to change their password.
         </label>
       </div>
     </div>
@@ -444,7 +444,17 @@ if ($_SESSION['userlevel'] != '10') {
                 <div class='col-sm-4'>
                   <select name='user_id' class='form-control input-sm'>";
         foreach ($user_list as $user_entry) {
-            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].'</option>';
+            switch ($user_entry['level']) {
+                case "10":
+                    $user_level = ' (admin)';
+                    break;
+                case "11":
+                    $user_level = ' (demo)';
+                    break;
+                default:
+                    $user_level = '';
+            }
+            echo "<option value='".$user_entry['user_id']."'>".$user_entry['username'].$user_level.'</option>';
         }
 
         echo "</select>

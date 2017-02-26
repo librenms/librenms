@@ -92,7 +92,7 @@ foreach (get_all_devices() as $hostname) {
     max = high - low;
     search = $('.search-field').val();
 
-    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $_POST['device_id']; ?>&string="+search+"&results="+max+"&start="+low+"'><img src='images/16/pdf.png' width='16' height='16' alt='Export to pdf'> Export to pdf</a>");
+    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $_POST['device_id']; ?>&string="+search+"&results="+max+"&start="+low+"'><i class='fa fa-heartbeat fa-lg icon-theme' aria-hidden='true'></i> Export to pdf</a>");
 
     grid.find(".incident-toggle").each( function() {
       $(this).parent().addClass('incident-toggle-td');

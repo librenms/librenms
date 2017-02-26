@@ -1,0 +1,11 @@
+os: deliberant
+text: 'Deliberant OS'
+type: wireless
+icon: deliberant
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+        - Deliberant
+poller_modules:
+    wifi: 1

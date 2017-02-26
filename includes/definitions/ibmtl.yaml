@@ -1,0 +1,6 @@
+os: ibmtl
+text: 'IBM Tape Library'
+type: storage
+icon: generic
+over:
+    - { graph: device_bits, text: Traffic }

@@ -229,7 +229,7 @@ if (defined('SHOW_SETTINGS')) {
 
             if ($config['webui']['availability_map_compact'] == 0) {
                 if ($directpage == "yes") {
-                    $deviceIcon = getImage($device);
+                    $deviceIcon = getIconTag($device);
                     $temp_output[] = '
                     <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
@@ -278,7 +278,7 @@ if (defined('SHOW_SETTINGS')) {
 
                 if ($config['webui']['availability_map_compact'] == 0) {
                     if ($directpage == "yes") {
-                        $deviceIcon = getImage($service);
+                        $deviceIcon = getIconTag($service);
                         $temp_output[] = '
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <div class="service-availability ' . $serviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
@@ -295,7 +295,7 @@ if (defined('SHOW_SETTINGS')) {
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost(ip_to_sysname($device, $device['hostname'])) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost(ip_to_sysname($service, $service['hostname'])) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }

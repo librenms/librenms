@@ -52,7 +52,7 @@ if (is_null($cntpPeersVarEntry)) {
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
             $result['status'] = 2;
-            $result['error'] = 'NTP Stratum is Insane';
+            $result['error'] = 'NTP is not in sync';
         } else {
             $result['status'] = 0;
             $result['error'] = '';

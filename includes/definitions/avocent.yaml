@@ -1,0 +1,8 @@
+os: avocent
+text: Avocent
+type: network
+icon: avocent
+discovery:
+    - sysDescr_regex:
+        - '/^Avocent/'
+        - '/^AlterPath/'

@@ -8,3 +8,4 @@ require 'netstats/netstats-snmp.inc.php';
 require 'netstats/netstats-ip_forward.inc.php';
 
 echo "\n";
+unset($oid_ds);

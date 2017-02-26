@@ -1,41 +1,20 @@
 <?php
 
-if ($device['status'] == '0') {
-    $class = 'alert-danger';
-} else {
-    $class = '';
-}
+echo getLogoTag($device, 'device-icon-header pull-left') .'
+<div class="pull-left" style="margin-top: 5px;">';
 
-if ($device['ignore'] == '1') {
-    $class = 'div-ignore-alert';
-    if ($device['status'] == '1') {
-        $class = 'alert-warning';
-    }
-}
-
-if ($device['disabled'] == '1') {
-    $class = 'alert-info';
-}
-
-$type = strtolower($device['os']);
-
-$image = getImage($device);
-$host_id = dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
-
-echo '
-            <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td><span class="device_icon">'.$image.'</span></td>
-             <td>';
+$host_id = get_vm_parent_id($device);
 if ($host_id > 0) {
     echo '
-             <a href="'.generate_url(array('page'=>'device','device'=>$host_id)).'"><i class="fa fa-server fa-fw fa-lg"></i></a>
-         ';
+<a href="'.generate_url(array('page'=>'device','device'=>$host_id)).'"><i class="fa fa-server fa-fw fa-lg"></i></a>';
 }
-             
+
 echo '
-             <span style="font-size: 20px;">'.generate_device_link($device).'</span>
-             <br />'.generate_link($device['location'], array('page' => 'devices', 'location' => $device['location'])).'</td>
-             <td>';
+<span style="font-size: 20px;">'.generate_device_link($device).'</span><br />
+'.generate_link($device['location'], array('page' => 'devices', 'location' => $device['location'])) .'
+</div>';
+//<div class="col-xs-6 col-sm-8 col-md-8">';
+
 
 if (isset($config['os'][$device['os']]['over'])) {
     $graphs = $config['os'][$device['os']]['over'];
@@ -59,6 +38,7 @@ $graph_array['height'] = '45';
 $graph_array['width']  = '150';
 $graph_array['bg']     = 'FFFFFF00';
 
+echo '<div class="pull-right">';
 foreach ($graphs as $entry) {
     if ($entry['graph']) {
         $graph_array['type'] = $entry['graph'];
@@ -69,8 +49,6 @@ foreach ($graphs as $entry) {
         echo '</div>';
     }
 }
+echo '</div><br style="clear: both;" />';
 
 unset($graph_array);
-
-echo '</td>
-   </tr>';

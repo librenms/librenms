@@ -11,7 +11,7 @@ if (count($toners)) {
             <div class="panel panel-default panel-condensed">
               <div class="panel-heading">';
     echo '<a href="device/device='.$device['device_id'].'/tab=toner/">';
-    echo "<img src='images/icons/toner.png'> <strong>Toner</strong></a>";
+    echo '<i class="fa fa-print fa-lg icon-theme" aria-hidden="true"></i> <strong>Toner</strong></a>';
     echo '</div>
         <table class="table table-hover table-condensed table-striped">';
 

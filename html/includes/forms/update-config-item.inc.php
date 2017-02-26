@@ -33,6 +33,8 @@ if (!is_numeric($config_id)) {
         if (!empty($k) || !empty($v)) {
             if ($config_type == 'slack') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.slack.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Slack Transport'), 'config');
+            } elseif ($config_type == 'rocket') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.rocket.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Rocket.Chat Transport'), 'config');
             } elseif ($config_type == 'hipchat') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Hipchat Transport'), 'config');
             } elseif ($config_type == 'pushover') {
@@ -44,6 +46,9 @@ if (!is_numeric($config_id)) {
                 $x++;
             } elseif ($config_type == 'playsms') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.playsms.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'PlaySMS Transport'), 'config');
+                $x++;
+            } elseif ($config_type == 'smseagle') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.smseagle.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'SMSEagle Transport'), 'config');
                 $x++;
             }
         }
@@ -57,6 +62,8 @@ if (!is_numeric($config_id)) {
 
         if ($config_type == 'slack') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.slack.$config_id.%' AND `config_name` != 'alert.transports.slack.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
+        } elseif ($config_type == 'rocket') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.rocket.$config_id.%' AND `config_name` != 'alert.transports.rocket.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
         } elseif ($config_type == 'hipchat') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.hipchat.$config_id.%' AND (`config_name` != 'alert.transports.hipchat.$config_id.url' AND `config_name` != 'alert.transports.hipchat.$config_id.room_id' AND `config_name` != 'alert.transports.hipchat.$config_id.from') AND `config_id` NOT IN ($db_inserts))");
         } elseif ($config_type == 'pushover') {
@@ -67,6 +74,8 @@ if (!is_numeric($config_id)) {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.clickatell.to.%' AND `config_id` NOT IN ($db_inserts))");
         } elseif ($config_type == 'playsms') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.playsms.to.%' AND `config_id` NOT IN ($db_inserts))");
+        } elseif ($config_type == 'smseagle') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.smseagle.to.%' AND `config_id` NOT IN ($db_inserts))");
         }
     }
 

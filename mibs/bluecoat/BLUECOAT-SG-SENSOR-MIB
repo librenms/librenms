@@ -1,0 +1,244 @@
+BLUECOAT-SG-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceSensorMIB MODULE-IDENTITY
+        LAST-UPDATED    "201511260300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The sensor MIB is used to monitor
+                         the values of sensors"
+        REVISION        "201511260300Z"
+        DESCRIPTION     "Add new value (notInstalled) to SensorStatus"
+        REVISION        "201307110300Z"
+        DESCRIPTION     "Access level for deviceSensorTrapEnabled changed."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200211060300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 1 }
+
+deviceSensorMIBObjects
+        OBJECT IDENTIFIER ::= { deviceSensorMIB 1 }
+
+deviceSensorMIBNotifications
+        OBJECT IDENTIFIER ::= { deviceSensorMIB 2 }
+
+deviceSensorMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { deviceSensorMIBNotifications 0 }
+
+-- textual conventions
+
+SensorUnits ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Sensor measurement unit types. Valid values are:
+                other(1)        - a measure other than those listed below.
+                truthvalue(2)   - value takes { true(1), false(2) }.
+                specialEnum(3)  - value takes user defined enumerated values.
+                volts(4)        - electrical potential.
+                celsius(5)      - temperature.
+                rpm(6)          - revolutions per minute."
+        SYNTAX INTEGER {
+                other(1),
+                truthvalue(2),
+                specialEnum(3),
+                volts(4),
+                celsius(5),
+                rpm(6)
+        }
+
+SensorCode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Interpretation of the current sensor value."
+        SYNTAX INTEGER {
+                ok(1),
+                unknown(2),
+                notInstalled(3),
+                voltageLowWarning(4),
+                voltageLowCritical(5),
+                noPower(6),
+                voltageHighWarning(7),
+                voltageHighCritical(8),
+                voltageHighSevere(9),
+                temperatureHighWarning(10),
+                temperatureHighCritical(11),
+                temperatureHighSevere(12),
+                fanSlowWarning(13),
+                fanSlowCritical(14),
+                fanStopped(15)
+        }
+
+ExpBase10 ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION     "Exponent base 10 for the current sensor value.
+                         For example '-1' means value*(1/10)."
+        SYNTAX Integer32 (-24..24)
+
+SensorValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS           current
+        DESCRIPTION     "For sensors that measure volts and celsius,
+                         this item is a fixed point number.
+                         For sensors that measure rpm, this item
+                         can take only nonnegative values.
+                         For sensors of type truthvalue, this item
+                         can take only two values: true(1), false(2).
+                         For sensors of type specialEnum, this item
+                         can take any value."
+        SYNTAX Integer32 (-1000000000..1000000000)
+
+SensorStatus ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the operational status of the sensor.
+                         ok(1) means the agent can read the sensor value.
+                         unavailable(2) means that the agent presently
+                         can not report the sensor value.
+                         nonoperational(3) means that the sensor is broken.
+                         notInstalled(4) means that the sensor or device is not present."
+        SYNTAX INTEGER {
+                ok(1),
+                unavailable(2),
+                nonoperational(3),
+                notInstalled(4)
+        }
+
+--
+-- MIB variables
+--
+
+deviceSensorValues
+        OBJECT IDENTIFIER ::= { deviceSensorMIBObjects 1 }
+
+--
+-- deviceSensorValueTable
+--
+
+deviceSensorValueTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceSensorValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of sensors."
+        ::= { deviceSensorValues 1 }
+
+deviceSensorValueEntry OBJECT-TYPE
+        SYNTAX          DeviceSensorValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An deviceSensorValueTable entry describes the
+                         present reading of a sensor, the measurement units
+                         and sensor operational status."
+        INDEX           { deviceSensorIndex }
+        ::= { deviceSensorValueTable 1 }
+
+DeviceSensorValueEntry ::= SEQUENCE {
+        deviceSensorIndex       INTEGER,
+        deviceSensorTrapEnabled TruthValue,
+        deviceSensorUnits       SensorUnits,
+        deviceSensorScale       ExpBase10,
+        deviceSensorValue       SensorValue,
+        deviceSensorCode        SensorCode,
+        deviceSensorStatus      SensorStatus,
+        deviceSensorTimeStamp   TimeStamp,
+        deviceSensorName        DisplayString
+        }
+
+deviceSensorIndex       OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies the sensor"
+        ::= { deviceSensorValueEntry 1 }
+
+deviceSensorTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable controls generation of
+                         deviceSensorTrap for this sensor.
+                         When this variable is true(1), generation of
+                         deviceSensorTrap is enabled.  When this variable
+                         is false(2), generation of deviceSensorTrap is
+                         disabled. The default start-up value is true(1)."
+        ::= { deviceSensorValueEntry 2 }
+
+deviceSensorUnits OBJECT-TYPE
+        SYNTAX          SensorUnits
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the type of data
+                         reported by the deviceSensorValue.
+                         This variable is set by the agent at start-up
+                         and the value does not change during operation."
+        ::= { deviceSensorValueEntry 3 }
+
+deviceSensorScale  OBJECT-TYPE
+        SYNTAX          ExpBase10
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Power of 10 to apply to the value
+                         reported by the deviceSensorValue.
+                         This variable is set by the agent at start-up
+                         and the value does not change during operation."
+        ::= { deviceSensorValueEntry 4 }
+
+deviceSensorValue OBJECT-TYPE
+        SYNTAX          SensorValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable reports the most recent measurement
+                         seen by the sensor. To correctly display or interpret
+                         this variable's value, you must also know
+                         deviceSensorUnits."
+        ::= { deviceSensorValueEntry 5 }
+
+deviceSensorCode OBJECT-TYPE
+        SYNTAX          SensorCode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable reports how to interpret
+                         deviceSensorValue for the sensor."
+        ::= { deviceSensorValueEntry 6 }
+
+deviceSensorStatus OBJECT-TYPE
+        SYNTAX          SensorStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the present operational
+                         status of the sensor."
+        ::= { deviceSensorValueEntry 7 }
+
+deviceSensorTimeStamp OBJECT-TYPE
+        SYNTAX          TimeStamp
+        UNITS           "Hundredths of seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the age of the value
+                         reported by deviceSensorValue."
+        ::= { deviceSensorValueEntry 8 }
+
+deviceSensorName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The textual name of the sensor."
+        ::= { deviceSensorValueEntry 9  }
+
+--
+-- notifications
+--
+
+deviceSensorTrap NOTIFICATION-TYPE
+        OBJECTS { deviceSensorName, deviceSensorValue, deviceSensorCode }
+        STATUS          current
+        DESCRIPTION     "The sensor value warrants a notification."
+        ::= { deviceSensorMIBNotificationsPrefix 1 }
+
+END

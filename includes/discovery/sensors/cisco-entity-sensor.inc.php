@@ -126,22 +126,22 @@ if ($device['os_group'] == 'cisco') {
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $entry) {
+                    foreach ($t_oids[$index] as $t_index => $key) {
                         // Critical Limit
-                        if ($entry['entSensorThresholdSeverity'] == 'major' && $entry['entSensorThresholdRelation'] == 'greaterOrEqual') {
-                            $limit = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
+                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                            $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($entry['entSensorThresholdSeverity'] == 'major' && $entry['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
                             $limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         // Warning Limit
-                        if ($entry['entSensorThresholdSeverity'] == 'minor' && $entry['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
                             $warn_limit = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($entry['entSensorThresholdSeverity'] == 'minor' && $entry['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
                             $warn_limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
@@ -161,7 +161,7 @@ if ($device['os_group'] == 'cisco') {
                 if ($ok) {
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
                     #Cisco IOS-XR : add a fake sensor to graph as dbm
-                    if ($type == "power" and $device['os'] == "iosxr" and preg_match("/power (R|T)x/i", $descr)) {
+                    if ($type == "power" and $device['os'] == "iosxr" and (preg_match("/power (R|T)x/i", $descr) or preg_match("/(R|T)x Power/i", $descr))) {
                             // convert Watts to dbm
                             $type = "dbm";
                             $limit_low = 10 * log10($limit_low*1000);
@@ -181,4 +181,7 @@ if ($device['os_group'] == 'cisco') {
             }//end if
         }//end foreach
     }//end if
+    unset(
+        $entity_array
+    );
 }//end if

@@ -1,0 +1,9 @@
+os: aos
+group: aos
+text: 'Alcatel-Lucent OS'
+type: network
+ifXmcbc: 1
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: alcatellucent

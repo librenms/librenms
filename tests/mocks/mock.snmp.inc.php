@@ -127,6 +127,9 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
     if ($oid == 'GAMATRONIC-MIB::psUnitManufacture.0') {
         return '1.3.6.1.4.1.6050.1.1.2.0';
     }
+    if ($oid === 'SYNOLOGY-SYSTEM-MIB::systemStatus.0') {
+        return '1.3.6.1.4.1.6574.1.1.0';
+    }
     // end optimizations
 
     if (preg_match('/^[\.\d]*$/', $oid)) {

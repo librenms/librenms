@@ -20,6 +20,7 @@ if ($enabled == 1) {
 
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
+    $version = version_info(false);
     $queries = array(
         'alert_rules'     => 'SELECT COUNT(`severity`) AS `total`,`severity` FROM `alert_rules` WHERE `disabled`=0 GROUP BY `severity`',
         'alert_templates' => 'SELECT COUNT(`id`) AS `total` FROM `alert_templates`',
@@ -30,8 +31,7 @@ if ($enabled == 1) {
         'bills'           => 'SELECT COUNT(`bill_type`) AS `total`,`bill_type` FROM `bills` GROUP BY `bill_type`',
         'cef'             => 'SELECT COUNT(`device_id`) AS `total` FROM `cef_switching`',
         'cisco_asa'       => 'SELECT COUNT(`oid`) AS `total`,`oid` FROM `ciscoASA` WHERE `disabled` = 0 GROUP BY `oid`',
-        'mempool'         => 'SELECT COUNT(`cmpName`) AS `total`,`cmpName` FROM `cmpMemPool` GROUP BY `cmpName`',
-        'current'         => 'SELECT COUNT(`current_type`) AS `total`,`current_type` FROM `current` GROUP BY `current_type`',
+        'mempool'         => 'SELECT COUNT(`mempool_descr`) AS `total`,`mempool_descr` FROM `mempools` GROUP BY `mempool_descr`',
         'dbschema'        => 'SELECT COUNT(`version`) AS `total`, `version` FROM `dbSchema`',
         'snmp_version'    => 'SELECT COUNT(`snmpver`) AS `total`,`snmpver` FROM `devices` GROUP BY `snmpver`',
         'os'              => 'SELECT COUNT(`os`) AS `total`,`os` FROM `devices` GROUP BY `os`',
@@ -69,10 +69,25 @@ if ($enabled == 1) {
         $data            = dbFetchRows($query);
         $response[$name] = $data;
     }
+    $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
+    $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
+    $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
+
+    // collect sysDescr and sysObjectID for submission
+    $device_info = dbFetchRows('SELECT COUNT(*) AS `count`,`os`, `sysDescr`, `sysObjectID` FROM `devices`
+        WHERE `sysDescr` IS NOT NULL AND `sysObjectID` IS NOT NULL GROUP BY `os`, `sysDescr`, `sysObjectID`');
+
+    // sanitize sysDescr
+    $device_info = array_map(function ($entry) {
+        $entry['sysDescr'] = preg_replace('/^Linux [A-Za-z\-0-9\.]+ (?=[0-9\.]{5,9})/', 'Linux hostname ', $entry['sysDescr']);
+        $entry['sysDescr'] = preg_replace('/ SN: [A-Z0-9]{12}/', ' SN: 0A0A0A0A0A0A ', $entry['sysDescr']);
+        return $entry;
+    }, $device_info);
 
     $output = array(
         'uuid' => $uuid,
         'data' => $response,
+        'info' => $device_info,
     );
     $data   = json_encode($output);
     $submit = array('data' => $data);

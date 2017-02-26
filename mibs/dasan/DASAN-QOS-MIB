@@ -1,0 +1,528 @@
+DASAN-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Integer32, TimeTicks, mib-2, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, PhysAddress, TruthValue, RowStatus, TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF 
+	--NetworkAddress, IpAddress  FROM RFC1155-SMI
+	dsSwitchModules FROM DASAN-SWITCH-MIB;
+
+
+-- Definition Grammer
+DsQosQueueNumber	::= TEXTUAL-CONVENTION
+			STATUS	current
+			DESCRIPTION	"."
+			SYNTAX	Integer32(0..3)
+
+DsQosCosNumber	::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION	"."
+		SYNTAX	Integer32(0..7)
+
+DsQosTosNumber	::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION	"."
+		SYNTAX	Integer32(0..63)
+
+DsQosDscpNumber	::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION	"."
+		SYNTAX	Integer32(0..63)
+
+dsQos	MODULE-IDENTITY
+    	LAST-UPDATED	"200407130000Z"
+    	ORGANIZATION	"DASAN Co., Ltd."
+    	CONTACT-INFO	"DASAN Co., Ltd."
+    	DESCRIPTION     "."
+	::= { dsSwitchModules 21 }
+
+
+-- Dasan Rule Table
+dsQosRuleTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsQosRuleEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of dsQosRuleEntry entries. 
+				 Each rule contains filtering informations for making QoS(Quality of Service) policies."
+		::= { dsQos 1 }
+
+		dsQosRuleEntry	OBJECT-TYPE
+				SYNTAX		DsQosRuleEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing rule information."
+				INDEX		{ dsQosRuleName }
+				::= { dsQosRuleTable 1 }
+
+		DsQosRuleEntry	::= SEQUENCE {
+							dsQosRuleName				DisplayString,
+							dsQosRulePriority			INTEGER,
+							dsQosRuleIngressPort			Integer32,
+							dsQosRuleEgressPort			Integer32,
+							dsQosRuleEthertype			Integer32,
+							dsQosRuleIpBasedSrcIpAddress		IpAddress,
+							dsQosRuleIpBasedSrcNetmask		NetworkAddress,
+							dsQosRuleIpBasedDesIpAddress		IpAddress,
+							dsQosRuleIpBasedDesNetmask		NetworkAddress,
+							dsQosRuleIpBasedProtocol		Integer32,
+							dsQosRuleIpBasedTCPorUDPSrcPort		Integer32,
+							dsQosRuleIpBasedTCPorUDPDesPort		Integer32,
+							dsQosRuleRowStatus			INTEGER,
+							dsQoSRuleIpBasedPriorityType		INTEGER,
+							dsQoSRuleIpBasedPriorityValue		Integer32
+
+					}
+
+			dsQosRuleName		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-create
+						STATUS		current
+						DESCRIPTION	"A unique string for each rule up to 255 characters. 
+								 This string is a index of rule table."
+						::= { dsQosRuleEntry 1 }
+
+			dsQosRulePriority	OBJECT-TYPE
+						SYNTAX		INTEGER {
+									none(0),
+									low(1), 
+									medium(2),
+									high(3)
+								}
+						MAX-ACCESS	read-create
+						STATUS		current
+						DESCRIPTION	"The priority of rule. 
+								 There are three priority levels, high, medium, low. 
+								 It can be used when multi-ruled filetering policy with priority is needed. 
+								 For example, If you want to set 'web traffic of host A' is rule 'web', and 
+								 'other traffic of host A' is rule 'others', 
+								 all traffic of host A is set to rule 'others' with priority medium first, 
+								 and then set web traffic of host A is rule 'web' with high priority."
+						::= { dsQosRuleEntry 2 }
+
+			dsQosRuleIngressPort	OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-create
+						STATUS		current
+						DESCRIPTION	"The logical ingress port number of rule. It can be from 0 to 26, 0 means 'any port'."
+						::= { dsQosRuleEntry 3 }
+
+			dsQosRuleEgressPort	OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-create
+						STATUS		current
+						DESCRIPTION	"The logical egress port number of rule. It can be from 0 to 26, 0 means 'any port'."
+						::= { dsQosRuleEntry 4 }	
+
+			dsQosRuleEthertype	OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-create
+						STATUS		current
+						DESCRIPTION	"The ethernet type of rule. It is 2 octet length value. 
+								 For example, 0x0800 for IPv4, 0x0806 for ARP."
+						::= { dsQosRuleEntry 5 }
+
+			dsQosRuleIpBasedSrcIpAddress	OBJECT-TYPE
+							SYNTAX		IpAddress
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The source IP Address of rule."
+							::= { dsQosRuleEntry 6 }
+
+			dsQosRuleIpBasedSrcNetmask	OBJECT-TYPE
+							SYNTAX		NetworkAddress
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The source netmask of rule."
+							::= { dsQosRuleEntry 7 }
+
+			dsQosRuleIpBasedDesIpAddress	OBJECT-TYPE
+							SYNTAX		IpAddress
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The destination IP Address of rule."
+							::= { dsQosRuleEntry 8 }
+
+			dsQosRuleIpBasedDesNetmask	OBJECT-TYPE
+							SYNTAX		NetworkAddress
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The destination netmask of rule."
+							::= { dsQosRuleEntry 9 }
+
+			dsQosRuleIpBasedProtocol	OBJECT-TYPE
+							SYNTAX		Integer32
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The protocol type of rule. 
+									 It is 1 octet length value. 
+									 For example, 1 for ICMP, 6 for TCP, 17 for UDP."
+							::= { dsQosRuleEntry 10 }
+						
+			dsQosRuleIpBasedTCPorUDPSrcPort	OBJECT-TYPE
+								SYNTAX		Integer32
+								MAX-ACCESS	read-create
+								STATUS		current
+								DESCRIPTION	"The source port of rule. It is 2 octet length value."
+								::= { dsQosRuleEntry 11 }
+
+			dsQosRuleIpBasedTCPorUDPDesPort	OBJECT-TYPE
+								SYNTAX		Integer32
+								MAX-ACCESS	read-create
+								STATUS		current
+								DESCRIPTION	"The destination port of rule. It is 2 octet length value."
+								::= { dsQosRuleEntry 12 }
+
+			dsQosRuleRowStatus		OBJECT-TYPE
+							SYNTAX		INTEGER {
+										none(0),
+										active(1),
+										create(2),
+										modify(3),
+										destroy(4)
+									}
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"This object is used to create a new row or modify or delete an existing row in this table. 
+									 A rule activated by being set this object to 'active'. 
+									 When 'active' is set, the system will validate the rule. 
+									 Before a rule can be deleted or modify, (by setting this object to 'delete' or 'modify')"
+								 	 --it must be first unreferenced from all associated lines.(when 'active-applied' is set, a rule cann't be deleted or modified)."
+							::= { dsQosRuleEntry 13 }
+
+
+			dsQoSRuleIpBasedPriorityType	OBJECT-TYPE
+							SYNTAX		INTEGER {
+							    			none(0),
+										ipProcedence(1),
+										diffServ(2),
+										ipToS(3)
+									}
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	""
+							::= { dsQosRuleEntry 14 }
+	
+			dsQoSRuleIpBasedPriorityValue	OBJECT-TYPE
+							SYNTAX		Integer32
+							MAX-ACCESS	read-create
+							STATUS		current
+							DESCRIPTION	"The Priority value in incoming IP packet.
+							If PriorityType is 1, this value's range is 0-7.
+							If PriorityType is 2, this value's range is 0-63.
+							If PriorityType is 3, this value's range is 0-255.
+							If PriorityType is 0, this value is any(Don't look at this field)."
+							::= { dsQosRuleEntry 15 }
+
+-- Dasan Qos Rule application by packet filtering rule
+dsQosRuleActionTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF DsQosRuleActionEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"A list of dsQosActionEntry entries. Each entry has action properties of the rule."
+			::= { dsQos 2 }
+
+		dsQosRuleActionEntry	OBJECT-TYPE
+					SYNTAX		DsQosRuleActionEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing rule action information."
+					INDEX		{ dsQosRuleName }
+					::= { dsQosRuleActionTable 1 }
+
+		DsQosRuleActionEntry	::= SEQUENCE {
+							dsQosRuleActionMatchPermit			TruthValue,
+							dsQosRuleActionMatchCopy2CPU			TruthValue,
+							dsQosRuleActionNoMatchCopy2CPU			TruthValue,
+							dsQosRuleActionMatchBandwidth			TruthValue,
+							dsQosRuleActionMatchBandwidthValue		Integer32,
+							dsQosRuleActionMatchDeny			TruthValue,
+							dsQosRuleActionNoMatchDeny			TruthValue,
+							dsQosRuleActionMatchRedirect			TruthValue,
+							dsQosRuleActionMatchRedirectEgressPort		Integer32,
+							dsQosRuleActionNoMatchRedirect			TruthValue,
+							dsQosRuleActionNoMatchRedirectEgressPort	Integer32,
+							dsQosRuleActionMatchMirror			TruthValue,
+							dsQosRuleActionNoMatchMirror			TruthValue
+					}
+
+			dsQosRuleActionMatchPermit	OBJECT-TYPE
+							SYNTAX		TruthValue	
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The permit action of rule taffics. True (1) or False (0). If the permit action is set true, all in-profile traffics will be permitted."
+							::= { dsQosRuleActionEntry 1 }
+
+			dsQosRuleActionMatchCopy2CPU	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The copy-packet-to-cpu action of rule-matched traffics. True (1) or False (0). If the copy-to-cpu action is set true, all in-profile traffics will be copied to CPU."
+							::= { dsQosRuleActionEntry 2 }
+
+			dsQosRuleActionNoMatchCopy2CPU	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The copy-packet-to-cpu action of rule-no-matched traffics. True (1) or False (0). If the copy-to-cpu action is set true, all in-profile traffics will be copied to CPU."
+							::= { dsQosRuleActionEntry 3 }
+
+			dsQosRuleActionMatchBandwidth	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The set-bandwidth action of rule-matched traffics. True (1) or False (0). If the set-bandwidth action is set true, the rate-limit of rule will be started."
+							::= { dsQosRuleActionEntry 4 }
+
+			dsQosRuleActionMatchBandwidthValue	OBJECT-TYPE
+								SYNTAX		Integer32(0..1000)
+								MAX-ACCESS	read-write
+								STATUS		current
+								DESCRIPTION	"The bandwidth value of rule-matched traffics. It can be configured in Mega bps and can be from 0 to 1000."
+								::= { dsQosRuleActionEntry 5 }	
+
+			dsQosRuleActionMatchDeny	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The deny action of rule-matched traffics. True (1) or False (0). If the deny action is set true, all in-profile traffics will be denied."
+							::= { dsQosRuleActionEntry 6 }
+
+			dsQosRuleActionNoMatchDeny	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The deny action of rule-no-matched traffics. True (1) or False (0). If the deny action is set true, all in-profile traffics will be denied."
+							::= { dsQosRuleActionEntry 7 }
+
+
+			dsQosRuleActionMatchRedirect	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The redirect-egress port action of rule-matched traffics. True (1) or False (0). If the redirect-egress port action is set true, all in-profile traffics will be passed to redirect-egress port."
+							::= { dsQosRuleActionEntry 8 }
+
+			dsQosRuleActionMatchRedirectEgressPort	OBJECT-TYPE
+								SYNTAX		Integer32(0..26)
+								MAX-ACCESS	read-write
+								STATUS		current
+								DESCRIPTION	"The logical redirect egress port number of rule-matched traffics. It can be from 1 to 26."
+								::= { dsQosRuleActionEntry 9 }
+
+			dsQosRuleActionNoMatchRedirect	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The redirect-egress port action of rule-no-matched traffics. True (1) or False (0). If the redirect-egress port action is set true, all in-profile traffics will be passed to redirect-egress port."
+							::= { dsQosRuleActionEntry 10 }
+
+
+			dsQosRuleActionNoMatchRedirectEgressPort	OBJECT-TYPE
+									SYNTAX		Integer32(0..26)
+									MAX-ACCESS	read-write
+									STATUS		current
+									DESCRIPTION	"The logical redirect egress port number of rule-no-matched traffics. It can be from 1 to 26."
+									::= { dsQosRuleActionEntry 11 }
+	
+			dsQosRuleActionMatchMirror	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The mirror action of rule-matched traffics. True (1) or False (0).  If the mirror action is set true, all in-profile traffics will be passed to mirroring port."
+							::= { dsQosRuleActionEntry 12 }
+
+			dsQosRuleActionNoMatchMirror	OBJECT-TYPE
+							SYNTAX		TruthValue
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The mirror action of rule-no-matched-traffics. True (1) or False (0).  If the mirror action is set true, all in-profile traffics will be passed to mirroring port."
+							::= { dsQosRuleActionEntry 13 }
+
+-- Qos Rule To Cos
+dsQosRule2CosMapTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF DsQosRule2CosMapEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"A list of dsQosRule2CosMapEntry entries. Each entry has CoS value of the rule."
+			::= { dsQos 3 }
+
+		dsQosRule2CosMapEntry	OBJECT-TYPE
+					SYNTAX		DsQosRule2CosMapEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing rule to COS mapping information."
+					INDEX		{ dsQosRuleName }
+					::= { dsQosRule2CosMapTable 1 }
+
+		DsQosRule2CosMapEntry	::= SEQUENCE {
+							dsQosRule2CosMapMatchCos	DsQosCosNumber,
+							dsQosRule2CosMapNoMatchCos	DsQosCosNumber
+					}
+
+			dsQosRule2CosMapMatchCos	OBJECT-TYPE
+							SYNTAX		DsQosCosNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The CoS (Class of Service) value of rule-matched traffics. It can be from 0 to 7, 7 is the highest priority."
+							::= { dsQosRule2CosMapEntry 1 }
+
+			dsQosRule2CosMapNoMatchCos	OBJECT-TYPE
+							SYNTAX		DsQosCosNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The CoS (Class of Service) value of rule-no-matched traffics. It can be from 0 to 7, 7 is the highest priority."
+							::= { dsQosRule2CosMapEntry 2 }
+
+-- Qos Rule To Dscp
+dsQosRule2DscpMapTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF DsQosRule2DscpMapEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"A list of dsQosRule2DscpMapEntry entries. Each entry has DSCP value of the rule."
+			::= { dsQos 4 }
+
+		dsQosRule2DscpMapEntry	OBJECT-TYPE
+					SYNTAX		DsQosRule2DscpMapEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing rule to DSCP mapping information."
+					INDEX		{ dsQosRuleName }
+					::= { dsQosRule2DscpMapTable 1 }
+
+		DsQosRule2DscpMapEntry	::= SEQUENCE {
+							dsQosRule2DscpMapMatchDscp	DsQosDscpNumber,
+							dsQosRule2DscpMapNoMatchDscp	DsQosDscpNumber
+					}
+
+			dsQosRule2DscpMapMatchDscp	OBJECT-TYPE
+							SYNTAX		DsQosDscpNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The DSCP (DiffServ Code Point) value of rule-matched traffics. It can be from 0 to 63, 63 is the highest priority."
+							::= { dsQosRule2DscpMapEntry 1 }
+
+			dsQosRule2DscpMapNoMatchDscp	OBJECT-TYPE
+							SYNTAX		DsQosDscpNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The DSCP (DiffServe Code Point) value of rule-no-matched traffics. It can be from 0 to 63, 63 is the highest priority."
+							::= { dsQosRule2DscpMapEntry 2 }
+
+-- Qos Rule To Tos
+dsQosRule2TosMapTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF DsQosRule2TosMapEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"A list of dsQosRule2TosMapEntry entries. Each entry has TOS value of the rule."
+			::= { dsQos 5 }
+
+		dsQosRule2TosMapEntry	OBJECT-TYPE
+					SYNTAX		DsQosRule2TosMapEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing rule to TOS mapping information."
+					INDEX		{ dsQosRuleName }
+					::= { dsQosRule2TosMapTable 1 }
+
+		DsQosRule2TosMapEntry	::= SEQUENCE {
+							dsQosRule2TosMapMatchTos	DsQosTosNumber,
+							dsQosRule2TosMapNoMatchTos	DsQosTosNumber
+					}
+
+			dsQosRule2TosMapMatchTos	OBJECT-TYPE
+							SYNTAX		DsQosTosNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The ToS (Type of Service) value of rule-matched traffics. The TOS is 1 octet length value."
+							::= { dsQosRule2TosMapEntry 1 }
+
+			dsQosRule2TosMapNoMatchTos	OBJECT-TYPE
+							SYNTAX		DsQosTosNumber
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The ToS (Type of Service) value of rule-no-matched traffics. The TOS is 1 octet length value."
+							::= { dsQosRule2TosMapEntry 2 }
+
+-- Qos Map establishment (Cos To QUEUE)
+dsQosCos2QueueMapTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF DsQosCos2QueueMapEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"A list of dsQosCos2QueueMapEntry entries. Each entry has queue number value of the CoS."
+			::= { dsQos 6 }
+
+		dsQosCos2QueueMapEntry	OBJECT-TYPE
+					SYNTAX		DsQosCos2QueueMapEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing COS to Queue mapping information."
+					INDEX		{ dsQosCos2QueueMapCos }
+					::= { dsQosCos2QueueMapTable 1 }
+
+		DsQosCos2QueueMapEntry	::= SEQUENCE {
+							dsQosCos2QueueMapCos	DsQosCosNumber,
+							dsQosCos2QueueMapQueue	DsQosQueueNumber
+					}
+
+			dsQosCos2QueueMapCos	OBJECT-TYPE
+						SYNTAX		DsQosCosNumber
+						MAX-ACCESS	not-accessible
+						STATUS		current
+						DESCRIPTION	"The COS value of rule traffics. It is a index value and can be from 0 to 7."
+						::= { dsQosCos2QueueMapEntry 1 }
+
+			dsQosCos2QueueMapQueue	OBJECT-TYPE
+						SYNTAX		DsQosQueueNumber
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The Queue number of COS. It can be from 0 to 3, 3 is the highest priority."
+						::= { dsQosCos2QueueMapEntry 2 }
+
+-- Qos Queue Scheduling Value Fixing
+dsQosQueueSchedulingTable	OBJECT-TYPE
+				SYNTAX		SEQUENCE OF DsQosQueueSchedulingEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"A list of dsQosQueueSchedulingEntry entries. Each entry has Scheduling property of the queue."
+				::= { dsQos 7 }
+
+		dsQosQueueSchedulingEntry	OBJECT-TYPE
+						SYNTAX		DsQosQueueSchedulingEntry
+						MAX-ACCESS	not-accessible
+						STATUS		current
+						DESCRIPTION	"An entry containing Queue Scheduling information."
+						INDEX		{ dsQosQueueSchedulingQueueIndex }
+						::= { dsQosQueueSchedulingTable 1 }
+
+		DsQosQueueSchedulingEntry	::= SEQUENCE {
+							dsQosQueueSchedulingQueueIndex	DsQosQueueNumber,
+							dsQosQueueSchedulingMaxPacket	Integer32,
+							dsQosQueueSchedulingMaxLatency	Integer32
+					}
+
+			dsQosQueueSchedulingQueueIndex	OBJECT-TYPE
+							SYNTAX		DsQosQueueNumber
+							MAX-ACCESS	not-accessible
+							STATUS		current
+							DESCRIPTION	"The Queue index number. It can be from 0 to 3."
+							::= { dsQosQueueSchedulingEntry 1 }
+
+			dsQosQueueSchedulingMaxPacket	OBJECT-TYPE
+							SYNTAX		Integer32(0..255)
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The max packet value of queue. The max packet value can be from 0 to 255, 0 means 'unlimited'. After  packets in a certain queue are sent up to max packet value, the packet of next queue will be serviced (Weighted Round Robin).  If max packet value is set 0 (unlimited), only when a certain queue is empty, packets of next queue will be serviced (Strict Queueing)."
+							::= { dsQosQueueSchedulingEntry 2 }
+
+			dsQosQueueSchedulingMaxLatency	OBJECT-TYPE
+							SYNTAX		Integer32(0..4080)
+							MAX-ACCESS	read-write
+							STATUS		current
+							DESCRIPTION	"The max latency value of queue. The Max Latency value can be 0 and from 16 to 4080, 0 means 'disable'. If packets in a certain queue are sent with over-max-latency, the packet of next queue will be serviced. In this scheme, the latency means a inter-packet-gap value. If max latency value is set 0 (disable), latency is not a factor of scheduling any more."
+							::= { dsQosQueueSchedulingEntry 3 }
+
+-- Qos Object Group
+
+-- Qos Module Compliance
+
+END

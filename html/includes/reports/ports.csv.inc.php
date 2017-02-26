@@ -165,7 +165,7 @@ foreach ($ports as $port) {
             $port['in_rate'],
             $port['out_rate'],
             $type,
-            $port['ifAlias'],
+            display($port['ifAlias']),
         );
     }
 }

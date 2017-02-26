@@ -1,0 +1,16 @@
+os: ruckuswireless
+text: 'Ruckus Wireless'
+type: wireless
+icon: ruckus
+mib_dir:
+    - ruckus
+over:
+    - { graph: device_bits, text: Traffic }
+register_mibs:
+    ruckusZDSystemStats: RUCKUS-ZD-SYSTEM-MIB
+    ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.25053.3.1

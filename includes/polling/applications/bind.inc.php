@@ -24,6 +24,8 @@
  * @subpackage Polling
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'bind';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name]) && $app_id > 0) {
@@ -69,18 +71,17 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     }//end foreach
 
     $rrd_name = array('app', $name, $app_id);
-    $rrd_def = array(
-        'DS:any:COUNTER:600:0:125000000000',
-        'DS:a:COUNTER:600:0:125000000000',
-        'DS:aaaa:COUNTER:600:0:125000000000',
-        'DS:cname:COUNTER:600:0:125000000000',
-        'DS:mx:COUNTER:600:0:125000000000',
-        'DS:ns:COUNTER:600:0:125000000000',
-        'DS:ptr:COUNTER:600:0:125000000000',
-        'DS:soa:COUNTER:600:0:125000000000',
-        'DS:srv:COUNTER:600:0:125000000000',
-        'DS:spf:COUNTER:600:0:125000000000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('any', 'COUNTER', 0, 125000000000)
+        ->addDataset('a', 'COUNTER', 0, 125000000000)
+        ->addDataset('aaaa', 'COUNTER', 0, 125000000000)
+        ->addDataset('cname', 'COUNTER', 0, 125000000000)
+        ->addDataset('mx', 'COUNTER', 0, 125000000000)
+        ->addDataset('ns', 'COUNTER', 0, 125000000000)
+        ->addDataset('ptr', 'COUNTER', 0, 125000000000)
+        ->addDataset('soa', 'COUNTER', 0, 125000000000)
+        ->addDataset('srv', 'COUNTER', 0, 125000000000)
+        ->addDataset('spf', 'COUNTER', 0, 125000000000);
 
     $fields = array(
         'any'   => ((int)$bind_parsed['incoming_queries']['any']),

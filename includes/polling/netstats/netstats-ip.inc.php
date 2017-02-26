@@ -1,6 +1,8 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+use LibreNMS\RRD\RrdDefinition;
+
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' IP';
 
     // These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
@@ -23,11 +25,10 @@ if ($device['os'] != 'Snom') {
         'ipInAddrErrors',
     );
 
-    $rrd_def = array();
+    $rrd_def = new RrdDefinition();
     $snmpstring = '';
     foreach ($oids as $oid) {
-        $oid_ds      = substr($oid, 0, 19);
-        $rrd_def[]   = "DS:$oid_ds:COUNTER:600:U:100000000000";
+        $rrd_def->addDataset($oids, 'COUNTER', null, 100000000000);
         $snmpstring .= ' IP-MIB::'.$oid.'.0';
     }
 

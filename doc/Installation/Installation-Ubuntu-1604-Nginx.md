@@ -8,7 +8,7 @@ source: Installation/Installation-Ubuntu-1604-Nginx.md
 #### Install / Configure MySQL
 ```bash
 apt-get install mariadb-server mariadb-client
-service mysql restart
+systemctl restart mysql
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mysql restart```
+```systemctl restart mysql```
 
 ### Web Server ###
 
@@ -42,7 +42,7 @@ sql-mode=""
 In `/etc/php/7.0/fpm/php.ini` and `/etc/php/7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-service php7.0-fpm restart
+systemctl restart php7.0-fpm
 phpenmod mcrypt
 ```
 
@@ -79,6 +79,8 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ gzip on;
+ gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
  location / {
   try_files $uri $uri/ @librenms;
  }
@@ -98,7 +100,8 @@ server {
 ```
 
 ```bash
-service nginx restart
+rm /etc/nginx/sites-enabled/default
+systemctl restart nginx
 ```
 
 #### Web installer
@@ -108,8 +111,8 @@ Now head to: http://librenms.example.com/install.php and follow the on-screen in
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.example /etc/snmpd/snmpd.conf
-vim /etc/snmpd/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+vim /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
@@ -117,12 +120,18 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job
 
 `cp librenms.nonroot.cron /etc/cron.d/librenms`
+
+#### Copy logrotate config
+
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+
+    cp misc/librenms.logrotate /etc/logrotate.d/librenms
 
 #### Final steps
 

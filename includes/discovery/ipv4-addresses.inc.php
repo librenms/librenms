@@ -39,7 +39,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 echo '+';
             } else {
                 //Update Context
-                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_addresses', 'ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?', array($oid, $cidr, $port_id));
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv4_addresses', '`ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?', array($oid, $cidr, $port_id));
                 echo '.';
             }
 

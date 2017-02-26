@@ -34,7 +34,7 @@ foreach (dbFetchRows($sql, array($device_id)) as $stp_ports_db) {
     $root_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedRoot']));
 
     $response[] = array (
-        'port_id'            => generate_port_link($stp_ports_db, $stp_ports_db['ifName'])."<br>".$stp_ports_db['ifAlias'],
+        'port_id'            => generate_port_link($stp_ports_db, $stp_ports_db['ifName'])."<br>".display($stp_ports_db['ifAlias']),
         'priority'           => $stp_ports_db['priority'],
         'state'              => $stp_ports_db['state'],
         'enable'             => $stp_ports_db['enable'],

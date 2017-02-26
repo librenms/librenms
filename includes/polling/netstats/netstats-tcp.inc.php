@@ -1,6 +1,8 @@
 <?php
 
-if ($device['os'] != 'Snom') {
+use LibreNMS\RRD\RrdDefinition;
+
+if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' TCP';
 
     $oids = array(
@@ -16,11 +18,10 @@ if ($device['os'] != 'Snom') {
         'tcpOutRsts',
     );
 
-    $rrd_def = array();
+    $rrd_def = new RrdDefinition();
     $snmpstring = '';
     foreach ($oids as $oid) {
-        $oid_ds      = substr($oid, 0, 19);
-        $rrd_def[]   = " DS:$oid_ds:COUNTER:600:U:10000000"; // Limit to 10MPPS
+        $rrd_def->addDataset($oid, 'COUNTER', null, 10000000);
         $snmpstring .= ' TCP-MIB::'.$oid.'.0';
     }
 

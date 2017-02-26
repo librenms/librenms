@@ -1,0 +1,12 @@
+os: dsm
+text: 'Synology DSM'
+group: unix
+type: storage
+icon: synology
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+mib_dir:
+    - synology
+processor_stacked: 1

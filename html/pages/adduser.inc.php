@@ -86,7 +86,7 @@ if ($_SESSION['userlevel'] < '10') {
       </select>
       <div class='checkbox'>
         <label>
-          <input type='checkbox' checked='checked' name='can_modify_passwd'> Allow the user to change his password.
+          <input type='checkbox' checked='checked' name='can_modify_passwd'> Allow the user to change their password.
         </label>
       </div>
       <hr>

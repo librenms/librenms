@@ -75,7 +75,7 @@ if (bill_permitted($bill_id)) {
 
         // Collected Earlier
         foreach ($ports as $port) {
-            $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
+            $portalias = (empty($port['ifAlias']) ? '' : ' - '.display($port['ifAlias']).'');
 
             echo '<div class="list-group-item">';
             echo generate_port_link($port, $port['ifName'].$portalias).' on '.generate_device_link($port);
@@ -118,7 +118,7 @@ if (bill_permitted($bill_id)) {
         $sep = ' | ';
     }
     
-    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><img align=absmiddle src="images/16/arrow_left.png"> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 

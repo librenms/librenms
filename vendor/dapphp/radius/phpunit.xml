@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="./tests/bootstrap.php"
+        colors="true">
+  <testsuites>
+    <testsuite name="PHP Radius Client Tests">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

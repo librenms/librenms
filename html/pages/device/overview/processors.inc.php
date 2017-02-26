@@ -10,7 +10,7 @@ if (count($processors)) {
             <div class="panel-heading">
 ';
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=processor/">';
-    echo "<img src='images/icons/processor.png'> <strong>Processors</strong></a>";
+    echo '<i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> <strong>Processors</strong></a>';
     echo '</div>
         <table class="table table-hover table-condensed table-striped">';
 

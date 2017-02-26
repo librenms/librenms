@@ -1,0 +1,161 @@
+BLUECOAT-SG-USAGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceUsageMIB MODULE-IDENTITY
+        LAST-UPDATED    "201307110300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The usage MIB is used to monitor
+                         resource usage of the device."
+        REVISION        "201307110300Z"
+        DESCRIPTION     "Access level changes in deviceUsageTable."
+        REVISION        "200801160300Z"
+        DESCRIPTION     "Deprecated the usage trap in favour
+                         of using health monitoring."
+        REVISION        "200712070300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200211060300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 4 }
+
+deviceUsageMIBObjects
+        OBJECT IDENTIFIER ::= { deviceUsageMIB 1 }
+
+deviceUsageMIBNotifications
+        OBJECT IDENTIFIER ::= { deviceUsageMIB 2 }
+
+deviceUsageMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { deviceUsageMIBNotifications 0 }
+
+--
+-- textual conventions
+--
+
+Percent ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d%"
+        STATUS          current
+        DESCRIPTION     "Percent value."
+        SYNTAX Integer32 ( 0..100)
+
+UsageStatus ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Current status of the deviceUsagePercent.
+                ok    - value within limit.
+                high  - value surpassed high limit. "
+        SYNTAX INTEGER {
+                ok(1),
+                high(2)
+        }
+
+--
+-- MIB variables
+--
+
+deviceUsageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various resources that
+                         are available."
+        ::= { deviceUsageMIBObjects 1 }
+
+deviceUsageEntry OBJECT-TYPE
+        SYNTAX          DeviceUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A deviceUsage entry describes the
+                         present usage of a resource."
+        INDEX           { deviceUsageIndex }
+        ::= { deviceUsageTable 1 }
+
+DeviceUsageEntry ::= SEQUENCE {
+        deviceUsageIndex        INTEGER,
+        deviceUsageTrapEnabled  TruthValue,
+        deviceUsageName         DisplayString,
+        deviceUsagePercent      Percent,
+        deviceUsageHigh         Percent,
+        deviceUsageStatus       UsageStatus,
+        deviceUsageTime         TimeStamp
+        }
+
+deviceUsageIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies
+                         a resource."
+        ::= { deviceUsageEntry 1 }
+
+deviceUsageTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable controls generation of deviceUsageTrap
+                         for this resource.
+                         When this variable is true(1), generation of
+                         deviceUsageTrap is enabled. When this variable is
+                         false(2), generation of deviceUsageTrap is disabled.
+                         The default start-up value is true(1)."
+        ::= { deviceUsageEntry 2 }
+
+deviceUsageName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The textual name of the resource e.g. Disk."
+        ::= { deviceUsageEntry 3  }
+
+deviceUsagePercent OBJECT-TYPE
+        SYNTAX          Percent
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Percent of resource in use."
+        ::= { deviceUsageEntry 4 }
+
+deviceUsageHigh OBJECT-TYPE
+        SYNTAX          Percent
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Percent usage which a notification will be sent when
+                         the value is reached. For example, if deviceUsageHigh
+                         is set to 79 then notification will be send when the
+                         value changes from less than 79 to 79. The default is
+                         defined by the device for a particular resource."
+        ::= { deviceUsageEntry 5 }
+
+deviceUsageStatus OBJECT-TYPE
+        SYNTAX          UsageStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Comparison of deviceUsagePercent with deviceUsageHigh."
+        ::= { deviceUsageEntry 6 }
+
+deviceUsageTime OBJECT-TYPE
+        SYNTAX          TimeStamp
+        UNITS           "Hundredths of seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Value of 'sysUpTime.0' at last resource reading."
+        ::= { deviceUsageEntry 7 }
+
+--
+-- notifications
+--
+
+deviceUsageTrap NOTIFICATION-TYPE
+        OBJECTS { deviceUsageName, deviceUsagePercent, deviceUsageStatus }
+        STATUS          deprecated
+        DESCRIPTION     "A notification is sent when the deviceUsagePercent
+                         exceeds a threshold. This is no longer functional.
+                         Use health monitoring instead."
+        ::= { deviceUsageMIBNotificationsPrefix 1 }
+
+END

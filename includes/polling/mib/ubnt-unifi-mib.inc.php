@@ -3,7 +3,7 @@
 // based on Airfiber MIB work of Mark Gibbons
 
 // UBNT-UniFi-MIB
-echo ' UBNT-UniFi-MIB ';
+echo 'UBNT-UniFi-MIB ';
 
 // $mib_oids     (oidindex,dsname,dsdescription,dstype)
 $mib_oids = array(

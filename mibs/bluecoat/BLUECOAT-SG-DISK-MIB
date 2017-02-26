@@ -1,0 +1,192 @@
+BLUECOAT-SG-DISK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Counter32, Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceDiskMIB MODULE-IDENTITY
+        LAST-UPDATED    "201307110300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The deviceDiskMIB is used to monitor
+                         the status of the device disks."
+        REVISION        "201307110300Z"
+        DESCRIPTION     "Access level for deviceDiskTrapEnabled changed."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200211060300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 2 }
+
+deviceDiskMIBObjects
+        OBJECT IDENTIFIER ::= { deviceDiskMIB 1 }
+
+deviceDiskMIBNotifications
+        OBJECT IDENTIFIER ::= { deviceDiskMIB 2 }
+
+deviceDiskMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { deviceDiskMIBNotifications 0 }
+
+-- textual conventions
+
+DiskStatus ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the operational status of the disk.
+                present(1)      - the agent disk is operational.
+                initializing(2) - the disk is being formatted by the device for use.
+                inserted(3)     - the disk has been inserted into the device.
+                offline(4)      - the disk has been taken offline by the system.
+                removed(5)      - the disk is being removed from the drive slot.
+                notpresent(6)   - no disk is present in drive slot.
+                empty(7)        - the drive slot is not in use.
+                ioerror(8)      - the drive had disk io error
+                unusable(9)     - the drive is unusable
+                unknown(10)     - cannot determine disk status."
+
+        SYNTAX INTEGER {
+                present(1),
+                initializing(2),
+                inserted(3),
+                offline(4),
+                removed(5),
+                notpresent(6),
+                empty(7),
+                ioerror(8),
+                unusable(9),
+                unknown(10)
+        }
+
+--
+-- MIB variables
+--
+
+deviceDiskValues
+        OBJECT IDENTIFIER ::= { deviceDiskMIBObjects 1 }
+
+--
+-- deviceDiskValueTable
+--
+
+deviceDiskValueTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceDiskValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of disks."
+        ::= { deviceDiskValues 1 }
+
+deviceDiskValueEntry OBJECT-TYPE
+        SYNTAX          DeviceDiskValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An deviceDiskValueTable entry describes the
+                         characteristics and operational status of a disk."
+        INDEX           { deviceDiskIndex }
+        ::= { deviceDiskValueTable 1 }
+
+DeviceDiskValueEntry ::= SEQUENCE {
+        deviceDiskIndex         INTEGER,
+        deviceDiskTrapEnabled   TruthValue,
+        deviceDiskStatus        DiskStatus,
+        deviceDiskTimeStamp     TimeStamp,
+        deviceDiskVendor        DisplayString,
+        deviceDiskProduct       DisplayString,
+        deviceDiskRevision      DisplayString,
+        deviceDiskSerialN       DisplayString,
+        deviceDiskBlockSize     Counter32,
+        deviceDiskBlockCount    Counter32
+        }
+
+deviceDiskIndex   OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies the disk."
+        ::= { deviceDiskValueEntry 1 }
+
+deviceDiskTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable controls generation of deviceDiskTrap
+                         for this disk. When this variable is true(1),
+                         generation of deviceDiskTrap is enabled.  When this
+                         variable is false(2), generation of deviceDiskTrap
+                         is disabled. The default start-up value is true(1)."
+        ::= { deviceDiskValueEntry 2 }
+
+deviceDiskStatus OBJECT-TYPE
+        SYNTAX          DiskStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the present operational status
+                         of the disk."
+        ::= { deviceDiskValueEntry 3 }
+
+deviceDiskTimeStamp OBJECT-TYPE
+        SYNTAX          TimeStamp
+        UNITS           "Hundredths of seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates when the value of
+                         deviceDiskStatus was last reported."
+        ::= { deviceDiskValueEntry 4 }
+
+deviceDiskVendor OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The vendor name."
+        ::= { deviceDiskValueEntry 5  }
+
+deviceDiskProduct OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The product name."
+        ::= { deviceDiskValueEntry 6  }
+
+deviceDiskRevision OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Revision code."
+        ::= { deviceDiskValueEntry 7  }
+
+deviceDiskSerialN OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Serial number of the disk."
+        ::= { deviceDiskValueEntry 8  }
+
+deviceDiskBlockSize OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Block size drive has been formatted to in bytes."
+        ::= { deviceDiskValueEntry 9  }
+
+deviceDiskBlockCount OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of blocks on the drive."
+        ::= { deviceDiskValueEntry 10  }
+
+--
+-- notifications
+--
+
+deviceDiskTrap NOTIFICATION-TYPE
+        OBJECTS { deviceDiskStatus }
+        STATUS          current
+        DESCRIPTION     "The disk status warrants a notification."
+        ::= { deviceDiskMIBNotificationsPrefix 1 }
+
+END

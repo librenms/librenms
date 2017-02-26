@@ -1,5 +1,3 @@
-LibreNMS is a fork of [Observium][1].
-
 LibreNMS core team:
 - Paul Gear <paul@librenms.org> (paulgear)
 - Neil Lathwood <neil@librenms.org> (laf)
@@ -79,6 +77,7 @@ LibreNMS contributors:
 - D. Britz <github@wrind.de> (flatterlight)
 - Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 - Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
+- Dave Hope <dave@hope.mx> (davehope)
 - Jurrian van Iersel <jurrian@vaniersel.net> (jviersel)
 - Adam Winberg <adam.winberg@gmail.com> (wiad)
 - Maximilian Wilhelm <max@rfc2324.org> (BarbarossaTM)
@@ -122,7 +121,7 @@ LibreNMS contributors:
 - Russell Morris <github@rkmorris.us> (arrmo)
 - Bennett Blodinger <bennett.blodinger@gmail.com> (benwa)
 - Michael Hansen <nerdalertdk@gmail.com> (nerdalertdk)
-- Daniel Cox <danielcoxman@gmail.com> (ospfbgp) 
+- Daniel Cox <danielcoxman@gmail.com> (ospfbgp)
 - Joseph Cunningham <joey.was@gmail.com> (joeywas)
 - Michael Van Delft <librenms@xo.tc> (HybridAU)
 - Piotr Jurga <deutor1361@gmail.com> (deutor)
@@ -154,12 +153,37 @@ LibreNMS contributors:
 - Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
 - Andres Rahn <andreser@gmail.com> (Andreser)
 - Christoph Zilian <czilian@hotmail.com> (czilian)
-- Guillem Mateos <bbguillem@gmail.com> (guillemmateos) 
+- Guillem Mateos <bbguillem@gmail.com> (guillemmateos)
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
+- Matthew Schwen <mschwen@gmail.com> (mattschwen)
+- Joel Cant <joel@linuxmod.co.uk> (NerdBlender
+- Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemira)
+- Rob Nichols <rob@ignition360.com> (rdnn)
+- Patrick Fruh <info@kaeltis.de> (Kaeltis)
+- Julian Kornberger <jk+github@digineo.de> (corny)
+- ant Kenworthy <git@manchetermonkey.co.uk> (mcrmonkey)
+- Aleksandr Stankevic <aleksandr.stankevic@gmail.com> (sysmonk)
+- Richard Mayhew <richard@splash.co.za> (InsaneSplash)
+- Jacob <wackychocolatefactory@gmail.com> (wackychocolatefactory)
+- Patrick Velder <patrick2+librenms@velder.li> (patrick7)
+- Andrew Wippler <andrew.wippler+librenms@gmail.com> (andrewwippler)
+- Robert Towster <rnt-github at towster.com> (towster)
+- Rocky Luke <rockyluke@offline.net> (rockyluke)
+- Tim Jackson <jackson.tim@gmail.com> (jackson-tim)
+- Jørn-Stian Lønsetteig <jeg@glemte.no> (gilrim)
+- Viktoria Rei Bauer <vbauer@stargazer.at> (ToeiRei)
+- Ryan Eno <ryaneno@gmail.com> (VimCommando)
+- Matt Peterson <matt@peterson.org> (dorkmatt)
+- William George <wrgeorge1983@gmail.com> (wrgeorge1983)
+- Valentin Parmeland <naoko.vp@gmail.com> (NK74)
+- Michał Margula <michal@margula.pl> (alchemyx)
+- Maclin Fuehr-Bush <macfuehrbush@gmail.com> (mobilemaclin)
+- Robert Penziol <rpenziol@pdx.edu> (rpenziol)
+- Stefan Behte <craig at haquarter.de> (craig)
+- Zane C. Bowers-Hadley <vvelox@vvelox.net> (vvelox)
+- Valentin Polonuyer <valik.vicious@gmail.com> (ValikVicious)
 
-
-[1]: http://observium.org/ "Observium web site"
 Observium was written by:
 - Adam Armstrong
 - Tom Laermans

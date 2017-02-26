@@ -8,6 +8,7 @@ message_groups:
     - fix
     - bugfix
   Devices:
+    - device
     - devices
     - newdevice
   WebUI:
@@ -23,3 +24,5 @@ message_groups:
   Refactoring:
     - refactoring
     - refactor
+  Security:
+    - security

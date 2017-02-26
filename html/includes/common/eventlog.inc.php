@@ -5,6 +5,7 @@ $common_output[] = '
     <table id="eventlog" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
+                <th data-column-id="eventicon"></th>
                 <th data-column-id="datetime" data-order="desc">Datetime</th>
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="type">Type</th>

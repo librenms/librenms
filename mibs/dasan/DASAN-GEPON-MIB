@@ -1,0 +1,196 @@
+DASAN-GEPON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Integer32, TimeTicks, mib-2, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, PhysAddress, TruthValue, RowStatus, TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF 
+	--NetworkAddress, IpAddress  FROM RFC1155-SMI 
+	dasanMgmt       FROM DASAN-SMI
+	dsSwitchModules FROM DASAN-SWITCH-MIB;
+
+
+-- Definition Grammer
+
+dasanPonMIB MODULE-IDENTITY
+    	LAST-UPDATED	"200504130000Z"
+    	ORGANIZATION	"DASAN Co., Ltd."
+    	CONTACT-INFO	"DASAN Co., Ltd."
+    	DESCRIPTION     "."
+    ::= { dasanMgmt 11 }
+
+ 
+dasanPonMIBObjects OBJECT IDENTIFIER ::= { dasanPonMIB 1 }
+
+dsPon    OBJECT IDENTIFIER ::= { dasanPonMIBObjects 1 } 
+
+-- GE-PON  ONU information  
+
+		dsPonOnuInfoTable	OBJECT-TYPE
+					SYNTAX		SEQUENCE OF DsPonOnuInfoEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"A list of dsPonOnuInfoEntry entries. Each entry has Scheduling property of the queue."
+					::= { dsPon 1 }
+
+		dsPonOnuInfoEntry	OBJECT-TYPE
+					SYNTAX		DsPonOnuInfoEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing Onu information."
+					INDEX		{dsPonOltIndex, dsPonOnuIndex}
+					::= { dsPonOnuInfoTable 1 }
+
+		DsPonOnuInfoEntry	::= SEQUENCE {
+							dsPonOltIndex       Integer32,
+							dsPonOnuIndex       Integer32,
+							dsPonOnuMacAddress  PhysAddress,
+							dsPonOnuIpAddress   IpAddress,
+							dsPonLinkStatus 	INTEGER,   
+							dsPonOnuFirmwareVersion  DisplayString,
+							dsPonOnuProductVersion   DisplayString,
+							dsPonOnuProductCode      DisplayString,
+							dsPonRTT	        Integer32
+					}
+
+			dsPonOltIndex	OBJECT-TYPE
+					SYNTAX		Integer32(0..8)
+					MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION	"OLT index number."
+					::= { dsPonOnuInfoEntry 1 }
+
+			dsPonOnuIndex	OBJECT-TYPE
+					SYNTAX		Integer32(0..32)
+					MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION	"ONU index number."
+					::= { dsPonOnuInfoEntry 2 }
+
+			dsPonOnuMacAddress OBJECT-TYPE
+       					   SYNTAX      PhysAddress
+       					   MAX-ACCESS  read-only
+       					   STATUS      current
+       					   DESCRIPTION "The ONU MAC address."
+       					   ::= { dsPonOnuInfoEntry 3 }   
+   
+            dsPonOnuIpAddress OBJECT-TYPE
+       					  SYNTAX      IpAddress
+       					  MAX-ACCESS  read-only
+       					  STATUS      current
+       					  DESCRIPTION "The ONU IP address."
+       					  ::= { dsPonOnuInfoEntry 4 }
+                                                          
+    		dsPonLinkStatus OBJECT-TYPE
+       					SYNTAX  INTEGER {    
+                        				link(1),
+                        				authfail(2),
+                        				nolink(3),
+                        				blockedlink(4)
+                   				}
+       					MAX-ACCESS  read-only
+       					STATUS      current
+       					DESCRIPTION "Link Status.
+						     Link Status(1) : Link .
+						     Link Status(2) : auth fail .
+						     Link Status(3) : no link .
+						     Link Status(4) : blocked link."
+				        ::= { dsPonOnuInfoEntry 5 }     
+
+   			dsPonOnuFirmwareVersion OBJECT-TYPE
+       						SYNTAX      DisplayString
+       						MAX-ACCESS  read-only
+       						STATUS      current
+       						DESCRIPTION "The GE-PON Onu Firmware Version informations."
+   						::= { dsPonOnuInfoEntry 6 }         
+ 
+   			dsPonOnuProductVersion OBJECT-TYPE
+       					       SYNTAX      DisplayString
+       					       MAX-ACCESS  read-only
+       					       STATUS      current
+       					       DESCRIPTION "The GE-PON Onu Product Version informations."
+               				       ::= { dsPonOnuInfoEntry 7 }  
+   							       
+   			dsPonOnuProductCode OBJECT-TYPE
+       					    SYNTAX      DisplayString
+       					    MAX-ACCESS  read-only
+       					    STATUS      current
+       					    DESCRIPTION "The GE-PON Onu Product Code informations."
+   					    ::= { dsPonOnuInfoEntry 8 }     
+      
+                                                 
+			dsPonRTT	OBJECT-TYPE
+					SYNTAX		Integer32
+					MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION	"The RTT."
+					::= { dsPonOnuInfoEntry 9 }
+
+
+		dsPonTaggedLabel OBJECT-TYPE
+					SYNTAX  INTEGER {    
+                        				onu(1),
+                        				onuport(2),
+                        				onulogicallink(3),
+                        				onuqueue(4),
+                        				oltport(5),
+                        				oltqueue(6),
+                        				oltlogicallink(7),
+                        				olt(8)
+                   				}
+			         MAX-ACCESS  read-only
+		    	         STATUS      current
+			         DESCRIPTION  " Tagged Label
+			          	          1. ONU Label
+                                  2. ONU Port Label
+                                  3. ONU Logical Link
+                                  4. ONU Queue Label
+                                  5. OLT Port Label
+                                  6. OLT Queue Label
+                                  7. OLT Logical LInk Label(alias ONU Logical Link Label)
+                                  8. OLT Label"
+			         ::= { dsPon 2 }
+	
+		dsPonPortIndex	OBJECT-TYPE
+					SYNTAX		Integer32(0..32)
+					MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION	"ONU index number."
+					::= { dsPon 3 }
+
+		dsPonDirection	OBJECT-TYPE
+				SYNTAX	INTEGER {
+			               		up(1),
+			               		down(2)
+		               		}
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION	"ONU Pon Direction."
+				::= { dsPon 4 }
+
+		dsPonState 	OBJECT-TYPE
+				SYNTAX      INTEGER { off(0), on(1) }
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION	"ONU Pon State."
+				::= { dsPon 5 }
+
+		dsPonCount      OBJECT-TYPE
+				SYNTAX      Counter
+				MAX-ACCESS  read-only
+				STATUS      current
+				DESCRIPTION "ONU Pon Conut."
+				::= { dsPon 6 }    
+				
+		dsPonQueueIndex	OBJECT-TYPE
+				SYNTAX		Integer32(0..32)
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION	"ONU index number."
+				::= { dsPon 7 }
+
+
+-- Pon Object Group
+
+-- Pon Module Compliance
+
+END

@@ -1,0 +1,8 @@
+os: avaya-ers
+text: 'ERS Firmware'
+type: network
+icon: avaya
+mib_dir:
+    - nortel
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

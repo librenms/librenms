@@ -8,7 +8,7 @@ source: Installation/Installation-CentOS-7-Apache.md
 #### Install / Configure MySQL
 ```bash
 yum install mariadb-server mariadb
-service mariadb restart
+systemctl restart mariadb
 mysql -uroot -p
 ```
 
@@ -31,7 +31,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mariadb restart```
+```systemctl restart mariadb```
 
 ### Web Server ###
 
@@ -102,12 +102,13 @@ Add the following config:
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
+    setsebool -P httpd_can_network_connect=1
 ```
 
 #### Restart Web server
 
 ```bash
-service httpd restart
+systemctl restart httpd
 ```
 
 #### Web installer
@@ -130,19 +131,24 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-service snmpd restart
+systemctl restart snmpd
 ```
 
 #### Cron job
 
 `cp librenms.nonroot.cron /etc/cron.d/librenms`
 
+#### Copy logrotate config
+
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+
+    cp misc/librenms.logrotate /etc/logrotate.d/librenms
+
 #### Final steps
 
 ```bash
 chown -R librenms:librenms /opt/librenms
-systemctl enable httpd
-systemctl enable mariadb
+systemctl enable httpd mariadb
 ```
 
 Run validate.php as root in the librenms directory:

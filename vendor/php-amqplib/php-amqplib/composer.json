@@ -1,0 +1,19 @@
+{
+    "name": "videlalvaro/php-amqplib",
+    "type": "library",
+    "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
+    "keywords": ["rabbitmq", "message", "queue"],
+    "homepage": "https://github.com/videlalvaro/php-amqplib/",
+    "authors": [
+        {
+            "name" : "Alvaro Videla"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": {"PhpAmqpLib": ""}
+    },
+    "license": "LGPL-2.1"
+}

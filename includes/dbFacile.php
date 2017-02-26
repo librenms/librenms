@@ -25,7 +25,7 @@
 
 function dbQuery($sql, $parameters = array())
 {
-    global $fullSql, $debug, $sql_debug, $database_link;
+    global $fullSql, $debug, $sql_debug, $database_link, $config;
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
@@ -39,23 +39,14 @@ function dbQuery($sql, $parameters = array())
         }
     }
 
-    /*
-        if($this->logFile)
-        $time_start = microtime(true);
-     */
-
     $result = mysqli_query($database_link, $fullSql);
-    // sets $this->result
-    /*
-        if($this->logFile) {
-        $time_end = microtime(true);
-        fwrite($this->logFile, date('Y-m-d H:i:s') . "\n" . $fullSql . "\n" . number_format($time_end - $time_start, 8) . " seconds\n\n");
+    if (!$result) {
+        $mysql_error = mysqli_error($database_link);
+        if ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || (in_array($config['mysql_log_level'], array('DEBUG')))) {
+            if (!empty($mysql_error)) {
+                logfile(date($config['dateformat']['compact']) . " MySQL Error: $mysql_error ($fullSql)");
+            }
         }
-     */
-
-    if ($result === false && (error_reporting() & 1)) {
-        // aye. this gets triggers on duplicate Contact insert
-        // trigger_error('QDB - Error in query: ' . $fullSql . ' : ' . mysql_error(), E_USER_WARNING);
     }
 
     return $result;
@@ -420,7 +411,11 @@ function dbMakeQuery($sql, $parameters)
     krsort($namedParams);
 
     // split on question-mark and named placeholders
-    $result = preg_split('/(\?|:[a-zA-Z0-9_-]+)/', $sql, -1, (PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+    if (preg_match('/(\[\[:[\w]+:\]\])/', $sql)) {
+        $result = preg_split('/(\?[a-zA-Z0-9_-]*)/', $sql, -1, (PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+    } else {
+        $result = preg_split('/(\?|:[a-zA-Z0-9_-]+)/', $sql, -1, (PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+    }
 
     // every-other item in $result will be the placeholder that was found
     $query            = '';

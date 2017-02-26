@@ -1,4 +1,3 @@
-require_once $config['install_dir']."/lib/PhpAmqpLib/autoload.php";
 
 // Configurations
 $host = $opts["host"];

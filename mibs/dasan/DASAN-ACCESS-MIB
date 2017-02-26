@@ -1,0 +1,1206 @@
+-- Made by Jeon, DHL 
+-- at Thu Jan 27 16:50:00 2005
+
+     DASAN-ACCESS-MIB DEFINITIONS ::= BEGIN 
+   
+     IMPORTS 
+          BITS, mib-2, Counter32, Gauge32, -- inserted by jeon 20041206
+          MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+          Integer32, IpAddress, Unsigned32 
+                  FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          RowStatus, TestAndIncr, AutonomousType, TimeStamp, DisplayString 
+                  FROM SNMPv2-TC 
+          MODULE-COMPLIANCE, OBJECT-GROUP, 
+          NOTIFICATION-GROUP                          
+                  FROM SNMPv2-CONF 
+          SnmpAdminString                             
+                  FROM SNMP-FRAMEWORK-MIB
+          Unsigned32
+          		  FROM DASAN-TC
+          InterfaceIndex                              
+                  FROM IF-MIB
+          dasanMgmt
+          		  FROM DASAN-SMI;
+
+     dasanAccessMib MODULE-IDENTITY 
+   
+         LAST-UPDATED   "200506112100Z" 
+         ORGANIZATION   "DASAN Networks" 
+         CONTACT-INFO 
+          " 
+          Postal: 
+   
+          Phone: 
+   
+          Email: 
+
+          " 
+         DESCRIPTION 
+          "Access Gateway Management Information Base (MIB)" 
+       
+         -- Revision History  
+   
+         REVISION     "200502112100Z"              -- Feb, 2005
+         DESCRIPTION 
+          "Initial Version by Jeon." 
+   
+   
+         --::= { mib-2 64 }
+         ::= { dasanMgmt 100 }
+         -- private oid
+         -- _ should be .... final assignment by IANA at publication time  
+   
+   
+     -- *****************************************************************  
+     --  
+     -- OID For the MIB 
+     -- 
+     -- *****************************************************************  
+   
+     dasanAccessGatewayMIBObjects    OBJECT IDENTIFIER::= { dasanAccessMib 1 }
+   
+      
+     -- *****************************************************************  
+     --  
+     -- Group Objects 
+     -- 
+     -- *****************************************************************  
+   
+     dsAccGwyConfiguration  
+          OBJECT IDENTIFIER::= { dasanAccessGatewayMIBObjects 1 }
+          
+     dsAccGwyControl  
+          OBJECT IDENTIFIER::= { dasanAccessGatewayMIBObjects 2 } 
+
+   
+     -- *****************************************************************  
+     -- accGwyGatewayConfigTable 
+     -- *****************************************************************  
+   
+     dsAccGwyControlMgcp		OBJECT IDENTIFIER
+     ::= { dsAccGwyControl 1 }
+     
+     dsControlMgcpRestart			OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+                   restart(1)
+               }
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Command mgcp daemon restart"
+     ::= {dsAccGwyControlMgcp 1}
+     
+   
+	 dsAccGwyControlTable		OBJECT IDENTIFIER
+	 ::= { dsAccGwyControl 2 }
+
+     dsAccGwyControlSlotTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyControlSlotEntry     
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of accGwyGatewayConfigEntry objects." 
+     ::= { dsAccGwyControlTable 1}
+     
+     dsAccGwyControlSlotEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyControlSlotEntry                
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Control AccessGateway Functions for each slot. 
+         			(Restart, Image upgrade)"
+         INDEX      { dsControlSlotIndex }                    
+     ::= { dsAccGwyControlSlotTable 1 }
+   
+     DsAccGwyControlSlotEntry ::= SEQUENCE                    
+     {   
+		dsControlSlotIndex							INTEGER,
+		dsControlSlotRestart						INTEGER
+--		dsControlSlotUpgradeFtp						DisplayString,
+--		dsControlSlotUpgradeTftp					DisplayString
+	 }
+	 
+	 dsControlSlotIndex			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AccessGateway Board Slot Index of a System"
+     ::= {dsAccGwyControlSlotEntry 1}
+     
+     dsControlSlotRestart			OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+                   restart(1)
+               }
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Command Restart AccessGateway Board Functions"
+     ::= {dsAccGwyControlSlotEntry 2}
+     
+     --controlSlotUpgradeFtp		OBJECT-TYPE
+	 --	SYNTAX		DisplayString
+	 --	MAX-ACCESS	read-write
+     --	STATUS		current
+     --	DESCRIPTION	"Command image upgrade via FTP"
+     --::= {accGwyControlSlotEntry 3}
+
+     --controlSlotUpgradeTftp		OBJECT-TYPE
+	 --	SYNTAX		DisplayString
+	 --	MAX-ACCESS	read-write
+     --	STATUS		current
+     --	DESCRIPTION	"Command image upgrade via TFTP"
+     --::= {accGwyControlSlotEntry 4}
+		
+     
+-------------------------------------------
+     dsAccGwyControlPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyControlPortEntry           
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of accGwyGatewayConfigEntry objects." 
+     ::= { dsAccGwyControlTable 2}
+     
+     dsAccGwyControlPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyControlPortEntry                      
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Control AccessGateway Functions for each port. 
+         			(Restart, Image upgrade)"
+         INDEX      { dsControlPortIndex }                          
+     ::= { dsAccGwyControlPortTable 1 }
+   
+     DsAccGwyControlPortEntry ::= SEQUENCE                          
+     {   
+		dsControlPortIndex							INTEGER,
+		dsControlPortReset							INTEGER,
+		dsControlPortTestRing						INTEGER
+	 }
+	 
+	 dsControlPortIndex			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AccessGateway Board Port Index of a System"
+     ::= {dsAccGwyControlPortEntry 1}
+     
+     dsControlPortReset			OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+                   reset(1)
+               }
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Command reset port"
+     ::= {dsAccGwyControlPortEntry 2}
+
+     dsControlPortTestRing		OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+	 				stop(0),
+                   	start(1)
+               }
+	 	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Command port ring test"
+     ::= {dsAccGwyControlPortEntry 3}
+
+
+-------------------------------------------
+
+
+
+--	 accGwyControlTable		OBJECT IDENTIFIER
+--	 ::= { dsAccGwyControl 1 }
+
+--     accGwyControlSlotTable	OBJECT-TYPE
+--     	SYNTAX      SEQUENCE OF AccGwyControlEntry
+--        MAX-ACCESS  not-accessible 
+--        STATUS      current 
+--        DESCRIPTION "A list of accGwyGatewayConfigEntry objects." 
+--     ::= { accGwyControlTable 1}
+     
+--     accGwyControlEntry OBJECT-TYPE
+--         SYNTAX       AccGwyControlEntry
+--         MAX-ACCESS   not-accessible
+--         STATUS       current
+--         DESCRIPTION "Control AccessGateway Functions for each slot. 
+--         			(Restart, Image upgrade)"
+--         INDEX      { slotindex }
+--     ::= { accGwyControlSlotTable 1 }
+   
+--     AccGwyControlEntry ::= SEQUENCE 
+--     {   
+--		controlSlotIndex							INTEGER,
+--		controlSlotRestart							INTEGER,
+--		controlSlotUpgradeFtp						DisplayString,
+--		controlSlotUpgradeTftp						DisplayString,
+--		controlPortReset							INTEGER,
+--		controlMgcpRestart							INTEGER
+--	 }
+--	 
+--	 controlSlotIndex			OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-only
+--   	STATUS		current
+--     	DESCRIPTION	"AccessGateway Board Slot Index of a System"
+--     ::= {accGwyControlEntry 1}
+     
+--     controlSlotRestart			OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"Command Restart AccessGateway Board Functions"
+--     ::= {accGwyControlEntry 2}
+     
+--     controlSlotUpgradeFtp		OBJECT-TYPE
+--	 	SYNTAX		DisplayString
+--	 	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"Command image upgrade via FTP"
+--     ::= {accGwyControlEntry 3}
+
+--     controlSlotUpgradeTftp		OBJECT-TYPE
+--	 	SYNTAX		DisplayString
+--	 	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"Command image upgrade via TFTP"
+--     ::= {accGwyControlEntry 4}
+		
+--     controlPortReset			OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"Command reset port"
+--     ::= {accGwyControlEntry 5}
+     
+--     controlMgcpRestart			OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"Command mgcp daemon restart"
+--     ::= {accGwyControlEntry 6}
+	 
+
+ 	 dsAccGwyConfigMgcp	OBJECT IDENTIFIER
+	 ::= { dsAccGwyConfiguration 2 }
+	 
+     
+     dsMgcpAddAreaCode	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Determine the use of area-code"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcp 1}
+     
+     dsMgcpAreaCode	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"area-code value"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigMgcp 2}
+     
+     dsMgcpAreaCodeAllows	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"area-code-allows value"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigMgcp 3}
+     
+     dsMgcpAreaCodeExceptions	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"area-code-exceptions value"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigMgcp 4}
+     
+     dsMgcpCallTrace	OBJECT-TYPE
+     	SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Call trace"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigMgcp 5}
+     
+     dsMgcpEncodePackageName	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Encode Package Name"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigMgcp 6}
+     
+     dsMgcpRetransmitStartTimeout		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpRetransmitStartTimeout [msec]"
+     	DEFVAL		{"400"}
+     ::= {dsAccGwyConfigMgcp 7}
+     
+     dsMgcpRetransmitMaxTimeout		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpRetransmitMaxTimeout [msec]"
+     	DEFVAL		{"4000"}
+     ::= {dsAccGwyConfigMgcp 8}
+     
+--     dsMgcpRetransmitLongTimer		OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-only
+--     	STATUS		current
+--     	DESCRIPTION	"mgcpRetransmitLongTimer [msec]"
+--     	DEFVAL		{"30000"}
+--     ::= {dsAccGwyConfigMgcp 9}
+     
+--     dsMgcpRetransmitMaxLifetime		OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"mgcpRetransmitMaxLifetime [msec]"
+--     	DEFVAL		{"30000"}
+--     ::= {dsAccGwyConfigMgcp 10}
+     
+     dsMgcpRetransmitMax1		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpRetransmitMax1"
+     	DEFVAL		{"3"}
+     ::= {dsAccGwyConfigMgcp 11}
+     
+     dsMgcpRetransmitMax2		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpRetransmitMax2"
+     	DEFVAL		{"5"}
+     ::= {dsAccGwyConfigMgcp 12}
+     
+     dsMgcpRestartMaxwait		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpRestartMaxwait [sec]"
+     	DEFVAL		{"5"}
+     ::= {dsAccGwyConfigMgcp 13}
+     
+     dsMgcpDisconnectInit		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpDisconnectInit [sec]"
+     	DEFVAL		{"8"}
+     ::= {dsAccGwyConfigMgcp 14}
+     
+     dsMgcpDisconnectMin		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpDisconnectMin [sec]"
+     	DEFVAL		{"8"}
+     ::= {dsAccGwyConfigMgcp 15}
+     
+     dsMgcpDisconnectMax		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"mgcpDisconnectMax [sec]"
+     	DEFVAL		{"600"}
+     ::= {dsAccGwyConfigMgcp 16}
+     
+     dsMgcpCaAddr1	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 17}
+     
+     dsMgcpCaAddr2	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 18}
+     
+     dsMgcpCaAddr3	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 19}
+     
+     dsMgcpCaAddr4	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 20}
+     
+     dsMgcpCaAddr5	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 21}
+     
+     dsMgcpCaAddr6	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 22}
+     
+     dsMgcpCaAddr7	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 23}
+     
+     dsMgcpCaAddr8	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 24}
+     
+     dsMgcpCaPort1	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 25}
+     
+     dsMgcpCaPort2	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 26}
+
+     dsMgcpCaPort3	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 27}
+     
+     dsMgcpCaPort4	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 28}
+     
+     dsMgcpCaPort5	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 29}
+     
+     dsMgcpCaPort6	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 30}
+     
+     dsMgcpCaPort7	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 31}
+     
+     dsMgcpCaPort8	OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 32}     
+
+     dsMgcpMgAddr		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Media Gateway IP Address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcp 33}
+     
+     dsMgcpMgPort		OBJECT-TYPE
+     	SYNTAX		INTEGER (0..65535)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Media Gateway Port"
+     	DEFVAL		{"2427"}
+     ::= {dsAccGwyConfigMgcp 34}
+     
+     dsMgcpStatus		OBJECT-TYPE
+     	--SYNTAX		OCTET STRING (SIZE (0..1024))
+     	--SYNTAX		DisplayString
+     	SYNTAX		OCTET STRING
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"MGCP Status"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcp 35}
+          
+     dsMgcpEndpointIdTable       OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DsMgcpEndpointIdEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A list of accGwyGatewayConfigEntry objects."
+     ::= { dsAccGwyConfigMgcp 50 }
+     
+     dsMgcpEndpointIdEntry  OBJECT-TYPE
+         SYNTAX       DsMgcpEndpointIdEntry                        
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION " "
+         INDEX      {dsMgcpEndpointIdIndex}                                
+     ::= { dsMgcpEndpointIdTable 1 }
+
+     DsMgcpEndpointIdEntry ::= SEQUENCE                            
+     {   
+		dsMgcpEndpointIdIndex		INTEGER,
+		dsMgcpEndpointId			DisplayString
+     }
+        
+     dsMgcpEndpointIdIndex		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Port Index"
+     ::= {dsMgcpEndpointIdEntry 1}
+               
+     dsMgcpEndpointId		OBJECT-TYPE
+     	--SYNTAX		OCTET STRING (SIZE (0..1024))
+     	--SYNTAX		DisplayString
+     	SYNTAX		OCTET STRING
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"End point ID"
+     	--DEFVAL		{"0"}
+     ::= {dsMgcpEndpointIdEntry 2}
+           
+     dsMgcpTraceTable       OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DsMgcpTraceEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A list of accGwyGatewayConfigEntry objects."
+     ::= { dsAccGwyConfigMgcp 51 }
+     
+     dsMgcpTraceEntry  OBJECT-TYPE
+         SYNTAX       DsMgcpTraceEntry                        
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION " "
+         INDEX      { dsMgcpTraceMessageIndex }
+     ::= { dsMgcpTraceTable 1 }
+   
+     DsMgcpTraceEntry ::= SEQUENCE                            
+     {   
+--		dsMgcpTraceSlotIndex				INTEGER,
+--		dsMgcpTracePortIndex				INTEGER,
+		dsMgcpTraceMessageIndex				INTEGER,
+		dsMgcpTraceMessageTime				DisplayString,
+		dsMgcpTraceMessageDirection			INTEGER,
+		dsMgcpTraceMessageContent			DisplayString,
+     }
+        
+--     dsMgcpTraceSlotIndex		OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-only
+--     	STATUS		current
+--     	DESCRIPTION	"Slot Index"
+--     ::= {dsMgcpTraceEntry 1}
+
+--     dsMgcpTracePortIndex		OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-only
+--     	STATUS		current
+--     	DESCRIPTION	"Port Index"
+--     ::= {dsMgcpTraceEntry 2}
+
+     dsMgcpTraceMessageIndex	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Message Index"
+     ::= {dsMgcpTraceEntry 3}
+
+     dsMgcpTraceMessageTime		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Message Time"
+     ::= {dsMgcpTraceEntry 4}
+
+     dsMgcpTraceMessageDirection	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   received(0),
+                   sent(1)
+               }
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Message Direction"
+     ::= {dsMgcpTraceEntry 5}
+
+     dsMgcpTraceMessageContent	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Message Content"
+     ::= {dsMgcpTraceEntry 6}
+
+
+	 --accGwyConfigDigitmapTable       OBJECT-TYPE 
+     --    SYNTAX      SEQUENCE OF AccGwyConfigDigitmapEntry
+     --    MAX-ACCESS  not-accessible 
+     --    STATUS      current 
+     --    DESCRIPTION "A list of accGwyGatewayConfigEntry objects." 
+     --::= { accGwyConfigMgcp 15 }
+     
+     --accGwyConfigDigitmapEntry  OBJECT-TYPE 
+     --    SYNTAX       AccGwyConfigDigitmapEntry 
+     --    MAX-ACCESS   not-accessible 
+     --    STATUS       current 
+     --    DESCRIPTION " " 
+     --    INDEX      { digitmapIndex } 
+     --::= { accGwyConfigDigitmapTable 1 } 
+   
+     --AccGwyConfigDigitmapEntry ::= SEQUENCE 
+     --{
+     --	digitmapIndex					DisplayString,
+	--	digitmapValue					DisplayString
+     --}
+        
+     --digitmapIndex		OBJECT-TYPE
+     --	SYNTAX		DisplayString
+     --	MAX-ACCESS	read-write
+     --	STATUS		current
+     --	DESCRIPTION	"Digitmap Index"
+     --::= {accGwyConfigDigitmapEntry 1}
+     
+     --digitmapValue		OBJECT-TYPE
+     --	SYNTAX		DisplayString
+     --	MAX-ACCESS	read-write
+     --	STATUS		current
+     --	DESCRIPTION	"Digitmap Value"
+     --::= {accGwyConfigDigitmapEntry 2}
+     
+
+      
+     dsAccGwyConfigGlobal		OBJECT IDENTIFIER
+     ::= { dsAccGwyConfiguration 3 }
+     
+     dsAccGwyConfigGlobalDigitmap	OBJECT-TYPE
+         --SYNTAX       INTEGER 
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-write 
+         STATUS       current 
+         DESCRIPTION " " 
+         DEFVAL		{"x.T"}
+	 ::= {dsAccGwyConfigGlobal 1}
+	 
+	 dsAccGwyConfigGlobalSwitchDhcp	OBJECT-TYPE
+         --SYNTAX		INTEGER {
+         --          on(1),
+         --          off(0)
+         --      }
+         SYNTAX		  DisplayString
+         MAX-ACCESS   read-write 
+         STATUS       current 
+         DESCRIPTION " " 
+         DEFVAL		{"off"}
+	 ::= {dsAccGwyConfigGlobal 2}
+	 
+	 dsAccGwyUpsStatus	OBJECT-TYPE
+         SYNTAX			DisplayString
+         MAX-ACCESS   read-only 
+         STATUS       current 
+         DESCRIPTION " " 
+	 ::= {dsAccGwyConfigGlobal 3}
+	 
+	 dsAccGwyAutoConfigServer	OBJECT-TYPE
+         SYNTAX			IpAddress
+         MAX-ACCESS   read-write 
+         STATUS       current 
+         DESCRIPTION " " 
+	 ::= {dsAccGwyConfigGlobal 4}
+
+	 dsAccGwyAutoUpgradeServer	OBJECT-TYPE
+         SYNTAX			IpAddress
+         MAX-ACCESS   read-write 
+         STATUS       current 
+         DESCRIPTION " " 
+	 ::= {dsAccGwyConfigGlobal 5}
+
+
+     ----------------------------------------------------
+     
+     dsAccGwyConfigSlot		OBJECT IDENTIFIER
+     ::= { dsAccGwyConfiguration 4 }
+     
+--     accGwyConfigSlotNumber	OBJECT-TYPE
+--     	SYNTAX		DisplayString
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	""
+--     	DEFVAL		{"8"}
+--     ::= {accGwyConfigSlot 1}
+
+
+     dsAccGwyConfigSlotTable       OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DsAccGwyConfigSlotEntry             
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A list of accGwyGatewayConfigEntry objects."
+     ::= { dsAccGwyConfigSlot 2 }
+     
+     dsAccGwyConfigSlotEntry  OBJECT-TYPE
+         SYNTAX       DsAccGwyConfigSlotEntry                        
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION " "
+         INDEX      {dsAccSlotIndex}                                
+     ::= { dsAccGwyConfigSlotTable 1 }
+   
+     DsAccGwyConfigSlotEntry ::= SEQUENCE                            
+     {   
+		dsAccSlotIndex							INTEGER,
+		dsSlotCodecType						DisplayString,
+		dsSlotCodecPacketizationPeriodG711	INTEGER,
+		dsSlotCodecPacketizationPeriodG723	INTEGER,
+		dsSlotCodecPacketizationPeriodG729	INTEGER,
+		dsSlotJitterbuffer					DisplayString,
+--		dsSlotJitterbufferDynamic			INTEGER,
+--		dsSlotJitterbufferStaticMin			INTEGER,
+--		dsSlotJitterbufferStaticMax			INTEGER,
+--		dsSlotJitterbufferStatic			INTEGER,
+		dsSlotRingonTime					INTEGER,
+		dsSlotRingoffTime					INTEGER,
+		dsSlotHookflashMin					INTEGER,
+		dsSlotHookflashMax					INTEGER,
+		dsSlotInterdigitTimeout				INTEGER,
+		dsSlotEce							DisplayString,
+--		dsSlotEce							INTEGER,
+		dsSlotFax							INTEGER,
+		dsSlotCid							INTEGER,
+		dsSlotVad							INTEGER,
+		dsSlotCng							INTEGER,
+        dsSlotOobdtmf						INTEGER,
+		dsSlotNetworkHostname				DisplayString,
+		dsSlotNetworkDhcp					INTEGER,
+		dsSlotNetworkIpaddress				DisplayString,
+		dsSlotNetworkSubnetmask				DisplayString,
+		dsSlotNetworkRouter					DisplayString,
+		dsSlotNetworkNameserver				DisplayString,
+		dsSlotVersion						DisplayString,
+		dsSlotInstallStatus					INTEGER
+		--dsSlotInfoStatistics				DisplayString
+		--dsSlotPortBlock					DisplayString
+     }
+        
+     dsAccSlotIndex		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Slot Index"
+     ::= {dsAccGwyConfigSlotEntry 1}
+     
+     dsSlotCodecType	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Slot codec Type"
+     	DEFVAL		{""}
+     ::= {dsAccGwyConfigSlotEntry 2}
+
+     dsSlotCodecPacketizationPeriodG711	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+     				p10(10),
+     				p20(20),
+     				p30(30)
+     				}
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"PacketizationPeriodG711 [msec]"
+     	DEFVAL		{ p10 }
+     ::= {dsAccGwyConfigSlotEntry 3}
+     
+     dsSlotCodecPacketizationPeriodG723	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+     				p30(30),
+     				p60(60)
+     				}
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"PacketizationPeriodG723 [msec]"
+     	DEFVAL		{ p30 }
+     ::= {dsAccGwyConfigSlotEntry 4}
+     
+     dsSlotCodecPacketizationPeriodG729	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+     				p10(10),
+     				p20(20),
+     				p30(30)
+     				}
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"PacketizationPeriodG729 [msec]"
+     	DEFVAL		{ p20 }
+     ::= {dsAccGwyConfigSlotEntry 5}
+
+     dsSlotJitterbuffer	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"slotJitterbuffer"
+     	DEFVAL		{"dynamic 20 200 20"}
+     ::= {dsAccGwyConfigSlotEntry 6}
+ 
+--     dsSlotJitterbufferDynamic	OBJECT-TYPE
+--     	SYNTAX		INTEGER {
+--     	             on(1)
+--                   on(1),
+--                   off(0)
+--               }
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"slotJitterbufferDynamic"
+--     	DEFVAL		{""}
+--     ::= {dsAccGwyConfigSlotEntry 6}
+     
+--     slotJitterbufferStaticMin	OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"slotJitterbufferStaticMin"
+--     	DEFVAL		{""}
+--     ::= {accGwyConfigSlotEntry 7}
+     
+--     slotJitterbufferStaticMax	OBJECT-TYPE
+--     dsSlotJitterbufferStatic	OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"slotJitterbufferStatic"
+     	--DESCRIPTION	"slotJitterbufferStaticMax"
+--     	DEFVAL		{""}
+--     ::= {dsAccGwyConfigSlotEntry 8}
+
+     dsSlotRingonTime		OBJECT-TYPE
+     	SYNTAX		INTEGER (500..1000)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotRingonTime [msec]"
+     	DEFVAL		{"1000"}
+     ::= {dsAccGwyConfigSlotEntry 9}
+     
+     dsSlotRingoffTime		OBJECT-TYPE
+     	SYNTAX		INTEGER (500..2000)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotRingoffTime [msec]"
+     	DEFVAL		{"2000"}
+     ::= {dsAccGwyConfigSlotEntry 10}
+     
+     dsSlotHookflashMin	OBJECT-TYPE
+     	SYNTAX		INTEGER (100..600)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotHookflashMin [msec]"
+     	DEFVAL		{"300"}
+     ::= {dsAccGwyConfigSlotEntry 11}
+     
+     dsSlotHookflashMax	OBJECT-TYPE
+     	SYNTAX		INTEGER (100..1000)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotHookflashMax [msec]"
+     	DEFVAL		{"800"}
+     ::= {dsAccGwyConfigSlotEntry 12}
+
+     dsSlotInterdigitTimeout	OBJECT-TYPE
+     	SYNTAX		INTEGER (1000..10000)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotInterdigitTimeout [msec]"
+     	DEFVAL		{"4000"}
+     ::= {dsAccGwyConfigSlotEntry 13}
+
+     dsSlotEce	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"slotEce"
+     	DEFVAL		{"on 15"}
+     ::= {dsAccGwyConfigSlotEntry 14}
+    
+--     dsSlotEce	OBJECT-TYPE
+--     	SYNTAX		INTEGER {
+--                   on(1),
+--                   off(0)
+--               }
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	"slotEce"
+--     	DEFVAL		{"1"}
+--     ::= {dsAccGwyConfigSlotEntry 14}
+     
+     dsSlotFax	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   t30(1),
+                   t38(2),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotEce"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 15}
+          
+     dsSlotCid	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   belcore(1),
+                   ntt(2),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotCid"
+     	DEFVAL		{"1"}
+     ::= {dsAccGwyConfigSlotEntry 16}
+     
+     dsSlotVad	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotVad"
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 17}
+     
+     dsSlotCng	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotCng"
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 18}
+     
+     dsSlotOobdtmf	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotOobdtmf"
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 19}
+     
+     dsSlotNetworkHostname	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkHostname"
+     	DEFVAL		{"access"}
+     ::= {dsAccGwyConfigSlotEntry 20}
+     
+     dsSlotNetworkDhcp			OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   off(0),
+                   on(1),
+                   on-syslog(2)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkDhcp"
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigSlotEntry 21}
+     
+     dsSlotNetworkIpaddress		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkIpaddress"
+     	DEFVAL		{"192.168.1.2"}
+     ::= {dsAccGwyConfigSlotEntry 22}
+     
+     dsSlotNetworkSubnetmask		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkSubnetmask"
+     	DEFVAL		{"255.255.255.0"}
+     ::= {dsAccGwyConfigSlotEntry 23}
+     
+     dsSlotNetworkRouter		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkRouter"
+     	DEFVAL		{"192.168.1.1"}
+     ::= {dsAccGwyConfigSlotEntry 24}
+     
+     dsSlotNetworkNameserver	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"slotNetworkNameserver"
+     	DEFVAL		{"168.126.63.1"}
+     ::= {dsAccGwyConfigSlotEntry 25}
+
+     dsSlotVersion	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"slotInfoVersion"
+     ::= {dsAccGwyConfigSlotEntry 26}
+                                               
+     dsSlotInstallStatus	OBJECT-TYPE
+		SYNTAX      INTEGER {
+     			   	  installed(1),
+       			      removed(2)
+					}
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"slotInfoStatus"
+     ::= {dsAccGwyConfigSlotEntry 27}
+     
+     --slotInfoStatistics	OBJECT-TYPE
+     --	SYNTAX		DisplayString
+     --	MAX-ACCESS	read-only
+     --	STATUS		current
+     --	DESCRIPTION	"slotInfoStatistics"
+     --::= {accGwyConfigSlotEntry 28}
+     
+     --slotPortBlock	OBJECT-TYPE
+     --	SYNTAX		DisplayString
+     --	MAX-ACCESS	read-write
+     --	STATUS		current
+     --	DESCRIPTION	"slotPortBlock"
+     --::= {accGwyConfigSlotEntry 29}
+     
+     
+     
+     ----------------------------------------------------
+     
+     dsAccGwyConfigPort		OBJECT IDENTIFIER
+     ::= { dsAccGwyConfiguration 5 }
+     
+--     accGwyConfigPortNumber	OBJECT-TYPE
+--     	SYNTAX		INTEGER
+--     	MAX-ACCESS	read-write
+--     	STATUS		current
+--     	DESCRIPTION	""
+--     	DEFVAL		{""}
+--     ::= {accGwyConfigPort 1}
+
+
+     dsAccGwyConfigPortTable       OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DsAccGwyConfigPortEntry            
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A list of accGwyGatewayConfigEntry objects."
+     ::= { dsAccGwyConfigPort 2 }
+     
+     dsAccGwyConfigPortEntry  OBJECT-TYPE
+         SYNTAX       DsAccGwyConfigPortEntry                       
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION " "
+         INDEX      { dsAccPortIndex }                              
+     ::= { dsAccGwyConfigPortTable 1 }
+   
+     DsAccGwyConfigPortEntry ::= SEQUENCE 
+     {   
+		dsAccPortIndex					INTEGER,                
+		dsPortIvol						INTEGER,
+		dsPortOvol						INTEGER,
+		dsPortStatus					DisplayString,
+		dsPortStatistics				DisplayString,
+		dsPortPortBlock					INTEGER
+	 }
+
+	 dsAccPortIndex		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"port Index"
+     ::= {dsAccGwyConfigPortEntry 1}
+     
+     dsPortIvol		OBJECT-TYPE
+     	SYNTAX		INTEGER (1..7)
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"port Ivol"
+     	DEFVAL		{"4"}
+     ::= {dsAccGwyConfigPortEntry 2}
+     
+     dsPortOvol		OBJECT-TYPE
+     	SYNTAX		INTEGER (1..7)
+     	MAX-ACCESS	read-write
+     	STATUS		current     	
+     	DESCRIPTION	"port Ovol"
+     	DEFVAL		{"4"}
+     ::= {dsAccGwyConfigPortEntry 3}
+         
+     dsPortStatus		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"port Status"
+     ::= {dsAccGwyConfigPortEntry 4}
+     
+     dsPortStatistics	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"port Statistics"
+     ::= {dsAccGwyConfigPortEntry 5}
+     
+     dsPortPortBlock	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   block(1),
+                   unblock(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"port PortBlock"
+     	DEFVAL		{"0"}
+     ::= {dsAccGwyConfigPortEntry 6}
+
+
+    
+     END

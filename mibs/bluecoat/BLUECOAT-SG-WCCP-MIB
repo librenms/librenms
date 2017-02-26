@@ -1,0 +1,165 @@
+BLUECOAT-SG-WCCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Counter64
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TruthValue
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceWccpMIB MODULE-IDENTITY
+        LAST-UPDATED    "200801230300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The deviceWccpMIB is used to monitor
+                         the status of the device's WCCP."
+        REVISION        "200801230300Z"
+        DESCRIPTION     "Minor comment corrections."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200208280300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 5 }
+
+-- textual conventions
+
+WccpServiceType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the type of WCCP service being used.
+                standard(1)     - standard or well known service is being used.
+                dynamic(2)      - dynamic service is being used.
+                unknown(3)      - cannot determine the type of service being used."
+        SYNTAX INTEGER {
+                standard(1),
+                dynamic(2),
+                unknown(3)
+        }
+
+WccpVersion ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the version of WCCP being used for a service.
+                version1(1)     - WCCP version 1 being used for the service.
+                version2(2)     - WCCP version 2 being used for the service.
+                unknown(3)      - unknown version."
+        SYNTAX INTEGER {
+                version1(1),
+                version2(2),
+                unknown(3)
+        }
+
+--
+-- MIB variables
+--
+
+deviceWccpEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "When this variable is true(1) then WCCP is enabled.
+                         When it is false(2) then WCCP is not enabled."
+        ::= { deviceWccpMIB 1 }
+
+deviceWccpMIBObjects
+        OBJECT IDENTIFIER ::= { deviceWccpMIB 2 }
+
+deviceWccpValues
+        OBJECT IDENTIFIER ::= { deviceWccpMIBObjects 1 }
+
+--
+-- deviceWccpValueTable
+--
+
+deviceWccpValueTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceWccpValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of WCCP services."
+        ::= { deviceWccpValues 1 }
+
+deviceWccpValueEntry OBJECT-TYPE
+        SYNTAX          DeviceWccpValueEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A deviceWccpValueTable entry describes the status
+                         of a WCCP service."
+        INDEX           { deviceWccpIndex }
+        ::= { deviceWccpValueTable 1 }
+
+DeviceWccpValueEntry ::= SEQUENCE {
+        deviceWccpIndex                 INTEGER,
+        deviceWccpServiceID             Integer32,
+        deviceWccpServiceType           WccpServiceType,
+        deviceWccpServiceVersion        WccpVersion,
+        deviceWccpPacketsRedir          Counter64,
+        deviceWccpPacketsLowRedir       Counter32,
+        deviceWccpBytesRedir            Counter64,
+        deviceWccpBytesLowRedir         Counter32
+        }
+
+deviceWccpIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies
+                         the WCCP service."
+        ::= { deviceWccpValueEntry 1 }
+
+deviceWccpServiceID OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates WCCP's service id."
+        ::= { deviceWccpValueEntry 2 }
+
+deviceWccpServiceType OBJECT-TYPE
+        SYNTAX          WccpServiceType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates WCCP's service type."
+        ::= { deviceWccpValueEntry 3 }
+
+deviceWccpServiceVersion OBJECT-TYPE
+        SYNTAX          WccpVersion
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the WCCP service's version."
+        ::= { deviceWccpValueEntry 4 }
+
+deviceWccpPacketsRedir OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates how many WCCP packets
+                         have been redirected."
+        ::= { deviceWccpValueEntry 5 }
+
+deviceWccpPacketsLowRedir OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates how many WCCP packets
+                         have been redirected - lower 32 bits."
+        ::= { deviceWccpValueEntry 6 }
+
+deviceWccpBytesRedir OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates how many WCCP bytes
+                         have been redirected."
+        ::= { deviceWccpValueEntry 7 }
+
+deviceWccpBytesLowRedir OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates how many WCCP bytes
+                         have been redirected - lower 32 bits."
+        ::= { deviceWccpValueEntry 8 }
+
+END
+

@@ -1,0 +1,6 @@
+os: allied
+text: AlliedWare
+type: network
+ifname: 1
+over:
+    - { graph: device_bits, text: Traffic }

@@ -10,14 +10,16 @@
  * the source code distribution for details.
 */
 
+use LibreNMS\RRD\RrdDefinition;
+
 $version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hostname = trim($poll_device['sysName'], '"');
 
-$users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($users)) {
-    $rrd_def = 'DS:users:GAUGE:600:0:U';
+    $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
 
     $fields = array(
         'users' => $users,
@@ -28,10 +30,10 @@ if (is_numeric($users)) {
     $graphs['pulse_users'] = true;
 }
 
-$sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
+$sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+    $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0);
 
     $fields = array(
         'sessions' => $sessions,

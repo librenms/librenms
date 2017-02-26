@@ -24,24 +24,33 @@ if ($_POST['editing']) {
             dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?', array($device['device_id']));
         }
 
+        if ($device['type'] != $vars['type']) {
+            $param['type'] = $vars['type'];
+            $update_type = true;
+        }
+
         #FIXME needs more sanity checking! and better feedback
 
-        $param = array('purpose' => $vars['descr'], 'type' => $vars['type'], 'ignore' => $vars['ignore'], 'disabled' => $vars['disabled']);
+        $param['purpose']  = $vars['descr'];
+        $param['ignore']   = set_numeric($vars['ignore']);
+        $param['disabled'] = set_numeric($vars['disabled']);
 
         $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
 
         if ($rows_updated > 0 || $updated) {
+            if ($update_type === true) {
+                set_dev_attrib($device, 'override_device_type', true);
+            }
             $update_message = "Device record updated.";
             $updated = 1;
             $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
-        } elseif ($rows_updated = '-1') {
+        } elseif ($rows_updated == 0) {
             $update_message = "Device record unchanged. No update necessary.";
             $updated = -1;
         } else {
             $update_message = "Device record update error.";
         }
-
-        if ($_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
+        if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (is_admin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {

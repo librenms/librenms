@@ -14,6 +14,8 @@ Table of Content:
         - [NIOS 7.x](#nios-7x)
     - [Juniper](#juniper)
         - [Junos OS](#junos-os)
+    - [Mikrotik](#mikrotik)
+        - [RouterOS 6.x](#routeros-6x)
     - [Palo Alto](#palo-alto)
         - [PANOS 6.x/7.x](#panos-6x7x)
 - [Operating systems](#operating-systems)
@@ -80,6 +82,17 @@ set snmp contact contact
 set snmp community YOUR-COMMUNITY authorization read-only
 ```
 
+### Mikrotik
+#### RouterOS 6.x
+```
+#Terminal SNMP v2 Configuration
+/snmp community
+set [ find default=yes ] read-access=no
+add addresses=<SRC IP/NETWORK> name=<COMMUNITY>
+/snmp
+set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
+```
+
 ### Palo Alto
 #### PANOS 6.x/7.x
 1. Access the web admin page and log in
@@ -114,6 +127,13 @@ syscontact Your Name <your@email.address>
 
 #Distro Detection
 extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+```
+
+```
+#If you have 'dmidecode' installed on your host, you can add the following lines for additional hardware detection
+extend .1.3.6.1.4.1.2021.7890.2 hardware '/usr/sbin/dmidecode -s system-product-name'
+extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/usr/sbin/dmidecode -s system-manufacturer'
+extend .1.3.6.1.4.1.2021.7890.4 serial '/usr/sbin/dmidecode -s system-serial-number'
 ```
 The LibreNMS server include a copy of this example here:
 

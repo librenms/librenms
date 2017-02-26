@@ -77,7 +77,7 @@ var grid = $("#ports").bootgrid({
             ifSpeed: '<?php echo mres($vars['ifSpeed']); ?>',
             ifType: '<?php echo mres($vars['ifType']); ?>',
             port_descr_type: '<?php echo mres($vars['port_descr_type']); ?>',
-            ifAlias: '<?php echo htmlspecialchars($vars['ifAlias']); ?>',
+            ifAlias: '<?php echo $vars['ifAlias']; ?>',
             location: '<?php echo mres($vars['location']); ?>',
             disabled: '<?php echo mres($vars['disabled']); ?>',
             ignore: '<?php echo mres($vars['ignore']); ?>',

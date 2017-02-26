@@ -21,9 +21,7 @@ foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ?', array
 
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
-        // echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
     } else {
-        // echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
     }
 
     $link_add = array('app' => $app['app_type']);

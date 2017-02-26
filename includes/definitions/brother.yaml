@@ -1,0 +1,13 @@
+os: brother
+group: printer
+text: 'Brother Printer'
+type: printer
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr_regex: '/Brother NC-.*(h|w),/'
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

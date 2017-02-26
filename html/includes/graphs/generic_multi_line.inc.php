@@ -19,28 +19,14 @@
 
 require 'includes/graphs/common.inc.php';
 
-if ($width > '500') {
-    $descr_len = 24;
-} else {
-    $descr_len  = 12;
-    $descr_len += round(($width - 250) / 8);
-}
+$descr_len = 12;
 
 if ($nototal) {
     $descr_len += '2';
     $unitlen  += '2';
 }
 
-if ($width > '500') {
-    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Now      Min      Max     Avg\l'";
-    if (!$nototal) {
-        $rrd_options .= " COMMENT:'Total      '";
-    }
-
-    $rrd_options .= " COMMENT:'\l'";
-} else {
-    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Now      Min      Max     Avg\l'";
-}
+$rrd_options .= " COMMENT:'".rrdtool_escape($unit_text, $descr_len)."      Now      Min      Max     Avg\l'";
 
 $i    = 0;
 $iter = 0;

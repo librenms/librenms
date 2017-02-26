@@ -94,8 +94,13 @@ $graphs['nfs-v3-stats'] = array(
 $graphs['os-updates'] = array(
     'packages',
 );
+
 $graphs['dhcp-stats'] = array(
      'stats',
+);
+
+$graphs['fail2ban'] = array(
+    'banned',
 );
 
 $graphs['freeswitch'] = array(
@@ -126,6 +131,15 @@ $graphs['gpsd'] = array(
     'mode',
 );
 
+$graphs['exim-stats'] = array(
+    'frozen',
+    'queue'
+);
+
+$graphs['php-fpm'] = array(
+    'stats'
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
@@ -141,12 +155,8 @@ $link_array = array(
 foreach ($app_list as $app) {
     echo $sep;
 
-    // if (!$vars['app']) { $vars['app'] = $app['app_type']; }
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
-        // echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
-    } else {
-        // echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
     }
 
     echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));

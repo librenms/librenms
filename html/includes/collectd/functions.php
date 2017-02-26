@@ -386,7 +386,7 @@ function rrd_strip_quotes($str)
  * @param string $file Name of RRD file to analyse
  * @return array Array describing the RRD file
  */
-function rrd_info($file)
+function _rrd_info($file)
 {
     $info = array('filename' => $file);
 
@@ -443,7 +443,7 @@ function rrd_info($file)
     }//end if
 
     return $info;
-}//end rrd_info()
+}//end _rrd_info()
 
 
 function rrd_get_color($code, $line = true)
@@ -499,7 +499,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     $rrdfile = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, is_null($pinst) ? '' : '-', $pinst, $type, is_null($tinst) ? '' : '-', $tinst);
     foreach ($config['datadirs'] as $datadir) {
         if (is_file($datadir.'/'.$rrdfile.'.rrd')) {
-            $rrdinfo = rrd_info($datadir.'/'.$rrdfile.'.rrd');
+            $rrdinfo = _rrd_info($datadir.'/'.$rrdfile.'.rrd');
             if (isset($rrdinfo['RRA']) && is_array($rrdinfo['RRA'])) {
                 break;
             } else {

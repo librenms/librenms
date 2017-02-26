@@ -1,6 +1,7 @@
 site_name: LibreNMS Docs
 docs_dir: doc
 theme_dir: 'librenms_theme'
+theme: null
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
@@ -88,8 +89,10 @@ pages:
     - Developing/Creating-Release.md
 - API: API/API-Docs.md
 - Support:
+    - Support/1-Minute-Polling.md
     - Support/Configuration.md
     - Support/Discovery Support.md
+    - Support/Example-Hardware-Setup.md
     - Support/FAQ.md
     - Support/Features.md
     - Support/Install Validation.md

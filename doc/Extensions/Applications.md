@@ -5,6 +5,7 @@ You can use Application support to graph performance statistics from many applic
 
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or the agent.
 
+1. [Agent Setup](#agent-setup)
 1. [Apache](#apache) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
@@ -18,15 +19,16 @@ Different applications support a variety of ways collect data: by direct connect
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
-1. [Proxmox](#proxmos) - SNMP extend
+1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
-1. [Agent Setup](#agent-setup)
-
-
+1. [EXIM Stats](#exim-stats) - SNMP extend
+1. [Munin](#munin) - Agent
+1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Fail2ban](#fail2ban) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -227,7 +229,10 @@ A small shell script that checks your system package manager for any available u
 For pacman users automatically refreshing the database, it is recommended you use an alternative database location `--dbpath=/var/lib/pacman/checkupdate`
 
 ##### SNMP Extend
-1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/os-updates.sh -O /etc/snmp/os-updates.sh
+```
 2. Make the script executable (chmod +x /etc/snmp/os-updates.sh)
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
@@ -331,12 +336,16 @@ Unbound configuration:
 ```text
 # Enable extended statistics.
 server:
-        statistics-interval: 0
         extended-statistics: yes
         statistics-cumulative: yes
+
+remote-control:
+        control-enable: yes
+        control-interface: 127.0.0.1
+
 ```
 
-Restart your unbound after changing the configuration,v erify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+Restart your unbound after changing the configuration, verify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
 
 
 
@@ -368,7 +377,21 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
 
+### EXIM Stats
+SNMP extend script to get your exim stats data into your host.
 
+##### SNMP Extend
+1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/master/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
+2. Make the script executable: `chmod +x /etc/snmp/exim-stats.sh`
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend exim-stats /etc/snmp/exim-stats.sh
+```
+4. If you are using sudo edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/exim-stats.sh, /usr/bin/exim*
+```
+5. Restart snmpd on your host
 
 Agent Setup
 -----------
@@ -422,3 +445,76 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 8. Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 9. Then under Applications, enable the apps that you plan to monitor.
 10. Wait for around 10 minutes and you should start seeing data in your graphs under Apps for the device.
+
+### Munin
+
+#### Agent
+1. Install the script to your agent: `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin -O /usr/lib/check_mk_agent/local/munin`
+2. Make the script executable (`chmod +x /usr/lib/check_mk_agent/local/munin`)
+3. Create the munin scripts dir: `mkdir -p /usr/share/munin`
+4. Install your munin scripts into the above directory.
+
+To create your own custom munin scripts, please see this example:
+
+```
+#!/bin/bash
+if [ "$1" = "config" ]; then
+    echo 'graph_title Some title'
+    echo 'graph_args --base 1000 -l 0' #not required
+    echo 'graph_vlabel Some label'
+    echo 'graph_scale no' #not required, can be yes/no
+    echo 'graph_category system' #Choose something meaningful, can be anything
+    echo 'graph_info This graph shows something awesome.' #Short desc
+    echo 'foobar.label Label for your unit' # Repeat these two lines as much as you like
+    echo 'foobar.info Desc for your unit.'
+    exit 0
+fi
+echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
+```
+
+
+#### PHP-FPM
+
+##### SNMP Extend
+
+1. Copy the shell script, phpfpm-sp, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpm-sp -O /etc/snmp/phpfpm-sp)
+2. Make the script executable (chmod +x /etc/snmp/phpfpm-sp)
+3. Edit your snmpd.conf file (usually /etc/snmp/phpfpm-sp) and add:
+```
+extend phpfpmsp /etc/snmp/phpfpm-sp
+```
+5: Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
+6. Restart snmpd on your host
+7. On the device page in Librenms, edit your host and check `PHP-FPM` under the Applications tab.
+
+It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
+
+#### Fail2ban
+
+##### SNMP Extend
+
+1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/fail2ban)
+
+2: Make the script executable (chmod +x /etc/snmp/fail2ban)
+
+3: Edit your snmpd.conf file (usually /etc/snmp/fail2ban) and add:
+```
+extend fail2ban /etc/snmp/fail2ban
+```
+
+4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set if you wish to use caching. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
+
+5: Restart snmpd on your host
+
+6: If you wish to use caching, add the following to /etc/crontab and restart cron.
+```
+*/3    *    *    *    *    root    /etc/snmp/fail2ban -u 
+```
+
+7: Restart or reload cron on your system.
+
+8: On the device page in Librenms, edit your host and check `Fail2ban` under the Applications tab.
+
+In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
+
+If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.

@@ -1,0 +1,10 @@
+os: kti
+text: KTI
+type: network
+icon: kti
+ifname: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex:
+        - '/^KGS-/'

@@ -1,0 +1,9 @@
+os: aos-emu2
+text: 'APC Environmental Monitoring Unit'
+type: environment
+icon: apc
+mib_dir:
+    - apc
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.318.1.3.8.3

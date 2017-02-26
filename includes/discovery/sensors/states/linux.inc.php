@@ -31,7 +31,7 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
         }
         $value = snmp_get($device, $oid.$codec, '-Oqv');
 
-        if (!empty($value)) {
+        if (stripos($value, 'abled') !== false) {
             $state_index_id = create_state_index($state);
             if ($state_index_id) {
                 $states = array(
@@ -50,8 +50,8 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
                 );
                 dbInsert($insert, 'state_translations');
             }
+            discover_sensor($valid['sensor'], 'state', $device, $oid.$codec, $codec, $state, $descr, '1', '1', null, null, null, null, $value, 'snmp', $codec);
+            create_sensor_to_state_index($device, $state, $codec);
         }
-        discover_sensor($valid['sensor'], 'state', $device, $oid.$codec, $codec, $state, $descr, '1', '1', null, null, null, null, $value, 'snmp', $codec);
-        create_sensor_to_state_index($device, $state, $codec);
     }
 }

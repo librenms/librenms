@@ -15,8 +15,6 @@
 $init_modules = array('web', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-require $config['install_dir'] . '/html/lib/Slim/Slim.php';
-\Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
@@ -42,7 +40,10 @@ $app->group(
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
+                        $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
+                        // api/v0/devices/$hostname/health
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
+                        $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
                         $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
                         $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
@@ -50,6 +51,7 @@ $app->group(
                         $app->put('/:hostname/components', 'authToken', 'edit_components')->name('edit_components');
                         $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
                         $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
+                        $app->get('/:hostname/graphs/health/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_health_graph');
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
                         $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
@@ -69,6 +71,14 @@ $app->group(
                     }
                 );
                 $app->get('/devicegroups', 'authToken', 'get_device_groups')->name('get_devicegroups');
+                $app->group(
+                    '/ports',
+                    function () use ($app) {
+                        $app->get('/:portid', 'authToken', 'get_port_info')->name('get_port_info');
+                        $app->get('/:portid/ip', 'authToken', 'get_ip_addresses')->name('get_port_ip_info');
+                    }
+                );
+                $app->get('/ports', 'authToken', 'get_all_ports')->name('get_all_ports');
                 $app->group(
                     '/portgroups',
                     function () use ($app) {

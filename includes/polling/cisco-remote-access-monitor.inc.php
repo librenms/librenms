@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 // CISCO-REMOTE-ACCESS-MONITOR-MIB::crasNumSessions.0 = Gauge32: 7 Sessions
 // CISCO-REMOTE-ACCESS-MONITOR-MIB::crasNumPrevSessions.0 = Counter32: 22 Sessions
 // CISCO-REMOTE-ACCESS-MONITOR-MIB::crasNumUsers.0 = Gauge32: 7 Users
@@ -36,14 +38,13 @@ if ($device['os_group'] == 'cisco') {
     $data     = $data[0];
 
     if (is_numeric($data['crasEmailNumSessions']) && is_numeric($data['crasIPSecNumSessions']) && is_numeric($data['crasL2LNumSessions']) && is_numeric($data['crasLBNumSessions']) && is_numeric($data['crasSVCNumSessions']) && is_numeric($data['crasWebvpnNumSessions'])) {
-        $rrd_def = array(
-            'DS:email:GAUGE:600:0:U',
-            'DS:ipsec:GAUGE:600:0:U',
-            'DS:l2l:GAUGE:600:0:U',
-            'DS:lb:GAUGE:600:0:U',
-            'DS:svc:GAUGE:600:0:U',
-            'DS:webvpn:GAUGE:600:0:U'
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('email', 'GAUGE', 0)
+            ->addDataset('ipsec', 'GAUGE', 0)
+            ->addDataset('l2l', 'GAUGE', 0)
+            ->addDataset('lb', 'GAUGE', 0)
+            ->addDataset('svc', 'GAUGE', 0)
+            ->addDataset('webvpn', 'GAUGE', 0);
 
         $fields = array(
             'email'   => $data['crasEmailNumSessions'],
@@ -60,5 +61,5 @@ if ($device['os_group'] == 'cisco') {
         $graphs['cras_sessions'] = true;
     }
 
-    unset($data, $rrd_def, $fields);
+    unset($data, $rrd_def, $fields, $oid_list);
 }//end if

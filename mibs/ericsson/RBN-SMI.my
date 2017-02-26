@@ -1,0 +1,93 @@
+-- *****************************************************************
+-- RBN-SMI.my:	  Structure of Management Information
+--
+-- Copyright (c) 1998, 2001-2002, 2011 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+rbnSMI MODULE-IDENTITY
+        LAST-UPDATED    "201101191800Z" -- Jan 19, 2011
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Structure of Management Information for
+		the enterprise."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION    "200206060000Z" -- June 6, 2002
+        DESCRIPTION
+                "Updated Contact-info and recovered revision info."
+
+        REVISION    "200106270000Z" -- June 27, 2001
+        DESCRIPTION
+                "Added rbnInternal."
+
+        REVISION    "9804182300Z" -- April 18, 1998
+        DESCRIPTION
+                "Initial version."
+	::= { enterprises 2352 }
+
+rbnProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { rbnSMI 1 }
+
+rbnMgmt OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 2 }
+
+rbnExperiment OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 3 }
+
+rbnCapabilities OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 4 }
+
+rbnModules OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 5 }
+
+rbnEntities OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 6 }
+
+rbnInternal OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { rbnSMI 7 }
+
+END
