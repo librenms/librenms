@@ -378,18 +378,24 @@ function poll_device($device, $options)
     }//end if
 }//end poll_device()
 
-
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs)
+/**
+ * if no rrd_name parameter is passed, the MIB name is used as the rrd_file_name
+ */
+function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_name = null)
 {
     echo "This is poll_mib_def Processing\n";
     $mib = null;
 
-    if (stristr($mib_name_table, 'UBNT')) {
-        list($mib,) = explode(':', $mib_name_table, 2);
-        $measurement_name = strtolower($mib);
+    if (is_null($rrd_name)) {
+        if (stristr($mib_name_table, 'UBNT')) {
+            list($mib,) = explode(':', $mib_name_table, 2);
+            $measurement_name = strtolower($mib);
+        } else {
+            list($mib,$file) = explode(':', $mib_name_table, 2);
+            $measurement_name = strtolower($file);
+        }
     } else {
-        list($mib,$file) = explode(':', $mib_name_table, 2);
-        $measurement_name = strtolower($file);
+        $measurement_name = strtolower($rrd_name);
     }
 
     $rrd_def = new RrdDefinition();

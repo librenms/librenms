@@ -140,7 +140,7 @@ if (empty($config['favicon'])) {
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>?ver=291727419" rel="stylesheet" type="text/css" />
-  <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417638" rel="stylesheet" type="text/css" />
+  <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417639" rel="stylesheet" type="text/css" />
 <?php
 
 foreach ((array)$config['webui']['custom_css'] as $custom_css) {

@@ -99,6 +99,10 @@ $graphs['dhcp-stats'] = array(
      'stats',
 );
 
+$graphs['fail2ban'] = array(
+    'banned',
+);
+
 $graphs['freeswitch'] = array(
     'peak',
     'callsIn',

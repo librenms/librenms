@@ -33,10 +33,21 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
     $component = new LibreNMS\Component();
     $component_count = $component->getComponentCount($device['device_id']);
 
+    $alert_class = '';
+    if ($device['disabled'] == '1') {
+        $alert_class = 'alert-info';
+    } else {
+        if ($device['status'] == '0') {
+            $alert_class = 'alert-danger';
+        } elseif ($device['ignore'] == '1') {
+            $alert_class = 'alert-warning';
+        }
+    }
+
     echo '<div class="panel panel-default">';
-        echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        echo '<div class="panel-body '.$alert_class.'">';
         require 'includes/device-header.inc.php';
-    echo '</table>';
+        echo '</div>';
     echo '</div>';
 
 
