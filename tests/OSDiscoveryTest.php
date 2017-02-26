@@ -726,6 +726,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('fortiswitch');
     }
 
+    public function testFortiwlc()
+    {
+        $this->checkOS('fortiwlc');
+    }
+
     public function testFoundryos()
     {
         $this->checkOS('foundryos');
