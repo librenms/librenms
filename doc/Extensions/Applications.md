@@ -29,6 +29,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [Squid](#squid) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -518,3 +519,31 @@ extend fail2ban /etc/snmp/fail2ban
 In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
+
+#### Fail2ban
+
+##### SNMP Extend
+
+1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/squid -O /etc/snmp/squid)
+
+2: Make the script executable (chmod +x /etc/snmp/squid)
+
+3: Edit your snmpd.conf file and add:
+```
+extend squid /etc/snmp/squid
+```
+
+5: Restart snmpd on your host
+
+6: Enable SNMP for Squid like below, if you have not already, and restart it.
+
+```
+acl snmppublic snmp_community public
+snmp_port 3401
+snmp_access allow snmppublic localhost
+snmp_access deny all
+```
+
+7: Make sure the port, community, and path for snmpwalk is set correctly in /etc/snmp/squid.
+
+8: On the device page in Librenms, edit your host and check `Squid` under the Applications tab.
