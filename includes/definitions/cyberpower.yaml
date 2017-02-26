@@ -1,0 +1,5 @@
+os: cyberpower
+text: 'Cyberpower'
+type: power
+over:
+    - { graph: device_current, text: Current }
