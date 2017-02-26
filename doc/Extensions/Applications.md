@@ -539,7 +539,7 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 5: On the device page in Librenms, edit your host and check `FreeBSD NFS Server` under the Applications tab.
 
 
-#### FreeBSD NFS Server
+#### FreeBSD NFS Client
 
 ##### SNMP Extend
 
