@@ -1436,3 +1436,39 @@ function set_image_type()
         return header('Content-type: image/png');
     }
 }
+
+function get_oxidized_nodes_list()
+{
+    global $config;
+
+    $context = stream_context_create(array(
+        'http' => array(
+            'header' => "Accept: application/json",
+        )
+    ));
+
+    $data = json_decode(file_get_contents($config['oxidized']['url'] . '/nodes?format=json', false, $context), true);
+
+    foreach ($data as $object) {
+        $device = device_by_name($object['name']);
+        $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
+        echo "
+        <tr>
+        <td>
+        " . generate_device_link($device) . "
+        </td>
+        <td>
+        <i class='fa fa-square text-" . $fa_color . "'></i>
+        </td>
+        <td>
+        " . $object['time'] . "
+        </td>
+        <td>
+        " . $object['model'] . "
+        </td>
+        <td>
+        " . $object['group'] . "
+        </td>
+        </tr>";
+    }
+}
