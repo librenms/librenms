@@ -367,9 +367,9 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     if ($_SESSION['username']) {
-      log_event("Device $host has been removed by ".$_SESSION['username'], 0, 'system', 3);
+        log_event("Device $host has been removed by ".$_SESSION['username'], 0, 'system', 3);
     } else {
-      log_event("Device $host has been removed", 0, 'system', 3);
+        log_event("Device $host has been removed", 0, 'system', 3);
     }
     return $ret;
 }
