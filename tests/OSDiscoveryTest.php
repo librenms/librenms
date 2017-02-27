@@ -1752,5 +1752,4 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('digipower');
     }
-
 }
