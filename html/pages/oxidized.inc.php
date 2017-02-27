@@ -15,14 +15,14 @@ $pagetitle[] = 'Oxidized';
     <h2>Oxidized</h2>
     <div class="panel-heading">
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#tab1default" data-toggle="tab">Node List</a></li>
-            <li><a href="#tab2default" data-toggle="tab">Config Search</a></li>
+            <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
+            <li><a href="#search" data-toggle="tab">Config Search</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-body">
             <div class="tab-content">
-                <div class="tab-pane fade in active" id="tab1default">
+                <div class="tab-pane fade in active" id="list">
                     <div class="table-responsive">
                         <table id="oxidized-nodes" class="table table-hover table-condensed table-striped">
                             <thead>
@@ -40,7 +40,7 @@ $pagetitle[] = 'Oxidized';
                         </table>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="tab2default">
+                <div class="tab-pane fade" id="search">
                     <form class="form-horizontal" action="" method="post">
                         <br/>
                         <div class="input-group">
