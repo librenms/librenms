@@ -108,6 +108,9 @@ function nicecase($item)
 
         case 'fbsd-nfs-server':
             return 'FreeBSD NFS Server';
+        
+        case 'php-fpm':
+            return 'PHP-FPM';
 
         default:
             return ucfirst($item);
