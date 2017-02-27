@@ -23,6 +23,9 @@ if ($database_link === false) {
 }
 
 $select = mysqli_select_db($database_link, $config['db_name']);
+mysqli_query($database_link, "SET NAMES 'utf8'");
+mysqli_query($database_link, "SET CHARACTER SET 'utf8'");
+mysqli_query($database_link, "SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
 if ($select === false) {
     echo 'ERROR: Cannot select database: '.mysqli_error($database_link)."\n";
     exit(1);
