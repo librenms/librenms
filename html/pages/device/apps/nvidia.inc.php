@@ -3,18 +3,18 @@
 global $config;
 
 $graphs = array(
-    'nvidia_pwr' => 'Power Usage',
-    'nvidia_temp' => 'Temperature',
     'nvidia_sm' => 'GPU Utilization',
     'nvidia_mem' => 'Memory Utilization',
     'nvidia_enc' => 'Encoder Utilization',
     'nvidia_dec' => 'Decoder Utilization',
-    'nvidia_mclk' => 'Memory Clock',
-    'nvidia_pclk' => 'GPU Clock',
     'nvidia_fb' => 'Frame Buffer Memory Usage',
     'nvidia_bar1' => 'Bar1 Memory Usage',
     'nvidia_rxpci' => 'PCIe RX',
     'nvidia_txpci' => 'PCIe TX',
+    'nvidia_pwr' => 'Power Usage',
+    'nvidia_temp' => 'Temperature',
+    'nvidia_mclk' => 'Memory Clock',
+    'nvidia_pclk' => 'GPU Clock',
     'nvidia_pviol' => 'Thermal Violation Percentage',
     'nvidia_tviol' => 'Thermal Violation Boolean',
     'nvidia_sbecc' => 'Single Bit ECC Errors',
