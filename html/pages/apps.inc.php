@@ -140,6 +140,25 @@ $graphs['php-fpm'] = array(
     'stats'
 );
 
+$graphs['nvidia'] = array(
+    'pwr',
+    'temp',
+    'sm',
+    'mem',
+    'enc',
+    'dec',
+    'mclk',
+    'pclk',
+    'fb',
+    'bar1',
+    'rxpci',
+    'txpci',
+    'pviol',
+    'tviol',
+    'sbecc',
+    'dbecc',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
