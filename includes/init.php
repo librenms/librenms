@@ -109,6 +109,9 @@ if (!module_selected('nodb', $init_modules)) {
         die;
     }
     $database_db = mysqli_select_db($database_link, $config['db_name']);
+    dbQuery("SET NAMES 'utf8'");
+    dbQuery("SET CHARACTER SET 'utf8'");
+    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
 
     // pull in the database config settings
     mergedb();

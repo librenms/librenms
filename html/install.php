@@ -43,6 +43,9 @@ $add_email = @$_POST['add_email'] ?: '';
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
     $database_link = mysqli_connect('p:'.$dbhost, $dbuser, $dbpass, $dbname, $dbport);
+    dbQuery("SET NAMES 'utf8'");
+    dbQuery("SET CHARACTER SET 'utf8'");
+    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
     if (mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
