@@ -4,8 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrd_options .= ' -l 0 -E ';
 
-$rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-rx');
->>>>>>> ec63aa5813701b68b20f21de07a30b6a97631f65
+$rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib-rx');
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dbm                        Now    Min     Max\\n'";
