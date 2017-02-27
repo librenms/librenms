@@ -1747,4 +1747,10 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('zyxelnwa');
         $this->checkOS('zyxelnwa', 'zyxelnwa1');
     }
+    
+    public function testDigipower()
+    {
+        $this->checkOS('digipower');
+    }
+
 }
