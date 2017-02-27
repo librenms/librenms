@@ -10,10 +10,10 @@ if (!rrdtool_check_rrd_exists($rrd_filename)) {
 
 while (is_file($rrd_filename)) {
     $rrd_list[]=array(
-<------>'filename' => $rrd_filename,
-<------>'descr'    => 'GPU '.$int,
-<------>'ds'       => $rrdVar,
-<------>'colour'   => $config['graph_colours']['manycolours'][$int]
+        'filename' => $rrd_filename,
+        'descr'    => 'GPU '.$int,
+        'ds'       => $rrdVar,
+        'colour'   => $config['graph_colours']['manycolours'][$int]
     );
 
     $int++;
