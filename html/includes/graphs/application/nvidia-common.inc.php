@@ -1,4 +1,15 @@
 <?php
+$name = 'nvidia';
+$app_id = $app['app_id'];
+$scale_min     = 0;
+$colours       = 'mixed';
+$dostack       = 0;
+$printtotal    = 0;
+$addarea       = 1;
+$transparency  = 15;
+$name = 'nvidia';
+$app_id = $app['app_id'];
+$scale_min     = 0;
 
 $int=0;
 $rrd_list=array();
@@ -13,7 +24,6 @@ while (is_file($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr'    => 'GPU '.$int,
         'ds'       => $rrdVar,
-        'colour'   => $config['graph_colours']['manycolours'][$int]
     );
 
     $int++;
