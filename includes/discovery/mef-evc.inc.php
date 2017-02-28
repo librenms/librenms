@@ -36,18 +36,18 @@ if ($device['os'] == 'coriant') {
         /*
          * Check if the MEF EVC is already known for this host
          */
-       if (dbFetchCell("SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?", array($device['device_id'], $index)) == 0) {
-           $mefid = dbInsert(array('device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => mres($mefType), 'mefIdent' => mres($mefIdent), 'mefMTU' => mres($mefMtu), 'mefAdmState' => mres($mefAdmState), 'mefRowState' => mres($mefRowState)), 'mefinfo');
-           log_event("MEF link: ". mres($mefIdent) . " (" . $index . ") Discovered", $device, 'system', $mefid);
-           echo '+';
-       } else {
-           echo '.';
-       }
-       /*
-        * Save the discovered MEF Link
-        */
-       $mefevc_list[] = $index;
-    }
+        if (dbFetchCell("SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?", array($device['device_id'], $index)) == 0) {
+            $mefid = dbInsert(array('device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => mres($mefType), 'mefIdent' => mres($mefIdent), 'mefMTU' => mres($mefMtu), 'mefAdmState' => mres($mefAdmState), 'mefRowState' => mres($mefRowState)), 'mefinfo');
+            log_event("MEF link: ". mres($mefIdent) . " (" . $index . ") Discovered", $device, 'system', $mefid);
+            echo '+';
+        } else {
+            echo '.';
+        }
+        /*
+         * Save the discovered MEF Link
+         */
+        $mefevc_list[] = $index;
+     }
 
     /*
      * Get a list of all the known EVC Links for this host
@@ -55,10 +55,10 @@ if ($device['os'] == 'coriant') {
 
     $sql = "SELECT id, mefID, mefIdent FROM mefinfo WHERE device_id = '".$device['device_id']."'";
     foreach (dbFetchRows($sql) as $db_mef) {
-	/*
+        /*
          * Delete the MEF Link that are removed from the host.
 	 */
-	if (!in_array($db_mef['mefID'], $mefevc_list)) {
+        if (!in_array($db_mef['mefID'], $mefevc_list)) {
             dbDelete('mefinfo', '`id` = ?', array($db_mef['id']));
             log_event("MEF link: ".mres($db_mef['mefIdent']).' Removed', $device, 'system', $db_mef['mefID']);
             echo '-';
