@@ -47,7 +47,7 @@ if ($device['os'] == 'coriant') {
          * Save the discovered MEF Link
          */
         $mefevc_list[] = $index;
-     }
+    }
 
     /*
      * Get a list of all the known EVC Links for this host
