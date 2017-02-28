@@ -9,9 +9,9 @@ echo '<td class="list">'. $mef['mefMTU'] . '</td>';
 
 echo '<td class="list">';
 if ($mef['mefAdmState'] == 'unlocked') {
-  echo '<i class="fa fa-unlock fa-lg icon-theme" aria-hidden="true" style="color:green"></i>';
+    echo '<i class="fa fa-unlock fa-lg icon-theme" aria-hidden="true" style="color:green"></i>';
 } else {
-  echo '<i class="fa fa-lock fa-lg icon-theme" aria-hidden="true" style="color:red"></i>';
+    echo '<i class="fa fa-lock fa-lg icon-theme" aria-hidden="true" style="color:red"></i>';
 }
 echo '</td>';
 if ($mef['mefRowState'] == 'active') {

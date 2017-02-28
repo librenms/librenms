@@ -19,13 +19,13 @@ if ($device['os'] == 'coriant') {
         $mef_info['mefAdmState'] = $current_mefinfo[$db_info['mefID']]['mefServiceEvcCfgAdminState'];
         $mef_info['mefRowState'] = $current_mefinfo[$db_info['mefID']]['mefServiceEvcCfgRowStatus'];
 
-	/*
+        /*
 	 * Coriant MEF-EVC is quite strange, MTU is sometime set to 0 so we can set it into 1600 instead
          * According to Coriant this should be fixed in Nov 2017 
 	 */
-	if ($mef_info['mefMTU'] == 0) {
-	    $mef_info['mefMTU'] = 1600;
-	}
+        if ($mef_info['mefMTU'] == 0) {
+            $mef_info['mefMTU'] = 1600;
+        }
 
         /*
          * Process all the MEF properties.
@@ -38,7 +38,7 @@ if ($device['os'] == 'coriant') {
                 // FIXME - this should loop building a query and then run the query after the loop (bad geert!)
                 dbUpdate(array($property => mres($mef_info[$property])), 'mefinfo', '`id` = ?', array($db_info['id']));
                 if ($db_info['mefIdent'] != null) {
-                    log_event("MEF Link : ".mres($db_info['mefIdent']) . ' (' . preg_replace('/^mef/','',mres($db_info[$property])) . ') -> ' . $mef_info[$property], $device);
+                    log_event("MEF Link : ".mres($db_info['mefIdent']) . ' (' . preg_replace('/^mef/', '', mres($db_info[$property])) . ') -> ' . $mef_info[$property], $device);
                 }
             }
         }

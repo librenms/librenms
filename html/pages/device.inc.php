@@ -166,11 +166,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
  
         if (@dbFetchCell("SELECT COUNT(id) FROM mefinfo WHERE device_id = '".$device['device_id']."'") > '0') {
-        echo '<li class="'.$select['mef'].'">
-            <a href="'.generate_device_url($device, array('tab' => 'mef')).'">
-            <i class="fa fa-link fa-lg icon-theme"  aria-hidden="true"></i> Metro Ethernet
-            </a>
-            </li>';
+            echo '<li class="'.$select['mef'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'mef')).'">
+                <i class="fa fa-link fa-lg icon-theme"  aria-hidden="true"></i> Metro Ethernet
+                </a>
+                </li>';
         }
 
         // $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
