@@ -540,7 +540,7 @@ extend postgres /etc/snmp/postgres
 
 6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
 
-7: If you wish it to ignore the database postges for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
+7: If you wish it to ignore the database postgres for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
 
 8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
 
