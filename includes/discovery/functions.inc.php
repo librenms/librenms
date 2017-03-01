@@ -1063,7 +1063,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
         $afi         = array_pop($afisafi_tmp);
         $bgp_ip      = str_replace(".$afi.$safi", '', $k);
         if ($device['os_group'] === 'arista') {
-            $bgp_ip      = str_replace("1.$afi.", '', $bgp_ip);
+            $bgp_ip      = str_replace("$afi.", '', $bgp_ip);
         }
         $bgp_ip      = preg_replace('/:/', ' ', $bgp_ip);
         $bgp_ip      = preg_replace('/(\S+\s+\S+)\s/', '$1:', $bgp_ip);
