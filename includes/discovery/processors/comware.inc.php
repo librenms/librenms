@@ -24,8 +24,7 @@ if ($device['os'] == 'comware') {
                     if ($index == $procindex) {
                         $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.6.';
 
-                        discover_processor($valid['processor'], $device, $cur_oid . $procindex, $procindex, 'comware',
-                            'Slot ' . $x, '1', $value['h3cEntityExtCpuUsage']);
+                        discover_processor($valid['processor'], $device, $cur_oid . $procindex, $procindex, 'comware', 'Slot ' . $x, '1', $value['h3cEntityExtCpuUsage']);
                         $x++;
                     }
                 }
