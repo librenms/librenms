@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $ospf_instance_count  = 0;
 $ospf_port_count      = 0;
 $ospf_area_count      = 0;
@@ -368,12 +370,11 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 }
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
 // Create device-wide statistics RRD
-$rrd_def = array(
-    'DS:instances:GAUGE:600:0:1000000',
-    'DS:areas:GAUGE:600:0:1000000',
-    'DS:ports:GAUGE:600:0:1000000',
-    'DS:neighbours:GAUGE:600:0:1000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('instances', 'GAUGE', 0, 1000000)
+    ->addDataset('areas', 'GAUGE', 0, 1000000)
+    ->addDataset('ports', 'GAUGE', 0, 1000000)
+    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
 $fields = array(
     'instances'   => $ospf_instance_count,

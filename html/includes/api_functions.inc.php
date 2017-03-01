@@ -71,8 +71,8 @@ function get_graph_by_port_hostname()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
-    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=?", array($hostname, $vars['port']));
-    $app->response->headers->set('Content-Type', 'image/png');
+    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($hostname, $vars['port']));
+    $app->response->headers->set(set_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -149,7 +149,7 @@ function get_graph_generic_by_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    $app->response->headers->set('Content-Type', 'image/png');
+    $app->response->headers->set(set_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -514,7 +514,7 @@ function get_graph_by_portgroup()
     unset($seperator);
     $vars['type'] = 'multiport_bits_separate';
     $vars['id']   = $if_list;
-    $app->response->headers->set('Content-Type', 'image/png');
+    $app->response->headers->set(set_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -1381,13 +1381,14 @@ function get_devices_by_group()
     $status   = 'error';
     $code     = 404;
     $count    = 0;
-    $name = urldecode($router['name']);
-    $devices = array();
+    $name     = urldecode($router['name']);
+    $devices  = array();
+    $full     = $_GET['full'];
     if (empty($name)) {
         $message = 'No device group name provided';
     } else {
         $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?", array($name));
-        $devices = GetDevicesFromGroup($group_id, true);
+        $devices = GetDevicesFromGroup($group_id, true, $full);
         $count = count($devices);
         if (empty($devices)) {
             $message = 'No devices found in group ' . $name;

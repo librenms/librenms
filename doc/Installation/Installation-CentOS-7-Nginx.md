@@ -13,7 +13,7 @@ mysql -uroot -p
 ```
 
 ```sql
-CREATE DATABASE librenms;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 GRANT ALL PRIVILEGES ON librenms.*
   TO 'librenms'@'localhost'
   IDENTIFIED BY '<password>'
@@ -99,6 +99,8 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ gzip on;
+ gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
  location / {
   try_files $uri $uri/ @librenms;
  }

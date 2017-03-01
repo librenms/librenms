@@ -1,6 +1,8 @@
 <?php
 
 // Polls Apache statistics from script via SNMP
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'apache';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
@@ -19,31 +21,30 @@ list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $score_closing, $score_logging, $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:access:DERIVE:600:0:125000000000',
-    'DS:kbyte:DERIVE:600:0:125000000000',
-    'DS:cpu:GAUGE:600:0:125000000000',
-    'DS:uptime:GAUGE:600:0:125000000000',
-    'DS:reqpersec:GAUGE:600:0:125000000000',
-    'DS:bytespersec:GAUGE:600:0:125000000000',
-    'DS:byesperreq:GAUGE:600:0:125000000000',
-    'DS:busyworkers:GAUGE:600:0:125000000000',
-    'DS:idleworkers:GAUGE:600:0:125000000000',
-    'DS:sb_wait:GAUGE:600:0:125000000000',
-    'DS:sb_start:GAUGE:600:0:125000000000',
-    'DS:sb_reading:GAUGE:600:0:125000000000',
-    'DS:sb_writing:GAUGE:600:0:125000000000',
-    'DS:sb_keepalive:GAUGE:600:0:125000000000',
-    'DS:sb_dns:GAUGE:600:0:125000000000',
-    'DS:sb_closing:GAUGE:600:0:125000000000',
-    'DS:sb_logging:GAUGE:600:0:125000000000',
-    'DS:sb_graceful:GAUGE:600:0:125000000000',
-    'DS:sb_idle:GAUGE:600:0:125000000000',
-    'DS:sb_open:GAUGE:600:0:125000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('access', 'DERIVE', 0, 125000000000)
+    ->addDataset('kbyte', 'DERIVE', 0, 125000000000)
+    ->addDataset('cpu', 'GAUGE', 0, 125000000000)
+    ->addDataset('uptime', 'GAUGE', 0, 125000000000)
+    ->addDataset('reqpersec', 'GAUGE', 0, 125000000000)
+    ->addDataset('bytespersec', 'GAUGE', 0, 125000000000)
+    ->addDataset('byesperreq', 'GAUGE', 0, 125000000000)
+    ->addDataset('busyworkers', 'GAUGE', 0, 125000000000)
+    ->addDataset('idleworkers', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_wait', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_start', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_reading', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_writing', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_keepalive', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_dns', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_closing', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_logging', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_graceful', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_idle', 'GAUGE', 0, 125000000000)
+    ->addDataset('sb_open', 'GAUGE', 0, 125000000000);
 
 $fields = array(
-                'access'       => $total_access,
+                'access'       => intval(trim($total_access, '"')),
                 'kbyte'        => $total_kbyte,
                 'cpu'          => $cpuload,
                 'uptime'       => $uptime,
@@ -62,7 +63,7 @@ $fields = array(
                 'sb_logging'   => $score_logging,
                 'sb_graceful'  => $score_graceful,
                 'sb_idle'      => $score_idle,
-                'sb_open'      => $score_open,
+                'sb_open'      => intval(trim($score_open, '"')),
 );
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');

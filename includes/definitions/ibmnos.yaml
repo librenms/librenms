@@ -6,6 +6,6 @@ over:
     - { graph: device_bits, text: Traffic }
 discovery:
     - sysDescr:
-        - IBM Networking Operating System
-        - IBM Flex System Fabric
+        - Networking Operating System
+        - Flex System Fabric
         - IBM Networking OS

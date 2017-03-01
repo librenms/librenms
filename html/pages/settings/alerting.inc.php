@@ -1159,6 +1159,63 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$smseagle_url     = get_config_by_name('alert.transports.smseagle.url');
+$smseagle_user    = get_config_by_name('alert.transports.smseagle.user');
+$smseagle_token   = get_config_by_name('alert.transports.smseagle.token');
+$mobiles         = get_config_like_name('alert.transports.smseagle.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#smseagle_transport_expand"><i class="fa fa-caret-down"></i> SMSEagle transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="smseagle" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="smseagle_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="smseagle_url" class="col-sm-4 control-label">SMSEagle URL </label>
+                        <div class="col-sm-4">
+                            <input id="smseagle_url" class="form-control" type="text" name="global-config-input" value="'.$smseagle_url['config_value'].'" data-config_id="'.$smseagle_url['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="smseagle_user" class="col-sm-4 control-label">User</label>
+                        <div class="col-sm-4">
+                            <input id="smseagle_user" class="form-control" type="text" name="global-config-input" value="'.$smseagle_user['config_value'].'" data-config_id="'.$smseagle_user['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="smseagle_token" class="col-sm-4 control-label">Password</label>
+                        <div class="col-sm-4">
+                            <input id="smseagle_token" class="form-control" type="text" name="global-config-input" value="'.$smseagle_token['config_value'].'" data-config_id="'.$smseagle_token['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="smseagle_to" class="col-sm-4 control-label">Mobiles</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="smseagle_to" placeholder="Enter mobile phone numbers, one per line" data-config_id="'.$smseagle_url['config_id'].'" data-type="smseagle">'.$upd_mobiles.'</textarea>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>

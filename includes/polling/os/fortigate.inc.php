@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $fnSysVersion = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysVersion.0', '-Ovq');
 $serial       = snmp_get($device, 'ENTITY-MIB::entPhysicalSerialNum.1', '-Ovq');
 $version                 = preg_replace('/(.+),(.+),(.+)/', '\\1||\\2||\\3', $fnSysVersion);
@@ -12,7 +15,7 @@ if (empty($hardware)) {
 
 $sessions = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:3000000';
+    $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
 
     print "Sessions: $sessions\n";
     $fields = array(
@@ -26,7 +29,7 @@ if (is_numeric($sessions)) {
 
 $cpu_usage = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
 if (is_numeric($cpu_usage)) {
-    $rrd_def = 'DS:LOAD:GAUGE:600:-1:100';
+    $rrd_def = RrdDefinition::make()->addDataset('LOAD', 'GAUGE', -1, 100);
 
     echo "CPU: $cpu_usage%\n";
     $fields = array(

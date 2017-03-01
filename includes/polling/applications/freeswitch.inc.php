@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'freeswitch';
 $app_id = $app['app_id'];
 if (!empty($agent_data[$name])) {
@@ -16,15 +19,14 @@ foreach ($lines as $line) {
 }
 # Freeswitch stats
 $rrd_name =  array('app', $name, 'stats', $app_id);
-$rrd_def = array(
-    'DS:calls:GAUGE:600:0:10000',
-    'DS:channels:GAUGE:600:0:10000',
-    'DS:peak:GAUGE:600:0:10000',
-    'DS:in_failed:COUNTER:600:0:4294967295',
-    'DS:in_okay:COUNTER:600:0:4294967295',
-    'DS:out_failed:COUNTER:600:0:4294967295',
-    'DS:out_okay:COUNTER:600:0:4294967295'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('calls', 'GAUGE', 0, 10000)
+    ->addDataset('channels', 'GAUGE', 0, 10000)
+    ->addDataset('peak', 'GAUGE', 0, 10000)
+    ->addDataset('in_failed', 'COUNTER', 0, 4294967295)
+    ->addDataset('in_okay', 'COUNTER', 0, 4294967295)
+    ->addDataset('out_failed', 'COUNTER', 0, 4294967295)
+    ->addDataset('out_okay', 'COUNTER', 0, 4294967295);
 $fields = array (
         'calls' => $freeswitch['Calls'],
         'channels' => $freeswitch['Channels'],

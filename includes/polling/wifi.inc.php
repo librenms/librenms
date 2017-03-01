@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['type'] == 'wireless') {
     if ($device['os'] == 'airos') {
         echo 'It Is Airos' . PHP_EOL;
@@ -102,7 +104,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     $i = 1;
     while (is_numeric(${'wificlients'.$i})) {
         $tags = array(
-            'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
+            'rrd_def'   => RrdDefinition::make()->addDataset('wificlients', 'GAUGE', -273, 1000),
             'rrd_name'  => array('wificlients', "radio$i"),
             'radio'     => $i,
         );

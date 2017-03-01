@@ -164,7 +164,34 @@ if (mysqli_connect_error()) {
 // Test for MySQL Strict mode
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
 if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
-    print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+    //FIXME - Come back to this once other MySQL modes are fixed
+    //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+if (empty($strict_mode) === false) {
+    print_fail("You have not set sql_mode='' in your mysql config");
+}
+
+// Test for correct character set and collation
+$collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
+if (empty($collation) !== true) {
+    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]));
+}
+$collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation) !== true) {
+    $error = '';
+    foreach ($collation as $id => $data) {
+        $error .= implode(' ', $data) . PHP_EOL;
+    }
+    print_fail('MySQL tables collation is wrong: ' . $error);
+}
+$collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation) !== true) {
+    $error = '';
+    foreach ($collation as $id => $data) {
+        $error .= implode(' ', $data) . PHP_EOL;
+    }
+    print_fail('MySQL column collation is wrong: ' . $error);
 }
 
 $ini_tz = ini_get('date.timezone');

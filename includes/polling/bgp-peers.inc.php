@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($config['enable_bgp']) {
     $peers = dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id']));
 
@@ -145,13 +147,12 @@ if ($config['enable_bgp']) {
             }
 
             $peer_rrd_name = safename('bgp-'.$peer['bgpPeerIdentifier']);
-            $peer_rrd_def = array(
-                'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInUpdates:COUNTER:600:U:100000000000',
-                'DS:bgpPeerOutTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerInTotal:COUNTER:600:U:100000000000',
-                'DS:bgpPeerEstablished:GAUGE:600:0:U'
-            );
+            $peer_rrd_def = RrdDefinition::make()
+                ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerOutTotal', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerInTotal', 'COUNTER', null, 100000000000)
+                ->addDataset('bgpPeerEstablished', 'GAUGE', 0);
 
             $fields = array(
                 'bgpPeerOutUpdates'    => $bgpPeerOutUpdates,
@@ -306,13 +307,12 @@ if ($config['enable_bgp']) {
                     dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
 
                     $cbgp_rrd_name = safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi");
-                    $cbgp_rrd_def = array(
-                        'DS:AcceptedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:DeniedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:AdvertisedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:SuppressedPrefixes:GAUGE:600:U:100000000000',
-                        'DS:WithdrawnPrefixes:GAUGE:600:U:100000000000'
-                    );
+                    $cbgp_rrd_def = RrdDefinition::make()
+                        ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('AdvertisedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('SuppressedPrefixes', 'GAUGE', null, 100000000000)
+                        ->addDataset('WithdrawnPrefixes', 'GAUGE', null, 100000000000);
 
                     $fields = array(
                         'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
