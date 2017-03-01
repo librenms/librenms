@@ -175,7 +175,7 @@ if (empty($strict_mode) === false) {
 // Test for correct character set and collation
 $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
 if (empty($collation) !== true) {
-    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]));
+    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]), 'http://bit.ly/2lAG9H8');
 }
 $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
 if (empty($collation) !== true) {
@@ -183,7 +183,7 @@ if (empty($collation) !== true) {
     foreach ($collation as $id => $data) {
         $error .= implode(' ', $data) . PHP_EOL;
     }
-    print_fail('MySQL tables collation is wrong: ' . $error);
+    print_fail('MySQL tables collation is wrong: ' . $error, 'http://bit.ly/2lAG9H8');
 }
 $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
 if (empty($collation) !== true) {
@@ -191,7 +191,7 @@ if (empty($collation) !== true) {
     foreach ($collation as $id => $data) {
         $error .= implode(' ', $data) . PHP_EOL;
     }
-    print_fail('MySQL column collation is wrong: ' . $error);
+    print_fail('MySQL column collation is wrong: ' . $error, 'http://bit.ly/2lAG9H8');
 }
 
 $ini_tz = ini_get('date.timezone');
@@ -423,16 +423,30 @@ function print_ok($msg)
 }//end print_ok()
 
 
-function print_fail($msg)
+function print_fail($msg, $fix)
 {
-    c_echo("[%RFAIL%n]  $msg\n");
+    c_echo("[%RFAIL%n]  $msg");
+    print_fix($fix);
+    c_echo(PHP_EOL);
 }//end print_fail()
 
 
 function print_warn($msg)
 {
-    c_echo("[%YWARN%n]  $msg\n");
+    c_echo("[%YWARN%n]  $msg");
+    print_fix($fix);
+    c_echo(PHP_EOL);
 }//end print_warn()
+
+/**
+ * @param $fix
+ */
+function print_fix($fix)
+{
+    if (!empty($fix)) {
+        c_echo(" [%RFIX: $fix%n]");
+    }
+}
 
 function check_rrdcached()
 {
