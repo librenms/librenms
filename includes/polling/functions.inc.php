@@ -397,6 +397,9 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     } else {
         $measurement_name = strtolower($rrd_name);
     }
+    if (is_null($rrd_name)) {
+        $rrd_name = $measurement_name;
+    }
 
     $rrd_def = new RrdDefinition();
     $oidglist  = array();
@@ -453,7 +456,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     }
 
     $tags = compact('rrd_def');
-    data_update($device, $measurement_name, $tags, $fields);
+    data_update($device, $rrd_name, $tags, $fields);
 
     foreach ($mib_graphs as $graphtoenable) {
         $graphs[$graphtoenable] = true;
