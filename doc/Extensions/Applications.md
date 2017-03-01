@@ -29,7 +29,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
-1. [Squid](#squid) - SNMP extend
+1. [Squid](#squid) - SNMP proxy
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -522,20 +522,9 @@ If you have more than a few jails configured, you may need to use caching as eac
 
 #### Squid
 
-##### SNMP Extend
+##### SNMP Proxy
 
-1: Copy the shell script, fail2ban, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/squid -O /etc/snmp/squid)
-
-2: Make the script executable (chmod +x /etc/snmp/squid)
-
-3: Edit your snmpd.conf file and add:
-```
-extend squid /etc/snmp/squid
-```
-
-5: Restart snmpd on your host
-
-6: Enable SNMP for Squid like below, if you have not already, and restart it.
+1: Enable SNMP for Squid like below, if you have not already, and restart it.
 
 ```
 acl snmppublic snmp_community public
@@ -544,6 +533,16 @@ snmp_access allow snmppublic localhost
 snmp_access deny all
 ```
 
-7: Make sure the port, community, and path for snmpwalk is set correctly in /etc/snmp/squid.
+2: Restart squid on your host.
 
-8: On the device page in Librenms, edit your host and check `Squid` under the Applications tab.
+3: Edit your snmpd.conf file and add, making sure you have the same community, host, and port as above:
+```
+proxy -v 2c -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
+```
+
+4: On the device page in Librenms, edit your host and check `Squid` under the Applications tab.
+
+For more advanced information on Squid and SNMP or setting up proxying for net-snmp, please see the links below.
+
+http://wiki.squid-cache.org/Features/Snmp
+http://www.net-snmp.org/wiki/index.php/Snmpd_proxy
