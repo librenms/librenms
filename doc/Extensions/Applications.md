@@ -29,6 +29,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 
 ### Apache
@@ -519,6 +520,29 @@ extend fail2ban /etc/snmp/fail2ban
 In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
+
+#### Postgres
+
+##### SNMP Extend
+
+1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres)
+
+2: Make the script executable (chmod +x /etc/snmp/postgres)
+
+3: Edit your snmpd.conf file and add:
+```
+extend postgres /etc/snmp/postgres
+```
+
+4: Restart snmpd on your host
+
+5: Install the Nagios check check_postgres.pl on your system.
+
+6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
+
+7: If you wish it to ignore the database postgres for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
+
+8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
 
 #### Postfix
 
