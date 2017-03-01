@@ -67,7 +67,7 @@ if ($config['enable_bgp']) {
                         unset($peer_data);
                         $ident_key = array_keys($peer_data_tmp);
                         foreach ($peer_data_tmp[$ident_key[0]] as $k => $v) {
-                            if (strstr($k, 'cbgpPeer2LocalAddr')) {
+                            if (strstr($k, 'cbgpPeer2LocalAddr') || $k === 'aristaBgp4V2PeerLocalAddr') {
                                 if ($ip_ver == 'ipv6') {
                                     $v = str_replace('"', '', $v);
                                     $v = rtrim($v);

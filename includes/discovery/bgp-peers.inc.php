@@ -30,9 +30,6 @@ if ($config['enable_bgp']) {
                     $peer2 = true;
                 }
             } elseif ($device['os'] == 'junos') {
-                // Juniper BGP4-V2 MIB
-                // FIXME: needs a big cleanup! also see below.
-                // FIXME: is .0.ipv6 the only possible value here?
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
             }
         } else {
