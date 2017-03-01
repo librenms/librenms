@@ -9,10 +9,10 @@ $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutLine.13.102.98.115.100.110.102.115.99.108.105.101.110.116';
 $nfsclient = snmp_walk($device, $oid, $options, $mib);
 
-list( $Getattr, $Setattr, $Lookup, $Readlink, $Read, $Write, $Create, $Remove, $Rename, $Link, $Symlink, $Mkdir, $Rmdir,
+list($Getattr, $Setattr, $Lookup, $Readlink, $Read, $Write, $Create, $Remove, $Rename, $Link, $Symlink, $Mkdir, $Rmdir,
     $Readdir, $RdirPlus, $Access, $Mknod, $Fsstat, $Fsinfo, $PathConf, $Commit, $TimedOut, $Invalid, $XReplies, $Retries,
     $Requests, $AttrHits, $AttrMisses, $LkupHits, $LkupMisses, $BioRHits, $BioRMisses, $BioWHits, $BioWMisses, $BioRLHits,
-    $BioRLMisses, $BioDHits, $BioDMisses, $DirEHits, $DirEMisses, $AccsHits, $AccsMisses,) = explode("\n", $nfsclient);
+    $BioRLMisses, $BioDHits, $BioDMisses, $DirEHits, $DirEMisses, $AccsHits, $AccsMisses) = explode("\n", $nfsclient);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
