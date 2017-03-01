@@ -10,27 +10,26 @@ $link_array = array(
 
 echo generate_link('General', $link_array, array('nfsen' => 'general'));
 
-$printedChannel='0';
+$printedChannel=false;
 $nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
 foreach ($config['nfsen_rrds'] as $nfsenDir) {
     $hostDir=$nfsenDir.'/'.$nfsenHostname.'/';
     if (is_dir($hostDir)) {
         $nfsenRRDchannelGlob=$hostDir.'*.rrd';
         foreach (glob($nfsenRRDchannelGlob) as $nfsenRRD) {
-            $channel=str_replace($hostDir, '', $nfsenRRD);
-            $channel=str_replace('.rrd', '', $channel);
-            
+            $channel = str_replace(array($hostDir, '.rrd'), '', $nfsenRRD);
+
             if (!$printedChannel) {
                 echo '|Channels:';
-                $printedChannel=1;
-            } else {
+                $printedChannel=true;
+            }else{
                 echo ',';
             }
-            
+
             if ($vars['channel'] == $channel) {
                 $channelFilter=$hostDir.$channel.'-filter.txt';
             }
-            
+
             echo generate_link($channel, $link_array, array('nfsen' => 'channel', 'channel' => $channel));
         }
     }
@@ -45,7 +44,7 @@ if (!$vars['nfsen']) {
 
 if (is_file('pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php')) {
     include 'pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php';
-} else {
+}else{
     include 'pages/device/nfsen/general.inc.php';
 }
 
