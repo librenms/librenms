@@ -366,11 +366,7 @@ function delete_device($id)
     }
 
     $ret .= "Removed device $host\n";
-    if ($_SESSION['username']) {
-        log_event("Device $host has been removed by ".$_SESSION['username'], 0, 'system', 3);
-    } else {
-        log_event("Device $host has been removed", 0, 'system', 3);
-    }
+    log_event("Device $host has been removed", 0, 'system', 3);
     return $ret;
 }
 
@@ -834,13 +830,19 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = device_by_id_cache($device);
     }
 
+    $username = '';
+    if (function_exists(get_userid) && !empty($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+    }
+
     $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
         'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
-        'type' => ($type ? $type : "NULL"),
-        'datetime' => array("NOW()"),
-        'severity' => $severity,
-        'message' => $text);
+        'type'      => ($type ? $type : "NULL"),
+        'datetime'  => array("NOW()"),
+        'severity'  => $severity,
+        'message'   => $text,
+        'username'  => $username);
 
     dbInsert($insert, 'eventlog');
 }
