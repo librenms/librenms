@@ -41,7 +41,7 @@ echo ' | Prefixes: ';
 
 if ($vars['view'] == 'prefixes_ipv4unicast') {
     echo "<span class='pagemenu-selected'>";
-    $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
+    $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
 }
 
 echo generate_link('IPv4', $link_array, array('view' => 'prefixes_ipv4unicast'));
@@ -64,7 +64,7 @@ echo ' | ';
 
 if ($vars['view'] == 'prefixes_ipv6unicast') {
     echo "<span class='pagemenu-selected'>";
-    $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
+    $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
 }
 
 echo generate_link('IPv6', $link_array, array('view' => 'prefixes_ipv6unicast'));
@@ -213,7 +213,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     echo '<tr bgcolor="'.$bg_colour.'"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>
         ';
 
-    echo '   <td width=20><span class=list-large>'.$i.'</span></td>
+    echo '
         <td>'.$peeraddresslink.'<br />'.$peername."</td>
         <td>$peer_type</td>
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>".(isset($peer['afi']) ? $peer['afi'] : '').'</td>
