@@ -1405,7 +1405,6 @@ function get_devices_by_group()
         'devices' => $devices,
     );
 
-    logfile(var_dump($output));
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);

@@ -30,7 +30,8 @@ before_install:
 
 install:
   - composer install --prefer-dist --no-interaction
-  - pip install --user snmpsim
+  - pip install --user pyasn1==0.2.2
+  - pip install --user snmpsim==0.3.1
   - pip install --user pylint
 
 before_script:

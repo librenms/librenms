@@ -132,18 +132,18 @@ $( ".sensor" ).blur(function() {
             dataType: "html",
             success: function(data){
                 $this.closest('.form-group').addClass('has-success');
-                $this.next().addClass('fa-check');
+                $this.next().find('.fa').addClass('fa-check');
                 setTimeout(function(){
                     $this.closest('.form-group').removeClass('has-success');
-                    $this.next().removeClass('fa-check');
+                    $this.next().find('.fa').removeClass('fa-check');
                 }, 2000);
             },
                 error:function(){
-                    $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('fa-times');
+                    $this.closest('.form-group').addClass('has-error');
+                    $this.next().find('.fa').addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('fa-times');
+                        $this.next().find('.fa').removeClass('fa-times');
                     }, 2000);
                 }
     });
