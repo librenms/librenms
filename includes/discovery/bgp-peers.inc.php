@@ -72,7 +72,7 @@ if ($config['enable_bgp']) {
                 }
 
                 if (!empty($af_data)) {
-                    $af_list = build_cbgp_peers($device, $peer, $af_data);
+                    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
 
                 if ($device['os'] == 'junos') {

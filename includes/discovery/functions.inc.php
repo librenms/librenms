@@ -1044,7 +1044,7 @@ function build_bgp_peers($device, $data, $peer2)
     return $peerlist;
 }
 
-function build_cbgp_peers($device, $peer, $af_data)
+function build_cbgp_peers($device, $peer, $af_data, $peer2)
 {
 
     d_echo('afi data :: ');
