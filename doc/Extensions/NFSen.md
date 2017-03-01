@@ -9,8 +9,8 @@ The following is the configuration that can be used:
 
 ```php
 $config['nfsen_enable'] = 1;
-$config['nfsen_split_char']   = "_";
-$config['nfsen_rrds'][]   = "/var/nfsen/profiles-stat/live/";
+$config['nfsen_split_char']   = '_';
+$config['nfsen_rrds'][]   = '/var/nfsen/profiles-stat/live/';
 $config['nfsen_rrds'][] = '/var/nfsen/profiles-stat';
 $config['nfsen_suffix']   = "_yourdomain_com";
 ```
