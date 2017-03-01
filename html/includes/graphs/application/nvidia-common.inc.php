@@ -2,7 +2,7 @@
 $name = 'nvidia';
 $app_id = $app['app_id'];
 $scale_min     = 0;
-$colours       = 'mixed';
+$colours       = 'manycolours';
 $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
