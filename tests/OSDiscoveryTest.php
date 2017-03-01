@@ -571,6 +571,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dnos', 'dnos9');
         $this->checkOS('dnos', 'dnos10');
         $this->checkOS('dnos', 'dnos11');
+        $this->checkOS('dnos', 'dnos12');
+        $this->checkOS('dnos', 'dnos13');
     }
 
     public function testDrac()

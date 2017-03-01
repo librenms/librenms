@@ -33,6 +33,15 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['postfix'] = array(
+    'messages',
+    'qstats',
+    'bytes',
+    'sr',
+    'deferral',
+    'rejects',
+);
+
 $graphs['powerdns-recursor'] = array(
     'questions',
     'answers',

@@ -28,7 +28,7 @@ Enter the MySQL root password to enter the MySQL command-line interface.
 Create database.
 
 ```sql
-CREATE DATABASE librenms;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 GRANT ALL PRIVILEGES ON librenms.*
   TO 'librenms'@'<ip>'
   IDENTIFIED BY '<password>'

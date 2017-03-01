@@ -30,6 +30,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
+1. [Postfix](#postfix) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -543,3 +544,28 @@ extend postgres /etc/snmp/postgres
 
 8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
 
+#### Postfix
+
+##### SNMP Extend
+
+1: Copy the shell script, postfix-queues, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/postfix-queues -O /etc/snmp/postfix-queues)
+
+1: Copy the Perl script, postfix-queues, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/postfixdetailed -O /etc/snmp/postfixdetailed)
+
+2: Make the scripts executable (chmod +x /etc/snmp/postfixdetailed /etc/snmp/postfix-queues)
+
+3: Edit your snmpd.conf file and add:
+```
+extend mailq /etc/snmp/postfix-queues
+extend postfixdetailed /etc/snmp/postfixdetailed
+```
+
+4: Restart snmpd.
+
+5: Install pflogsumm for your OS.
+
+6: Make sure the cache file in /etc/snmp/postfixdetailed is some place that snmpd can write too. This file is used for tracking changes between various values between each time it is called by snmpd. Also make sure the path for pflogsumm is correct.
+
+7: On the device page in Librenms, edit your host and check `Postfix` under the Applications tab. Before doing this, run /etc/snmp/postfixdetailed to create the initial cache file so you don't end up with some crazy initial starting value.
+
+Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is updated, so if this happens in between LibreNMS doing it then the values will be thrown off for that polling period.

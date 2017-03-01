@@ -775,7 +775,7 @@ $('#gsearch').typeahead({
   valueKey: 'name',
     templates: {
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-        suggestion: Handlebars.compile('<p><a href="{{url}}"><small><img src="{{bgp_image}}" border="0">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
+        suggestion: Handlebars.compile('<p><a href="{{url}}"><small>{{{bgp_image}}} {{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
     }
 });
 $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
