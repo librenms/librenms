@@ -982,6 +982,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('lantronix-slc');
     }
 
+    public function testLantronixuds()
+    {
+        $this->checkOS('lantronix-uds');
+    }
+
     public function testLcos()
     {
         $this->checkOS('lcos');
