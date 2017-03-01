@@ -1,4 +1,4 @@
-UPDATE `dbSchema` SET `version` = 166;# Fudge the db schema to update as this could take a while
+UPDATE `dbSchema` SET `version` = 171;
 ALTER TABLE `access_points` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `alert_map` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE `alert_rules` DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;
