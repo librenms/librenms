@@ -14,14 +14,10 @@
 if ($device['os'] == 'comware') {
     echo 'HPE Comware ';
 
-    if (dbFetchCell('SELECT COUNT(`entPhysical_id`) FROM `entPhysical` WHERE `device_id` = ?', array($device['device_id']))) {
-        $indexes = dbFetchColumn('SELECT `entPhysicalIndex` FROM `entPhysical` WHERE device_id = ? AND entPhysicalName = ?', array($device['device_id'], 'Board'));
-    } else {
-        $entity_data = snmpwalk_cache_oid($device, 'entPhysicalName', array(), 'ENTITY-MIB');
-        $indexes = array_keys(array_filter($entity_data, function ($entry) {
-            return $entry['entPhysicalName'] == 'Board';
-        }));
-    }
+    $entity_data = snmpwalk_cache_oid($device, 'entPhysicalName', array(), 'ENTITY-MIB');
+    $indexes = array_keys(array_filter($entity_data, function ($entry) {
+        return $entry['entPhysicalName'] == 'Board';
+    }));
 
     if (!empty($indexes)) {
         $procdata = snmpwalk_cache_oid($device, 'hh3cEntityExtCpuUsage', array(), 'HH3C-ENTITY-EXT-MIB');
