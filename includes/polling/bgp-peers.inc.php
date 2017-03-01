@@ -299,12 +299,17 @@ if ($config['enable_bgp']) {
                         $afis['ipv6']       = 2;
                         $type['ipv4']       = 4;
                         $type['ipv6']       = 16;
-                        $cbgp_oids = array(
-                            "aristaBgp4V2PrefixInPrefixesAccepted.1.{$afis[$afi]}.{$type[$afi]}.{$peer['bgpPeerIdentifier']}.{$afis[$afi]}.{$safis[$safi]}",
-                        );
-                        $cbgp_oids = '"' . implode(' ', $cbgp_oids) . '"';
-                        $cbgp_info = snmp_get_multi_oid($device, $cbgp_oids, '-OQs', 'ARISTA-BGP4V2-MIB');
-                        $cbgpPeerAcceptedPrefixes = $cbgp_info["aristaBgp4V2PrefixInPrefixesAccepted.1.{$afi}.\"{$peer['bgpPeerIdentifier']}\".{$afi}.{$safi}"];
+                        if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
+                            $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
+                            $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);
+                            $tmp_peer = rtrim($tmp_peer, ':');
+                        } else {
+                            $tmp_peer = $peer['bgpPeerIdentifier'];
+                        }
+                        if (empty($a_prefixes)) {
+                            $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        }
+                        $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                     }
 
                     // FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
