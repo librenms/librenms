@@ -10,7 +10,7 @@ $oid          = 'nsExtendOutputFull.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options, $mib);
 
 list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del ) = explode("\n", $postgres);
+    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del) = explode("\n", $postgres);
 
 $rrd_name = array('app', $name, $app_id);
 
