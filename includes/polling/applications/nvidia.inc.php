@@ -33,8 +33,8 @@ $rrd_def = RrdDefinition::make()
 
 $int=0;
 while (isset($gpuArray[$int])) {
-    list( $gpu, $pwr, $temp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
-        $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci )=explode(",", $gpuArray[$int]);
+    list($gpu, $pwr, $temp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
+        $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci)=explode(",", $gpuArray[$int]);
 
         $rrd_name = array('app', $name, $app_id, $int);
 
