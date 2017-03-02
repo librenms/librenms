@@ -675,7 +675,7 @@ function generate_bill_url($bill, $vars = array())
 function generate_port_image($args)
 {
     if (!$args['bg']) {
-        $args['bg'] = 'FFFFFF';
+        $args['bg'] = 'FFFFFF00';
     }
 
     return "<img src='graph.php?type=".$args['graph_type'].'&amp;id='.$args['port_id'].'&amp;from='.$args['from'].'&amp;to='.$args['to'].'&amp;width='.$args['width'].'&amp;height='.$args['height'].'&amp;bg='.$args['bg']."'>";
