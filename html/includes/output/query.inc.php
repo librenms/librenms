@@ -43,7 +43,7 @@ switch ($type) {
                 $rule['query'] = GenSQL($rule['rule']);
             }
             $sql = $rule['query'];
-            $qry = dbFetchRow($sql, array($device_id));
+            $qry[] = dbFetchRow($sql, array($device_id));
             if (is_array($qry)) {
                 $response = 'matches';
             } else {
@@ -55,7 +55,7 @@ switch ($type) {
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
         if ($config['alert']['transports']['mail'] === true) {
-            $contacts = GetContacts($rules);
+            $contacts = GetContacts($qry);
             if (count($contacts) > 0) {
                 $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
             }
