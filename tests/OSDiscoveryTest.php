@@ -728,6 +728,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('fortiswitch');
     }
 
+    public function testFortiwlc()
+    {
+        $this->checkOS('fortiwlc');
+    }
+
     public function testFoundryos()
     {
         $this->checkOS('foundryos');
@@ -980,6 +985,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLantronixslc()
     {
         $this->checkOS('lantronix-slc');
+    }
+
+    public function testLantronixuds()
+    {
+        $this->checkOS('lantronix-uds');
     }
 
     public function testLcos()

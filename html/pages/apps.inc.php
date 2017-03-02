@@ -65,6 +65,15 @@ $graphs['tinydns']   = array(
     'other',
 );
 
+$graphs['postgres'] = array(
+    'backends',
+    'cr',
+    'rows',
+    'hr',
+    'index',
+    'sequential'
+);
+
 $graphs['powerdns'] = array(
     'latency',
     'fail',

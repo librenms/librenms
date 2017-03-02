@@ -30,6 +30,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
+1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 
 
@@ -546,6 +547,29 @@ The GPU numbering on the graphs will correspond to how the nvidia-smi sees them 
 For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
 
 Please be aware that if you have more than 35 GPUs, you will need to add more colors to the config entry $config['graph_colours']['manycolours'].
+
+#### Postgres
+
+##### SNMP Extend
+
+1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres)
+
+2: Make the script executable (chmod +x /etc/snmp/postgres)
+
+3: Edit your snmpd.conf file and add:
+```
+extend postgres /etc/snmp/postgres
+```
+
+4: Restart snmpd on your host
+
+5: Install the Nagios check check_postgres.pl on your system.
+
+6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
+
+7: If you wish it to ignore the database postgres for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
+
+8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
 
 #### Postfix
 
