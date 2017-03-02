@@ -38,7 +38,7 @@ if ($device['os'] == 'coriant') {
          */
         if (dbFetchCell("SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?", array($device['device_id'], $index)) == 0) {
             $mefid = dbInsert(array('device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => mres($mefType), 'mefIdent' => mres($mefIdent), 'mefMTU' => mres($mefMtu), 'mefAdmState' => mres($mefAdmState), 'mefRowState' => mres($mefRowState)), 'mefinfo');
-            log_event("MEF link: ". mres($mefIdent) . " (" . $index . ") Discovered", $device, 'system', $mefid);
+            log_event("MEF link: ". mres($mefIdent) . " (" . $index . ") Discovered", $device, 'system', 2);
             echo '+';
         } else {
             echo '.';
@@ -60,7 +60,7 @@ if ($device['os'] == 'coriant') {
 	 */
         if (!in_array($db_mef['mefID'], $mefevc_list)) {
             dbDelete('mefinfo', '`id` = ?', array($db_mef['id']));
-            log_event("MEF link: ".mres($db_mef['mefIdent']).' Removed', $device, 'system', $db_mef['mefID']);
+            log_event("MEF link: ".mres($db_mef['mefIdent']).' Removed', $device, 'system', 3);
             echo '-';
         }
     }
