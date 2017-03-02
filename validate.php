@@ -145,7 +145,11 @@ if (isset($config['user'])) {
         // This isn't just the log directory, let's print the list to the user
         $files = explode(PHP_EOL, $find_result);
         if (is_array($files)) {
-            print_fail("We have found some files that are owned by a different user than $tmp_user, this will stop you updating automatically and / or rrd files being updated causing graphs to fail:\nIf you don't run a bespoke install then you can fix this by running `chown -R $tmp_user:$tmp_user ".$config['install_dir']."`");
+            print_fail(
+                "We have found some files that are owned by a different user than $tmp_user, " .
+                'this will stop you updating automatically and / or rrd files being updated causing graphs to fail.',
+                "chown -R $tmp_user:$tmp_user {$config['install_dir']}"
+            );
             print_list($files, "\t %s\n");
         }
     }
@@ -163,7 +167,7 @@ if (mysqli_connect_error()) {
 
 // Test for MySQL Strict mode
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
-if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
+if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
     //FIXME - Come back to this once other MySQL modes are fixed
     //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
@@ -175,23 +179,17 @@ if (empty($strict_mode) === false) {
 // Test for correct character set and collation
 $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
 if (empty($collation) !== true) {
-    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]));
+    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]), 'http://bit.ly/2lAG9H8');
 }
-$collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
-if (empty($collation) !== true) {
-    $error = '';
-    foreach ($collation as $id => $data) {
-        $error .= implode(' ', $data) . PHP_EOL;
-    }
-    print_fail('MySQL tables collation is wrong: ' . $error);
+$collation_tables = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation_tables) !== true) {
+    print_fail('MySQL tables collation is wrong: ', 'http://bit.ly/2lAG9H8');
+    print_list($collation_tables, "\t %s\n");
 }
-$collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
-if (empty($collation) !== true) {
-    $error = '';
-    foreach ($collation as $id => $data) {
-        $error .= implode(' ', $data) . PHP_EOL;
-    }
-    print_fail('MySQL column collation is wrong: ' . $error);
+$collation_columns = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation_columns) !== true) {
+    print_fail('MySQL column collation is wrong: ', 'http://bit.ly/2lAG9H8');
+    print_list($collation_columns, "\t %s\n");
 }
 
 $ini_tz = ini_get('date.timezone');
@@ -199,7 +197,10 @@ $sh_tz = rtrim(shell_exec('date +%Z'));
 $php_tz = date('T');
 
 if (empty($ini_tz)) {
-    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone.');
+    print_fail(
+        'You have no timezone set for php.',
+        'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+    );
 } elseif ($sh_tz !== $php_tz) {
     print_fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
 }
@@ -217,7 +218,7 @@ if (!$config['rrdcached']) {
     }
 
     if (substr(sprintf('%o', fileperms($config['rrd_dir'])), -3) != 775) {
-        print_warn('Your RRD directory is not set to 0775, please check our installation instructions');
+        print_warn('Your RRD directory is not set to 0775', "chmod 775 {$config['rrd_dir']}");
     }
 }
 
@@ -247,7 +248,7 @@ foreach ($bins as $bin) {
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
     } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
-        print_fail("$bin should be suid, please chmod u+s $cmd");
+        print_fail("$bin should be suid!", "chmod u+s $cmd");
     }
 }
 
@@ -423,16 +424,35 @@ function print_ok($msg)
 }//end print_ok()
 
 
-function print_fail($msg)
+function print_fail($msg, $fix = null)
 {
-    c_echo("[%RFAIL%n]  $msg\n");
-}//end print_fail()
+    c_echo("[%RFAIL%n]  $msg");
+    if ($fix && strlen($msg) > 72) {
+        echo PHP_EOL . "       ";
+    }
+    print_fix($fix);
+}
 
 
-function print_warn($msg)
+function print_warn($msg, $fix = null)
 {
-    c_echo("[%YWARN%n]  $msg\n");
-}//end print_warn()
+    c_echo("[%YWARN%n]  $msg");
+    if ($fix && strlen($msg) > 72) {
+        echo PHP_EOL . "       ";
+    }
+    print_fix($fix);
+}
+
+/**
+ * @param $fix
+ */
+function print_fix($fix)
+{
+    if (!empty($fix)) {
+        c_echo(" [%BFIX%n] %B$fix%n");
+    }
+    echo PHP_EOL;
+}
 
 function check_rrdcached()
 {
