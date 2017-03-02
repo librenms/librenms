@@ -537,7 +537,7 @@ If you have more than a few jails configured, you may need to use caching as eac
 extend postgres /etc/snmp/postgres
 ```
 
-4: Restart snmpd on your host 
+4: Restart snmpd on your host
 
 5: Install the Nagios check check_postgres.pl on your system.
 
