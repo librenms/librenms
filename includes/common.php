@@ -1599,7 +1599,7 @@ function uw_to_dbm($value)
  * @param int $min
  * @return null
  */
-function set_null($value, $default = null, $min = 0)
+function set_null($value, $default = null, $min = null)
 {
     if (!is_numeric($value)) {
         return $default;

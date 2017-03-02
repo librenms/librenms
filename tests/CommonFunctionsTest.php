@@ -83,4 +83,12 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $data = 'Toner, S/N:CR_UM-16021314488.';
         $this->assertEquals('Toner, S/N CR_UM-16021314488.', safedescr($data));
     }
+
+    public function testSetNull()
+    {
+        $this->assertEquals(null, set_null('BAD-DATA'));
+        $this->assertEquals(0, set_null(0));
+        $this->assertEquals(25, set_null(25));
+        $this->assertEquals(-25, set_null(-25));
+    }
 }
