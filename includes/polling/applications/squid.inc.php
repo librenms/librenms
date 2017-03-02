@@ -4,18 +4,87 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'squid';
 $app_id = $app['app_id'];
-$options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutLine.5.115.113.117.105.100';
-$returned = snmp_walk($device, $oid, $options, $mib);
 
-# cacheCurrentLRUExpiration is returned here, but we don't use it as it would be more work to exclude it from the extend
-list( $MemMaxSize, $SwapMaxSize, $SwapHighWM, $SwapLowWM, $SysPageFaults, $SysNumReads, $MemUsage, $CpuTime, $CpuUsage,
-    $MaxResSize, $NumObjCount, $CurrentLRUExpiration, $CurrentUnlinkRequests, $CurrentUnusedFDescrCnt,
-    $CurrentResFileDescrCnt, $CurrentFileDescrCnt, $CurrentFileDescrMax, $ProtoClientHttpRequests, $HttpHits,
-    $HttpErrors, $HttpInKb, $HttpOutKb, $IcpPktsSent, $IcpPktsRecv, $IcpKbSent, $IcpKbRecv, $ServerRequests,
-    $ServerErrors, $ServerInKb, $ServerOutKb, $CurrentSwapSize, $Clients, $RequestHitRatio1, $RequestHitRatio5,
-    $RequestHitRatio60, $RequestByteRatio1, $RequestByteRatio5, $RequestByteRatio60,  ) = explode("\n", $returned);
++$OIDs=array(
+    '.1.3.6.1.4.1.3495.1.2.5.1.0',
+    '.1.3.6.1.4.1.3495.1.2.5.2.0',
+    '.1.3.6.1.4.1.3495.1.2.5.3.0',
+    '.1.3.6.1.4.1.3495.1.2.5.4.0',
+    '.1.3.6.1.4.1.3495.1.3.1.1.0',
+    '.1.3.6.1.4.1.3495.1.3.1.2.0',
+    '.1.3.6.1.4.1.3495.1.3.1.3.0',
+    '.1.3.6.1.4.1.3495.1.3.1.4.0',
+    '.1.3.6.1.4.1.3495.1.3.1.5.0',
+    '.1.3.6.1.4.1.3495.1.3.1.6.0',
+    '.1.3.6.1.4.1.3495.1.3.1.7.0',
+    '.1.3.6.1.4.1.3495.1.3.1.8.0',
+    '.1.3.6.1.4.1.3495.1.3.1.9.0',
+    '.1.3.6.1.4.1.3495.1.3.1.10.0',
+    '.1.3.6.1.4.1.3495.1.3.1.11.0',
+    '.1.3.6.1.4.1.3495.1.3.1.12.0',
+    '.1.3.6.1.4.1.3495.1.3.1.13.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.1.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.2.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.3.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.4.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.5.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.6.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.7.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.8.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.9.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.10.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.11.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.12.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.13.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.14.0',
+    '.1.3.6.1.4.1.3495.1.3.2.1.15.0',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.9.1',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.9.5',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.9.60',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.10.1',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.10.5',
+    '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'
+);
+$returnedOIDs=snmp_get_multi_oid($device, $OIDs); 
+
+$MemMaxSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.1.0'];
+$SwapMaxSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.2.0'];
+$SwapHighWM = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.3.0'];
+$SwapLowWM = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.4.0'];
+$SysPageFaults = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.1.0'];
+$SysNumReads = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.2.0'];
+$MemUsage = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.3.0'];
+$CpuTime = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.4.0'];
+$CpuUsage = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.5.0'];
+$MaxResSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.6.0'];
+$NumObjCount = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.7.0'];
+$CurrentLRUExpiration = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.8.0'];
+$CurrentUnlinkRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.9.0'];
+$CurrentUnusedFDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.10.0'];
+$CurrentResFileDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.11.0'];
+$CurrentFileDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.12.0'];
+$CurrentFileDescrMax = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.13.0'];
+$ProtoClientHttpRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.1.0'];
+$HttpHits = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.2.0'];
+$HttpErrors = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.3.0'];
+$HttpInKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.4.0'];
+$HttpOutKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.5.0'];
+$IcpPktsSent = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.6.0'];
+$IcpPktsRecv = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.7.0'];
+$IcpKbSent = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.8.0'];
+$IcpKbRecv = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.9.0'];
+$ServerRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.10.0'];
+$ServerErrors = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.11.0'];
+$ServerInKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.12.0'];
+$ServerOutKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.13.0'];
+$CurrentSwapSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.14.0'];
+$Clients = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.15.0'];
+$RequestHitRatio1 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.1'];
+$RequestHitRatio5 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.5'];
+$RequestHitRatio60 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.60'];
+$RequestByteRatio1 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.1'];
+$RequestByteRatio5 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.5'];
+$RequestByteRatio60 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'];
 
 $rrd_name = array('app', $name, $app_id);
 
