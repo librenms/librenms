@@ -1481,6 +1481,12 @@ function get_auth_ad_group_filter($groupname)
  */
 function print_list($list, $format, $max = 10)
 {
+    if (is_array(current($list))) {
+        $list = array_map(function ($item) {
+            return implode(' ', $item);
+        }, $list);
+    }
+
     foreach (array_slice($list, 0, $max) as $item) {
         printf($format, $item);
     }
