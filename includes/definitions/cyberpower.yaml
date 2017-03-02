@@ -1,6 +1,7 @@
 os: cyberpower
 text: 'Cyberpower'
 type: power
+icon: cyberpower
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
