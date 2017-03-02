@@ -22,7 +22,7 @@ foreach ($config['nfsen_rrds'] as $nfsenDir) {
             if (!$printedChannel) {
                 echo '|Channels:';
                 $printedChannel=true;
-            }else{
+            } else {
                 echo ',';
             }
 
@@ -35,7 +35,6 @@ foreach ($config['nfsen_rrds'] as $nfsenDir) {
     }
 }
 
-
 print_optionbar_end();
 
 if (!$vars['nfsen']) {
@@ -44,9 +43,8 @@ if (!$vars['nfsen']) {
 
 if (is_file('pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php')) {
     include 'pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php';
-}else{
+} else {
     include 'pages/device/nfsen/general.inc.php';
 }
-
 
 $pagetitle[] = 'Netflow';
