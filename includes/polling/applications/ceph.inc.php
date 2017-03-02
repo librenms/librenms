@@ -12,6 +12,7 @@ if (!empty($agent_data['app'][$name])) {
         }
         list($section, $data) = explode('>', $section);
 
+        update_applications($device, $app, $section);
         if ($section == "poolstats") {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('ops', 'GAUGE', 0)

@@ -15,6 +15,7 @@ if ($agent_data['app'][$name]) {
 } else {
     $powerdns = snmp_get($device, $oid, $options, $mib);
 }
+update_applications($device, $app, $powerdns);
 
 echo ' powerdns';
 
