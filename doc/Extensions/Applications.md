@@ -34,7 +34,6 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 
-
 ### Apache
 Either use SNMP extend or use the agent.
 ##### SNMP Extend
