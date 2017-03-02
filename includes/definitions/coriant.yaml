@@ -10,13 +10,8 @@ discovery_modules:
     ucd-mib: 0
     ipmi: 0
     bgp-peers: 0
-    toner: 0
     services: 0
-    loadbalancer: 0
-    libvirt-vminfo: 0
-    vmware-vminfo: 0
     vlans: 0
-    junose-atm-vp: 0
     arp-table: 0
     mef-evc: 1
     cisco-vrf-lite: 0
@@ -29,13 +24,10 @@ poller_modules:
     ucd-mib: 0
     ipmi: 0
     bgp-peers: 0
-    toner: 0
     services: 0
-    loadbalancer: 0
     libvirt-vminfo: 0
     vmware-vminfo: 0
     vlans: 0
-    junose-atm-vp: 0
     arp-table: 0
     mef-evc: 1
     cisco-vrf-lite: 0
