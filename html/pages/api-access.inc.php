@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if ($_SESSION['userlevel'] >= '10') {
+if (is_admin() === true) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
     }
@@ -54,7 +54,7 @@ if ($_SESSION['userlevel'] >= '10') {
               <div class="col-sm-4">
                 <select class="form-control" id="user_id" name="user_id">
 <?php
-foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'", array()) as $users) {
+foreach (get_userlist() as $users) {
     echo '<option value="'.$users['user_id'].'">'.$users['username'].'</option>';
 }
 
