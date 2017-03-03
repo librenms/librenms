@@ -1488,7 +1488,12 @@ function host_exists($hostname, $snmphost = '')
         return true;
     } else {
         if ($config['allow_duplicate_sysName'] === false && !empty($snmphost)) {
-            $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
+            if (!empty($config['mydomain'])) {
+                $full_host = rtrim($snmphost, '.') . '.' . $config['mydomain'];
+                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ? or `sysName` = ?", array($snmphost,$full_host));
+            } else {
+                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
+            }
             if ($count > 0) {
                 return true;
             } else {

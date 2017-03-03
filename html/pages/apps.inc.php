@@ -172,7 +172,19 @@ $graphs['squid'] = array(
     'bytehit',
     'sysnumread',
     'pagefaults',
-    'cputime',
+    'cputime'
+);
+
+$graphs['fbsd-nfs-server'] = array(
+    'stats',
+    'cache',
+    'gathering',
+);
+
+$graphs['fbsd-nfs-client'] = array(
+    'stats',
+    'cache',
+    'rpc',
 );
 
 print_optionbar_start();
