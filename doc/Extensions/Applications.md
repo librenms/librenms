@@ -29,6 +29,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [Squid](#squid) - SNMP proxy
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
@@ -522,6 +523,33 @@ extend fail2ban /etc/snmp/fail2ban
 In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
+
+#### Squid
+
+##### SNMP Proxy
+
+1: Enable SNMP for Squid like below, if you have not already, and restart it.
+
+```
+acl snmppublic snmp_community public
+snmp_port 3401
+snmp_access allow snmppublic localhost
+snmp_access deny all
+```
+
+2: Restart squid on your host.
+
+3: Edit your snmpd.conf file and add, making sure you have the same community, host, and port as above:
+```
+proxy -v 2c -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
+```
+
+4: On the device page in Librenms, edit your host and check `Squid` under the Applications tab.
+
+For more advanced information on Squid and SNMP or setting up proxying for net-snmp, please see the links below.
+
+http://wiki.squid-cache.org/Features/Snmp
+http://www.net-snmp.org/wiki/index.php/Snmpd_proxy
 
 #### Postgres
 
