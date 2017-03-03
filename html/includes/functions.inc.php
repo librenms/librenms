@@ -1472,3 +1472,9 @@ function get_oxidized_nodes_list()
         </tr>";
     }
 }
+
+// fetches disks for a system
+function get_disks($device)
+{
+    return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
+}
