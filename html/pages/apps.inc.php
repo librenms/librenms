@@ -158,6 +158,23 @@ $graphs['php-fpm'] = array(
     'stats'
 );
 
+$graphs['squid'] = array(
+    'memory',
+    'clients',
+    'cpuusage',
+    'objcount',
+    'filedescr',
+    'httpbw',
+    'http',
+    'server',
+    'serverbw',
+    'reqhit',
+    'bytehit',
+    'sysnumread',
+    'pagefaults',
+    'cputime'
+);
+
 $graphs['fbsd-nfs-server'] = array(
     'stats',
     'cache',
