@@ -226,16 +226,17 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
+            $device_system_name = ip_to_sysname($device, $device['hostname']);
 
             if ($config['webui']['availability_map_compact'] == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
-                        <span class="small">' . shorthost(ip_to_sysname($device, $device['hostname'])) . '</span>
+                        <span class="small">' . shorthost($device_system_name) . '</span>
                     </div>
                     </a>';
                 } else {
@@ -244,12 +245,12 @@ if (defined('SHOW_SETTINGS')) {
                         $deviceLabel .= ' widget-availability-fixed';
                     }
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
                     </a>';
                 }
             } else {
-                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device['hostname'] . ' - ' . formatUptime($device['uptime']) . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device_system_name . ' - ' . formatUptime($device['uptime']) . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
             }
         }
     }
@@ -275,17 +276,18 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = "down";
                     $service_down_count++;
                 }
+                $service_system_name = ip_to_sysname($service, $service['hostname']);
 
                 if ($config['webui']['availability_map_compact'] == 0) {
                     if ($directpage == "yes") {
                         $deviceIcon = getIconTag($service);
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service['hostname'] . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service_system_name . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <div class="service-availability ' . $serviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
                                 <span class="device-icon">' . $deviceIcon . '</span><br>
-                                <span class="small">' . shorthost(ip_to_sysname($service, $service['hostname'])) . '</span>
+                                <span class="small">' . shorthost($service_system_name) . '</span>
                             </div>
                         </a>';
                     } else {
@@ -295,12 +297,12 @@ if (defined('SHOW_SETTINGS')) {
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost(ip_to_sysname($service, $service['hostname'])) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
+                        <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . shorthost($service_system_name) . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }
                 } else {
-                    $temp_output[] = "<a href='" . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . "' title='${service['hostname']} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                    $temp_output[] = "<a href='" . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
                 }
             }
         } else {
