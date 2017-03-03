@@ -136,15 +136,21 @@ echo '
         </tr>
 ';
 
-foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN users AS U ON AT.user_id=U.user_id ORDER BY AT.user_id') as $api) {
+$tmp_users = get_userlist();
+foreach (dbFetchRows('SELECT * FROM `api_tokens` ORDER BY user_id') as $api) {
     if ($api['disabled'] == '1') {
         $api_disabled = 'checked';
     } else {
         $api_disabled = '';
     }
+    foreach ($tmp_users as $tmp_user) {
+        if ($tmp_user['user_id'] === $api['user_id']) {
+            $user_details = $tmp_user;
+        }
+    }
     echo '
         <tr id="'.$api['id'].'">
-          <td>'.$api['username'].'</td>
+          <td>'.$user_details['username'].'</td>
           <td>'.$api['token_hash'].'</td>
           <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api['token_hash'].'"><i class="fa fa-qrcode" ></i></button></td>
           <td>'.$api['description'].'</td>
