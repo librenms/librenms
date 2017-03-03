@@ -29,6 +29,8 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 
@@ -543,6 +545,40 @@ extend postgres /etc/snmp/postgres
 7: If you wish it to ignore the database postgres for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
 
 8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
+
+#### FreeBSD NFS Client
+
+##### SNMP Extend
+
+1: Copy the shell script, fbsdnfsserver, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsclient -O /etc/snmp/fbsdnfsclient)
+
+2: Make the script executable (chmod +x /etc/snmp/fbsdnfsclient)
+
+3: Edit your snmpd.conf file and add:
+```
+extend fbsdnfsclient /etc/snmp/fbsdnfsclient
+```
+
+4: Restart snmpd on your host
+
+5: On the device page in Librenms, edit your host and check `FreeBSD NFS Client` under the Applications tab.
+
+#### FreeBSD NFS Server
+
+##### SNMP Extend
+
+1: Copy the shell script, fbsdnfsserver, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsserver -O /etc/snmp/fbsdnfsserver)
+
+2: Make the script executable (chmod +x /etc/snmp/fbsdnfsserver)
+
+3: Edit your snmpd.conf file and add:
+```
+extend fbsdnfsserver /etc/snmp/fbsdnfsserver
+```
+
+4: Restart snmpd on your host
+
+5: On the device page in Librenms, edit your host and check `FreeBSD NFS Server` under the Applications tab.
 
 #### Postfix
 
