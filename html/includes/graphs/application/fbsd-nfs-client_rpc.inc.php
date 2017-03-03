@@ -3,7 +3,7 @@ $name = 'fbsd-nfs-client';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Per Second';
+$unit_text     = 'per second';
 $unitlen       = 10;
 $bigdescrlen   = 10;
 $smalldescrlen = 10;
@@ -18,33 +18,33 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Timed Out',
-            'ds'       => 'TimedOut',
-            'colour'   => '582A72'
+            'descr'    => 'timed out',
+            'ds'       => 'timedout',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Invalid',
-            'ds'       => 'Invalid',
-            'colour'   => 'FFD1AA'
+            'descr'    => 'invalid',
+            'ds'       => 'invalid',
+            'colour'   => 'ffd1aa'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'X Replies',
-            'ds'       => 'XReplies',
-            'colour'   => 'AA6C39'
+            'descr'    => 'x replies',
+            'ds'       => 'xreplies',
+            'colour'   => 'aa6c39'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Retries',
-            'ds'       => 'Retries',
-            'colour'   => '28536C'
+            'descr'    => 'retries',
+            'ds'       => 'retries',
+            'colour'   => '28536c'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Requests',
-            'ds'       => 'Requests',
-            'colour'   => 'FF11BB'
+            'descr'    => 'requests',
+            'ds'       => 'requests',
+            'colour'   => 'ff11bb'
         )
     );
 } else {

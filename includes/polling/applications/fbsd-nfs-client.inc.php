@@ -4,104 +4,104 @@ $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
-$options      = '-O qv';
+$options      = '-o qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutLine.13.102.98.115.100.110.102.115.99.108.105.101.110.116';
 $nfsclient = snmp_walk($device, $oid, $options, $mib);
 
-list($Getattr, $Setattr, $Lookup, $Readlink, $Read, $Write, $Create, $Remove, $Rename, $Link, $Symlink, $Mkdir, $Rmdir,
-    $Readdir, $RdirPlus, $Access, $Mknod, $Fsstat, $Fsinfo, $PathConf, $Commit, $TimedOut, $Invalid, $XReplies, $Retries,
-    $Requests, $AttrHits, $AttrMisses, $LkupHits, $LkupMisses, $BioRHits, $BioRMisses, $BioWHits, $BioWMisses, $BioRLHits,
-    $BioRLMisses, $BioDHits, $BioDMisses, $DirEHits, $DirEMisses, $AccsHits, $AccsMisses) = explode("\n", $nfsclient);
+list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink, $mkdir, $rmdir,
+    $readdir, $rdirplus, $access, $mknod, $fsstat, $fsinfo, $pathconf, $commit, $timedout, $invalid, $xreplies, $retries,
+    $requests, $attrhits, $attrmisses, $lkuphits, $lkupmisses, $biorhits, $biormisses, $biowhits, $biowmisses, $biorlhits,
+    $biorlmisses, $biodhits, $biodmisses, $direhits, $diremisses, $accshits, $accsmisses) = explode("\n", $nfsclient);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
-    ->addDataset('Getattr', 'DERIVE', 0)
-    ->addDataset('Setattr', 'DERIVE', 0)
-    ->addDataset('Lookup', 'DERIVE', 0)
-    ->addDataset('Readlink', 'DERIVE', 0)
-    ->addDataset('Read', 'DERIVE', 0)
-    ->addDataset('Write', 'DERIVE', 0)
-    ->addDataset('Create', 'DERIVE', 0)
-    ->addDataset('Remove', 'DERIVE', 0)
-    ->addDataset('Rename', 'DERIVE', 0)
-    ->addDataset('Link', 'DERIVE', 0)
-    ->addDataset('Symlink', 'DERIVE', 0)
-    ->addDataset('Mkdir', 'DERIVE', 0)
-    ->addDataset('Rmdir', 'DERIVE', 0)
-    ->addDataset('Readdir', 'DERIVE', 0)
-    ->addDataset('RdirPlus', 'DERIVE', 0)
-    ->addDataset('Access', 'DERIVE', 0)
-    ->addDataset('Mknod', 'DERIVE', 0)
-    ->addDataset('Fsstat', 'DERIVE', 0)
-    ->addDataset('Fsinfo', 'DERIVE', 0)
-    ->addDataset('PathConf', 'DERIVE', 0)
-    ->addDataset('Commit', 'DERIVE', 0)
-    ->addDataset('TimedOut', 'DERIVE', 0)
-    ->addDataset('Invalid', 'DERIVE', 0)
-    ->addDataset('XReplies', 'DERIVE', 0)
-    ->addDataset('Retries', 'DERIVE', 0)
-    ->addDataset('Requests', 'DERIVE', 0)
-    ->addDataset('AttrHits', 'DERIVE', 0)
-    ->addDataset('AttrMisses', 'DERIVE', 0)
-    ->addDataset('LkupHits', 'DERIVE', 0)
-    ->addDataset('LkupMisses', 'DERIVE', 0)
-    ->addDataset('BioRHits', 'DERIVE', 0)
-    ->addDataset('BioRMisses', 'DERIVE', 0)
-    ->addDataset('BioWHits', 'DERIVE', 0)
-    ->addDataset('BioWMisses', 'DERIVE', 0)
-    ->addDataset('BioRLHits', 'DERIVE', 0)
-    ->addDataset('BioRLMisses', 'DERIVE', 0)
-    ->addDataset('BioDHits', 'DERIVE', 0)
-    ->addDataset('BioDMisses', 'DERIVE', 0)
-    ->addDataset('DirEHits', 'DERIVE', 0)
-    ->addDataset('DirEMisses', 'DERIVE', 0)
-    ->addDataset('AccsHits', 'DERIVE', 0)
-    ->addDataset('AccsMisses', 'DERIVE', 0);
+    ->addDataset('getattr', 'derive', 0)
+    ->addDataset('setattr', 'derive', 0)
+    ->addDataset('lookup', 'derive', 0)
+    ->addDataset('readlink', 'derive', 0)
+    ->addDataset('read', 'derive', 0)
+    ->addDataset('write', 'derive', 0)
+    ->addDataset('create', 'derive', 0)
+    ->addDataset('remove', 'derive', 0)
+    ->addDataset('rename', 'derive', 0)
+    ->addDataset('link', 'derive', 0)
+    ->addDataset('symlink', 'derive', 0)
+    ->addDataset('mkdir', 'derive', 0)
+    ->addDataset('rmdir', 'derive', 0)
+    ->addDataset('readdir', 'derive', 0)
+    ->addDataset('rdirplus', 'derive', 0)
+    ->addDataset('access', 'derive', 0)
+    ->addDataset('mknod', 'derive', 0)
+    ->addDataset('fsstat', 'derive', 0)
+    ->addDataset('fsinfo', 'derive', 0)
+    ->addDataset('pathconf', 'derive', 0)
+    ->addDataset('commit', 'derive', 0)
+    ->addDataset('timedout', 'derive', 0)
+    ->addDataset('invalid', 'derive', 0)
+    ->addDataset('xreplies', 'derive', 0)
+    ->addDataset('retries', 'derive', 0)
+    ->addDataset('requests', 'derive', 0)
+    ->addDataset('attrhits', 'derive', 0)
+    ->addDataset('attrmisses', 'derive', 0)
+    ->addDataset('lkuphits', 'derive', 0)
+    ->addDataset('lkupmisses', 'derive', 0)
+    ->addDataset('biorhits', 'derive', 0)
+    ->addDataset('biormisses', 'derive', 0)
+    ->addDataset('biowhits', 'derive', 0)
+    ->addDataset('biowmisses', 'derive', 0)
+    ->addDataset('biorlhits', 'derive', 0)
+    ->addDataset('biorlmisses', 'derive', 0)
+    ->addDataset('biodhits', 'derive', 0)
+    ->addDataset('biodmisses', 'derive', 0)
+    ->addDataset('direhits', 'derive', 0)
+    ->addDataset('diremisses', 'derive', 0)
+    ->addDataset('accshits', 'derive', 0)
+    ->addDataset('accsmisses', 'derive', 0);
 
 $fields = array(
-    'Getattr' => $Getattr,
-    'Setattr' => $Setattr,
-    'Lookup' => $Lookup,
-    'Readlink' => $Readlink,
-    'Read' => $Read,
-    'Write' => $Write,
-    'Create' => $Create,
-    'Remove' => $Remove,
-    'Rename' => $Rename,
-    'Link' => $Link,
-    'Symlink' => $Symlink,
-    'Mkdir' => $Mkdir,
-    'Rmdir' => $Rmdir,
-    'Readdir' => $Readdir,
-    'RdirPlus' => $RdirPlus,
-    'Access' => $Access,
-    'Mknod' => $Mknod,
-    'Fsstat' => $Fsstat,
-    'Fsinfo' => $Fsinfo,
-    'PathConf' => $PathConf,
-    'Commit' => $Commit,
-    'TimedOut' => $TimedOut,
-    'Invalid' => $Invalid,
-    'XReplies' => $XReplies,
-    'Retries' => $Retries,
-    'Requests' => $Requests,
-    'AttrHits' => $AttrHits,
-    'AttrMisses' => $AttrMisses,
-    'LkupHits' => $LkupHits,
-    'LkupMisses' => $LkupMisses,
-    'BioRHits' => $BioRHits,
-    'BioRMisses' => $BioRMisses,
-    'BioWHits' => $BioWHits,
-    'BioWMisses' => $BioWMisses,
-    'BioRLHits' => $BioRLHits,
-    'BioRLMisses' => $BioRLMisses,
-    'BioDHits' => $BioDHits,
-    'BioDMisses' => $BioDMisses,
-    'DirEHits' => $DirEHits,
-    'DirEMisses' => $DirEMisses,
-    'AccsHits' => $AccsHits,
-    'AccsMisses' => $AccsMisses,
+    'getattr' => $getattr,
+    'setattr' => $setattr,
+    'lookup' => $lookup,
+    'readlink' => $readlink,
+    'read' => $read,
+    'write' => $write,
+    'create' => $create,
+    'remove' => $remove,
+    'rename' => $rename,
+    'link' => $link,
+    'symlink' => $symlink,
+    'mkdir' => $mkdir,
+    'rmdir' => $rmdir,
+    'readdir' => $readdir,
+    'rdirplus' => $rdirplus,
+    'access' => $access,
+    'mknod' => $mknod,
+    'fsstat' => $fsstat,
+    'fsinfo' => $fsinfo,
+    'pathconf' => $pathconf,
+    'commit' => $commit,
+    'timedout' => $timedout,
+    'invalid' => $invalid,
+    'xreplies' => $xreplies,
+    'retries' => $retries,
+    'requests' => $requests,
+    'attrhits' => $attrhits,
+    'attrmisses' => $attrmisses,
+    'lkuphits' => $lkuphits,
+    'lkupmisses' => $lkupmisses,
+    'biorhits' => $biorhits,
+    'biormisses' => $biormisses,
+    'biowhits' => $biowhits,
+    'biowmisses' => $biowmisses,
+    'biorlhits' => $biorlhits,
+    'biorlmisses' => $biorlmisses,
+    'biodhits' => $biodhits,
+    'biodmisses' => $biodmisses,
+    'direhits' => $direhits,
+    'diremisses' => $diremisses,
+    'accshits' => $accshits,
+    'accsmisses' => $accsmisses,
 );
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);

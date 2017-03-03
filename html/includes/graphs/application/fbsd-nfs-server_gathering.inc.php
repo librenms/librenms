@@ -3,7 +3,7 @@ $name = 'fbsd-nfs-server';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Per Second';
+$unit_text     = 'per second';
 $unitlen       = 10;
 $bigdescrlen   = 10;
 $smalldescrlen = 10;
@@ -18,21 +18,21 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'WriteOps',
-            'ds'       => 'WriteOps',
-            'colour'   => 'AA6C39'
+            'descr'    => 'write ops',
+            'ds'       => 'writeops',
+            'colour'   => 'aa6c39'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'WriteRPC',
-            'ds'       => 'WriteRPC',
-            'colour'   => '582A72'
+            'descr'    => 'write rpc',
+            'ds'       => 'writerpc',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Opsaved',
-            'ds'       => 'Opsaved',
-            'colour'   => '28536C'
+            'descr'    => 'ops saved',
+            'ds'       => 'opsaved',
+            'colour'   => '28536c'
         )
     );
 } else {
