@@ -29,7 +29,7 @@ foreach ($oids as $index => $entry) {
      * According to Coriant this should be fixed in Nov 2017.
      */
     if (($mefMtu == 0) && ($device['os'] == 'coriant')) {
-       $mefMtu = 1600;
+        $mefMtu = 1600;
     }
 
     /*
