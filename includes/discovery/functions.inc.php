@@ -1010,6 +1010,7 @@ function build_bgp_peers($device, $data, $peer2)
     $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
     $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.', '', $peers));
     $peerlist = array();
+    $ver = '';
     foreach (explode("\n", $peers) as $peer) {
         if ($peer2 === true) {
             list($ver, $peer) = explode('.', $peer, 2);
@@ -1086,7 +1087,7 @@ function add_bgp_peer($device, $peer)
             'bgpPeerIdentifier' => $peer['ip'],
             'bgpPeerRemoteAs' => $peer['as'],
             'context_name' => $device['context_name'],
-            'astext' => $astext,
+            'astext' => $peer['astext'],
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
             'bgpLocalAddr' => '0.0.0.0',
@@ -1105,7 +1106,7 @@ function add_bgp_peer($device, $peer)
         }
         echo '+';
     } else {
-        dbUpdate(array('bgpPeerRemoteAs' => $peer['as'], 'astext' => mres($astext)), 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', array($device['device_id'], $peer['ip']));
+        dbUpdate(array('bgpPeerRemoteAs' => $peer['as'], 'astext' => mres($peer['astext'])), 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', array($device['device_id'], $peer['ip']));
         echo '.';
     }
 }

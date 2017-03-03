@@ -46,6 +46,7 @@ if ($config['enable_bgp']) {
         if (isset($peerlist)) {
             foreach ($peerlist as $peer) {
                 $astext = get_astext($peer['as']);
+                $peer['astext'] = $astext;
 
                 add_bgp_peer($device, $peer);
 
