@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition; 
+use LibreNMS\RRD\RrdDefinition;
 
 $name = 'squid';
 $app_id = $app['app_id'];
@@ -45,7 +45,7 @@ $app_id = $app['app_id'];
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.5',
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'
 );
-$returnedoids=snmp_get_multi_oid($device, $oids); 
+$returnedoids=snmp_get_multi_oid($device, $oids);
 
 $memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];
 $swapmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.2.0'];
