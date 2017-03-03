@@ -118,6 +118,9 @@ if (!module_selected('nodb', $init_modules)) {
 
     // load graph types from the database
     require $install_dir . '/includes/load_db_graph_types.inc.php';
+
+    // Process $config to tidy up
+    require $install_dir . '/includes/process_config.inc.php';
 }
 
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
