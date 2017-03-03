@@ -1158,7 +1158,7 @@ Route: /api/v0/devicegroups/:name
 
 Input (JSON):
 
-  -full: set to true to return all columns for the devices in a group
+  - full: set to any value to return all data for the devices in a given group
 
 Examples:
 ```curl

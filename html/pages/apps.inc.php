@@ -33,6 +33,15 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['postfix'] = array(
+    'messages',
+    'qstats',
+    'bytes',
+    'sr',
+    'deferral',
+    'rejects',
+);
+
 $graphs['powerdns-recursor'] = array(
     'questions',
     'answers',
@@ -54,6 +63,15 @@ $graphs['tinydns']   = array(
     'errors',
     'dnssec',
     'other',
+);
+
+$graphs['postgres'] = array(
+    'backends',
+    'cr',
+    'rows',
+    'hr',
+    'index',
+    'sequential'
 );
 
 $graphs['powerdns'] = array(
@@ -138,6 +156,18 @@ $graphs['exim-stats'] = array(
 
 $graphs['php-fpm'] = array(
     'stats'
+);
+
+$graphs['fbsd-nfs-server'] = array(
+    'stats',
+    'cache',
+    'gathering',
+);
+
+$graphs['fbsd-nfs-client'] = array(
+    'stats',
+    'cache',
+    'rpc',
 );
 
 print_optionbar_start();

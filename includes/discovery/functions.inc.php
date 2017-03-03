@@ -986,14 +986,14 @@ function sensors($types, $device, $valid, $pre_cache = array())
         $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
-            include_once $dir . $device['os_group'] . '.inc.php';
+            include $dir . $device['os_group'] . '.inc.php';
         }
         if (is_file($dir . $device['os'] . '.inc.php')) {
-            include_once $dir . $device['os'] . '.inc.php';
+            include $dir . $device['os'] . '.inc.php';
         }
         if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
-                include_once $dir . '/rfc1628.inc.php';
+                include $dir . '/rfc1628.inc.php';
             }
         }
         d_echo($valid['sensor'][$type]);
