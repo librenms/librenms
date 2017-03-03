@@ -21,13 +21,14 @@ if (count($processors)) {
     $graph_array['legend'] = 'no';
 
     $totalPercent=0;
+    $totalPercentWarn=0;
 
     foreach ($processors as $proc) {
         $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
         $percent      = $proc['processor_usage'];
         if ($config['cpu_details_overview'] === true) {
-            $background   = get_percentage_colours($percent);
+            $background   = get_percentage_colours($percent, $proc['processor_perc_warn']);
 
             $graph_array['id']     = $proc['processor_id'];
 
@@ -54,6 +55,7 @@ if (count($processors)) {
               </tr>';
         } else {
             $totalPercent = $totalPercent + $percent;
+            $totalPercentWarn = $totalPercentWarn + $proc['processor_perc_warn'];
         }
     }//end foreach
 
@@ -94,7 +96,8 @@ if (count($processors)) {
 
         //Add a row with CPU desc, count and percent graph
         $totalPercent=$totalPercent/count($processors);
-        $background   = get_percentage_colours($totalPercent);
+        $totalPercentWarn=$totalPercentWarn/count($processors);
+        $background   = get_percentage_colours($totalPercent, $totalPercentWarn);
 
          echo '<tr>
              <td class="col-md-4">'.overlib_link($link, $text_descr, $overlib_content).'</td>
