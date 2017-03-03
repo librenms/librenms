@@ -482,6 +482,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cyberoam-utm');
     }
 
+    public function testCyberpower()
+    {
+        $this->checkOS('cyberpower');
+    }
+
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
@@ -540,6 +545,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDevelopprinter()
     {
         $this->checkOS('developprinter');
+    }
+
+    public function testDigipower()
+    {
+        $this->checkOS('digipower');
     }
 
     public function testDlinkap()
@@ -726,6 +736,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFortiswitch()
     {
         $this->checkOS('fortiswitch');
+    }
+
+    public function testFortiwlc()
+    {
+        $this->checkOS('fortiwlc');
     }
 
     public function testFoundryos()
@@ -980,6 +995,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLantronixslc()
     {
         $this->checkOS('lantronix-slc');
+    }
+
+    public function testLantronixuds()
+    {
+        $this->checkOS('lantronix-uds');
     }
 
     public function testLcos()
