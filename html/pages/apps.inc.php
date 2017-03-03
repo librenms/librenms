@@ -158,6 +158,25 @@ $graphs['php-fpm'] = array(
     'stats'
 );
 
+$graphs['nvidia'] = array(
+    'sm',
+    'mem',
+    'enc',
+    'dec',
+    'rxpci',
+    'txpci',
+    'fb',
+    'bar1',
+    'mclk',
+    'pclk',
+    'pwr',
+    'temp',
+    'pviol',
+    'tviol',
+    'sbecc',
+    'dbecc',
+);
+
 $graphs['squid'] = array(
     'memory',
     'clients',
@@ -172,7 +191,7 @@ $graphs['squid'] = array(
     'bytehit',
     'sysnumread',
     'pagefaults',
-    'cputime'
+    'cputime',
 );
 
 $graphs['fbsd-nfs-server'] = array(
