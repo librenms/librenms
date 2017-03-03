@@ -103,6 +103,12 @@ function nicecase($item)
         case 'exim-stats':
             return 'EXIM Stats';
 
+        case 'fbsd-nfs-client':
+            return 'FreeBSD NFS Client';
+
+        case 'fbsd-nfs-server':
+            return 'FreeBSD NFS Server';
+        
         case 'php-fpm':
             return 'PHP-FPM';
 
