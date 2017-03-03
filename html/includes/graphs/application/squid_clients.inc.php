@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Clients';
+$unit_text     = 'clients';
 $unitlen       = 10;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
@@ -19,9 +19,9 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Clients',
-            'ds'       => 'Clients',
-            'colour'   => '582A72'
+            'descr'    => 'clients',
+            'ds'       => 'clients',
+            'colour'   => '582a72'
         )
     );
 } else {

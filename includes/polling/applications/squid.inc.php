@@ -1,11 +1,11 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdDefinition; 
 
 $name = 'squid';
 $app_id = $app['app_id'];
 
-+$OIDs=array(
++$oids=array(
     '.1.3.6.1.4.1.3495.1.2.5.1.0',
     '.1.3.6.1.4.1.3495.1.2.5.2.0',
     '.1.3.6.1.4.1.3495.1.2.5.3.0',
@@ -45,131 +45,131 @@ $app_id = $app['app_id'];
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.5',
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'
 );
-$returnedOIDs=snmp_get_multi_oid($device, $OIDs); 
+$returnedoids=snmp_get_multi_oid($device, $oids); 
 
-$MemMaxSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.1.0'];
-$SwapMaxSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.2.0'];
-$SwapHighWM = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.3.0'];
-$SwapLowWM = $returnedOIDs['.1.3.6.1.4.1.3495.1.2.5.4.0'];
-$SysPageFaults = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.1.0'];
-$SysNumReads = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.2.0'];
-$MemUsage = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.3.0'];
-$CpuTime = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.4.0'];
-$CpuUsage = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.5.0'];
-$MaxResSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.6.0'];
-$NumObjCount = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.7.0'];
-$CurrentLRUExpiration = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.8.0'];
-$CurrentUnlinkRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.9.0'];
-$CurrentUnusedFDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.10.0'];
-$CurrentResFileDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.11.0'];
-$CurrentFileDescrCnt = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.12.0'];
-$CurrentFileDescrMax = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.1.13.0'];
-$ProtoClientHttpRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.1.0'];
-$HttpHits = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.2.0'];
-$HttpErrors = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.3.0'];
-$HttpInKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.4.0'];
-$HttpOutKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.5.0'];
-$IcpPktsSent = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.6.0'];
-$IcpPktsRecv = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.7.0'];
-$IcpKbSent = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.8.0'];
-$IcpKbRecv = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.9.0'];
-$ServerRequests = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.10.0'];
-$ServerErrors = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.11.0'];
-$ServerInKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.12.0'];
-$ServerOutKb = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.13.0'];
-$CurrentSwapSize = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.14.0'];
-$Clients = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.1.15.0'];
-$RequestHitRatio1 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.1'];
-$RequestHitRatio5 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.5'];
-$RequestHitRatio60 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.9.60'];
-$RequestByteRatio1 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.1'];
-$RequestByteRatio5 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.5'];
-$RequestByteRatio60 = $returnedOIDs['.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'];
+$memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];
+$swapmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.2.0'];
+$swaphighwm = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.3.0'];
+$swaplowwm = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.4.0'];
+$syspagefaults = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.1.0'];
+$sysnumreads = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.2.0'];
+$memusage = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.3.0'];
+$cputime = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.4.0'];
+$cpuusage = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.5.0'];
+$maxressize = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.6.0'];
+$numobjcount = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.7.0'];
+$currentlruexpiration = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.8.0'];
+$currentunlinkrequests = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.9.0'];
+$currentunusedfdescrcnt = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.10.0'];
+$currentresfiledescrcnt = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.11.0'];
+$currentfiledescrcnt = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.12.0'];
+$currentfiledescrmax = $returnedoids['.1.3.6.1.4.1.3495.1.3.1.13.0'];
+$protoclienthttprequests = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.1.0'];
+$httphits = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.2.0'];
+$httperrors = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.3.0'];
+$httpinkb = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.4.0'];
+$httpoutkb = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.5.0'];
+$icppktssent = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.6.0'];
+$icppktsrecv = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.7.0'];
+$icpkbsent = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.8.0'];
+$icpkbrecv = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.9.0'];
+$serverrequests = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.10.0'];
+$servererrors = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.11.0'];
+$serverinkb = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.12.0'];
+$serveroutkb = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.13.0'];
+$currentswapsize = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.14.0'];
+$clients = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.1.15.0'];
+$requesthitratio1 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.9.1'];
+$requesthitratio5 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.9.5'];
+$requesthitratio60 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.9.60'];
+$requestbyteratio1 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.1'];
+$requestbyteratio5 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.5'];
+$requestbyteratio60 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'];
 
 $rrd_name = array('app', $name, $app_id);
 
 $rrd_def = RrdDefinition::make()
-    ->addDataset('MemMaxSize', 'GAUGE', 0)
-    ->addDataset('SwapMaxSize', 'GAUGE', 0)
-    ->addDataset('SwapHighWM', 'GAUGE', 0)
-    ->addDataset('SwapLowWM', 'GAUGE', 0)
-    ->addDataset('SysPageFaults', 'COUNTER', 0)
-    ->addDataset('SysNumReads', 'COUNTER', 0)
-    ->addDataset('MemUsage', 'GAUGE', 0)
-    ->addDataset('CpuTime', 'GAUGE', 0)
-    ->addDataset('CpuUsage', 'GAUGE', 0)
-    ->addDataset('MaxResSize', 'GAUGE', 0)
-    ->addDataset('NumObjCount', 'GAUGE', 0)
-    ->addDataset('CurUnlinkReq', 'GAUGE', 0)
-    ->addDataset('CurUnusedFDescrCnt', 'GAUGE', 0)
-    ->addDataset('CurResFileDescrCnt', 'GAUGE', 0)
-    ->addDataset('CurFileDescrCnt', 'GAUGE', 0)
-    ->addDataset('CurFileDescrMax', 'GAUGE', 0)
-    ->addDataset('ProtoClientHttpReq', 'COUNTER', 0)
-    ->addDataset('HttpHits', 'COUNTER', 0)
-    ->addDataset('HttpErrors', 'COUNTER', 0)
-    ->addDataset('HttpInKb', 'COUNTER', 0)
-    ->addDataset('HttpOutKb', 'COUNTER', 0)
-    ->addDataset('IcpPktsSent', 'COUNTER', 0)
-    ->addDataset('IcpPktsRecv', 'COUNTER', 0)
-    ->addDataset('IcpKbSent', 'COUNTER', 0)
-    ->addDataset('IcpKbRecv', 'COUNTER', 0)
-    ->addDataset('ServerRequests', 'COUNTER', 0)
-    ->addDataset('ServerErrors', 'COUNTER', 0)
-    ->addDataset('ServerInKb', 'COUNTER', 0)
-    ->addDataset('ServerOutKb', 'COUNTER', 0)
-    ->addDataset('CurrentSwapSize', 'GAUGE', 0)
-    ->addDataset('Clients', 'GAUGE', 0)
-    ->addDataset('ReqHitRatio1', 'GAUGE', 0)
-    ->addDataset('ReqHitRatio5', 'GAUGE', 0)
-    ->addDataset('ReqHitRatio60', 'GAUGE', 0)
-    ->addDataset('ReqByteRatio1', 'GAUGE', 0)
-    ->addDataset('ReqByteRatio5', 'GAUGE', 0)
-    ->addDataset('ReqByteRatio60', 'GAUGE', 0);
+    ->addDataset('memmaxsize', 'gauge', 0)
+    ->addDataset('swapmaxsize', 'gauge', 0)
+    ->addDataset('swaphighwm', 'gauge', 0)
+    ->addDataset('swaplowwm', 'gauge', 0)
+    ->addDataset('syspagefaults', 'counter', 0)
+    ->addDataset('sysnumreads', 'counter', 0)
+    ->addDataset('memusage', 'gauge', 0)
+    ->addDataset('cputime', 'gauge', 0)
+    ->addDataset('cpuusage', 'gauge', 0)
+    ->addDataset('maxressize', 'gauge', 0)
+    ->addDataset('numobjcount', 'gauge', 0)
+    ->addDataset('curunlinkreq', 'gauge', 0)
+    ->addDataset('curunusedfdescrcnt', 'gauge', 0)
+    ->addDataset('curresfiledescrcnt', 'gauge', 0)
+    ->addDataset('curfiledescrcnt', 'gauge', 0)
+    ->addDataset('curfiledescrmax', 'gauge', 0)
+    ->addDataset('protoclienthttpreq', 'counter', 0)
+    ->addDataset('httphits', 'counter', 0)
+    ->addDataset('httperrors', 'counter', 0)
+    ->addDataset('httpinkb', 'counter', 0)
+    ->addDataset('httpoutkb', 'counter', 0)
+    ->addDataset('icppktssent', 'counter', 0)
+    ->addDataset('icppktsrecv', 'counter', 0)
+    ->addDataset('icpkbsent', 'counter', 0)
+    ->addDataset('icpkbrecv', 'counter', 0)
+    ->addDataset('serverrequests', 'counter', 0)
+    ->addDataset('servererrors', 'counter', 0)
+    ->addDataset('serverinkb', 'counter', 0)
+    ->addDataset('serveroutkb', 'counter', 0)
+    ->addDataset('currentswapsize', 'gauge', 0)
+    ->addDataset('clients', 'gauge', 0)
+    ->addDataset('reqhitratio1', 'gauge', 0)
+    ->addDataset('reqhitratio5', 'gauge', 0)
+    ->addDataset('reqhitratio60', 'gauge', 0)
+    ->addDataset('reqbyteratio1', 'gauge', 0)
+    ->addDataset('reqbyteratio5', 'gauge', 0)
+    ->addDataset('reqbyteratio60', 'gauge', 0);
 
-$MemMaxSize=$MemMaxSize*1000;
-$SwapMaxSize=$SwapMaxSize*1000;
-$SwapHighWM=$SwapHighWM*1000;
-$SwapLowWM=$SwapLowWM*1000;
+$memmaxsize=$memmaxsize*1000;
+$swapmaxsize=$swapmaxsize*1000;
+$swaphighwm=$swaphighwm*1000;
+$swaplowwm=$swaplowwm*1000;
 
 $fields = array(
-    "MemMaxSize" => $MemMaxSize,
-    "SwapMaxSize" => $SwapMaxSize,
-    "SwapHighWM" => $SwapHighWM,
-    "SwapLowWM" => $SwapLowWM,
-    "SysPageFaults" => $SysPageFaults,
-    "SysNumReads" => $SysNumReads,
-    "MemUsage" => $MemUsage,
-    "CpuTime" => $CpuTime,
-    "CpuUsage" => $CpuUsage,
-    "MaxResSize" => $MaxResSize,
-    "NumObjCount" => $NumObjCount,
-    "CurUnlinkReq" => $CurrentUnlinkRequests,
-    "CurUnusedFDescrCnt" => $CurrentUnusedFDescrCnt,
-    "CurResFileDescrCnt" => $CurrentResFileDescrCnt,
-    "CurFileDescrCnt" => $CurrentFileDescrCnt,
-    "CurFileDescrMax" => $CurrentFileDescrMax,
-    "ProtoClientHttpReq" => $ProtoClientHttpRequests,
-    "HttpHits" => $HttpHits,
-    "HttpErrors" => $HttpErrors,
-    "HttpInKb" => $HttpInKb,
-    "HttpOutKb" => $HttpOutKb,
-    "IcpPktsSent" => $IcpPktsSent,
-    "IcpPktsRecv" => $IcpPktsRecv,
-    "IcpKbSent" => $IcpKbSent,
-    "IcpKbRecv" => $IcpKbRecv,
-    "ServerRequests" => $ServerRequests,
-    "ServerErrors" => $ServerErrors,
-    "ServerInKb" => $ServerInKb,
-    "ServerOutKb" => $ServerOutKb,
-    "CurrentSwapSize" => $CurrentSwapSize,
-    "Clients" => $Clients,
-    "ReqHitRatio1" => $RequestHitRatio1,
-    "ReqHitRatio5" => $RequestHitRatio5,
-    "ReqHitRatio60" => $RequestHitRatio60,
-    "ReqByteRatio1" => $RequestByteRatio1,
-    "ReqByteRatio5" => $RequestByteRatio5,
-    "ReqByteRatio60" => $RequestByteRatio60,
+    "memmaxsize" => $memmaxsize,
+    "swapmaxsize" => $swapmaxsize,
+    "swaphighwm" => $swaphighwm,
+    "swaplowwm" => $swaplowwm,
+    "syspagefaults" => $syspagefaults,
+    "sysnumreads" => $sysnumreads,
+    "memusage" => $memusage,
+    "cputime" => $cputime,
+    "cpuusage" => $cpuusage,
+    "maxressize" => $maxressize,
+    "numobjcount" => $numobjcount,
+    "curunlinkreq" => $currentunlinkrequests,
+    "curunusedfdescrcnt" => $currentunusedfdescrcnt,
+    "curresfiledescrcnt" => $currentresfiledescrcnt,
+    "curfiledescrcnt" => $currentfiledescrcnt,
+    "curfiledescrmax" => $currentfiledescrmax,
+    "protoclienthttpreq" => $protoclienthttprequests,
+    "httphits" => $httphits,
+    "httperrors" => $httperrors,
+    "httpinkb" => $httpinkb,
+    "httpoutkb" => $httpoutkb,
+    "icppktssent" => $icppktssent,
+    "icppktsrecv" => $icppktsrecv,
+    "icpkbsent" => $icpkbsent,
+    "icpkbrecv" => $icpkbrecv,
+    "serverrequests" => $serverrequests,
+    "servererrors" => $servererrors,
+    "serverinkb" => $serverinkb,
+    "serveroutkb" => $serveroutkb,
+    "currentswapsize" => $currentswapsize,
+    "clients" => $clients,
+    "reqhitratio1" => $requesthitratio1,
+    "reqhitratio5" => $requesthitratio5,
+    "reqhitratio60" => $requesthitratio60,
+    "reqbyteratio1" => $requestbyteratio1,
+    "reqbyteratio5" => $requestbyteratio5,
+    "reqbyteratio60" => $requestbyteratio60,
 );
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);

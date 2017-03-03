@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Per Second';
+$unit_text     = 'per second';
 $unitlen       = 10;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
@@ -19,15 +19,15 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Requests',
-            'ds'       => 'ServerRequests',
-            'colour'   => '582A72'
+            'descr'    => 'requests',
+            'ds'       => 'serverrequests',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Hits',
-            'ds'       => 'ServerErrors',
-            'colour'   => '28774F'
+            'descr'    => 'hits',
+            'ds'       => 'servererrors',
+            'colour'   => '28774f'
         )
     );
 } else {

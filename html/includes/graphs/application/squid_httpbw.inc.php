@@ -20,14 +20,14 @@ if (is_file($rrd_filename)) {
         array(
             'filename' => $rrd_filename,
             'descr'    => 'HTTP in',
-            'ds'       => 'HttpInKb',
-            'colour'   => 'D46A6A'
+            'ds'       => 'httpinkb',
+            'colour'   => 'd46a6a'
         ),
         array(
             'filename' => $rrd_filename,
             'descr'    => 'HTTP out',
-            'ds'       => 'HttpOutKb',
-            'colour'   => '28774F'
+            'ds'       => 'httpoutkb',
+            'colour'   => '28774f'
         )
     );
 } else {

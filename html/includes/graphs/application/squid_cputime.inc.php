@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Seconds';
+$unit_text     = 'seconds';
 $unitlen       = 10;
 $bigdescrlen   = 10;
 $smalldescrlen = 10;
@@ -19,9 +19,9 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'CPU Time',
-            'ds'       => 'CpuTime',
-            'colour'   => '582A72'
+            'descr'    => 'cpu time',
+            'ds'       => 'cputime',
+            'colour'   => '582a72'
         )
     );
 } else {

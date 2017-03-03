@@ -19,15 +19,15 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Server In',
-            'ds'       => 'ServerInKb',
-            'colour'   => 'D46A6A'
+            'descr'    => 'server in',
+            'ds'       => 'serverinkb',
+            'colour'   => 'd46a6a'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Server Out',
-            'ds'       => 'ServerOutKb',
-            'colour'   => '28774F'
+            'descr'    => 'server out',
+            'ds'       => 'serveroutkb',
+            'colour'   => '28774f'
         )
     );
 } else {

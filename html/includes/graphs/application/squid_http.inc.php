@@ -19,21 +19,21 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Requests',
-            'ds'       => 'ProtoClientHttpReq',
-            'colour'   => '582A72'
+            'descr'    => 'requests',
+            'ds'       => 'protoclienthttpreq',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Hits',
-            'ds'       => 'HttpHits',
-            'colour'   => '28774F'
+            'descr'    => 'hits',
+            'ds'       => 'httphits',
+            'colour'   => '28774f'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Errs To Clnt',
-            'ds'       => 'HttpErrors',
-            'colour'   => '28536C'
+            'descr'    => 'errs to clnt',
+            'ds'       => 'httperrors',
+            'colour'   => '28536c'
         )
     );
 } else {

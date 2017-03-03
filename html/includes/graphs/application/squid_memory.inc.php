@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Kilobytes';
+$unit_text     = 'kilobytes';
 $unitlen       = 10;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
@@ -19,39 +19,39 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Max Mem',
-            'ds'       => 'MemMaxSize',
-            'colour'   => '582A72'
+            'descr'    => 'max mem',
+            'ds'       => 'memmaxsize',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Max Swap',
-            'ds'       => 'SwapMaxSize',
-            'colour'   => '28774F'
+            'descr'    => 'max swap',
+            'ds'       => 'swapmaxsize',
+            'colour'   => '28774f'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'High Swap WM',
-            'ds'       => 'SwapHighWM',
-            'colour'   => '28536C'
+            'descr'    => 'high swap WM',
+            'ds'       => 'swaphighwm',
+            'colour'   => '28536c'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Low Swap WM',
-            'ds'       => 'SwapLowWM',
-            'colour'   => 'D46A6A'
+            'descr'    => 'low swap WM',
+            'ds'       => 'swaplowwm',
+            'colour'   => 'd46a6a'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Swap Usage',
-            'ds'       => 'CurrentSwapSize',
-            'colour'   => 'FF11BB'
+            'descr'    => 'swap usage',
+            'ds'       => 'currentswapsize',
+            'colour'   => 'ff11bb'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Memory Usage',
-            'ds'       => 'MemUsage',
-            'colour'   => 'D853DC'
+            'descr'    => 'memory usage',
+            'ds'       => 'memusage',
+            'colour'   => 'd853dc'
         )
     );
 } else {

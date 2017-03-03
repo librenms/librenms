@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Byte Hit Ratio';
+$unit_text     = 'byte hit ratio';
 $unitlen       = 15;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
@@ -20,20 +20,20 @@ if (is_file($rrd_filename)) {
         array(
             'filename' => $rrd_filename,
             'descr'    => '1 minute',
-            'ds'       => 'ReqByteRatio1',
-            'colour'   => '582A72'
+            'ds'       => 'reqbyteratio1',
+            'colour'   => '582a72'
         ),
         array(
             'filename' => $rrd_filename,
             'descr'    => '5 minute',
-            'ds'       => 'ReqByteRatio5',
-            'colour'   => '28774F'
+            'ds'       => 'reqbyteratio5',
+            'colour'   => '28774f'
         ),
         array(
             'filename' => $rrd_filename,
             'descr'    => '60 minute',
-            'ds'       => 'ReqByteRatio60',
-            'colour'   => '28536C'
+            'ds'       => 'reqbyteratio60',
+            'colour'   => '28536c'
         )
     );
 } else {

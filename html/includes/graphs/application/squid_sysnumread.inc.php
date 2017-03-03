@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'Per Second';
+$unit_text     = 'per second';
 $unitlen       = 10;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
@@ -19,9 +19,9 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'HTTP IO reads',
-            'ds'       => 'SysNumReads',
-            'colour'   => '582A72'
+            'descr'    => 'http io reads',
+            'ds'       => 'sysnumreads',
+            'colour'   => '582a72'
         )
     );
 } else {

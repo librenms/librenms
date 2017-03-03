@@ -4,7 +4,7 @@ $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
 $colours       = 'mixed';
-$unit_text     = 'File Descr.';
+$unit_text     = 'file descr.';
 $unitlen       = 11;
 $bigdescrlen   = 11;
 $smalldescrlen = 11;
@@ -19,15 +19,15 @@ if (is_file($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'In Use',
-            'ds'       => 'CurFileDescrCnt',
-            'colour'   => '28536C'
+            'descr'    => 'in use',
+            'ds'       => 'curfiledescrcnt',
+            'colour'   => '28536c'
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Max',
-            'ds'       => 'CurFileDescrMax',
-            'colour'   => 'D46A6A'
+            'descr'    => 'max',
+            'ds'       => 'curfiledescrmax',
+            'colour'   => 'd46a6a'
         )
     );
 } else {
