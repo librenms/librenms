@@ -1,5 +1,5 @@
 <?php
-require 'includes/graphs/common.inc.php';
+
 $name = 'squid';
 $app_id = $app['app_id'];
 $scale_min     = 0;
