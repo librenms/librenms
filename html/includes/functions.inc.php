@@ -103,6 +103,9 @@ function nicecase($item)
         case 'exim-stats':
             return 'EXIM Stats';
 
+        case 'php-fpm':
+            return 'PHP-FPM';
+
         default:
             return ucfirst($item);
     }
@@ -672,7 +675,7 @@ function generate_bill_url($bill, $vars = array())
 function generate_port_image($args)
 {
     if (!$args['bg']) {
-        $args['bg'] = 'FFFFFF';
+        $args['bg'] = 'FFFFFF00';
     }
 
     return "<img src='graph.php?type=".$args['graph_type'].'&amp;id='.$args['port_id'].'&amp;from='.$args['from'].'&amp;to='.$args['to'].'&amp;width='.$args['width'].'&amp;height='.$args['height'].'&amp;bg='.$args['bg']."'>";
@@ -1431,5 +1434,41 @@ function set_image_type()
         return header('Content-type: image/svg+xml');
     } else {
         return header('Content-type: image/png');
+    }
+}
+
+function get_oxidized_nodes_list()
+{
+    global $config;
+
+    $context = stream_context_create(array(
+        'http' => array(
+            'header' => "Accept: application/json",
+        )
+    ));
+
+    $data = json_decode(file_get_contents($config['oxidized']['url'] . '/nodes?format=json', false, $context), true);
+
+    foreach ($data as $object) {
+        $device = device_by_name($object['name']);
+        $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
+        echo "
+        <tr>
+        <td>
+        " . generate_device_link($device) . "
+        </td>
+        <td>
+        <i class='fa fa-square text-" . $fa_color . "'></i>
+        </td>
+        <td>
+        " . $object['time'] . "
+        </td>
+        <td>
+        " . $object['model'] . "
+        </td>
+        <td>
+        " . $object['group'] . "
+        </td>
+        </tr>";
     }
 }

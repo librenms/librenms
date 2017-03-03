@@ -33,6 +33,15 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['postfix'] = array(
+    'messages',
+    'qstats',
+    'bytes',
+    'sr',
+    'deferral',
+    'rejects',
+);
+
 $graphs['powerdns-recursor'] = array(
     'questions',
     'answers',
@@ -54,6 +63,15 @@ $graphs['tinydns']   = array(
     'errors',
     'dnssec',
     'other',
+);
+
+$graphs['postgres'] = array(
+    'backends',
+    'cr',
+    'rows',
+    'hr',
+    'index',
+    'sequential'
 );
 
 $graphs['powerdns'] = array(
