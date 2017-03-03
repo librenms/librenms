@@ -982,7 +982,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
     global $config;
     foreach ((array)$types as $type) {
         echo ucfirst($type) . ': ';
-
+        $sensor_type = $type;
         $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
@@ -997,7 +997,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
             }
         }
         d_echo($valid['sensor'][$type]);
-        check_valid_sensors($device, $type, $valid['sensor']);
+        check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
     }
 }
