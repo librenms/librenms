@@ -196,10 +196,16 @@ function generate_overlib_content($graph_array, $text)
 }//end generate_overlib_content()
 
 
-function get_percentage_colours($percentage)
+function get_percentage_colours($percentage, $component_perc_warn = null)
 {
+    $perc_warn = '75';
+
+    if (isset($component_perc_warn)) {
+        $perc_warn = round($component_perc_warn, 0);
+    }
+
     $background = array();
-    if ($percentage > '90') {
+    if ($percentage > $perc_warn) {
         $background['left']  = 'c4323f';
         $background['right'] = 'C96A73';
     } elseif ($percentage > '75') {
