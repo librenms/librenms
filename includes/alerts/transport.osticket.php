@@ -11,9 +11,15 @@
 
 $url = $opts['url'];
 $token = $opts['token'];
+
+foreach (parse_email($config['email_from']) as $from => $from_name) {
+    $email = $from_name . ' <' . $from . '>';
+    break;
+}
+
 $protocol = array(
     'name' => 'LibreNMS',
-    'email' => $_SERVER['SERVER_NAME'],
+    'email' => $email,
     'subject' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']) ,
     'message' => strip_tags($obj['msg']) ,
     'ip' => $_SERVER['REMOTE_ADDR'],

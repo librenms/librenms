@@ -177,6 +177,35 @@ $graphs['nvidia'] = array(
     'dbecc',
 );
 
+$graphs['squid'] = array(
+    'memory',
+    'clients',
+    'cpuusage',
+    'objcount',
+    'filedescr',
+    'httpbw',
+    'http',
+    'server',
+    'serverbw',
+    'reqhit',
+    'bytehit',
+    'sysnumread',
+    'pagefaults',
+    'cputime',
+);
+
+$graphs['fbsd-nfs-server'] = array(
+    'stats',
+    'cache',
+    'gathering',
+);
+
+$graphs['fbsd-nfs-client'] = array(
+    'stats',
+    'cache',
+    'rpc',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
