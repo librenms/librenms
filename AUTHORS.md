@@ -152,6 +152,7 @@ LibreNMS contributors:
 - Markus Wigge <markus@cultcom.de> (cultcom)
 - Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
 - Andres Rahn <andreser@gmail.com> (Andreser)
+- Philippe Mathieu-Daudé <philmd@users.noreply.github.com> (philmd)
 - Christoph Zilian <czilian@hotmail.com> (czilian)
 - Guillem Mateos <bbguillem@gmail.com> (guillemmateos)
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
