@@ -29,11 +29,13 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
+
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -524,6 +526,31 @@ In regards to the totals graphed there are two variables banned and firewalled. 
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
 
+### Nvidia GPU
+
+##### SNMP Extend
+
+1: Copy the shell script, nvidia, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/nvidia -O /etc/snmp/nvidia)
+
+2: Make the script executable (chmod +x /etc/snmp/nvidia)
+
+3: Edit your snmpd.conf file and add:
+```
+extend nvidia /etc/snmp/nvidia
+```
+
+5: Restart snmpd on your host.
+
+6: Verify you have nvidia-smi installed, which it generally should be if you have the driver from Nvida installed.
+
+7: On the device page in Librenms, edit your host and check `Nvidia` under the Applications tab.
+
+The GPU numbering on the graphs will correspond to how the nvidia-smi sees them as being.
+
+For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
+
+Please be aware that if you have more than 35 GPUs, you will need to add more colors to the config entry $config['graph_colours']['manycolours'].
+=======
 #### Squid
 
 ##### SNMP Proxy
@@ -633,3 +660,4 @@ extend postfixdetailed /etc/snmp/postfixdetailed
 7: On the device page in Librenms, edit your host and check `Postfix` under the Applications tab. Before doing this, run /etc/snmp/postfixdetailed to create the initial cache file so you don't end up with some crazy initial starting value.
 
 Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is updated, so if this happens in between LibreNMS doing it then the values will be thrown off for that polling period.
+
