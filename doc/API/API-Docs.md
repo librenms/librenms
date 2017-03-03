@@ -1711,7 +1711,14 @@ Output:
    "allowed": "10Mbps",
    "used": "0bps",
    "percent": 0,
-   "overuse": "-"
+   "overuse": "-",
+   "ports": [
+       {
+           "device_id": "168",
+           "port_id": "35146",
+           "ifName": "eth0"
+       }
+   ]
   }
  ]
 }
@@ -1771,7 +1778,14 @@ Output:
    "allowed": "10Mbps",
    "used": "0bps",
    "percent": 0,
-   "overuse": "-"
+   "overuse": "-",
+   "ports": [
+       {
+           "device_id": "168",
+           "port_id": "35146",
+           "ifName": "eth0"
+       }
+   ]
   }
  ]
 }
