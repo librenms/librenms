@@ -20,7 +20,7 @@ $descr = rrdtool_escape($storage['storage_descr'], 12);
 
 $percentage = round($storage['storage_perc'], 0);
 
-$background = get_percentage_colours($percentage);
+$background = get_percentage_colours($percentage, $storage['storage_perc_warn']);
 
 $rrd_options .= " DEF:used=$rrd_filename:used:AVERAGE";
 $rrd_options .= " DEF:free=$rrd_filename:free:AVERAGE";

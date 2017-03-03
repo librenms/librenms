@@ -47,7 +47,7 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     $graph_array_zoom['width']  = '400';
     $link       = 'graphs/id='.$graph_array['id'].'/type='.$graph_array['type'].'/from='.$graph_array['from'].'/to='.$graph_array['to'].'/';
     $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-    $background = get_percentage_colours($perc);
+    $background = get_percentage_colours($perc, $processor['processor_perc_warn']);
     $bar_link   = overlib_link($link, print_percentage_bar(400, 20, $perc, $perc.'%', 'ffffff', $background['left'], (100 - $perc).'%', 'ffffff', $background['right']), generate_graph_tag($graph_array_zoom), null);
 
     $response[] = array(
