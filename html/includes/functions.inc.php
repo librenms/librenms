@@ -192,7 +192,7 @@ function generate_overlib_content($graph_array, $text)
 
 function get_percentage_colours($percentage, $component_perc_warn = null)
 {
-    $perc_warn = '90';
+    $perc_warn = '75';
 
     if (isset($component_perc_warn)) {
         $perc_warn = round($component_perc_warn, 0);
