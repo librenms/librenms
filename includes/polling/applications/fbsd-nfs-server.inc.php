@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fbsd-nfs-server';
 $app_id = $app['app_id'];
-$options      = '-o qv';
+$options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutLine.13.102.98.115.100.110.102.115.115.101.114.118.101.114';
 $nfsserver = snmp_walk($device, $oid, $options, $mib);
@@ -15,36 +15,36 @@ list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $r
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
-    ->addDataset('getattr', 'derive', 0)
-    ->addDataset('setattr', 'derive', 0)
-    ->addDataset('lookup', 'derive', 0)
-    ->addDataset('readlink', 'derive', 0)
-    ->addDataset('read', 'derive', 0)
-    ->addDataset('write', 'derive', 0)
-    ->addDataset('create', 'derive', 0)
-    ->addDataset('remove', 'derive', 0)
-    ->addDataset('rename', 'derive', 0)
-    ->addDataset('link', 'derive', 0)
-    ->addDataset('symlink', 'derive', 0)
-    ->addDataset('mkdir', 'derive', 0)
-    ->addDataset('rmdir', 'derive', 0)
-    ->addDataset('readdir', 'derive', 0)
-    ->addDataset('rdirplus', 'derive', 0)
-    ->addDataset('access', 'derive', 0)
-    ->addDataset('mknod', 'derive', 0)
-    ->addDataset('fsstat', 'derive', 0)
-    ->addDataset('fsinfo', 'derive', 0)
-    ->addDataset('pathconf', 'derive', 0)
-    ->addDataset('commit', 'derive', 0)
-    ->addDataset('retfailed', 'derive', 0)
-    ->addDataset('faults', 'derive', 0)
-    ->addDataset('inprog', 'derive', 0)
-    ->addDataset('idem', 'derive', 0)
-    ->addDataset('nonidem', 'derive', 0)
-    ->addDataset('misses', 'derive', 0)
-    ->addDataset('writeops', 'derive', 0)
-    ->addDataset('writerpc', 'derive', 0)
-    ->addDataset('opsaved', 'derive', 0);
+    ->addDataset('getattr', 'DERIVE', 0)
+    ->addDataset('setattr', 'DERIVE', 0)
+    ->addDataset('lookup', 'DERIVE', 0)
+    ->addDataset('readlink', 'DERIVE', 0)
+    ->addDataset('read', 'DERIVE', 0)
+    ->addDataset('write', 'DERIVE', 0)
+    ->addDataset('create', 'DERIVE', 0)
+    ->addDataset('remove', 'DERIVE', 0)
+    ->addDataset('rename', 'DERIVE', 0)
+    ->addDataset('link', 'DERIVE', 0)
+    ->addDataset('symlink', 'DERIVE', 0)
+    ->addDataset('mkdir', 'DERIVE', 0)
+    ->addDataset('rmdir', 'DERIVE', 0)
+    ->addDataset('readdir', 'DERIVE', 0)
+    ->addDataset('rdirplus', 'DERIVE', 0)
+    ->addDataset('access', 'DERIVE', 0)
+    ->addDataset('mknod', 'DERIVE', 0)
+    ->addDataset('fsstat', 'DERIVE', 0)
+    ->addDataset('fsinfo', 'DERIVE', 0)
+    ->addDataset('pathconf', 'DERIVE', 0)
+    ->addDataset('commit', 'DERIVE', 0)
+    ->addDataset('retfailed', 'DERIVE', 0)
+    ->addDataset('faults', 'DERIVE', 0)
+    ->addDataset('inprog', 'DERIVE', 0)
+    ->addDataset('idem', 'DERIVE', 0)
+    ->addDataset('nonidem', 'DERIVE', 0)
+    ->addDataset('misses', 'DERIVE', 0)
+    ->addDataset('writeops', 'DERIVE', 0)
+    ->addDataset('writerpc', 'DERIVE', 0)
+    ->addDataset('opsaved', 'DERIVE', 0);
 
 $fields = array(
     'getattr' => $getattr,
