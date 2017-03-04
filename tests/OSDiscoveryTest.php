@@ -1327,6 +1327,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('planetos');
         $this->checkOS('planetos', 'planetos1');
+        $this->checkOS('planetos', 'planetos-gs-5220-16s8c');
+        $this->checkOS('planetos', 'planetos-sgsw-24240');
     }
 
     public function testPoweralert()
