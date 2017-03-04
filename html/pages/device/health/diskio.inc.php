@@ -2,7 +2,7 @@
 
 $row = 1;
 
-foreach (get_disk($device['device_id']) as $drive) {
+foreach (get_disks($device['device_id']) as $drive) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
     } else {
