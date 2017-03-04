@@ -28,7 +28,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
     $rrd_def = new RrdDefinition();
     $snmpstring = '';
     foreach ($oids as $oid) {
-        $rrd_def->addDataset($oids, 'COUNTER', null, 100000000000);
+        $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
         $snmpstring .= ' IP-MIB::'.$oid.'.0';
     }
 
