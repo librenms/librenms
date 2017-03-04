@@ -2,8 +2,6 @@
 
 require_once 'includes/discovery/functions.inc.php';
 
-$agent_data['hddtemp'] = '|/dev/sda|WDC WD30EFRX-68EUZN0|31|C||/dev/sdb|WDC WD30EFRX-68EUZN0|31|C||/dev/sdc|ST3160815AS|35|C||/dev/sdd|WDC WD30EFRX-68EUZN0|32|C||/dev/sde|WDC WD30EFRX-68EUZN0|32|C||/dev/sdf|WDC WD30EFRX-68EUZN0|37|C||/dev/sdg|WDC WD30EFRX-68EUZN0|32|C||/dev/sdh|WDC WD30EFRX-68EUZN0|34|C|';
-
 if ($agent_data['hddtemp'] != '|') {
     $disks = explode('||', trim($agent_data['hddtemp'], '|'));
 
