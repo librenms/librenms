@@ -688,7 +688,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testExtremeware()
     {
-        $this->checkOS('extremeware');
     }
 
     public function testF5()
@@ -1745,6 +1744,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testXos()
     {
         $this->checkOS('xos');
+        $this->checkOS('xos', 'xos-x440-24p');
     }
 
     public function testZxr10()

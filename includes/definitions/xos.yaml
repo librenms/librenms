@@ -2,7 +2,6 @@ os: xos
 text: 'Extreme XOS'
 type: network
 ifname: 1
-group: extremeware
 icon: extreme
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -10,4 +9,4 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysDescr:
-        - XOS
+      - XOS
