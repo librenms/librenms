@@ -60,7 +60,7 @@ class RrdDefinition
 
         if (strlen($name) == 0 || strlen($name) > 19) {
             $msg = "$name is an Invalid name for a DS";
-            throw InvalidRrdNameException($mst);
+            throw InvalidRrdNameException($msg);
         }
 
         $ds = array();
