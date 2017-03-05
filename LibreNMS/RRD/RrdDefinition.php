@@ -26,6 +26,7 @@
 namespace LibreNMS\RRD;
 
 use LibreNMS\Exceptions\InvalidRrdTypeException;
+use LibreNMS\Exceptions\InvalidRrdNameException;
 
 class RrdDefinition
 {
@@ -50,13 +51,20 @@ class RrdDefinition
      * @param int $max Maximum allowed value.  null means undefined.
      * @param int $heartbeat Heartbeat for this dataset. Uses the global setting if null.
      * @return $this
+     * @throws InvalidRrdNameException
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         global $config;
+        $name = $this->escapeName($name);
+
+        if (strlen($name) == 0 || strlen($name) > 19) {
+            $msg = "$name is an Invalid name for a DS";
+            throw InvalidRrdNameException($mst);
+        }
 
         $ds = array();
-        $ds[] = $this->escapeName($name);
+        $ds[] = $name;
         $ds[] = $this->checkType($type);
         $ds[] = is_null($heartbeat) ? $config['rrd']['heartbeat'] : $heartbeat;
         $ds[] = is_null($min) ? 'U' : $min;
