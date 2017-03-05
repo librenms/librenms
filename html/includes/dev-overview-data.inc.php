@@ -32,7 +32,7 @@ echo '<tr>
 
 if (!empty($device['ip'])) {
      echo "<tr><td>Resolved IP</td><td>{$device['ip']}</td></tr>";
-} elseif ($config['force_ip_to_sysname'] === true) {
+} elseif ($config['force_ip_to_sysname'] === true && is_ip($device['hostname']) === true) {
      echo "<tr><td>IP Address</td><td>{$device['hostname']}</td></tr>";
 }
 

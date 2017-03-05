@@ -1644,3 +1644,26 @@ function get_vm_parent_id($device)
 
     return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
 }
+
+/**
+ * @param $string
+ * @param string $ver
+ * @return bool
+ */
+function is_ip($string, $ver = 'ipv4ipv6')
+{
+    if ($ver === 'ipv4ipv6') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            return true;
+        }
+    } elseif ($ver === 'ipv4') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true) {
+            return true;
+        }
+    } elseif ($ver === 'ipv6') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            return true;
+        }
+    }
+    return false;
+}
