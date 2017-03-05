@@ -12,4 +12,4 @@
  * the source code distribution for details.
  */
 
-$version = snmp_get($device, 'EXTRAHOP-MIB::extrahopInfoVersionString', '-Oqv');
+$version = snmp_get($device, 'extrahopInfoVersionString', '-Oqv', 'EXTRAHOP-MIB');
