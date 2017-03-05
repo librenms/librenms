@@ -83,4 +83,14 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $data = 'Toner, S/N:CR_UM-16021314488.';
         $this->assertEquals('Toner, S/N CR_UM-16021314488.', safedescr($data));
     }
+
+    public function testIsIp()
+    {
+        $this->assertTrue(is_ip('192.168.0.1'));
+        $this->assertTrue(is_ip('192.168.0.1', 'ipv4'));
+        $this->assertTrue(is_ip('2001:4860:4860::8888', 'ipv6'));
+        $this->assertFalse(is_ip('2001:4860:4860::8888', 'ipv4'));
+        $this->assertFalse(is_ip('192.168.0.1', 'ipv6'));
+        $this->assertFalse(is_ip('not_an_ip'));
+    }
 }
