@@ -56,6 +56,9 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
         $this->assertEquals($expected, (string)$def);
+
+        list($junk, $name, $junk, $junk, $junk, $junk) = explode(':', $def);
+        $this->assertLessThanOrEqual(19, strlen($name));
     }
 
     public function testCreation()

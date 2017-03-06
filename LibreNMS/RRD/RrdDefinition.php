@@ -58,9 +58,9 @@ class RrdDefinition
         global $config;
         $name = $this->escapeName($name);
 
-        if (strlen($name) == 0 || strlen($name) > 19) {
+        if (strlen($name) == 0) {
             $msg = "$name is an Invalid name for a DS";
-            throw InvalidRrdNameException($msg);
+            throw new InvalidRrdNameException($msg);
         }
 
         $ds = array();
