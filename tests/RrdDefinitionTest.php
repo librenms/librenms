@@ -47,6 +47,18 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
         $def->addDataset('badtype', 'Something unexpected');
     }
 
+    /**
+     * @expectedException \LibreNMS\Exceptions\InvalidRrdNameException
+     */
+    public function testZeroLenghName()
+    {
+        global $config;
+        $config['rrd']['step'] = 300;
+        $config['rrd']['heartbeat'] = 600;
+        $def = new RrdDefinition();
+        $def = RrdDefinition::make()->addDataset('', 'GAUGE', 0, 100, 600);
+    }
+
     public function testNameEscaping()
     {
         global $config;
@@ -56,9 +68,6 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
         $this->assertEquals($expected, (string)$def);
-
-        list(, $name, ,,,) = explode(':', $def);
-        $this->assertLessThanOrEqual(19, strlen($name));
     }
 
     public function testCreation()

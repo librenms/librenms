@@ -58,8 +58,8 @@ class RrdDefinition
         global $config;
         $name = $this->escapeName($name);
 
-        if (strlen($name) == 0) {
-            $msg = "$name is an Invalid name for a DS";
+        if (empty($name)) {
+            $msg = "DS must be set to a non-empty string.";
             throw new InvalidRrdNameException($msg);
         }
 
