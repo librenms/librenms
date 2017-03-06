@@ -980,10 +980,9 @@ function ignore_storage($descr)
 function sensors($types, $device, $valid, $pre_cache = array())
 {
     global $config;
-    foreach ((array)$types as $type) {
-        echo ucfirst($type) . ': ';
-        $sensor_type = $type;
-        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $type .'/';
+    foreach ((array)$types as $sensor_type) {
+        echo ucfirst($sensor_type) . ': ';
+        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $sensor_type .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -996,7 +995,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        d_echo($valid['sensor'][$type]);
+        d_echo($valid['sensor'][$sensor_type]);
         check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
     }
