@@ -1,7 +1,7 @@
 <?php
 
 $storage   = dbFetchCell('select count(*) from storage WHERE device_id = ?', array($device['device_id']));
-$diskio    = dbFetchCell('select count(*) from ucd_diskio WHERE device_id = ?', array($device['device_id']));
+$diskio    = get_disks($device['device_id']);
 $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
 

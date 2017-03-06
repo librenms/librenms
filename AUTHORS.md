@@ -1,10 +1,16 @@
 LibreNMS core team:
-- Paul Gear <paul@librenms.org> (paulgear)
-- Neil Lathwood <neil@librenms.org> (laf)
-- Daniel Preussker <f0o@librenms.org> (f0o)
-- Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
-- Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
-- Tony Murray <tonym@librenms.org> (murrant)
+- Paul Gear <paul@librenms.org> [paulgear](https://github.com/paulgear/)
+- Neil Lathwood <neil@librenms.org> [laf](https://github.com/laf/)
+- Daniel Preussker <f0o@librenms.org> [f0o](https://github.com/f0o/)
+- Søren Friis Rosiak <sorenrosiak@gmail.com> [rosiak](https://github.com/rosiak/)
+- Mike Rostermund <mike@kollegienet.dk> [SaaldjorMike](https://github.com/SaaldjorMike/)
+- Tony Murray <tonym@librenms.org> [murrant](https://github.com/murrant/)
+- David Bell <me@geordish.org> [geordish](https://github.com/geordish/)
+
+Notable contributors:
+- Cercel Valentin <crc@nuamchefazi.ro> (crcro)
+- Clint Armstrong <clint@clintarmstrong.net> (clinta)
+- Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 
 LibreNMS contributors:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
@@ -31,7 +37,6 @@ LibreNMS contributors:
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
 - Louis Rossouw <lrossouw@gmail.com> (spinza)
-- Clint Armstrong <clint@clintarmstrong.net> (clinta)
 - Tony Ditchfield  <tony.ditchfield@gmail.com> (arnoldthebat)
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
 - Will Jones <email@willjones.eu> (willjones)
@@ -39,7 +44,6 @@ LibreNMS contributors:
 - Rasmus Aberg <rasmus@sthix.net> (rasssta)
 - Jan Saner <jan@trick77.com> (trick77)
 - Mikhail Bratchikov <mbratchikov@odin.com> (pepyaka)
-- Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 - David M. Syzdek <david@syzdek.net> (syzdek)
 - Gerben Meijer <gerben@daybyday.nl> (infernix)
 - Michael Newton <mnewton@pofp.com> (miken32)
@@ -77,7 +81,6 @@ LibreNMS contributors:
 - D. Britz <github@wrind.de> (flatterlight)
 - Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 - Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
-- Dave Hope <dave@hope.mx> (davehope)
 - Jurrian van Iersel <jurrian@vaniersel.net> (jviersel)
 - Adam Winberg <adam.winberg@gmail.com> (wiad)
 - Maximilian Wilhelm <max@rfc2324.org> (BarbarossaTM)
@@ -89,7 +92,6 @@ LibreNMS contributors:
 - Georges Dick <georges.dick@gmail.com> (GeorgesDick)
 - Richard Lawley <richard@richardlawley.com> (richardlawley)
 - Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
-- David Bell <me@geordish.org> (geordish)
 - Ibrahim Tachijian <barhom@netsat.se> (barhom)
 - Guillaume Coeugnet <aliasprotect-git@yahoo.fr> (gcoeugnet)
 - Jared Newell <jared.newell@gmail.com> (Jaredn)
@@ -110,7 +112,6 @@ LibreNMS contributors:
 - Benjamin Busche <benjamin.busche@gmail.com> (optic00)
 - Brandon Boudrias <bt.boudrias@gmail.com> (brandune)
 - Andy Noyland <andrew@noyland.co.uk> (Zappatron)
-- Cercel Valentin <crc@nuamchefazi.ro> (crcro)
 - Ahmed Sajid <ahmed4343@hotmail.com> (ahmedsajid)
 - Karsten Schmidt <git@guggemand.dk> (guggemand)
 - Maxence POULAIN <maxence.poulain@eriador.info> (Linutux42)
@@ -152,6 +153,7 @@ LibreNMS contributors:
 - Markus Wigge <markus@cultcom.de> (cultcom)
 - Matthew Wall <llawwehttam@gmail.com> (llawwehttam)
 - Andres Rahn <andreser@gmail.com> (Andreser)
+- Philippe Mathieu-Daudé <philmd@users.noreply.github.com> (philmd)
 - Christoph Zilian <czilian@hotmail.com> (czilian)
 - Guillem Mateos <bbguillem@gmail.com> (guillemmateos)
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
@@ -184,6 +186,9 @@ LibreNMS contributors:
 - Zane C. Bowers-Hadley <vvelox@vvelox.net> (vvelox)
 - Valentin Polonuyer <valik.vicious@gmail.com> (ValikVicious)
 - Olivier Le Brouster <olb@nebkha.net> (ollb)
+- Avery Payne <avery.p.payne@gmail.com> (apayne) 
+- Ryan Medlyn <ryan.medlyn@gmail.com> (rmedlyn)
+- Mark Hughes <m@rkhugh.es> (markehme)
 
 Observium was written by:
 - Adam Armstrong
