@@ -686,6 +686,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('exinda');
     }
 
+    public function testExtrahop()
+    {
+        $this->checkOS('extrahop');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
