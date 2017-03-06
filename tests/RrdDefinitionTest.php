@@ -50,7 +50,7 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \LibreNMS\Exceptions\InvalidRrdNameException
      */
-    public function testZeroLenghName()
+    public function testZeroLengthName()
     {
         global $config;
         $config['rrd']['step'] = 300;
