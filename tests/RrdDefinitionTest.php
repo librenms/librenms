@@ -57,7 +57,7 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, (string)$def);
 
-        list($junk, $name, $junk, $junk, $junk, $junk) = explode(':', $def);
+        list(, $name, ,,,) = explode(':', $def);
         $this->assertLessThanOrEqual(19, strlen($name));
     }
 
