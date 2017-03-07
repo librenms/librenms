@@ -31,7 +31,7 @@ foreach ($rrd_list as $i => $rrd) {
         $colour = $config['graph_colours'][$colours][$colour_iter];
         $colour_iter++;
     }
-
+    $i++;
     $descr = rrdtool_escape($rrd['descr'], $descr_len);
 
     $rrd_options .= ' DEF:'.$rrd['ds'].$i.'='.$rrd['filename'].':'.$rrd['ds'].':AVERAGE ';
