@@ -1,11 +1,3 @@
-.ie9 img {
-    width: 100%;
-}
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    img {
-        width: 100%;
-    }
-}
 .fa-nav-icons {
     color: #e30613;
 }
