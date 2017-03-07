@@ -445,16 +445,17 @@ foreach ($ports as $port) {
             $port['update']['poll_period'] = $polled_period;
         }
 
-        // Copy ifHC[In|Out]Octets values to non-HC if they exist
-        if ($this_port['ifHCInOctets'] >= 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] >= 0 && is_numeric($this_port['ifHCOutOctets'])) {
-            echo 'HC ';
-            $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
-            $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-        }
-
-        if (is_numeric($this_port['ifHCInUcastPkts']) && $this_port['ifHCInUcastPkts'] >= 0 && is_numeric($this_port['ifHCOutUcastPkts']) && $this_port['ifHCOutUcastPkts'] >= 0) {
-            $this_port['ifInUcastPkts']  = $this_port['ifHCInUcastPkts'];
-            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
+        // usee HC values if they are available
+        $hc_names = array(
+            'ifHCInOctets' => 'ifInOctets',
+            'ifHCOutOctets' => 'ifOutOctets',
+            'ifHCInUcastPkts' => 'ifInUcastPkts',
+            'ifHCOutUcastPkts' => 'ifOutUcastPkts',
+        );
+        foreach ($hc_names as $hc => $non_hc) {
+            if (is_numeric($this_port[$hc]) && $this_port[$hc] > 0) {
+                $this_port[$non_hc] = $this_port[$hc];
+            }
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
