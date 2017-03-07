@@ -54,7 +54,7 @@ In `/etc/php-fpm.d/www.conf` make these changes:
 
 ```nginx
 ;listen = 127.0.0.1:9000
-listen = /var/run/php/php7.0-fpm.sock
+listen = /var/run/php-fpm/php7.0-fpm.sock
 
 listen.owner = nginx
 listen.group = nginx
