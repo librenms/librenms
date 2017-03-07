@@ -35,12 +35,14 @@ if (empty($hostname)) {
     echo "*********************************************************************\n";
     echo "We highly suggest that you back up your rrd files before running this\n";
     echo "*********************************************************************\n";
-    echo "-h <hostname or device id>       Device to process the rrd file for\n";
+    echo "-h <hostname or device id or all>  Device to process the rrd file for\n";
     echo "\n";
     exit;
 }
 
-$hostname = !ctype_digit($hostname) ? $hostname : gethostbyid($hostname);
+if ($hostname !== 'all') {
+    $hostname = !ctype_digit($hostname) ? $hostname : gethostbyid($hostname);
+}
 
 if (empty($hostname)) {
     echo "Invalid hostname or device id specified\n";
@@ -53,7 +55,10 @@ $rrd_path  = $config['rrd_dir'];
 $rrdtool   = $config['rrdtool'];
 $tmp_path  = $config['temp_dir'];
 
-$files = glob($rrd_path.'/'.$hostname.'/*.rrd');
+if ($hostname === 'all') {
+    $hostname = '*';
+}
+$files = glob($rrd_path . '/' . $hostname . '/*.rrd');
 
 $run = readline("Are you sure you want to run this command [N/y]: ");
 if ($run != 'y' || $run == 'Y') {
