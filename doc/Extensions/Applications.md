@@ -12,7 +12,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
-1. [MySQL](#mysql) - Agent
+1. [MySQL](#mysql) - Agent, SNMP extend
 1. [NGINX](#nginx) - Agent
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
@@ -174,7 +174,24 @@ $mysql_port = 3306;
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
+##### SNMP extend
 
+1: Copy the shell script, mysql_stats.php, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql_stats.php -O /etc/snmp/mysql_stats.php )
+
+2: Make the scripts executable (chmod +x /etc/snmp/mysql_stats.php)
+
+3: Examine it to make sure you the hostname, user, and pass are properly set in it, if needed.
+
+4: Edit your snmpd.conf file and add:
+```
+extend mysql /etc/snmp/mysql_stats.php
+```
+
+4: Restart snmpd.
+
+5: Install the PHP CLI language and your MySQL module of choice for PHP.
+
+7: On the device page in Librenms, edit your host and check `MySQL` under the Applications tab
 
 ### NGINX
 NGINX is a free, open-source, high-performance HTTP server: https://www.nginx.org/
