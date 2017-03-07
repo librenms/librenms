@@ -90,5 +90,18 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, set_null(0));
         $this->assertEquals(25, set_null(25));
         $this->assertEquals(-25, set_null(-25));
+        $this->assertEquals(99, set_null(' ', 99));
+        $this->assertNull(set_null(-25, null, 0));
+        $this->assertEquals(2, set_null(2, 0, 2));
+    }
+
+    public function testIsIp()
+    {
+        $this->assertTrue(is_ip('192.168.0.1'));
+        $this->assertTrue(is_ip('192.168.0.1', 'ipv4'));
+        $this->assertTrue(is_ip('2001:4860:4860::8888', 'ipv6'));
+        $this->assertFalse(is_ip('2001:4860:4860::8888', 'ipv4'));
+        $this->assertFalse(is_ip('192.168.0.1', 'ipv6'));
+        $this->assertFalse(is_ip('not_an_ip'));
     }
 }

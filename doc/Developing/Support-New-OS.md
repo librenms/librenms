@@ -70,27 +70,53 @@ Hints for [Inkscape](https://inkscape.org/):
 By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
 [SVG Optimizer](https://github.com/svg/svgo) does a great job. There is also an [online version](https://jakearchibald.github.io/svgomg/).
 
-#### Discovery OS
+#### OS Discovery
+The discovery section of the OS yaml file contains information needed to detect this OS.
 
-> NOTE: In the above example, an discovery os file is not needed as we are matching the device based on the contents 
-of it's sysDescr value. You can also do this with sysObjectId. If you require a more complex discovery then you can 
-continue to create the os discovery file, below is an example:
+##### Discovery Operators
+ - `sysObjectId` The preferred operator. Checks if the sysObjectID starts with one of the strings under this item
+ - `sysDescr` Use this in addition to sysObjectId if required. Check that the sysDescr contains one of the strings under this item
+ - `sysDescr_regex` Please avoid use of this. Checks if the sysDescr matches one of the regex statements under this item
 
-We create a new file named as our OS definition and in this directory:
+##### Discoery Logic
+YAML is converted to an array in PHP.  Consider the following YAML:
+```yaml
+discovery: 
+  - sysObjectId: foo
+  - 
+    sysDescr: [ snafu, exodar ]
+    sysObjectId: bar
 
-```bash
-includes/discovery/os/pulse.inc.php
 ```
-This file just sets the $os variable, done by checking the SNMP tree for a particular value that matches the OS you are adding. Typically, this will come from the presence of specific values in sysObjectID or sysDescr, or the existence of a particular enterprise tree.
-Look at other files to get help in the code structure.
-
+This is how the discovery array would look in PHP:
 ```php
-<?php
-
-if (str_contains($sysDescr, array('Pulse Connect Secure', 'Pulse Secure', 'Juniper Networks,Inc,VA-DTE', 'VA-SPE'))) {
-    $os = 'pulse';
-}
+[
+     [
+       "sysObjectId" => "foo",
+     ],
+     [
+       "sysDescr" => [
+         "snafu",
+         "exodar",
+       ],
+       "sysObjectId" => "bar",
+     ]
+]
 ```
+
+
+The logic for the discovery is as follows:
+1. One of the first level items must match
+2. ALL of the second level items must match (sysObjectId, sysDescr)
+3. One of the third level items (foo, [snafu,exodar], bar) must match
+
+So, considering the example:
+ - `sysObjectId: foo, sysDescr: ANYTHING` matches
+ - `sysObjectId: bar, sysDescr: ANYTHING` does not match
+ - `sysObjectId: bar, sysDescr: exodar` matches 
+ - `sysObjectId: bar, sysDescr: snafu` matches 
+
+#### Basic OS information polling
 
 Here is the file location for polling the new OS within a vendor MIB or a standard one:
 

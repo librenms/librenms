@@ -65,6 +65,15 @@ $graphs['tinydns']   = array(
     'other',
 );
 
+$graphs['postgres'] = array(
+    'backends',
+    'cr',
+    'rows',
+    'hr',
+    'index',
+    'sequential'
+);
+
 $graphs['powerdns'] = array(
     'latency',
     'fail',
@@ -147,6 +156,54 @@ $graphs['exim-stats'] = array(
 
 $graphs['php-fpm'] = array(
     'stats'
+);
+
+$graphs['nvidia'] = array(
+    'sm',
+    'mem',
+    'enc',
+    'dec',
+    'rxpci',
+    'txpci',
+    'fb',
+    'bar1',
+    'mclk',
+    'pclk',
+    'pwr',
+    'temp',
+    'pviol',
+    'tviol',
+    'sbecc',
+    'dbecc',
+);
+
+$graphs['squid'] = array(
+    'memory',
+    'clients',
+    'cpuusage',
+    'objcount',
+    'filedescr',
+    'httpbw',
+    'http',
+    'server',
+    'serverbw',
+    'reqhit',
+    'bytehit',
+    'sysnumread',
+    'pagefaults',
+    'cputime',
+);
+
+$graphs['fbsd-nfs-server'] = array(
+    'stats',
+    'cache',
+    'gathering',
+);
+
+$graphs['fbsd-nfs-client'] = array(
+    'stats',
+    'cache',
+    'rpc',
 );
 
 print_optionbar_start();

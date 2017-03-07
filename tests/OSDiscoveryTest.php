@@ -482,6 +482,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cyberoam-utm');
     }
 
+    public function testCyberpower()
+    {
+        $this->checkOS('cyberpower');
+    }
+
     public function testDasanNos()
     {
         $this->checkOS('dasan-nos');
@@ -540,6 +545,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDevelopprinter()
     {
         $this->checkOS('developprinter');
+    }
+
+    public function testDigipower()
+    {
+        $this->checkOS('digipower');
     }
 
     public function testDlinkap()
@@ -676,6 +686,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('exinda');
     }
 
+    public function testExtrahop()
+    {
+        $this->checkOS('extrahop');
+    }
+
     public function testExtremeware()
     {
         $this->checkOS('extremeware');
@@ -726,6 +741,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testFortiswitch()
     {
         $this->checkOS('fortiswitch');
+    }
+
+    public function testFortiwlc()
+    {
+        $this->checkOS('fortiwlc');
     }
 
     public function testFoundryos()
@@ -980,6 +1000,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testLantronixslc()
     {
         $this->checkOS('lantronix-slc');
+    }
+
+    public function testLantronixuds()
+    {
+        $this->checkOS('lantronix-uds');
     }
 
     public function testLcos()
@@ -1306,6 +1331,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPlanetos()
     {
         $this->checkOS('planetos');
+        $this->checkOS('planetos', 'planetos1');
+        $this->checkOS('planetos', 'planetos-gs-5220-16s8c');
+        $this->checkOS('planetos', 'planetos-sgsw-24240');
     }
 
     public function testPoweralert()

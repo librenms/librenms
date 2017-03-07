@@ -34,9 +34,6 @@ if (empty($uptime)) {
     $snmp_uptime = (integer)$uptime_data['snmpEngineTime'];
     $hrSystemUptime = $uptime_data['hrSystemUptime'];
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
-        // Move uptime into agent_uptime
-        $agent_uptime = $uptime;
-
         $uptime = floor($hrSystemUptime / 100);
         echo 'Using hrSystemUptime (' . $uptime . "s)\n";
     } else {
@@ -54,7 +51,7 @@ if ($config['os'][$device['os']]['bad_snmpEngineTime'] !== true) {
 
 if (is_numeric($uptime) && ($config['os'][$device['os']]['bad_uptime'] !== true)) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']), $device, 'reboot', 4, $device['uptime']);
+        log_event('Device rebooted after ' . formatUptime($device['uptime']) . ' -> ' . $uptime, $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(

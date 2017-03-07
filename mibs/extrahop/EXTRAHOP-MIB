@@ -1,0 +1,335 @@
+EXTRAHOP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises                     FROM SNMPv2-SMI
+    Counter64                       FROM SNMPv2-SMI
+    OBJECT-TYPE                     FROM SNMPv2-SMI
+    DisplayString                   FROM SNMPv2-TC
+    NOTIFICATION-TYPE               FROM SNMPv2-SMI
+    OBJECT-GROUP                    FROM SNMPv2-CONF
+    NOTIFICATION-GROUP              FROM SNMPv2-CONF
+    MODULE-IDENTITY                 FROM SNMPv2-SMI;
+
+extrahop MODULE-IDENTITY
+    LAST-UPDATED "201505080000Z"
+    ORGANIZATION "ExtraHop Networks"
+    CONTACT-INFO
+            "support@extrahop.com"
+    DESCRIPTION
+            "The MIB module for ExtraHop SNMP messages."
+    REVISION      "201505080000Z"
+    DESCRIPTION
+            "The latest version of this MIB module."
+
+    ::= { enterprises 32015 }
+
+extrahopInfo OBJECT IDENTIFIER ::= { extrahop 0 }
+
+extrahopInfoVersionString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The full version number of the ExtraHop firmware."
+    ::= { extrahopInfo 0 }
+
+extrahopInfoVersionMajor OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The major version number of the ExtraHop firmware."
+    ::= { extrahopInfo 1 }
+
+extrahopInfoVersionMinor OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The minor version number of the ExtraHop firmware."
+    ::= { extrahopInfo 2 }
+
+extrahopInfoVersionBranchRelease OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The branch release version number of the ExtraHop firmware."
+    ::= { extrahopInfo 3 }
+
+extrahopInfoVersionRevision OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The revision version number of the ExtraHop firmware."
+    ::= { extrahopInfo 4 }
+
+extrahopAlert OBJECT IDENTIFIER ::= { extrahop 1 }
+
+extrahopTraps OBJECT IDENTIFIER ::= { extrahop 2 }
+
+extrahopObjects OBJECT IDENTIFIER ::= { extrahop 4 }
+
+extrahopObjectGroup OBJECT-GROUP
+        OBJECTS {
+            extrahopAlertName,
+            extrahopAlertComment,
+            extrahopAlertObjectType,
+            extrahopAlertObjectName,
+            extrahopAlertExpr,
+            extrahopAlertValue,
+            extrahopAlertTime,
+            extrahopAlertObjectId,
+            extrahopAlertObjectStrId,
+            extrahopAlertObjectMACAddr,
+            extrahopAlertObjectIPAddr,
+            extrahopAlertObjectTags,
+            extrahopAlertObjectURL,
+            extrahopAlertStatName,
+            extrahopAlertStatFieldName,
+            extrahopAlertSeverity,
+            extrahopStatsPktsSinceBoot,
+            extrahopStatsBytesSinceBoot,
+            extrahopStorageAlertRole,
+            extrahopStorageAlertDevice,
+            extrahopStorageAlertStatus,
+            extrahopStorageAlertDetails,
+            extrahopStorageAlertSeverity,
+            extrahopStorageAlertMachine
+    }
+   STATUS current
+   DESCRIPTION "ExtraHop Object Collection"
+        ::= { extrahopObjects 1 }
+
+extrahopNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            extrahopAlertTrap,
+            extrahopStorageAlertTrap
+        }
+   STATUS current
+   DESCRIPTION "ExtraHop Notification Collection"
+        ::= { extrahopObjects 2 }
+
+extrahopAlertTrap NOTIFICATION-TYPE
+    OBJECTS {
+        extrahopAlertName,
+        extrahopAlertComment,
+        extrahopAlertObjectType,
+        extrahopAlertObjectName,
+        extrahopAlertExpr,
+        extrahopAlertValue,
+        extrahopAlertTime,
+        extrahopAlertObjectId,
+        extrahopAlertObjectStrId,
+        extrahopAlertObjectMACAddr,
+        extrahopAlertObjectIPAddr,
+        extrahopAlertObjectTags,
+        extrahopAlertObjectURL,
+        extrahopAlertStatName,
+        extrahopAlertStatFieldName,
+        extrahopAlertSeverity
+    }
+    STATUS      current
+    DESCRIPTION "Alert notification"
+    ::= { extrahopTraps 1 }
+
+extrahopAlertName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the alert"
+    ::= { extrahopAlert 1}
+
+extrahopAlertComment OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION "Alert comment"
+    ::= { extrahopAlert 2}
+
+extrahopAlertObjectType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of object alert applies to"
+    ::= { extrahopAlert 3}
+
+extrahopAlertObjectName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of object alert applies to"
+    ::= { extrahopAlert 4}
+
+extrahopAlertExpr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alert expression"
+    ::= { extrahopAlert 5}
+
+extrahopAlertValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Value that triggered alert"
+    ::= { extrahopAlert 6}
+
+extrahopAlertTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time of the alert trigger"
+    ::= { extrahopAlert 7}
+
+extrahopAlertObjectId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Decimal representation of numeric object id"
+    ::= { extrahopAlert 8}
+
+extrahopAlertObjectStrId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "String object id"
+    ::= { extrahopAlert 9}
+
+extrahopAlertObjectMACAddr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object MAC Address"
+    ::= { extrahopAlert 10}
+
+extrahopAlertObjectIPAddr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object IP Address"
+    ::= { extrahopAlert 11}
+
+extrahopAlertObjectTags OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Object tags"
+    ::= { extrahopAlert 12}
+
+extrahopAlertObjectURL OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "URL"
+    ::= { extrahopAlert 13}
+
+extrahopAlertStatName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stat name"
+    ::= { extrahopAlert 14}
+
+extrahopAlertStatFieldName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stat field name"
+    ::= { extrahopAlert 15}
+
+extrahopAlertSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    emergency (0),
+                    alert (1),
+                    critical (2),
+                    error (3),
+                    warning (4),
+                    notice (5),
+                    info (6),
+                    debug (7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity"
+    ::= { extrahopAlert 16}
+
+extrahopStats OBJECT IDENTIFIER ::= { extrahop 3 }
+
+extrahopStatsPktsSinceBoot OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The number of packets captured since system boot."
+    ::= { extrahopStats 1 }
+
+extrahopStatsBytesSinceBoot OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The number of bytes captured since system boot."
+    ::= { extrahopStats 2 }
+
+extrahopStorageAlert OBJECT IDENTIFIER ::= { extrahop 5 }
+
+extrahopStorageAlertTrap NOTIFICATION-TYPE
+    OBJECTS {
+        extrahopStorageAlertRole,
+        extrahopStorageAlertDevice,
+        extrahopStorageAlertStatus,
+        extrahopStorageAlertDetails,
+        extrahopStorageAlertSeverity,
+        extrahopStorageAlertMachine
+    }
+    STATUS      current
+    DESCRIPTION "Storage notification"
+    ::= { extrahopTraps 2 }
+
+extrahopStorageAlertRole OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Role of the storage device"
+    ::= { extrahopStorageAlert 1}
+
+extrahopStorageAlertDevice OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Storage device issuing the alert"
+    ::= { extrahopStorageAlert 2}
+
+extrahopStorageAlertStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION "Status of the device"
+    ::= { extrahopStorageAlert 3}
+
+extrahopStorageAlertDetails OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION "Details about the notification"
+    ::= { extrahopStorageAlert 4}
+
+extrahopStorageAlertSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    emergency (0),
+                    alert (1),
+                    critical (2),
+                    error (3),
+                    warning (4),
+                    notice (5),
+                    info (6),
+                    debug (7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity"
+    ::= { extrahopStorageAlert 5}
+
+extrahopStorageAlertMachine OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION "Machine sending alert"
+    ::= { extrahopStorageAlert 6}
+
+END

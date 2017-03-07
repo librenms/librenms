@@ -1481,6 +1481,12 @@ function get_auth_ad_group_filter($groupname)
  */
 function print_list($list, $format, $max = 10)
 {
+    if (is_array(current($list))) {
+        $list = array_map(function ($item) {
+            return implode(' ', $item);
+        }, $list);
+    }
+
     foreach (array_slice($list, 0, $max) as $item) {
         printf($format, $item);
     }
@@ -1603,7 +1609,7 @@ function set_null($value, $default = null, $min = null)
 {
     if (!is_numeric($value)) {
         return $default;
-    } elseif (isset($min) && $value <= $min) {
+    } elseif (isset($min) && $value < $min) {
         return $default;
     }
     return $value;
@@ -1639,4 +1645,27 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
+}
+
+/**
+ * @param $string
+ * @param string $ver
+ * @return bool
+ */
+function is_ip($string, $ver = 'ipv4ipv6')
+{
+    if ($ver === 'ipv4ipv6') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            return true;
+        }
+    } elseif ($ver === 'ipv4') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true) {
+            return true;
+        }
+    } elseif ($ver === 'ipv6') {
+        if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            return true;
+        }
+    }
+    return false;
 }

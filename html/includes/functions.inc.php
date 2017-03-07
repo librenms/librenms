@@ -103,6 +103,12 @@ function nicecase($item)
         case 'exim-stats':
             return 'EXIM Stats';
 
+        case 'fbsd-nfs-client':
+            return 'FreeBSD NFS Client';
+
+        case 'fbsd-nfs-server':
+            return 'FreeBSD NFS Server';
+        
         case 'php-fpm':
             return 'PHP-FPM';
 
@@ -190,10 +196,16 @@ function generate_overlib_content($graph_array, $text)
 }//end generate_overlib_content()
 
 
-function get_percentage_colours($percentage)
+function get_percentage_colours($percentage, $component_perc_warn = null)
 {
+    $perc_warn = '75';
+
+    if (isset($component_perc_warn)) {
+        $perc_warn = round($component_perc_warn, 0);
+    }
+
     $background = array();
-    if ($percentage > '90') {
+    if ($percentage > $perc_warn) {
         $background['left']  = 'c4323f';
         $background['right'] = 'C96A73';
     } elseif ($percentage > '75') {
@@ -675,7 +687,7 @@ function generate_bill_url($bill, $vars = array())
 function generate_port_image($args)
 {
     if (!$args['bg']) {
-        $args['bg'] = 'FFFFFF';
+        $args['bg'] = 'FFFFFF00';
     }
 
     return "<img src='graph.php?type=".$args['graph_type'].'&amp;id='.$args['port_id'].'&amp;from='.$args['from'].'&amp;to='.$args['to'].'&amp;width='.$args['width'].'&amp;height='.$args['height'].'&amp;bg='.$args['bg']."'>";
@@ -1471,4 +1483,10 @@ function get_oxidized_nodes_list()
         </td>
         </tr>";
     }
+}
+
+// fetches disks for a system
+function get_disks($device)
+{
+    return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
