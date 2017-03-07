@@ -25,7 +25,7 @@ foreach ($rrd_list as $rrd) {
     if (!$config['graph_colours'][$colours_in][$iter] || !$config['graph_colours'][$colours_out][$iter]) {
         $iter = 0;
     }
-
+    $i++;
     $colour_in  = $config['graph_colours'][$colours_in][$iter];
     $colour_out = $config['graph_colours'][$colours_out][$iter];
 
