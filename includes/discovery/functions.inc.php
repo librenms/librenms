@@ -169,9 +169,7 @@ function discover_device($device, $options = null)
         register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
     }
 
-    if ($config['geoloc']['latlng'] === true) {
-        location_to_latlng($device);
-    }
+    location_to_latlng($device);
 
     $device_end = microtime(true);
     $device_run = ($device_end - $device_start);
@@ -1013,66 +1011,68 @@ function sensors($types, $device, $valid, $pre_cache = array())
 function location_to_latlng($device)
 {
     global $config;
-    if (function_check('curl_version') !== true) {
-        d_echo("Curl support for PHP not enabled\n");
-        return false;
-    }
-    $bad_loc = false;
-    $device_location = $device['location'];
-    if (!empty($device_location)) {
-        $new_device_location = preg_replace("/ /", "+", $device_location);
-        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
-        // We have a location string for the device.
-        $loc = parse_location($device_location);
-        if (!is_array($loc)) {
-            $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
+    if ($config['geoloc']['latlng'] === true) {
+        if (function_check('curl_version') !== true) {
+            d_echo("Curl support for PHP not enabled\n");
+            return false;
         }
-        if (is_array($loc) === false) {
-            // Grab data from which ever Geocode service we use.
-            switch ($config['geoloc']['engine']) {
-                case "google":
-                default:
-                    d_echo("Google geocode engine being used\n");
-                    $api_key = ($config['geoloc']['api_key']);
-                    if (!empty($api_key)) {
-                        d_echo("Use Google API key: $api_key\n");
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
-                    } else {
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
-                    }
-                    break;
+        $bad_loc = false;
+        $device_location = $device['location'];
+        if (!empty($device_location)) {
+            $new_device_location = preg_replace("/ /", "+", $device_location);
+            $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
+            // We have a location string for the device.
+            $loc = parse_location($device_location);
+            if (!is_array($loc)) {
+                $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
             }
-            $curl_init = curl_init($api_url);
-            set_curl_proxy($curl_init);
-            curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
-            curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
-            curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
-            $data = json_decode(curl_exec($curl_init), true);
-            // Parse the data from the specific Geocode services.
-            switch ($config['geoloc']['engine']) {
-                case "google":
-                default:
-                    if ($data['status'] == 'OK') {
-                        $loc = $data['results'][0]['geometry']['location'];
-                    } else {
-                        $bad_loc = true;
-                    }
-                    break;
-            }
-            if ($bad_loc === true) {
-                d_echo("Bad lat / lng received\n");
-            } else {
-                $loc['timestamp'] = array('NOW()');
-                $loc['location'] = $device_location;
-                if (dbInsert($loc, 'locations')) {
-                    d_echo("Device lat/lng created\n");
-                } else {
-                    d_echo("Device lat/lng could not be created\n");
+            if (is_array($loc) === false) {
+                // Grab data from which ever Geocode service we use.
+                switch ($config['geoloc']['engine']) {
+                    case "google":
+                    default:
+                        d_echo("Google geocode engine being used\n");
+                        $api_key = ($config['geoloc']['api_key']);
+                        if (!empty($api_key)) {
+                            d_echo("Use Google API key: $api_key\n");
+                            $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
+                        } else {
+                            $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
+                        }
+                        break;
                 }
+                $curl_init = curl_init($api_url);
+                set_curl_proxy($curl_init);
+                curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
+                curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
+                curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
+                $data = json_decode(curl_exec($curl_init), true);
+                // Parse the data from the specific Geocode services.
+                switch ($config['geoloc']['engine']) {
+                    case "google":
+                    default:
+                        if ($data['status'] == 'OK') {
+                            $loc = $data['results'][0]['geometry']['location'];
+                        } else {
+                            $bad_loc = true;
+                        }
+                        break;
+                }
+                if ($bad_loc === true) {
+                    d_echo("Bad lat / lng received\n");
+                } else {
+                    $loc['timestamp'] = array('NOW()');
+                    $loc['location'] = $device_location;
+                    if (dbInsert($loc, 'locations')) {
+                        d_echo("Device lat/lng created\n");
+                    } else {
+                        d_echo("Device lat/lng could not be created\n");
+                    }
+                }
+            } else {
+                d_echo("Using cached lat/lng from other device\n");
             }
-        } else {
-            d_echo("Using cached lat/lng from other device\n");
         }
     }
 }// end location_to_latlng()
