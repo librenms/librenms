@@ -38,6 +38,7 @@ switch ($type) {
         $device = device_by_id_cache($device_id);
         $rules = GetRules($device_id);
         $output = '';
+        $qry = array();
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
                 $rule['query'] = GenSQL($rule['rule']);
