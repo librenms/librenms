@@ -2,15 +2,6 @@
 
 echo 'IPOMANII-MIB: ';
 
-if (!is_array($cache['ipoman'])) {
-    d_echo('outletConfigDesc ');
-    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', $cache['ipoman']['out'], 'IPOMANII-MIB');
-    d_echo('outletConfigLocation ');
-    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigLocation', $cache['ipoman']['out'], 'IPOMANII-MIB');
-    d_echo('inletConfigDesc ');
-    $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, 'inletConfigDesc', $cache['ipoman']['in'], 'IPOMANII-MIB');
-}
-
 $oids = array();
 
 d_echo('inletConfigFrequencyHigh ');
@@ -24,7 +15,7 @@ if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         $freq_oid   = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.4.'.$index;
         $divisor    = 10;
-        $descr      = (trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') != '' ? trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') : "Inlet $index");
+        $descr      = (trim($pre_cache['ipoman']['in'][$index]['inletConfigDesc'], '"') != '' ? trim($pre_cache['ipoman']['in'][$index]['inletConfigDesc'], '"') : "Inlet $index");
         $current    = ($entry['inletStatusFrequency'] / 10);
         $low_limit  = $entry['inletConfigFrequencyLow'];
         $high_limit = $entry['inletConfigFrequencyHigh'];

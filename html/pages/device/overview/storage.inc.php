@@ -44,7 +44,7 @@ if (count($drives)) {
         $total      = formatStorage($drive['storage_size']);
         $free       = formatStorage($drive['storage_free']);
         $used       = formatStorage($drive['storage_used']);
-        $background = get_percentage_colours($percent);
+        $background = get_percentage_colours($percent, $drive['storage_perc_warn']);
 
         $graph_array           = array();
         $graph_array['height'] = '100';

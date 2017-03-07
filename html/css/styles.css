@@ -1764,7 +1764,9 @@ tr.search:nth-child(odd) {
     height: 600px;
 }
 
-.edit-storage-input {
+.edit-storage-input,
+.edit-processor-input,
+.edit-mempool-input {
     width: 100px;
 }
 

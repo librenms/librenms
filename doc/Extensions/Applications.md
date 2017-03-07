@@ -12,7 +12,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
-1. [MySQL](#mysql) - Agent
+1. [MySQL](#mysql) - Agent, SNMP extend
 1. [NGINX](#nginx) - Agent
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
@@ -29,8 +29,13 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
+1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
+1. [Squid](#squid) - SNMP proxy
+1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
+
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -169,7 +174,24 @@ $mysql_port = 3306;
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
+##### SNMP extend
 
+1: Copy the shell script, mysql_stats.php, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql_stats.php -O /etc/snmp/mysql_stats.php )
+
+2: Make the scripts executable (chmod +x /etc/snmp/mysql_stats.php)
+
+3: Examine it to make sure you the hostname, user, and pass are properly set in it, if needed.
+
+4: Edit your snmpd.conf file and add:
+```
+extend mysql /etc/snmp/mysql_stats.php
+```
+
+4: Restart snmpd.
+
+5: Install the PHP CLI language and your MySQL module of choice for PHP.
+
+7: On the device page in Librenms, edit your host and check `MySQL` under the Applications tab
 
 ### NGINX
 NGINX is a free, open-source, high-performance HTTP server: https://www.nginx.org/
@@ -521,6 +543,58 @@ In regards to the totals graphed there are two variables banned and firewalled. 
 
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
 
+### Nvidia GPU
+
+##### SNMP Extend
+
+1: Copy the shell script, nvidia, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/nvidia -O /etc/snmp/nvidia)
+
+2: Make the script executable (chmod +x /etc/snmp/nvidia)
+
+3: Edit your snmpd.conf file and add:
+```
+extend nvidia /etc/snmp/nvidia
+```
+
+5: Restart snmpd on your host.
+
+6: Verify you have nvidia-smi installed, which it generally should be if you have the driver from Nvida installed.
+
+7: On the device page in Librenms, edit your host and check `Nvidia` under the Applications tab.
+
+The GPU numbering on the graphs will correspond to how the nvidia-smi sees them as being.
+
+For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
+
+Please be aware that if you have more than 35 GPUs, you will need to add more colors to the config entry $config['graph_colours']['manycolours'].
+=======
+#### Squid
+
+##### SNMP Proxy
+
+1: Enable SNMP for Squid like below, if you have not already, and restart it.
+
+```
+acl snmppublic snmp_community public
+snmp_port 3401
+snmp_access allow snmppublic localhost
+snmp_access deny all
+```
+
+2: Restart squid on your host.
+
+3: Edit your snmpd.conf file and add, making sure you have the same community, host, and port as above:
+```
+proxy -v 2c -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
+```
+
+4: On the device page in Librenms, edit your host and check `Squid` under the Applications tab.
+
+For more advanced information on Squid and SNMP or setting up proxying for net-snmp, please see the links below.
+
+http://wiki.squid-cache.org/Features/Snmp
+http://www.net-snmp.org/wiki/index.php/Snmpd_proxy
+
 #### Postgres
 
 ##### SNMP Extend
@@ -543,6 +617,40 @@ extend postgres /etc/snmp/postgres
 7: If you wish it to ignore the database postgres for totalling up the stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you are using netdata or the like, you may wish to set this or otherwise that total will be very skewed on systems with light or moderate usage.
 
 8: On the device page in Librenms, edit your host and check `Postgres` under the Applications tab.
+
+#### FreeBSD NFS Client
+
+##### SNMP Extend
+
+1: Copy the shell script, fbsdnfsserver, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsclient -O /etc/snmp/fbsdnfsclient)
+
+2: Make the script executable (chmod +x /etc/snmp/fbsdnfsclient)
+
+3: Edit your snmpd.conf file and add:
+```
+extend fbsdnfsclient /etc/snmp/fbsdnfsclient
+```
+
+4: Restart snmpd on your host
+
+5: On the device page in Librenms, edit your host and check `FreeBSD NFS Client` under the Applications tab.
+
+#### FreeBSD NFS Server
+
+##### SNMP Extend
+
+1: Copy the shell script, fbsdnfsserver, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/fbsdnfsserver -O /etc/snmp/fbsdnfsserver)
+
+2: Make the script executable (chmod +x /etc/snmp/fbsdnfsserver)
+
+3: Edit your snmpd.conf file and add:
+```
+extend fbsdnfsserver /etc/snmp/fbsdnfsserver
+```
+
+4: Restart snmpd on your host
+
+5: On the device page in Librenms, edit your host and check `FreeBSD NFS Server` under the Applications tab.
 
 #### Postfix
 
@@ -569,3 +677,4 @@ extend postfixdetailed /etc/snmp/postfixdetailed
 7: On the device page in Librenms, edit your host and check `Postfix` under the Applications tab. Before doing this, run /etc/snmp/postfixdetailed to create the initial cache file so you don't end up with some crazy initial starting value.
 
 Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is updated, so if this happens in between LibreNMS doing it then the values will be thrown off for that polling period.
+
