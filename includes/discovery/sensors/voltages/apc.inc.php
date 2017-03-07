@@ -1,9 +1,26 @@
 <?php
 
+// Battery Bus Voltage
+
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.8.0', '-OsqnU');
+d_echo($oids."\n");
+
+if ($oids) {
+    echo ' Battery Bus ';
+    list($oid,$current) = explode(' ', $oids);
+    $divisor            = 1;
+    $type               = 'apc';
+    $index              = '2.2.8.0';
+    $descr              = 'Battery Bus';
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+}
+unset($oids);
+
 //Three Phase Detection & Support
 
-$phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
+$phasecount = $pre_cache['apcups_phase_count'];
     d_echo($phasecount);
+    d_echo($pre_cache['apcups_phase_count']);
 // Check for three phase UPS devices - else skip to normal discovery
 if ($phasecount > 1) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');

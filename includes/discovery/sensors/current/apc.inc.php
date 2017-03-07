@@ -174,7 +174,7 @@ unset($oids);
 
 // UPS
 
-    $phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
+    $phasecount =  $phasecount = $pre_cache['apcups_phase_count'];
 if ($phasecount > 1) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', $oids, 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputCurrent', $in_oids, 'PowerNet-MIB');

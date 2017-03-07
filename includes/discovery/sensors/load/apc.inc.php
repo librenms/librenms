@@ -2,7 +2,7 @@
 
 echo 'APC Load ';
 
-$phasecount = snmp_get($device, 'upsBasicInputPhase.0', '-OsqvU', 'PowerNet-MIB');
+$phasecount =  $phasecount = $pre_cache['apcups_phase_count'];
 if ($phasecount > 1) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputPercentLoad', array(), 'PowerNet-MIB');
     d_echo($oids);
