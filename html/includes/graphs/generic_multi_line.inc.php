@@ -42,7 +42,7 @@ foreach ($rrd_list as $rrd) {
         $colour = $config['graph_colours'][$colours][$iter];
         $iter++;
     }
-
+    $i++;
     if (!empty($rrd['area']) && empty($rrd['areacolour'])) {
         $rrd['areacolour'] = $colour."20";
     }
