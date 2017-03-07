@@ -52,11 +52,7 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testZeroLengthName()
     {
-        global $config;
-        $config['rrd']['step'] = 300;
-        $config['rrd']['heartbeat'] = 600;
-        $def = new RrdDefinition();
-        $def = RrdDefinition::make()->addDataset('', 'GAUGE', 0, 100, 600);
+        RrdDefinition::make()->addDataset('', 'GAUGE', 0, 100, 600);
     }
 
     public function testNameEscaping()
