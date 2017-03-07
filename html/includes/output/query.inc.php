@@ -44,7 +44,7 @@ switch ($type) {
             }
             $sql = $rule['query'];
             $qry[] = dbFetchRow($sql, array($device_id));
-            if (is_array($qry)) {
+            if (count($qry) > 0) {
                 $response = 'matches';
             } else {
                 $response = 'no match';
