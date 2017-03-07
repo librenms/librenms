@@ -445,17 +445,12 @@ foreach ($ports as $port) {
             $port['update']['poll_period'] = $polled_period;
         }
 
-        // usee HC values if they are available
-        $hc_names = array(
-            'ifHCInOctets' => 'ifInOctets',
-            'ifHCOutOctets' => 'ifOutOctets',
-            'ifHCInUcastPkts' => 'ifInUcastPkts',
-            'ifHCOutUcastPkts' => 'ifOutUcastPkts',
-        );
-        foreach ($hc_names as $hc => $non_hc) {
-            if (is_numeric($this_port[$hc]) && $this_port[$hc] > 0) {
-                $this_port[$non_hc] = $this_port[$hc];
-            }
+        // use HC values if they are available
+        if (is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCInOctets'] >= 0) {
+            $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
+            $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
+            $this_port['ififInUcastPkts'] = $this_port['ifHCInUcastPkts'];
+            $this_port['ififOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
