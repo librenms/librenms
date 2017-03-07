@@ -31,7 +31,10 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```systemctl restart mariadb```
+```
+systemctl enable mariadb  
+systemctl restart mariadb
+```
 
 ### Web Server ###
 
