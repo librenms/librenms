@@ -54,7 +54,7 @@ if (is_admin() === true) {
               <div class="col-sm-4">
                 <select class="form-control" id="user_id" name="user_id">
 <?php
-foreach (get_userlist() as $users) {
+foreach ($userlist = get_userlist() as $users) {
     echo '<option value="'.$users['user_id'].'">'.$users['username'].'</option>';
 }
 
@@ -136,14 +136,13 @@ echo '
         </tr>
 ';
 
-$tmp_users = get_userlist();
 foreach (dbFetchRows('SELECT * FROM `api_tokens` ORDER BY user_id') as $api) {
     if ($api['disabled'] == '1') {
         $api_disabled = 'checked';
     } else {
         $api_disabled = '';
     }
-    foreach ($tmp_users as $tmp_user) {
+    foreach ($userlist as $tmp_user) {
         if ($tmp_user['user_id'] === $api['user_id']) {
             $user_details = $tmp_user;
         }
