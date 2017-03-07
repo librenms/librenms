@@ -63,7 +63,7 @@ class RrdDefinition
         }
 
         $ds = array();
-        $ds[] = $this->escapeName($name)
+        $ds[] = $this->escapeName($name);
         $ds[] = $this->checkType($type);
         $ds[] = is_null($heartbeat) ? $config['rrd']['heartbeat'] : $heartbeat;
         $ds[] = is_null($min) ? 'U' : $min;
