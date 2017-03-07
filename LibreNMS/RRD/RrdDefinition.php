@@ -56,7 +56,6 @@ class RrdDefinition
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         global $config;
-        $name = $this->escapeName($name);
 
         if (empty($name)) {
             $msg = "DS must be set to a non-empty string.";
@@ -64,7 +63,7 @@ class RrdDefinition
         }
 
         $ds = array();
-        $ds[] = $name;
+        $ds[] = $this->escapeName($name)
         $ds[] = $this->checkType($type);
         $ds[] = is_null($heartbeat) ? $config['rrd']['heartbeat'] : $heartbeat;
         $ds[] = is_null($min) ? 'U' : $min;
