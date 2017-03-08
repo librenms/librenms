@@ -48,9 +48,11 @@ while (isset($lines[$int])) {
     $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
 
     if (is_int($id5)) {
-        $id=null; }
+        $id=null;
+    }
     if (is_int($id10)) {
-        $id10=null; }
+        $id10=null;
+    }
     if (is_int($id173)) {
         $id173=null;
     }
@@ -126,5 +128,5 @@ while (isset($lines[$int])) {
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 
-    $in    +;
+    $int+;
 }
