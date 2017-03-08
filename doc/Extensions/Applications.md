@@ -147,7 +147,37 @@ extend memcached /etc/snmp/memcached
 
 
 ### MySQL
-##### Agent
+
+Unlike most other scripts, the MySQL script requires a configuration file `mysql.cnf` in the same directory as the extend or agent script with following content:
+
+```php
+<?php
+$mysql_user = 'root';
+$mysql_pass = 'toor';
+$mysql_host = 'localhost';
+$mysql_port = 3306;
+```
+
+#### SNMP extend
+
+1: Copy the mysql script to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql )
+
+2: Make the scripts executable (chmod +x /etc/snmp/mysql)
+
+3: Make sure you set hostname, user, and pass are properly set in `/etc/snmp/mysql.cnf`
+
+4: Edit your snmpd.conf file and add:
+```
+extend mysql /etc/snmp/mysql
+```
+
+4: Restart snmpd.
+
+5: Install the PHP CLI language and your MySQL module of choice for PHP.
+
+7: On the device page in Librenms, edit your host and check `MySQL` under the Applications tab
+
+#### Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
@@ -162,36 +192,10 @@ Debian
 apt-get install php5-cli php5-mysql
 ```
 
-Unlike most other scripts, the MySQL script requires a configuration file `/usr/lib/check_mk_agent/local/mysql.cnf` with following content:
-
-```php
-<?php
-$mysql_user = 'root';
-$mysql_pass = 'toor';
-$mysql_host = 'localhost';
-$mysql_port = 3306;
-```
+Make sure you set hostname, user, and pass are properly set in `/usr/lib/check_mk_agent/local/mysql.cnf
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 
-##### SNMP extend
-
-1: Copy the shell script, mysql_stats.php, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql_stats.php -O /etc/snmp/mysql_stats.php )
-
-2: Make the scripts executable (chmod +x /etc/snmp/mysql_stats.php)
-
-3: Examine it to make sure you the hostname, user, and pass are properly set in it, if needed.
-
-4: Edit your snmpd.conf file and add:
-```
-extend mysql /etc/snmp/mysql_stats.php
-```
-
-4: Restart snmpd.
-
-5: Install the PHP CLI language and your MySQL module of choice for PHP.
-
-7: On the device page in Librenms, edit your host and check `MySQL` under the Applications tab
 
 ### NGINX
 NGINX is a free, open-source, high-performance HTTP server: https://www.nginx.org/
