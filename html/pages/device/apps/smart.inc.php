@@ -34,12 +34,12 @@ print_optionbar_end();
 
 if (isset($vars['disk'])) {
     $graphs = array(
-    'smart_big5'=>'Big 5: Reallocated Sector Count(5), Reported Uncorrectable Errors(187), Command Timeout(188), Current Pending Sector Count(197), Offline Uncorrectable(198)',
-    'smart_temp'=>'Temperature(C)(190), Air Temperature(C)(194)',
-    'smart_ssd'=>'SSD: Wear Leveling Count(173), SSD Life Left(231), Media Wearout Indicator(233)',
-    'smart_other'=>'Other: Spin Retry Count(10), Detected Uncorrentable Bad Blocks(183), End-to-End error(184), Reallocation Event Count(196), UltraDMA CRC Error Count(199)',
-    'smart_tests_status'=>'Tallies various selftest statuses',
-    'smart_tests_ran'=>'Tallies various selftest types',
+        'smart_big5'=>'Big 5: Reallocated Sector Count(5), Reported Uncorrectable Errors(187), Command Timeout(188), Current Pending Sector Count(197), Offline Uncorrectable(198)',
+        'smart_temp'=>'Temperature(C)(190), Air Temperature(C)(194)',
+        'smart_ssd'=>'SSD: Wear Leveling Count(173), SSD Life Left(231), Media Wearout Indicator(233)',
+        'smart_other'=>'Other: Spin Retry Count(10), Detected Uncorrentable Bad Blocks(183), End-to-End error(184), Reallocation Event Count(196), UltraDMA CRC Error Count(199)',
+        'smart_tests_status'=>'Tallies various selftest statuses',
+        'smart_tests_ran'=>'Tallies various selftest types',
     );
 } else {
     $graphs = array(
