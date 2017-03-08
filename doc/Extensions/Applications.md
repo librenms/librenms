@@ -3,9 +3,7 @@ Applications
 ------------
 You can use Application support to graph performance statistics from many applications.
 
-Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or the agent.
-
-[Agent Setup](#agent-setup)
+Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - Agent
@@ -55,7 +53,7 @@ extend apache /etc/snmp/apache-stats.py
 5. Restart snmpd on your host
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 
 1. Verify it is working by running /usr/lib/check_mk_agent/local/apache
 (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
@@ -63,7 +61,7 @@ extend apache /etc/snmp/apache-stats.py
 
 ### BIND9 aka named
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `bind` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `bind` script to `/usr/lib/check_mk_agent/local/`
 
 Create stats file with appropriate permissions:
 ```shell
@@ -199,7 +197,7 @@ extend mailscanner /etc/snmp/mailscanner.php
 A small shell script that reports GPSD status.
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
 
 You may need to configure `$server` or `$port`.
 
@@ -245,7 +243,7 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 ### MySQL
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
 
@@ -284,7 +282,7 @@ extend mysql /etc/snmp/mysql
 7: On the device page in Librenms, edit your host and check `MySQL` under the Applications tab
 
 #### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so please verify those are installed.
 
@@ -307,7 +305,7 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 NGINX is a free, open-source, high-performance HTTP server: https://www.nginx.org/
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
 It's required to have the following directive in your nginx configuration responsible for the localhost server:
 
@@ -465,7 +463,7 @@ extend postgres /etc/snmp/postgres
 An authoritative DNS server: https://www.powerdns.com/auth.html
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
 
 ### PowerDNS Recursor
 A recursive DNS server: https://www.powerdns.com/recursor.html
@@ -480,7 +478,7 @@ The web-server must be enabled, see the Recursor docs: https://doc.powerdns.com/
 `$config['apps']['powerdns-recursor']['https']` true or false, defaults to use http.
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
 
 This script uses `rec_control get-all` to collect stats.
 
@@ -540,7 +538,7 @@ http://www.net-snmp.org/wiki/index.php/Snmpd_proxy
 ### TinyDNS aka  djbdns
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `tinydns` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `tinydns` script to `/usr/lib/check_mk_agent/local/`
 
 _Note_: We assume that you use DJB's [Daemontools](http://cr.yp.to/daemontools.html) to start/stop tinydns.
 And that your tinydns instance is located in `/service/dns`, adjust this path if necessary.
@@ -561,7 +559,7 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 ### Unbound
 
 ##### Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
 
 Unbound configuration:
 
