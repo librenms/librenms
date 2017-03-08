@@ -1605,10 +1605,12 @@ function uw_to_dbm($value)
  * @param int $min
  * @return null
  */
-function set_null($value, $default = null, $min = 0)
+function set_null($value, $default = null, $min = null)
 {
-    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
-        $value = $default;
+    if (!is_numeric($value)) {
+        return $default;
+    } elseif (isset($min) && $value < $min) {
+        return $default;
     }
     return $value;
 }
