@@ -60,7 +60,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         $type = $eventlog['type'];
     }
     $severity_colour = $eventlog['severity'];
-    if ($eventlog['username'] === 0) {
+    if ($eventlog['username'] == 0) {
         $eventlog['username'] = '';
     }
     $response[] = array(
