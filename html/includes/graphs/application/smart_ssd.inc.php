@@ -15,19 +15,19 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $vars
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-    'filename' => $rrd_filename,
-    'descr'    => 'ID# 173',
-    'ds'       => 'id173',
+        'filename' => $rrd_filename,
+        'descr'    => 'ID# 173',
+        'ds'       => 'id173',
     );
     $rrd_list[]=array(
-    'filename' => $rrd_filename,
-    'descr'    => 'ID# 231',
-    'ds'       => 'id231',
+        'filename' => $rrd_filename,
+        'descr'    => 'ID# 231',
+        'ds'       => 'id231',
     );
     $rrd_list[]=array(
-    'filename' => $rrd_filename,
-    'descr'    => 'ID# 233',
-    'ds'       => 'id233',
+        'filename' => $rrd_filename,
+        'descr'    => 'ID# 233',
+        'ds'       => 'id233',
     );
 }
 
