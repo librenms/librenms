@@ -566,28 +566,35 @@ function get_device_oid_limit($device)
 }
 
 /**
- * @param $device
- * @param $app
- * @param $response
+ * Update the application status and output in the database.
+ *
+ * @param array $device
+ * @param array $app
+ * @param string $response
  */
 function update_applications($device, $app, $response)
 {
-    $data = array();
-    if (is_numeric($device['device_id']) && is_numeric($app['app_id'])) {
-        $data['app_state']      = 'UNKNOWN';
-        if (!empty($response)) {
-            if (str_contains($response, array(
-                'Traceback (most recent call last):',
-            ))) {
-                $data['app_state'] = 'ERROR';
-            } else {
-                $data['app_state'] = 'OK';
-            }
-        }
-        $data['timestamp'] = array('NOW()');
-        if ($data['app_state'] != $app['app_state']) {
-            $data['app_state_prev'] = $app['app_state'];
-        }
-        dbUpdate($data, 'applications', '`app_id` = ? AND `device_id` = ?', array($app['app_id'], $device['device_id']));
+    if (!is_numeric($device['device_id']) || !is_numeric($app['app_id'])) {
+        return;
     }
+
+    $data = array(
+        'app_state' => 'UNKNOWN',
+        'timestamp' => array('NOW()'),
+    );
+
+    if (!empty($response)) {
+        if (str_contains($response, array(
+            'Traceback (most recent call last):',
+        ))) {
+            $data['app_state'] = 'ERROR';
+        } else {
+            $data['app_state'] = 'OK';
+        }
+    }
+
+    if ($data['app_state'] != $app['app_state']) {
+        $data['app_state_prev'] = $app['app_state'];
+    }
+    dbUpdate($data, 'applications', '`app_id` = ? AND `device_id` = ?', array($app['app_id'], $device['device_id']));
 }
