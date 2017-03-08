@@ -20,7 +20,7 @@ To make the changes, please navigate to `/settings/sub=external/` within your We
 
 We provide a basic script to convert the default rrd files we generate to utilise your configured step and heartbeat 
 values. Please do ensure that you backup your RRD files before running this just in case. The script runs on a per 
-device basis, it doesn't support running on all devices.
+device basis or all devices at once.
 
 > The rrd files must be accessible from the server you run this script from.
 

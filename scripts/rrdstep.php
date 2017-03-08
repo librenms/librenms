@@ -76,10 +76,10 @@ foreach ($files as $file) {
         sed -i 's/<minimal_heartbeat>600/<minimal_heartbeat>$heartbeat/' $random;
         $rrdtool restore -f $random $file;
         rm -f $random";
-    if ($code == 0) {
+    exec($command, $output, $code);
+    if ($code === 0) {
         echo "[OK]\n";
     } else {
         echo "\033[FAIL]\n";
     }
-    exec($command, $output, $code);
 }
