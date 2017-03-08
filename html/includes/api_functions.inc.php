@@ -457,14 +457,19 @@ function list_bgp()
     $message    = 'Error retrieving bgpPeers';
     $sql        = '';
     $sql_params = array();
-    $hostname   = $_GET['hostname'];
+    $hostname   = $_GET['hostname'] ?: '';
+    $asn        = $_GET['asn'] ?: '';
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `device_id`=?';
-        $sql_params = array($device_id);
+        $sql        = ' AND `devices`.`device_id` = ?';
+        $sql_params[] = $device_id;
+    }
+    if (!empty($asn)) {
+        $sql = ' AND `devices`.`bgpLocalAs` = ?';
+        $sql_params[] = $asn;
     }
 
-    $bgp_sessions       = dbFetchRows("SELECT * FROM bgpPeers WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
+    $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (is_numeric($total_bgp_sessions)) {
         $code    = 200;
@@ -489,7 +494,8 @@ function get_graph_by_portgroup()
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $group  = $router['group'];
+    $group  = $router['group'] ?: '';
+    $id     = $router['id'] ?: '';
     $vars   = array();
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
@@ -502,13 +508,19 @@ function get_graph_by_portgroup()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
-
-    $ports = get_ports_from_type(explode(',', $group));
     $if_list     = '';
-    $seperator   = '';
-    foreach ($ports as $port) {
-        $if_list  .= $seperator.$port['port_id'];
-        $seperator = ',';
+
+    if (!empty($id)) {
+        $if_list = $id;
+    } else {
+        $ports = get_ports_from_type(explode(',', $group));
+    }
+    if (empty($if_list)) {
+        $seperator   = '';
+        foreach ($ports as $port) {
+            $if_list  .= $seperator.$port['port_id'];
+            $seperator = ',';
+        }
     }
 
     unset($seperator);

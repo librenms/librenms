@@ -82,8 +82,8 @@ $app->group(
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
+                        $app->get('/multiport/bits/:id', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
                         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');
-                        // api/v0/portgroups/$group
                     }
                 );
                 $app->group(
