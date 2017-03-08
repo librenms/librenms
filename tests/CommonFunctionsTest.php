@@ -86,7 +86,7 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetNull()
     {
-        $this->assertEquals(null, set_null('BAD-DATA'));
+        $this->assertNull(set_null('BAD-DATA'));
         $this->assertEquals(0, set_null(0));
         $this->assertEquals(25, set_null(25));
         $this->assertEquals(-25, set_null(-25));
