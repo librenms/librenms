@@ -9,33 +9,32 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Apache](#apache) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
+1. [Fail2ban](#fail2ban) - SNMP extend
+1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [GPSD](#gpsd) - Agent
-1. [Mailscanner](#mailscanner) - SNMP extend
-1. [Memcached](#memcached) - SNMP extend
-1. [MySQL](#mysql) - Agent, SNMP extend
-1. [NGINX](#nginx) - Agent
-1. [NTP Client](#ntp-client) - SNMP extend
-1. [NTP Server](#ntp-server) - SNMP extend
-1. [OS Updates](#os-updates) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [EXIM Stats](#exim-stats) - SNMP extend
+1. [Mailscanner](#mailscanner) - SNMP extend
+1. [Memcached](#memcached) - SNMP extend
+1. [Munin](#munin) - Agent
+1. [MySQL](#mysql) - Agent, SNMP extend
+1. [NGINX](#nginx) - Agent
+1. [NTP Client](#ntp-client) - SNMP extend
+1. [NTP Server](#ntp-server) - SNMP extend
+1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
+1. [OS Updates](#os-updates) - SNMP extend
+1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Postfix](#postfix) - SNMP extend
+1. [Postgres](#postgres) - SNMP extend
+1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
-1. [EXIM Stats](#exim-stats) - SNMP extend
-1. [Munin](#munin) - Agent
-1. [PHP-FPM](#php-fpm) - SNMP extend
-1. [Fail2ban](#fail2ban) - SNMP extend
-1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
-1. [Squid](#squid) - SNMP proxy
-1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
-1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
-1. [Postgres](#postgres) - SNMP extend
-1. [Postfix](#postfix) - SNMP extend
-
 
 ### Apache
 Either use SNMP extend or use the agent.
