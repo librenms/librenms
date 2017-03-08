@@ -181,17 +181,12 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } else {
     if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo('Select ports polling');
-        foreach ($table_base_oids as $oid) {
-            $data = snmpwalk_cache_oid($device, $oid, $data, 'IF-MIB');
-        }
-        unset(
-            $oid,
-            $table_base_oids
-        );
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
             if (is_port_valid($lport, $device)) {
                 $i = $lport['ifIndex'];
+                $base_oids = implode(".$i ", $table_base_oids) . ".$i";
+                $data = snmp_get_multi($device, $base_oids, '-OQUst', 'IF-MIB', null, $data);
                 if ($lport['ifAdminStatus_prev'] === 'down' && $data[$i]['ifAdminStatus'] === 'down') {
                     echo 'port is still admin down';
                 } elseif ($lport['ifOperStatus_prev'] === 'down' && $data[$i]['ifOperStatus'] === 'down') {
