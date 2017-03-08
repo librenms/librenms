@@ -8,7 +8,7 @@
  * Variable to hold the discovered MEF Links.
  */
 
-$mefevc_list = array();
+$mef_list = array();
 
 /*
  * Fetch information about MEF Links.
@@ -16,7 +16,7 @@ $mefevc_list = array();
 
 $oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', $oids, 'MEF-UNI-EVC-MIB');
 
-echo "MEF EVC : ";
+echo "MEF : ";
 foreach ($oids as $index => $entry) {
     $mefIdent    = $entry['mefServiceEvcCfgIdentifier'];
     $mefType     = $entry['mefServiceEvcCfgServiceType'];
@@ -33,7 +33,7 @@ foreach ($oids as $index => $entry) {
     }
 
     /*
-     * Check if the MEF EVC is already known for this host
+     * Check if the MEF is already known for this host
      */
     if (dbFetchCell("SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?", array($device['device_id'], $index)) == 0) {
         $mefid = dbInsert(array('device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => mres($mefType), 'mefIdent' => mres($mefIdent), 'mefMTU' => mres($mefMtu), 'mefAdmState' => mres($mefAdmState), 'mefRowState' => mres($mefRowState)), 'mefinfo');
@@ -45,11 +45,11 @@ foreach ($oids as $index => $entry) {
     /*
      * Save the discovered MEF Link
      */
-    $mefevc_list[] = $index;
+    $mef_list[] = $index;
 }
 
 /*
- * Get a list of all the known EVC Links for this host
+ * Get a list of all the known MEF Links for this host
  */
 
 $sql = "SELECT id, mefID, mefIdent FROM mefinfo WHERE device_id = '".$device['device_id']."'";
@@ -57,7 +57,7 @@ foreach (dbFetchRows($sql) as $db_mef) {
     /*
      * Delete the MEF Link that are removed from the host.
      */
-    if (!in_array($db_mef['mefID'], $mefevc_list)) {
+    if (!in_array($db_mef['mefID'], $mef_list)) {
         dbDelete('mefinfo', '`id` = ?', array($db_mef['id']));
         log_event("MEF link: ".mres($db_mef['mefIdent']).' Removed', $device, 'system', 3);
         echo '-';
@@ -66,5 +66,5 @@ foreach (dbFetchRows($sql) as $db_mef) {
 /*
  * Finished MEF information
  */
-unset($mefevc_list, $oids, $db_mef);
+unset($mef_list, $oids, $db_mef);
 echo PHP_EOL;
