@@ -566,8 +566,6 @@ The GPU numbering on the graphs will correspond to how the nvidia-smi sees them 
 
 For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
 
-Please be aware that if you have more than 35 GPUs, you will need to add more colors to the config entry $config['graph_colours']['manycolours'].
-=======
 #### Squid
 
 ##### SNMP Proxy
