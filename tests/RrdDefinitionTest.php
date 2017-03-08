@@ -47,14 +47,6 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
         $def->addDataset('badtype', 'Something unexpected');
     }
 
-    /**
-     * @expectedException \LibreNMS\Exceptions\InvalidRrdNameException
-     */
-    public function testZeroLengthName()
-    {
-        RrdDefinition::make()->addDataset('', 'GAUGE', 0, 100, 600);
-    }
-
     public function testNameEscaping()
     {
         global $config;
