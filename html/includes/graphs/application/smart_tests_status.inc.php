@@ -15,24 +15,24 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $vars
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Completed',
-	'ds'       => 'completed',
+    'filename' => $rrd_filename,
+    'descr'    => 'Completed',
+    'ds'       => 'completed',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Interrupted',
-	'ds'       => 'interrupted',
+    'filename' => $rrd_filename,
+    'descr'    => 'Interrupted',
+    'ds'       => 'interrupted',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Read Failure',
-	'ds'       => 'readfailure',
+    'filename' => $rrd_filename,
+    'descr'    => 'Read Failure',
+    'ds'       => 'readfailure',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Unknown Failure',
-	'ds'       => 'unknownfail',
+    'filename' => $rrd_filename,
+    'descr'    => 'Unknown Failure',
+    'ds'       => 'unknownfail',
     );
 }
 

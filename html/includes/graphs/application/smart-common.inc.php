@@ -19,11 +19,11 @@ while (isset($disks[$int])) {
     $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $disk));
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-	$rrd_list[]=array(
-	    'filename' => $rrd_filename,
-	    'descr'    => $disk,
-	    'ds'       => $rrdVar,
-	);
+    $rrd_list[]=array(
+        'filename' => $rrd_filename,
+        'descr'    => $disk,
+        'ds'       => $rrdVar,
+    );
     }
     $int++;
 }
