@@ -508,7 +508,8 @@ function get_graph_by_portgroup()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
-    $if_list     = '';
+    $if_list        = '';
+    $ports          = array();
 
     if (!empty($id)) {
         $if_list = $id;
@@ -1433,6 +1434,7 @@ function list_ipsec()
     $code     = 404;
     $message  = '';
     $hostname = $router['hostname'];
+    $total    = 0;
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (!is_numeric($device_id)) {
@@ -1463,6 +1465,7 @@ function list_arp()
     $code     = 404;
     $message  = '';
     $ip       = $router['ip'];
+    $total    = 0;
     if (empty($ip)) {
         $message = "No valid IP provided";
     } else {
