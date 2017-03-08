@@ -336,7 +336,6 @@ $config['graph_colours']['mega']=array_merge(
     $config['graph_colours']['mixed']
 );
 
-
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',

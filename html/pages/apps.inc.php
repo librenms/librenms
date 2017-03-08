@@ -214,7 +214,7 @@ $graphs['smart'] = array(
     'id10',
     'id173',
     'id183',
-     'id184',
+    'id184',
     'id187',
     'id188',
     'id190',
