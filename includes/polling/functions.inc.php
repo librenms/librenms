@@ -583,7 +583,7 @@ function update_applications($device, $app, $response)
         'timestamp' => array('NOW()'),
     );
 
-    if (!empty($response)) {
+    if (!empty($response) && $response !== false) {
         if (str_contains($response, array(
             'Traceback (most recent call last):',
         ))) {
