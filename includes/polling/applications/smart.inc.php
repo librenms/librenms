@@ -45,8 +45,8 @@ $rrd_def = RrdDefinition::make()
 $int=0;
 while (isset($lines[$int])) {
     list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
-    $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
-    $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
+        $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
+        $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
 
     if (is_int($id5)) {
         $id=null;
