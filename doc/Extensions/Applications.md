@@ -21,6 +21,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [SMART](#smart) - SNMP extend
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
@@ -311,8 +312,6 @@ This script uses `rec_control get-all` to collect stats.
 4. Restart snmpd on your host
 5. On the device page in Librenms, edit your host and check `Proxmox` on the Applications tab.
 
-
-
 ### Raspberry PI
 SNMP extend script to get your PI data into your host.
 
@@ -329,7 +328,29 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 ```
 5. Restart snmpd on PI host
 
+### SMART
 
+#### SNMP Extend
+
+1: Copy the Perl script, smart, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart)
+
+2: Make the script executable (chmod +x /etc/snmp/smart)
+
+3: Edit your snmpd.conf file and add:
+```
+extend smart /etc/snmp/smart
+```
+
+4: Edit /etc/snmp/smart and make sure the array @disks contains the disks you want to monitor. This is the name of the disk below /dev/, so /dev/sda would be just sda. Also make sure the path for smartctl is correct as well as the cache file if you are using it.
+
+5: Restart snmpd on your host
+
+6: On the device page in Librenms, edit your host and check `SMART` under the Applications tab.
+
+If you have a large number of more than one or two disks on a system, you should consider adding this to cron. Also make sure the cache file is some place it can be written to.
+```
+ */3 * * * * /etc/snmp/smart -u
+```
 
 ### TinyDNS aka  djbdns
 
