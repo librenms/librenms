@@ -15,24 +15,24 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $vars
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Extended',
-	'ds'       => 'extended',
+    'filename' => $rrd_filename,
+    'descr'    => 'Extended',
+    'ds'       => 'extended',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Short',
-	'ds'       => 'short',
+    'filename' => $rrd_filename,
+    'descr'    => 'Short',
+    'ds'       => 'short',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Selective',
-	'ds'       => 'selective',
+    'filename' => $rrd_filename,
+    'descr'    => 'Selective',
+    'ds'       => 'selective',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Conveyance',
-	'ds'       => 'conveyance',
+    'filename' => $rrd_filename,
+    'descr'    => 'Conveyance',
+    'ds'       => 'conveyance',
     );
 }
 
