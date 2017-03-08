@@ -5,8 +5,9 @@ You can use Application support to graph performance statistics from many applic
 
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or the agent.
 
-1. [Agent Setup](#agent-setup)
-1. [Apache](#apache) - SNMP extend
+[Agent Setup](#agent-setup)
+
+1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
@@ -17,7 +18,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
-1. [MySQL](#mysql) - Agent, SNMP extend
+1. [MySQL](#mysql) - SNMP extend, Agent
 1. [NGINX](#nginx) - Agent
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
@@ -52,6 +53,13 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 extend apache /etc/snmp/apache-stats.py
 ```
 5. Restart snmpd on your host
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
+
+1. Verify it is working by running /usr/lib/check_mk_agent/local/apache
+(If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
+2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
 ### BIND9 aka named
 ##### Agent
@@ -599,15 +607,7 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 
 ---------------------------------------------------------------------------------------
 
-## Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
-
-1. Verify it is working by running /usr/lib/check_mk_agent/local/apache
-(If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
-2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
-
-Agent Setup
------------
+## Agent Setup
 
 To gather data from remote systems you can use LibreNMS in combination with check_mk (found [here](https://github.com/librenms/librenms-agent)).
 
