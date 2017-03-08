@@ -588,6 +588,6 @@ function update_applications($device, $app, $response)
         if ($data['app_state'] != $app['app_state']) {
             $data['app_state_prev'] = $app['app_state'];
         }
-        dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
+        dbUpdate($data, 'applications', '`app_id` = ? AND `device_id` = ?', array($app['app_id'], $device['device_id']));
     }
 }
