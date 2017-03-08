@@ -24,9 +24,6 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     'descr'    => 'ID# 190',
     'ds'       => 'id190',
     );
-
 }
-
-
 
 require 'includes/graphs/generic_multi_line_exact_numbers.inc.php';
