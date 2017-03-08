@@ -2,7 +2,6 @@
 
 $name = 'squid';
 $app_id = $app['app_id'];
-$scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'kB/s';
 $unitlen       = 10;
