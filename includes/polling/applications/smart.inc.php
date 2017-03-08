@@ -44,8 +44,8 @@ $rrd_def = RrdDefinition::make()
 $int=0;
 while (isset($lines[$int])) {
     list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
-	$id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
-	$unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
+    $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
+    $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
 
     if (is_int($id5)) { $id=null; }
     if (is_int($id10)) { $id10=null; }
@@ -67,30 +67,30 @@ while (isset($lines[$int])) {
     $rrd_name = array('app', $name, $app_id, $disk);
 
     $fields = array(
-	'id5'=>$id5,
-	'id10'=>$id10,
-	'id173'=>$id173,
-	'id177'=>$id177,
-	'id183'=>$id183,
-	'id184'=>$id184,
-	'id187'=>$id187,
-	'id188'=>$id188,
-	'id190'=>$id190,
-	'id194'=>$id194,
-	'id196'=>$id196,
-	'id197'=>$id197,
-	'id198'=>$id198,
-	'id199'=>$id199,
-	'id231'=>$id231,
-	'id233'=>$id233,
-	'completed'=>$completed,
-	'interrupted'=>$interrupted,
-	'readfailure'=>$read_failure,
-	'unknownfail'=>$unknown_failure,
-	'extended'=>$extended,
-	'short'=>$short,
-	'conveyance'=>$conveyance,
-	'selective'=>$selective
+    'id5'=>$id5,
+    'id10'=>$id10,
+    'id173'=>$id173,
+    'id177'=>$id177,
+    'id183'=>$id183,
+    'id184'=>$id184,
+    'id187'=>$id187,
+    'id188'=>$id188,
+    'id190'=>$id190,
+    'id194'=>$id194,
+    'id196'=>$id196,
+    'id197'=>$id197,
+    'id198'=>$id198,
+    'id199'=>$id199,
+    'id231'=>$id231,
+    'id233'=>$id233,
+    'completed'=>$completed,
+    'interrupted'=>$interrupted,
+    'readfailure'=>$read_failure,
+    'unknownfail'=>$unknown_failure,
+    'extended'=>$extended,
+    'short'=>$short,
+    'conveyance'=>$conveyance,
+    'selective'=>$selective
     );
 
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
