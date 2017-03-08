@@ -129,5 +129,5 @@ while (isset($lines[$int])) {
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 
-    $int+;
+    $int++;
 }
