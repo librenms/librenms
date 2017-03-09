@@ -13,7 +13,6 @@ if ($oids) {
         $temperature_oid  = ".1.3.6.1.4.1.5528.100.4.1.1.1.8.$temperature_id";
         $temperature      = snmp_get($device, $temperature_oid, '-Ovq');
         $descr            = str_replace('"', '', $descr);
-        $descr            = preg_replace('/Temperature  /', '', $descr);
         $descr            = trim($descr);
         if ($temperature != '0' && $temperature <= '1000') {
             discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'netbotz', $descr, '1', '1', null, null, null, null, $temperature);
