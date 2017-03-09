@@ -108,4 +108,5 @@ pages:
     - Installation/Installation-(Debian-Ubuntu).md
     - Installation/Installation-(RHEL-CentOS).md
     - Support/Support-New-OS.md
+    - Extensions/Agent-Setup.md
     - Extensions/RRDCached-Security.md
