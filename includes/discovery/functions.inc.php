@@ -904,37 +904,35 @@ function avtech_add_sensor($device, $sensor)
  */
 function get_device_divisor($device, $os_version, $sensor_type, $oid)
 {
-    $divisor = 10; // default
-
     if ($device['os'] == 'poweralert') {
         if ($sensor_type == 'current' || $sensor_type == 'frequencies') {
             if (version_compare($os_version, '12.06.0068', '>=')) {
-                $divisor = 10;
+                return 10;
             } elseif (version_compare($os_version, '12.04.0055', '=')) {
-                $divisor = 10;
+                return 10;
             } elseif (version_compare($os_version, '12.04.0056', '>=')) {
-                $divisor = 1;
+                return 1;
             }
         } elseif ($sensor_type == 'load') {
             if (version_compare($os_version, '12.06.0064', '=')) {
-                $divisor = 10;
+                return 10;
             } else {
-                $divisor = 1;
+                return 1;
             }
         } elseif ($sensor_type == 'voltages') {
-            $divisor = 1;
+            return 1;
         }
     } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequencies')) {
-        $divisor = 100;
+        return 100;
     } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltages')) {
-        $divisor = 1;
+        return 1;
     } elseif ($device['os'] == 'generex-ups') {
-        if ($sensor_type == 'voltages' && starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            $divisor = 1;
+        if ($sensor_type == 'voltages' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+            return 1;
         }
     }
 
-    return $divisor;
+    return 10; //default
 }
 
 /**
