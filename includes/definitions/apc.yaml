@@ -10,5 +10,3 @@ discovery:
         - APC MasterSwitch PDU
         - APC Metered Rack PDU
         - APC Embedded PowerNet
-    - sysObjectId:
-        - .1.3.6.1.4.1.5528.100.20.10
