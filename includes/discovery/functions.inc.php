@@ -921,6 +921,8 @@ function get_device_divisor($device, $serial, $sensor)
         $divisor = 100;
     } elseif (($device['os'] == 'netmanplus') && ($sensor == 'voltages')) {
         $divisor = 1;
+    } elseif (($device['os'] == 'generex-ups') && ($sensor == 'load')) {
+        $divisor = 1;
     } else {
         $divisor = 10;
     }
