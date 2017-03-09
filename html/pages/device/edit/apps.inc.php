@@ -33,8 +33,8 @@ foreach ($applications as $app) {
     }
 
     echo '<li class="list-group-item col-xs-12 col-md-6 col-lg-4">';
-    echo "<input type='checkbox' name='application' data-application='$app'";
-    echo " data-device_id='{$device['device_id']}'$modifiers>";
+    echo "<input style='visibility:hidden;width:100px;' type='checkbox' name='application'";
+    echo " data-application='$app' data-device_id='{$device['device_id']}'$modifiers>";
     echo '<span style="font-size:medium;padding-left:5px;"> ' . $app_text . '</span>';
     echo '</li>';
 }
