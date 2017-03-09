@@ -30,5 +30,7 @@ poller_modules:
     services: 0
     storage: 0
 over:
+    - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
-    - { graph: sensor_voltage, text: 'Battery Voltage' }
+    - { graph: device_load, text: Load }
+    - { graph: device_power, text: Power }
