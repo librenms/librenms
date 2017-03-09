@@ -61,8 +61,8 @@ if ($hostname === 'all') {
 $files = glob($rrd_path . '/' . $hostname . '/*.rrd');
 
 $run = readline("Are you sure you want to run this command [N/y]: ");
-if ($run != 'y' || $run == 'Y') {
-    echo "Exiting.....";
+if (!($run == 'y' || $run == 'Y')) {
+    echo "Exiting....." . PHP_EOL;
     exit;
 }
 
@@ -71,10 +71,10 @@ foreach ($files as $file) {
     $tmp = explode('/', $file);
     $rrd_file = array_pop($tmp);
     echo "Converting $file: ";
-    $command = "$rrdtool dump $file > $random;
-        sed -i 's/<step>300/<step>$step/' $random;
-        sed -i 's/<minimal_heartbeat>600/<minimal_heartbeat>$heartbeat/' $random;
-        $rrdtool restore -f $random $file;
+    $command = "$rrdtool dump $file > $random && 
+        sed -i 's/<step>300/<step>$step/' $random && 
+        sed -i 's/<minimal_heartbeat>600/<minimal_heartbeat>$heartbeat/' $random &&
+        $rrdtool restore -f $random $file &&
         rm -f $random";
     exec($command, $output, $code);
     if ($code === 0) {
