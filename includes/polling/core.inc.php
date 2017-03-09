@@ -100,7 +100,3 @@ if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocat
     $update_array['location'] = $poll_device['sysLocation'];
     log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
 }
-
-if ($config['geoloc']['latlng'] === true) {
-    location_to_latlng($device);
-}
