@@ -1,6 +1,6 @@
 <?php
 
-$divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current');
+$divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current',);
 
 echo 'RFC1628 ';
 
