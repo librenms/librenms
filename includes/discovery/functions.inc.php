@@ -927,7 +927,9 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
     } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltages')) {
         return 1;
     } elseif ($device['os'] == 'generex-ups') {
-        if ($sensor_type == 'voltages' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+        if ($sensor_type == 'load') {
+            return 1;
+        } elseif ($sensor_type == 'voltages' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
             return 1;
         }
     }
