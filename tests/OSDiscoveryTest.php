@@ -200,6 +200,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-masterswitch');
         $this->checkOS('apc', 'apc-metered-rack');
         $this->checkOS('apc', 'apc-embedded-powernet');
+        $this->checkOS('apc', 'apc-netbotz-570');
     }
 
     public function testApic()
