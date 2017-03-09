@@ -897,7 +897,7 @@ function avtech_add_sensor($device, $sensor)
  * @param $sensor
  * @return int
  */
-function get_device_divisor($device, $serial, $sensor)
+function get_device_divisor($device, $serial, $sensor, $exclude)
 {
     if ($device['os'] == 'poweralert') {
         if ($sensor == 'current' || $sensor == 'frequencies') {
@@ -920,6 +920,8 @@ function get_device_divisor($device, $serial, $sensor)
     } elseif (($device['os'] == 'huaweiups') && ($sensor == 'frequencies')) {
         $divisor = 100;
     } elseif (($device['os'] == 'netmanplus') && ($sensor == 'voltages')) {
+        $divisor = 1;
+    } elseif (($device['os'] == 'generex-ups') && ($sensor == 'voltages') && ($exclude !== 1)) {
         $divisor = 1;
     } else {
         $divisor = 10;

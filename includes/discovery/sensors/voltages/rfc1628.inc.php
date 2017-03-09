@@ -13,7 +13,8 @@ foreach (explode("\n", $oids) as $data) {
         $split_oid        = explode('.', $oid);
         $volt_id          = $split_oid[(count($split_oid) - 1)];
         $volt_oid         = ".1.3.6.1.2.1.33.1.2.5.$volt_id";
-        $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages');
+        $exclude          = 1;
+        $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages', $exclude);
 
         $volt  = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
         $descr = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
