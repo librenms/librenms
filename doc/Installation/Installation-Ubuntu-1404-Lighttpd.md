@@ -28,7 +28,7 @@ Enter the MySQL root password to enter the MySQL command-line interface.
 Create database.
 
 ```sql
-CREATE DATABASE librenms;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 GRANT ALL PRIVILEGES ON librenms.*
   TO 'librenms'@'<ip>'
   IDENTIFIED BY '<password>'
@@ -117,7 +117,7 @@ Next, add the following to `/etc/lighttpd/librenms.conf`
 
      server.document-root = "/opt/librenms/html"
      url.rewrite-once = (
-       "^/(.*)\.(png|css|jpg|gif|php)$" => "/$0",
+       "^/(.*)\.(gif|jpg|jpeg|tiff|svg|png|css|php)$" => "/$0",
        "^/([a-z|0-9\-]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/" => "/?page=$1&$2&$3&$4&$5&$6&$7&$8&$9&$10",
        "^/([a-z|0-9\-]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/" => "/?page=$1&$2&$3&$4&$5&$6&$7&$8&$9",
        "^/([a-z|0-9\-]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/" => "/?page=$1&$2&$3&$4&$5&$6&$7&$8",

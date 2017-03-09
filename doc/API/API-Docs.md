@@ -1158,7 +1158,7 @@ Route: /api/v0/devicegroups/:name
 
 Input (JSON):
 
-  -full: set to true to return all columns for the devices in a group
+  - full: set to any value to return all data for the devices in a given group
 
 Examples:
 ```curl
@@ -1711,7 +1711,14 @@ Output:
    "allowed": "10Mbps",
    "used": "0bps",
    "percent": 0,
-   "overuse": "-"
+   "overuse": "-",
+   "ports": [
+       {
+           "device_id": "168",
+           "port_id": "35146",
+           "ifName": "eth0"
+       }
+   ]
   }
  ]
 }
@@ -1771,7 +1778,14 @@ Output:
    "allowed": "10Mbps",
    "used": "0bps",
    "percent": 0,
-   "overuse": "-"
+   "overuse": "-",
+   "ports": [
+       {
+           "device_id": "168",
+           "port_id": "35146",
+           "ifName": "eth0"
+       }
+   ]
   }
  ]
 }

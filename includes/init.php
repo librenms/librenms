@@ -109,12 +109,18 @@ if (!module_selected('nodb', $init_modules)) {
         die;
     }
     $database_db = mysqli_select_db($database_link, $config['db_name']);
+    dbQuery("SET NAMES 'utf8'");
+    dbQuery("SET CHARACTER SET 'utf8'");
+    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
 
     // pull in the database config settings
     mergedb();
 
     // load graph types from the database
     require $install_dir . '/includes/load_db_graph_types.inc.php';
+
+    // Process $config to tidy up
+    require $install_dir . '/includes/process_config.inc.php';
 }
 
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {

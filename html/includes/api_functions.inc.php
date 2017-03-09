@@ -1272,6 +1272,9 @@ function list_bills()
         $bill['used'] = $used;
         $bill['percent'] = $percent;
         $bill['overuse'] = $overuse;
+
+        $bill['ports'] = dbFetchRows("SELECT `D`.`device_id`,`P`.`port_id`,`P`.`ifName` FROM `bill_ports` AS `B`, `ports` AS `P`, `devices` AS `D` WHERE `B`.`bill_id` = ? AND `P`.`port_id` = `B`.`port_id` AND `D`.`device_id` = `P`.`device_id`", array($bill["bill_id"]));
+
         $bills[] = $bill;
     }
     $count = count($bills);
@@ -1405,7 +1408,6 @@ function get_devices_by_group()
         'devices' => $devices,
     );
 
-    logfile(var_dump($output));
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);

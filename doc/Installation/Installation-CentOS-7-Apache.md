@@ -13,7 +13,7 @@ mysql -uroot -p
 ```
 
 ```sql
-CREATE DATABASE librenms;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 GRANT ALL PRIVILEGES ON librenms.*
   TO 'librenms'@'localhost'
   IDENTIFIED BY '<password>'
@@ -31,7 +31,10 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```systemctl restart mariadb```
+```
+systemctl enable mariadb  
+systemctl restart mariadb
+```
 
 ### Web Server ###
 

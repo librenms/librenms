@@ -870,9 +870,7 @@ function send_mail($emails, $subject, $message, $html = false)
     if (is_array($emails) || ($emails = parse_email($emails))) {
         $mail = new PHPMailer();
         $mail->Hostname = php_uname('n');
-        if (empty($config['email_from'])) {
-            $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@'.$mail->Hostname.'>';
-        }
+
         foreach (parse_email($config['email_from']) as $from => $from_name) {
             $mail->setFrom($from, $from_name);
         }
@@ -1131,9 +1129,6 @@ if (!defined('JSON_UNESCAPED_UNICODE')) {
 
 function _json_encode($data, $options = 448)
 {
-    array_walk_recursive($data, function (&$val) {
-        $val = utf8_encode($val);
-    });
     if (version_compare(PHP_VERSION, '5.4', '>=')) {
         return json_encode($data, $options);
     } else {
@@ -1488,7 +1483,12 @@ function host_exists($hostname, $snmphost = '')
         return true;
     } else {
         if ($config['allow_duplicate_sysName'] === false && !empty($snmphost)) {
-            $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
+            if (!empty($config['mydomain'])) {
+                $full_host = rtrim($snmphost, '.') . '.' . $config['mydomain'];
+                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ? or `sysName` = ?", array($snmphost,$full_host));
+            } else {
+                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
+            }
             if ($count > 0) {
                 return true;
             } else {

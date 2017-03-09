@@ -111,7 +111,12 @@ function IssueAlert($alert)
     }
 
     if ($config['alert']['fixed-contacts'] == false) {
-        $alert['details']['contacts'] = GetContacts($alert['details']['rule']);
+        if (empty($alert['query'])) {
+            $alert['query'] = GenSQL($alert['rule']);
+        }
+        $sql = $alert['query'];
+        $qry = dbFetchRows($sql, array($alert['device_id']));
+        $alert['details']['contacts'] = GetContacts($qry);
     }
 
     $obj = DescribeAlert($alert);

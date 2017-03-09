@@ -39,10 +39,13 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
     {
         if (getenv('DBTEST')) {
             global $config;
-
             self::$sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
-            self::$db_created = dbQuery("CREATE DATABASE " . $config['db_name']);
+            dbQuery("SET NAMES 'utf8'");
+            dbQuery("SET CHARACTER SET 'utf8'");
+            dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+            self::$db_created = dbQuery("CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci");
             dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            dbQuery("USE " . $config['db_name']);
             $build_base = $config['install_dir'] . '/build-base.php';
             exec($build_base, $schema);
             self::$schema = $schema;
@@ -69,6 +72,46 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
                     throw new PHPUnitException("Errors loading DB Schema: " . $output);
                 }
             }
+        }
+    }
+
+    public function testCheckDBCollation()
+    {
+        global $config;
+        if (getenv('DBTEST')) {
+            $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
+            if (isset($collation[0])) {
+                $error = implode(' ', $collation[0]);
+            } else {
+                $error = '';
+            }
+            $this->assertEmpty($collation, 'Wrong Database Collation or Character set: ' . $error);
+        }
+    }
+
+    public function testCheckTableCollation()
+    {
+        global $config;
+        if (getenv('DBTEST')) {
+            $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+            $error = '';
+            foreach ($collation as $id => $data) {
+                $error .= implode(' ', $data) . PHP_EOL;
+            }
+            $this->assertEmpty($collation, 'Wrong Table Collation or Character set: ' . $error);
+        }
+    }
+
+    public function testCheckColumnCollation()
+    {
+        global $config;
+        if (getenv('DBTEST')) {
+            $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+            $error = '';
+            foreach ($collation as $id => $data) {
+                $error .= implode(' ', $data) . PHP_EOL;
+            }
+            $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
         }
     }
 }

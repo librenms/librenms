@@ -345,6 +345,8 @@ Enable / disable additional port statistics.
 
 ### External integration
 
+#### Rancid
+
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
 $config['rancid_ignorecomments']        = 0;
