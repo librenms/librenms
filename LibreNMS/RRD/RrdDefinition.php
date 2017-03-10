@@ -55,6 +55,10 @@ class RrdDefinition
     {
         global $config;
 
+        if (empty($name)) {
+            d_echo("DS must be set to a non-empty string.");
+        }
+
         $ds = array();
         $ds[] = $this->escapeName($name);
         $ds[] = $this->checkType($type);

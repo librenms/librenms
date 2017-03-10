@@ -1160,6 +1160,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('netbotz', 'netbotz-2014');
         $this->checkOS('netbotz', 'netbotz-2016');
+        $this->checkOS('netbotz', 'netbotz-2017');
     }
 
     public function testNetgear()
