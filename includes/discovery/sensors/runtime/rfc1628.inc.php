@@ -18,7 +18,7 @@ foreach (explode("\n", $oids) as $data) {
         $type             = 'rfc1628';
         $index            = (500 + $current_id);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'runtime', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     }
 }
 
@@ -38,6 +38,6 @@ foreach (explode("\n", $oids) as $data) {
         $type             = 'rfc1628';
         $index            = (510 + $current_id);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'runtime', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     }
 }
