@@ -522,7 +522,25 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 extend smart /etc/snmp/smart
 ```
 
-4: Edit /etc/snmp/smart and make sure the array @disks contains the disks you want to monitor. This is the name of the disk below /dev/, so /dev/sda would be just sda. Also make sure the path for smartctl is correct as well as the cache file if you are using it.
+4: You will also need to create the config file, which defaults to the same path as the script, but with .config appended. So if the script is located at /etc/snmp/smart, the config file will be /etc/snmp/smart.config. Alternatively you can also specific a config via -c.
+
+Anything starting with a # is comment. The format for variables is $variable=$value. Empty lines are ignored. Spaces and tabes at either the start or end of a line are ignored. Any line with out a = or # are treated as a disk.
+```
+#This is a comment
+cache=/var/cache/smart
+smartctl=/usr/bin/env smartctl
+ada0
+ada1
+```
+
+The variables are as below.
+```
+cache = The path to the cache file to use. Default: /var/cache/smart
+smartctl = The path to use for smartctl. Default: /usr/bin/env smartctl
+```
+
+If you want to guess at the configuration, call it with -g and it will print out what it thinks
+it should be. This will result in a usable config, but may miss some less common disk devices.
 
 5: Restart snmpd on your host
 
