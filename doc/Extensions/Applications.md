@@ -541,8 +541,6 @@ smartctl = The path to use for smartctl. Default: /usr/bin/env smartctl
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
 it should be. This will result in a usable config, but may miss some less common disk devices.
 
-4: Edit /etc/snmp/smart and make sure the array @disks contains the disks you want to monitor. This is the name of the disk below /dev/, so /dev/sda would be just sda. Also make sure the path for smartctl is correct as well as the cache file if you are using it.
-
 5: Restart snmpd on your host
 
 6: On the device page in Librenms, edit your host and check `SMART` under the Applications tab.
