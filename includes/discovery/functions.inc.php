@@ -891,42 +891,50 @@ function avtech_add_sensor($device, $sensor)
     return true;
 }
 
+
 /**
- * @param $device
- * @param $serial
- * @param $sensor
+ * Get the device divisor, account for device specific quirks
+ * The default divisor is 10
+ *
+ * @param array $device device array
+ * @param string $os_version firmware version poweralert quirks
+ * @param string $sensor_type the type of this sensor
+ * @param string $oid the OID of this sensor
  * @return int
  */
-function get_device_divisor($device, $serial, $sensor)
+function get_device_divisor($device, $os_version, $sensor_type, $oid)
 {
     if ($device['os'] == 'poweralert') {
-        if ($sensor == 'current' || $sensor == 'frequencies') {
-            if (version_compare($serial, '12.06.0068', '>=')) {
-                $divisor = 10;
-            } elseif (version_compare($serial, '12.04.0055', '=')) {
-                $divisor = 10;
-            } elseif (version_compare($serial, '12.04.0056', '>=')) {
-                $divisor = 1;
+        if ($sensor_type == 'current' || $sensor_type == 'frequencies') {
+            if (version_compare($os_version, '12.06.0068', '>=')) {
+                return 10;
+            } elseif (version_compare($os_version, '12.04.0055', '=')) {
+                return 10;
+            } elseif (version_compare($os_version, '12.04.0056', '>=')) {
+                return 1;
             }
-        } elseif ($sensor == 'load') {
-            if (version_compare($serial, '12.06.0064', '=')) {
-                $divisor = 10;
+        } elseif ($sensor_type == 'load') {
+            if (version_compare($os_version, '12.06.0064', '=')) {
+                return 10;
             } else {
-                $divisor = 1;
+                return 1;
             }
-        } elseif ($sensor == 'voltages') {
-            $divisor = 1;
+        } elseif ($sensor_type == 'voltages') {
+            return 1;
         }
-    } elseif (($device['os'] == 'huaweiups') && ($sensor == 'frequencies')) {
-        $divisor = 100;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor == 'voltages')) {
-        $divisor = 1;
-    } elseif (($device['os'] == 'generex-ups') && ($sensor == 'load')) {
-        $divisor = 1;
-    } else {
-        $divisor = 10;
+    } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequencies')) {
+        return 100;
+    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltages')) {
+        return 1;
+    } elseif ($device['os'] == 'generex-ups') {
+        if ($sensor_type == 'load') {
+            return 1;
+        } elseif ($sensor_type == 'voltages' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+            return 1;
+        }
     }
-    return $divisor;
+
+    return 10; //default
 }
 
 /**
