@@ -13,7 +13,7 @@ foreach (explode("\n", $oids) as $data) {
         $split_oid        = explode('.', $oid);
         $volt_id          = $split_oid[(count($split_oid) - 1)];
         $volt_oid         = ".1.3.6.1.2.1.33.1.2.5.$volt_id";
-        $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages');
+        $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages', $volt_oid);
 
         $volt  = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
         $descr = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
@@ -36,7 +36,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     }
 
     $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages');
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages', $volt_oid);
 
     $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
     $index   = $i;
@@ -56,10 +56,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
     }
 
     $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages');
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages', $volt_oid);
 
     $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-    $divisor = get_device_divisor($device, $_tmp_serial, 'voltages');
+
     $index   = (100 + $i);
 
     discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
@@ -77,7 +77,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     }
 
     $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages');
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltages', $volt_oid);
 
     $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
     $index   = (200 + $i);

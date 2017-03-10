@@ -1,7 +1,5 @@
 <?php
 
-$divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current');
-
 echo 'RFC1628 ';
 
 $oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.2.6', '-Osqn', 'UPS-MIB');
@@ -15,8 +13,8 @@ foreach (explode("\n", $oids) as $data) {
         $split_oid        = explode('.', $oid);
         $current_id       = $split_oid[(count($split_oid) - 1)];
         $current_oid      = ".1.3.6.1.2.1.33.1.2.6.$current_id";
-        $precision        = 10;
-        $current          = (snmp_get($device, $current_oid, '-O vq') / $precision);
+        $divisor          = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
+        $current          = (snmp_get($device, $current_oid, '-O vq') / $divisor);
         $descr            = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
         $type             = 'rfc1628';
         $index            = (500 + $current_id);
@@ -36,8 +34,8 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $precision = 10;
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $precision);
+    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
+    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
     $type      = 'rfc1628';
     $index     = $i;
 
@@ -55,8 +53,8 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $precision = 10;
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $precision);
+    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
+    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
     $type      = 'rfc1628';
     $index     = (100 + $i);
 
@@ -74,8 +72,8 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $precision = 10;
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $precision);
+    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
+    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
     $type      = 'rfc1628';
     $index     = (200 + $i);
 
