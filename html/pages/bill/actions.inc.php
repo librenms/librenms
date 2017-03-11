@@ -1,11 +1,6 @@
 <?php
 
 if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
-    foreach (dbFetchRows('SELECT * FROM `bill_ports` WHERE `bill_id` = ?', array($bill_id)) as $port_data) {
-        dbDelete('port_in_measurements', '`port_id` = ?', array($port_data['bill_id']));
-        dbDelete('port_out_measurements', '`port_id` = ?', array($port_data['bill_id']));
-    }
-
     dbDelete('bill_hist', '`bill_id` = ?', array($bill_id));
     dbDelete('bill_ports', '`bill_id` = ?', array($bill_id));
     dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
@@ -19,11 +14,6 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
 
 if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
     if ($_POST['confirm'] == 'mysql') {
-        foreach (dbFetchRows('SELECT * FROM `bill_ports` WHERE `bill_id` = ?', array($bill_id)) as $port_data) {
-            dbDelete('port_in_measurements', '`port_id` = ?', array($port_data['bill_id']));
-            dbDelete('port_out_measurements', '`port_id` = ?', array($port_data['bill_id']));
-        }
-
         dbDelete('bill_hist', '`bill_id` = ?', array($bill_id));
         dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
     }
@@ -32,7 +22,7 @@ if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['c
         // Stil todo
     }
 
-    echo '<div class=infobox>Bill Reseting. Redirecting to Bills list.</div>';
+    echo '<div class=infobox>Bill Resetting. Redirecting to Bills list.</div>';
 
     echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
 }
