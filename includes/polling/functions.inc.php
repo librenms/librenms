@@ -386,19 +386,14 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     echo "This is poll_mib_def Processing\n";
     $mib = null;
 
+    list($mib, $file) = explode(':', $mib_name_table, 2);
+
     if (is_null($rrd_name)) {
-        if (stristr($mib_name_table, 'UBNT')) {
-            list($mib,) = explode(':', $mib_name_table, 2);
-            $measurement_name = strtolower($mib);
+        if (str_contains($mib_name_table, 'UBNT', true)) {
+            $rrd_name = strtolower($mib);
         } else {
-            list($mib,$file) = explode(':', $mib_name_table, 2);
-            $measurement_name = strtolower($file);
+            $rrd_name = strtolower($file);
         }
-    } else {
-        $measurement_name = strtolower($rrd_name);
-    }
-    if (is_null($rrd_name)) {
-        $rrd_name = $measurement_name;
     }
 
     $rrd_def = new RrdDefinition();
