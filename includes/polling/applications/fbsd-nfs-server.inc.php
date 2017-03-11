@@ -8,6 +8,7 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutLine.13.102.98.115.100.110.102.115.115.101.114.118.101.114';
 $nfsserver = snmp_walk($device, $oid, $options, $mib);
+update_application($app, $nfsserver);
 
 list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink,
     $mkdir, $rmdir, $readdir, $rdirplus, $access, $mknod, $fsstat, $fsinfo, $pathconf, $commit, $retfailed,

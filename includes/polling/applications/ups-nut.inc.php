@@ -30,6 +30,7 @@ $name = 'ups-nut';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.117.112.115.45.110.117.116';
 $ups_nut = snmp_get($device, $oid, '-Oqv');
+update_application($app, $ups_nut);
 
 // If "extend" (used above) fails, try "exec" support.
 // Note, exec always splits outputs on newline, so need to use snmp_walk (not a single SNMP entry!)

@@ -8,6 +8,7 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options, $mib);
+update_application($app, $postgres);
 
 list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
     $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del) = explode("\n", $postgres);

@@ -53,6 +53,7 @@ if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($age
 }
 
 if ($proxmox) {
+    update_application($app, $proxmox);
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(

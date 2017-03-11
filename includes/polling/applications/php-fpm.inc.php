@@ -9,6 +9,7 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.112.104.112.102.112.109.115.112';
 $phpfpm = snmp_walk($device, $oid, $options, $mib);
+update_application($app, $phpfpm);
 
 list($pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_queue,$listen_queue_len,$idle_processes,
      $active_processes,$total_processes,$max_active_processes,$max_children_reached,$slow_requests) = explode("\n", $phpfpm);
