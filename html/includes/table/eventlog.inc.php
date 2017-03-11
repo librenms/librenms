@@ -60,12 +60,16 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         $type = $eventlog['type'];
     }
     $severity_colour = $eventlog['severity'];
+    if ($eventlog['username'] == 0) {
+        $eventlog['username'] = '';
+    }
     $response[] = array(
         'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
-        'datetime' => $eventlog['humandate'],
-        'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
-        'type'     => $type,
-        'message'  => htmlspecialchars($eventlog['message']),
+        'datetime'  => $eventlog['humandate'],
+        'hostname'  => generate_device_link($dev, shorthost($dev['hostname'])),
+        'type'      => $type,
+        'message'   => htmlspecialchars($eventlog['message']),
+        'username'   => $eventlog['username'],
     );
 }
 
