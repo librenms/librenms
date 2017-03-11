@@ -693,7 +693,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testExtremeware()
     {
-        $this->checkOS('extremeware');
     }
 
     public function testF5()
