@@ -107,7 +107,7 @@ if ($_SESSION['userlevel'] < '5') {
     echo ' | Prefixes: Unicast (';
     if ($vars['graph'] == 'prefixes_ipv4unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
     }
 
     echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast'));
@@ -119,7 +119,7 @@ if ($_SESSION['userlevel'] < '5') {
 
     if ($vars['graph'] == 'prefixes_ipv6unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
     }
 
     echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast'));
