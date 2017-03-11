@@ -26,6 +26,10 @@ if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/temperatures/dell.inc.php';
 }
 
+if (strstr($device['hardware'], 'ProLiant')) {
+    include 'includes/discovery/sensors/states/hp.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',

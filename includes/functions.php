@@ -844,7 +844,9 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'type' => ($type ?: "NULL"),
         'datetime' => array("NOW()"),
         'severity' => $severity,
-        'message' => $text);
+        'message' => $text,
+        'username'  => $username,
+     );
 
     dbInsert($insert, 'eventlog');
 }

@@ -564,3 +564,37 @@ function get_device_oid_limit($device)
         return 10;
     }
 }
+
+/**
+ * Update the application status and output in the database.
+ *
+ * @param array $app app from the db, including app_id
+ * @param string $response This should be the full output
+ */
+function update_application($app, $response)
+{
+    if (!is_numeric($app['app_id'])) {
+        d_echo('$app does not contain app_id, could not update');
+        return;
+    }
+
+    $data = array(
+        'app_state' => 'UNKNOWN',
+        'timestamp' => array('NOW()'),
+    );
+
+    if ($response != '' && $response !== false) {
+        if (str_contains($response, array(
+            'Traceback (most recent call last):',
+        ))) {
+            $data['app_state'] = 'ERROR';
+        } else {
+            $data['app_state'] = 'OK';
+        }
+    }
+
+    if ($data['app_state'] != $app['app_state']) {
+        $data['app_state_prev'] = $app['app_state'];
+    }
+    dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
+}
