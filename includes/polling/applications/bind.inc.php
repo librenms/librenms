@@ -33,6 +33,7 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     $bind         = $agent_data['app'][$name];
     $bind_parsed  = array();
     $prefix       = '';
+    update_application($app, $bind);
     foreach (explode("\n", $bind) as $line) {
         $pattern = '/^\+\+ ([^+]+) \+\+$/';
         preg_match($pattern, $line, $matches);

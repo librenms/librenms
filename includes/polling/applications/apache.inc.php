@@ -11,6 +11,7 @@ if (!empty($agent_data['app'][$name])) {
     $options = '-O qv';
     $oid     = 'nsExtendOutputFull.6.97.112.97.99.104.101';
     $apache  = snmp_get($device, $oid, $options);
+    update_application($app, $apache);
 }
 
 echo ' apache';

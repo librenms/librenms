@@ -50,6 +50,7 @@ if ($agent_data['app'][$name]) {
 }
 
 if (!empty($data)) {
+    update_application($app, $data);
     $ds_list = array(
         'all-outqueries' => 'DERIVE',
         'answers-slow' => 'DERIVE',
