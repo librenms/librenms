@@ -1001,7 +1001,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
  */
 function toggle_poller_module($device, $module, $state)
 {
-    if (is_bool()) {
+    if (is_bool($state)) {
         if ($state === false) {
             $state = 0 ;
         }
