@@ -1757,6 +1757,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('xos');
     }
 
+    public function testZebra()
+    {
+        $this->checkOS('zebra');
+        $this->checkOS('zebra', 'zebra1');
+    }
+
     public function testZxr10()
     {
         $this->checkOS('zxr10');
