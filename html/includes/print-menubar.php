@@ -511,6 +511,12 @@ if ($bgp_alerts) {
             <li><a href="routing/protocol=bgp/adminstatus=start/state=down/"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> Alerted BGP (' . $bgp_alerts . ')</a></li>');
 }
 
+if (is_admin() === true && $routing_count['bgp']) {
+    echo '
+            <li role="presentation" class="divider"></li>
+            <li><a href="peering/"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>';
+}
+
     echo('          </ul>');
 ?>
 
