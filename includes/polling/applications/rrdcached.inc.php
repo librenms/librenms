@@ -70,7 +70,7 @@ if ($agent_data['app'][$name]) {
     }
 }
 
-update_applications($device, $app, $data);
+update_application($app, $data);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()

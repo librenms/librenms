@@ -47,7 +47,7 @@ $oids=array(
 );
 $returnedoids=snmp_get_multi_oid($device, $oids);
 if (is_array($returnedoids)) {
-    update_applications($device, $app, 'Data ok');
+    update_application($app, 'Data ok');
 }
 
 $memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];

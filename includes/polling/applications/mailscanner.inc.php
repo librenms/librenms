@@ -8,7 +8,7 @@ $options      = '-O qv';
 $oid          = 'nsExtendOutputFull.11.109.97.105.108.115.99.97.110.110.101.114';
 
 $mailscanner = snmp_get($device, $oid, $options);
-update_applications($device, $app, $mailscanner);
+update_application($app, $mailscanner);
 
 echo ' mailscanner';
 

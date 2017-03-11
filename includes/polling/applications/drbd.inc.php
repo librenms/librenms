@@ -11,7 +11,7 @@ foreach (explode('|', $agent_data['app'][$name][$app_instance]) as $part) {
         $drbd[$stat] = $val;
     }
 }
-update_applications($device, $app, $agent_data['app'][$name][$app_instance]);
+update_application($app, $agent_data['app'][$name][$app_instance]);
 
 $rrd_name = array('app', $name, $app_instance);
 $rrd_def = RrdDefinition::make()

@@ -29,7 +29,7 @@ $stats = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
-update_applications($device, $app, $stats);
+update_application($app, $stats);
 
 list ($frozen, $queue) = explode("\n", $stats);
 

@@ -568,13 +568,13 @@ function get_device_oid_limit($device)
 /**
  * Update the application status and output in the database.
  *
- * @param array $device
- * @param array $app
- * @param string $response
+ * @param array $app app from the db, including app_id
+ * @param string $response This should be the full output
  */
-function update_applications($device, $app, $response)
+function update_application($app, $response)
 {
-    if (!is_numeric($device['device_id']) || !is_numeric($app['app_id'])) {
+    if (!is_numeric($app['app_id'])) {
+        d_echo('$app does not contain app_id, could not update');
         return;
     }
 
@@ -596,5 +596,5 @@ function update_applications($device, $app, $response)
     if ($data['app_state'] != $app['app_state']) {
         $data['app_state_prev'] = $app['app_state'];
     }
-    dbUpdate($data, 'applications', '`app_id` = ? AND `device_id` = ?', array($app['app_id'], $device['device_id']));
+    dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
 }
