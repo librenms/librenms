@@ -1001,13 +1001,14 @@ function sensors($types, $device, $valid, $pre_cache = array())
  */
 function toggle_poller_module($device, $module, $state)
 {
-    if ($state === true || $state === false) {
+    if (is_bool()) {
         if ($state === false) {
             $state = 0 ;
         }
         $updated = set_dev_attrib($device, 'poll_'.$module, $state);
         if ($updated > 0) {
-            log_event("Poller module $module state changed to $state", $device);
+            $msg = "Poller module $module " . ($state ? 'enabled' : 'disabled');
+            log_event($msg, $device);
         }
     }
 }
