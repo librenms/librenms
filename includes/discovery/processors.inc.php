@@ -27,6 +27,12 @@ foreach (dbFetchRows($sql) as $test_processor) {
     unset($processor_type);
 }
 
+if (count($valid) > 0) {
+    $module_state = true;
+} else {
+    $module_state = false;
+}
+
 echo "\n";
 
 unset(

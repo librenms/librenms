@@ -35,5 +35,11 @@ foreach (dbFetchRows($sql) as $test) {
     }
 }
 
+if (count($valid_diskio) > 0) {
+    $module_state = true;
+} else {
+    $module_state = false;
+}
+
 unset($valid_diskio);
 echo "\n";

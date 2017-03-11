@@ -23,5 +23,11 @@ foreach (dbFetchRows($sql) as $test_storage) {
     unset($storage_mib);
 }
 
+if (count($valid_storage) > 0) {
+    $module_state = true;
+} else {
+    $module_state = false;
+}
+
 unset($valid_storage);
 echo "\n";

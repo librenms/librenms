@@ -79,5 +79,11 @@ foreach ($toners as $test_toner) {
     }
 }
 
+if (count($valid_toner) > 0) {
+    $module_state = true;
+} else {
+    $module_state = false;
+}
+
 unset($valid_toner);
 echo PHP_EOL;

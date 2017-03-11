@@ -41,6 +41,12 @@ if ($device['os'] == 'junose' && $config['enable_ports_junoseatmvp']) {
         unset($vp_id);
     }
 
+    if (count($valid_vp) > 0) {
+        $module_state = true;
+    } else {
+        $module_state = false;
+    }
+
     unset($valid_vp);
     echo "\n";
 }//end if

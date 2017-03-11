@@ -10,6 +10,7 @@ if ($config['enable_bgp']) {
 
     $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB'));
 
+    $found_data = 0;
     foreach ($vrfs_lite_cisco as $vrf) {
             $device['context_name'] = $vrf['context_name'];
         if (is_numeric($bgpLocalAs)) {
@@ -119,10 +120,11 @@ if ($config['enable_bgp']) {
                         $name             = gethostbyaddr($peer['ip']);
                         $remote_device_id = discover_new_device($name, $device, 'BGP');
                     }
-
+                    $found_data++;
                     echo '+';
                 } else {
                     $update = dbUpdate(array('bgpPeerRemoteAs' => $peer['as'], 'astext' => mres($astext)), 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', array($device['device_id'], $peer['ip']));
+                    $found_data++;
                     echo '.';
                 }
 
@@ -280,7 +282,15 @@ if ($config['enable_bgp']) {
             echo "\n";
            unset($device['context_name']);
     }
-    unset($device['context_name']);
-    unset($vrfs_c);
+    if ($found_data > 0) {
+        $module_state = true;
+    } else {
+        $module_state = false;
+    }
+    unset(
+        $device['context_name'],
+        $vrfs_c,
+        $found_data
+    );
 }
 echo "FIN BGP \n\n\n";

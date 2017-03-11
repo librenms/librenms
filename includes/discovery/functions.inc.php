@@ -154,6 +154,8 @@ function discover_device($device, $options = null)
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
+            toggle_poller_module($device, $module, $module_state);
+            unset($module_state);
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
@@ -1008,5 +1010,29 @@ function sensors($types, $device, $valid, $pre_cache = array())
         d_echo($valid['sensor'][$sensor_type]);
         check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
+    }
+    if (count($valid['sensor']) > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @param $device
+ * @param $module
+ * @param $state
+ */
+function toggle_poller_module($device, $module, $state)
+{
+    if (is_bool($state)) {
+        if ($state === false) {
+            $state = 0 ;
+        }
+        $updated = set_dev_attrib($device, 'poll_'.$module, $state);
+        if ($updated > 0) {
+            $msg = "Poller module $module " . ($state ? 'enabled' : 'disabled');
+            log_event($msg, $device);
+        }
     }
 }
