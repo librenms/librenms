@@ -9,6 +9,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.110.102.115.115.116.97.116';
 echo ' ' . $name;
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
+update_application($app, $nfsstats);
 
 $rrd_name = array('app', 'nfs-stats', $app_id);
 $rrd_def = RrdDefinition::make()

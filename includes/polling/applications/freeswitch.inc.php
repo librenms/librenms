@@ -6,6 +6,7 @@ $name = 'freeswitch';
 $app_id = $app['app_id'];
 if (!empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
+    update_application($app, $rawdata);
 } else {
     echo "Freeswitch Missing";
     return;
