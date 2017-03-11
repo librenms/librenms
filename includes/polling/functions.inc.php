@@ -583,7 +583,7 @@ function update_application($app, $response)
         'timestamp' => array('NOW()'),
     );
 
-    if (!empty($response) && $response !== false) {
+    if ($response != '' && $response !== false) {
         if (str_contains($response, array(
             'Traceback (most recent call last):',
         ))) {
