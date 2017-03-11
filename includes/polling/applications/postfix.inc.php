@@ -16,7 +16,7 @@ list($incomingq, $activeq, $deferredq, $holdq) = explode("\n", $mailq);
 
 list($received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
      $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
-     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr) = explode("\n", $detail);
+     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $msefl, $sce, $scp, $urr) = explode("\n", $detail);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -52,6 +52,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rardnf', 'GAUGE', 0)
     ->addDataset('rarnfqa', 'GAUGE', 0)
     ->addDataset('iuscp', 'GAUGE', 0)
+    ->addDataset('msefl', 'GAUGE', 0)
     ->addDataset('sce', 'GAUGE', 0)
     ->addDataset('scp', 'GAUGE', 0)
     ->addDataset('urr', 'GAUGE', 0);
@@ -89,6 +90,7 @@ $fields = array(
     'rardnf' => $rardnf,
     'rarnfqa' => $rarnfqa,
     'iuscp' => $iuscp,
+    'msefl' => $msefl,
     'sce' => $sce,
     'scp' => $scp,
     'urr' => $urr
