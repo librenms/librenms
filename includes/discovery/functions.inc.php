@@ -187,7 +187,7 @@ function discover_device($device, $options = null)
 // Discover sensors
 
 
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
 {
 
     $low_limit      = set_null($low_limit);
@@ -199,27 +199,27 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         $divisor  = 1;
     }
 
-    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n");
+    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
 
     if (is_null($low_warn_limit) && !is_null($warn_limit)) {
         // Warn limits only make sense when we have both a high and a low limit
         $low_warn_limit = null;
         $warn_limit = null;
-    } elseif ($low_warn_limit > $warn_limit) {
+    } elseif (!is_null($warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
         list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
     }
 
     if (dbFetchCell('SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?', array($poller_type, $class, $device['device_id'], $type, $index)) == '0') {
-        if (!$high_limit) {
+        if (is_null($high_limit)) {
             $high_limit = sensor_limit($class, $current);
         }
 
-        if (!$low_limit) {
+        if (is_null($low_limit)) {
             $low_limit = sensor_low_limit($class, $current);
         }
 
-        if ($low_limit > $high_limit) {
+        if (!is_null($high_limit) && $low_limit > $high_limit) {
             // Fix high/low thresholds (i.e. on negative numbers)
             list($high_limit, $low_limit) = array($low_limit, $high_limit);
         }
