@@ -14,11 +14,26 @@ foreach (explode("\n", $oids) as $data) {
         $current_id       = $split_oid[(count($split_oid) - 1)];
         $current_oid      = ".1.3.6.1.2.1.33.1.2.2.$current_id";
         $current          = snmp_get($device, $current_oid, '-O vq');
-        $descr            = 'Seconds on Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
+        $descr            = 'Time on battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
         $type             = 'rfc1628';
         $index            = (500 + $current_id);
 
-        discover_sensor($valid['sensor'], 'runtime', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(
+            $valid['sensor'],
+            'runtime',
+            $device,
+            $current_oid,
+            $index,
+            $type,
+            $descr,
+            60,
+            1,
+            0,
+            0,
+            100,
+            120,
+            $current
+        );
     }
 }
 
@@ -34,10 +49,25 @@ foreach (explode("\n", $oids) as $data) {
         $current_id       = $split_oid[(count($split_oid) - 1)];
         $current_oid      = ".1.3.6.1.2.1.33.1.2.3.$current_id";
         $current          = snmp_get($device, $current_oid, '-O vq');
-        $descr            = 'Battery: Estimated minutes remaining'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
+        $descr            = 'Estimated battery time remaining'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
         $type             = 'rfc1628';
         $index            = (510 + $current_id);
 
-        discover_sensor($valid['sensor'], 'runtime', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(
+            $valid['sensor'],
+            'runtime',
+            $device,
+            $current_oid,
+            $index,
+            $type,
+            $descr,
+            1,
+            1,
+            5,
+            10,
+            null,
+            10000,
+            $current
+        );
     }
 }
