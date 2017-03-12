@@ -823,23 +823,30 @@ function get_astext($asn)
     }
 }
 
-# Use this function to write to the eventlog table
+/**
+ * Log events to the event table
+ *
+ * @param string $text message describing the event
+ * @param array|int $device device array or device_id
+ * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+ * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+ * @param int $reference the id of the referenced entity.  Supported types: interface
+ */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
 
-    $username = $_SESSION['username'] ?: '';
-
-    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
-        'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
-        'reference' => ($reference ? $reference : "NULL"),
-        'type'      => ($type ? $type : "NULL"),
-        'datetime'  => array("NOW()"),
-        'severity'  => $severity,
-        'message'   => $text,
-        'username'  => $username);
+    $insert = array('host' => ($device['device_id'] ?: 0),
+        'device_id' => ($device['device_id'] ?: 0),
+        'reference' => ($reference ?: "NULL"),
+        'type' => ($type ?: "NULL"),
+        'datetime' => array("NOW()"),
+        'severity' => $severity,
+        'message' => $text,
+        'username'  => $_SESSION['username'] ?: '',
+     );
 
     dbInsert($insert, 'eventlog');
 }
