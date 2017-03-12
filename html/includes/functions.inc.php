@@ -1408,30 +1408,24 @@ function array_to_htmljson($data)
 }
 
 /**
- * @param $eventlog_severity
- * @return $eventlog_severity_icon
+ * @param int $eventlog_severity
+ * @return string $eventlog_severity_icon
  */
 function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
             return "severity-ok"; //OK
-            break;
         case 2:
             return "severity-info"; //Informational
-            break;
         case 3:
             return "severity-notice"; //Notice
-            break;
         case 4:
             return "severity-warning"; //Warning
-            break;
         case 5:
             return "severity-critical"; //Critical
-            break;
         default:
             return "severity-unknown"; //Unknown
-            break;
     }
 } // end eventlog_severity
 

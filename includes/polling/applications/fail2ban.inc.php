@@ -10,6 +10,7 @@ $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.102.97.105.108.50.98.97.110';
 $f2b = snmp_walk($device, $oid, $options, $mib);
 
+update_application($app, $f2b);
 $bannedStuff = explode("\n", $f2b);
 
 $banned=$bannedStuff[0];

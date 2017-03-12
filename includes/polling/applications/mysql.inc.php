@@ -14,6 +14,7 @@ if (!empty($agent_data['app'][$name])) {
     $mysql      = shell_exec($mysql_cmd);
 }
 
+update_application($app, $mysql);
 echo ' mysql';
 
 // General Stats

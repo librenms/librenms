@@ -11,7 +11,6 @@ if (count($app_rows) > 0) {
             echo $app['app_type'].' include missing! ';
         }
     }
-
     echo "\n";
 }
 
