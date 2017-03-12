@@ -17,4 +17,3 @@ switch ($vars['section']) {
     default:
         require_once 'pages/peering/as-selection.inc.php';
 }
-

@@ -11,6 +11,7 @@ $asn = $vars['asn'];
                      <tr>
                          <th data-column-id="exchange" data-sortable="false">Exchange</th>
                          <th data-column-id="action" data-sortable="false"></th>
+                         <th data-column-id="links" data-sortable="false"></th>
                      </tr>
                  </thead>
              </table>

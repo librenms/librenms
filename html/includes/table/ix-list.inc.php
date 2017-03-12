@@ -2,36 +2,46 @@
 
 $asn = clean($_POST['asn']);
 
-$file_cache = false;
-$json_file = $config['install_dir'] . '/cache/ix-list-' . $asn . '.json';
-if (is_file($json_file)) {
-    $file_time = filemtime($json_file);
-    if (time() - $file_time > 86400) {
-        unlink($json_file);
-    } else {
-        $json_data = file_get_contents($json_file);
-        $file_cache = true;
-    }
+$sql    = " FROM `pdb_ix` WHERE `asn` = ?";
+$params = array($asn);
+
+
+if (isset($searchPhrase) && !empty($searchPhrase)) {
+    $sql .= " AND (`name` LIKE '%$searchPhrase%')";
 }
 
-if ($file_cache === false) {
-    $get = Requests::get('https://peeringdb.com/api/net?depth=2&asn=' . $asn);
-    $json_data = $get->body;
-    file_put_contents($json_file, $get->body);
+$count_sql = "SELECT COUNT(*) $sql";
+
+$total     = dbFetchCell($count_sql, $params);
+if (empty($total)) {
+    $total = 0;
 }
 
-$data = json_decode($json_data);
-$ixs = $data->{'data'}{0}->{'netixlan_set'};
+if (!isset($sort) || empty($sort)) {
+    $sort = 'name ASC';
+}
 
-$total = count($ixs);
-foreach ($ixs as $ix) {
+$sql .= " ORDER BY $sort";
+
+if (isset($current)) {
+    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_high = $rowCount;
+}
+
+if ($rowCount != -1) {
+    $sql .= " LIMIT $limit_low,$limit_high";
+}
+
+$sql = "SELECT * $sql";
+
+foreach (dbFetchRows($sql, $params) as $ix) {
+    $ix_id = $ix['ix_id'];
     $response[] = array(
-        'exchange' => $ix->{'name'},
-        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn['bgpLocalAs'], 'ixid' => $ix->{'ix_id'})) . "' role='button'>Show Peers</a>"
+        'exchange' => $ix['name'],
+        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn, 'ixid' => $ix['pdb_ix_id'])) . "' role='button'>Show Peers</a>",
+        'links'    => "<a href='https://peeringdb.com/ix/$ix_id'><i class='fa fa-database'></i></a>",
     );
 }
-
-
 
 $output = array(
     'current'  => $current,

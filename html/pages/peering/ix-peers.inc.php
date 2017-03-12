@@ -7,11 +7,12 @@ $ixid = $vars['ixid'];
 <div class="row">
     <div class="col-sm-6">
         <div class="table-responsive">
-            <table id="peerlist" class="table table-bordered table-striped">
+            <table id="ixpeers" class="table table-bordered table-striped">
                 <thead>
                 <tr>
                     <th data-column-id="peer" data-sortable="false">Peer</th>
                     <th data-column-id="connected" data-sortable="false">Connected</th>
+                    <th data-column-id="links" data-sortable="false"></th>
                 </tr>
                 </thead>
             </table>
@@ -20,13 +21,13 @@ $ixid = $vars['ixid'];
 </div>
 
 <script>
-    var grid = $("#peerlist").bootgrid({
+    var grid = $("#ixpeers").bootgrid({
         ajax: true,
         rowCount: [25,50,100,250,-1],
         post: function ()
         {
             return {
-                id:          'peer-list',
+                id:          'ixpeers',
                 asn:         '<?php echo $asn; ?>',
                 ixid:        '<?php echo $ixid; ?>',
             };
