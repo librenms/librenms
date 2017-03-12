@@ -19,15 +19,15 @@ if ($device['os'] == 'openbsd') {
 }
 
 if (strstr($device['hardware'], 'Dell')) {
-    include 'includes/discovery/sensors/fanspeeds/dell.inc.php';
+    include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
-    include 'includes/discovery/sensors/voltages/dell.inc.php';
-    include 'includes/discovery/sensors/states/dell.inc.php';
-    include 'includes/discovery/sensors/temperatures/dell.inc.php';
+    include 'includes/discovery/sensors/voltage/dell.inc.php';
+    include 'includes/discovery/sensors/state/dell.inc.php';
+    include 'includes/discovery/sensors/temperature/dell.inc.php';
 }
 
 if (strstr($device['hardware'], 'ProLiant')) {
-    include 'includes/discovery/sensors/states/hp.inc.php';
+    include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
 $run_sensors = array(
@@ -35,16 +35,16 @@ $run_sensors = array(
     'current',
     'charge',
     'dbm',
-    'fanspeeds',
-    'frequencies',
+    'fanspeed',
+    'frequency',
     'humidity',
     'load',
     'power',
     'runtime',
     'signal',
-    'states',
-    'temperatures',
-    'voltages',
+    'state',
+    'temperature',
+    'voltage',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(
