@@ -845,7 +845,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => $username,
+        'username'  => $_SESSION['username'] ?: '',
      );
 
     dbInsert($insert, 'eventlog');
