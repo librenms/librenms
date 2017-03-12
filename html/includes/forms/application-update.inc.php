@@ -23,32 +23,33 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-header('Content-type: text/plain');
-
 if (is_admin() === false) {
-    die('ERROR: You need to be admin');
-}
-
-$device_id = $_POST['device_id'];
-$app = $_POST['application'];
-
-if (!isset($app) && validate_device_id($device_id) === false) {
-    echo 'error with data';
-    exit;
+    $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
-    if ($_POST['state'] == 'true') {
-        $update = array(
-            'device_id' => $device_id,
-            'app_type' => $app,
-            'app_status' => '',
-            'app_instance' => ''
-        );
-        if (dbInsert($update, 'applications')) {
-            log_event("Application enabled by user: $app", $device_id, 'application', 1);
-        }
+    $device_id = $_POST['device_id'];
+    $app = $_POST['application'];
+
+    if (!isset($app) && validate_device_id($device_id) === false) {
+        $status = array('status' => 1, 'message' => 'Error with data');
     } else {
-        if (dbDelete('applications', '`device_id`=? AND `app_type`=?', array($device_id, $app))) {
-            log_event("Application disabled by user: $app", $device_id, 'application', 3);
+        if ($_POST['state'] == 'true') {
+            $update = array(
+                'device_id' => $device_id,
+                'app_type' => $app,
+                'app_status' => '',
+                'app_instance' => ''
+            );
+            if (dbInsert($update, 'applications')) {
+                log_event("Application enabled by user: $app", $device_id, 'application', 1);
+                $status = array('status' => 0, 'message' => 'Application enabled');
+            }
+        } else {
+            if (dbDelete('applications', '`device_id`=? AND `app_type`=?', array($device_id, $app))) {
+                log_event("Application disabled by user: $app", $device_id, 'application', 3);
+                $status = array('status' => 0, 'message' => 'Application disabled');
+            }
         }
     }
 }
+header('Content-Type: application/json');
+echo _json_encode($status);

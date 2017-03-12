@@ -19,7 +19,6 @@ $enabled_apps = array_reduce(dbFetchRows(
 
 
 echo '<ul class="list-group row">';
-
 foreach ($applications as $app) {
     $modifiers = '';
     $app_text = nicecase($app);
@@ -33,7 +32,7 @@ foreach ($applications as $app) {
     }
 
     echo '<li class="list-group-item col-xs-12 col-md-6 col-lg-4">';
-    echo "<input style='visibility:hidden;width:100px;' type='checkbox' name='application'";
+    echo "<input style='visibility:hidden;width:100px;' type='checkbox' name='application' data-size='small'";
     echo " data-application='$app' data-device_id='{$device['device_id']}'$modifiers>";
     echo '<span style="font-size:medium;padding-left:5px;"> ' . $app_text . '</span>';
     echo '</li>';
@@ -53,12 +52,15 @@ echo '</ul>';
             type: 'POST',
             url: 'ajax_form.php',
             data: {type: "application-update", application: application, device_id: device_id, state: state},
-            dataType: "html",
-            success: function () {
-                //alert('good');
+            success: function(result){
+                if (result.status == 0) {
+                    toastr.success(result.message);
+                } else {
+                    toastr.error(result.message);
+                }
             },
             error: function () {
-                //alert('bad');
+                toastr.error('Problem with backend');
             }
         });
     });
