@@ -1272,22 +1272,32 @@ function set_curl_proxy($curl)
 {
     global $config;
 
-    $proxy = '';
-    if (getenv('http_proxy')) {
-        $proxy = getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        $proxy = getenv('https_proxy');
-    } elseif (isset($config['callback_proxy'])) {
-        $proxy = $config['callback_proxy'];
-    } elseif (isset($config['http_proxy'])) {
-        $proxy = $config['http_proxy'];
-    }
+    $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
     $proxy = str_replace(array("http://", "https://"), "", $tmp);
     if (!empty($proxy)) {
         curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
+}
+
+/**
+ * Return the proxy url
+ *
+ * @return array|bool|false|string
+ */
+function get_proxy()
+{
+    if (getenv('http_proxy')) {
+        return getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        return getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        return $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        return $config['http_proxy'];
+    }
+    return false;
 }
 
 function target_to_id($target)
@@ -2098,7 +2108,7 @@ function cache_peeringdb()
             sleep($rand);
             foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
                 $json_data = $get->body;
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}{0}->{'netixlan_set'};
@@ -2119,7 +2129,7 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $keep = $pdb_ix_id;
-                    $get_ix = Requests::get("$peeringdb_url/ixlan/$ixid?depth=2");
+                    $get_ix = Requests::get("$peeringdb_url/ixlan/$ixid?depth=2", array(), array('proxy' => get_proxy()));
                     $ix_json = $get_ix->body;
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'}{0}->{'net_set'};
