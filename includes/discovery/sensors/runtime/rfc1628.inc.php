@@ -30,8 +30,8 @@ foreach (explode("\n", $oids) as $data) {
             1,
             0,
             0,
-            100,
-            120,
+            1,
+            2,
             $current
         );
     }
