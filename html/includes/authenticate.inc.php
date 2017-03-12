@@ -46,6 +46,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $_SESSION['password'] = $_GET['password'];
 } elseif (isset($_SERVER['REMOTE_USER'])) {
     $_SESSION['username'] = $_SERVER['REMOTE_USER'];
+} elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+    $_SESSION['username'] = $_SERVER['PHP_AUTH_USER'];
 }
 
 if (!isset($config['auth_mechanism'])) {
