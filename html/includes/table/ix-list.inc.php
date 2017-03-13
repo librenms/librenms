@@ -38,7 +38,7 @@ foreach (dbFetchRows($sql, $params) as $ix) {
     $ix_id = $ix['ix_id'];
     $response[] = array(
         'exchange' => $ix['name'],
-        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn, 'ixid' => $ix['pdb_ix_id'])) . "' role='button'>Show Peers</a>",
+        'action'   => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-peers', 'asn' => $asn, 'ixid' => $ix['ix_id'])) . "' role='button'>Show Peers</a>",
         'links'    => "<a href='https://peeringdb.com/ix/$ix_id'><i class='fa fa-database'></i></a>",
     );
 }

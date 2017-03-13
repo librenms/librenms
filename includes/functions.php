@@ -2144,7 +2144,7 @@ function cache_peeringdb()
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'}{0}->{'net_set'};
                     foreach ($peers as $peer) {
-                        $tmp_peer = dbFetchRow("SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ?", array($peer->{'id'}));
+                        $tmp_peer = dbFetchRow("SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?", array($peer->{'id'}, $ixid));
                         if ($tmp_peer) {
                             $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
                             $update = array(
@@ -2154,7 +2154,7 @@ function cache_peeringdb()
                             dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', array($tmp_peer['pdb_ix_peers_id']));
                         } else {
                             $peer_insert = array(
-                                'pdb_ix_id' => $pdb_ix_id,
+                                'ix_id' => $ixid,
                                 'peer_id' => $peer->{'id'},
                                 'remote_asn' => $peer->{'asn'},
                                 'name' => $peer->{'name'},

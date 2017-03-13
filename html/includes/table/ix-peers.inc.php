@@ -1,10 +1,19 @@
 <?php
 
-$asn  = clean($_POST['asn']);
-$ixid = clean($_POST['ixid']);
+$asn    = clean($_POST['asn']);
+$ixid   = clean($_POST['ixid']);
+$status = clean($_POST['status']);
 
-$sql    = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`pdb_ix_id` = `pdb_ix`.`pdb_ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_asn` = `bgpPeers`.`bgpPeerRemoteAs` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `P`.`pdb_ix_id` = ?";
+$sql    = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_asn` = `bgpPeers`.`bgpPeerRemoteAs` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `P`.`ix_id` = ?";
 $params = array($ixid);
+
+if ($status === 'connected') {
+    $sql .= " AND `remote_asn` = `bgpPeerRemoteAs` ";
+}
+
+if ($status === 'unconnected') {
+    $sql .= " AND `bgpPeerRemoteAs` IS NULL ";
+}
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`remote_asn` LIKE '%$searchPhrase%' OR `P`.`name` LIKE '%$searchPhrase%')";
