@@ -41,6 +41,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     );
 }
 
-
-
 require 'includes/graphs/generic_multi_line_exact_numbers.inc.php';
