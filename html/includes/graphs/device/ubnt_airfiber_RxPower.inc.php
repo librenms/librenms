@@ -6,7 +6,7 @@ $rrd_options .= ' -l 0 -E ';
 
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfibre-mib-rx');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dbm                        Now    Min     Max\\n'";
     $rrd_options .= ' DEF:rxPower0='.$rrdfilename.':rxPower0:AVERAGE ';
     $rrd_options .= ' DEF:rxPower1='.$rrdfilename.':rxPower1:AVERAGE ';
