@@ -16,7 +16,6 @@
 /composer.lock
 Thumbs.db
 config.php
-cache/*
 html/css/custom/*
 html/images/custom/*
 html/plugins/*
