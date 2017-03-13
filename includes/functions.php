@@ -877,7 +877,7 @@ function send_mail($emails, $subject, $message, $html = false)
         foreach ($emails as $email => $email_name) {
             $mail->addAddress($email, $email_name);
         }
-        if ((count($emails) == 0) && (!empty($config['alert']['default_mail']))) {
+        if ((count($emails) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
             $mail->addAddress($config['alert']['default_mail'], 'Default');
         }
         $mail->Subject = $subject;
