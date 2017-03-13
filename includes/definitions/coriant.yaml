@@ -13,7 +13,7 @@ discovery_modules:
     services: 0
     vlans: 0
     arp-table: 0
-    mef-evc: 1
+    mef: 1
     cisco-vrf-lite: 0
     storage: 0
 poller_modules:
@@ -29,7 +29,7 @@ poller_modules:
     vmware-vminfo: 0
     vlans: 0
     arp-table: 0
-    mef-evc: 1
+    mef: 1
     cisco-vrf-lite: 0
     storage: 0
 discovery:
