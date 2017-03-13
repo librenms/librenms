@@ -1,4 +1,26 @@
 <?php
+/**
+ *
+ * LibreNMS PeeringDB Integration
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2017 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
+ */
 
 $asn    = clean($_POST['asn']);
 $ixid   = clean($_POST['ixid']);
@@ -46,15 +68,15 @@ $sql = "SELECT `P`.`name`, `P`.`remote_asn`, `P`.`peer_id`, `bgpPeers`.`bgpPeerR
 
 foreach (dbFetchRows($sql, $params) as $peer) {
     if ($peer['remote_asn'] === $peer['bgpPeerRemoteAs']) {
-        $connected = 'Connected';
+        $connected = '<i class="fa fa-check fa-2x text text-success"></i>';
     } else {
-        $connected = 'Not Connected';
+        $connected = '<i class="fa fa-times fa-2x text text-default"></i>';
     }
     $peer_id = $peer['peer_id'];
     $response[] = array(
         'peer'      => $peer['name'],
         'connected' => "$connected",
-        'links'     => "<a href='https://peeringdb.com/net/$peer_id'><i class='fa fa-database'></i></a>",
+        'links'     => "<a href='https://peeringdb.com/net/$peer_id' target='_blank'><i class='fa fa-database'></i></a>",
     );
 }
 
