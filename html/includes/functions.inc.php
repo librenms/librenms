@@ -1443,6 +1443,17 @@ function set_image_type()
     }
 }
 
+function get_image_type()
+{
+    global $config;
+
+    if ($config['webui']['graph_type'] === 'svg') {
+        return 'image/svg+xml';
+    } else {
+        return 'image/png';
+    }
+}
+
 function get_oxidized_nodes_list()
 {
     global $config;
