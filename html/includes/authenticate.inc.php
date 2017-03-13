@@ -46,7 +46,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $_SESSION['password'] = $_GET['password'];
 } elseif (isset($_SERVER['REMOTE_USER'])) {
     $_SESSION['username'] = $_SERVER['REMOTE_USER'];
-} elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+} elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
     $_SESSION['username'] = $_SERVER['PHP_AUTH_USER'];
 }
 
@@ -97,7 +97,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 
         $permissions = permissions_cache($_SESSION['user_id']);
         if (isset($_POST['username'])) {
-            header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
+            header('Location: '.$_SERVER['REQUEST_URI'] ?: $config['base_url'], true, 303);
             exit;
         }
     } elseif (isset($_SESSION['username'])) {
