@@ -19,14 +19,13 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`remote_asn` LIKE '%$searchPhrase%' OR `P`.`name` LIKE '%$searchPhrase%')";
 }
 
+$sql .= ' GROUP BY `bgpPeerRemoteAs`, `P`.`name`, `P`.`remote_asn`, `P`.`peer_id` ';
 $count_sql = "SELECT COUNT(*) $sql";
 
-$total     = dbFetchCell($count_sql, $params);
+$total     = count(dbFetchRows($count_sql, $params));
 if (empty($total)) {
     $total = 0;
 }
-
-$sql .= ' GROUP BY `bgpPeerRemoteAs`, `P`.`name`, `P`.`remote_asn`, `P`.`peer_id` ';
 
 if (!isset($sort) || empty($sort)) {
     $sort = 'remote_asn ASC';
