@@ -59,6 +59,9 @@ if ($tmp[0] <= $db_rev) {
     return;
 }
 
+// Set Database Character set and Collation
+dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array($config['db_name'])));
+
 $limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
