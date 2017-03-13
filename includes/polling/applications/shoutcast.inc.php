@@ -10,6 +10,7 @@ $app_id = $app['app_id'];
 $options = '-O qv';
 $oid     = 'nsExtendOutputFull.9.115.104.111.117.116.99.97.115.116';
 $shoutcast = snmp_get($device, $oid, $options);
+update_application($app, $shoutcast);
 
 echo ' shoutcast';
 

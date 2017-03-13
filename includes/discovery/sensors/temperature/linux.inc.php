@@ -43,4 +43,4 @@ if (starts_with($sysObjectId, '.1.3.6.1.4.1.232.')) {
     }
 }
 
-include_once $config['install_dir'] . '/includes/discovery/sensors/temperatures/supermicro.inc.php';
+include_once $config['install_dir'] . '/includes/discovery/sensors/temperature/supermicro.inc.php';

@@ -16,7 +16,9 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $precision  = 1;
     $index      = 300+$i;
 
-    discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    }
 }
 
 $oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -33,7 +35,9 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $precision  = 1;
     $index      = 100+$i;
 
-    discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    }
 }
 
 $oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -50,5 +54,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $precision  = 1;
     $index      = 200+$i;
 
-    discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    }
 }

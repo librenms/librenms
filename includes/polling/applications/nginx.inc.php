@@ -10,6 +10,7 @@ if (!empty($agent_data['app'][$name])) {
     // Polls nginx statistics from script via SNMP
     $nginx = snmp_get($device, 'nsExtendOutputFull.5.110.103.105.110.120', '-Ovq', 'NET-SNMP-EXTEND-MIB');
 }
+update_application($app, $nginx);
 
 echo ' nginx';
 

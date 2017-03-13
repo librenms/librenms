@@ -13,6 +13,7 @@ if (!empty($agent_data['app']['memcached'])) {
     $data    = reset($result);
 }
 
+update_application($app, $data);
 echo ' memcached('.$app['app_instance'].')';
 
 $rrd_name = array('app', $name, $app_id);

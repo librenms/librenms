@@ -9,6 +9,7 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.6.110.118.105.100.105.97';
 $gpus = snmp_walk($device, $oid, $options, $mib);
+update_application($app, $gpus);
 
 $gpuArray = explode("\n", $gpus);
 
