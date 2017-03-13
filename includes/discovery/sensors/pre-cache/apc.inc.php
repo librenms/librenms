@@ -25,6 +25,6 @@
 
 if ($device['os'] === 'apc') {
     $pre_cache['cooling_unit_analog'] = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', array(), 'PowerNet-MIB');
-    $pre_cache['apcups_phase_count'] = snmp_get($device, 'upsBasicInputPhase.0', '-OQv', 'PowerNet-MIB');
+    $pre_cache['apcups_phase_count'] = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OQv', 'PowerNet-MIB');
     d_echo($pre_cache);
 }
