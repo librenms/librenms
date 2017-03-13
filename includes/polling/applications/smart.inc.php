@@ -11,6 +11,7 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.5.115.109.97.114.116';
 $output = snmp_walk($device, $oid, $options, $mib);
+update_application($app, $output);
 
 $lines = explode("\n", $output);
 
