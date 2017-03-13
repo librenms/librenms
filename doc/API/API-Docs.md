@@ -37,6 +37,7 @@ source: API/API-Docs.md
         - [`get_port_info`](#api-route-get_port_info)
         - [`get_port_ip_info`](#api-route-get_port_ip_info)
     - [`portgroups`](#api-portgroups)
+        - [`get_graph_by_portgroup_multiport_bits`](#api-route-get_graph_by_portgroup_multiport_bits)
         - [`get_graph_by_portgroup`](#api-route-get_graph_by_portgroup)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
@@ -1213,6 +1214,31 @@ Output:
 
 Output is an image.
 
+### <a name="api-route-get_graph_by_portgroup_multiport_bits">Function: `get_graph_by_portgroup_multiport_bits`</a> [`top`](#top)
+
+Get the graph based on the multiple port id separated by commas `,`.
+
+Route: /api/v0/devices/portgroups/multiport/bits/:id
+
+  - id is a comma separated list of port ids you want, I.e 1,2,3,4, etc. You can specify multiple IDs comma separated.
+
+Input:
+
+  - from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
+  - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
+  - width: The graph width, defaults to 1075.
+  - height: The graph height, defaults to 300.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/multiport/bits/1,2,3
+```
+
+Output:
+
+Output is an image.
+
+
 ## <a name="api-routing">`Routing`</a> [`top`](#top)
 
 ### <a name="api-route-1">Function: `list_bgp`</a> [`top`](#top)
@@ -1223,7 +1249,9 @@ Route: /api/v0/bgp
 
 Input:
 
-  - hostname = either the devices hostname or id.
+  - hostname = Either the devices hostname or id.
+**OR**
+  - asn = The ASN you would like to filter by
 
 Example:
 ```curl

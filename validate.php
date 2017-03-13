@@ -179,7 +179,7 @@ if (empty($strict_mode) === false) {
 // Test for correct character set and collation
 $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
 if (empty($collation) !== true) {
-    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]), 'http://bit.ly/2lAG9H8');
+    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]), 'https://t.libren.ms/-zdwk');
 }
 $collation_tables = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
 if (empty($collation_tables) !== true) {
@@ -188,7 +188,7 @@ if (empty($collation_tables) !== true) {
 }
 $collation_columns = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
 if (empty($collation_columns) !== true) {
-    print_fail('MySQL column collation is wrong: ', 'http://bit.ly/2lAG9H8');
+    print_fail('MySQL column collation is wrong: ', 'https://t.libren.ms/-zdwk');
     print_list($collation_columns, "\t %s\n");
 }
 

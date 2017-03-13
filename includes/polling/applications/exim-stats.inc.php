@@ -29,6 +29,8 @@ $stats = snmp_get($device, $oid, '-Oqv');
 
 echo ' '.$name;
 
+update_application($app, $stats);
+
 list ($frozen, $queue) = explode("\n", $stats);
 
 $rrd_name = array('app', $name, $app_id);

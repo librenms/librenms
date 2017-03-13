@@ -1,5 +1,6 @@
 source: Support/1-Minute-Polling.md
 
+### Information
 We now have support for polling data at intervals to fit your needs.
 
 > Please be aware of the following:
@@ -13,3 +14,18 @@ To make the changes, please navigate to `/settings/sub=external/` within your We
 
   - Step is how often you want to insert data, so if you change to 1 minute polling then this should be 60.
   - Heartbeat is how long to wait for data before registering a null value, i.e 120 seconds.
+
+
+### Converting existing RRD files
+
+We provide a basic script to convert the default rrd files we generate to utilise your configured step and heartbeat 
+values. Please do ensure that you backup your RRD files before running this just in case. The script runs on a per 
+device basis or all devices at once.
+
+> The rrd files must be accessible from the server you run this script from.
+
+`./scripts/rrdstep.php`
+
+This will provide the help information. To run it for localhost just run:
+
+`./scripts/rrdstep.php -h localhost`

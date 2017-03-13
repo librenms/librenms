@@ -11,8 +11,8 @@ function authenticate($username, $password)
 {
     global $config;
 
-    if (isset($_SERVER['REMOTE_USER'])) {
-        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
+    if (isset($_SERVER['REMOTE_USER']) || isset($_SERVER['PHP_AUTH_USER'])) {
+        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']) ?: mres($_SERVER['PHP_AUTH_USER']);
 
         $row = @dbFetchRow('SELECT username FROM `users` WHERE `username`=?', array($_SESSION['username']));
         if (isset($row['username']) && $row['username'] == $_SESSION['username']) {

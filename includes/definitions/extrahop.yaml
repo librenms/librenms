@@ -1,0 +1,11 @@
+os: extrahop
+type: network
+group: unix
+text: 'Extrahop Appliance'
+icon: extrahop
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: extrahop
+processor_stacked: 1

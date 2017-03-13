@@ -1,9 +1,11 @@
 <?php
-//
-// NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
-//
-// YES, THAT MEANS YOU                   #
-//
+/*
+ NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE
+
+ YES, THAT MEANS YOU
+
+ Any changes you want to make here, make in config.php instead.
+*/
 
 $config['os']['default']['over'][0]['graph'] = 'device_processor';
 $config['os']['default']['over'][0]['text']  = 'Processor Usage';
