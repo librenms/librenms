@@ -74,11 +74,11 @@ foreach (dbFetchRows($sql, $params) as $peer) {
     }
     $peer_id = $peer['peer_id'];
     $response[] = array(
-        'asn'       => $peer['remote_asn'],
-        'ipaddr4'   => $peer['remote_ipaddr4'],
-        'peer'      => $peer['name'],
-        'connected' => "$connected",
-        'links'     => "<a href='https://peeringdb.com/net/$peer_id' target='_blank'><i class='fa fa-database'></i></a>",
+        'remote_asn'     => $peer['remote_asn'],
+        'remote_ipaddr4' => $peer['remote_ipaddr4'],
+        'peer'           => $peer['name'],
+        'connected'      => "$connected",
+        'links'          => "<a href='https://peeringdb.com/net/$peer_id' target='_blank'><i class='fa fa-database'></i></a>",
     );
 }
 
