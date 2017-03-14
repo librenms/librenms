@@ -1,4 +1,8 @@
 <?php
+
+// Don't refresh this page to stop adding multiple ports
+$no_refresh = true;
+
   require 'includes/javascript-interfacepicker.inc.php';
   
   // This needs more verification. Is it already added? Does it exist?
