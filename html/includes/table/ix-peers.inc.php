@@ -66,7 +66,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `P`.`remote_asn`, `P`.`name`, `P`.`remote_ipaddr4`, `P`.`peer_id`, `bgpPeers`.`bgpPeerIdentifier` $sql";
 
-logfile($sql);
 foreach (dbFetchRows($sql, $params) as $peer) {
     if ($peer['remote_ipaddr4'] === $peer['bgpPeerIdentifier']) {
         $connected = '<i class="fa fa-check fa-2x text text-success"></i>';
