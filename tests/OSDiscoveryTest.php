@@ -572,22 +572,26 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dlink', 'dlink-dgs');
     }
 
-    public function testDnos()
+    public function testDnosv6()
     {
-        $this->checkOS('dnos');
-        $this->checkOS('dnos', 'dnos1');
-        $this->checkOS('dnos', 'dnos2');
-        $this->checkOS('dnos', 'dnos3');
-        $this->checkOS('dnos', 'dnos4');
-        $this->checkOS('dnos', 'dnos5');
-        $this->checkOS('dnos', 'dnos6');
-        $this->checkOS('dnos', 'dnos7');
-        $this->checkOS('dnos', 'dnos8');
-        $this->checkOS('dnos', 'dnos9');
-        $this->checkOS('dnos', 'dnos10');
-        $this->checkOS('dnos', 'dnos11');
-        $this->checkOS('dnos', 'dnos12');
-        $this->checkOS('dnos', 'dnos13');
+        $this->checkOS('dnosv6', 'dnosv6-1');
+        $this->checkOS('dnosv6', 'dnosv6-2');
+        $this->checkOS('dnosv6', 'dnosv6-3');
+        $this->checkOS('dnosv6', 'dnosv6-4');
+        $this->checkOS('dnosv6', 'dnosv6-5');
+        $this->checkOS('dnosv6', 'dnosv6-6');
+        $this->checkOS('dnosv6', 'dnosv6-7');
+        $this->checkOS('dnosv6', 'dnosv6-8');
+        $this->checkOS('dnosv6', 'dnosv6-9');
+        $this->checkOS('dnosv6', 'dnosv6-10');
+        $this->checkOS('dnosv6', 'dnosv6-11');
+        $this->checkOS('dnosv6', 'dnosv6-12');
+        $this->checkOS('dnosv6', 'dnosv6-13');
+    }
+
+    public function testDnosv9()
+    {
+        $this->checkOS('dnosv9');
     }
 
     public function testDrac()
