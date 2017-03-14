@@ -37,6 +37,6 @@
   },
   {
     "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
-    "name": "Device Discovered"
+    "name": "Device discovered within the last 60 minutes"
   }
 ]
