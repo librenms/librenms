@@ -29,6 +29,15 @@ PROGRAM=${0##*/}
 # paste. take input from stdin
 pastebin() {
 	# show params
+
+        if [[ "${expire}" == "" ]]; then
+            expire=0;
+        fi
+
+        if [[ "${private}" == "" ]]; then
+            private=1;
+        fi
+
 	sed -e '/^$/d' >&2 <<-EOF
 		${title+title: "$title"}
 		${name+name: "$name"}
@@ -37,9 +46,6 @@ pastebin() {
 		${expire+expire: "$expire"}
 		${reply+reply: "$reply"}
 	EOF
-        if [$expire == '']; then
-            expire=0;
-        fi
 
 	# do paste
 	curl "$PASTE_URL" \
@@ -85,7 +91,7 @@ usage() {
 Options:
   -t, --title     title of this paste
   -n, --name      author of this paste
-  -p, --private   should this paste be private
+  -p, --private   should this paste be private (0 = public, 1 = private)
   -l, --language  language this paste is in
   -e, --expire    paste expiration in minutes
   -r, --reply     reply to existing paste
@@ -100,13 +106,13 @@ set_defaults() {
 	unset reply
 
 	# default to user@hostname
-	name=${SUDO_USER:-$USER}@${HOSTNAME:-$(hostname)}
+	name=${SUDO_USER:-$USER}
 }
 
 set_defaults
 
 # parse command line args
-t=$(getopt -o h,t:,n:,p,l:,e:,r:,b: --long help,title:,name:,private,language:,expire:,reply: -n "$PROGRAM" -- "$@")
+t=$(getopt -o h,t:,n:,p:,l:,e:,r:,b: --long help,title:,name:,private:,language:,expire:,reply: -n "$PROGRAM" -- "$@")
 eval set -- "$t"
 
 while :; do
@@ -124,7 +130,8 @@ while :; do
 		name="$1"
 	;;
 	-p|--private)
-		private=1
+                shift
+		private="$1"
 	;;
 	-l|--language)
 		shift
