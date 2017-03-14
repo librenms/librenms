@@ -26,11 +26,11 @@ $asn    = clean($_POST['asn']);
 $ixid   = clean($_POST['ixid']);
 $status = clean($_POST['status']);
 
-$sql    = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_asn` = `bgpPeers`.`bgpPeerRemoteAs` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `P`.`ix_id` = ?";
+$sql    = " FROM `pdb_ix_peers` AS `P` LEFT JOIN `pdb_ix` ON `P`.`ix_id` = `pdb_ix`.`ix_id` LEFT JOIN `bgpPeers` ON `P`.`remote_ipaddr4` = `bgpPeers`.`bgpPeerIdentifier` WHERE `P`.`ix_id` = ? AND `remote_ipaddr4` IS NOT NULL";
 $params = array($ixid);
 
 if ($status === 'connected') {
-    $sql .= " AND `remote_asn` = `bgpPeerRemoteAs` ";
+    $sql .= " AND `remote_ipaddr4` = `bgpPeerIdentifier` ";
 }
 
 if ($status === 'unconnected') {
@@ -38,10 +38,10 @@ if ($status === 'unconnected') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`remote_asn` LIKE '%$searchPhrase%' OR `P`.`name` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`remote_ipaddr4` LIKE '%$searchPhrase%' OR `remote_asn` LIKE '%$searchPhrase%' OR `P`.`name` LIKE '%$searchPhrase%')";
 }
 
-$sql .= ' GROUP BY `bgpPeerRemoteAs`, `P`.`name`, `P`.`remote_asn`, `P`.`peer_id` ';
+$sql .= ' GROUP BY `bgpPeerIdentifier`, `P`.`name`, `P`.`remote_ipaddr4`, `P`.`peer_id`, `P`.`remote_asn` ';
 $count_sql = "SELECT COUNT(*) $sql";
 
 $total     = count(dbFetchRows($count_sql, $params));
@@ -64,16 +64,19 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `P`.`name`, `P`.`remote_asn`, `P`.`peer_id`, `bgpPeers`.`bgpPeerRemoteAs` $sql";
+$sql = "SELECT `P`.`remote_asn`, `P`.`name`, `P`.`remote_ipaddr4`, `P`.`peer_id`, `bgpPeers`.`bgpPeerIdentifier` $sql";
 
+logfile($sql);
 foreach (dbFetchRows($sql, $params) as $peer) {
-    if ($peer['remote_asn'] === $peer['bgpPeerRemoteAs']) {
+    if ($peer['remote_ipaddr4'] === $peer['bgpPeerIdentifier']) {
         $connected = '<i class="fa fa-check fa-2x text text-success"></i>';
     } else {
         $connected = '<i class="fa fa-times fa-2x text text-default"></i>';
     }
     $peer_id = $peer['peer_id'];
     $response[] = array(
+        'asn'       => $peer['remote_asn'],
+        'ipaddr4'   => $peer['remote_ipaddr4'],
         'peer'      => $peer['name'],
         'connected' => "$connected",
         'links'     => "<a href='https://peeringdb.com/net/$peer_id' target='_blank'><i class='fa fa-database'></i></a>",

@@ -33,7 +33,9 @@ $status = $vars['status'];
             <table id="ixpeers" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th data-column-id="peer" data-sortable="false">Peer</th>
+                    <th data-column-id="asn">ASN</th>
+                    <th data-column-id="ipaddr4">IP</th>
+                    <th data-column-id="peer">Peer</th>
                     <th data-column-id="connected" data-sortable="false">Connected</th>
                     <th data-column-id="links" data-sortable="false"></th>
                 </tr>
