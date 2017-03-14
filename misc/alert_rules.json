@@ -33,7 +33,7 @@
   },
   {
     "rule": "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
-    "name": "Interface Errors Rate"
+    "name": "Interface Errors Rate greater than 100"
   },
   {
     "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
