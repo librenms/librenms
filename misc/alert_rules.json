@@ -36,7 +36,7 @@
     "name": "Interface Errors Rate"
   },
   {
-    "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"autodiscovered\" && %eventlog.datetime >= %macros.past_60m",
+    "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
     "name": "Device Discovered"
   }
 ]
