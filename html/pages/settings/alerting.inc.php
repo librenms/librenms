@@ -254,7 +254,7 @@ $general_conf = array(
           'type'               => 'text',
     ),
     array('name'               => 'alert.default_if_none',
-          'descr'              => 'Send mail to default contact if no other contacts listed',
+          'descr'              => 'Send mail to default contact if no other contacts are found',
           'type'               => 'checkbox',
     ),
     array('name'               => 'alert.tolerance_window',
