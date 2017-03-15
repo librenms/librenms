@@ -16,7 +16,6 @@ function graphite_update($device, $measurement, $tags, $fields)
 {
     global $graphite, $config;
     if ($graphite !== false) {
-
         $timestamp = time();
         $graphite_prefix = $config['graphite']['prefix'];
         // metrics will be built as prefix.hostname.measurement.field value timestamp
@@ -25,12 +24,10 @@ function graphite_update($device, $measurement, $tags, $fields)
         $measurement = preg_replace('/\./', '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
         foreach ($fields as $k => $v) {
-          $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $k)));
-          $line = implode(" ", array($metric, $v, $timestamp));
-          d_echo("Sending $line");
-          fwrite($graphite, $line . "\n");
+            $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $k)));
+            $line = implode(" ", array($metric, $v, $timestamp));
+            d_echo("Sending $line\n");
+            fwrite($graphite, $line . "\n");
         }
     }
 }
-
-?>
