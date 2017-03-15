@@ -21,7 +21,7 @@ function graphite_update($device, $measurement, $tags, $fields)
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
         $hostname = preg_replace('/\./', '_', $device['hostname']);
-        $measurement = preg_replace('/\./', '_', $measurement);
+        $measurement = preg_replace(array('/\./', '/\//'), '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
         foreach ($fields as $k => $v) {
             $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $k)));
