@@ -26,14 +26,25 @@
 $lib_data = snmpwalk_cache_oid($device, 'lgpEnvHumidityEntryRel', array(), 'LIEBERT-GP-ENVIRONMENTAL-MIB');
 
 foreach ($lib_data as $index => $data) {
-    $oid        = '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.3.' . $index;
-    $descr      = $data['lgpEnvHumidityDescrRel'];
-    $low_limit  = $data['lgpEnvHumidityLowThresholdRel'];
-    $high_limit = $data['lgpEnvHumidityHighThresholdRel'];
-    $current    = $data['lgpEnvHumidityMeasurementRel'];
-    $new_index  = 'lgpEnvHumidityMeasurementRel.' . $index;
+    if (is_numeric($data['lgpEnvHumidityMeasurementRelTenths'])) {
+        $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.50.' . $index;
+        $low_limit = $data['lgpEnvHumidityLowThresholdRelTenths'];
+        $high_limit = $data['lgpEnvHumidityHighThresholdRelTenths'];
+        $current = $data['lgpEnvHumidityMeasurementRelTenths'];
+        $divisor = 10;
+        $new_index = 'lgpEnvHumidityMeasurementRelTenths.' . $index;
+    } elseif (is_numeric($data['lgpEnvHumidityMeasurementRel'])) {
+        $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.3.' . $index;
+        $low_limit = $data['lgpEnvHumidityLowThresholdRel'];
+        $high_limit = $data['lgpEnvHumidityHighThresholdRel'];
+        $current = $data['lgpEnvHumidityMeasurementRel'];
+        $divisor = 1;
+        $new_index = 'lgpEnvHumidityMeasurementRel.' . $index;
+    }
+
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'humidity', $device, $oid, $new_index, 'liebert', $descr, $divisor, '1', $low_limit, null, null, $high_limit, $current);
+        $descr = $data['lgpEnvHumidityDescrRel'];
+        discover_sensor($valid['sensor'], 'humidity', $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
     }
 }
 
