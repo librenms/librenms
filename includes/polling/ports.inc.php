@@ -446,7 +446,7 @@ foreach ($ports as $port) {
         }
 
         // use HC values if they are available
-        if (!isset($this_port['ifInOctets')) {
+        if (!isset($this_port['ifInOctets'])) {
             echo "HC ";
             $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
