@@ -17,7 +17,7 @@ $config['graphite']['prefix'] = 'your.metric.prefix';
 ```
 
 Your metric path can be prefixed if required, otherwise the metric path for Graphite will be in the form of
-`hostname.measurement.fieldname`
+`hostname.measurement.fieldname`, interfaces will be stored as `hostname.ports.ifName.fieldname`. 
 
 The same data then stored within rrd will be sent to Graphite and recorded. You can then create graphs within Grafana
 to display the information you need.
