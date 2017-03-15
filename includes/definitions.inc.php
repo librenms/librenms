@@ -86,6 +86,10 @@ $config['graph_types']['device']['ubnt_airfiber_TxPower']['section'] = 'wireless
 $config['graph_types']['device']['ubnt_airfiber_TxPower']['order'] = '0';
 $config['graph_types']['device']['ubnt_airfiber_TxPower']['descr'] = 'Radio Tx Power';
 
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['order'] = '0';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['descr'] = 'Radio Rx Power';
+
 $config['graph_types']['device']['ubnt_airfiber_LinkDist']['section'] = 'wireless';
 $config['graph_types']['device']['ubnt_airfiber_LinkDist']['order'] = '1';
 $config['graph_types']['device']['ubnt_airfiber_LinkDist']['descr'] = 'Link Distance';
