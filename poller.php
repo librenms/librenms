@@ -121,12 +121,7 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 }
 
 if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
-    if (isset($config['graphite']['port'])) {
-        $graphite_port = $config['graphite']['port'];
-    } else {
-        $graphite_port = '2003';
-    }
-    $graphite = fsockopen($config['graphite']['host'], $graphite_port);
+    $graphite = fsockopen($config['graphite']['host'], $config['graphite']['port']);
 } else {
     $graphite = false;
 }
