@@ -123,7 +123,7 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
     if (isset($config['graphite']['port'])) {
       $graphite_port = $config['graphite']['port'];
-    } else
+    } else {
       $graphite_port = '2003';
     }
     $graphite = fsockopen($config['graphite']['host'], $graphite_port);
@@ -157,7 +157,7 @@ $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
 if ($graphite !== false) {
-    fclose($graphite)
+    fclose($graphite);
 }
 
 if ($polled_devices) {
