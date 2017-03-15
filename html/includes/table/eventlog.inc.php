@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] >= '5') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(event_id) $sql";
@@ -60,9 +60,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         $type = $eventlog['type'];
     }
     $severity_colour = $eventlog['severity'];
-    if ($eventlog['username'] == 0) {
-        $eventlog['username'] = '';
-    }
+
     $response[] = array(
         'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
         'datetime'  => $eventlog['humandate'],
