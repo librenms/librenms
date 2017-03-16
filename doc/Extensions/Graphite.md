@@ -17,7 +17,16 @@ $config['graphite']['prefix'] = 'your.metric.prefix';
 ```
 
 Your metric path can be prefixed if required, otherwise the metric path for Graphite will be in the form of
-`hostname.measurement.fieldname`, interfaces will be stored as `hostname.ports.ifName.fieldname`. 
+`hostname.measurement.fieldname`, interfaces will be stored as `hostname.ports.ifName.fieldname`.
 
 The same data then stored within rrd will be sent to Graphite and recorded. You can then create graphs within Grafana
 to display the information you need.
+
+### Graphite Configuration
+As LibreNMS updates its metrics every 5 minutes, the following addition to your storage-schemas.conf is suggested.
+
+```
+[network]
+pattern = your\.metric\.prefix\..*
+retentions = 5m:30d,15m:90d,1h:1y
+```
