@@ -23,8 +23,19 @@ function graphite_update($device, $measurement, $tags, $fields)
         $hostname = preg_replace('/\./', '_', $device['hostname']);
         $measurement = preg_replace(array('/\./', '/\//'), '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
+        $measurement_name = preg_replace('/\./', '_', $tags['rrd_name']);
+        if (is_array($measurement_name)) {
+            $ms_name = implode(".", $measurement_name);
+        } else {
+            $ms_name = $measurement_name;
+        }
+        // remove the port-id tags from the metric
+        if (preg_match('/^port-id\d+/', $ms_name)) {
+          $ms_name = "";
+        }
+
         foreach ($fields as $k => $v) {
-            $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $k)));
+            $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $ms_name, $k)));
             $line = implode(" ", array($metric, $v, $timestamp));
             d_echo("Sending $line\n");
             fwrite($graphite, $line . "\n");
