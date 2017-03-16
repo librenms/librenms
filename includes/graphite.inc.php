@@ -31,7 +31,7 @@ function graphite_update($device, $measurement, $tags, $fields)
         }
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', $ms_name)) {
-          $ms_name = "";
+            $ms_name = "";
         }
 
         foreach ($fields as $k => $v) {
