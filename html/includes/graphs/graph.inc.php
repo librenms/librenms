@@ -42,11 +42,11 @@ if ($auth !== true && $auth != 1) {
 
 require $config['install_dir']."/html/includes/graphs/$type/auth.inc.php";
 
-if ($auth === true && is_custom_graph($type, $subtype, $device)) {
+if ($auth && is_custom_graph($type, $subtype, $device)) {
     include($config['install_dir'] . "/html/includes/graphs/custom.inc.php");
-} elseif ($auth === true && is_mib_graph($type, $subtype)) {
+} elseif ($auth && is_mib_graph($type, $subtype)) {
     include $config['install_dir']."/html/includes/graphs/$type/mib.inc.php";
-} elseif ($auth === true && is_file($config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php")) {
+} elseif ($auth && is_file($config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php")) {
     include $config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php";
 } else {
     graph_error("$type*$subtype ");

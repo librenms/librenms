@@ -72,7 +72,7 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($hostname, $vars['port']));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -149,7 +149,7 @@ function get_graph_generic_by_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -457,14 +457,19 @@ function list_bgp()
     $message    = 'Error retrieving bgpPeers';
     $sql        = '';
     $sql_params = array();
-    $hostname   = $_GET['hostname'];
+    $hostname   = $_GET['hostname'] ?: '';
+    $asn        = $_GET['asn'] ?: '';
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `device_id`=?';
-        $sql_params = array($device_id);
+        $sql        = ' AND `devices`.`device_id` = ?';
+        $sql_params[] = $device_id;
+    }
+    if (!empty($asn)) {
+        $sql = ' AND `devices`.`bgpLocalAs` = ?';
+        $sql_params[] = $asn;
     }
 
-    $bgp_sessions       = dbFetchRows("SELECT * FROM bgpPeers WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
+    $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (is_numeric($total_bgp_sessions)) {
         $code    = 200;
@@ -489,7 +494,8 @@ function get_graph_by_portgroup()
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $group  = $router['group'];
+    $group  = $router['group'] ?: '';
+    $id     = $router['id'] ?: '';
     $vars   = array();
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
@@ -502,19 +508,26 @@ function get_graph_by_portgroup()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
+    $if_list        = '';
+    $ports          = array();
 
-    $ports = get_ports_from_type(explode(',', $group));
-    $if_list     = '';
-    $seperator   = '';
-    foreach ($ports as $port) {
-        $if_list  .= $seperator.$port['port_id'];
-        $seperator = ',';
+    if (!empty($id)) {
+        $if_list = $id;
+    } else {
+        $ports = get_ports_from_type(explode(',', $group));
+    }
+    if (empty($if_list)) {
+        $seperator   = '';
+        foreach ($ports as $port) {
+            $if_list  .= $seperator.$port['port_id'];
+            $seperator = ',';
+        }
     }
 
     unset($seperator);
     $vars['type'] = 'multiport_bits_separate';
     $vars['id']   = $if_list;
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -1421,6 +1434,7 @@ function list_ipsec()
     $code     = 404;
     $message  = '';
     $hostname = $router['hostname'];
+    $total    = 0;
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (!is_numeric($device_id)) {
@@ -1451,6 +1465,7 @@ function list_arp()
     $code     = 404;
     $message  = '';
     $ip       = $router['ip'];
+    $total    = 0;
     if (empty($ip)) {
         $message = "No valid IP provided";
     } else {

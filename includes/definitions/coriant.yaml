@@ -1,0 +1,39 @@
+os: coriant
+text: 'Coriant TNMS'
+type: network
+icon: coriant
+discovery_modules:
+    ntp: 0
+    ospf: 0
+    stp: 0
+    ucd-diskio: 0
+    ucd-mib: 0
+    ipmi: 0
+    bgp-peers: 0
+    services: 0
+    vlans: 0
+    arp-table: 0
+    mef: 1
+    cisco-vrf-lite: 0
+    storage: 0
+poller_modules:
+    ntp: 0
+    ospf: 0
+    stp: 0
+    ucd-diskio: 0
+    ucd-mib: 0
+    ipmi: 0
+    bgp-peers: 0
+    services: 0
+    libvirt-vminfo: 0
+    vmware-vminfo: 0
+    vlans: 0
+    arp-table: 0
+    mef: 1
+    cisco-vrf-lite: 0
+    storage: 0
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.42229.6.22
+register_mibs:
+    mefServiceEvcCfgTable: MEF-UNI-EVC-MIB

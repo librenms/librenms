@@ -29,6 +29,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'tinydns';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name]) && $app_id > 0) {
+    update_application($app, $name);
     echo ' tinydns';
     $rrd_name = array('app', $name, $app_id);
     $rrd_def = RrdDefinition::make()

@@ -459,6 +459,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('comware', 'comware-hp-c1234');
     }
 
+    public function testCoriant()
+    {
+        $this->checkOS('coriant');
+    }
+
     public function testCtcu()
     {
         $this->checkOS('ctcu');
@@ -693,7 +698,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testExtremeware()
     {
-        $this->checkOS('extremeware');
     }
 
     public function testF5()
@@ -1756,6 +1760,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testXos()
     {
         $this->checkOS('xos');
+    }
+
+    public function testZebra()
+    {
+        $this->checkOS('zebra');
+        $this->checkOS('zebra', 'zebra1');
     }
 
     public function testZxr10()

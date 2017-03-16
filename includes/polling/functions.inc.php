@@ -386,19 +386,14 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     echo "This is poll_mib_def Processing\n";
     $mib = null;
 
+    list($mib, $file) = explode(':', $mib_name_table, 2);
+
     if (is_null($rrd_name)) {
-        if (stristr($mib_name_table, 'UBNT')) {
-            list($mib,) = explode(':', $mib_name_table, 2);
-            $measurement_name = strtolower($mib);
+        if (str_contains($mib_name_table, 'UBNT', true)) {
+            $rrd_name = strtolower($mib);
         } else {
-            list($mib,$file) = explode(':', $mib_name_table, 2);
-            $measurement_name = strtolower($file);
+            $rrd_name = strtolower($file);
         }
-    } else {
-        $measurement_name = strtolower($rrd_name);
-    }
-    if (is_null($rrd_name)) {
-        $rrd_name = $measurement_name;
     }
 
     $rrd_def = new RrdDefinition();
@@ -563,4 +558,38 @@ function get_device_oid_limit($device)
     } else {
         return 10;
     }
+}
+
+/**
+ * Update the application status and output in the database.
+ *
+ * @param array $app app from the db, including app_id
+ * @param string $response This should be the full output
+ */
+function update_application($app, $response)
+{
+    if (!is_numeric($app['app_id'])) {
+        d_echo('$app does not contain app_id, could not update');
+        return;
+    }
+
+    $data = array(
+        'app_state' => 'UNKNOWN',
+        'timestamp' => array('NOW()'),
+    );
+
+    if ($response != '' && $response !== false) {
+        if (str_contains($response, array(
+            'Traceback (most recent call last):',
+        ))) {
+            $data['app_state'] = 'ERROR';
+        } else {
+            $data['app_state'] = 'OK';
+        }
+    }
+
+    if ($data['app_state'] != $app['app_state']) {
+        $data['app_state_prev'] = $app['app_state'];
+    }
+    dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
 }
