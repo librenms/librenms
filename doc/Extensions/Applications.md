@@ -84,7 +84,7 @@ options {
 
 5: Also be aware that this file is appended to each time `rndc stats` is called. Given this it is suggested you setup file rotation for it.
 
-6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
+6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards in CentOS/Redhat and libfile-readbackwards-perl Debian/Ubuntu. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
 
 7: You may possible need to configure the agent/extend script as well.
 
