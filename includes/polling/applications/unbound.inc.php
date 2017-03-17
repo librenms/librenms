@@ -6,6 +6,7 @@ $name = 'unbound';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
+    update_application($app, $rawdata);
 } else {
     $options = '-O qv';
     $oid     = 'nsExtendOutputFull.7.117.110.98.111.117.110.100';

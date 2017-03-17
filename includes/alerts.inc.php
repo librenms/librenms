@@ -294,5 +294,10 @@ function GetContacts($results)
         }
     }
 
+    # Send email to default contact if no other contact found
+    if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
+        $tmp_contacts[$config['alert']['default_mail']] = 'NOC';
+    }
+
     return $tmp_contacts;
 }
