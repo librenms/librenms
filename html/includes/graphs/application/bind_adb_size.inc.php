@@ -22,7 +22,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'Name',
         'ds'       => 'nhts',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 

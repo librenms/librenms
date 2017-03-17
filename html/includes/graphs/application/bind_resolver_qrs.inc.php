@@ -33,7 +33,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'IPv6 Rcvd',
         'ds'       => 'i6rr',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 

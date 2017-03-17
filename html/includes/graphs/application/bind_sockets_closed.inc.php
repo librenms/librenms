@@ -32,7 +32,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'TCP/IPv6',
         'ds'       => 'ti6sc',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 
