@@ -14,24 +14,24 @@ $rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'
 $rrd_list=array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv4 Sent',
-	'ds'       => 'i4qs',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv4 Sent',
+        'ds'       => 'i4qs',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv6 Sent',
-	'ds'       => 'i6qs',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv6 Sent',
+        'ds'       => 'i6qs',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv4 Rcvd',
-	'ds'       => 'i4rr',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv4 Rcvd',
+        'ds'       => 'i4rr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv6 Rcvd',
-	'ds'       => 'i6rr',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv6 Rcvd',
+        'ds'       => 'i6rr',
     );
 }else{
     d_echo('RRD "'.$rrd_filename.'" not found');

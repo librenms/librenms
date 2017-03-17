@@ -13,29 +13,29 @@ $rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'
 $rrd_list=array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Auth Qry Rej',
-	'ds'       => 'aqr',
+        'filename' => $rrd_filename,
+        'descr'    => 'Auth Qry Rej',
+        'ds'       => 'aqr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Rec Qry Rej',
-	'ds'       => 'rqr',
+        'filename' => $rrd_filename,
+        'descr'    => 'Rec Qry Rej',
+        'ds'       => 'rqr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Trnctd Rsp Snt',
-	'ds'       => 'trs',
+        'filename' => $rrd_filename,
+        'descr'    => 'Trnctd Rsp Snt',
+        'ds'       => 'trs',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Oth Qry Fail',
-	'ds'       => 'oqf',
+        'filename' => $rrd_filename,
+        'descr'    => 'Oth Qry Fail',
+        'ds'       => 'oqf',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Qry Dropped',
-	'ds'       => 'qd',
+        'filename' => $rrd_filename,
+        'descr'    => 'Qry Dropped',
+        'ds'       => 'qd',
     );
 }else{
     d_echo('RRD "'.$rrd_filename.'" not found');

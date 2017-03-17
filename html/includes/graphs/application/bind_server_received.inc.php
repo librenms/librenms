@@ -13,44 +13,44 @@ $rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'
 $rrd_list=array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv4 Req',
-	'ds'       => 'i4rr',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv4 Req',
+        'ds'       => 'i4rr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'IPv6 Req',
-	'ds'       => 'i6rr',
+        'filename' => $rrd_filename,
+        'descr'    => 'IPv6 Req',
+        'ds'       => 'i6rr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'TCP Req',
-	'ds'       => 'trr',
+        'filename' => $rrd_filename,
+        'descr'    => 'TCP Req',
+        'ds'       => 'trr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'TCP Qry',
-	'ds'       => 'tqr',
+        'filename' => $rrd_filename,
+        'descr'    => 'TCP Qry',
+        'ds'       => 'tqr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'UDP Qry',
-	'ds'       => 'uqr',
+        'filename' => $rrd_filename,
+        'descr'    => 'UDP Qry',
+        'ds'       => 'uqr',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'With EDNS(0)',
-	'ds'       => 'rwer',
+        'filename' => $rrd_filename,
+        'descr'    => 'With EDNS(0)',
+        'ds'       => 'rwer',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Other EDNS',
-	'ds'       => 'oeor',
+        'filename' => $rrd_filename,
+        'descr'    => 'Other EDNS',
+        'ds'       => 'oeor',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Dup. Qry',
-	'ds'       => 'dqr',
+        'filename' => $rrd_filename,
+        'descr'    => 'Dup. Qry',
+        'ds'       => 'dqr',
     );
 }else{
     d_echo('RRD "'.$rrd_filename.'" not found');

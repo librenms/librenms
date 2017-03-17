@@ -13,39 +13,39 @@ $rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'
 $rrd_list=array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Successful',
-	'ds'       => 'qrisa',
+        'filename' => $rrd_filename,
+        'descr'    => 'Successful',
+        'ds'       => 'qrisa',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Authoritative',
-	'ds'       => 'qriaa',
+        'filename' => $rrd_filename,
+        'descr'    => 'Authoritative',
+        'ds'       => 'qriaa',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'Non Authoritative',
-	'ds'       => 'qrinaa',
+        'filename' => $rrd_filename,
+        'descr'    => 'Non Authoritative',
+        'ds'       => 'qrinaa',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'NX RR Set',
-	'ds'       => 'qrin',
+        'filename' => $rrd_filename,
+        'descr'    => 'NX RR Set',
+        'ds'       => 'qrin',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'SERVFAIL',
-	'ds'       => 'qris',
+        'filename' => $rrd_filename,
+        'descr'    => 'SERVFAIL',
+        'ds'       => 'qris',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'NXDOMAIN',
-	'ds'       => 'qrind',
+        'filename' => $rrd_filename,
+        'descr'    => 'NXDOMAIN',
+        'ds'       => 'qrind',
     );
     $rrd_list[]=array(
-	'filename' => $rrd_filename,
-	'descr'    => 'With EDNS(0)',
-	'ds'       => 'rwes',
+        'filename' => $rrd_filename,
+        'descr'    => 'With EDNS(0)',
+        'ds'       => 'rwes',
     );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
