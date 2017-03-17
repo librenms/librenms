@@ -1434,12 +1434,17 @@ function eventlog_severity($eventlog_severity)
  */
 function set_image_type()
 {
+    return header('Content-type: ' . get_image_type());
+}
+
+function get_image_type()
+{
     global $config;
 
     if ($config['webui']['graph_type'] === 'svg') {
-        return header('Content-type: image/svg+xml');
+        return 'image/svg+xml';
     } else {
-        return header('Content-type: image/png');
+        return 'image/png';
     }
 }
 

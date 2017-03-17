@@ -72,7 +72,7 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($hostname, $vars['port']));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -149,7 +149,7 @@ function get_graph_generic_by_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -527,7 +527,7 @@ function get_graph_by_portgroup()
     unset($seperator);
     $vars['type'] = 'multiport_bits_separate';
     $vars['id']   = $if_list;
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();

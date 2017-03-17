@@ -189,6 +189,7 @@ LibreNMS contributors:
 - Avery Payne <avery.p.payne@gmail.com> (apayne) 
 - Ryan Medlyn <ryan.medlyn@gmail.com> (rmedlyn)
 - Mark Hughes <m@rkhugh.es> (markehme)
+- Mark Abrahams <mark@abrahams.co.nz> (markabrahams)
 
 Observium was written by:
 - Adam Armstrong

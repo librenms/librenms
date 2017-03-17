@@ -30,5 +30,13 @@
   {
     "rule": "%ports.ifOperStatus = \"down\" && %ports.ifOperStatus_prev = \"up\" && %macros.device_up = \"1\"",
     "name": "Port status change from up to down"
+  },
+  {
+    "rule": "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
+    "name": "Interface Errors Rate greater than 100"
+  },
+  {
+    "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
+    "name": "Device discovered within the last 60 minutes"
   }
 ]
