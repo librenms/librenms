@@ -10,8 +10,9 @@ if (!empty($agent_data['app'][$name])) {
     $name = 'bind';
     $app_id = $app['app_id'];
     $options = '-O qv';
+    $mib          = 'NET-SNMP-EXTEND-MIB';
     $oid     = 'nsExtendOutputFull.4.98.105.110.100';
-    $bind    = snmp_get($device, $oid, $options);
+    $bind    = snmp_get($device, $oid, $options, $mib);
 }
 
 list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
