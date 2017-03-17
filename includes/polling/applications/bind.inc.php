@@ -4,11 +4,15 @@ use LibreNMS\RRD\RrdDefinition;
 
 echo ' bind ';
 
-$name = 'bind';
-$app_id = $app['app_id'];
-$options = '-O qv';
-$oid     = 'nsExtendOutputFull.4.98.105.110.100';
-$bind    = snmp_get($device, $oid, $options);
+if (!empty($agent_data['app'][$name])) {
+    $bind = $agent_data['app'][$name];
+} else {
+    $name = 'bind';
+    $app_id = $app['app_id'];
+    $options = '-O qv';
+    $oid     = 'nsExtendOutputFull.4.98.105.110.100';
+    $bind    = snmp_get($device, $oid, $options);
+}
 
 list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
 
