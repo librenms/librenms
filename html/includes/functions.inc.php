@@ -1489,3 +1489,20 @@ function get_disks($device)
 {
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
+
+// takes the device array and app_id
+function get_disks_with_smart($device, $app_id)
+{
+    $all_disks=get_disks($device['device_id']);
+    $disks=array();
+    $all_disks_int=0;
+    while (isset($all_disks[$all_disks_int])) {
+        $disk=$all_disks[$all_disks_int]['diskio_descr'];
+        $rrd_filename = rrd_name($device['hostname'], array('app', 'smart', $app_id, $disk));
+        if (rrdtool_check_rrd_exists($rrd_filename)) {
+            $disks[]=$disk;
+        }
+        $all_disks_int++;
+    }
+    return $disks;
+}
