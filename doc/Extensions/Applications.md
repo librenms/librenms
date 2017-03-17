@@ -82,7 +82,7 @@ options {
 
 4: Verify that everything works by executing `rndc stats && cat /var/run/named/stats`. In case you get a `Permission Denied` error, make sure you chown'ed correctly.
 
-5: Also be aware that this file is appended to each time `rndc stats` is called. Given this it is suggested you setup file rotation for it.
+5: Also be aware that this file is appended to each time `rndc stats` is called. Given this it is suggested you setup file rotation for it. Alternatively you can also set zero_stats to 1 in the config.
 
 6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards in CentOS/Redhat and libfile-readbackwards-perl Debian/Ubuntu. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
 
@@ -97,6 +97,8 @@ The variables are as below.
 rndc = The path to rndc. Default: /usr/bin/env rndc
 call_rndc = A 0/1 boolean on weather to call rndc stats. Suggest to set to 0 if using netdata. Default: 1
 stats_file = The path to the named stats file. Default: /var/run/named/stats
+agent = A 0/1 boolean for if this is being used as a LibreNMS agent or not. Default: 0
+zero_stats = A 0/1 boolean for if the stats file should be zeroed first. Default: 0 (1 if guessed)
 ```
 
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
@@ -122,6 +124,8 @@ extend bind /etc/snmp/bind
 1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/bind` via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/bind -O /usr/lib/check_mk_agent/local/bind`
 
 2: Run `chmod +x /usr/lib/check_mk_agent/local/bind`
+
+3: Set the variable 'agent' to '1' in the config.
 
 ### DHCP Stats
 A small shell script that reports current DHCP leases stats.
