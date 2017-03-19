@@ -1489,3 +1489,31 @@ function get_disks($device)
 {
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
+
+//gets the postgres databases for a device... just requires the device ID
+//an empty return means either no databases(very unlikely) or it is not in use
+function get_postgres_databases($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'device_id' => array('=', $device_id),
+            'type' => array('=', 'postgres'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $pgc=$component->getComponents($device_id, $options);
+
+    if (isset($pgc[$device_id])) {
+        $pgcs=array_keys($pgc[$device_id]);
+
+        if (isset($pgc[$device_id][$pgcs[0]]['databases'])) {
+            return explode('|', $pgc[$device_id][$pgcs[0]]['databases']);
+        }else{
+            return;
+        }
+
+    }else{
+        return;
+    }
+}
