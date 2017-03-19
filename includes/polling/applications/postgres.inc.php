@@ -106,7 +106,7 @@ while (isset($db_lines[$db_lines_int])) {
 $device_id=$device['device_id'];
 
 $options=array(
-    'filter' => array( 
+    'filter' => array(
         'device_id' => array('=', $device_id),
         'type' => array('=', 'postgres'),
     ),
@@ -131,7 +131,7 @@ if (isset($pgc[$device_id])) {
     $pgc['databases']=implode('|', $found_dbs);
     $pgc=array( $pgcs[0] => $pgc );
 } else {
-    $pgc=$component->createComponent($device_id,'postgres');
+    $pgc=$component->createComponent($device_id, 'postgres');
     $pgcs=array_keys($pgc[$device_id]);
     $pgc=$pgc[$device_id][$pgcs[0]];
     $pgc['label']='postgres';

@@ -1509,11 +1509,10 @@ function get_postgres_databases($device_id)
 
         if (isset($pgc[$device_id][$pgcs[0]]['databases'])) {
             return explode('|', $pgc[$device_id][$pgcs[0]]['databases']);
-        }else{
+        } else {
             return;
         }
-
-    }else{
+    } else {
         return;
     }
 }
