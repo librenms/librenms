@@ -1489,3 +1489,31 @@ function get_disks($device)
 {
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
+
+//gets the fail2ban jails for a device... just requires the device ID
+//an empty return means either no jails or fail2ban is not in use
+function get_fail2ban_jails($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'device_id' => array('=', $device_id),
+            'type' => array('=', 'fail2ban'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $f2bc=$component->getComponents($device_id, $options);
+
+    if (isset($f2bc[$device_id])) {
+        $f2bcs=array_keys($f2bc[$device_id]);
+
+        if (isset($f2bc[$device_id][$f2bcs[0]]['jails'])) {
+            return explode('|', $f2bc[$device_id][$f2bcs[0]]['jails']);
+        }else{
+            return;
+        }
+
+    }else{
+        return;
+    }
+}
