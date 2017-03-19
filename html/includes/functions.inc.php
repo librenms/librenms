@@ -1509,11 +1509,10 @@ function get_fail2ban_jails($device_id)
 
         if (isset($f2bc[$device_id][$f2bcs[0]]['jails'])) {
             return explode('|', $f2bc[$device_id][$f2bcs[0]]['jails']);
-        }else{
+        } else {
             return;
         }
-
-    }else{
+    } else {
         return;
     }
 }

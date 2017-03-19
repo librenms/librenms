@@ -56,7 +56,7 @@ while (isset($bannedStuff[$int])) {
 $device_id=$device['device_id'];
 
 $options=array(
-    'filter' => array( 
+    'filter' => array(
         'device_id' => array('=', $device_id),
         'type' => array('=', 'fail2ban'),
     ),
@@ -81,7 +81,7 @@ if (isset($f2bc[$device_id])) {
     $f2bc['jails']=implode('|', $jails);
     $f2bc=array( $f2bcs[0] => $f2bc );
 } else {
-    $f2b=$component->createComponent($device_id,'fail2ban');
+    $f2b=$component->createComponent($device_id, 'fail2ban');
     $f2bcs=array_keys($f2b[$device_id]);
     $f2bc=$f2bc[$device_id][$f2bcs[0]];
     $f2bc['label']='fail2ban';
