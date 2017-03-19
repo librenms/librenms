@@ -558,9 +558,6 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 
 ### Unbound
 
-##### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
-
 Unbound configuration:
 
 ```text
@@ -575,7 +572,25 @@ remote-control:
 
 ```
 
-Restart your unbound after changing the configuration, verify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+Restart your unbound after changing the configuration, verify it is working by running 'unbound-control stats'.
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+
+##### SNMP Extend
+
+1: Copy the shell script, unbound, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound)
+
+2: Make the scripts executable (chmod +x /etc/snmp/unbound)
+
+3: Edit your snmpd.conf file and add:
+```
+extend unbound /etc/snmp/unbound
+```
+
+4: Restart snmpd.
+
+5: On the device page in Librenms, edit your host and check `Unbound` under the Applications tab.
 
 ### UPS-nut
 A small shell script that exports nut ups status.
