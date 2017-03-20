@@ -808,6 +808,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hikvision');
     }
 
+    public function testHirschmann()
+    {
+        $this->checkOS('hirschmann');
+    }
+
     public function testHp3par()
     {
         $this->checkOS('informos');
