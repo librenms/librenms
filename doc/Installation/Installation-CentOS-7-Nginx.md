@@ -74,6 +74,7 @@ systemctl restart php-fpm
 ```bash
 useradd librenms -d /opt/librenms -M -r
 usermod -a -G librenms nginx
+usermod -a -G librenms apache
 ```
 
 #### Clone repo
