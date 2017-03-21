@@ -14,6 +14,7 @@ if (!empty($agent_data['app'][$name])) {
     $oid     = 'nsExtendOutputFull.4.98.105.110.100';
     $bind    = snmp_get($device, $oid, $options, $mib);
 }
+update_application($app, $bind);
 
 list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
 
