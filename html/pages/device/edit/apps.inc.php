@@ -57,10 +57,12 @@ echo '</ul>';
                     toastr.success(result.message);
                 } else {
                     toastr.error(result.message);
+                    $this.bootstrapSwitch('state', !state, true);
                 }
             },
             error: function () {
                 toastr.error('Problem with backend');
+                $this.bootstrapSwitch('state', !state, true);
             }
         });
     });
