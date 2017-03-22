@@ -2,7 +2,6 @@
 
 require 'includes/graphs/common.inc.php';
 
-$scale_min       = 0;
 $ds              = 'frequency';
 $colour_area     = $config['graph_colours']['pinks'][0].'33';
 $colour_line     = $config['graph_colours']['pinks'][0];
