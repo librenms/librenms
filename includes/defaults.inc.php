@@ -604,10 +604,14 @@ $config['ignore_mount'][] = '/kern';
 $config['ignore_mount'][] = '/mnt/cdrom';
 $config['ignore_mount'][] = '/proc';
 $config['ignore_mount'][] = '/dev';
+$config['ignore_mount'][] = '/compat/linux/proc';
+$config['ignore_mount'][] = '/compat/linux/sys';
 
 $config['ignore_mount_string'][] = 'packages';
 $config['ignore_mount_string'][] = 'devfs';
 $config['ignore_mount_string'][] = 'procfs';
+$config['ignore_mount_string'][] = 'linprocfs';
+$config['ignore_mount_string'][] = 'linsysfs';
 $config['ignore_mount_string'][] = 'UMA';
 $config['ignore_mount_string'][] = 'MALLOC';
 
