@@ -59,6 +59,7 @@ pages:
     - Extensions/Network-Map.md
     - Extensions/NFSen.md
     - Extensions/Oxidized.md
+    - Extensions/PeeringDB.md
     - Extensions/Plugin-System.md
     - Extensions/Poller-Service.md
     - Extensions/Port-Description-Parser.md
