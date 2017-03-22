@@ -264,6 +264,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('avocent');
         $this->checkOS('avocent', 'avocent-alterpath');
+        $this->checkOS('avocent', 'avocent-cyclades-acs6000');
     }
 
     public function testAvtech()
