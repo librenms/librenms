@@ -397,7 +397,7 @@ $config['network_map_vis_options'] = '{
       "damping": 0.4,
       "avoidOverlap": 1
     },
-    
+
      "repulsion": {
       "centralGravity": 0.2,
       "springLength": 250,
@@ -413,7 +413,7 @@ $config['network_map_vis_options'] = '{
       "springConstant": 0.2,
       "damping": 0.07
     },
-    
+
   "maxVelocity": 50,
   "minVelocity": 0.4,
   "solver": "hierarchicalRepulsion",
@@ -905,3 +905,6 @@ $config['influxdb']['verifySSL']    = false;
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
+
+// Graphite default port
+$config['graphite']['port']         = 2003;
