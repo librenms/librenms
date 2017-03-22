@@ -319,6 +319,25 @@ $config['graph_colours']['manycolours'] = array(
     "E6A4A5", "D6707B", "C4384F", "BC1C39", "B30023",   // pinks
 );
 
+// interleaved purple, pink, green, blue, and orange
+$config['graph_colours']['psychedelic'] = array(
+    'CC7CCC', 'D0558F', 'B6D14B', 'A0A0E5', 'E43C00',
+    'AF63AF', 'B34773', '91B13C', '8080BD', 'E74B00',
+    '934A93', '943A57', '6D912D', '606096', 'EB5B00',
+    '773177', '792C38', '48721E', '40406F', 'EF6A00',
+    '5B185B', '5C1F1E', '24520F', '202048', 'F37900',
+    '3F003F', '401F10', '003300', '000033', 'F78800',
+    'FB9700', 'FFA700'
+);
+
+$config['graph_colours']['mega']=array_merge(
+    $config['graph_colours']['psychedelic'],
+    $config['graph_colours']['manycolours'],
+    $config['graph_colours']['default'],
+    $config['graph_colours']['mixed']
+);
+
+
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
@@ -378,7 +397,7 @@ $config['network_map_vis_options'] = '{
       "damping": 0.4,
       "avoidOverlap": 1
     },
-    
+
      "repulsion": {
       "centralGravity": 0.2,
       "springLength": 250,
@@ -394,7 +413,7 @@ $config['network_map_vis_options'] = '{
       "springConstant": 0.2,
       "damping": 0.07
     },
-    
+
   "maxVelocity": 50,
   "minVelocity": 0.4,
   "solver": "hierarchicalRepulsion",
@@ -750,6 +769,7 @@ $config['discovery_modules']['vmware-vminfo']        = 0;
 $config['discovery_modules']['libvirt-vminfo']       = 0;
 $config['discovery_modules']['toner']                = 0;
 $config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['applications']         = 0;
 $config['discovery_modules']['services']             = 1;
 $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
@@ -885,3 +905,6 @@ $config['influxdb']['verifySSL']    = false;
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
+
+// Graphite default port
+$config['graphite']['port']         = 2003;

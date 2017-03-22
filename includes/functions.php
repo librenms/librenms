@@ -1282,22 +1282,32 @@ function set_curl_proxy($curl)
 {
     global $config;
 
-    $proxy = '';
-    if (getenv('http_proxy')) {
-        $proxy = getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        $proxy = getenv('https_proxy');
-    } elseif (isset($config['callback_proxy'])) {
-        $proxy = $config['callback_proxy'];
-    } elseif (isset($config['http_proxy'])) {
-        $proxy = $config['http_proxy'];
-    }
+    $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
     $proxy = str_replace(array("http://", "https://"), "", $tmp);
     if (!empty($proxy)) {
         curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
+}
+
+/**
+ * Return the proxy url
+ *
+ * @return array|bool|false|string
+ */
+function get_proxy()
+{
+    if (getenv('http_proxy')) {
+        return getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        return getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        return $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        return $config['http_proxy'];
+    }
+    return false;
 }
 
 function target_to_id($target)
@@ -2090,5 +2100,85 @@ function update_device_logo(&$device)
         $device['icon'] = $icon;
         dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
         echo "Changed Icon! : $icon\n";
+    }
+}
+
+/**
+ * Function to generate PeeringDB Cache
+ */
+function cache_peeringdb()
+{
+    global $config;
+    if ($config['peeringdb']['enabled'] === true) {
+        $peeringdb_url = 'https://peeringdb.com/api';
+        // We cache for 71 hours
+        $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600");
+        if ($cached == 0) {
+            $rand = rand(30, 600);
+            echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
+            sleep($rand);
+            foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
+                $asn = $as['bgpLocalAs'];
+                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
+                $json_data = $get->body;
+                $data = json_decode($json_data);
+                $ixs = $data->{'data'}{0}->{'netixlan_set'};
+                foreach ($ixs as $ix) {
+                    $ixid = $ix->{'ix_id'};
+                    $tmp_ix = dbFetchRow("SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?", array($ixid, $asn));
+                    if ($tmp_ix) {
+                        $pdb_ix_id = $tmp_ix['pdb_ix_id'];
+                        $update = array('name' => $ix->{'name'}, 'timestamp' => time());
+                        dbUpdate($update, 'pdb_ix', 'ix_id` = ? AND asn = ?', array($ixid, $asn));
+                    } else {
+                        $insert = array(
+                            'ix_id' => $ixid,
+                            'name' => $ix->{'name'},
+                            'asn' => $asn,
+                            'timestamp' => time()
+                        );
+                        $pdb_ix_id = dbInsert($insert, 'pdb_ix');
+                    }
+                    $keep = $pdb_ix_id;
+                    $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", array(), array('proxy' => get_proxy()));
+                    $ix_json = $get_ix->body;
+                    $ix_data = json_decode($ix_json);
+                    $peers = $ix_data->{'data'};
+                    foreach ($peers as $index => $peer) {
+                        $peer_name = get_astext($peer->{'asn'});
+                        $tmp_peer = dbFetchRow("SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?", array($peer->{'id'}, $ixid));
+                        if ($tmp_peer) {
+                            $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
+                            $update = array(
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4'  => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                            );
+                            dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', array($tmp_peer['pdb_ix_peers_id']));
+                        } else {
+                            $peer_insert = array(
+                                'ix_id'          => $ixid,
+                                'peer_id'        => $peer->{'id'},
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4' => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                                'timestamp'      => time()
+                            );
+                            $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
+                        }
+                    }
+                    $pdb_ix_peers_ids = implode(',', $peer_keep);
+                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
+                }
+                $pdb_ix_ids = implode(',', $keep);
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
+            }
+        } else {
+            echo "Cached PeeringDB data found....." . PHP_EOL;
+        }
+    } else {
+        echo 'Peering DB integration disabled' . PHP_EOL;
     }
 }
