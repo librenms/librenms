@@ -32,6 +32,7 @@ if (is_admin() === false) {
     if (!isset($app) && validate_device_id($device_id) === false) {
         $status = array('status' => 1, 'message' => 'Error with data');
     } else {
+        $status = array('status' => 1, 'message' => 'Database update failed');
         if ($_POST['state'] == 'true') {
             $update = array(
                 'device_id' => $device_id,
