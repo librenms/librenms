@@ -2111,7 +2111,8 @@ function cache_peeringdb()
     global $config;
     if ($config['peeringdb']['enabled'] === true) {
         $peeringdb_url = 'https://peeringdb.com/api';
-        $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 82800");
+        // We cache for 71 hours
+        $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600");
         if ($cached == 0) {
             $rand = rand(30, 600);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
