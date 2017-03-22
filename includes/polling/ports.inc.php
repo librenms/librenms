@@ -227,7 +227,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 if ($config['enable_ports_etherlike']) {
     echo 'dot3Stats ';
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsEntry', $port_stats, 'EtherLike-MIB');
-} else {
+} elseif ($device['os'] != 'asa') {
     echo 'dot3StatsDuplexStatus';
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
@@ -279,7 +279,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vmVlan', $port_stats, 'CISCO-VLAN-MEMBERSHIP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
-} else {
+} elseif ($device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
 
