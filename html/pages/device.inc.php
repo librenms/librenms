@@ -445,7 +445,6 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     echo '<div class="tabcontent">';
     require 'pages/device/'.filter_var(basename($tab), FILTER_SANITIZE_URL).'.inc.php';
     echo '</div>';
-
 } else {
     // no device permissions
     require 'includes/error-no-perm.inc.php';
