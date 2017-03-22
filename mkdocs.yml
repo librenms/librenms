@@ -50,6 +50,7 @@ pages:
     - Extensions/Email-Alerting.md
     - Extensions/Globe-Frontpage.md
     - Extensions/Graylog.md
+    - Extensions/Graphite.md
     - Extensions/IRC-Bot.md
     - Extensions/IRC-Bot-Extensions.md
     - Extensions/InfluxDB.md
