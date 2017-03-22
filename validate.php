@@ -267,29 +267,40 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
     }
 }
 
-// check discovery last run
-if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
-    print_fail('Discovery has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 hour) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
-    print_fail("Discovery has not completed in the last 24 hours, check the cron job");
-}
-
 // check poller
-if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
+if (dbFetchCell('SELECT COUNT(*) FROM `pollers`')) {
+    if (dbFetchCell('SELECT COUNT(*) FROM `pollers` WHERE `last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE)') == 0) {
+        print_fail("The poller has not run in the last 5 minutes, check the cron job");
+    }
+} else {
     print_fail('The poller has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` >= DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") == 0) {
-    print_fail("The poller has not run in the last 5 minutes, check the cron job");
-} elseif (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
-    print_warn("Some devices have not been polled in the last 5 minutes.
-        You may have performance issues. Check your poll log and see: http://docs.librenms.org/Support/Performance/");
-    print_list($devices, "\t %s\n");
 }
 
-if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
-    print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.
+
+if (dbFetchCell('SELECT COUNT(*) FROM `devices`') == 0) {
+    print_warn("You have not added any devices yet.");
+} else {
+// check discovery last run
+    if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
+        print_fail('Discovery has never run, check the cron job');
+    } elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 HOUR) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+        print_fail("Discovery has not completed in the last 24 hours, check the cron job");
+    }
+
+// check devices polling
+    if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
+        print_warn("Some devices have not been polled in the last 5 minutes.
+        You may have performance issues. Check your poll log and see: http://docs.librenms.org/Support/Performance/");
+        print_list($devices, "\t %s\n");
+    }
+
+    if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
+        print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.
         Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
-    print_list($devices, "\t %s\n");
+        print_list($devices, "\t %s\n");
+    }
 }
+
 
 if ($git_found === true) {
     if ($versions['local_branch'] != 'master') {
