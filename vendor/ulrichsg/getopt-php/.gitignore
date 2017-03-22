@@ -1,0 +1,6 @@
+bin
+build
+composer.lock
+vendor
+nbproject
+_site
