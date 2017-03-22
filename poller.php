@@ -122,6 +122,12 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 
 if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
     $graphite = fsockopen($config['graphite']['host'], $config['graphite']['port']);
+    if ($graphite !== false) {
+        echo "Connection made to {$config['graphite']['host']} for Graphite support\n";
+    } else {
+        echo "Connection to {$config['graphite']['host']} has failed for, Graphite support disabled\n";
+        $config['nographite'] = true;
+    }
 } else {
     $graphite = false;
 }
