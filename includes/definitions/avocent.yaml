@@ -6,4 +6,4 @@ discovery:
     - sysDescr_regex:
         - '/^Avocent/'
         - '/^AlterPath/'
-        - '/^Cyclades ACS/'
+        - '/^Cyclades ACS 6000/'
