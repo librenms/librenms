@@ -170,6 +170,7 @@ main () {
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
+                status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
             cleanup)
                 # Cleanups
@@ -183,8 +184,7 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "rrd_purge"
-                               "peeringdb");
+                               "rrd_purge");
                 call_daily_php "${options[@]}";
             ;;
             submodules)

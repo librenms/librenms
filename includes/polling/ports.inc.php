@@ -751,6 +751,7 @@ foreach ($ports as $port) {
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
+        graphite_update($device, 'ports|' . $ifName, $tags, $fields);
 
         // End Update IF-MIB
         // Update PAgP

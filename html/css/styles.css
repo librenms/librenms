@@ -2038,6 +2038,10 @@ label {
   line-height:34px;
 }
 
+.nav > li > a {
+  padding: 10px 5px !important;
+}
+
 /* devices layout modifications */
 .devices-font-bold {
     font-weight: bold;
