@@ -52,10 +52,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rardnf', 'GAUGE', 0)
     ->addDataset('rarnfqa', 'GAUGE', 0)
     ->addDataset('iuscp', 'GAUGE', 0)
-    ->addDataset('msefl', 'GAUGE', 0)
     ->addDataset('sce', 'GAUGE', 0)
     ->addDataset('scp', 'GAUGE', 0)
-    ->addDataset('urr', 'GAUGE', 0);
+    ->addDataset('urr', 'GAUGE', 0)
+    ->addDataset('msefl', 'GAUGE', 0);
 
 $fields = array(
     'incomingq' => $incomingq,
@@ -90,10 +90,10 @@ $fields = array(
     'rardnf' => $rardnf,
     'rarnfqa' => $rarnfqa,
     'iuscp' => $iuscp,
-    'msefl' => $msefl,
     'sce' => $sce,
     'scp' => $scp,
-    'urr' => $urr
+    'urr' => $urr,
+    'msefl' => $msefl,
 );
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
