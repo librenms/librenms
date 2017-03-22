@@ -769,6 +769,7 @@ $config['discovery_modules']['vmware-vminfo']        = 0;
 $config['discovery_modules']['libvirt-vminfo']       = 0;
 $config['discovery_modules']['toner']                = 0;
 $config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['applications']         = 0;
 $config['discovery_modules']['services']             = 1;
 $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
