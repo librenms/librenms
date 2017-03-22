@@ -21,6 +21,7 @@ Table of Content:
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
+    - [Telegram](#transports-telegram)
     - [Pushbullet](#transports-pushbullet)
     - [Clickatell](#transports-clickatell)
     - [PlaySMS](#transports-playsms)
@@ -452,6 +453,26 @@ $config['alert']['transports']['boxcar'][] = array(
                                                     );
 ```
 ~~
+
+## <a name="transports-telegram">Telegram</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+> Thank you to [snis](https://github.com/snis) for these instructions.
+
+1. First you must create a telegram account and add BotFather to you list. To do this click on the following url: https://telegram.me/botfather
+
+2. Generate a new bot with the command "/newbot" BotFather is then asking for a username and a normal name. After that your bot is created and you get a HTTP token. (for more options for your bot type "/help")
+
+3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` and send some text to the bot.
+
+4. Now copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
+
+5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468”
+   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`
+   
+6. Now create a new "Telegram transport" in LibreNMS (Global Settings -> Alerting Settings -> Telegram transport).
+Click on 'Add Telegram config' and put your chat id and token into the relevant box.
 
 ## <a name="transports-pushbullet">Pushbullet</a>
 
