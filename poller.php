@@ -125,7 +125,7 @@ if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
     if ($graphite !== false) {
         echo "Connection made to {$config['graphite']['host']} for Graphite support\n";
     } else {
-        echo "Connection to {$config['graphite']['host']} has failed for, Graphite support disabled\n";
+        echo "Connection to {$config['graphite']['host']} has failed, Graphite support disabled\n";
         $config['nographite'] = true;
     }
 } else {
