@@ -1,0 +1,24 @@
+{
+    "name": "ulrichsg/getopt-php",
+    "type": "library",
+    "description": "Command line arguments parser for PHP 5.3",
+    "homepage": "http://ulrichsg.github.io/getopt-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ulrich Schmidt-Goertz",
+            "email": "ulrich@schmidt-goertz.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Ulrichsg\\": "src"
+        }
+    }
+}

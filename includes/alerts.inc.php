@@ -186,13 +186,16 @@ function RunRules($device)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
+        $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
         if ($doalert) {
             if ($chk['state'] === "2") {
                 c_echo('Status: %ySKIP');
             } elseif ($chk['state'] >= "1") {
+                // NOCHG here doesn't mean no change full stop. It means no change to the alert state
+                // So we update the details column with any fresh changes to the alert output we might have.
+                dbUpdate(array('details' => $extra), 'alert_log', 'device_id = ? && rule_id = ?', array($device,$rule['id']));
                 c_echo('Status: %bNOCHG');
             } else {
-                $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
                 if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
                     if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
                         dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
