@@ -38,17 +38,20 @@ $graph_array['height'] = '45';
 $graph_array['width']  = '150';
 $graph_array['bg']     = 'FFFFFF00';
 
-echo '<div class="pull-right">';
-foreach ($graphs as $entry) {
-    if ($entry['graph']) {
-        $graph_array['type'] = $entry['graph'];
+if (device_permitted($device['device_id']) || $config['allow_unauth_graphs']) {
+    echo '<div class="pull-right">';
+    foreach ($graphs as $entry) {
+        if ($entry['graph']) {
+            $graph_array['type'] = $entry['graph'];
 
-        echo "<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; ' class='rounded-5px'>";
-        print_graph_popup($graph_array);
-        echo "<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>".$entry['text'].'</div>';
-        echo '</div>';
+            echo "<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; ' class='rounded-5px'>";
+            print_graph_popup($graph_array);
+            echo "<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>" . $entry['text'] . '</div>';
+            echo '</div>';
+        }
     }
+    echo '</div>';
 }
-echo '</div><br style="clear: both;" />';
+echo '<br style="clear: both;" />';
 
 unset($graph_array);
