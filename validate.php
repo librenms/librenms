@@ -269,7 +269,7 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
 
 // check poller
 if (dbFetchCell('SELECT COUNT(*) FROM `pollers`')) {
-    if (dbFetchCell('SELECT COUNT(*) FROM `pollers` WHERE `last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE)') == 0) {
+    if (dbFetchCell('SELECT COUNT(*) FROM `pollers` WHERE `last_polled` >= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)') == 0) {
         print_fail("The poller has not run in the last 5 minutes, check the cron job");
     }
 } else {
