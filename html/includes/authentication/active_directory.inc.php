@@ -1,5 +1,7 @@
 <?php
 
+use Phpass\PasswordHash;
+
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
 
 // disable certificate checking before connect if required
@@ -18,6 +20,19 @@ $ldap_connection = @ldap_connect($config['auth_ad_url']);
 
 ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
 ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+// Bind to AD
+if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+    // With specified bind user
+    if (!ldap_bind($ldap_connection, "${config['auth_ad_binduser']}@${config['auth_ad_domain']}", "${config['auth_ad_bindpassword']}")) {
+        echo ldap_error($ldap_connection);
+    }
+} else {
+    // Anonymous
+    if (!ldap_bind($ldap_connection)) {
+        echo ldap_error($ldap_connection);
+    }
+}
 
 function authenticate($username, $password)
 {
@@ -78,10 +93,30 @@ function authenticate($username, $password)
     return 0;
 }
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
-    // not supported so return 0
-    return 0;
+    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+        $sess_id = clean($sess_id);
+        $token = clean($token);
+        list($username, $hash) = explode('|', $token);
+
+        if (!user_exists($username)) {
+            return 0;
+        }
+
+        $session = dbFetchRow(
+            "SELECT * FROM `session` WHERE `session_username`=? AND session_value=?",
+            array($username, $sess_id),
+            true
+        );
+        $hasher = new PasswordHash(8, false);
+        if ($hasher->CheckPassword($username . $session['session_token'], $hash)) {
+            $_SESSION['username'] = $username;
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }
 
 
@@ -108,20 +143,8 @@ function auth_usermanagement()
 
 function adduser($username, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '', $twofactor = 0)
 {
-    // Check to see if user is already added in the database
-    if (!user_exists_in_db($username)) {
-        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
-        if ($userid == false) {
-            return false;
-        } else {
-            foreach (dbFetchRows('select notifications.* from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?) order by notifications.notifications_id desc', array($userid)) as $notif) {
-                dbInsert(array('notifications_id'=>$notif['notifications_id'],'user_id'=>$userid,'key'=>'read','value'=>1), 'notifications_attribs');
-            }
-        }
-        return $userid;
-    } else {
-        return false;
-    }
+    // not supported so return 0
+    return 0;
 }
 
 function user_exists_in_db($username)
@@ -199,12 +222,37 @@ function get_userid($username)
     $entries = ldap_get_entries($ldap_connection, $search);
 
     if ($entries['count']) {
-        return preg_replace('/.*-(\d+)$/', '$1', sid_from_ldap($entries[0]['objectsid'][0]));
+        return get_userid_from_sid(sid_from_ldap($entries[0]['objectsid'][0]));
     }
 
     return -1;
 }
 
+function get_domain_sid()
+{
+    global $config, $ldap_connection;
+
+    $search = ldap_read(
+        $ldap_connection,
+        $config['auth_ad_base_dn'],
+        '(objectClass=*)',
+        array('objectsid')
+    );
+    $entry = ldap_get_entries($ldap_connection, $search);
+    return substr(sid_from_ldap($entry[0]['objectsid'][0]), 0, 41);
+}
+
+function get_user($user_id)
+{
+    global $config, $ldap_connection;
+
+    $domain_sid = get_domain_sid();
+
+    $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
+    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, array('samaccountname'));
+    $entries = ldap_get_entries($ldap_connection, $search);
+    return $entries[0]['samaccountname'][0];
+}
 
 function deluser($userid)
 {
@@ -212,8 +260,7 @@ function deluser($userid)
     dbDelete('devices_perms', '`user_id` =  ?', array($userid));
     dbDelete('ports_perms', '`user_id` =  ?', array($userid));
     dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-    dbDelete('users', '`user_id` =  ?', array($userid));
-    return dbDelete('users', '`user_id` =  ?', array($userid));
+    return 0;
 }
 
 
@@ -235,15 +282,11 @@ function get_userlist()
 
         foreach ($results as $result) {
             if (isset($result['samaccountname'][0])) {
-                $userid = preg_replace(
-                    '/.*-(\d+)$/',
-                    '$1',
-                    sid_from_ldap($result['objectsid'][0])
-                );
+                $userid = get_userid_from_sid(sid_from_ldap($result['objectsid'][0]));
 
                 // don't make duplicates, user may be member of more than one group
                 $userhash[$result['samaccountname'][0]] = array(
-                    'realname' => $result['displayName'][0],
+                    'realname' => $result['displayname'][0],
                     'user_id'  => $userid,
                     'email'    => $result['mail'][0]
                 );
@@ -271,18 +314,27 @@ function can_update_users()
 }
 
 
-function get_user($user_id)
-{
-    // not supported so return 0
-    return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
-}
-
-
 function update_user($user_id, $realname, $level, $can_modify_passwd, $email)
 {
-    dbUpdate(array('realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
+    // not supported so return 0
+    return 0;
 }
 
+function get_email($username)
+{
+    global $config, $ldap_connection;
+
+    $attributes = array('mail');
+    $search = ldap_search(
+        $ldap_connection,
+        $config['auth_ad_base_dn'],
+        get_auth_ad_user_filter($username),
+        $attributes
+    );
+    $result = ldap_get_entries($ldap_connection, $search);
+    unset($result[0]['mail']['count']);
+    return current($result[0]['mail']);
+}
 
 function get_fullname($username)
 {
@@ -357,6 +409,11 @@ function get_cn($dn)
     $dn = str_replace('\\,', '~C0mmA~', $dn);
     preg_match('/[^,]*/', $dn, $matches, PREG_OFFSET_CAPTURE, 3);
     return str_replace('~C0mmA~', ',', $matches[0][0]);
+}
+
+function get_userid_from_sid($sid)
+{
+    return preg_replace('/.*-(\d+)$/', '$1', $sid);
 }
 
 function sid_from_ldap($sid)

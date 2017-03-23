@@ -84,6 +84,8 @@ $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
 $config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
+$config['auth_ad_binduser'] = 'examplebinduser';
+$config['auth_ad_bindpassword'] = 'examplepassword';
 
 $config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;
@@ -93,6 +95,7 @@ $config['auth_ldap_groupmemberattr'] = "memberUid";
 ```
 
 Typically auth_ldap_suffix, auth_ldap_group, auth_ldap_groupbase, auth_ldap_groups are what's required to be configured.
+It is highly suggested to create a bind user, other wise "remember me", alerting AD users, and the API will not work.
 
 An example config setup for use with Jumpcloud LDAP as a service is:
 
