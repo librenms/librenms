@@ -37,9 +37,31 @@ $temp_output .= "
         data.addRows([
 ";
 
-$locations = array();
-foreach (getlocations() as $location) {
-    $location = mres($location);
+if ($_SESSION['userlevel'] >= '5') {
+    $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+                    LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
+                    ORDER BY `status` ASC, `hostname`";
+    $params = array();
+} else {
+    $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
+                    FROM `devices_perms`, `devices`
+                    LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
+                    AND `devices`.`device_id` = `devices_perms`.`device_id`
+                    AND `devices_perms`.`user_id` = ? 
+                    ORDER BY `status` ASC, `hostname`";
+    $params = array($_SESSION['user_id']);
+}
+foreach (dbFetchRows($sql, $params) as $tmp_locations) {
+    $location = mres($tmp_locations['location']);
+    $lat      = $tmp_locations['lat'];
+    $lng      = $tmp_locations['lng'];
+    $loc      = parse_location($location);
+    if (is_array($loc)) {
+        $lat = $loc['lat'];
+        $lng = $loc['lng'];
+    }
     $devices = array();
     $devices_down = array();
     $devices_up = array();
@@ -73,7 +95,11 @@ foreach (getlocations() as $location) {
     } elseif ($config['frontpage_globe']['markers'] == 'ports') {
         $devices_down = array_merge(array(count($devices_up). " Ports OK"), $devices_down);
     }
-    $locations[] = "            ['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
+    if (!empty($lat) && !empty($lng)) {
+        $locations[] = "            ['$lat, $lng', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
+    } else {
+        $locations[] = "            ['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
+    }
 }
 $temp_output .= implode(",\n", $locations);
 
