@@ -55,7 +55,6 @@ case "critical":
     $sev_txt = "Critical";
     break;
 case "warning":
-    $priority = $facility + 4;
     $severity = 4;
     $sev_txt = "Warning";
     break;
