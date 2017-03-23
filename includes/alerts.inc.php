@@ -157,9 +157,9 @@ function RunRules($device)
     }
     foreach (GetRules($device) as $rule) {
         c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
-        $inv = json_decode($rule['extra'], true);
-        if (isset($inv['invert'])) {
-            $inv = (bool) $inv['invert'];
+        $extra = json_decode($rule['extra'], true);
+        if (isset($extra['invert'])) {
+            $inv = (bool) $extra['invert'];
         } else {
             $inv = false;
         }
@@ -186,7 +186,9 @@ function RunRules($device)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
-        $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
+        $extra['contacts'] = GetContacts($qry);
+        $extra['rule']     = $qry;
+        $extra = gzcompress(json_encode($extra), 9);
         if ($doalert) {
             if ($chk['state'] === "2") {
                 c_echo('Status: %ySKIP');
