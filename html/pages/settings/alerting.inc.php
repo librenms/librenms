@@ -1307,6 +1307,48 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$syslog_host     = get_config_by_name('alert.transports.syslog.syslog_host');
+$syslog_port    = get_config_by_name('alert.transports.syslog.syslog_port');
+$syslog_facility   = get_config_by_name('alert.transports.syslog.syslog_facility');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#syslog_transport_expand"><i class="fa fa-caret-down"></i> Syslog transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="syslog" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="syslog_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="syslog_host" class="col-sm-4 control-label">Syslog Host </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_host" class="form-control" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="syslog_port" class="col-sm-4 control-label">Syslog Port </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="syslog_facility" class="col-sm-4 control-label">Syslog Facility </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
