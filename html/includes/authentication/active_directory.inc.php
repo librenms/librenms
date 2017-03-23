@@ -119,6 +119,8 @@ function reauthenticate($sess_id, $token)
             return 0;
         }
     }
+
+    return 0;
 }
 
 
