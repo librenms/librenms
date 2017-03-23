@@ -25,19 +25,19 @@ $device = device_by_id_cache($obj['device_id']); // for event logging
 if (!empty($opts['syslog_facility']) && preg_match("/^\d+$/", $opts['syslog_facility'])) {
     $facility = (int)$opts['syslog_facility'] * 8;
 } else {
-    log_event("Syslog facility is not an integer: " . $opts['syslog_facility'], $device, 'poller');
+    log_event("Syslog facility is not an integer: " . $opts['syslog_facility'], $device, 'poller', 5);
 }
 if (!empty($opts['syslog_host'])) {
     if (preg_match("/[a-zA-Z]/", $opts['syslog_host'])) {
         $syslog_host = gethostbyname($opts['syslog_host']);
         if ($syslog_host === $opts['syslog_host']) {
-          log_event("Alphanumeric hostname found but does not resolve to an IP.", $device, 'poller');
+          log_event("Alphanumeric hostname found but does not resolve to an IP.", $device, 'poller', 5);
           return false;
         }
     } elseif (filter_var($opts['syslog_host'], FILTER_VALIDATE_IP)) {
         $syslog_host = $opts['syslog_host'];
     } else {
-        log_event("Syslog host is not a valid IP: " . $opts['syslog_host'], $device, 'poller');
+        log_event("Syslog host is not a valid IP: " . $opts['syslog_host'], $device, 'poller', 5);
         return false;
     }
 } else {
@@ -46,7 +46,7 @@ if (!empty($opts['syslog_host'])) {
 if (!empty($opts['syslog_port']) && preg_match("/^\d+$/", $opts['syslog_port'])) {
     $syslog_port = $opts['syslog_port'];
 } else {
-    log_event("Syslog port is not an integer.", $device, 'poller');
+    log_event("Syslog port is not an integer.", $device, 'poller', 5);
 }
 
 switch( $obj['severity'] ) {
@@ -93,7 +93,7 @@ $syslog_prefix = '<'
 ;
 
 if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
-    log_event("socket_create() failed: reason: " . socket_strerror(socket_last_error()), $device, 'poller');
+    log_event("socket_create() failed: reason: " . socket_strerror(socket_last_error()), $device, 'poller', 5);
     return false;
 } else {
     if( !empty( $obj['faults'] ) ) {
