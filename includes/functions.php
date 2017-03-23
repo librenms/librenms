@@ -1280,8 +1280,6 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    global $config;
-
     $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
@@ -1298,6 +1296,8 @@ function set_curl_proxy($curl)
  */
 function get_proxy()
 {
+    global $config;
+    
     if (getenv('http_proxy')) {
         return getenv('http_proxy');
     } elseif (getenv('https_proxy')) {
