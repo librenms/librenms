@@ -31,6 +31,7 @@ Table of Content:
     - [Microsoft Teams](#transports-msteams)
     - [Cisco Spark](#transports-ciscospark)
     - [SMSEagle](#transports-smseagle)
+    - [Syslog](#transports-syslog)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -628,7 +629,7 @@ SMSEagle is a hardware SMS Gateway that can be used via their HTTP-API using a U
 Please consult their documentation at [www.smseagle.eu](http://www.smseagle.eu)
 Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
 
-~~
+~
 ```php
 $config['alert']['transports']['smseagle']['url']   = 'ip.add.re.ss';
 $config['alert']['transports']['smseagle']['user']  = 'smseagle_user';
@@ -636,7 +637,22 @@ $config['alert']['transports']['smseagle']['token'] = 'smseagle_user_password';
 $config['alert']['transports']['smseagle']['to'][]  = '+3534567890';
 $config['alert']['transports']['smseagle']['to'][]  = '0834567891';
 ```
-~~
+~
+
+## <a name="transports-syslog">Syslog</a>
+
+You can have LibreNMS emit alerts as syslogs complying with RFC 3164.
+More information on RFC 3164 can be found here: https://tools.ietf.org/html/rfc3164
+Example output: `<26> Mar 22 00:59:03 librenms.host.net librenms[233]: [Critical] network.device.net: Port Down - port_id => 98939; ifDescr => xe-1/1/0;`
+Each fault will be sent as a separate syslog.
+
+~
+```php
+$config['alert']['transports']['syslog']['syslog_host']   = '127.0.0.1';
+$config['alert']['transports']['syslog']['syslog_port']  = 514;
+$config['alert']['transports']['syslog']['syslog_facility'] = 3;
+```
+~
 
 # <a name="entities">Entities
 
