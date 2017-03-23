@@ -1,0 +1,4 @@
+suites:
+    readmegen:
+        namespace: ReadmeGen
+        psr4_prefix: ReadmeGen

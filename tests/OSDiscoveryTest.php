@@ -264,6 +264,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('avocent');
         $this->checkOS('avocent', 'avocent-alterpath');
+        $this->checkOS('avocent', 'avocent-cyclades-acs6000');
     }
 
     public function testAvtech()
@@ -1586,6 +1587,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('sonus-sbc');
         $this->checkOS('sonus-sbc', 'sonus-sbc1');
+        $this->checkOS('sonus-sbc', 'sonus-sbc1500');
     }
 
     public function testSophos()
