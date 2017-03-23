@@ -2,7 +2,7 @@
 
 // Code borrowed and modified from 'powerconnect-cpu.inc.php' 
 
-if ($device['os'] == 'dnos') {
+if ($device['os_group'] == 'dnos') {
     echo 'DNOS-MEMORY-POOL:  ';
 
     $get_series = explode('.', snmp_get($device, 'mib-2.1.2.0', '-Onvsbq', 'F10-PRODUCTS-MIB', 'dnos'), 2); // Get series From MIB
