@@ -10,3 +10,4 @@ poller_modules:
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.5951.1
+        - .1.3.6.1.4.1.5951.6
