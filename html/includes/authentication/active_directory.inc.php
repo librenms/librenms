@@ -95,6 +95,8 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
+    global $config;
+
     if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
         $sess_id = clean($sess_id);
         $token = clean($token);
