@@ -2129,7 +2129,7 @@ function cache_peeringdb()
                     if ($tmp_ix) {
                         $pdb_ix_id = $tmp_ix['pdb_ix_id'];
                         $update = array('name' => $ix->{'name'}, 'timestamp' => time());
-                        dbUpdate($update, 'pdb_ix', 'ix_id` = ? AND asn = ?', array($ixid, $asn));
+                        dbUpdate($update, 'pdb_ix', '`ix_id` = ? AND `asn` = ?', array($ixid, $asn));
                     } else {
                         $insert = array(
                             'ix_id' => $ixid,

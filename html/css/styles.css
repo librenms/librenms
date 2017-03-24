@@ -2039,7 +2039,8 @@ label {
 }
 
 .nav > li > a {
-  padding: 10px 5px !important;
+  padding-left: 10px;
+  padding-right: 5px;
 }
 
 /* devices layout modifications */
