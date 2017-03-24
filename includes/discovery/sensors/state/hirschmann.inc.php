@@ -35,16 +35,22 @@ if ($device['os'] == 'hirschmann') {
         foreach ($oid as $index => $entry) {
             //Discover Sensors
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'Power Supply '.$oid[$index]['hmPSID'], '1', '1', null, null, null, null, $oid[$index]['hmPowerSupplyStatus'], 'snmp', $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
+<<<<<<< HEAD
 =======
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, 'hmPowerSupplyStatus'.$index, $state_name, 'Power Supply '.$oid[$index]['hmPSID'], '1', '1', null, null, null, null, $oid[$index]['hmPowerSupplyStatus'], 'snmp', 'hmPowerSupplyStatus'.$index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, 'hmPowerSupplyStatus'.$index);
 >>>>>>> a4be2a48926c3e4942aaed8a573eea2f6d4a29ab
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
         }
     }
 
@@ -83,16 +89,22 @@ if ($device['os'] == 'hirschmann') {
         $descr = 'LED Status Power Supply';
     //Discover Sensors
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', $index);
 
     //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
+<<<<<<< HEAD
 =======
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, 'hmLEDRSPowerSupply.'.$index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', 'hmLEDRSPowerSupply.'.$index);
 
     //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, 'hmLEDRSPowerSupply.'.$index);
 >>>>>>> a4be2a48926c3e4942aaed8a573eea2f6d4a29ab
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
     }
 
    //////////////////////////
@@ -130,16 +142,22 @@ if ($device['os'] == 'hirschmann') {
         $descr = 'LED Status Standby';
         //Discover Sensors
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', $index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
+<<<<<<< HEAD
 =======
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, 'hmLEDRStandby.'.$index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', 'hmLEDRStandby.'.$index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, 'hmLEDRStandby.'.$index);
 >>>>>>> a4be2a48926c3e4942aaed8a573eea2f6d4a29ab
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
     }
 
     /////////////////////////////////////
@@ -177,16 +195,22 @@ if ($device['os'] == 'hirschmann') {
         $descr = 'LED Status Redundancy Manager';
         //Discover Sensors
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', $index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
+<<<<<<< HEAD
 =======
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, 'hmLEDRSRedundancyManager.'.$index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', 'hmLEDRSRedundancyManager.'.$index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, 'hmLEDRSRedundancyManager.'.$index);
 >>>>>>> a4be2a48926c3e4942aaed8a573eea2f6d4a29ab
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
     }
 
     ////////////////////////
@@ -224,15 +248,21 @@ if ($device['os'] == 'hirschmann') {
         $descr = 'LED Status Fault';
         //Discover Sensors
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', $index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
+<<<<<<< HEAD
 =======
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, 'hmLEDRSFault.'.$index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', 'hmLEDRSFault.'.$index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, 'hmLEDRSFault.'.$index);
 >>>>>>> a4be2a48926c3e4942aaed8a573eea2f6d4a29ab
+=======
+>>>>>>> c3de8148d1accc0a328bff2972836f6e2c969efd
     }
 }
