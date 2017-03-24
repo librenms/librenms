@@ -10,4 +10,7 @@ mib_dir:
     - ups
 discovery:
     - sysObjectId: .1.3.6.1.4.1.534.
-    - sysDescr: 'Eaton 5P'
+    - sysDescr:
+        - 'Eaton 5P'
+        - 'Eaton 9PX 2000 RT'
+
