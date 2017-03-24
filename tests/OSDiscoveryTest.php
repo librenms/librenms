@@ -1199,6 +1199,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testNetscaler()
     {
         $this->checkOS('netscaler');
+        $this->checkOS('netscaler', 'netscaler-sdx');
     }
 
     public function testNetvision()
