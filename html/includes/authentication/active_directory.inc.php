@@ -22,16 +22,8 @@ ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
 ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 // Bind to AD
-if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
-    // With specified bind user
-    if (!ldap_bind($ldap_connection, "${config['auth_ad_binduser']}@${config['auth_ad_domain']}", "${config['auth_ad_bindpassword']}")) {
-        echo ldap_error($ldap_connection);
-    }
-} else {
-    // Anonymous
-    if (!ldap_bind($ldap_connection)) {
-        echo ldap_error($ldap_connection);
-    }
+if (!ad_bind($ldap_connection)) {
+    d_echo(ldap_error($ldap_connection));
 }
 
 function authenticate($username, $password)
@@ -95,9 +87,9 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
-    global $config;
+    global $ldap_connection;
 
-    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+    if (ad_bind($ldap_connection, false)) {
         $sess_id = clean($sess_id);
         $token = clean($token);
         list($username, $hash) = explode('|', $token);
@@ -253,9 +245,15 @@ function get_user($user_id)
     $domain_sid = get_domain_sid();
 
     $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
-    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, array('samaccountname'));
-    $entries = ldap_get_entries($ldap_connection, $search);
-    return $entries[0]['samaccountname'][0];
+    $attributes = array('samaccountname','displayname','objectsid','mail');
+    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, $attributes);
+    $entry = ldap_get_entries($ldap_connection, $search);
+
+    if (isset($entry[0]['samaccountname'][0])) {
+        return user_from_ad($entry[0]);
+    }
+
+    return array();
 }
 
 function deluser($userid)
@@ -272,7 +270,6 @@ function get_userlist()
 {
     global $config, $ldap_connection;
     $userlist = array();
-    $userhash = array();
 
     $ldap_groups = get_group_list();
 
@@ -286,28 +283,35 @@ function get_userlist()
 
         foreach ($results as $result) {
             if (isset($result['samaccountname'][0])) {
-                $userid = get_userid_from_sid(sid_from_ldap($result['objectsid'][0]));
-
-                // don't make duplicates, user may be member of more than one group
-                $userhash[$result['samaccountname'][0]] = array(
-                    'realname' => $result['displayname'][0],
-                    'user_id'  => $userid,
-                    'email'    => $result['mail'][0]
-                );
+                $userlist[$result['samaccountname'][0]] = user_from_ad($result);
             }
         }
     }
 
-    foreach (array_keys($userhash) as $key) {
-        $userlist[] = array(
-            'username' => $key,
-            'realname' => $userhash[$key]['realname'],
-            'user_id'  => $userhash[$key]['user_id'],
-            'email'    => $userhash[$key]['email']
-        );
-    }
+    return array_values($userlist);
+}
 
-    return $userlist;
+/**
+ * Generate a user array from an AD LDAP entry
+ * Must have the attributes: objectsid, samaccountname, displayname, mail
+ * @internal
+ *
+ * @param $entry
+ * @return array
+ */
+function user_from_ad($entry)
+{
+    return array(
+        'user_id' => get_userid_from_sid(sid_from_ldap($entry['objectsid'][0])),
+        'username' => $entry['samaccountname'][0],
+        'realname' => $entry['displayname'][0],
+        'email' => $entry['mail'][0],
+        'descr' => '',
+        'level' => get_userlevel($entry['samaccountname'][0]),
+        'can_modify_passwd' => 0,
+        'twofactor' => 0,
+        // 'dashboard' => 'broken!',
+    );
 }
 
 
@@ -428,4 +432,33 @@ function sid_from_ldap($sid)
         $revLevel = hexdec(substr($sidHex, 0, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));
         return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
+}
+
+/**
+ * Bind to AD with the bind user if available, otherwise anonymous bind
+ * @internal
+ *
+ * @param resource $connection the ldap connection resource
+ * @param bool $allow_anonymous attempt anonymous bind if bind user isn't available
+ * @return bool success or failure
+ */
+function ad_bind($connection, $allow_anonymous = true)
+{
+    global $config;
+
+    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+        // With specified bind user
+        return ldap_bind(
+            $connection,
+            "${config['auth_ad_binduser']}@${config['auth_ad_domain']}",
+            "${config['auth_ad_bindpassword']}"
+        );
+    }
+
+    if ($allow_anonymous) {
+        // Anonymous
+        return ldap_bind($connection);
+    }
+
+    return false;
 }
