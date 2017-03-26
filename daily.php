@@ -170,3 +170,7 @@ if ($options['f'] === 'notify') {
         );
     }
 }
+
+if ($options['f'] === 'peeringdb') {
+    cache_peeringdb();
+}

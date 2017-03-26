@@ -226,6 +226,24 @@ $graphs['bind']      = array(
     'adb_in',
     'sockets_active',
     'sockets_errors',
+};
+  
+$graphs['smart'] = array(
+    'id5',
+    'id10',
+    'id173',
+    'id183',
+    'id184',
+    'id187',
+    'id188',
+    'id190',
+    'id194',
+    'id196',
+    'id197',
+    'id198',
+    'id199',
+    'id231',
+    'id233',
 );
 
 print_optionbar_start();

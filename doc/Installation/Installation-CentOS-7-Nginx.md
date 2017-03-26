@@ -9,7 +9,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 ```bash
 yum install mariadb-server mariadb
 systemctl restart mariadb
-mysql -uroot -p
+mysql -uroot
 ```
 
 ```sql
@@ -74,6 +74,7 @@ systemctl restart php-fpm
 ```bash
 useradd librenms -d /opt/librenms -M -r
 usermod -a -G librenms nginx
+usermod -a -G librenms apache
 ```
 
 #### Clone repo

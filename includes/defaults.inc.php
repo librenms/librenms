@@ -319,6 +319,7 @@ $config['graph_colours']['manycolours'] = array(
     "E6A4A5", "D6707B", "C4384F", "BC1C39", "B30023",   // pinks
 );
 
+// interleaved purple, pink, green, blue, and orange
 $config['graph_colours']['psychedelic'] = array(
     'CC7CCC', 'D0558F', 'B6D14B', 'A0A0E5', 'E43C00',
     'AF63AF', 'B34773', '91B13C', '8080BD', 'E74B00',
@@ -395,7 +396,7 @@ $config['network_map_vis_options'] = '{
       "damping": 0.4,
       "avoidOverlap": 1
     },
-    
+
      "repulsion": {
       "centralGravity": 0.2,
       "springLength": 250,
@@ -411,7 +412,7 @@ $config['network_map_vis_options'] = '{
       "springConstant": 0.2,
       "damping": 0.07
     },
-    
+
   "maxVelocity": 50,
   "minVelocity": 0.4,
   "solver": "hierarchicalRepulsion",
@@ -621,10 +622,14 @@ $config['ignore_mount'][] = '/kern';
 $config['ignore_mount'][] = '/mnt/cdrom';
 $config['ignore_mount'][] = '/proc';
 $config['ignore_mount'][] = '/dev';
+$config['ignore_mount'][] = '/compat/linux/proc';
+$config['ignore_mount'][] = '/compat/linux/sys';
 
 $config['ignore_mount_string'][] = 'packages';
 $config['ignore_mount_string'][] = 'devfs';
 $config['ignore_mount_string'][] = 'procfs';
+$config['ignore_mount_string'][] = 'linprocfs';
+$config['ignore_mount_string'][] = 'linsysfs';
 $config['ignore_mount_string'][] = 'UMA';
 $config['ignore_mount_string'][] = 'MALLOC';
 
@@ -763,6 +768,7 @@ $config['discovery_modules']['vmware-vminfo']        = 0;
 $config['discovery_modules']['libvirt-vminfo']       = 0;
 $config['discovery_modules']['toner']                = 0;
 $config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['applications']         = 0;
 $config['discovery_modules']['services']             = 1;
 $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
@@ -898,3 +904,6 @@ $config['influxdb']['verifySSL']    = false;
 
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
+
+// Graphite default port
+$config['graphite']['port']         = 2003;
