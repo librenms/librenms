@@ -9,7 +9,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 ```bash
 yum install mariadb-server mariadb
 systemctl restart mariadb
-mysql -uroot -p
+mysql -uroot
 ```
 
 ```sql
