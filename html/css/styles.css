@@ -2038,18 +2038,9 @@ label {
   line-height:34px;
 }
 
-@media only screen and (max-width: 1240px) and (min-width: 1200px) {
-    .nav > li > a {
-        padding: 4px 4px !important;
-        padding-top: 15px !important;
-    }
-}
-
-@media only screen and (min-width: 1241px) {
-    .nav > li > a {
-        padding: 5px 5px !important;
-        padding-top: 15px !important;
-    }
+.nav > li > a {
+  padding-left: 10px;
+  padding-right: 5px;
 }
 
 /* devices layout modifications */

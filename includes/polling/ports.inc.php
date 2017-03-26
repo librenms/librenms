@@ -227,7 +227,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 if ($config['enable_ports_etherlike']) {
     echo 'dot3Stats ';
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsEntry', $port_stats, 'EtherLike-MIB');
-} else {
+} elseif ($device['os'] != 'asa') {
     echo 'dot3StatsDuplexStatus';
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
@@ -279,7 +279,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vmVlan', $port_stats, 'CISCO-VLAN-MEMBERSHIP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
-} else {
+} elseif ($device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
 
@@ -440,14 +440,12 @@ foreach ($ports as $port) {
             $port['update']['poll_period'] = $polled_period;
         }
 
-        // Copy ifHC[In|Out]Octets values to non-HC if they exist
-        if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {
-            echo 'HC ';
-            $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
+        // use HC values if they are available
+        if (!isset($this_port['ifInOctets'])) {
+            echo "HC ";
+            $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-        }
-        if (is_numeric($this_port['ifHCInUcastPkts']) && $this_port['ifHCInUcastPkts'] > 0 && is_numeric($this_port['ifHCOutUcastPkts']) && $this_port['ifHCOutUcastPkts'] > 0) {
-            $this_port['ifInUcastPkts']  = $this_port['ifHCInUcastPkts'];
+            $this_port['ifInUcastPkts'] = $this_port['ifHCInUcastPkts'];
             $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
         }
 
@@ -753,6 +751,7 @@ foreach ($ports as $port) {
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
+        graphite_update($device, 'ports|' . $ifName, $tags, $fields);
 
         // End Update IF-MIB
         // Update PAgP

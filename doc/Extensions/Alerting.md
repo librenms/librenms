@@ -21,6 +21,7 @@ Table of Content:
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
+    - [Telegram](#transports-telegram)
     - [Pushbullet](#transports-pushbullet)
     - [Clickatell](#transports-clickatell)
     - [PlaySMS](#transports-playsms)
@@ -30,6 +31,7 @@ Table of Content:
     - [Microsoft Teams](#transports-msteams)
     - [Cisco Spark](#transports-ciscospark)
     - [SMSEagle](#transports-smseagle)
+    - [Syslog](#transports-syslog)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -453,6 +455,26 @@ $config['alert']['transports']['boxcar'][] = array(
 ```
 ~~
 
+## <a name="transports-telegram">Telegram</a>
+
+[Using a proxy?](../Support/Configuration.md#proxy-support)
+
+> Thank you to [snis](https://github.com/snis) for these instructions.
+
+1. First you must create a telegram account and add BotFather to you list. To do this click on the following url: https://telegram.me/botfather
+
+2. Generate a new bot with the command "/newbot" BotFather is then asking for a username and a normal name. After that your bot is created and you get a HTTP token. (for more options for your bot type "/help")
+
+3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` and send some text to the bot.
+
+4. Now copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
+
+5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468”
+   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`
+   
+6. Now create a new "Telegram transport" in LibreNMS (Global Settings -> Alerting Settings -> Telegram transport).
+Click on 'Add Telegram config' and put your chat id and token into the relevant box.
+
 ## <a name="transports-pushbullet">Pushbullet</a>
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
@@ -607,7 +629,7 @@ SMSEagle is a hardware SMS Gateway that can be used via their HTTP-API using a U
 Please consult their documentation at [www.smseagle.eu](http://www.smseagle.eu)
 Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
 
-~~
+~
 ```php
 $config['alert']['transports']['smseagle']['url']   = 'ip.add.re.ss';
 $config['alert']['transports']['smseagle']['user']  = 'smseagle_user';
@@ -615,7 +637,22 @@ $config['alert']['transports']['smseagle']['token'] = 'smseagle_user_password';
 $config['alert']['transports']['smseagle']['to'][]  = '+3534567890';
 $config['alert']['transports']['smseagle']['to'][]  = '0834567891';
 ```
-~~
+~
+
+## <a name="transports-syslog">Syslog</a>
+
+You can have LibreNMS emit alerts as syslogs complying with RFC 3164.
+More information on RFC 3164 can be found here: https://tools.ietf.org/html/rfc3164
+Example output: `<26> Mar 22 00:59:03 librenms.host.net librenms[233]: [Critical] network.device.net: Port Down - port_id => 98939; ifDescr => xe-1/1/0;`
+Each fault will be sent as a separate syslog.
+
+~
+```php
+$config['alert']['transports']['syslog']['syslog_host']   = '127.0.0.1';
+$config['alert']['transports']['syslog']['syslog_port']  = 514;
+$config['alert']['transports']['syslog']['syslog_facility'] = 3;
+```
+~
 
 # <a name="entities">Entities
 
