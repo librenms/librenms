@@ -226,8 +226,8 @@ $graphs['bind']      = array(
     'adb_in',
     'sockets_active',
     'sockets_errors',
-};
-  
+);
+
 $graphs['smart'] = array(
     'id5',
     'id10',
