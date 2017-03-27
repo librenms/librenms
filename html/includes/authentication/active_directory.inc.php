@@ -95,6 +95,7 @@ function reauthenticate($sess_id, $token)
         list($username, $hash) = explode('|', $token);
 
         if (!user_exists($username)) {
+            d_echo("$username is not a valid AD user\n");
             return 0;
         }
 
@@ -108,6 +109,7 @@ function reauthenticate($sess_id, $token)
             $_SESSION['username'] = $username;
             return 1;
         } else {
+            d_echo("Reauthenticate token check failed\n");
             return 0;
         }
     }
@@ -245,7 +247,7 @@ function get_user($user_id)
     $domain_sid = get_domain_sid();
 
     $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
-    $attributes = array('samaccountname','displayname','objectsid','mail');
+    $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
     $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, $attributes);
     $entry = ldap_get_entries($ldap_connection, $search);
 
@@ -278,7 +280,8 @@ function get_userlist()
         if ($config['auth_ad_user_filter']) {
             $search_filter = "(&{$config['auth_ad_user_filter']}$search_filter)";
         }
-        $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, array('samaccountname','displayname','objectsid','mail'));
+        $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
+        $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], $search_filter, $attributes);
         $results = ldap_get_entries($ldap_connection, $search);
 
         foreach ($results as $result) {

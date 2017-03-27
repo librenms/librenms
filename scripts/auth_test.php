@@ -1,18 +1,49 @@
 #!/usr/bin/php
 <?php
 
-if (isset($argv[1]) && $argv[1] == '-d') {
+use Phpass\PasswordHash;
+
+$options = getopt('u:drh');
+if (isset($options['h']) || !isset($options['u'])) {
+    echo ' -u <username>  (Required) username to test
+ -r             Reauthenticate user, (requires previous web login with "Remember me" enabled)
+ -d             Enable debug output
+ -v             Enable verbose debug output
+ -h             Display this help message
+';
+    exit;
+}
+
+$username = $options['u'];
+
+if (isset($options['d'])) {
     $debug = true;
-    $config['auth_ad_debug'] = 1;
+}
+
+if (isset($options['v'])) {
+    // might need more options for other auth methods
+    $config['auth_ad_debug'] = 1; // active_directory
 }
 
 $init_modules = array('auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (function_exists('ad_bind') && isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
-    if (!ad_bind($ldap_connection, false)) {
-        print_error('LDAP Bind failed for user ' . $config['auth_ad_binduser'] . '@' . $config['auth_ad_domain'] .
-        '. Check $config[\'auth_ad_binduser\'] and $config[\'auth_ad_bindpassword\'] in your config.php');
+echo "Authentication Method: {$config['auth_mechanism']}\n";
+
+if (function_exists('ad_bind')) {
+    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+        if (!ad_bind($ldap_connection, false)) {
+            print_error('AD bind failed for user ' . $config['auth_ad_binduser'] . '@' . $config['auth_ad_domain'] .
+                '. Check $config[\'auth_ad_binduser\'] and $config[\'auth_ad_bindpassword\'] in your config.php');
+        } else {
+            print_message('AD bind success');
+        }
+    } else {
+        if (!ad_bind($ldap_connection)) {
+            print_warn("Could not anonymous bind to AD");
+        } else {
+            print_message('AD bind anonymous successful');
+        }
     }
 }
 
@@ -30,36 +61,59 @@ if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_di
     }
 }
 
-$username = readline('Username: ');
-echo 'Password: ';
-`stty -echo`;
-$password = trim(fgets(STDIN));
-`stty echo`;
-echo PHP_EOL;
+$auth = false;
+if (isset($options['r'])) {
+    echo "Reauthenticate Test\n";
 
-echo "Authenticate user $username: \n";
-if (authenticate($username, $password)) {
-    print_message("AUTH SUCCESS\n");
+    $session = dbFetchRow('SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1', array($username));
+    d_echo($session);
+    if (empty($session)) {
+        print_error('Requires previous login with \'Remember me\' box checked on the webui');
+        exit;
+    }
+
+    $hasher   = new PasswordHash(8, false);
+    $token = $session['session_username'] . '|' . $hasher->HashPassword($session['session_username'] . $session['session_token']);
+
+    $auth = reauthenticate($session['session_value'], $token);
+    if ($auth) {
+        print_message("Reauthentication successful.\n");
+    } else {
+        print_error('Reauthentication failed or us unsupported');
+    }
 } else {
-    print_error("AUTH FAILURE\n");
-}
+    echo 'Password: ';
+    `stty -echo`;
+    $password = trim(fgets(STDIN));
+    `stty echo`;
+    echo PHP_EOL;
 
-$user_id = get_userid($username);
+    echo "Authenticate user $username: \n";
+    $auth = authenticate($username, $password);
+    unset($password);
 
-echo "User:\n";
-if (function_exists('get_user')) {
-    $user = get_user($user_id);
-
-    unset($user['password']);
-    unset($user['remember_token']);
-    foreach ($user as $property => $value) {
-        echo "  $property => $value\n";
+    if ($auth) {
+        print_message("AUTH SUCCESS\n");
+    } else {
+        print_error('AUTH FAILURE');
     }
 }
 
-if (function_exists('get_group_list')) {
-    echo 'Groups: ' . implode('; ', get_group_list()) . PHP_EOL;
+if ($auth) {
+    $user_id = get_userid($username);
+
+    echo "User:\n";
+    if (function_exists('get_user')) {
+        $user = get_user($user_id);
+
+        unset($user['password']);
+        unset($user['remember_token']);
+        foreach ($user as $property => $value) {
+            echo "  $property => $value\n";
+        }
+    }
+
+    if (function_exists('get_group_list')) {
+        echo 'Groups: ' . implode('; ', get_group_list()) . PHP_EOL;
+    }
 }
-
-
-unset($password);
