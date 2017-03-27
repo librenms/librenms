@@ -3,7 +3,7 @@
 
 use Phpass\PasswordHash;
 
-$options = getopt('u:drh');
+$options = getopt('u:rdvh');
 if (isset($options['h']) || !isset($options['u'])) {
     echo ' -u <username>  (Required) username to test
  -r             Reauthenticate user, (requires previous web login with "Remember me" enabled)
@@ -30,24 +30,6 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 echo "Authentication Method: {$config['auth_mechanism']}\n";
 
-if (function_exists('ad_bind')) {
-    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
-        if (!ad_bind($ldap_connection, false)) {
-            print_error('AD bind failed for user ' . $config['auth_ad_binduser'] . '@' . $config['auth_ad_domain'] .
-                '. Check $config[\'auth_ad_binduser\'] and $config[\'auth_ad_bindpassword\'] in your config.php');
-        } else {
-            print_message('AD bind success');
-        }
-    } else {
-        if (!ad_bind($ldap_connection)) {
-            print_warn("Could not anonymous bind to AD");
-        } else {
-            print_message('AD bind anonymous successful');
-        }
-    }
-}
-
-
 // if ldap like, check selinux
 if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_directory") {
     $enforce = shell_exec('getenforce 2>/dev/null');
@@ -57,6 +39,28 @@ if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_di
         if ($output != "httpd_can_connect_ldap --> on\n") {
             print_error("You need to run: setsebool -P httpd_can_connect_ldap=1");
             exit;
+        }
+    }
+}
+
+if (function_exists('ad_bind')) {
+    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+        if (!ad_bind($ldap_connection, false)) {
+            $ldap_error = ldap_error($ldap_connection);
+            echo $ldap_error . PHP_EOL;
+            if ($ldap_error == 'Invalid credentials') {
+                print_error('AD bind failed for user ' . $config['auth_ad_binduser'] . '@' . $config['auth_ad_domain'] .
+                    '. Check $config[\'auth_ad_binduser\'] and $config[\'auth_ad_bindpassword\'] in your config.php');
+            }
+        } else {
+            print_message('AD bind success');
+        }
+    } else {
+        if (!ad_bind($ldap_connection)) {
+            echo ldap_error($ldap_connection) . PHP_EOL;
+            print_warn("Could not anonymous bind to AD");
+        } else {
+            print_message('AD bind anonymous successful');
         }
     }
 }
@@ -79,7 +83,7 @@ if (isset($options['r'])) {
     if ($auth) {
         print_message("Reauthentication successful.\n");
     } else {
-        print_error('Reauthentication failed or us unsupported');
+        print_error('Reauthentication failed or is unsupported');
     }
 } else {
     echo 'Password: ';
@@ -95,6 +99,9 @@ if (isset($options['r'])) {
     if ($auth) {
         print_message("AUTH SUCCESS\n");
     } else {
+        if (isset($ldap_connection)) {
+            echo ldap_error($ldap_connection) . PHP_EOL;
+        }
         print_error('AUTH FAILURE');
     }
 }

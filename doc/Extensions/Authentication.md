@@ -41,7 +41,14 @@ When using SELinux on the LibreNMS server, you need to allow Apache (httpd) to c
 setsebool -P httpd_can_connect_ldap=1
 ```
 
-#### MySQL Authentication
+#### Testing authentication
+You can test authentication with this script:
+```shell
+./scripts/auth_test
+```
+Enable debug output to troubleshoot issues
+
+### MySQL Authentication
 
 Config option: `mysql`
 
@@ -54,7 +61,7 @@ $config['db_pass'] = "DBPASS";
 $config['db_name'] = "DBNAME";
 ```
 
-#### HTTP Authentication
+### HTTP Authentication
 
 Config option: `http-auth`
 
@@ -69,7 +76,7 @@ $config['http_auth_guest'] = "guest";
 ```
 This will then assign the userlevel for guest to all authenticated users.
 
-#### LDAP Authentication
+### LDAP Authentication
 
 Config option: `ldap`
 
@@ -115,7 +122,7 @@ $config['auth_ldap_groupmemberattr'] = "memberUid";
 
 Replace {id} with the unique ID provided by Jumpcloud.
 
-#### HTTP Authentication / LDAP Authorization
+### HTTP Authentication / LDAP Authorization
 
 Config option: `ldap-authorization`
 
@@ -133,7 +140,7 @@ To disabled this caching (highly discourage) set this option to 0.
 $config['auth_ldap_cache_ttl'] = 300;
 ```
 
-#### Active Directory Authentication
+### Active Directory Authentication
 
 Config option: `active_directory`
 
@@ -186,7 +193,7 @@ $config['auth_ad_group_filter'] = "(objectclass=group)";
 
 This yields `(&(objectclass=user)(sAMAccountName=$username))` for the user filter and `(&(objectclass=group)(sAMAccountName=$group))` for the group filter.
 
-#### Radius Authentication
+### Radius Authentication
 
 Please note that a mysql user is created for each user the logs in successfully. User level 1 is assigned to those accounts so you will then need to assign the relevant permissions unless you set `$config['radius']['userlevel']` to be something other than 1.
 
@@ -202,7 +209,7 @@ $config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14
 $config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user.
 ```
 
-#### HTTP Authentication / AD Authorization
+### HTTP Authentication / AD Authorization
 
 Config option: `ad-authorization`
 

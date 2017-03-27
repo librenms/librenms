@@ -23,7 +23,7 @@ ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 // Bind to AD
 if (!ad_bind($ldap_connection)) {
-    d_echo(ldap_error($ldap_connection));
+    d_echo(ldap_error($ldap_connection) . PHP_EOL);
 }
 
 function authenticate($username, $password)
