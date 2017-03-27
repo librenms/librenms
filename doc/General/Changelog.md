@@ -1,5 +1,121 @@
 source: General/Changelog.md
 
+## 1.26
+*(2017-03-25)*
+
+#### Features
+* Added syslog alert transport ([#6246](https://github.com/librenms/librenms/issues/6246))
+* Send collected data to graphite server ([#6201](https://github.com/librenms/librenms/issues/6201))
+* Added SMART application support ([#6181](https://github.com/librenms/librenms/issues/6181))
+* Peeringdb integration to show the Exchanges and peers for your AS' ([#6178](https://github.com/librenms/librenms/issues/6178))
+* Added support for sending alerts to Telegram [#2114](https://github.com/librenms/librenms/issues/2114) ([#6202](https://github.com/librenms/librenms/issues/6202))
+* Added pbin.sh to upload text to p.libren.ms ([#6175](https://github.com/librenms/librenms/issues/6175))
+* Added better BGP support for Arista ([#6046](https://github.com/librenms/librenms/issues/6046))
+* Added rrd step conversion script ([#6081](https://github.com/librenms/librenms/issues/6081))
+* Store the username in eventlog for any entries created through the Webui ([#6032](https://github.com/librenms/librenms/issues/6032))
+* Added Nvidia GPU  application support ([#6024](https://github.com/librenms/librenms/issues/6024))
+* Added Squid application support ([#6011](https://github.com/librenms/librenms/issues/6011))
+* Added FreeBSD NFS Client/Server application support ([#6008](https://github.com/librenms/librenms/issues/6008))
+* Added get_disks function ([#6058](https://github.com/librenms/librenms/issues/6058))
+* Updated Nfsen integration support ([#6003](https://github.com/librenms/librenms/issues/6003))
+* Added Basic Oxidized Node List ([#6017](https://github.com/librenms/librenms/issues/6017))
+* Added support for dynamic interfaces in ifAlias script ([#6005](https://github.com/librenms/librenms/issues/6005))
+* Added support Postfix application ([#6002](https://github.com/librenms/librenms/pull/6002))
+* Added Postgres application support ([#6004](https://github.com/librenms/librenms/pull/6004))
+* Added ability to show links to fixes for validate ([#6054](https://github.com/librenms/librenms/pull/6054))
+* Added FreeBSD NFS Client/Server application support ([#6008](https://github.com/librenms/librenms/pull/6008))
+* Added Squid application support ([#6011](https://github.com/librenms/librenms/pull/6011))
+* Added Nvidia GPU application support ([#6024](https://github.com/librenms/librenms/pull/6024))
+* Added app_state support for applications #5068 ([#6061](https://github.com/librenms/librenms/pull/6061))
+* Send default mail when no email destinations found ([#6165](https://github.com/librenms/librenms/pull/6165))
+* Added new alert rules to collection ([#6166](https://github.com/librenms/librenms/pull/6166))
+* Added SMART app support ([#6181](https://github.com/librenms/librenms/pull/6181))
+* Added Application discovery ([#6143](https://github.com/librenms/librenms/pull/6143))
+* Added syslog alert transport and docs ([#6246](https://github.com/librenms/librenms/pull/6246))
+
+#### Bugfixes
+* Clear out stale alerts ([#6268](https://github.com/librenms/librenms/issues/6268))
+* Remove min value for ntp* graphs [#6240](https://github.com/librenms/librenms/issues/6240)
+* Alerts that worsen or get better will now record updated info [#4323](https://github.com/librenms/librenms/issues/4323) ([#6203](https://github.com/librenms/librenms/issues/6203))
+* Do not show overview graphs when user only has port permissions for device ([#6230](https://github.com/librenms/librenms/issues/6230))
+* Yaml files for edgeos and edgeswitch ([#6208](https://github.com/librenms/librenms/issues/6208))
+* Fix Liebert humidity and temp sensors [#6196](https://github.com/librenms/librenms/issues/6196) ([#6198](https://github.com/librenms/librenms/issues/6198))
+* Graphs $auth check was too strict ([#6195](https://github.com/librenms/librenms/issues/6195))
+* Alter the database to set the proper character set and collation ([#6189](https://github.com/librenms/librenms/issues/6189))
+* Wrong NetBotz file location ([#6188](https://github.com/librenms/librenms/issues/6188))
+* Change rfc1628 'state' (est. runtime and on battery) to runtime ([#6158](https://github.com/librenms/librenms/issues/6158))
+* Fix the displaying of alert info for historical alerts [#6092](https://github.com/librenms/librenms/issues/6092) ([#6107](https://github.com/librenms/librenms/issues/6107))
+* Record actual sensor value for unix-agent hddtemp [#5904](https://github.com/librenms/librenms/issues/5904) ([#6089](https://github.com/librenms/librenms/issues/6089))
+* Ping perf is in milliseconds, not seconds ([#6140](https://github.com/librenms/librenms/issues/6140))
+* SVG scaling issues in Internet Explorer ([#6021](https://github.com/librenms/librenms/issues/6021))
+* Old / duplicate sensors would never be removed, this is fixed by setting the $type correctly [#6044](https://github.com/librenms/librenms/issues/6044) ([#6079](https://github.com/librenms/librenms/issues/6079))
+* Refactor ipoman cache code to use pre-cache in sensors [#5881](https://github.com/librenms/librenms/issues/5881) ([#5983](https://github.com/librenms/librenms/issues/5983))
+* Fixed the previous graphs for diskio/bits [#6077](https://github.com/librenms/librenms/issues/6077) ([#6083](https://github.com/librenms/librenms/issues/6083))
+* Update OSTicket transport to use the from email address [#5739](https://github.com/librenms/librenms/issues/5739) ([#5927](https://github.com/librenms/librenms/issues/5927))
+* Do not try and only include files once when they are needed again! ([#5881](https://github.com/librenms/librenms/issues/5881))
+* Correct the use of GetContacts() #5012 ([#6059](https://github.com/librenms/librenms/pull/6059))
+* Netonix: properly set default fanspeed limits ([#6144](https://github.com/librenms/librenms/pull/6144))
+* Fix Generex load sensor divisor ([#6155](https://github.com/librenms/librenms/pull/6155))
+* Sensors not being removed from database ([#6169](https://github.com/librenms/librenms/pull/6169))
+* Updated http-auth to work with nginx http auth #6102 ([#6174](https://github.com/librenms/librenms/pull/6174))
+* Change rfc1628 'state' (est. runtime and on battery) to runtime ([#6158](https://github.com/librenms/librenms/pull/6158))
+
+#### Documentation
+* Renamed the mysql extend script to just mysql ([#6126](https://github.com/librenms/librenms/issues/6126))
+
+#### Refactoring
+* Move some DNOS detection to PowerConnect [#6150](https://github.com/librenms/librenms/issues/6150) ([#6206](https://github.com/librenms/librenms/issues/6206))
+* Rename check_domain_expire.inc.php to check_domain.inc.php ([#6238](https://github.com/librenms/librenms/issues/6238))
+* Further speed improvements to port poller ([#6037](https://github.com/librenms/librenms/issues/6037))
+
+#### Devices
+* Added Rx levels on Ubiquiti Airfibre ([#6160](https://github.com/librenms/librenms/issues/6160))
+* Added detection for Hirschmann Railswitch [#6161](https://github.com/librenms/librenms/issues/6161) ([#6207](https://github.com/librenms/librenms/issues/6207))
+* Support for Netscaler SDX appliances ([#6249](https://github.com/librenms/librenms/issues/6249))
+* Added discovery of Cyclades ACS ([#6234](https://github.com/librenms/librenms/issues/6234))
+* Added additional sensors for Liebert / Vertiv [#5369](https://github.com/librenms/librenms/issues/5369) ([#6123](https://github.com/librenms/librenms/issues/6123))
+* Added state detection for Dell TL4k [#2752](https://github.com/librenms/librenms/issues/2752)
+* Added support for Cyberpower PDU ([#6013](https://github.com/librenms/librenms/issues/6013))
+* Added support for Digipower PDU ([#6014](https://github.com/librenms/librenms/issues/6014))
+* Basic Lantronix UDS support ([#6042](https://github.com/librenms/librenms/issues/6042))
+* Added detection for more Dell switches ([#6048](https://github.com/librenms/librenms/issues/6048))
+* Added HPE Comware Processor Discovery ([#6029](https://github.com/librenms/librenms/issues/6029))
+* Added Basic FortiWLC Support ([#6016](https://github.com/librenms/librenms/issues/6016))
+* Added support for F5 Traffic Management Module mempool ([#6076](https://github.com/librenms/librenms/pull/6076))
+* Added new Planet switch ([#6085](https://github.com/librenms/librenms/pull/6085))
+* Added state detection for Dell TL4k ([#6094](https://github.com/librenms/librenms/pull/6094))
+* Added extrahop detection ([#6097](https://github.com/librenms/librenms/pull/6097))
+* Updated 3com switch detection ([#6114](https://github.com/librenms/librenms/pull/6114))
+* Improved APC NetBotz Support ([#6157](https://github.com/librenms/librenms/pull/6157))
+* Added state support for HP servers #5113 ([#6124](https://github.com/librenms/librenms/pull/6124))
+* Added Coriant support ([#6026](https://github.com/librenms/librenms/pull/6026))
+* Basic Zebra Print Server detection ([#6162](https://github.com/librenms/librenms/pull/6162))
+* Added state sensor support for RFC1628 UPS ([#6153](https://github.com/librenms/librenms/pull/6153))
+* Added APC NetBotz State Sensor Support ([#6167](https://github.com/librenms/librenms/pull/6167))
+* Updated Sonus SBC os detection #6241 ([#6243](https://github.com/librenms/librenms/pull/6243))
+* Added discovery of Cyclades ACS 6000 ([#6234](https://github.com/librenms/librenms/pull/6234))
+
+#### WebUI
+* Do not show disabled devices in alerts list as they stale [#6213](https://github.com/librenms/librenms/issues/6213) ([#6263](https://github.com/librenms/librenms/issues/6263))
+* Create correct link for BGP peers [#5958](https://github.com/librenms/librenms/issues/5958)
+* Update device overview to not show hostname when certain conditions match [#5984](https://github.com/librenms/librenms/issues/5984) ([#6091](https://github.com/librenms/librenms/issues/6091))
+* Display sysnames/hostnames instead of ip addresses [#4155](https://github.com/librenms/librenms/issues/4155)
+* Fix BGP Icon for global search [#6031](https://github.com/librenms/librenms/issues/6031)
+* Generex: more helpful overview graphs ([#6154](https://github.com/librenms/librenms/issues/6154))
+* Added ability to set warning percentage for CPU and mempools ([#5901](https://github.com/librenms/librenms/pull/5901))
+* Stop autorefresh on bill edit page #6182 ([#6193](https://github.com/librenms/librenms/pull/6193))
+* Allow remember_token to be null ([#6231](https://github.com/librenms/librenms/pull/6231))
+* Set the from / to for graphs in the devices list #6262 ([#6264](https://github.com/librenms/librenms/pull/6264))
+
+#### Security
+* Stop multiport_bits_separate graphs for showing regardless of auth [#6101](https://github.com/librenms/librenms/issues/6101) ([#6109](https://github.com/librenms/librenms/issues/6109))
+
+#### API
+* Expose ports in API requests for bills ([#6069](https://github.com/librenms/librenms/issues/6069))
+* Added new route for multiport bit graphs + asn list_bgp filter ([#6129](https://github.com/librenms/librenms/issues/6129))
+
+---
+
 ## 1.25
 *(2017-02-26)*
 

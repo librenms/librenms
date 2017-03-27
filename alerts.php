@@ -63,6 +63,8 @@ if (isset($options['d'])) {
 
 if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'Start: '.date('r')."\r\n";
+    echo "ClearStaleAlerts():" . PHP_EOL;
+    ClearStaleAlerts();
     echo "RunFollowUp():\r\n";
     RunFollowUp();
     echo "RunAlerts():\r\n";
@@ -74,6 +76,16 @@ if (!defined('TEST') && $config['alert']['disable'] != 'true') {
 
 unlink($config['install_dir'].'/.alerts.lock');
 
+function ClearStaleAlerts()
+{
+    $sql = "SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=0 AND `devices`.`hostname` IS NULL";
+    foreach (dbFetchRows($sql) as $alert) {
+        if (empty($alert['hostname']) && isset($alert['alert_id'])) {
+            dbDelete('alerts', '`id` = ?', array($alert['alert_id']));
+            echo "Stale-alert: #{$alert['alert_id']}" . PHP_EOL;
+        }
+    }
+}
 
 /**
  * Re-Validate Rule-Mappings
