@@ -44,7 +44,7 @@ setsebool -P httpd_can_connect_ldap=1
 #### Testing authentication
 You can test authentication with this script:
 ```shell
-./scripts/auth_test
+./scripts/auth_test.php
 ```
 Enable debug output to troubleshoot issues
 
