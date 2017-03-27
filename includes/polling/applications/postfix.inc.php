@@ -4,6 +4,8 @@ $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
+echo "Postfix";
+
 $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $queueOID     = 'nsExtendOutputFull.5.109.97.105.108.113';
@@ -16,7 +18,7 @@ list($incomingq, $activeq, $deferredq, $holdq) = explode("\n", $mailq);
 
 list($received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
      $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
-     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr) = explode("\n", $detail);
+     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr, $msefl) = explode("\n", $detail);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -56,6 +58,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('scp', 'GAUGE', 0)
     ->addDataset('urr', 'GAUGE', 0);
 
+$msefl_rrd_name = array('app', $name, $app_id, 'msefl');
+$msefl_rrd_def = RrdDefinition::make()
+    ->addDataset('msefl', 'GAUGE', 0);
+
 $fields = array(
     'incomingq' => $incomingq,
     'activeq' => $activeq,
@@ -94,5 +100,12 @@ $fields = array(
     'urr' => $urr
 );
 
+$msefl_fields = array(
+    'msefl' => $msefl,
+);
+
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
+
+$msefl_tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $msefl_rrd_def, 'rrd_name' => $msefl_rrd_name);
+data_update($device, 'app', $msefl_tags, $msefl_fields);

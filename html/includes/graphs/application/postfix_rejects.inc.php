@@ -13,6 +13,7 @@ $addarea       = 1;
 $transparency  = 15;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
+$msefl_rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, 'msefl'));
 
 if (is_file($rrd_filename)) {
     $rrd_list = array(
@@ -93,6 +94,12 @@ if (is_file($rrd_filename)) {
             'descr'    => 'Config Problem',
             'ds'       => 'scp',
             'colour'   => '28006C'
+        ),
+        array(
+            'filename' => $msefl_rrd_filename,
+            'descr'    => 'Msg Size',
+            'ds'       => 'msefl',
+            'colour'   => '003300'
         ),
         array(
             'filename' => $rrd_filename,
