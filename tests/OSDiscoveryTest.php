@@ -576,19 +576,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDnos()
     {
         $this->checkOS('dnos');
-        $this->checkOS('dnos', 'dnos1');
-        $this->checkOS('dnos', 'dnos2');
-        $this->checkOS('dnos', 'dnos3');
-        $this->checkOS('dnos', 'dnos4');
-        $this->checkOS('dnos', 'dnos5');
-        $this->checkOS('dnos', 'dnos6');
-        $this->checkOS('dnos', 'dnos7');
-        $this->checkOS('dnos', 'dnos8');
-        $this->checkOS('dnos', 'dnos9');
-        $this->checkOS('dnos', 'dnos10');
-        $this->checkOS('dnos', 'dnos11');
-        $this->checkOS('dnos', 'dnos12');
-        $this->checkOS('dnos', 'dnos13');
     }
 
     public function testDrac()
@@ -1367,6 +1354,19 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('powerconnect', 'powerconnect-3019');
         $this->checkOS('powerconnect', 'powerconnect-3031');
         $this->checkOS('powerconnect', 'powerconnect-3041');
+        $this->checkOS('powerconnect', 'powerconnect1');
+        $this->checkOS('powerconnect', 'powerconnect2');
+        $this->checkOS('powerconnect', 'powerconnect3');
+        $this->checkOS('powerconnect', 'powerconnect4');
+        $this->checkOS('powerconnect', 'powerconnect5');
+        $this->checkOS('powerconnect', 'powerconnect6');
+        $this->checkOS('powerconnect', 'powerconnect7');
+        $this->checkOS('powerconnect', 'powerconnect8');
+        $this->checkOS('powerconnect', 'powerconnect9');
+        $this->checkOS('powerconnect', 'powerconnect10');
+        $this->checkOS('powerconnect', 'powerconnect11');
+        $this->checkOS('powerconnect', 'powerconnect12');
+        $this->checkOS('powerconnect', 'powerconnect13');
     }
 
     public function testPowervault()

@@ -2,7 +2,7 @@
 
 require_once $config['install_dir'].'/includes/device-groups.inc.php';
 
-$where = 1;
+$where = ' `devices`.`disabled` = 0';
 
 $alert_states = array(
     // divined from librenms/alerts.php
