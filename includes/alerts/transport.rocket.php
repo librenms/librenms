@@ -28,7 +28,7 @@ foreach( $opts as $tmp_api ) {
     $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
     /*
     $data = array(
-        "attachments' => array(
+        'attachments' => array(
             0 => array(
                 'fallback' => $rocket_msg,
                 'color' => $color,
