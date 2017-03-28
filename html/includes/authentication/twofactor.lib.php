@@ -208,11 +208,10 @@ function twofactor_form($form = true)
 function twofactor_auth()
 {
     global $auth_message, $twofactorform, $config;
-    $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
-    if (empty($twofactor['twofactor'])) {
+    $twofactor = get_user_pref('twofactor');
+    if (empty($twofactor)) {
         $_SESSION['twofactor'] = true;
     } else {
-        $twofactor = json_decode($twofactor['twofactor'], true);
         if ($twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time()-$twofactor['last']) < $config['twofactor_lock'])) {
             $auth_message = "Too many failures, please ".($config['twofactor_lock'] ? "wait ".$config['twofactor_lock']." seconds" : "contact administrator").".";
         } else {
@@ -234,7 +233,7 @@ function twofactor_auth()
                     $twofactor['fails'] = 0;
                     $_SESSION['twofactor'] = true;
                 }
-                dbUpdate(array('twofactor' => json_encode($twofactor)), 'users', 'username = ?', array($_SESSION['username']));
+                set_user_pref('twofactor', $twofactor);
             }
         }
     }

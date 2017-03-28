@@ -1506,3 +1506,40 @@ function get_disks_with_smart($device, $app_id)
     }
     return $disks;
 }
+
+/**
+ * Gets all dashboards the user can access
+ * adds in the keys:
+ *   username - the username of the owner of each dashboard
+ *   default - the default dashboard for the logged in user
+ *
+ * @return array list of dashboards
+ */
+function get_dashboards()
+{
+    $default = get_user_pref('dashboard');
+    $dashboards = dbFetchRows(
+        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
+        array($_SESSION['user_id'])
+    );
+
+    $usernames = array(
+        $_SESSION['user_id'] => $_SESSION['username']
+    );
+
+    $result = array();
+    foreach ($dashboards as $dashboard) {
+        $duid = $dashboard['user_id'];
+        if (!isset($usernames[$duid])) {
+            $user = get_user($duid);
+            $usernames[$duid] = $user['username'];
+        }
+
+        $dashboard['username'] = $usernames[$duid];
+        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
+
+        $result[$dashboard['dashboard_id']] = $dashboard;
+    }
+
+    return $result;
+}
