@@ -1513,14 +1513,15 @@ function get_disks_with_smart($device, $app_id)
  *   username - the username of the owner of each dashboard
  *   default - the default dashboard for the logged in user
  *
+ * @param int $user_id optionally get list for another user
  * @return array list of dashboards
  */
-function get_dashboards()
+function get_dashboards($user_id = null)
 {
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array($_SESSION['user_id'])
+        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
     );
 
     $usernames = array(

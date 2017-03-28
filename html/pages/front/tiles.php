@@ -99,7 +99,6 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
 <?php
 
 
-
 $nodash = true;
 foreach ($user_dashboards as $dash) {
     if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {

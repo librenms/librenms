@@ -372,7 +372,7 @@ if ($_SESSION['userlevel'] != '10') {
        <div class='form-group'>
            <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
            <div class='col-sm-4'><select class='form-control' name='dashboard'>";
-                foreach (get_dashboards() as $dash) {
+                foreach (get_dashboards($vars['user_id']) as $dash) {
                     echo "<option value='".$dash['dashboard_id']."'".($dash['default'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
                 }
                 echo "</select>
