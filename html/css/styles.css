@@ -1895,7 +1895,7 @@ label {
 .widget_body {
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 5px);
+    height: calc(100% - 38px);
 }
 
 .device-availability, .service-availability {
