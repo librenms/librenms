@@ -61,7 +61,11 @@ function ifNameDescr($interface, $device = null)
     return cleanPort($interface, $device);
 }
 
-
+/**
+ * @param array $interface
+ * @param null|array $device
+ * @return mixed
+ */
 function cleanPort($interface, $device = null)
 {
     global $config;
