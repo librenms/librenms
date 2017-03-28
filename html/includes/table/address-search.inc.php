@@ -98,7 +98,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     }
 
     if (port_permitted($interface['port_id'])) {
-        $interface  = ifLabel($interface, $interface);
+        $interface  = cleanPort($interface, $interface);
         $response[] = array(
             'hostname'    => generate_device_link($interface),
             'interface'   => generate_port_link($interface).' '.$error_img,

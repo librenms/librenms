@@ -45,7 +45,7 @@ $response[] = array(
 );
 
 foreach (dbFetchRows($sql, $param) as $port) {
-    $port = ifLabel($port);
+    $port = cleanPort($port);
 
     // Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
     // - as to draw the attention to a possible problem.

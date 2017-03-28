@@ -33,5 +33,11 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
-    $common_output[] = nl2br(display($widget_settings['notes']));
+    $tmp_config = array(
+        'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
+        'HTML.Trusted'    => true,
+        'HTML.SafeIframe' => true,
+    );
+    $common_output[] = display(nl2br($widget_settings['notes']), $tmp_config);
+    unset($tmp_config);
 }

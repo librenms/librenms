@@ -142,6 +142,7 @@ $(function() {
     ';
 
     foreach (dbFetchRows($query, $params) as $result) {
+        $result = cleanPort($result);
         $common_output[] = '
     <tr>
       <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>

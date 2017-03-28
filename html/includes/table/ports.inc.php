@@ -139,6 +139,7 @@ $query .= $sql;
 
 foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
+    $port = cleanPort($port, $device);
 
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';

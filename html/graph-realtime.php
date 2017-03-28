@@ -17,7 +17,7 @@ $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id']))) {
-    $port   = get_port_by_id($_GET['id']);
+    $port   = cleanPort(get_port_by_id($_GET['id']));
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= " :: Port  ".generate_port_link($port);
@@ -31,7 +31,7 @@ header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
 $ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname=ifLabel($port);
+$ifname=cleanPort($port);
 $ifname=$ifname['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 

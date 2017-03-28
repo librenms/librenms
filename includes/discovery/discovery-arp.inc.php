@@ -41,7 +41,7 @@ foreach (dbFetchRows($sql, array($deviceid)) as $entry) {
     $ip    = $entry['ipv4_address'];
     $mac   = $entry['mac_address'];
     $if    = $entry['port_id'];
-    $int   = ifLabel($if);
+    $int   = cleanPort($if);
     $label = $int['label'];
 
     // Even though match_network is done inside discover_new_device, we do it here
