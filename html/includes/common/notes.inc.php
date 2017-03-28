@@ -17,7 +17,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
             <div class="col-sm-12">
-                html is supported here. If you want just text then wrap in &lt;pre&gt;&lt;/pre&gt;
+                The following html tags are supported: &lt;b&gt;, &lt;iframe&gt;, &lt;i&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;h4&gt;, &lt;br&gt;, &lt;p&gt;. If you want just text then wrap in &lt;pre&gt;&lt;/pre&gt;
             </div>
         </div>
         <div class="form-group">
