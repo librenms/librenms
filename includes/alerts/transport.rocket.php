@@ -26,6 +26,7 @@ foreach( $opts as $tmp_api ) {
     $curl = curl_init();
     $rocket_msg = strip_tags($obj['msg']);
     $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+    /*
     $data = array(
         'attachments' => array(
             0 => array(
@@ -40,6 +41,8 @@ foreach( $opts as $tmp_api ) {
         'icon_url' => $tmp_api['icon_url'],
         'icon_emoji' => $tmp_api['icon_emoji'],
     );
+    */
+    $data = array ("text" => $rocket_msg);
     $alert_message = json_encode($data);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json')
