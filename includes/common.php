@@ -1555,7 +1555,7 @@ function load_os(&$device)
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
-        echo "Device type changed to " . $device['type'] . "!\n";
+        d_echo("Device type changed to " . $device['type'] . "!\n");
     }
 
     if ($config['os'][$device['os']]['group']) {
