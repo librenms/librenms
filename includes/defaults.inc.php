@@ -776,7 +776,6 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
-$config['discovery_modules']['tnms-nbi']             = 0;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;

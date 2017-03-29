@@ -3,38 +3,46 @@
 echo 'TNMS-NBI-MIB: ';
 
 /*
- * Get a list of all the known NE for this host.
+ * Coriant have done some SQL over SNMP, since we have to populate and update all the tables
+ * before using it, we have to do ugly stuff
  */
+function SqlSNMP($table, $cmib, $dd)
+{
 
-$db_info_list = dbFetchRows('SELECT id, neID, neType, neName, neLocation, neAlarm, neOpMode, neOpState FROM tnmsneinfo WHERE device_id = ?', array($device['device_id']));
-$current_tnmsneinfo = snmpwalk_cache_multi_oid($device, 'enmsNETable', array(), 'TNMS-NBI-MIB');
+    echo ' '.$cmib.' ';
+    $c_oids = snmpwalk_cache_multi_oid($dd, $cmib, $ne_oids, 'TNMS-NBI-MIB');
+    $c_list = array();
 
-foreach ($db_info_list as $db_info) {
-    $tnmsne_info = array();
+    foreach ($c_oids as $index => $entry) {
+        $neType     = $entry['enmsNeType'];
+        $neName     = $entry['enmsNeName'];
+        $neLocation = $entry['enmsNeLocation'];
+        $neAlarm    = $entry['enmsNeAlarmSeverity'];
+        $neOpMode   = $entry['enmsNeOperatingMode'];
+        $neOpState  = $entry['enmsNeOpState'];
+        
+        if (dbFetchCell("SELECT COUNT(id) FROM ".$table." WHERE `device_id` = ? AND `neID` = ?", array($dd['device_id'], $index)) == 0) {
+            $neid = dbInsert(array('device_id' => $dd['device_id'], 'neID' => $index, 'neType' => mres($neType), 'neName' => mres($neName), 'neLocation' => mres($neLocation), 'neAlarm' => mres($neAlarm), 'neOpMode' => mres($neOpMode), 'neOpState' => mres($neOpState)), $table);
+            log_event("Coriant ".$cmib." Hardware ". mres($neType) . " : " . mres($neName) . " (" . $index . ") at " . mres($neLocation) . " Discovered", $dd, 'system', 2);
+            echo '+';
+        } else {
+            echo '.';
+        }
+        $c_list[] = $index;
+    }
 
-    $tnmsne_info['neType']     = $current_tnmsneinfo[$db_info['neID']]['enmsNeType'];
-    $tnmsne_info['neName']     = $current_tnmsneinfo[$db_info['neID']]['enmsNeName'];
-    $tnmsne_info['neLocation'] = $current_tnmsneinfo[$db_info['neID']]['enmsNeLocation'];
-    $tnmsne_info['neAlarm']    = $current_tnmsneinfo[$db_info['neID']]['enmsNeAlarmSeverity'];
-    $tnmsne_info['neOpMode']   = $current_tnmsneinfo[$db_info['neID']]['enmsNeOperatingMode'];
-    $tnmsne_info['neOpState']  = $current_tnmsneinfo[$db_info['neID']]['enmsNeOpState'];
-
-    foreach ($tnmsne_info as $property => $value) {
-        /*
-         * Check the property for any modifications.
-         */
-        if ($tnmsne_info[$property] != $db_info[$property]) {
-            dbUpdate(array($property => mres($tnmsne_info[$property])), 'tnmsneinfo', '`id` = ?', array($db_info['id']));
-            if ($db_info['neName'] != null) {
-                log_event("Coriant NE ".mres($db_info['neName']) . ' (' . $db_info[$property] . ') -> ' . $tnmsne_info[$property], $device);
-            }
+    $sql = "SELECT id, neID, neName FROM ".$table." WHERE device_id = '".$dd['device_id']."'";
+    print_r($sql);
+    foreach (dbFetchRows($sql) as $db_ne) {
+        print_r($db_ne);
+        if (!in_array($db_ne['neID'], $c_list)) {
+            dbDelete($table, '`id` = ?', array($db_ne['id']));
+            log_event("Coriant ".$cmib." Hardware ".mres($db_ne['neName']).' at ' . mres($db_ne['neLocation']) . ' Removed', $device, 'system', $db_me['neID']);
+            echo '-';
         }
     }
 }
 
-/*
- * Finished discovering NE information.
- */
+SqlSNMP('tnmsneinfo', 'enmsNETable', $device);
 
-unset($db_info, $db_info_list, $current_mefinfo);
 echo PHP_EOL;
