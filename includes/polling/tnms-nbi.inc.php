@@ -32,7 +32,6 @@ function SqlSNMP($table, $cmib, $dd)
     }
 
     $sql = "SELECT id, neID, neName FROM ".$table." WHERE device_id = '".$dd['device_id']."'";
-    print_r($sql);
     foreach (dbFetchRows($sql) as $db_ne) {
         print_r($db_ne);
         if (!in_array($db_ne['neID'], $c_list)) {
