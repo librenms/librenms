@@ -1280,8 +1280,6 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    global $config;
-
     $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
@@ -1298,6 +1296,8 @@ function set_curl_proxy($curl)
  */
 function get_proxy()
 {
+    global $config;
+    
     if (getenv('http_proxy')) {
         return getenv('http_proxy');
     } elseif (getenv('https_proxy')) {
@@ -2129,7 +2129,7 @@ function cache_peeringdb()
                     if ($tmp_ix) {
                         $pdb_ix_id = $tmp_ix['pdb_ix_id'];
                         $update = array('name' => $ix->{'name'}, 'timestamp' => time());
-                        dbUpdate($update, 'pdb_ix', 'ix_id` = ? AND asn = ?', array($ixid, $asn));
+                        dbUpdate($update, 'pdb_ix', '`ix_id` = ? AND `asn` = ?', array($ixid, $asn));
                     } else {
                         $insert = array(
                             'ix_id' => $ixid,

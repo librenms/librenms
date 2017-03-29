@@ -445,8 +445,8 @@ foreach ($ports as $port) {
             echo "HC ";
             $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-            $this_port['ififInUcastPkts'] = $this_port['ifHCInUcastPkts'];
-            $this_port['ififOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
+            $this_port['ifInUcastPkts'] = $this_port['ifHCInUcastPkts'];
+            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
@@ -751,6 +751,7 @@ foreach ($ports as $port) {
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
+        graphite_update($device, 'ports|' . $ifName, $tags, $fields);
 
         // End Update IF-MIB
         // Update PAgP
