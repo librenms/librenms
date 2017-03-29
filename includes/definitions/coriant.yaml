@@ -16,7 +16,6 @@ discovery_modules:
     mef: 1
     cisco-vrf-lite: 0
     storage: 0
-    tnms-nbi: 1
 poller_modules:
     ntp: 0
     ospf: 0
