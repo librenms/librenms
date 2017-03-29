@@ -1454,10 +1454,13 @@ function starts_with($haystack, $needles, $case_insensitive = false)
 function get_auth_ad_user_filter($username)
 {
     global $config;
-    $user_filter = "(samaccountname=$username)";
+
+    // don't return disabled users
+    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
     if ($config['auth_ad_user_filter']) {
-        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
+        $user_filter .= $config['auth_ad_user_filter'];
     }
+    $user_filter .= ')';
     return $user_filter;
 }
 

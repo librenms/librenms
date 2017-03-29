@@ -74,7 +74,6 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 
         if (isset($_POST['remember'])) {
             $sess_id  = session_id();
-            $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
