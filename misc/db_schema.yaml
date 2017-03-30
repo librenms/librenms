@@ -1,0 +1,1149 @@
+access_points:
+    accesspoint_id: { Field: accesspoint_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    channel: { Field: channel, Type: 'tinyint(4) unsigned', 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    deleted: { Field: deleted, Type: tinyint(1), 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    interference: { Field: interference, Type: 'tinyint(3) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mac_addr: { Field: mac_addr, Type: varchar(24), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    name: { Field: name, Type: varchar(255), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    numactbssid: { Field: numactbssid, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    numasoclients: { Field: numasoclients, Type: smallint(6), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    nummonbssid: { Field: nummonbssid, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    nummonclients: { Field: nummonclients, Type: smallint(6), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    radioutil: { Field: radioutil, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    radio_number: { Field: radio_number, Type: tinyint(4), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    txpow: { Field: txpow, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    type: { Field: type, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+alerts:
+    alerted: { Field: alerted, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    open: { Field: open, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rule_id: { Field: rule_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    state: { Field: state, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+alert_log:
+    details: { Field: details, Type: longblob, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    rule_id: { Field: rule_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    state: { Field: state, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    time_logged: { Field: time_logged, Type: timestamp, 'Null': 'NO', Key: MUL, Default: CURRENT_TIMESTAMP, Extra: '' }
+alert_map:
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    rule: { Field: rule, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    target: { Field: target, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+alert_rules:
+    device_id: { Field: device_id, Type: varchar(255), 'Null': 'NO', Key: MUL, Default: '', Extra: '' }
+    disabled: { Field: disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    extra: { Field: extra, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    name: { Field: name, Type: varchar(255), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+    proc: { Field: proc, Type: varchar(80), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    query: { Field: query, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rule: { Field: rule, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    severity: { Field: severity, Type: 'enum(''ok'',''warning'',''critical'')', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+alert_schedule:
+    end: { Field: end, Type: datetime, 'Null': 'NO', Key: '', Default: '1970-01-02 00:00:01', Extra: '' }
+    end_recurring_dt: { Field: end_recurring_dt, Type: date, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    end_recurring_hr: { Field: end_recurring_hr, Type: time, 'Null': 'NO', Key: '', Default: '00:00:00', Extra: '' }
+    notes: { Field: notes, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    recurring: { Field: recurring, Type: 'tinyint(1) unsigned', 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    recurring_day: { Field: recurring_day, Type: varchar(15), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    schedule_id: { Field: schedule_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    start: { Field: start, Type: datetime, 'Null': 'NO', Key: '', Default: '1970-01-02 00:00:01', Extra: '' }
+    start_recurring_dt: { Field: start_recurring_dt, Type: date, 'Null': 'NO', Key: '', Default: '1970-01-01', Extra: '' }
+    start_recurring_hr: { Field: start_recurring_hr, Type: time, 'Null': 'NO', Key: '', Default: '00:00:00', Extra: '' }
+    title: { Field: title, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+alert_schedule_items:
+    item_id: { Field: item_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    schedule_id: { Field: schedule_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    target: { Field: target, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+alert_templates:
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    name: { Field: name, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rule_id: { Field: rule_id, Type: varchar(255), 'Null': 'NO', Key: '', Default: ',', Extra: '' }
+    template: { Field: template, Type: longtext, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    title: { Field: title, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    title_rec: { Field: title_rec, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+alert_template_map:
+    alert_rule_id: { Field: alert_rule_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    alert_templates_id: { Field: alert_templates_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+api_tokens:
+    description: { Field: description, Type: varchar(100), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    disabled: { Field: disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    token_hash: { Field: token_hash, Type: varchar(255), 'Null': 'YES', Key: UNI, Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+applications:
+    app_id: { Field: app_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    app_instance: { Field: app_instance, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    app_state: { Field: app_state, Type: varchar(32), 'Null': 'NO', Key: '', Default: UNKNOWN, Extra: '' }
+    app_state_prev: { Field: app_state_prev, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    app_status: { Field: app_status, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    app_type: { Field: app_type, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    discovered: { Field: discovered, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    timestamp: { Field: timestamp, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+authlog:
+    address: { Field: address, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    datetime: { Field: datetime, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    result: { Field: result, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user: { Field: user, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+bgpPeers:
+    astext: { Field: astext, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpLocalAddr: { Field: bgpLocalAddr, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerAdminStatus: { Field: bgpPeerAdminStatus, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerFsmEstablishedTime: { Field: bgpPeerFsmEstablishedTime, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerIdentifier: { Field: bgpPeerIdentifier, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerInTotalMessages: { Field: bgpPeerInTotalMessages, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerInUpdateElapsedTime: { Field: bgpPeerInUpdateElapsedTime, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerInUpdates: { Field: bgpPeerInUpdates, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerOutTotalMessages: { Field: bgpPeerOutTotalMessages, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerOutUpdates: { Field: bgpPeerOutUpdates, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerRemoteAddr: { Field: bgpPeerRemoteAddr, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerRemoteAs: { Field: bgpPeerRemoteAs, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeerState: { Field: bgpPeerState, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bgpPeer_id: { Field: bgpPeer_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+bgpPeers_cbgp:
+    AcceptedPrefixes: { Field: AcceptedPrefixes, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    AcceptedPrefixes_delta: { Field: AcceptedPrefixes_delta, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    AcceptedPrefixes_prev: { Field: AcceptedPrefixes_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    AdvertisedPrefixes: { Field: AdvertisedPrefixes, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    AdvertisedPrefixes_delta: { Field: AdvertisedPrefixes_delta, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    AdvertisedPrefixes_prev: { Field: AdvertisedPrefixes_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    afi: { Field: afi, Type: varchar(16), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    bgpPeerIdentifier: { Field: bgpPeerIdentifier, Type: varchar(64), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    DeniedPrefixes: { Field: DeniedPrefixes, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    DeniedPrefixes_delta: { Field: DeniedPrefixes_delta, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    DeniedPrefixes_prev: { Field: DeniedPrefixes_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    PrefixAdminLimit: { Field: PrefixAdminLimit, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    PrefixClearThreshold: { Field: PrefixClearThreshold, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    PrefixThreshold: { Field: PrefixThreshold, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    safi: { Field: safi, Type: varchar(16), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    SuppressedPrefixes: { Field: SuppressedPrefixes, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    SuppressedPrefixes_delta: { Field: SuppressedPrefixes_delta, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    SuppressedPrefixes_prev: { Field: SuppressedPrefixes_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    WithdrawnPrefixes: { Field: WithdrawnPrefixes, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    WithdrawnPrefixes_delta: { Field: WithdrawnPrefixes_delta, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    WithdrawnPrefixes_prev: { Field: WithdrawnPrefixes_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+bills:
+    bill_autoadded: { Field: bill_autoadded, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_cdr: { Field: bill_cdr, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    bill_custid: { Field: bill_custid, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_day: { Field: bill_day, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    bill_last_calc: { Field: bill_last_calc, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_name: { Field: bill_name, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_notes: { Field: bill_notes, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_quota: { Field: bill_quota, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    bill_ref: { Field: bill_ref, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_type: { Field: bill_type, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    dir_95th: { Field: dir_95th, Type: varchar(3), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_95th: { Field: rate_95th, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_95th_in: { Field: rate_95th_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_95th_out: { Field: rate_95th_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average: { Field: rate_average, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average_in: { Field: rate_average_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average_out: { Field: rate_average_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    total_data: { Field: total_data, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    total_data_in: { Field: total_data_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    total_data_out: { Field: total_data_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+bill_data:
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    delta: { Field: delta, Type: bigint(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    in_delta: { Field: in_delta, Type: bigint(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    out_delta: { Field: out_delta, Type: bigint(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    period: { Field: period, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: datetime, 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+bill_history:
+    bill_allowed: { Field: bill_allowed, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_datefrom: { Field: bill_datefrom, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_dateto: { Field: bill_dateto, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_hist_id: { Field: bill_hist_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    bill_overuse: { Field: bill_overuse, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_percent: { Field: bill_percent, Type: 'decimal(10,2)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_type: { Field: bill_type, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_used: { Field: bill_used, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    dir_95th: { Field: dir_95th, Type: varchar(3), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pdf: { Field: pdf, Type: longblob, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    rate_95th: { Field: rate_95th, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_95th_in: { Field: rate_95th_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_95th_out: { Field: rate_95th_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average: { Field: rate_average, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average_in: { Field: rate_average_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rate_average_out: { Field: rate_average_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    traf_in: { Field: traf_in, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    traf_out: { Field: traf_out, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    traf_total: { Field: traf_total, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    updated: { Field: updated, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+bill_perms:
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+bill_ports:
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bill_port_autoadded: { Field: bill_port_autoadded, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+bill_port_counters:
+    bill_id: { Field: bill_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    in_counter: { Field: in_counter, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    in_delta: { Field: in_delta, Type: bigint(20), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    out_counter: { Field: out_counter, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    out_delta: { Field: out_delta, Type: bigint(20), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+callback:
+    callback_id: { Field: callback_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    name: { Field: name, Type: char(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    value: { Field: value, Type: char(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+cef_switching:
+    afi: { Field: afi, Type: varchar(4), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cef_index: { Field: cef_index, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cef_path: { Field: cef_path, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cef_switching_id: { Field: cef_switching_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    drop: { Field: drop, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    drop_prev: { Field: drop_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    punt: { Field: punt, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    punt2host: { Field: punt2host, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    punt2host_prev: { Field: punt2host_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    punt_prev: { Field: punt_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    updated: { Field: updated, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    updated_prev: { Field: updated_prev, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ciscoASA:
+    ciscoASA_id: { Field: ciscoASA_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    data: { Field: data, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    disabled: { Field: disabled, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    high_alert: { Field: high_alert, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    low_alert: { Field: low_alert, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    oid: { Field: oid, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+component:
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    disabled: { Field: disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    error: { Field: error, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    id: { Field: id, Type: 'int(11) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    ignore: { Field: ignore, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    label: { Field: label, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    status: { Field: status, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    type: { Field: type, Type: varchar(50), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+component_prefs:
+    attribute: { Field: attribute, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    component: { Field: component, Type: 'int(11) unsigned', 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: 'int(11) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    value: { Field: value, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+component_statuslog:
+    component_id: { Field: component_id, Type: 'int(11) unsigned', 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: 'int(11) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    message: { Field: message, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    status: { Field: status, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    timestamp: { Field: timestamp, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+config:
+    config_default: { Field: config_default, Type: varchar(512), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_descr: { Field: config_descr, Type: varchar(100), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_disabled: { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    config_group: { Field: config_group, Type: varchar(50), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_group_order: { Field: config_group_order, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_hidden: { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    config_id: { Field: config_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    config_name: { Field: config_name, Type: varchar(255), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+    config_sub_group: { Field: config_sub_group, Type: varchar(50), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    config_value: { Field: config_value, Type: varchar(512), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+customers:
+    customer_id: { Field: customer_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    level: { Field: level, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    password: { Field: password, Type: char(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    string: { Field: string, Type: char(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    username: { Field: username, Type: char(64), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+dashboards:
+    access: { Field: access, Type: int(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    dashboard_id: { Field: dashboard_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    dashboard_name: { Field: dashboard_name, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+dbSchema:
+    version: { Field: version, Type: int(11), 'Null': 'NO', Key: PRI, Default: '0', Extra: '' }
+devices:
+    agent_uptime: { Field: agent_uptime, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    authalgo: { Field: authalgo, Type: 'enum(''MD5'',''SHA'')', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    authlevel: { Field: authlevel, Type: 'enum(''noAuthNoPriv'',''authNoPriv'',''authPriv'')', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    authname: { Field: authname, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    authpass: { Field: authpass, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    bgpLocalAs: { Field: bgpLocalAs, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    community: { Field: community, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cryptoalgo: { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cryptopass: { Field: cryptopass, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    disabled: { Field: disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    features: { Field: features, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    hardware: { Field: hardware, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    hostname: { Field: hostname, Type: varchar(128), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    icon: { Field: icon, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ignore: { Field: ignore, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    ip: { Field: ip, Type: varbinary(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_discovered: { Field: last_discovered, Type: timestamp, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_discovered_timetaken: { Field: last_discovered_timetaken, Type: 'double(5,2)', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_ping: { Field: last_ping, Type: timestamp, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_ping_timetaken: { Field: last_ping_timetaken, Type: 'double(5,2)', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_polled: { Field: last_polled, Type: timestamp, 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    last_polled_timetaken: { Field: last_polled_timetaken, Type: 'double(5,2)', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    last_poll_attempted: { Field: last_poll_attempted, Type: timestamp, 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    location: { Field: location, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    notes: { Field: notes, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    os: { Field: os, Type: varchar(32), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    override_sysLocation: { Field: override_sysLocation, Type: tinyint(1), 'Null': 'YES', Key: '', Default: '0', Extra: '' }
+    poller_group: { Field: poller_group, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    port: { Field: port, Type: 'smallint(5) unsigned', 'Null': 'NO', Key: '', Default: '161', Extra: '' }
+    port_association_mode: { Field: port_association_mode, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    purpose: { Field: purpose, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    retries: { Field: retries, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    serial: { Field: serial, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    snmpver: { Field: snmpver, Type: varchar(4), 'Null': 'NO', Key: '', Default: v2c, Extra: '' }
+    status: { Field: status, Type: tinyint(4), 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    status_reason: { Field: status_reason, Type: varchar(50), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    sysContact: { Field: sysContact, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sysDescr: { Field: sysDescr, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sysName: { Field: sysName, Type: varchar(128), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    sysObjectID: { Field: sysObjectID, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    timeout: { Field: timeout, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    transport: { Field: transport, Type: varchar(16), 'Null': 'NO', Key: '', Default: udp, Extra: '' }
+    type: { Field: type, Type: varchar(20), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    uptime: { Field: uptime, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    version: { Field: version, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+devices_attribs:
+    attrib_id: { Field: attrib_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    attrib_type: { Field: attrib_type, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    attrib_value: { Field: attrib_value, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    updated: { Field: updated, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+devices_perms:
+    access_level: { Field: access_level, Type: int(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+device_graphs:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    graph: { Field: graph, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+device_groups:
+    desc: { Field: desc, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    id: { Field: id, Type: 'int(11) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    name: { Field: name, Type: varchar(255), 'Null': 'NO', Key: UNI, Default: '', Extra: '' }
+    params: { Field: params, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pattern: { Field: pattern, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+device_group_device:
+    device_group_id: { Field: device_group_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+device_mibs:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    included_by: { Field: included_by, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    last_modified: { Field: last_modified, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+    mib: { Field: mib, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    module: { Field: module, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+device_oids:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    last_modified: { Field: last_modified, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+    mib: { Field: mib, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    module: { Field: module, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    numvalue: { Field: numvalue, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    object_type: { Field: object_type, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    oid: { Field: oid, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    value: { Field: value, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+device_perf:
+    avg: { Field: avg, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: auto_increment }
+    loss: { Field: loss, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    max: { Field: max, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    min: { Field: min, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rcv: { Field: rcv, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    xmt: { Field: xmt, Type: float, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+entPhysical:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    entPhysicalAlias: { Field: entPhysicalAlias, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalAssetID: { Field: entPhysicalAssetID, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalClass: { Field: entPhysicalClass, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalContainedIn: { Field: entPhysicalContainedIn, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalDescr: { Field: entPhysicalDescr, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalFirmwareRev: { Field: entPhysicalFirmwareRev, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalHardwareRev: { Field: entPhysicalHardwareRev, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalIsFRU: { Field: entPhysicalIsFRU, Type: varchar(8), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalMfgName: { Field: entPhysicalMfgName, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalModelName: { Field: entPhysicalModelName, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalName: { Field: entPhysicalName, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalParentRelPos: { Field: entPhysicalParentRelPos, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalSerialNum: { Field: entPhysicalSerialNum, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    entPhysicalSoftwareRev: { Field: entPhysicalSoftwareRev, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalVendorType: { Field: entPhysicalVendorType, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysical_id: { Field: entPhysical_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    ifIndex: { Field: ifIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+entPhysical_state:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    group: { Field: group, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    key: { Field: key, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    subindex: { Field: subindex, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    value: { Field: value, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+eventlog:
+    datetime: { Field: datetime, Type: datetime, 'Null': 'NO', Key: MUL, Default: '1970-01-02 00:00:01', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    event_id: { Field: event_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    host: { Field: host, Type: int(11), 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    message: { Field: message, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    reference: { Field: reference, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    severity: { Field: severity, Type: int(1), 'Null': 'YES', Key: '', Default: '2', Extra: '' }
+    type: { Field: type, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    username: { Field: username, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+graph_types:
+    graph_descr: { Field: graph_descr, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    graph_order: { Field: graph_order, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    graph_section: { Field: graph_section, Type: varchar(32), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    graph_subtype: { Field: graph_subtype, Type: varchar(64), 'Null': 'NO', Key: PRI, Default: '', Extra: '' }
+    graph_type: { Field: graph_type, Type: varchar(32), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+graph_types_dead:
+    graph_descr: { Field: graph_descr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    graph_order: { Field: graph_order, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    graph_section: { Field: graph_section, Type: varchar(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    graph_subtype: { Field: graph_subtype, Type: varchar(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    graph_type: { Field: graph_type, Type: varchar(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+hrDevice:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    hrDeviceDescr: { Field: hrDeviceDescr, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    hrDeviceErrors: { Field: hrDeviceErrors, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    hrDeviceIndex: { Field: hrDeviceIndex, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    hrDeviceStatus: { Field: hrDeviceStatus, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    hrDeviceType: { Field: hrDeviceType, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    hrDevice_id: { Field: hrDevice_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    hrProcessorLoad: { Field: hrProcessorLoad, Type: tinyint(4), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+ipsec_tunnels:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    local_addr: { Field: local_addr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    local_port: { Field: local_port, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    peer_addr: { Field: peer_addr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    peer_port: { Field: peer_port, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    tunnel_id: { Field: tunnel_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    tunnel_name: { Field: tunnel_name, Type: varchar(96), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    tunnel_status: { Field: tunnel_status, Type: varchar(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ipv4_addresses:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipv4_address: { Field: ipv4_address, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv4_address_id: { Field: ipv4_address_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    ipv4_network_id: { Field: ipv4_network_id, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv4_prefixlen: { Field: ipv4_prefixlen, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+ipv4_mac:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipv4_address: { Field: ipv4_address, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mac_address: { Field: mac_address, Type: varchar(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+ipv4_networks:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipv4_network: { Field: ipv4_network, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv4_network_id: { Field: ipv4_network_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+ipv6_addresses:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipv6_address: { Field: ipv6_address, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv6_address_id: { Field: ipv6_address_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    ipv6_compressed: { Field: ipv6_compressed, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv6_network_id: { Field: ipv6_network_id, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv6_origin: { Field: ipv6_origin, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv6_prefixlen: { Field: ipv6_prefixlen, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+ipv6_networks:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipv6_network: { Field: ipv6_network, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipv6_network_id: { Field: ipv6_network_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+juniAtmVp:
+    juniAtmVp_id: { Field: juniAtmVp_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    vp_descr: { Field: vp_descr, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vp_id: { Field: vp_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+links:
+    active: { Field: active, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    local_device_id: { Field: local_device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    local_port_id: { Field: local_port_id, Type: int(11), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    protocol: { Field: protocol, Type: varchar(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    remote_device_id: { Field: remote_device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_hostname: { Field: remote_hostname, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_platform: { Field: remote_platform, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_port: { Field: remote_port, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_port_id: { Field: remote_port_id, Type: int(11), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    remote_version: { Field: remote_version, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+loadbalancer_rservers:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    farm_id: { Field: farm_id, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rserver_id: { Field: rserver_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    StateDescr: { Field: StateDescr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+loadbalancer_vservers:
+    classmap: { Field: classmap, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    classmap_id: { Field: classmap_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    serverstate: { Field: serverstate, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+locations:
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: auto_increment }
+    lat: { Field: lat, Type: 'float(10,6)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    lng: { Field: lng, Type: 'float(10,6)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    location: { Field: location, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+mac_accounting:
+    bps_in: { Field: bps_in, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bps_out: { Field: bps_out, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_input: { Field: cipMacHCSwitchedBytes_input, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_input_delta: { Field: cipMacHCSwitchedBytes_input_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_input_prev: { Field: cipMacHCSwitchedBytes_input_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_input_rate: { Field: cipMacHCSwitchedBytes_input_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_output: { Field: cipMacHCSwitchedBytes_output, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_output_delta: { Field: cipMacHCSwitchedBytes_output_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_output_prev: { Field: cipMacHCSwitchedBytes_output_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedBytes_output_rate: { Field: cipMacHCSwitchedBytes_output_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_input: { Field: cipMacHCSwitchedPkts_input, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_input_delta: { Field: cipMacHCSwitchedPkts_input_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_input_prev: { Field: cipMacHCSwitchedPkts_input_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_input_rate: { Field: cipMacHCSwitchedPkts_input_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_output: { Field: cipMacHCSwitchedPkts_output, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_output_delta: { Field: cipMacHCSwitchedPkts_output_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_output_prev: { Field: cipMacHCSwitchedPkts_output_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    cipMacHCSwitchedPkts_output_rate: { Field: cipMacHCSwitchedPkts_output_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    in_oid: { Field: in_oid, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mac: { Field: mac, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ma_id: { Field: ma_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    out_oid: { Field: out_oid, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    poll_period: { Field: poll_period, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    poll_prev: { Field: poll_prev, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    poll_time: { Field: poll_time, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+mefinfo:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    mefAdmState: { Field: mefAdmState, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mefID: { Field: mefID, Type: int(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    mefIdent: { Field: mefIdent, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mefMTU: { Field: mefMTU, Type: int(16), 'Null': 'NO', Key: '', Default: '1500', Extra: '' }
+    mefRowState: { Field: mefRowState, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mefType: { Field: mefType, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+mempools:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    hrDeviceIndex: { Field: hrDeviceIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mempool_deleted: { Field: mempool_deleted, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    mempool_descr: { Field: mempool_descr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_free: { Field: mempool_free, Type: bigint(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_id: { Field: mempool_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    mempool_index: { Field: mempool_index, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_largestfree: { Field: mempool_largestfree, Type: bigint(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mempool_lowestfree: { Field: mempool_lowestfree, Type: bigint(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mempool_perc: { Field: mempool_perc, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_perc_warn: { Field: mempool_perc_warn, Type: int(11), 'Null': 'YES', Key: '', Default: '75', Extra: '' }
+    mempool_precision: { Field: mempool_precision, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    mempool_total: { Field: mempool_total, Type: bigint(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_type: { Field: mempool_type, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mempool_used: { Field: mempool_used, Type: bigint(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+mibdefs:
+    description: { Field: description, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    included_by: { Field: included_by, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    last_modified: { Field: last_modified, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+    max_access: { Field: max_access, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mib: { Field: mib, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    module: { Field: module, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    object_type: { Field: object_type, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    oid: { Field: oid, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    status: { Field: status, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    syntax: { Field: syntax, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+munin_plugins:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    mplug_args: { Field: mplug_args, Type: varchar(512), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mplug_category: { Field: mplug_category, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mplug_graph: { Field: mplug_graph, Type: binary(1), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    mplug_id: { Field: mplug_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    mplug_info: { Field: mplug_info, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mplug_instance: { Field: mplug_instance, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mplug_title: { Field: mplug_title, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    mplug_total: { Field: mplug_total, Type: binary(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    mplug_type: { Field: mplug_type, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mplug_vlabel: { Field: mplug_vlabel, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+munin_plugins_ds:
+    ds_cdef: { Field: ds_cdef, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_colour: { Field: ds_colour, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_critical: { Field: ds_critical, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_draw: { Field: ds_draw, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_extinfo: { Field: ds_extinfo, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_graph: { Field: ds_graph, Type: 'enum(''no'',''yes'')', 'Null': 'NO', Key: '', Default: 'yes', Extra: '' }
+    ds_info: { Field: ds_info, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_label: { Field: ds_label, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_line: { Field: ds_line, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_max: { Field: ds_max, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_min: { Field: ds_min, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_name: { Field: ds_name, Type: varchar(32), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    ds_negative: { Field: ds_negative, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_stack: { Field: ds_stack, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_sum: { Field: ds_sum, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ds_type: { Field: ds_type, Type: 'enum(''COUNTER'',''ABSOLUTE'',''DERIVE'',''GAUGE'')', 'Null': 'NO', Key: '', Default: GAUGE, Extra: '' }
+    ds_warning: { Field: ds_warning, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mplug_id: { Field: mplug_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+netscaler_vservers:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_bps_in: { Field: vsvr_bps_in, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_bps_out: { Field: vsvr_bps_out, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_clients: { Field: vsvr_clients, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_id: { Field: vsvr_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    vsvr_ip: { Field: vsvr_ip, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_name: { Field: vsvr_name, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_port: { Field: vsvr_port, Type: int(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_req_rate: { Field: vsvr_req_rate, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_server: { Field: vsvr_server, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_state: { Field: vsvr_state, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsvr_type: { Field: vsvr_type, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+notifications:
+    body: { Field: body, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    checksum: { Field: checksum, Type: varchar(128), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+    datetime: { Field: datetime, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    notifications_id: { Field: notifications_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    source: { Field: source, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    title: { Field: title, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+notifications_attribs:
+    attrib_id: { Field: attrib_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    key: { Field: key, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    notifications_id: { Field: notifications_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    value: { Field: value, Type: varchar(255), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+ospf_areas:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    ospfAreaBdrRtrCount: { Field: ospfAreaBdrRtrCount, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaId: { Field: ospfAreaId, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaLsaCksumSum: { Field: ospfAreaLsaCksumSum, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaLsaCount: { Field: ospfAreaLsaCount, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaStatus: { Field: ospfAreaStatus, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaSummary: { Field: ospfAreaSummary, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAsBdrRtrCount: { Field: ospfAsBdrRtrCount, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAuthType: { Field: ospfAuthType, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfImportAsExtern: { Field: ospfImportAsExtern, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfSpfRuns: { Field: ospfSpfRuns, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ospf_instances:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    ospfAdminStat: { Field: ospfAdminStat, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfAreaBdrRtrStatus: { Field: ospfAreaBdrRtrStatus, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfASBdrRtrStatus: { Field: ospfASBdrRtrStatus, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfDemandExtensions: { Field: ospfDemandExtensions, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfExitOverflowInterval: { Field: ospfExitOverflowInterval, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfExternLsaCksumSum: { Field: ospfExternLsaCksumSum, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfExternLsaCount: { Field: ospfExternLsaCount, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfExtLsdbLimit: { Field: ospfExtLsdbLimit, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfMulticastExtensions: { Field: ospfMulticastExtensions, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfOriginateNewLsas: { Field: ospfOriginateNewLsas, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfRouterId: { Field: ospfRouterId, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfRxNewLsas: { Field: ospfRxNewLsas, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfTOSSupport: { Field: ospfTOSSupport, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfVersionNumber: { Field: ospfVersionNumber, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospf_instance_id: { Field: ospf_instance_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ospf_nbrs:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    ospfNbmaNbrPermanence: { Field: ospfNbmaNbrPermanence, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbmaNbrStatus: { Field: ospfNbmaNbrStatus, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrAddressLessIndex: { Field: ospfNbrAddressLessIndex, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrEvents: { Field: ospfNbrEvents, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrHelloSuppressed: { Field: ospfNbrHelloSuppressed, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrIpAddr: { Field: ospfNbrIpAddr, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrLsRetransQLen: { Field: ospfNbrLsRetransQLen, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrOptions: { Field: ospfNbrOptions, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrPriority: { Field: ospfNbrPriority, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrRtrId: { Field: ospfNbrRtrId, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfNbrState: { Field: ospfNbrState, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospf_nbr_id: { Field: ospf_nbr_id, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ospf_ports:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    ospfAddressLessIf: { Field: ospfAddressLessIf, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfIfAdminStat: { Field: ospfIfAdminStat, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfAreaId: { Field: ospfIfAreaId, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfIfAuthKey: { Field: ospfIfAuthKey, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfAuthType: { Field: ospfIfAuthType, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfBackupDesignatedRouter: { Field: ospfIfBackupDesignatedRouter, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfDemand: { Field: ospfIfDemand, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfDesignatedRouter: { Field: ospfIfDesignatedRouter, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfEvents: { Field: ospfIfEvents, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfHelloInterval: { Field: ospfIfHelloInterval, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfIpAddress: { Field: ospfIfIpAddress, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ospfIfMulticastForwarding: { Field: ospfIfMulticastForwarding, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfPollInterval: { Field: ospfIfPollInterval, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfRetransInterval: { Field: ospfIfRetransInterval, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfRtrDeadInterval: { Field: ospfIfRtrDeadInterval, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfRtrPriority: { Field: ospfIfRtrPriority, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfState: { Field: ospfIfState, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfStatus: { Field: ospfIfStatus, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfTransitDelay: { Field: ospfIfTransitDelay, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospfIfType: { Field: ospfIfType, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ospf_port_id: { Field: ospf_port_id, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+packages:
+    arch: { Field: arch, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    build: { Field: build, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    manager: { Field: manager, Type: varchar(16), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    name: { Field: name, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pkg_id: { Field: pkg_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    size: { Field: size, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    status: { Field: status, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    version: { Field: version, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+pdb_ix:
+    asn: { Field: asn, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ix_id: { Field: ix_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    name: { Field: name, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pdb_ix_id: { Field: pdb_ix_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    timestamp: { Field: timestamp, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+pdb_ix_peers:
+    ix_id: { Field: ix_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    name: { Field: name, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pdb_ix_peers_id: { Field: pdb_ix_peers_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    peer_id: { Field: peer_id, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_asn: { Field: remote_asn, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remote_ipaddr4: { Field: remote_ipaddr4, Type: varchar(15), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    remote_ipaddr6: { Field: remote_ipaddr6, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: 'int(10) unsigned', 'Null': 'YES', Key: '', Default: null, Extra: '' }
+perf_times:
+    devices: { Field: devices, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    doing: { Field: doing, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    duration: { Field: duration, Type: 'double(8,2)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    poller: { Field: poller, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    start: { Field: start, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    type: { Field: type, Type: varchar(8), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+plugins:
+    plugin_active: { Field: plugin_active, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    plugin_id: { Field: plugin_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    plugin_name: { Field: plugin_name, Type: varchar(60), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+pollers:
+    devices: { Field: devices, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: auto_increment }
+    last_polled: { Field: last_polled, Type: datetime, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    poller_name: { Field: poller_name, Type: varchar(255), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    time_taken: { Field: time_taken, Type: double, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+poller_groups:
+    descr: { Field: descr, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    group_name: { Field: group_name, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+ports:
+    counter_in: { Field: counter_in, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    counter_out: { Field: counter_out, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    deleted: { Field: deleted, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    detailed: { Field: detailed, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    disabled: { Field: disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    ifAdminStatus: { Field: ifAdminStatus, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifAdminStatus_prev: { Field: ifAdminStatus_prev, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifAlias: { Field: ifAlias, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifConnectorPresent: { Field: ifConnectorPresent, Type: varchar(12), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifDescr: { Field: ifDescr, Type: varchar(255), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    ifDuplex: { Field: ifDuplex, Type: varchar(12), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifHardType: { Field: ifHardType, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifHighSpeed: { Field: ifHighSpeed, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifIndex: { Field: ifIndex, Type: bigint(20), 'Null': 'YES', Key: '', Default: '0', Extra: '' }
+    ifInErrors: { Field: ifInErrors, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInErrors_delta: { Field: ifInErrors_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInErrors_prev: { Field: ifInErrors_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInErrors_rate: { Field: ifInErrors_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInOctets: { Field: ifInOctets, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInOctets_delta: { Field: ifInOctets_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInOctets_prev: { Field: ifInOctets_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInOctets_rate: { Field: ifInOctets_rate, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUcastPkts: { Field: ifInUcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUcastPkts_delta: { Field: ifInUcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUcastPkts_prev: { Field: ifInUcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUcastPkts_rate: { Field: ifInUcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifLastChange: { Field: ifLastChange, Type: 'bigint(20) unsigned', 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    ifMtu: { Field: ifMtu, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifName: { Field: ifName, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOperStatus: { Field: ifOperStatus, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOperStatus_prev: { Field: ifOperStatus_prev, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutErrors: { Field: ifOutErrors, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutErrors_delta: { Field: ifOutErrors_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutErrors_prev: { Field: ifOutErrors_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutErrors_rate: { Field: ifOutErrors_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutOctets: { Field: ifOutOctets, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutOctets_delta: { Field: ifOutOctets_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutOctets_prev: { Field: ifOutOctets_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutOctets_rate: { Field: ifOutOctets_rate, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutUcastPkts: { Field: ifOutUcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutUcastPkts_delta: { Field: ifOutUcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutUcastPkts_prev: { Field: ifOutUcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutUcastPkts_rate: { Field: ifOutUcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifPhysAddress: { Field: ifPhysAddress, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifPromiscuousMode: { Field: ifPromiscuousMode, Type: varchar(12), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifSpeed: { Field: ifSpeed, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifTrunk: { Field: ifTrunk, Type: varchar(8), 'Null': 'YES', Key: '', Default: '', Extra: '' }
+    ifType: { Field: ifType, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifVlan: { Field: ifVlan, Type: varchar(8), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    ifVrf: { Field: ifVrf, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    ignore: { Field: ignore, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    pagpDeviceId: { Field: pagpDeviceId, Type: varchar(48), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpEthcOperationMode: { Field: pagpEthcOperationMode, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpGroupIfIndex: { Field: pagpGroupIfIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpOperationMode: { Field: pagpOperationMode, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPartnerDeviceId: { Field: pagpPartnerDeviceId, Type: varchar(48), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPartnerDeviceName: { Field: pagpPartnerDeviceName, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPartnerGroupIfIndex: { Field: pagpPartnerGroupIfIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPartnerIfIndex: { Field: pagpPartnerIfIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPartnerLearnMethod: { Field: pagpPartnerLearnMethod, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    pagpPortState: { Field: pagpPortState, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    poll_period: { Field: poll_period, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    poll_prev: { Field: poll_prev, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    poll_time: { Field: poll_time, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    portName: { Field: portName, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_descr_circuit: { Field: port_descr_circuit, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_descr_descr: { Field: port_descr_descr, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_descr_notes: { Field: port_descr_notes, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_descr_speed: { Field: port_descr_speed, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_descr_type: { Field: port_descr_type, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+ports_adsl:
+    adslAtucChanCurrTxRate: { Field: adslAtucChanCurrTxRate, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucCurrAtn: { Field: adslAtucCurrAtn, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucCurrAttainableRate: { Field: adslAtucCurrAttainableRate, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucCurrOutputPwr: { Field: adslAtucCurrOutputPwr, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucCurrSnrMgn: { Field: adslAtucCurrSnrMgn, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucInvVendorID: { Field: adslAtucInvVendorID, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAtucInvVersionNumber: { Field: adslAtucInvVersionNumber, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturChanCurrTxRate: { Field: adslAturChanCurrTxRate, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturCurrAtn: { Field: adslAturCurrAtn, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturCurrAttainableRate: { Field: adslAturCurrAttainableRate, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturCurrOutputPwr: { Field: adslAturCurrOutputPwr, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturCurrSnrMgn: { Field: adslAturCurrSnrMgn, Type: 'decimal(5,1)', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturInvSerialNumber: { Field: adslAturInvSerialNumber, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturInvVendorID: { Field: adslAturInvVendorID, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslAturInvVersionNumber: { Field: adslAturInvVersionNumber, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslLineCoding: { Field: adslLineCoding, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    adslLineType: { Field: adslLineType, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_adsl_updated: { Field: port_adsl_updated, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+ports_perms:
+    access_level: { Field: access_level, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ports_stack:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    ifStackStatus: { Field: ifStackStatus, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id_high: { Field: port_id_high, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    port_id_low: { Field: port_id_low, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+ports_statistics:
+    ifInBroadcastPkts: { Field: ifInBroadcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInBroadcastPkts_delta: { Field: ifInBroadcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInBroadcastPkts_prev: { Field: ifInBroadcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInBroadcastPkts_rate: { Field: ifInBroadcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInDiscards: { Field: ifInDiscards, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInDiscards_delta: { Field: ifInDiscards_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInDiscards_prev: { Field: ifInDiscards_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInDiscards_rate: { Field: ifInDiscards_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInMulticastPkts: { Field: ifInMulticastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInMulticastPkts_delta: { Field: ifInMulticastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInMulticastPkts_prev: { Field: ifInMulticastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInMulticastPkts_rate: { Field: ifInMulticastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInNUcastPkts: { Field: ifInNUcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInNUcastPkts_delta: { Field: ifInNUcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInNUcastPkts_prev: { Field: ifInNUcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInNUcastPkts_rate: { Field: ifInNUcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUnknownProtos: { Field: ifInUnknownProtos, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUnknownProtos_delta: { Field: ifInUnknownProtos_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUnknownProtos_prev: { Field: ifInUnknownProtos_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifInUnknownProtos_rate: { Field: ifInUnknownProtos_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutBroadcastPkts: { Field: ifOutBroadcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutBroadcastPkts_delta: { Field: ifOutBroadcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutBroadcastPkts_prev: { Field: ifOutBroadcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutBroadcastPkts_rate: { Field: ifOutBroadcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutDiscards: { Field: ifOutDiscards, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutDiscards_delta: { Field: ifOutDiscards_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutDiscards_prev: { Field: ifOutDiscards_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutDiscards_rate: { Field: ifOutDiscards_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutMulticastPkts: { Field: ifOutMulticastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutMulticastPkts_delta: { Field: ifOutMulticastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutMulticastPkts_prev: { Field: ifOutMulticastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutMulticastPkts_rate: { Field: ifOutMulticastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutNUcastPkts: { Field: ifOutNUcastPkts, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutNUcastPkts_delta: { Field: ifOutNUcastPkts_delta, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutNUcastPkts_prev: { Field: ifOutNUcastPkts_prev, Type: bigint(20), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ifOutNUcastPkts_rate: { Field: ifOutNUcastPkts_rate, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+ports_stp:
+    designatedBridge: { Field: designatedBridge, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    designatedCost: { Field: designatedCost, Type: 'smallint(5) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    designatedPort: { Field: designatedPort, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    designatedRoot: { Field: designatedRoot, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    enable: { Field: enable, Type: varchar(8), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    forwardTransitions: { Field: forwardTransitions, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pathCost: { Field: pathCost, Type: 'int(10) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_stp_id: { Field: port_stp_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    priority: { Field: priority, Type: 'tinyint(3) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    state: { Field: state, Type: varchar(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ports_vlans:
+    baseport: { Field: baseport, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cost: { Field: cost, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_vlan_id: { Field: port_vlan_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    priority: { Field: priority, Type: bigint(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    state: { Field: state, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    untagged: { Field: untagged, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    vlan: { Field: vlan, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+port_association_mode:
+    name: { Field: name, Type: varchar(12), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pom_id: { Field: pom_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+processes:
+    command: { Field: command, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cputime: { Field: cputime, Type: varchar(12), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    pid: { Field: pid, Type: int(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rss: { Field: rss, Type: int(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user: { Field: user, Type: varchar(50), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vsz: { Field: vsz, Type: int(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+processors:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    hrDeviceIndex: { Field: hrDeviceIndex, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    processor_descr: { Field: processor_descr, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    processor_id: { Field: processor_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    processor_index: { Field: processor_index, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    processor_oid: { Field: processor_oid, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    processor_perc_warn: { Field: processor_perc_warn, Type: int(11), 'Null': 'YES', Key: '', Default: '75', Extra: '' }
+    processor_precision: { Field: processor_precision, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    processor_type: { Field: processor_type, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    processor_usage: { Field: processor_usage, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+proxmox:
+    cluster: { Field: cluster, Type: varchar(255), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    description: { Field: description, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    last_seen: { Field: last_seen, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    vmid: { Field: vmid, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+proxmox_ports:
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    last_seen: { Field: last_seen, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    port: { Field: port, Type: varchar(10), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vm_id: { Field: vm_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+pseudowires:
+    cpwOid: { Field: cpwOid, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    cpwVcID: { Field: cpwVcID, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    peer_device_id: { Field: peer_device_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    peer_ldp_id: { Field: peer_ldp_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pseudowire_id: { Field: pseudowire_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    pw_descr: { Field: pw_descr, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pw_local_mtu: { Field: pw_local_mtu, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pw_peer_mtu: { Field: pw_peer_mtu, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pw_psntype: { Field: pw_psntype, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    pw_type: { Field: pw_type, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+route:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    discoveredAt: { Field: discoveredAt, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteDest: { Field: ipRouteDest, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteIfIndex: { Field: ipRouteIfIndex, Type: varchar(256), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    ipRouteMask: { Field: ipRouteMask, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteMetric: { Field: ipRouteMetric, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteNextHop: { Field: ipRouteNextHop, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteProto: { Field: ipRouteProto, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    ipRouteType: { Field: ipRouteType, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+sensors:
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    entPhysicalIndex_measured: { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    lastupdate: { Field: lastupdate, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+    poller_type: { Field: poller_type, Type: varchar(16), 'Null': 'NO', Key: '', Default: snmp, Extra: '' }
+    sensor_alert: { Field: sensor_alert, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    sensor_class: { Field: sensor_class, Type: varchar(64), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    sensor_current: { Field: sensor_current, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_custom: { Field: sensor_custom, Type: 'enum(''No'',''Yes'')', 'Null': 'NO', Key: '', Default: 'No', Extra: '' }
+    sensor_deleted: { Field: sensor_deleted, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    sensor_descr: { Field: sensor_descr, Type: varchar(255), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_divisor: { Field: sensor_divisor, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    sensor_id: { Field: sensor_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    sensor_index: { Field: sensor_index, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_limit: { Field: sensor_limit, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_limit_low: { Field: sensor_limit_low, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_limit_low_warn: { Field: sensor_limit_low_warn, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_limit_warn: { Field: sensor_limit_warn, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_multiplier: { Field: sensor_multiplier, Type: int(11), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    sensor_oid: { Field: sensor_oid, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    sensor_prev: { Field: sensor_prev, Type: float, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+sensors_to_state_indexes:
+    sensors_to_state_translations_id: { Field: sensors_to_state_translations_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    sensor_id: { Field: sensor_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    state_index_id: { Field: state_index_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+services:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    service_changed: { Field: service_changed, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    service_desc: { Field: service_desc, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_disabled: { Field: service_disabled, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    service_ds: { Field: service_ds, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_id: { Field: service_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    service_ignore: { Field: service_ignore, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_ip: { Field: service_ip, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_message: { Field: service_message, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_param: { Field: service_param, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    service_status: { Field: service_status, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    service_type: { Field: service_type, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+session:
+    session_auth: { Field: session_auth, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    session_expiry: { Field: session_expiry, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    session_id: { Field: session_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    session_token: { Field: session_token, Type: varchar(60), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    session_username: { Field: session_username, Type: varchar(30), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    session_value: { Field: session_value, Type: varchar(60), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+slas:
+    deleted: { Field: deleted, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    opstatus: { Field: opstatus, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    owner: { Field: owner, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rtt_type: { Field: rtt_type, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    sla_id: { Field: sla_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    sla_nr: { Field: sla_nr, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    status: { Field: status, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    tag: { Field: tag, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+state_indexes:
+    state_index_id: { Field: state_index_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    state_name: { Field: state_name, Type: varchar(64), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+state_translations:
+    state_descr: { Field: state_descr, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    state_draw_graph: { Field: state_draw_graph, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    state_generic_value: { Field: state_generic_value, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    state_index_id: { Field: state_index_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    state_lastupdated: { Field: state_lastupdated, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
+    state_translation_id: { Field: state_translation_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    state_value: { Field: state_value, Type: 'smallint(5) unsigned', 'Null': 'NO', Key: '', Default: null, Extra: '' }
+storage:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    storage_deleted: { Field: storage_deleted, Type: tinyint(1), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    storage_descr: { Field: storage_descr, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    storage_free: { Field: storage_free, Type: bigint(20), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    storage_id: { Field: storage_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    storage_index: { Field: storage_index, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    storage_mib: { Field: storage_mib, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    storage_perc: { Field: storage_perc, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    storage_perc_warn: { Field: storage_perc_warn, Type: int(11), 'Null': 'YES', Key: '', Default: '60', Extra: '' }
+    storage_size: { Field: storage_size, Type: bigint(20), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    storage_type: { Field: storage_type, Type: varchar(32), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    storage_units: { Field: storage_units, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    storage_used: { Field: storage_used, Type: bigint(20), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+stp:
+    bridgeAddress: { Field: bridgeAddress, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bridgeForwardDelay: { Field: bridgeForwardDelay, Type: smallint(6), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bridgeHelloTime: { Field: bridgeHelloTime, Type: smallint(6), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    bridgeMaxAge: { Field: bridgeMaxAge, Type: smallint(6), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    designatedRoot: { Field: designatedRoot, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    forwardDelay: { Field: forwardDelay, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    helloTime: { Field: helloTime, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    holdTime: { Field: holdTime, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    maxAge: { Field: maxAge, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    priority: { Field: priority, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    protocolSpecification: { Field: protocolSpecification, Type: varchar(16), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rootBridge: { Field: rootBridge, Type: tinyint(1), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rootCost: { Field: rootCost, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    rootPort: { Field: rootPort, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    stp_id: { Field: stp_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    timeSinceTopologyChange: { Field: timeSinceTopologyChange, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    topChanges: { Field: topChanges, Type: mediumint(9), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+syslog:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    facility: { Field: facility, Type: varchar(10), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    level: { Field: level, Type: varchar(10), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    msg: { Field: msg, Type: text, 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    priority: { Field: priority, Type: varchar(10), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    program: { Field: program, Type: varchar(32), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    seq: { Field: seq, Type: 'bigint(20) unsigned', 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    tag: { Field: tag, Type: varchar(10), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    timestamp: { Field: timestamp, Type: timestamp, 'Null': 'NO', Key: MUL, Default: CURRENT_TIMESTAMP, Extra: '' }
+toner:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: '0', Extra: '' }
+    toner_capacity: { Field: toner_capacity, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    toner_capacity_oid: { Field: toner_capacity_oid, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    toner_current: { Field: toner_current, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    toner_descr: { Field: toner_descr, Type: varchar(32), 'Null': 'NO', Key: '', Default: '', Extra: '' }
+    toner_id: { Field: toner_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    toner_index: { Field: toner_index, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    toner_oid: { Field: toner_oid, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    toner_type: { Field: toner_type, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+ucd_diskio:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    diskio_descr: { Field: diskio_descr, Type: varchar(32), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    diskio_id: { Field: diskio_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    diskio_index: { Field: diskio_index, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+users:
+    can_modify_passwd: { Field: can_modify_passwd, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '1', Extra: '' }
+    created_at: { Field: created_at, Type: timestamp, 'Null': 'NO', Key: '', Default: '1970-01-02 00:00:01', Extra: '' }
+    dashboard: { Field: dashboard, Type: int(11), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    descr: { Field: descr, Type: char(30), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    email: { Field: email, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    level: { Field: level, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '0', Extra: '' }
+    password: { Field: password, Type: varchar(60), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    realname: { Field: realname, Type: varchar(64), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    remember_token: { Field: remember_token, Type: varchar(100), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    twofactor: { Field: twofactor, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    updated_at: { Field: updated_at, Type: timestamp, 'Null': 'NO', Key: '', Default: CURRENT_TIMESTAMP, Extra: '' }
+    username: { Field: username, Type: char(30), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+users_prefs:
+    pref: { Field: pref, Type: varchar(32), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(16), 'Null': 'NO', Key: PRI, Default: null, Extra: '' }
+    value: { Field: value, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+users_widgets:
+    col: { Field: col, Type: tinyint(4), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    dashboard_id: { Field: dashboard_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    refresh: { Field: refresh, Type: tinyint(4), 'Null': 'NO', Key: '', Default: '60', Extra: '' }
+    row: { Field: row, Type: tinyint(4), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    settings: { Field: settings, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    size_x: { Field: size_x, Type: tinyint(4), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    size_y: { Field: size_y, Type: tinyint(4), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    title: { Field: title, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    user_id: { Field: user_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    user_widget_id: { Field: user_widget_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    widget_id: { Field: widget_id, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+vlans:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'YES', Key: MUL, Default: null, Extra: '' }
+    vlan_domain: { Field: vlan_domain, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vlan_id: { Field: vlan_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    vlan_mtu: { Field: vlan_mtu, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vlan_name: { Field: vlan_name, Type: varchar(64), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vlan_type: { Field: vlan_type, Type: varchar(16), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vlan_vlan: { Field: vlan_vlan, Type: int(11), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+vminfo:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    vmwVmCpus: { Field: vmwVmCpus, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vmwVmDisplayName: { Field: vmwVmDisplayName, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vmwVmGuestOS: { Field: vmwVmGuestOS, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vmwVmMemSize: { Field: vmwVmMemSize, Type: int(11), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vmwVmState: { Field: vmwVmState, Type: varchar(128), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    vmwVmVMID: { Field: vmwVmVMID, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    vm_type: { Field: vm_type, Type: varchar(16), 'Null': 'NO', Key: '', Default: vmware, Extra: '' }
+vrfs:
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    mplsVpnVrfDescription: { Field: mplsVpnVrfDescription, Type: text, 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    mplsVpnVrfRouteDistinguisher: { Field: mplsVpnVrfRouteDistinguisher, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vrf_id: { Field: vrf_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    vrf_name: { Field: vrf_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: null, Extra: '' }
+    vrf_oid: { Field: vrf_oid, Type: varchar(256), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+vrf_lite_cisco:
+    context_name: { Field: context_name, Type: varchar(128), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': 'NO', Key: MUL, Default: null, Extra: '' }
+    intance_name: { Field: intance_name, Type: varchar(128), 'Null': 'YES', Key: '', Default: '', Extra: '' }
+    vrf_lite_cisco_id: { Field: vrf_lite_cisco_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    vrf_name: { Field: vrf_name, Type: varchar(128), 'Null': 'YES', Key: MUL, Default: Default, Extra: '' }
+widgets:
+    base_dimensions: { Field: base_dimensions, Type: varchar(10), 'Null': 'NO', Key: '', Default: null, Extra: '' }
+    widget: { Field: widget, Type: varchar(255), 'Null': 'NO', Key: UNI, Default: null, Extra: '' }
+    widget_id: { Field: widget_id, Type: int(11), 'Null': 'NO', Key: PRI, Default: null, Extra: auto_increment }
+    widget_title: { Field: widget_title, Type: varchar(255), 'Null': 'NO', Key: '', Default: null, Extra: '' }

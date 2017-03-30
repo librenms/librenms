@@ -2182,3 +2182,23 @@ function cache_peeringdb()
         echo 'Peering DB integration disabled' . PHP_EOL;
     }
 }
+
+function dump_db_schema()
+{
+    global $config;
+    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
+        $table = $table['TABLE_NAME'];
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table' ORDER BY COLUMN_NAME") as $data) {
+            $column = $data['COLUMN_NAME'];
+            $output[$table][$column] = array(
+                'Field'   => $data['COLUMN_NAME'],
+                'Type'    => $data['COLUMN_TYPE'],
+                'Null'    => $data['IS_NULLABLE'],
+                'Key'     => $data['COLUMN_KEY'],
+                'Default' => $data['COLUMN_DEFAULT'],
+                'Extra'   => $data['EXTRA'],
+            );
+        }
+    }
+    return $output;
+}

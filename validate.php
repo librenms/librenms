@@ -192,6 +192,45 @@ if (empty($collation_columns) !== true) {
     print_list($collation_columns, "\t %s\n");
 }
 
+if (is_file('misc/db_schema.yaml')) {
+    $master_schema = Symfony\Component\Yaml\Yaml::parse(
+        file_get_contents('misc/db_schema.yaml')
+    );
+
+    $current_schema = dump_db_schema();
+    $schema_update = array();
+
+    foreach ($master_schema as $table => $data) {
+        if (empty($current_schema[$table])) {
+            print_fail("You have a missing table ($table)");
+        }
+        foreach ($data as $column => $cdata) {
+            $cur = $current_schema[$table][$column];
+            if (empty($current_schema[$table][$column])) {
+                print_fail("You have a missing column ($table/$column)");
+            }
+            if ($cdata['Type']    !== $cur['Type'] ||
+                $cdata['Null']    !== $cur['Null'] ||
+                $cdata['Default'] !== $cur['Default'] ||
+                $cdata['Extra']   !== $cur['Extra']) {
+                $null = $cdata['Null'] === 'NO' ? $null = 'NOT NULL' : $null = 'NULL';
+                $default = $cdata['Default'] == '' ? $default = '' : $default = "DEFAULT '{$cdata['Default']}'";
+                if (str_contains($default, 'CURRENT_TIMESTAMP')) {
+                    $default = str_replace("'", "", $default);
+                }
+                $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` `$column` {$cdata['Type']} $null $default;";
+            }
+        }
+    }
+} else {
+    print_warn("We haven't detected the db_schema.yaml file");
+}
+
+if (!empty($schema_update)) {
+    print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site:");
+     print_list($schema_update, "\t %s\n");
+}
+
 $ini_tz = ini_get('date.timezone');
 $sh_tz = rtrim(shell_exec('date +%Z'));
 $php_tz = date('T');
