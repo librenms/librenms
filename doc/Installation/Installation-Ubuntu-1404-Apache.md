@@ -31,7 +31,7 @@ Create the database:
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON 'librenms'.* TO 'librenms'@'localhost';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
 exit
 ```
