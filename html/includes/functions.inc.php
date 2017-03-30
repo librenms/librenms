@@ -629,9 +629,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(display($port['label'])).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
     if ($port['ifAlias']) {
-        $content .= addslashes($port['ifAlias']).'<br />';
+        $content .= addslashes(display($port['ifAlias'])).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
