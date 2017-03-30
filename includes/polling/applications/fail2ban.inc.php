@@ -33,13 +33,13 @@ data_update($device, 'app', $tags, $fields);
 
 $int=2;
 $jails=array();
-$total_banned=0;
+
 while (isset($bannedStuff[$int])) {
     list($jail, $banned) = explode(" ", $bannedStuff[$int]);
 
     if (isset($jail) && isset($banned)) {
         $jails[] = $jail;
-        $total_banned += $banned;
+
         $rrd_name = array('app', $name, $app_id, $jail);
         $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
         $fields = array('banned' => $banned);
@@ -82,7 +82,6 @@ if (empty($jails)) {
     $id = $component->getFirstComponentID($f2bc);
     $f2bc[$id]['label'] = 'Fail2ban Jails';
     $f2bc[$id]['jails'] = json_encode($jails);
-    $f2bc[$id]['banned'] = $total_banned;
 
     $component->setComponentPrefs($device_id, $f2bc);
 }
