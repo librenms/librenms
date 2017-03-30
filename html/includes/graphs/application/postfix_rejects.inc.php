@@ -84,12 +84,6 @@ if (is_file($rrd_filename)) {
         ),
         array(
             'filename' => $rrd_filename,
-            'descr'    => 'Msg ex limit',
-            'ds'       => 'msefl',
-            'colour'   => '0053EE'
-        ),
-        array(
-            'filename' => $rrd_filename,
             'descr'    => 'Config Error',
             'ds'       => 'sce',
             'colour'   => '005300'
