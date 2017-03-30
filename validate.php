@@ -200,7 +200,7 @@ if (is_file('misc/db_schema.yaml')) {
     $current_schema = dump_db_schema();
     $schema_update = array();
 
-    foreach ($master_schema as $table => $data) {
+    foreach ((array)$master_schema as $table => $data) {
         if (empty($current_schema[$table])) {
             print_fail("You have a missing table ($table)");
         }
