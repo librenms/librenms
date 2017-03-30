@@ -25,14 +25,7 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-$baseName=rrd_name($device['hostname'], array('app', 'fail2ban', $app['app_id']), '-');
-$jails=array();
-$jailGlob=$baseName.'*.rrd';
-foreach (glob($jailGlob) as $jailrrd) {
-    $jail=str_replace($baseName, '', $jailrrd);
-    $jail=str_replace('.rrd', '', $jail);
-    $jails[]=$jail;
-}
+$jails=get_fail2ban_jails($device['device_id']);
 
 foreach ($jails as $jail) {
     $graph_type            = 'fail2ban_jail';
