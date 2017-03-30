@@ -110,10 +110,26 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
+if (isset($options['g'])) {
+    $config['nographite'] = true;
+}
+
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
+}
+
+if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
+    $graphite = fsockopen($config['graphite']['host'], $config['graphite']['port']);
+    if ($graphite !== false) {
+        echo "Connection made to {$config['graphite']['host']} for Graphite support\n";
+    } else {
+        echo "Connection to {$config['graphite']['host']} has failed, Graphite support disabled\n";
+        $config['nographite'] = true;
+    }
+} else {
+    $graphite = false;
 }
 
 rrdtool_initialize();
@@ -140,6 +156,10 @@ foreach (dbFetch($query) as $device) {
 $poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
+
+if ($graphite !== false) {
+    fclose($graphite);
+}
 
 if ($polled_devices) {
     dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices, 'poller' => $config['distributed_poller_name'] ), 'perf_times');

@@ -15,6 +15,7 @@ poller_modules:
     ospf: 0
     stp: 0
 discovery_modules:
+    applications: 1
     bgp-peers: 0
     stp: 0
     vmware-vminfo: 1

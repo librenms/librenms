@@ -38,4 +38,4 @@ An upstart configuration file can be found in `scripts/librenms-poller-service.c
 ### LSB
 An LSB init script can be found in `scripts/librenms-poller-service.init`. To install run `cp /opt/librenms/scripts/librenms-poller-service.init /etc/init.d/librenms-poller-service && update-rc.d librenms-poller-service defaults`.
 ### systemd
-A systemd unit file can be found in `scripts/librenms-poller-service.init`. To install run `cp /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable librenms-poller-service.service`.
+A systemd unit file can be found in `scripts/librenms-poller-service.service`. To install run `cp /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable --now librenms-poller-service.service`.
