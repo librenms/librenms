@@ -374,4 +374,24 @@ class Component
 
         return true;
     }
+
+    /**
+     * Get the component id for the first component in the array
+     * Only set $device_id if using the array from getCompenents(), which is keyed by device_id
+     *
+     * @param array $component_array
+     * @param int $device_id
+     * @return int the component id
+     */
+    public function getFirstComponentID($component_array, $device_id = null)
+    {
+        if (!is_null($device_id) && isset($component_array[$device_id])) {
+            $component_array = $component_array[$device_id];
+        }
+
+        foreach ($component_array as $id => $array) {
+            return $id;
+        }
+        return -1;
+    }
 }
