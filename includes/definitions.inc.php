@@ -114,6 +114,10 @@ $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['section'] = 'wire
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['order'] = '7';
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['descr'] = 'RF Total Packets Rx';
 
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['order'] = '8';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['descr'] = 'Radio Rx Power';
+
 // Unifi Support
 $config['graph_types']['device']['ubnt_unifi_RadioCu_0']['section'] = 'wireless';
 $config['graph_types']['device']['ubnt_unifi_RadioCu_0']['order'] = '0';

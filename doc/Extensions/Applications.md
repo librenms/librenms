@@ -29,6 +29,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
@@ -508,6 +509,48 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 ```
 5. Restart snmpd on PI host
 
+### SMART
+
+#### SNMP Extend
+
+1: Copy the Perl script, smart, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart)
+
+2: Make the script executable (chmod +x /etc/snmp/smart)
+
+3: Edit your snmpd.conf file and add:
+```
+extend smart /etc/snmp/smart
+```
+
+4: You will also need to create the config file, which defaults to the same path as the script, but with .config appended. So if the script is located at /etc/snmp/smart, the config file will be /etc/snmp/smart.config. Alternatively you can also specific a config via -c.
+
+Anything starting with a # is comment. The format for variables is $variable=$value. Empty lines are ignored. Spaces and tabes at either the start or end of a line are ignored. Any line with out a = or # are treated as a disk.
+```
+#This is a comment
+cache=/var/cache/smart
+smartctl=/usr/bin/env smartctl
+ada0
+ada1
+```
+
+The variables are as below.
+```
+cache = The path to the cache file to use. Default: /var/cache/smart
+smartctl = The path to use for smartctl. Default: /usr/bin/env smartctl
+```
+
+If you want to guess at the configuration, call it with -g and it will print out what it thinks
+it should be. This will result in a usable config, but may miss some less common disk devices.
+
+5: Restart snmpd on your host
+
+6: On the device page in Librenms, edit your host and check `SMART` under the Applications tab.
+
+If you have a large number of more than one or two disks on a system, you should consider adding this to cron. Also make sure the cache file is some place it can be written to.
+```
+ */3 * * * * /etc/snmp/smart -u
+```
+
 ### Squid
 
 #### SNMP Proxy
@@ -558,9 +601,6 @@ chown dnslog:nofiles /service/dns/log/main/tinystats
 
 ### Unbound
 
-##### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
-
 Unbound configuration:
 
 ```text
@@ -575,7 +615,25 @@ remote-control:
 
 ```
 
-Restart your unbound after changing the configuration, verify it is working by running /usr/lib/check_mk_agent/local/unbound.sh
+Restart your unbound after changing the configuration, verify it is working by running 'unbound-control stats'.
+
+##### Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+
+##### SNMP Extend
+
+1: Copy the shell script, unbound, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound)
+
+2: Make the scripts executable (chmod +x /etc/snmp/unbound)
+
+3: Edit your snmpd.conf file and add:
+```
+extend unbound /etc/snmp/unbound
+```
+
+4: Restart snmpd.
+
+5: On the device page in Librenms, edit your host and check `Unbound` under the Applications tab.
 
 ### UPS-nut
 A small shell script that exports nut ups status.

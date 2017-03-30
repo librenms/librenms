@@ -1,51 +1,5 @@
 [
     {
-        "name": "ezyang/htmlpurifier",
-        "version": "v4.8.0",
-        "version_normalized": "4.8.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ezyang/htmlpurifier.git",
-            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2"
-        },
-        "time": "2016-07-16T12:58:58+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "HTMLPurifier": "library/"
-            },
-            "files": [
-                "library/HTMLPurifier.composer.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Edward Z. Yang",
-                "email": "admin@htmlpurifier.org",
-                "homepage": "http://ezyang.com"
-            }
-        ],
-        "description": "Standards compliant HTML filter written in PHP",
-        "homepage": "http://htmlpurifier.org/",
-        "keywords": [
-            "html"
-        ]
-    },
-    {
         "name": "xjtuwangke/passwordhash",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -63,7 +17,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2012-08-31T00:00:00+00:00",
+        "time": "2012-08-31 00:00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -109,7 +63,7 @@
         "require": {
             "php": ">=5.0.0"
         },
-        "time": "2012-10-23T11:52:18+00:00",
+        "time": "2012-10-23 11:52:18",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -163,7 +117,7 @@
         "suggest": {
             "pear/Console_Color2": ">=0.1.2"
         },
-        "time": "2016-01-21T16:14:31+00:00",
+        "time": "2016-01-21 16:14:31",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -200,54 +154,6 @@
         ]
     },
     {
-        "name": "slim/slim",
-        "version": "2.6.2",
-        "version_normalized": "2.6.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/slimphp/Slim.git",
-            "reference": "20a02782f76830b67ae56a5c08eb1f563c351a37"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/slimphp/Slim/zipball/20a02782f76830b67ae56a5c08eb1f563c351a37",
-            "reference": "20a02782f76830b67ae56a5c08eb1f563c351a37",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "suggest": {
-            "ext-mcrypt": "Required for HTTP cookie encryption"
-        },
-        "time": "2015-03-08T18:41:17+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Slim": "."
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Josh Lockhart",
-                "email": "info@joshlockhart.com",
-                "homepage": "http://www.joshlockhart.com/"
-            }
-        ],
-        "description": "Slim Framework, a PHP micro framework",
-        "homepage": "http://github.com/codeguy/Slim",
-        "keywords": [
-            "microframework",
-            "rest",
-            "router"
-        ]
-    },
-    {
         "name": "easybook/geshi",
         "version": "v1.0.8.18",
         "version_normalized": "1.0.8.18",
@@ -265,7 +171,7 @@
         "require": {
             "php": ">4.3.0"
         },
-        "time": "2016-10-05T07:15:42+00:00",
+        "time": "2016-10-05 07:15:42",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -314,7 +220,7 @@
             "ext-gd": "*",
             "php": ">=5.3.0"
         },
-        "time": "2016-03-11T13:58:40+00:00",
+        "time": "2016-03-11 13:58:40",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -360,7 +266,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-12T10:08:34+00:00",
+        "time": "2015-09-12 10:08:34",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -408,58 +314,6 @@
         ]
     },
     {
-        "name": "dapphp/radius",
-        "version": "2.5.0",
-        "version_normalized": "2.5.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dapphp/radius.git",
-            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/dapphp/radius/zipball/72df4f8dc82281e7364b23212bbf16df6232151e",
-            "reference": "72df4f8dc82281e7364b23212bbf16df6232151e",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "dev-master"
-        },
-        "time": "2016-08-01T23:26:47+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Dapphp\\Radius\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL-3.0"
-        ],
-        "authors": [
-            {
-                "name": "Drew Phillips",
-                "email": "drew@drew-phillips.com",
-                "homepage": "https://drew-phillips.com/"
-            },
-            {
-                "name": "SysCo/al",
-                "homepage": "http://developer.sysco.ch/php/"
-            }
-        ],
-        "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
-        "homepage": "https://github.com/dapphp/radius",
-        "keywords": [
-            "Authentication",
-            "authorization",
-            "radius"
-        ]
-    },
-    {
         "name": "php-amqplib/php-amqplib",
         "version": "v2.0.2",
         "version_normalized": "2.0.2.0",
@@ -477,7 +331,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2013-02-13T19:43:51+00:00",
+        "time": "2013-02-13 19:43:51",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -503,69 +357,67 @@
         ]
     },
     {
-        "name": "symfony/yaml",
-        "version": "v2.8.15",
-        "version_normalized": "2.8.15.0",
+        "name": "ezyang/htmlpurifier",
+        "version": "v4.9.2",
+        "version_normalized": "4.9.2.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/symfony/yaml.git",
-            "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff"
+            "url": "https://github.com/ezyang/htmlpurifier.git",
+            "reference": "6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/yaml/zipball/befb26a3713c97af90d25dd12e75621ef14d91ff",
-            "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff",
+            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4",
+            "reference": "6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.9"
+            "php": ">=5.2"
         },
-        "time": "2016-11-14T16:15:57+00:00",
+        "require-dev": {
+            "simpletest/simpletest": "^1.1"
+        },
+        "time": "2017-03-13 06:30:53",
         "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.8-dev"
-            }
-        },
         "installation-source": "dist",
         "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\Yaml\\": ""
+            "psr-0": {
+                "HTMLPurifier": "library/"
             },
-            "exclude-from-classmap": [
-                "/Tests/"
+            "files": [
+                "library/HTMLPurifier.composer.php"
             ]
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "MIT"
+            "LGPL"
         ],
         "authors": [
             {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
+                "name": "Edward Z. Yang",
+                "email": "admin@htmlpurifier.org",
+                "homepage": "http://ezyang.com"
             }
         ],
-        "description": "Symfony Yaml Component",
-        "homepage": "https://symfony.com"
+        "description": "Standards compliant HTML filter written in PHP",
+        "homepage": "http://htmlpurifier.org/",
+        "keywords": [
+            "html"
+        ]
     },
     {
         "name": "phpmailer/phpmailer",
-        "version": "v5.2.21",
-        "version_normalized": "5.2.21.0",
+        "version": "v5.2.22",
+        "version_normalized": "5.2.22.0",
         "source": {
             "type": "git",
             "url": "https://github.com/PHPMailer/PHPMailer.git",
-            "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e"
+            "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d51856b76c06fc687fcd9180efa7a0bed0d761e",
-            "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e",
+            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/b18cb98131bd83103ccb26a888fdfe3177b8a663",
+            "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663",
             "shasum": ""
         },
         "require": {
@@ -578,7 +430,7 @@
         "suggest": {
             "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
         },
-        "time": "2016-12-28T15:35:48+00:00",
+        "time": "2017-01-09 09:33:47",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -614,5 +466,220 @@
             }
         ],
         "description": "PHPMailer is a full-featured email creation and transfer class for PHP"
+    },
+    {
+        "name": "slim/slim",
+        "version": "2.6.3",
+        "version_normalized": "2.6.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/slimphp/Slim.git",
+            "reference": "9224ed81ac1c412881e8d762755e3d76ebf580c0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/slimphp/Slim/zipball/9224ed81ac1c412881e8d762755e3d76ebf580c0",
+            "reference": "9224ed81ac1c412881e8d762755e3d76ebf580c0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "suggest": {
+            "ext-mcrypt": "Required for HTTP cookie encryption",
+            "phpseclib/mcrypt_compat": "Polyfil for mcrypt extension"
+        },
+        "time": "2017-01-07 12:21:41",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Slim": "."
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Josh Lockhart",
+                "email": "info@joshlockhart.com",
+                "homepage": "http://www.joshlockhart.com/"
+            }
+        ],
+        "description": "Slim Framework, a PHP micro framework",
+        "homepage": "http://github.com/codeguy/Slim",
+        "keywords": [
+            "microframework",
+            "rest",
+            "router"
+        ]
+    },
+    {
+        "name": "dapphp/radius",
+        "version": "2.5.1",
+        "version_normalized": "2.5.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dapphp/radius.git",
+            "reference": "ede9a0a63dc806eca63d3b166f3897bfdf53a026"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/dapphp/radius/zipball/ede9a0a63dc806eca63d3b166f3897bfdf53a026",
+            "reference": "ede9a0a63dc806eca63d3b166f3897bfdf53a026",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "dev-master"
+        },
+        "suggest": {
+            "ext-mcrypt": "*"
+        },
+        "time": "2017-02-02 00:42:55",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Dapphp\\Radius\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Drew Phillips",
+                "email": "drew@drew-phillips.com",
+                "homepage": "https://drew-phillips.com/"
+            },
+            {
+                "name": "SysCo/al",
+                "homepage": "http://developer.sysco.ch/php/"
+            }
+        ],
+        "description": "A pure PHP RADIUS client based on the SysCo/al implementation",
+        "homepage": "https://github.com/dapphp/radius",
+        "keywords": [
+            "Authentication",
+            "authorization",
+            "chap",
+            "ms-chap",
+            "ms-chap v2",
+            "pap",
+            "radius",
+            "rfc1994",
+            "rfc2284",
+            "rfc2759",
+            "rfc2865",
+            "rfc2869"
+        ]
+    },
+    {
+        "name": "symfony/yaml",
+        "version": "v2.8.18",
+        "version_normalized": "2.8.18.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/yaml.git",
+            "reference": "2a7bab3c16f6f452c47818fdd08f3b1e49ffcf7d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/yaml/zipball/2a7bab3c16f6f452c47818fdd08f3b1e49ffcf7d",
+            "reference": "2a7bab3c16f6f452c47818fdd08f3b1e49ffcf7d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.9"
+        },
+        "time": "2017-03-01 18:13:50",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.8-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\Yaml\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Yaml Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "rmccue/requests",
+        "version": "v1.7.0",
+        "version_normalized": "1.7.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/rmccue/Requests.git",
+            "reference": "87932f52ffad70504d93f04f15690cf16a089546"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/rmccue/Requests/zipball/87932f52ffad70504d93f04f15690cf16a089546",
+            "reference": "87932f52ffad70504d93f04f15690cf16a089546",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "require-dev": {
+            "requests/test-server": "dev-master"
+        },
+        "time": "2016-10-13 00:11:37",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Requests": "library/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "ISC"
+        ],
+        "authors": [
+            {
+                "name": "Ryan McCue",
+                "homepage": "http://ryanmccue.info"
+            }
+        ],
+        "description": "A HTTP library written in PHP, for human beings.",
+        "homepage": "http://github.com/rmccue/Requests",
+        "keywords": [
+            "curl",
+            "fsockopen",
+            "http",
+            "idna",
+            "ipv6",
+            "iri",
+            "sockets"
+        ]
     }
 ]

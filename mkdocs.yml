@@ -50,6 +50,7 @@ pages:
     - Extensions/Email-Alerting.md
     - Extensions/Globe-Frontpage.md
     - Extensions/Graylog.md
+    - Extensions/Graphite.md
     - Extensions/IRC-Bot.md
     - Extensions/IRC-Bot-Extensions.md
     - Extensions/InfluxDB.md
@@ -59,6 +60,7 @@ pages:
     - Extensions/Network-Map.md
     - Extensions/NFSen.md
     - Extensions/Oxidized.md
+    - Extensions/PeeringDB.md
     - Extensions/Plugin-System.md
     - Extensions/Poller-Service.md
     - Extensions/Port-Description-Parser.md

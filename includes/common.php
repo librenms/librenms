@@ -1454,10 +1454,13 @@ function starts_with($haystack, $needles, $case_insensitive = false)
 function get_auth_ad_user_filter($username)
 {
     global $config;
-    $user_filter = "(samaccountname=$username)";
+
+    // don't return disabled users
+    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
     if ($config['auth_ad_user_filter']) {
-        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
+        $user_filter .= $config['auth_ad_user_filter'];
     }
+    $user_filter .= ')';
     return $user_filter;
 }
 
@@ -1552,7 +1555,7 @@ function load_os(&$device)
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
-        echo "Device type changed to " . $device['type'] . "!\n";
+        d_echo("Device type changed to " . $device['type'] . "!\n");
     }
 
     if ($config['os'][$device['os']]['group']) {
