@@ -1490,6 +1490,31 @@ function get_disks($device)
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
 
+/**
+ * Get the fail2ban jails for a device... just requires the device ID
+ * an empty return means either no jails or fail2ban is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_fail2ban_jails($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'type' => array('=', 'fail2ban'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $f2bc=$component->getComponents($device_id, $options);
+
+    if (isset($f2bc[$device_id])) {
+        $id = $component->getFirstComponentID($f2bc, $device_id);
+        return json_decode($f2bc[$device_id][$id]['jails']);
+    }
+
+    return array();
+}
+
 // takes the device array and app_id
 function get_disks_with_smart($device, $app_id)
 {

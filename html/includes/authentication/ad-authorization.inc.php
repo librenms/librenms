@@ -54,7 +54,7 @@ function authenticate($username, $password)
 }
 
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
     // not supported so return 0
     return 0;
