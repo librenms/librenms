@@ -2,7 +2,7 @@
 ############################################################
 # copy this file somewhere like /opt and chmod +x it       #
 # edit your snmpd.conf and add the below line and restart: #
-# extend nfs-stats /opt/nfs-stats.sh                       #
+# extend nfs-v3-stats /opt/nfs-stats.sh                       #
 ############################################################
 CFG_NFSFILE='/proc/net/rpc/nfsd'
 BIN_CAT='/usr/bin/cat'
@@ -36,7 +36,7 @@ $BIN_CAT $CFG_NFSFILE | $BIN_SED -n 6p | $BIN_AWK '{print $2,$3,$4,$5}' | $BIN_T
 $BIN_CAT $CFG_NFSFILE | $BIN_SED -n 7p | $BIN_AWK '{print $2,$3,$4,$5,$6}' | $BIN_TR " " "\n" >> $LOG_NEW
 
 #get nfs v3 stats (proc3 - values: null, getattr, setattr, lookup, access, readlink, read, write, create, mkdir, symlink, mknod, remove, rmdir, rename, link, readdir, readdirplus, fsstat, fsinfo, pathconf, commit)
-$BIN_CAT $CFG_NFSFILE | $BIN_SED -n 8p | $BIN_AWK '{print $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24}' | $BIN_TR " " "\n" >> $LOG_NEW
+$BIN_CAT $CFG_NFSFILE | $BIN_SED -n 9p | $BIN_AWK '{print $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24}' | $BIN_TR " " "\n" >> $LOG_NEW
 
 $BIN_PASTE $LOG_FIX
 $BIN_PASTE $LOG_NEW $LOG_OLD | while read a b ; do
