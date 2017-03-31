@@ -25,7 +25,7 @@ function authenticate($username, $password)
     }
 }
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
     return 0;
 }

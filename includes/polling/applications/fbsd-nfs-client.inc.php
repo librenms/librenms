@@ -5,9 +5,8 @@ $app_id = $app['app_id'];
 use LibreNMS\RRD\RrdDefinition;
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutLine.13.102.98.115.100.110.102.115.99.108.105.101.110.116';
-$nfsclient = snmp_walk($device, $oid, $options, $mib);
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.13.102.98.115.100.110.102.115.99.108.105.101.110.116';
+$nfsclient = snmp_walk($device, $oid, $options);
 update_application($app, $nfsclient);
 
 list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink, $mkdir, $rmdir,

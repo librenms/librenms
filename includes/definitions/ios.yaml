@@ -25,6 +25,7 @@ poller_modules:
     cisco-ipsec-flow-monitor: 1
     cipsec-tunnels: 1
     cisco-otv: 1
+    cisco-vpdn: 1
     ipmi: 0
 discovery_modules:
     cisco-cef: 1
