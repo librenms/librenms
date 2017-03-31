@@ -1698,8 +1698,6 @@ function get_user_pref($name, $default = null, $user_id = null)
         'SELECT `value` FROM `users_prefs` WHERE `user_id`=? AND `pref`=?',
         array($user_id, $name)
     );
-//    echo 'rawdb:';
-//    var_dump($pref);
 
     if (!is_null($pref)) {
         $pref = json_decode($pref, true);
