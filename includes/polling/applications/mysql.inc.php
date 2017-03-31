@@ -9,8 +9,8 @@ if (!empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
     // Polls MySQL  statistics from script via SNMP
-    $mysql_cmd  = $config['snmpget'].' -m NET-SNMP-EXTEND-MIB -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
-    $mysql_cmd .= ' nsExtendOutputFull.5.109.121.115.113.108';
+    $mysql_cmd  = $config['snmpget'].' -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
+    $mysql_cmd .= '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108';
     $mysql      = shell_exec($mysql_cmd);
 }
 

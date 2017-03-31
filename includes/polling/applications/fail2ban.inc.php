@@ -8,9 +8,8 @@ $name = 'fail2ban';
 $app_id = $app['app_id'];
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutputFull.8.102.97.105.108.50.98.97.110';
-$new_component = snmp_walk($device, $oid, $options, $mib);
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.102.97.105.108.50.98.97.110';
+$f2b = snmp_walk($device, $oid, $options);
 update_application($app, $new_component);
 
 $bannedStuff = explode("\n", $new_component);
