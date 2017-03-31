@@ -1,4 +1,4 @@
-m<?php
+<?php
 
 // Polls Apache statistics from script via SNMP
 use LibreNMS\RRD\RrdDefinition;
