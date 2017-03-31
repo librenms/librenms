@@ -5,15 +5,14 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutputFull.8.112.111.119.101.114.100.110.115';
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.119.101.114.100.110.115';
 
 $name = 'powerdns';
 $app_id = $app['app_id'];
 if ($agent_data['app'][$name]) {
     $powerdns = $agent_data['app'][$name];
 } else {
-    $powerdns = snmp_get($device, $oid, $options, $mib);
+    $powerdns = snmp_get($device, $oid, $options);
 }
 update_application($app, $powerdns);
 
