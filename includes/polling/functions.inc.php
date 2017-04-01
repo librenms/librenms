@@ -209,10 +209,10 @@ function poll_device($device, $options)
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
+    $db_ip = inet_pton($ip);
 
-    if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
+    if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
-        $db_ip = inet_pton($ip);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
 
