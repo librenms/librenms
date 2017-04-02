@@ -11,6 +11,8 @@ $link_array = array(
     'app'    => 'postgres',
 );
 
+print_optionbar_start();
+
 echo generate_link('Total', $link_array);
 echo '| DBs:';
 $db_int=0;
@@ -32,6 +34,7 @@ while (isset($databases[$db_int])) {
     echo generate_link($label, $link_array, array('database'=>$db)).$append;
 }
 
+print_optionbar_end();
 
 $graphs = array(
     'postgres_backends' => 'Backends',
