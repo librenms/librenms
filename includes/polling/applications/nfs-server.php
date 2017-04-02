@@ -1,9 +1,8 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
-
 $name = 'nfs-server';
-$app_id = $app[app_id];
+$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
 echo ' ' . $name;
@@ -13,273 +12,238 @@ update_application($app, $nfsstats);
 
 $rrd_name = array('app', 'nfs-server', $app_id);
 $rrd_def = RrdDefinition::make()
-		->addDataset('rc_hits', 'GAUGE', 0)
-		->addDataset('rc_misses', 'GAUGE', 0)
-		->addDataset('rc_nocache', 'GAUGE', 0)
-		->addDataset('fh_lookup', 'GAUGE', 0)
-		->addDataset('fh_anon', 'GAUGE', 0)
-		->addDataset('fh_ncachedir', 'GAUGE', 0)
-		->addDataset('fh_ncachenondir', 'GAUGE', 0)
-		->addDataset('fh_stale', 'GAUGE', 0)
-		->addDataset('io_read', 'GAUGE', 0)
-		->addDataset('io_write', 'GAUGE', 0)
-		->addDataset('ra_range01', 'GAUGE', 0)
-		->addDataset('ra_range02', 'GAUGE', 0)
-		->addDataset('ra_range03', 'GAUGE', 0)
-		->addDataset('ra_range04', 'GAUGE', 0)
-		->addDataset('ra_range05', 'GAUGE', 0)
-		->addDataset('ra_range06', 'GAUGE', 0)
-		->addDataset('ra_range07', 'GAUGE', 0)
-		->addDataset('ra_range08', 'GAUGE', 0)
-		->addDataset('ra_range09', 'GAUGE', 0)
-		->addDataset('ra_range10', 'GAUGE', 0)
-		->addDataset('ra_notfound', 'GAUGE', 0)
-		->addDataset('net_all', 'GAUGE', 0)
-		->addDataset('net_udp', 'GAUGE', 0)
-		->addDataset('net_tcp', 'GAUGE', 0)
-		->addDataset('net_tcpconn', 'GAUGE', 0)
-		->addDataset('rpc_calls', 'GAUGE', 0)
-		->addDataset('rpc_badfmt', 'GAUGE', 0)
-		->addDataset('rpc_badauth', 'GAUGE', 0)
-		->addDataset('rpc_badclnt', 'GAUGE', 0)
-		->addDataset('proc2_null', 'GAUGE', 0)
-		->addDataset('proc2_getattr', 'GAUGE', 0)
-		->addDataset('proc2_setattr', 'GAUGE', 0)
-		->addDataset('proc2_root', 'GAUGE', 0)
-		->addDataset('proc2_lookup', 'GAUGE', 0)
-		->addDataset('proc2_readlink', 'GAUGE', 0)
-		->addDataset('proc2_read', 'GAUGE', 0)
-		->addDataset('proc2_wrcache', 'GAUGE', 0)
-		->addDataset('proc2_write', 'GAUGE', 0)
-		->addDataset('proc2_create', 'GAUGE', 0)
-		->addDataset('proc2_remove', 'GAUGE', 0)
-		->addDataset('proc2_rename', 'GAUGE', 0)
-		->addDataset('proc2_link', 'GAUGE', 0)
-		->addDataset('proc2_symlink', 'GAUGE', 0)
-		->addDataset('proc2_mkdir', 'GAUGE', 0)
-		->addDataset('proc2_rmdir', 'GAUGE', 0)
-		->addDataset('proc2_readdir', 'GAUGE', 0)
-		->addDataset('proc2_fsstat', 'GAUGE', 0)
-		->addDataset('proc3_null', 'GAUGE', 0)
-		->addDataset('proc3_getattr', 'GAUGE', 0)
-		->addDataset('proc3_setattr', 'GAUGE', 0)
-		->addDataset('proc3_lookup', 'GAUGE', 0)
-		->addDataset('proc3_access', 'GAUGE', 0)
-		->addDataset('proc3_readlink', 'GAUGE', 0)
-		->addDataset('proc3_read', 'GAUGE', 0)
-		->addDataset('proc3_write', 'GAUGE', 0)
-		->addDataset('proc3_create', 'GAUGE', 0)
-		->addDataset('proc3_mkdir', 'GAUGE', 0)
-		->addDataset('proc3_symlink', 'GAUGE', 0)
-		->addDataset('proc3_mknod', 'GAUGE', 0)
-		->addDataset('proc3_remove', 'GAUGE', 0)
-		->addDataset('proc3_rmdir', 'GAUGE', 0)
-		->addDataset('proc3_rename', 'GAUGE', 0)
-		->addDataset('proc3_link', 'GAUGE', 0)
-		->addDataset('proc3_readdir', 'GAUGE', 0)
-		->addDataset('proc3_readdirplus', 'GAUGE', 0)
-		->addDataset('proc3_fsstat', 'GAUGE', 0)
-		->addDataset('proc3_fsinfo', 'GAUGE', 0)
-		->addDataset('proc3_pathconf', 'GAUGE', 0)
-		->addDataset('proc3_commit', 'GAUGE', 0)
-		->addDataset('proc4_null', 'GAUGE', 0)
-		->addDataset('proc4_compound', 'GAUGE', 0)
-		->addDataset('v4ops_access', 'GAUGE', 0)
-		->addDataset('v4ops_close', 'GAUGE', 0)
-		->addDataset('v4ops_commit', 'GAUGE', 0)
-		->addDataset('v4ops_create', 'GAUGE', 0)
-		->addDataset('v4ops_delegpurge', 'GAUGE', 0)
-		->addDataset('v4ops_delegreturn', 'GAUGE', 0)
-		->addDataset('v4ops_getattr', 'GAUGE', 0)
-		->addDataset('v4ops_getfh', 'GAUGE', 0)
-		->addDataset('v4ops_link', 'GAUGE', 0)
-		->addDataset('v4ops_lock', 'GAUGE', 0)
-		->addDataset('v4ops_lockt', 'GAUGE', 0)
-		->addDataset('v4ops_locku', 'GAUGE', 0)
-		->addDataset('v4ops_lookup', 'GAUGE', 0)
-		->addDataset('v4ops_lookup_root', 'GAUGE', 0)
-		->addDataset('v4ops_nverify', 'GAUGE', 0)
-		->addDataset('v4ops_open', 'GAUGE', 0)
-		->addDataset('v4ops_openattr', 'GAUGE', 0)
-		->addDataset('v4ops_open_confirm', 'GAUGE', 0)
-		->addDataset('v4ops_open_downgrad', 'GAUGE', 0)
-		->addDataset('v4ops_putfh', 'GAUGE', 0)
-		->addDataset('v4ops_putpubfh', 'GAUGE', 0)
-		->addDataset('v4ops_putrootfh', 'GAUGE', 0)
-		->addDataset('v4ops_read', 'GAUGE', 0)
-		->addDataset('v4ops_readdir', 'GAUGE', 0)
-		->addDataset('v4ops_readlink', 'GAUGE', 0)
-		->addDataset('v4ops_remove', 'GAUGE', 0)
-		->addDataset('v4ops_rename', 'GAUGE', 0)
-		->addDataset('v4ops_renew', 'GAUGE', 0)
-		->addDataset('v4ops_restorefh', 'GAUGE', 0)
-		->addDataset('v4ops_savefh', 'GAUGE', 0)
-		->addDataset('v4ops_secinfo', 'GAUGE', 0)
-		->addDataset('v4ops_setattr', 'GAUGE', 0)
-		->addDataset('v4ops_setclientid', 'GAUGE', 0)
-		->addDataset('v4ops_setclientid_c', 'GAUGE', 0)
-		->addDataset('v4ops_verify', 'GAUGE', 0)
-		->addDataset('v4ops_write', 'GAUGE', 0)
-		->addDataset('v4ops_release_locko', 'GAUGE', 0)
-		->addDataset('v4ops_backchannel_c', 'GAUGE', 0)
-		->addDataset('v4ops_bind_conn_to_', 'GAUGE', 0)
-		->addDataset('v4ops_exchange_id', 'GAUGE', 0)
-		->addDataset('v4ops_create_sessio', 'GAUGE', 0)
-		->addDataset('v4ops_destroy_sessi', 'GAUGE', 0)
-		->addDataset('v4ops_free_stateid', 'GAUGE', 0)
-		->addDataset('v4ops_get_dir_deleg', 'GAUGE', 0)
-		->addDataset('v4ops_getdeviceinfo', 'GAUGE', 0)
-		->addDataset('v4ops_getdevicelist', 'GAUGE', 0)
-		->addDataset('v4ops_layoutcommit', 'GAUGE', 0)
-		->addDataset('v4ops_layoutget', 'GAUGE', 0)
-		->addDataset('v4ops_secinfo_no_na', 'GAUGE', 0)
-		->addDataset('v4ops_sequence', 'GAUGE', 0)
-		->addDataset('v4ops_set_ssv', 'GAUGE', 0)
-		->addDataset('v4ops_test_stateid', 'GAUGE', 0)
-		->addDataset('v4ops_want_delegati', 'GAUGE', 0)
-		->addDataset('v4ops_destroy_clien', 'GAUGE', 0)
-		->addDataset('v4ops_reclaim_compl', 'GAUGE', 0)
+		->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
+		->addDataset('rc_misses', 'COUNTER', 0, 125000000000)
+		->addDataset('rc_nocache', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('fh_lookup', 'COUNTER', 0, 125000000000)
+		->addDataset('fh_anon', 'COUNTER', 0, 125000000000)
+		->addDataset('fh_ncachedir', 'COUNTER', 0, 125000000000)
+		->addDataset('fh_ncachenondir', 'COUNTER', 0, 125000000000)
+		->addDataset('fh_stale', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('io_read', 'COUNTER', 0, 125000000000)
+		->addDataset('io_write', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('th_threads', 'COUNTER', 0, 125000000000)
+		->addDataset('th_fullcnt', 'COUNTER', 0, 125000000000)
+		->addDataset('th_range01', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range02', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range03', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range04', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range05', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range06', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range07', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range08', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range09', 'GAUGE', 0, 125000000000)
+		->addDataset('th_range10', 'GAUGE', 0, 125000000000)
+		
+		->addDataset('ra_cachesize', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range01', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range02', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range03', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range04', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range05', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range06', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range07', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range08', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range09', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_range10', 'GAUGE', 0, 125000000000)
+		->addDataset('ra_notfound', 'GAUGE', 0, 125000000000)
+		
+		->addDataset('net_cnt', 'COUNTER', 0, 125000000000)
+		->addDataset('net_udp', 'COUNTER', 0, 125000000000)
+		->addDataset('net_tcp', 'COUNTER', 0, 125000000000)
+		->addDataset('net_tcpconn', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('rpc_calls', 'COUNTER', 0, 125000000000)
+		->addDataset('rpc_badcount', 'COUNTER', 0, 125000000000)
+		->addDataset('rpc_badfmt', 'COUNTER', 0, 125000000000)
+		->addDataset('rpc_badauth', 'COUNTER', 0, 125000000000)
+		->addDataset('rpc_badclnt', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_getattr', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_setattr', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_root', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_lookup', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_readlink', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_read', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_wrcache', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_write', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_create', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_remove', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_rename', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_link', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_symlink', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_mkdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_rmdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_readdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc2_fsstat', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('proc3_null', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_getattr', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_setattr', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_lookup', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_access', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_readlink', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_read', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_write', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_create', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_mkdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_symlink', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_mknod', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_remove', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_rmdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_rename', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_link', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_readdir', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_readdirplus', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_fsstat', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_fsinfo', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_pathconf', 'COUNTER', 0, 125000000000)
+		->addDataset('proc3_commit', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
+		->addDataset('proc4_compound', 'COUNTER', 0, 125000000000)
+		
+		->addDataset('v4ops_access', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_close', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_commit', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_create', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_delegpurge', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_delegreturn', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_getattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_getfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_link', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_lock', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_lockt', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_locku', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_lookup', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_lookup_root', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_nverify', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_open', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_openattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_open_confirm', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_open_downgrad', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_putfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_putpubfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_putrootfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_read', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_readdir', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_readlink', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_remove', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_rename', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_renew', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_restorefh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_savefh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_secinfo', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_setattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_setclientid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_setclientid_c', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_verify', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_write', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_release_locko', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_backchannel_c', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_bind_conn_to_', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_exchange_id', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_create_sessio', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_destroy_sessi', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_free_stateid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_get_dir_deleg', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_getdeviceinfo', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_getdevicelist', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_layoutcommit', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_layoutget', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_secinfo_no_na', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_sequence', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_set_ssv', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_test_stateid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_want_delegati', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_destroy_clien', 'COUNTER', 0, 125000000000)
+		->addDataset('v4ops_reclaim_compl', 'COUNTER', 0, 125000000000)
 ;
 
-$data = explode("|", base64_decode($nfsstats));
+/* examples output :
+rc 0 87795065 629022724
+fh 0 0 0 0 0
+io 35586909 1515531914
+th 16 0 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+ra 32 229333249 0 0 0 0 0 0 0 0 0 4106423
+net 717504610 0 717216613 15750
+rpc 717521317 0 0 0 0
+proc2 18 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+proc3 22 84 185701663 9587314 62436191 114380547 61635 233519348 60991846 8887178 203052 68539 0 5816369 163267 1946736 127750 35510 8641639 1060644 112 56 13833978
+proc4 2 1 404
+proc4ops 59 0 0 0 2 0 0 0 0 0 402 3 0 0 0 0 3 0 0 0 0 0 0 403 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+*/
 
-$fields = array(
-				'rc_hits' => $data[0],
-				'rc_misses' => $data[1],
-				'rc_nocache' => $data[2],
+$keys_nfs_server = array(
+							'rc' => array('th_hits', 'th_misses', 'th_nocache'),
+							'fh' => array('fh_lookup', 'fh_anon', 'fh_ncachedir', 'fh_ncachenondir', 'fh_stale'),
+							'io' => array('io_read', 'io_write'),
+							'th' => array('th_threads', 'th_fullcnt', 'th_range01', 'th_range02', 'th_range03', 'th_range04', 'th_range05', 'th_range06', 'th_range07', 'th_range08', 'th_range09', 'th_range10'),
+							'ra' => array('ra_cachesize', 'ra_range01', 'ra_range02', 'ra_range03', 'ra_range04', 'ra_range05', 'ra_range06', 'ra_range07', 'ra_range08', 'ra_range09', 'ra_range10', 'ra_notfound'),
+							'net' => array('net_cnt', 'net_udp', 'net_tcp', 'net_tcpconn'),
+							'rpc' => array('rpc_calls', 'rpc_badcount', 'rpc_badfmt', 'rpc_badauth', 'rpc_badclnt'),
+							'proc2' => array('proc2_null', 'proc2_getattr', 'proc2_setattr', 'proc2_root', 'proc2_lookup','proc2_readlink', 'proc2_read', 'proc2_wrcache', 'proc2_write', 'proc2_create','proc2_remove', 'proc2_rename', 'proc2_link', 'proc2_symlink', 'proc2_mkdir','proc2_rmdir', 'proc2_readdir', 'proc2_fsstat'),
+							'proc3' => array('proc3_null', 'proc3_getattr', 'proc3_setattr', 'proc3_lookup', 'proc3_access','proc3_readlink', 'proc3_read', 'proc3_write', 'proc3_create', 'proc3_mkdir','proc3_symlink', 'proc3_mknod', 'proc3_remove', 'proc3_rmdir', 'proc3_rename','proc3_link', 'proc3_readdir', 'proc3_readdirplus', 'proc3_fsstat', 'proc3_fsinfo', 'proc3_pathconf', 'proc3_commit'),
+							'proc4' => array('proc4_null', 'proc4_compound'),
+							'proc4ops' => array(
+												'v4ops_access','v4ops_close','v4ops_commit','v4ops_create','v4ops_delegpurge','v4ops_delegreturn','v4ops_getattr','v4ops_getfh','v4ops_link',
+												'v4ops_lock','v4ops_lockt','v4ops_locku','v4ops_lookup','v4ops_lookup_root','v4ops_nverify','v4ops_open','v4ops_openattr','v4ops_open_confirm',
+												'v4ops_open_downgrad','v4ops_putfh','v4ops_putpubfh','v4ops_putrootfh','v4ops_read','v4ops_readdir','v4ops_readlink','v4ops_remove','v4ops_rename',
+												'v4ops_renew','v4ops_restorefh','v4ops_savefh','v4ops_secinfo','v4ops_setattr','v4ops_setclientid','v4ops_setclientid_c','v4ops_verify',
+												'v4ops_write','v4ops_release_locko','v4ops_backchannel_c','v4ops_bind_conn_to_','v4ops_exchange_id','v4ops_create_sessio','v4ops_destroy_sessi',
+												'v4ops_free_stateid','v4ops_get_dir_deleg','v4ops_getdeviceinfo','v4ops_getdevicelist','v4ops_layoutcommit','v4ops_layoutget','v4ops_secinfo_no_na',
+												'v4ops_sequence','v4ops_set_ssv','v4ops_test_stateid','v4ops_want_delegati','v4ops_destroy_clien','v4ops_reclaim_compl')
+						);
 
-				'fh_lookup' => $data[3],
-				'fh_anon' => $data[4],
-				'fh_ncachedir' => $data[5],
-				'fh_ncachenondir' => $data[6],
-				'fh_stale' => $data[7],
-
-				'io_read' => $data[8],
-				'io_write' => $data[9],
-
-				'ra_range01' => $data[10],
-				'ra_range02' => $data[11],
-				'ra_range03' => $data[12],
-				'ra_range04' => $data[13],
-				'ra_range05' => $data[14],
-				'ra_range06' => $data[15],
-				'ra_range07' => $data[16],
-				'ra_range08' => $data[17],
-				'ra_range09' => $data[18],
-				'ra_range10' => $data[19],
-				'ra_notfound' => $data[20],
-
-				'net_all' => $data[21],
-				'net_udp' => $data[22],
-				'net_tcp' => $data[23],
-				'net_tcpconn' => $data[24],
-
-				'rpc_calls' => $data[25],
-				'rpc_badfmt' => $data[26],
-				'rpc_badauth' => $data[27],
-				'rpc_badclnt' => $data[28],
-
-				'proc2_null' => $data[29],
-				'proc2_getattr' => $data[30],
-				'proc2_setattr' => $data[31],
-				'proc2_root' => $data[32],
-				'proc2_lookup' => $data[33],
-				'proc2_readlink' => $data[34],
-				'proc2_read' => $data[35],
-				'proc2_wrcache' => $data[36],
-				'proc2_write' => $data[37],
-				'proc2_create' => $data[38],
-				'proc2_remove' => $data[39],
-				'proc2_rename' => $data[40],
-				'proc2_link' => $data[41],
-				'proc2_symlink' => $data[42],
-				'proc2_mkdir' => $data[43],
-				'proc2_rmdir' => $data[44],
-				'proc2_readdir' => $data[45],
-				'proc2_fsstat' => $data[46],
-
-				'proc3_null' => $data[47],
-				'proc3_getattr' => $data[48],
-				'proc3_setattr' => $data[49],
-				'proc3_lookup' => $data[50],
-				'proc3_access' => $data[51],
-				'proc3_readlink' => $data[52],
-				'proc3_read' => $data[53],
-				'proc3_write' => $data[54],
-				'proc3_create' => $data[55],
-				'proc3_mkdir' => $data[56],
-				'proc3_symlink' => $data[57],
-				'proc3_mknod' => $data[58],
-				'proc3_remove' => $data[59],
-				'proc3_rmdir' => $data[60],
-				'proc3_rename' => $data[61],
-				'proc3_link' => $data[62],
-				'proc3_readdir' => $data[63],
-				'proc3_readdirplus' => $data[64],
-				'proc3_fsstat' => $data[65],
-				'proc3_fsinfo' => $data[66],
-				'proc3_pathconf' => $data[67],
-				'proc3_commit' => $data[68],
-
-				'proc4_null' => $data[69],
-				'proc4_compound' => $data[70],
-				
-				'v4ops_access' => $data[71],
-				'v4ops_close' => $data[72],
-				'v4ops_commit' => $data[73],
-				'v4ops_create' => $data[74],
-				'v4ops_delegpurge' => $data[75],
-				'v4ops_delegreturn' => $data[76],
-				'v4ops_getattr' => $data[77],
-				'v4ops_getfh' => $data[78],
-				'v4ops_link' => $data[79],
-				'v4ops_lock' => $data[80],
-				'v4ops_lockt' => $data[81],
-				'v4ops_locku' => $data[82],
-				'v4ops_lookup' => $data[83],
-				'v4ops_lookup_root' => $data[84],
-				'v4ops_nverify' => $data[85],
-				'v4ops_opsen' => $data[86],
-				'v4ops_opsenattr' => $data[87],
-				'v4ops_opsen_confirm' => $data[88],
-				'v4ops_opsen_downgrade' => $data[89],
-				'v4ops_putfh' => $data[90],
-				'v4ops_putpubfh' => $data[91],
-				'v4ops_putrootfh' => $data[92],
-				'v4ops_read' => $data[93],
-				'v4ops_readdir' => $data[94],
-				'v4ops_readlink' => $data[95],
-				'v4ops_remove' => $data[96],
-				'v4ops_rename' => $data[97],
-				'v4ops_renew' => $data[98],
-				'v4ops_restorefh' => $data[99],
-				'v4ops_savefh' => $data[100],
-				'v4ops_secinfo' => $data[101],
-				'v4ops_setattr' => $data[102],
-				'v4ops_setclientid' => $data[103],
-				'v4ops_setclientid_confirm' => $data[104],
-				'v4ops_verify' => $data[105],
-				'v4ops_write' => $data[106],
-				'v4ops_release_lockowner' => $data[107],
-				'v4ops_backchannel_ctl' => $data[108],
-				'v4ops_bind_conn_to_session' => $data[109],
-				'v4ops_exchange_id' => $data[110],
-				'v4ops_create_session' => $data[111],
-				'v4ops_destroy_session' => $data[112],
-				'v4ops_free_stateid' => $data[113],
-				'v4ops_get_dir_delegation' => $data[114],
-				'v4ops_getdeviceinfo' => $data[115],
-				'v4ops_getdevicelist' => $data[116],
-				'v4ops_layoutcommit' => $data[117],
-				'v4ops_layoutget' => $data[118],
-				'v4ops_secinfo_no_name' => $data[119],
-				'v4ops_sequence' => $data[120],
-				'v4ops_set_ssv' => $data[121],
-				'v4ops_test_stateid' => $data[122],
-				'v4ops_want_delegation' => $data[123],
-				'v4ops_destroy_clientid' => $data[124],
-				'v4ops_reclaim_complete' => $data[125]
-);
+						
+# parse each output line, by the id
+# then 'map' the values to the arrays from $keys_nfs_server
+$lines 	= explode("\n", $nfsstats);
+$fields = array();
+foreach ($lines as $line)
+{
+	$line_values 	= split(" ", $line);
+	$line_id 		= $line_values[0];
+	
+	# remove the line_id
+	array_shift($line_values);
+	
+	switch ($line_id)
+	{
+		case 'rc':
+		case 'fh':
+		case 'io':
+		case 'th':
+		case 'ra':
+		case 'net': 
+		case 'rpc': 
+			# combine keys + values, and then merge it in $fields array
+			$fields = array_merge($fields, array_combine($keys_nfs_server['rc'], $line_values));
+		break;
+		case 'proc2': 
+		case 'proc3': 
+		case 'proc4':
+		case 'proc4ops': 
+			# note : proc2 is dropped for kernels 3.10.0+ (centos 7+)
+			# note : proc4ops has changed a few times, and getting the keys is difficult
+			#		 I only use the version which reports 59 value's (centos 6)
+			
+			# the first value of the proc* is the amount of fields that will follow;
+			# we check this, and if its incorrect, do not polute the chart with wrong values
+			$value_count = $line_values[0];
+			if ($value_count == count($keys_nfs_server[$line_id]))
+			{
+				# pop the value_count
+				array_shift($line_values);
+				$fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
+			}
+		break;
+	}
+}
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
