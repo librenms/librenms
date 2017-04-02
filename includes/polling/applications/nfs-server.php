@@ -107,61 +107,65 @@ $rrd_def = RrdDefinition::make()
 		->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
 		->addDataset('proc4_compound', 'COUNTER', 0, 125000000000)
 		
-		->addDataset('v4ops_access', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_close', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_commit', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_create', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_delegpurge', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_delegreturn', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_getattr', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_getfh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_link', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_lock', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_lockt', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_locku', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_lookup', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_lookup_root', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_nverify', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_open', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_openattr', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_open_confirm', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_open_downgrad', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_putfh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_putpubfh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_putrootfh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_read', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_readdir', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_readlink', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_remove', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_rename', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_renew', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_restorefh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_savefh', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_secinfo', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_setattr', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_setclientid', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_setclientid_c', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_verify', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_write', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_release_locko', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_backchannel_c', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_bind_conn_to_', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_exchange_id', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_create_sessio', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_destroy_sessi', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_free_stateid', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_get_dir_deleg', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_getdeviceinfo', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_getdevicelist', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_layoutcommit', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_layoutget', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_secinfo_no_na', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_sequence', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_set_ssv', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_test_stateid', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_want_delegati', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_destroy_clien', 'COUNTER', 0, 125000000000)
-		->addDataset('v4ops_reclaim_compl', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_op0-unused', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_op1-unused', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_op2-future', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_access', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_close', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_commit', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_create', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_delegpurge', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_delegreturn', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_getattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_getfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_link', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_lock', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_lockt', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_locku', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_lookup', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_lookup_root', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_nverify', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_open', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_openattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_open_conf', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_open_dgrd', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_putfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_putpubfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_putrootfh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_read', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_readdir', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_readlink', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_remove', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_rename', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_renew', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_restorefh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_savefh', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_secinfo', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_setattr', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_setcltid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_setcltidconf', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_verify', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_write', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_rellockowner', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_bc_ctl', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_bind_conn', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_exchange_id', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_create_ses', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_destroy_ses', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_free_stateid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_getdirdeleg', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_getdevinfo', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_getdevlist', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_layoutcommit', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_layoutget', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_layoutreturn', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_secinfononam', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_sequence', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_set_ssv', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_test_stateid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_want_deleg', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_destroy_clid', 'COUNTER', 0, 125000000000)
+		->addDataset('v4_reclaim_comp', 'COUNTER', 0, 125000000000)
 ;
 
 /* examples output :
@@ -190,13 +194,16 @@ $keys_nfs_server = array(
 							'proc3' => array('proc3_null', 'proc3_getattr', 'proc3_setattr', 'proc3_lookup', 'proc3_access','proc3_readlink', 'proc3_read', 'proc3_write', 'proc3_create', 'proc3_mkdir','proc3_symlink', 'proc3_mknod', 'proc3_remove', 'proc3_rmdir', 'proc3_rename','proc3_link', 'proc3_readdir', 'proc3_readdirplus', 'proc3_fsstat', 'proc3_fsinfo', 'proc3_pathconf', 'proc3_commit'),
 							'proc4' => array('proc4_null', 'proc4_compound'),
 							'proc4ops' => array(
-												'v4ops_access','v4ops_close','v4ops_commit','v4ops_create','v4ops_delegpurge','v4ops_delegreturn','v4ops_getattr','v4ops_getfh','v4ops_link',
-												'v4ops_lock','v4ops_lockt','v4ops_locku','v4ops_lookup','v4ops_lookup_root','v4ops_nverify','v4ops_open','v4ops_openattr','v4ops_open_confirm',
-												'v4ops_open_downgrad','v4ops_putfh','v4ops_putpubfh','v4ops_putrootfh','v4ops_read','v4ops_readdir','v4ops_readlink','v4ops_remove','v4ops_rename',
-												'v4ops_renew','v4ops_restorefh','v4ops_savefh','v4ops_secinfo','v4ops_setattr','v4ops_setclientid','v4ops_setclientid_c','v4ops_verify',
-												'v4ops_write','v4ops_release_locko','v4ops_backchannel_c','v4ops_bind_conn_to_','v4ops_exchange_id','v4ops_create_sessio','v4ops_destroy_sessi',
-												'v4ops_free_stateid','v4ops_get_dir_deleg','v4ops_getdeviceinfo','v4ops_getdevicelist','v4ops_layoutcommit','v4ops_layoutget','v4ops_secinfo_no_na',
-												'v4ops_sequence','v4ops_set_ssv','v4ops_test_stateid','v4ops_want_delegati','v4ops_destroy_clien','v4ops_reclaim_compl')
+													'v4_op0-unused','v4_op1-unused','v4_op2-future','v4_access','v4_close',
+													'v4_commit','v4_create','v4_delegpurge','v4_delegreturn','v4_getattr','v4_getfh',
+													'v4_link','v4_lock','v4_lockt','v4_locku','v4_lookup','v4_lookup_root','v4_nverify',
+													'v4_open','v4_openattr','v4_open_conf','v4_open_dgrd','v4_putfh','v4_putpubfh','v4_putrootfh',
+													'v4_read','v4_readdir','v4_readlink','v4_remove','v4_rename','v4_renew','v4_restorefh','v4_savefh',
+													'v4_secinfo','v4_setattr','v4_setcltid','v4_setcltidconf','v4_verify','v4_write','v4_rellockowner',
+													'v4_bc_ctl','v4_bind_conn','v4_exchange_id','v4_create_ses','v4_destroy_ses','v4_free_stateid',
+													'v4_getdirdeleg','v4_getdevinfo','v4_getdevlist','v4_layoutcommit','v4_layoutget','v4_layoutreturn',
+													'v4_secinfononam','v4_sequence','v4_set_ssv','v4_test_stateid','v4_want_deleg','v4_destroy_clid',
+													'v4_reclaim_comp')
 						);
 
 						
@@ -222,7 +229,7 @@ foreach ($lines as $line)
 		case 'net': 
 		case 'rpc': 
 			# combine keys + values, and then merge it in $fields array
-			$fields = array_merge($fields, array_combine($keys_nfs_server['rc'], $line_values));
+			$fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
 		break;
 		case 'proc2': 
 		case 'proc3': 
@@ -235,10 +242,12 @@ foreach ($lines as $line)
 			# the first value of the proc* is the amount of fields that will follow;
 			# we check this, and if its incorrect, do not polute the chart with wrong values
 			$value_count = $line_values[0];
+
 			if ($value_count == count($keys_nfs_server[$line_id]))
 			{
 				# pop the value_count
 				array_shift($line_values);
+
 				$fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
 			}
 		break;
