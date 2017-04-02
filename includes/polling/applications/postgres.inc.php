@@ -113,29 +113,24 @@ $options=array(
 );
 
 $component=new LibreNMS\Component();
-$pgc=$component->getComponents($device_id, $options);
+$pg_components=$component->getComponents($device_id, $options);
 
-// get or create a new fail2ban component and update it
-if (isset($pgc[$device_id])) {
-    $pgcs=array_keys($pgc[$device_id]);
-
-    //we should only ever have one of these, remove any extras
-    $pgcs_int=1;
-    while (isset($pgcs[$pgs_int])) {
-        echo 'found extra postgres type component, removing component ID "'.$pgcs[$pgcs_int].'"'."\n";
-        $component->deleteComponent($pgcs[$pgcs_int]);
-        $pgcs_int++;
+if (empty($found_dbs)) {
+    if (isset($pg_components[$device_id])) {
+        foreach ($pg_components[$device_id] as $component_id => $_unused) {
+                 $component->deleteComponent($component_id);
+        }
+    }
+} else {
+    if (isset($pg_components[$device_id])) {
+        $pgc = $pg_components[$device_id];
+    } else {
+        $pgc = $component->createComponent($device_id, 'postgres');
     }
 
-    $pgc=$pgc[$device_id][$pgcs[0]];
-    $pgc['databases']=implode('|', $found_dbs);
-    $pgc=array( $pgcs[0] => $pgc );
-} else {
-    $pgc=$component->createComponent($device_id, 'postgres');
-    $pgcs=array_keys($pgc[$device_id]);
-    $pgc=$pgc[$device_id][$pgcs[0]];
-    $pgc['label']='postgres';
-    $pgc['databases']=implode('|', $found_dbs);
-    $pgc=array( $pgs[0] => $pgc );
+    $id = $component->getFirstComponentID($pgc);
+    $pgc[$id]['label'] = 'Postgres';
+    $pgc[$id]['databases'] = json_encode($found_dbs);
+
+    $component->setComponentPrefs($device_id, $pgc);
 }
-$component->setComponentPrefs($device_id, $pgc);
