@@ -958,6 +958,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('juniperex2500os');
     }
 
+    public function testJuniperMss()
+    {
+        $this->checkOS('juniper-mss');
+    }
+
     public function testJunose()
     {
         $this->checkOS('junose');
