@@ -2,7 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 $name = 'nfs-server';
-$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
 echo ' ' . $name;
@@ -10,8 +9,13 @@ echo ' ' . $name;
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 update_application($app, $nfsstats);
 
-$rrd_name = array('app', 'nfs-server', $app_id);
-$rrd_def = RrdDefinition::make()
+// define the rrd names
+$rrd_name['default'] = array('app', 'nfs-server-default', $app_id);
+$rrd_name['proc2'] = array('app', 'nfs-server-proc2', $app_id);
+$rrd_name['proc3'] = array('app', 'nfs-server-proc3', $app_id);
+$rrd_name['proc4'] = array('app', 'nfs-server-proc4', $app_id);
+
+$rrd_def['default'] = RrdDefinition::make()
 		->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
 		->addDataset('rc_misses', 'COUNTER', 0, 125000000000)
 		->addDataset('rc_nocache', 'COUNTER', 0, 125000000000)
@@ -61,7 +65,9 @@ $rrd_def = RrdDefinition::make()
 		->addDataset('rpc_badfmt', 'COUNTER', 0, 125000000000)
 		->addDataset('rpc_badauth', 'COUNTER', 0, 125000000000)
 		->addDataset('rpc_badclnt', 'COUNTER', 0, 125000000000)
-		
+;
+
+$rrd_def['proc2'] = RrdDefinition::make()		
 		->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
 		->addDataset('proc2_getattr', 'COUNTER', 0, 125000000000)
 		->addDataset('proc2_setattr', 'COUNTER', 0, 125000000000)
@@ -80,7 +86,9 @@ $rrd_def = RrdDefinition::make()
 		->addDataset('proc2_rmdir', 'COUNTER', 0, 125000000000)
 		->addDataset('proc2_readdir', 'COUNTER', 0, 125000000000)
 		->addDataset('proc2_fsstat', 'COUNTER', 0, 125000000000)
-		
+;
+
+$rrd_def['proc3'] = RrdDefinition::make()	
 		->addDataset('proc3_null', 'COUNTER', 0, 125000000000)
 		->addDataset('proc3_getattr', 'COUNTER', 0, 125000000000)
 		->addDataset('proc3_setattr', 'COUNTER', 0, 125000000000)
@@ -103,7 +111,9 @@ $rrd_def = RrdDefinition::make()
 		->addDataset('proc3_fsinfo', 'COUNTER', 0, 125000000000)
 		->addDataset('proc3_pathconf', 'COUNTER', 0, 125000000000)
 		->addDataset('proc3_commit', 'COUNTER', 0, 125000000000)
-		
+;
+
+$rrd_def['proc4'] = RrdDefinition::make()			
 		->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
 		->addDataset('proc4_compound', 'COUNTER', 0, 125000000000)
 		
@@ -210,6 +220,7 @@ $keys_nfs_server = array(
 # parse each output line, by the id
 # then 'map' the values to the arrays from $keys_nfs_server
 $lines 	= explode("\n", $nfsstats);
+$default_fields = array();
 $fields = array();
 foreach ($lines as $line)
 {
@@ -229,7 +240,7 @@ foreach ($lines as $line)
 		case 'net': 
 		case 'rpc': 
 			# combine keys + values, and then merge it in $fields array
-			$fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
+			$default_fields = array_merge($default_fields, array_combine($keys_nfs_server[$line_id], $line_values));
 		break;
 		case 'proc2': 
 		case 'proc3': 
@@ -247,14 +258,19 @@ foreach ($lines as $line)
 			{
 				# pop the value_count
 				array_shift($line_values);
-
+				
 				$fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
+			
+				# create or push data to rrd
+				$tags = array('name' => $name, 'app_id' => $app['id'], 'rrd_name' => $rdd_name[$line_id], 'rrd_def' => $rrd_def[$line_id]);
+				data_update($device, 'app', $tags, $fields);				
 			}
 		break;
 	}
 }
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+# push the default data to rrd
+$tags = array('name' => $name, 'app_id' => $app['id'], 'rrd_name' => $rdd_name['default'], 'rrd_def' => $rrd_def['default']);
+data_update($device, 'app', $tags, $default_fields);
 
 unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
