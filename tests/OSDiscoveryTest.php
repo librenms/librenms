@@ -1240,6 +1240,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('okilan');
     }
 
+    public function testOmnitronIConverter()
+    {
+        $this->checkOS('omnitron-iconverter');
+    }
+
     public function testOnefs()
     {
         $this->checkOS('onefs');
@@ -1638,6 +1643,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
         $this->checkOS('timos', 'timos9');
+        $this->checkOS('timos', 'timos10');
     }
 
     public function testTomato()
