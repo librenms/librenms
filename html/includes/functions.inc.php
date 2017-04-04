@@ -610,7 +610,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     global $config;
 
     $graph_array = array();
-    $port        = ifNameDescr($port);
+
     if (!$text) {
         $text = fixifName($port['label']);
     }
@@ -629,9 +629,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
     if ($port['ifAlias']) {
-        $content .= display($port['ifAlias']).'<br />';
+        $content .= addslashes(display($port['ifAlias'])).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1139,6 +1139,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
+            $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
             $fallback      = false;
         }

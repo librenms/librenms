@@ -59,7 +59,7 @@ if (is_admin() === true || is_read() === true) {
 if ($config['warn']['ifdown']) {
     foreach (dbFetchRows($sql) as $interface) {
         if (!$interface['deleted']) {
-            $interface = ifNameDescr($interface);
+            $interface = cleanPort($interface);
             generate_front_box(
                 'alert alert-danger',
                 generate_device_link($interface, shorthost($interface['hostname'])) . "<br />
