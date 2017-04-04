@@ -1,8 +1,8 @@
 <?php
 /**
- * cyberoam-utm.inc.php
+ * hpe-ipdu.inc.php
  *
- * LibreNMS processor discovery module for Cyberoam-UTM
+ * LibreNMS os poller module for HPE iPDU
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,20 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'cyberoam-utm') {
-    echo 'Cyberoam UTM : ';
-
-    $oid = '.1.3.6.1.4.1.21067.2.1.2.2.1.0';
-    $descr = 'Processor';
-    $usage = snmp_get($device, $oid, '-Ovqn');
-
-    if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, $oid, '0', 'cyberroam-utm', $descr, '1', $usage);
-    }
-}
-
-unset(
-    $oid,
-    $descr,
-    $usage
-);
+list(,$version) = explode('firmware version', $poll_device['sysDescr']);
