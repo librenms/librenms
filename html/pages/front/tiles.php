@@ -33,7 +33,7 @@ list($user_dashboards, $shared_dashboards) = array_reduce($dashboards, function 
 // if the default dashboard doesn't exist, set it to the global default or to 0
 if (!isset($dashboards[$default_dash])) {
     $global_default = (int)$config['webui']['default_dashboard_id'];
-    $default_dash = isset($dashboards[$global_default]) ? $dashboards[$global_default] : 0;
+    $default_dash = isset($dashboards[$global_default]) ? $global_default : 0;
 }
 
 // if there are no possible dashboards, add one
