@@ -1,0 +1,10 @@
+os: ict-psu
+text: 'ICT Digital Series Power Supply'
+type: power
+icon: ict
+nobulk: 1
+mib_dir:
+    - ict
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.39145.11
