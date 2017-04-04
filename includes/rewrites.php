@@ -68,11 +68,6 @@ function cleanPort($interface, $device = null)
 {
     global $config;
 
-    // port already cleaned
-    if (isset($interface['label'])) {
-        return $interface;
-    }
-
     $interface['ifAlias'] = display($interface['ifAlias']);
     $interface['ifName']  = display($interface['ifName']);
     $interface['ifDescr'] = display($interface['ifDescr']);
