@@ -324,7 +324,7 @@ function overlib_link($url, $text, $contents, $class = null)
     global $config;
 
     $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
-    $contents = str_replace('"', "\'", $contents);
+    $contents = str_replace('"', "'", $contents);
     if ($class === null) {
         $output   = '<a href="'.$url.'"';
     } else {
@@ -337,7 +337,7 @@ function overlib_link($url, $text, $contents, $class = null)
         $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
     }
 
-    $output .= $text.'</a>';
+    $output .= display($text).'</a>';
 
     return $output;
 }//end overlib_link()
@@ -611,8 +611,11 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     $graph_array = array();
     $port        = ifNameDescr($port);
-    if (!$text) {
-        $text = fixifName($port['label']);
+    $label =  display(htmlentities(fixifName($port['label'])));
+    if ($text) {
+        $text = display(htmlentities(fixifName($text)));
+    } else {
+        $text = $label;
     }
 
     if ($type) {
@@ -629,7 +632,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.$label.'</div>';
     if ($port['ifAlias']) {
         $content .= display($port['ifAlias']).'<br />';
     }
@@ -661,7 +664,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     } elseif (port_permitted($port['port_id'], $port['device_id'])) {
         return overlib_link($url, $text, $content, $class);
     } else {
-        return fixifName($text);
+        return $text;
     }
 }//end generate_port_link()
 
