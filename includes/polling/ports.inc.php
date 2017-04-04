@@ -66,23 +66,6 @@ $stat_oids_db_extended = array(
     'ifOutMulticastPkts',
 );
 
-// From above for DB
-$etherlike_oids = array(
-    'dot3StatsAlignmentErrors',
-    'dot3StatsFCSErrors',
-    'dot3StatsSingleCollisionFrames',
-    'dot3StatsMultipleCollisionFrames',
-    'dot3StatsSQETestErrors',
-    'dot3StatsDeferredTransmissions',
-    'dot3StatsLateCollisions',
-    'dot3StatsExcessiveCollisions',
-    'dot3StatsInternalMacTransmitErrors',
-    'dot3StatsCarrierSenseErrors',
-    'dot3StatsFrameTooLongs',
-    'dot3StatsInternalMacReceiveErrors',
-    'dot3StatsSymbolErrors',
-);
-
 $cisco_oids = array(
     'locIfHardType',
     'locIfInRunts',
@@ -99,6 +82,9 @@ $cisco_oids = array(
 
 $pagp_oids = array(
     'pagpOperationMode',
+);
+
+$pagp_extended_oids = array(
     'pagpPortState',
     'pagpPartnerDeviceId',
     'pagpPartnerLearnMethod',
@@ -224,11 +210,11 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     }
 }
 
-if ($config['enable_ports_etherlike']) {
-    echo 'dot3Stats ';
-    $port_stats = snmpwalk_cache_oid($device, 'dot3StatsEntry', $port_stats, 'EtherLike-MIB');
-} elseif ($device['os'] != 'asa') {
+if ($device['os'] != 'asa') {
     echo 'dot3StatsDuplexStatus';
+    if ($config['enable_ports_poe'] || $config['enable_ports_etherlike']) {
+        $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
+    }
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
 
@@ -265,13 +251,17 @@ if ($config['enable_ports_poe']) {
     $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
 }
 
-// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
-// foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
-// foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
-// foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
+        $pagp_port_stats = snmpwalk_cache_oid($device, $oid, array(), 'CISCO-PAGP-MIB');
+    }
+    if (count($pagp_port_stats) > 0) {
+        foreach ($pagp_port_stats as $p_index => $p_stats) {
+            $port_stats[$p_index]['pagpOperationMode'] = $p_stats['pagpOperationMode'];
+        }
+        foreach ($pagp_extended_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
+        }
     }
 
     // Grab data to put ports into vlans or make them trunks
@@ -280,7 +270,7 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
 } elseif ($device['os'] != 'asa') {
-    $port_stats = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', $port_stats, 'Q-BRIDGE-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
 
 $polled = time();
@@ -806,4 +796,4 @@ foreach ($ports as $port) {
 } //end port update
 
 // Clear Variables Here
-unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $etherlike_oids, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
+unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
