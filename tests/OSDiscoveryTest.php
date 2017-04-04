@@ -1636,6 +1636,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('symbol');
     }
 
+    public function testTeradicipcoip()
+    {
+        $this->checkOS('teradici-pcoip');
+    }
+
     public function testTimos()
     {
         $this->checkOS('timos');
