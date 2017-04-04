@@ -18,7 +18,7 @@ echo '<tr">
   <td>';
 
 if ($entry['type'] == 'interface') {
-    $entry['link'] = '<b>'.generate_port_link(getifbyid($entry['reference'])).'</b>';
+    $entry['link'] = '<b>'.generate_port_link(cleanPort(getifbyid($entry['reference']))).'</b>';
 }
 
   echo $entry['link'].' '.htmlspecialchars($entry['message']).'</td>

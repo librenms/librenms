@@ -55,6 +55,7 @@ foreach ($vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
+        $otherport = cleanPort($otherport);
         echo $vsep.generate_port_link($otherport, makeshortif($otherport['ifDescr']));
         if ($otherport['untagged']) {
             echo '(U)';
