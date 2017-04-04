@@ -220,7 +220,20 @@ if (is_file('misc/db_schema.yaml')) {
                 }
                 $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` `$column` {$cdata['Type']} $null $default;";
             }
+            unset($current_schema[$table][$column]); // remove checked columns
         }
+
+        foreach ($current_schema[$table] as $column => $data) {
+            print_fail("You have an extra column ($table/$column)");
+            $schema_update[] = "ALTER TABLE `$table` DROP `$column`;";
+        }
+
+        unset($current_schema[$table]); // remove checked tables
+    }
+
+    foreach ($current_schema as $table => $data) {
+        print_fail("You have an extra table ($table)");
+        $schema_update[] = "DROP TABLE `$table`;";
     }
 } else {
     print_warn("We haven't detected the db_schema.yaml file");
@@ -228,7 +241,7 @@ if (is_file('misc/db_schema.yaml')) {
 
 if (!empty($schema_update)) {
     print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site:");
-     print_list($schema_update, "\t %s\n");
+    print_list($schema_update, "\t %s\n", 30);
 }
 
 $ini_tz = ini_get('date.timezone');
