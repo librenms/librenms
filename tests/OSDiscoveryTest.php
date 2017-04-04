@@ -821,6 +821,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hpe-ilo');
     }
 
+    public function testHpeIpdu()
+    {
+        $this->checkOS('hpe-ipdu');
+    }
+
     public function testHpeMsl()
     {
         $this->checkOS('hpe-msl');
