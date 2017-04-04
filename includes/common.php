@@ -1511,16 +1511,27 @@ function clean($value)
 
 /**
  * @param $value
+ * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value)
+function display($value, $purifier_config = array())
 {
     /** @var HTMLPurifier $purifier */
     global $config, $purifier;
+
+    // If $purifier_config is non-empty then we don't want
+    // to convert html tags and allow these to be controlled
+    // by purifier instead.
+    if (empty($purifier_config)) {
+        $value = htmlentities($value);
+    }
     if (!isset($purifier)) {
         // initialize HTML Purifier here since this is the only user
         $p_config = HTMLPurifier_Config::createDefault();
         $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        foreach ($purifier_config as $k => $v) {
+            $p_config->set($k, $v);
+        }
         $purifier = new HTMLPurifier($p_config);
     }
 
