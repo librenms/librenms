@@ -278,7 +278,7 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($pseudowire['peer_device_id']));
         $pw_peer_int = dbFetchRow('SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.port_id = I.port_id', array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
 
-        $pw_peer_int = ifNameDescr($pw_peer_int);
+        $pw_peer_int = cleanPort($pw_peer_int);
         echo "$br<i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i><b> ".generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])).' on '.generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])).'</b>';
         $br = '<br />';
     }
