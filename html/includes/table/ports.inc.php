@@ -169,7 +169,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifInErrors' => $port['ifInErrors'],
         'ifOutErrors' => $port['ifOutErrors'],
         'ifType' => humanmedia($port['ifType']),
-        'description' => display($port['ifAlias']),
+        'description' => $port['ifAlias'],
         'actions' => $actions,
     );
 }

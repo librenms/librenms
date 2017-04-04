@@ -103,7 +103,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
             'hostname'    => generate_device_link($interface),
             'interface'   => generate_port_link($interface).' '.$error_img,
             'address'     => $address,
-            'description' => display($interface['ifAlias']),
+            'description' => $interface['ifAlias'],
         );
     }
 }//end foreach
