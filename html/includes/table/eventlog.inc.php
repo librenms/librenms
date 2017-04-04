@@ -54,7 +54,7 @@ $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['co
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['host']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = ifLabel(getifbyid($eventlog['reference']));
+        $this_if = cleanPort(getifbyid($eventlog['reference']));
         $type    = '<b>'.generate_port_link($this_if, makeshortif(strtolower($this_if['label']))).'</b>';
     } else {
         $type = $eventlog['type'];
