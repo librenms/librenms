@@ -1511,16 +1511,27 @@ function clean($value)
 
 /**
  * @param $value
+ * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value)
+function display($value, $purifier_config = array())
 {
     /** @var HTMLPurifier $purifier */
     global $config, $purifier;
+
+    // If $purifier_config is non-empty then we don't want
+    // to convert html tags and allow these to be controlled
+    // by purifier instead.
+    if (empty($purifier_config)) {
+        $value = htmlentities($value);
+    }
     if (!isset($purifier)) {
         // initialize HTML Purifier here since this is the only user
         $p_config = HTMLPurifier_Config::createDefault();
         $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        foreach ($purifier_config as $k => $v) {
+            $p_config->set($k, $v);
+        }
         $purifier = new HTMLPurifier($p_config);
     }
 
@@ -1671,4 +1682,76 @@ function is_ip($string, $ver = 'ipv4ipv6')
         }
     }
     return false;
+}
+
+/**
+ * Fetch a user preference from the database
+ * Do not use strict comparison as results could be strings
+ *
+ * @param string $name preference name
+ * @param mixed $default value to return if the preference is not set
+ * @param int $user_id for this user_id otherwise, the currently logged in user
+ * @return mixed value of this preference
+ */
+function get_user_pref($name, $default = null, $user_id = null)
+{
+    global $user_prefs;
+
+    if (array_key_exists($name, $user_prefs)) {
+        return $user_prefs[$name];
+    }
+
+    if (is_null($user_id)) {
+        $user_id = $_SESSION['user_id'];
+    }
+
+    $pref = dbFetchCell(
+        'SELECT `value` FROM `users_prefs` WHERE `user_id`=? AND `pref`=?',
+        array($user_id, $name)
+    );
+
+    if (!is_null($pref)) {
+        $pref = json_decode($pref, true);
+        $user_prefs[$name] = $pref;
+        return $pref;
+    }
+
+    return $default;
+}
+
+/**
+ * Set a user preference value
+ *
+ * @param string $name preference name
+ * @param mixed $value value of this preference
+ * @param int $user_id for this user_id otherwise, the currently logged in user
+ * @return bool whether the setting was changed or not
+ */
+function set_user_pref($name, $value, $user_id = null)
+{
+    global $user_prefs;
+    if (is_null($user_id)) {
+        $user_id = $_SESSION['user_id'];
+    }
+
+    $pref = array(
+        'user_id' => $user_id,
+        'pref' => $name,
+        'value' => json_encode($value),
+    );
+
+    if (dbFetchCell('SELECT count(*) FROM `users_prefs` WHERE `user_id`=? AND `pref`=?', array($user_id, $name))) {
+        $update = array('value' => json_encode($value));
+        $params = array($user_id, $name);
+
+        $result = dbUpdate($update, 'users_prefs', '`user_id`=? AND `pref`=?', $params) > 0;
+    } else {
+        $result = dbInsert($pref, 'users_prefs') !== null;
+    }
+
+    if ($result) {
+        $user_prefs[$name] = $value;
+    }
+
+    return $result;
 }

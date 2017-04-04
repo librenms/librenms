@@ -206,6 +206,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('apic');
     }
+    
+    public function testArdmoreencoder()
+    {
+        $this->checkOS('ardmore-encoder');
+    }
 
     public function testAreca()
     {
@@ -814,6 +819,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHpeIlo()
     {
         $this->checkOS('hpe-ilo');
+    }
+
+    public function testHpeIpdu()
+    {
+        $this->checkOS('hpe-ipdu');
     }
 
     public function testHpeMsl()
