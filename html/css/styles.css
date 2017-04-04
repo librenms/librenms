@@ -838,7 +838,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin: 8px;
 }
 
-.infobox pre {
+.infobox .rrd-pre {
   background-color: #CCCCFF;
   font-size: 12px;
   white-space: pre-wrap;
