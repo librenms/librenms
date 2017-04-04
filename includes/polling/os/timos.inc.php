@@ -14,11 +14,8 @@ $version = 'v' . $majorVersion . '.' . $minorVersion . '.' . $versionModifier;
 //All rights reserved. All use subject to applicable license agreements.
 //Built on Thu Jan 5 11:01:16 IST 2017 by builder in /home/builder/9.0B1/R3/panos/main
 
-$description = $poll_device['sysDescr'];
-
-$versionEscaped = $majorVersion . '\.' . $minorVersion . '\.' . $versionModifier;
-$pattern = '~' . $versionEscaped . '\sboth\/hops\s(?\'hardware\'.*)\sCopyright~';
-preg_match($pattern, $description, $matches);
+$pattern = "~(cpm|both)\/(hops64|hops|x86_64) (?'hardware'.*)\sCopyright~";
+preg_match($pattern, $poll_device['sysDescr'], $matches);
 
 if ($matches['hardware']) {
     $hardware = $matches['hardware'];
