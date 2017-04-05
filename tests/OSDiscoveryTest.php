@@ -1274,6 +1274,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testOpengear()
     {
         $this->checkOS('opengear');
+        $this->checkOS('opengear', 'opengear1');
     }
 
     public function testOpenindiana()
