@@ -91,9 +91,6 @@ $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
 $config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
-$config['auth_ad_binduser'] = 'examplebinduser';
-$config['auth_ad_bindpassword'] = 'examplepassword';
-
 $config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
@@ -163,6 +160,8 @@ $config['auth_ad_url']                     = "ldaps://<your-domain.controll.er>"
 $config['auth_ad_domain']                  = "<your-domain.com>";
 $config['auth_ad_base_dn']                 = "<dc=your-domain,dc=com>";
 $config['auth_ad_check_certificates']      = true;  // require a valid ssl certificate
+$config['auth_ad_binduser']                = 'examplebinduser';
+$config['auth_ad_bindpassword']            = 'examplepassword';
 $config['auth_ad_debug']                   = false; // enable for verbose debug messages
 $config['active_directory']['users_purge'] = 30;    // purge users who haven't logged in for 30 days.
 $config['auth_ad_require_groupmembership'] = false; // require users to be members of a group listed below
