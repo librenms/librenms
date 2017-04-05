@@ -51,7 +51,7 @@ $add_email = @$_POST['add_email'] ?: '';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
-    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port'], config['db_socket']);
+    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port'], $config['db_socket']);
     dbQuery("SET NAMES 'utf8'");
     dbQuery("SET CHARACTER SET 'utf8'");
     dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
