@@ -114,4 +114,20 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
             $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
         }
     }
+
+    public function testValidateSchema()
+    {
+        if (is_file('misc/db_schema.yaml')) {
+            $master_schema = \Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents('misc/db_schema.yaml')
+            );
+
+            $current_schema = dump_db_schema();
+
+            $message = "Schema does not match the excpected schema defined by misc/db_schema.yaml\n";
+            $message .= "If you have changed the schema, make sure you update it with ./scripts/build-schema.php\n";
+
+            $this->assertEquals($master_schema, $current_schema, $message);
+        }
+    }
 }
