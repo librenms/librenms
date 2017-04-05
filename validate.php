@@ -202,44 +202,70 @@ if (is_file('misc/db_schema.yaml')) {
 
     foreach ((array)$master_schema as $table => $data) {
         if (empty($current_schema[$table])) {
-            print_fail("You have a missing table ($table)");
-        }
-        foreach ($data as $column => $cdata) {
-            $cur = $current_schema[$table][$column];
-            if (empty($current_schema[$table][$column])) {
-                print_fail("You have a missing column ($table/$column)");
-            }
-            if ($cdata['Type']    !== $cur['Type'] ||
-                $cdata['Null']    !== $cur['Null'] ||
-                $cdata['Default'] !== $cur['Default'] ||
-                $cdata['Extra']   !== $cur['Extra']) {
-                $null = $cdata['Null'] === 'NO' ? $null = 'NOT NULL' : $null = 'NULL';
-                $default = $cdata['Default'] == '' ? $default = '' : $default = "DEFAULT '{$cdata['Default']}'";
-                if (str_contains($default, 'CURRENT_TIMESTAMP')) {
-                    $default = str_replace("'", "", $default);
-                }
-                $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` `$column` {$cdata['Type']} $null $default;";
-            }
-            unset($current_schema[$table][$column]); // remove checked columns
-        }
+            print_fail("Database: missing table ($table)");
 
-        foreach ($current_schema[$table] as $column => $data) {
-            print_fail("You have an extra column ($table/$column)");
-            $schema_update[] = "ALTER TABLE `$table` DROP `$column`;";
+            $columns = array_map('column_schema_to_sql', $data['Columns']);
+            $indexes = array_map('index_schema_to_sql', $data['Indexes']);
+
+            $schema_update[] = "CREATE TABLE `$table` (" . implode(', ', array_merge($columns, $indexes)). ');';
+        } else {
+            $previous_column = '';
+            foreach ($data['Columns'] as $column => $cdata) {
+                $cur = $current_schema[$table]['Columns'][$column];
+                if (empty($current_schema[$table]['Columns'][$column])) {
+                    print_fail("Database: missing column ($table/$column)");
+
+                    $sql = "ALTER TABLE `$table` ADD " . column_schema_to_sql($cdata);
+                    if (!empty($previous_column)) {
+                        $sql .= " AFTER `$previous_column`";
+                    }
+                    $schema_update[] = $sql . ';';
+                } elseif ($cdata != $cur) {
+                    print_fail("Database: incorrect column ($table/$column)");
+                    $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` " . column_schema_to_sql($cdata) . ';';
+                }
+                $previous_column = $column;
+                unset($current_schema[$table]['Columns'][$column]); // remove checked columns
+            }
+
+            foreach ($current_schema[$table]['Columns'] as $column => $_unused) {
+                print_fail("Database: extra column ($table/$column)");
+                $schema_update[] = "ALTER TABLE `$table` DROP `$column`;";
+            }
+
+
+            foreach ($data['Indexes'] as $name => $index) {
+                if (empty($current_schema[$table]['Indexes'][$name])) {
+                    print_fail("Database: missing index ($table/$name)");
+                    $schema_update[] = "ALTER TABLE `$table` ADD " . index_schema_to_sql($index) . ';';
+                } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
+                    print_fail("Database: incorrect index ($table/$name)");
+                    $schema_update[] = "ALTER TABLE `$table` DROP INDEX `$name`, " . index_schema_to_sql($index) . ';';
+                }
+
+                unset($current_schema[$table]['Indexes'][$name]);
+            }
+
+            foreach ($current_schema[$table]['Indexes'] as $name => $_unused) {
+                print_fail("Database: extra index ($table/$name)");
+                $schema_update[] = "ALTER TABLE `$table` DROP INDEX `$name`;";
+            }
         }
 
         unset($current_schema[$table]); // remove checked tables
     }
 
     foreach ($current_schema as $table => $data) {
-        print_fail("You have an extra table ($table)");
+        print_fail("Database: extra table ($table)");
         $schema_update[] = "DROP TABLE `$table`;";
     }
 } else {
     print_warn("We haven't detected the db_schema.yaml file");
 }
 
-if (!empty($schema_update)) {
+if (empty($schema_update)) {
+    print_ok('Database schema correct');
+} else {
     print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site:");
     print_list($schema_update, "\t %s\n", 30);
 }

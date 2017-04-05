@@ -29,6 +29,5 @@ if (getenv('DBTEST')) {
 
     $output = dump_db_schema();
 
-    $yaml = Symfony\Component\Yaml\Yaml::dump($output);
-    print_r($yaml);
+    echo Symfony\Component\Yaml\Yaml::dump($output, 3, 2);
 }
