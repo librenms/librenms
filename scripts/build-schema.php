@@ -26,8 +26,7 @@ if (getenv('DBTEST')) {
     }
 
     sleep(60);//Sleep for 60 seconds to ensure db work has completed
-
-    $output = dump_db_schema();
-
-    echo Symfony\Component\Yaml\Yaml::dump($output, 3, 2);
 }
+
+$output = dump_db_schema();
+echo Symfony\Component\Yaml\Yaml::dump($output, 3, 2);
