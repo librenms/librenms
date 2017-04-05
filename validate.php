@@ -192,7 +192,8 @@ if (empty($collation_columns) !== true) {
     print_list($collation_columns, "\t %s\n");
 }
 
-if (is_file('misc/db_schema.yaml')) {
+// Skip this for now by checking for bad file
+if (is_file('misc/bad_db_schema.yaml')) {
     $master_schema = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents('misc/db_schema.yaml')
     );
