@@ -59,9 +59,7 @@ $fields = array(
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-//
 //process each database
-//
 $db_lines=explode("\n", $postgres);
 $db_lines_int=17;
 $found_dbs=array();
