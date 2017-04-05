@@ -1,6 +1,6 @@
 #!/bin/bash
 GH_REPO="@github.com/librenms/librenms.git"
-FULL_REPO="https://${LIBRENMS_TOKEN}$GH_REPO"
+FULL_REPO="https://${GH_TOKEN}:x-oauth-basic$GH_REPO"
 
 git config user.name "librenms-docs"
 git config user.email "travis@librenms.org"
