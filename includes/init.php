@@ -103,7 +103,7 @@ if ($config['memcached']['enable'] === true) {
 
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
-    $database_link = dbConnect($config['db_host'], $config['db_user'], $config['db_pass'], NULL, $config['db_port'], $config['db_socket']);
+    $database_link = dbConnect($config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port'], $config['db_socket']);
     if ($database_link === false) {
         exit(2);
     }

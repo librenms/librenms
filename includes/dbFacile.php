@@ -17,7 +17,7 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
-function dbConnect($host = NULL, $user = '', $password = '', $database = '', $port = NULL, $socket = NULL)
+function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
 {
     $db_link = mysqli_connect('p:' . $host, $user, $password, $database, $port, $socket);
     if ($db_link === false) {
