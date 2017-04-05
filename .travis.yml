@@ -11,7 +11,7 @@ matrix:
   - php: 5.5
     env: SKIP_STYLE_CHECK=1
   - php: 5.6
-    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
+    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true EXECUTE_BUILD_SCHEMA=true
 #  - php: hhvm
 #    env: SKIP_STYLE_CHECK=1
 
@@ -39,6 +39,7 @@ before_script:
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_SCHEMA == "true" && bash scripts/deploy-schema.sh
 
 after_failure:
   - cat /tmp/snmpsimd.log
