@@ -46,8 +46,14 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
             self::$db_created = dbQuery("CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci");
             dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             dbQuery("USE " . $config['db_name']);
-            $build_base = $config['install_dir'] . '/build-base.php';
-            exec($build_base, $schema);
+
+            if (dbQuery('SELECT `version` FROM `dbSchema`')) {
+                $cmd = '/usr/bin/env php ' . $config['install_dir'] . '/includes/sql-schema/update.php';
+            } else {
+                $cmd = $config['install_dir'] . '/build-base.php';
+            }
+
+            exec($cmd, $schema);
             self::$schema = $schema;
         }
     }
