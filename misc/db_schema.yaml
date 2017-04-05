@@ -1482,14 +1482,12 @@ users:
   Columns:
     can_modify_passwd: { Field: can_modify_passwd, Type: tinyint(4), 'Null': false, Default: '1', Extra: '' }
     created_at: { Field: created_at, Type: timestamp, 'Null': false, Default: '1970-01-02 00:00:01', Extra: '' }
-    dashboard: { Field: dashboard, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     descr: { Field: descr, Type: char(30), 'Null': false, Default: null, Extra: '' }
     email: { Field: email, Type: varchar(64), 'Null': false, Default: null, Extra: '' }
     level: { Field: level, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
     password: { Field: password, Type: varchar(60), 'Null': true, Default: null, Extra: '' }
     realname: { Field: realname, Type: varchar(64), 'Null': false, Default: null, Extra: '' }
     remember_token: { Field: remember_token, Type: varchar(100), 'Null': true, Default: null, Extra: '' }
-    twofactor: { Field: twofactor, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
     updated_at: { Field: updated_at, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
     username: { Field: username, Type: char(30), 'Null': false, Default: null, Extra: '' }
     user_id: { Field: user_id, Type: int(11), 'Null': false, Default: null, Extra: auto_increment }
@@ -1502,9 +1500,7 @@ users_prefs:
     user_id: { Field: user_id, Type: int(16), 'Null': false, Default: null, Extra: '' }
     value: { Field: value, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     user_id.pref: { Name: user_id.pref, Columns: [user_id, pref], Unique: true, Type: BTREE }
-    pref: { Name: pref, Columns: [pref], Unique: false, Type: BTREE }
 users_widgets:
   Columns:
     col: { Field: col, Type: tinyint(4), 'Null': false, Default: null, Extra: '' }
