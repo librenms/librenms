@@ -2254,18 +2254,16 @@ function column_schema_to_sql($column_data)
 function index_schema_to_sql($index_data)
 {
     if ($index_data['Name'] == 'PRIMARY') {
-        $index = 'PRIMARY KEY';
+        $index = 'PRIMARY KEY (%s)';
     } elseif ($index_data['Unique']) {
-        $index = 'UNIQUE';
+        $index = "UNIQUE `{$index_data['Name']}` (%s)";
     } else {
-        $index = 'INDEX';
+        $index = "INDEX `{$index_data['Name']}` (%s)";
     }
-
-    $type = $index_data['Type'] != 'BTREE' ? " USING {$index_data['Type']}" : '';
 
     $columns = implode(',', array_map(function ($col) {
         return "`$col`";
     }, $index_data['Columns']));
 
-    return "$index ($columns)$type";
+    return sprintf($index, $columns);
 }
