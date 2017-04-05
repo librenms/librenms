@@ -44,7 +44,6 @@ if (!empty($inputVoltage)) {
 $outputVoltage_oid = '.1.3.6.1.4.1.39145.11.7.0';
 $outputVoltage = trim(snmp_get($device, $outputVoltage_oid, '-Oqv'), '" ');
 if (!empty($outputVoltage)) {
-
     $divisor = 1;
     $index = '11.7.0';
     $descr = 'Output Voltage';
