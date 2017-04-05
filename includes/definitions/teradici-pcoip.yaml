@@ -6,8 +6,6 @@ mib_dir:
     - teradici
 over:
     - { graph: device_bits, text: 'Device Bits' }
-    #- { graph: device_pcoip-net-latency, text: 'Net Latency' }
-    #- { graph: device_pcoip-net-packets, text: 'Packets' }
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.25071.1
