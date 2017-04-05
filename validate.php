@@ -266,7 +266,7 @@ if (is_file('misc/db_schema.yaml')) {
 if (empty($schema_update)) {
     print_ok('Database schema correct');
 } else {
-    print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site:");
+    print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):");
     print_list($schema_update, "\t %s\n", 30);
 }
 
