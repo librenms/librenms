@@ -206,8 +206,9 @@ if (is_file('misc/db_schema.yaml')) {
 
             $columns = array_map('column_schema_to_sql', $data['Columns']);
             $indexes = array_map('index_schema_to_sql', $data['Indexes']);
+            $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
 
-            $schema_update[] = "CREATE TABLE `$table` (" . implode(', ', array_merge($columns, $indexes)). ');';
+            $schema_update[] = "CREATE TABLE `$table` ($def);";
         } else {
             $previous_column = '';
             foreach ($data['Columns'] as $column => $cdata) {
