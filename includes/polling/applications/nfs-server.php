@@ -7,7 +7,16 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114'
 echo ' ' . $name;
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
-update_application($app, $nfsstats);
+
+# check for false return
+if (!$nfsstats)
+{
+	update_application($app, $nfsstats);
+}
+else 
+{
+	echo "snmpwalk failed";
+}
 
 // define the rrd names
 $rrd_name['default'] = array('app', 'nfs-server-default', $app_id);
@@ -224,7 +233,7 @@ $default_fields = array();
 $fields = array();
 foreach ($lines as $line)
 {
-	$line_values 	= split(" ", $line);
+	$line_values 	= explode(" ", $line);
 	$line_id 		= $line_values[0];
 	
 	# remove the line_id
