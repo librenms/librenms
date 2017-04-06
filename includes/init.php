@@ -103,11 +103,9 @@ if ($config['memcached']['enable'] === true) {
 
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
-    if (!$database_link) {
-        echo '<h2>MySQL Error</h2>';
-        echo mysqli_connect_error();
-        die;
+    $database_link = dbConnect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
+    if ($database_link === false) {
+        exit(1);
     }
     $database_db = mysqli_select_db($database_link, $config['db_name']);
     if (!$database_db) {

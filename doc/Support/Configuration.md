@@ -26,13 +26,18 @@ These are the configuration options you will need to use to specify to get start
 
 ```php
 $config['db_host'] = '127.0.0.1';
-$config['db_port'] = 3306;
 $config['db_user'] = '';
 $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
-### Programs
+If you use a non-standard port or unix socket, you can specify them with these options:
+```php
+$config['db_port'] = 3306;
+$config['db_socket'] = '/run/mysqld/mysqld.sock';
+```
+
+#### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
 documentation page will be linked to rather than having the config provided.

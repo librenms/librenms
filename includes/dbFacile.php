@@ -17,6 +17,24 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+
+function dbConnect($host, $user = '', $password = '', $database = '', $port = '', $socket = '')
+{
+    $db_link = mysqli_connect('p:' . $host, $user, $password, $database, $port, $socket);
+    if ($db_link === false) {
+        $error = mysqli_connect_error();
+        if ($error == 'No such file or directory') {
+            $error = 'Could not connect to ' . $host;
+        }
+        if (isCli()) {
+            echo "MySQL Error: $error\n";
+        } else {
+            echo "<h2>MySQL Error</h2><p>$error</p>";
+        }
+    }
+    return $db_link;
+}
+
 /*
  * Performs a query using the given string.
  * Used by the other _query functions.
