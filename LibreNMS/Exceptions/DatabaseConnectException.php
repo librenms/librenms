@@ -1,8 +1,8 @@
 <?php
 /**
- * bootstrap.php
+ * DatabaseConnectException.php
  *
- * Initialize the Autoloader and includes for phpunit to be able to run tests
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +19,13 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Tony Murray
+ * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$install_dir = realpath(__DIR__ . '/..');
+namespace LibreNMS\Exceptions;
 
-$init_modules = array('web');
+class DatabaseConnectException extends \Exception
+{
 
-if (!getenv('SNMPSIM')) {
-    $init_modules[] = 'mocksnmp';
 }
-
-if (getenv('DBTEST')) {
-    if (!is_file($install_dir . '/config.php')) {
-        exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
-    }
-}
-
-require $install_dir . '/includes/init.php';
-chdir($install_dir);
-
-ini_set('display_errors', 1);
-error_reporting(E_ALL & ~E_WARNING);
