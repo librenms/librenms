@@ -33,50 +33,20 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
     private static $schema;
     private static $sql_mode;
     private static $empty_db;
-    protected $backupGlobals = false;
+//    protected $backupGlobals = false;
 
     public static function setUpBeforeClass()
     {
-        if (getenv('DBTEST')) {
-            global $config, $database_link;
-            self::$sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
-            dbQuery("SET NAMES 'utf8'");
-            dbQuery("SET CHARACTER SET 'utf8'");
-            dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
-            self::$empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", array($config['db_name'])) == 0);
-            dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-
-            if (self::$empty_db) {
-                $cmd = $config['install_dir'] . '/build-base.php';
-            } else {
-                $cmd = '/usr/bin/env php ' . $config['install_dir'] . '/includes/sql-schema/update.php';
-            }
-            
-
-            exec($cmd, $schema);
-            echo "Test Database Link: " . mysqli_stat($database_link) . PHP_EOL;
-            ini_set('display_errors', 0);
-            error_reporting(0);
-            echo "Databases: " . implode(',', dbFetchColumn('SHOW DATABASES;')) . PHP_EOL; // debug
-            ini_set('display_errors', 1);
-            error_reporting(E_ALL & ~E_WARNING);
-            echo "Selecting: " . $config['db_name'] . PHP_EOL; // debug
-//            dbQuery("USE " . $config['db_name']);
-            mysqli_select_db($database_link, $config['db_name']);
-
-            echo "DB: " . dbFetchCell('SELECT DATABASE();') . PHP_EOL; // debug
-            print_r($schema); // debug
-            self::$schema = $schema;
-        }
+        //
     }
 
     public static function tearDownAfterClass()
     {
         if (getenv('DBTEST')) {
-            global $config;
+            global $config, $empty_db;
 
-            dbQuery("SET GLOBAL sql_mode='" . self::$sql_mode . "'");
-            if (self::$empty_db) {
+
+            if ($empty_db) {
                 dbQuery("DROP DATABASE " . $config['db_name']);
             }
         }
@@ -85,7 +55,8 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
     public function testSetupDB()
     {
         if (getenv('DBTEST')) {
-            foreach (self::$schema as $output) {
+            global $schema;
+            foreach ($schema as $output) {
                 if (preg_match('/([1-9]+) errors/', $output) || preg_match('/Cannot execute query/', $output)) {
                     throw new PHPUnitException("Errors loading DB Schema: " . $output);
                 }
@@ -95,8 +66,9 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
 
     public function testSchema()
     {
-        global $config;
         if (getenv('DBTEST')) {
+            global $config, $database_link;
+            echo "Test Database Link: " . mysqli_stat($database_link) . PHP_EOL;
             echo "DB: " . dbFetchCell('SELECT DATABASE();') . PHP_EOL; // debug
             $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
             $this->assertGreaterThan(0, $schema, "Database has no schema!");
