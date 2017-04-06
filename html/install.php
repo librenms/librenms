@@ -52,7 +52,7 @@ $add_email = @$_POST['add_email'] ?: '';
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
     try {
-        $database_link = dbConnect();
+        dbConnect();
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;
             $msg = "It appears that the database is already setup so have moved onto stage $stage";

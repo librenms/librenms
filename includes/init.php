@@ -27,6 +27,8 @@
  * @param array $modules Which modules to initialize
  */
 
+global $config;
+
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
@@ -104,7 +106,7 @@ if ($config['memcached']['enable'] === true) {
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
-        $database_link = dbConnect();
+        dbConnect();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
