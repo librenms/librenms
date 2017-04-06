@@ -32,6 +32,13 @@ $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
+If you use a unix socket, you can specify it with these options:
+```php
+$config['db_host']   = NULL;
+$config['db_port']   = NULL;
+$config['db_socket'] = '/run/mysqld/mysqld.sock';
+```
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
