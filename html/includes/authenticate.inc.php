@@ -96,7 +96,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 
         $permissions = permissions_cache($_SESSION['user_id']);
         if (isset($_POST['username'])) {
-            header('Location: '.$_SERVER['REQUEST_URI'] ?: $config['base_url'], true, 303);
+            header('Location: '.substr($config['base_url'], 0, -1).$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }
     } elseif (isset($_SESSION['username'])) {
