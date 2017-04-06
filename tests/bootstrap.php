@@ -42,3 +42,6 @@ chdir($install_dir);
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
+
+global $database_link;
+echo "Bootstrap Database Link: " . mysqli_stat($database_link) . PHP_EOL;

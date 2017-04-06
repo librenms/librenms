@@ -1,5 +1,7 @@
 sudo: required
 language: php
+services:
+  - mysql
 matrix:
   fast_finish: true
   include:
@@ -27,6 +29,7 @@ cache:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp
+  - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
 
 install:
   - composer install --prefer-dist --no-interaction
