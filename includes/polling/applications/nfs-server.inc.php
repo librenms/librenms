@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+
 $name = 'nfs-server';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
@@ -8,20 +9,14 @@ echo ' ' . $name;
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
-// check for false return
-if (!$nfsstats) {
-    update_application($app, $nfsstats);
-}
-else 
-{
-    echo "snmpwalk failed";
-}
+update_application($app, $nfsstats);
+
 
 // define the rrd names
-$rrd_name['default'] = array('app', 'nfs-server-default', $app_id);
-$rrd_name['proc2'] = array('app', 'nfs-server-proc2', $app_id);
-$rrd_name['proc3'] = array('app', 'nfs-server-proc3', $app_id);
-$rrd_name['proc4'] = array('app', 'nfs-server-proc4', $app_id);
+$rrd_name['default'] = array('app', 'nfs-server-default', $app['app_id']);
+$rrd_name['proc2'] = array('app', 'nfs-server-proc2', $app['app_id']);
+$rrd_name['proc3'] = array('app', 'nfs-server-proc3', $app['app_id']);
+$rrd_name['proc4'] = array('app', 'nfs-server-proc4', $app['app_id']);
 
 $rrd_def['default'] = RrdDefinition::make()
         ->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
@@ -265,7 +260,7 @@ foreach ($lines as $line)
             $fields = array_merge($fields, array_combine($keys_nfs_server[$line_id], $line_values));
             
             // create or push data to rrd
-            $tags = array('name' => $name, 'app_id' => $app['id'], 'rrd_name' => $rdd_name[$line_id], 'rrd_def' => $rrd_def[$line_id]);
+            $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def[$line_id]);
             data_update($device, 'app', $tags, $fields);                
         }
         break;
@@ -273,7 +268,8 @@ foreach ($lines as $line)
 }
 
 // push the default data to rrd
-$tags = array('name' => $name, 'app_id' => $app['id'], 'rrd_name' => $rdd_name['default'], 'rrd_def' => $rrd_def['default']);
+$tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def['default']);
+
 data_update($device, 'app', $tags, $default_fields);
 
 unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
