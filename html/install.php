@@ -51,18 +51,15 @@ $add_email = @$_POST['add_email'] ?: '';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
-    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port'], $config['db_socket']);
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
-    if (mysqli_connect_error()) {
-        $stage = 1;
-        $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
-    } elseif ($stage == 2) {
-        if ($_SESSION['build-ok'] == true) {
-                    $stage = 3;
-                    $msg = "It appears that the database is already setup so have moved onto stage $stage";
+    try {
+        $database_link = dbConnect();
+        if ($stage == 2 && $_SESSION['build-ok'] == true) {
+            $stage = 3;
+            $msg = "It appears that the database is already setup so have moved onto stage $stage";
         }
+    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+        $stage = 1;
+        $msg = "Couldn't connect to the database, please check your details<br /> " . $e->getMessage();
     }
     $_SESSION['stage'] = $stage;
 }

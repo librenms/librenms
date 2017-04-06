@@ -103,18 +103,16 @@ if ($config['memcached']['enable'] === true) {
 
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
-    $database_link = dbConnect($config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port'], $config['db_socket']);
-    if ($database_link === false) {
+    try {
+        $database_link = dbConnect();
+    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+        if (isCli()) {
+            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+        } else {
+            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+        }
         exit(2);
     }
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
-    if (!$database_db) {
-        mysqli_query($database_link, "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci");
-        $database_db = mysqli_select_db($database_link, $config['db_name']);
-    }
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
 
     // pull in the database config settings
     mergedb();
