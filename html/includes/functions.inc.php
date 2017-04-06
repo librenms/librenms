@@ -610,7 +610,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     global $config;
 
     $graph_array = array();
-    $port        = ifNameDescr($port);
+
     if (!$text) {
         $text = fixifName($port['label']);
     }
@@ -629,9 +629,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
     if ($port['ifAlias']) {
-        $content .= display($port['ifAlias']).'<br />';
+        $content .= addslashes(display($port['ifAlias'])).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1139,6 +1139,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
+            $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
             $fallback      = false;
         }
@@ -1490,6 +1491,31 @@ function get_disks($device)
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
 
+/**
+ * Get the fail2ban jails for a device... just requires the device ID
+ * an empty return means either no jails or fail2ban is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_fail2ban_jails($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'type' => array('=', 'fail2ban'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $f2bc=$component->getComponents($device_id, $options);
+
+    if (isset($f2bc[$device_id])) {
+        $id = $component->getFirstComponentID($f2bc, $device_id);
+        return json_decode($f2bc[$device_id][$id]['jails']);
+    }
+
+    return array();
+}
+
 // takes the device array and app_id
 function get_disks_with_smart($device, $app_id)
 {
@@ -1505,4 +1531,42 @@ function get_disks_with_smart($device, $app_id)
         $all_disks_int++;
     }
     return $disks;
+}
+
+/**
+ * Gets all dashboards the user can access
+ * adds in the keys:
+ *   username - the username of the owner of each dashboard
+ *   default - the default dashboard for the logged in user
+ *
+ * @param int $user_id optionally get list for another user
+ * @return array list of dashboards
+ */
+function get_dashboards($user_id = null)
+{
+    $default = get_user_pref('dashboard');
+    $dashboards = dbFetchRows(
+        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
+        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
+    );
+
+    $usernames = array(
+        $_SESSION['user_id'] => $_SESSION['username']
+    );
+
+    $result = array();
+    foreach ($dashboards as $dashboard) {
+        $duid = $dashboard['user_id'];
+        if (!isset($usernames[$duid])) {
+            $user = get_user($duid);
+            $usernames[$duid] = $user['username'];
+        }
+
+        $dashboard['username'] = $usernames[$duid];
+        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
+
+        $result[$dashboard['dashboard_id']] = $dashboard;
+    }
+
+    return $result;
 }

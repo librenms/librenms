@@ -74,7 +74,6 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 
         if (isset($_POST['remember'])) {
             $sess_id  = session_id();
-            $hasher   = new PasswordHash(8, false);
             $token    = strgen();
             $auth     = strgen();
             $hasher   = new PasswordHash(8, false);
@@ -97,7 +96,8 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 
         $permissions = permissions_cache($_SESSION['user_id']);
         if (isset($_POST['username'])) {
-            header('Location: '.$_SERVER['REQUEST_URI'] ?: $config['base_url'], true, 303);
+            // Trim the trailing slash off of base_url and concatenate the (relative) REQUEST_URI
+            header('Location: '.rtrim($config['base_url'], '/').$_SERVER['REQUEST_URI'], true, 303);
             exit;
         }
     } elseif (isset($_SESSION['username'])) {

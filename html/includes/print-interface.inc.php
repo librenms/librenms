@@ -11,7 +11,7 @@ $port['hostname']  = $device['hostname'];
 
 $if_id = $port['port_id'];
 
-$port = ifLabel($port);
+$port = cleanPort($port);
 
 if ($int_colour) {
     $row_colour = $int_colour;
@@ -47,7 +47,7 @@ if (is_admin() || is_read()) {
 
     echo '        <span class=list-large>
         '.generate_port_link($port, $port['label'])." $error_img $mac
-        </span><br /><span class=interface-desc>".display($port['ifAlias']).'</span>';
+        </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
 
 if ($port['ifAlias']) {
     echo '<br />';
@@ -246,6 +246,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
                 echo '<span class="neighbors-interface-list" style="display: none;">';
             }
             $link_if = dbFetchRow('SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.port_id = ?', array($int_link));
+            $link_if = cleanPort($link_if);
             echo "$br";
 
             if ($int_links_phys[$int_link]) {
@@ -277,18 +278,20 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($pseudowire['peer_device_id']));
         $pw_peer_int = dbFetchRow('SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.port_id = I.port_id', array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
 
-        $pw_peer_int = ifNameDescr($pw_peer_int);
+        $pw_peer_int = cleanPort($pw_peer_int);
         echo "$br<i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i><b> ".generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])).' on '.generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])).'</b>';
         $br = '<br />';
     }
 
     foreach (dbFetchRows('SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?', array($port['ifIndex'], $device['device_id'])) as $member) {
+        $member = cleanPort($member);
         echo "$br<i class='fa fa-cube fa-lg icon-theme' aria-hidden='true'></i> <strong>".generate_port_link($member).' (PAgP)</strong>';
         $br = '<br />';
     }
 
     if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex']) {
         $parent = dbFetchRow('SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?', array($port['pagpGroupIfIndex'], $device['device_id']));
+        $parent = cleanPort($parent);
         echo "$br<i class='fa fa-cube fa-lg icon-theme' aria-hidden='true'></i> <strong>".generate_port_link($parent).' (PAgP)</strong>';
         $br = '<br />';
     }
@@ -296,6 +299,7 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
     foreach (dbFetchRows('SELECT * FROM `ports_stack` WHERE `port_id_low` = ? and `device_id` = ?', array($port['ifIndex'], $device['device_id'])) as $higher_if) {
         if ($higher_if['port_id_high']) {
             $this_port = get_port_by_index_cache($device['device_id'], $higher_if['port_id_high']);
+            $this_port = cleanPort($this_port);
             echo "$br<i class='fa fa-expand fa-lg icon-theme' aria-hidden='true'></i> <strong>".generate_port_link($this_port).'</strong>';
             $br = '<br />';
         }
@@ -304,6 +308,7 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
     foreach (dbFetchRows('SELECT * FROM `ports_stack` WHERE `port_id_high` = ? and `device_id` = ?', array($port['ifIndex'], $device['device_id'])) as $lower_if) {
         if ($lower_if['port_id_low']) {
             $this_port = get_port_by_index_cache($device['device_id'], $lower_if['port_id_low']);
+            $this_port = cleanPort($this_port);
             echo "$br<i class='fa fa-compress fa-lg icon-theme' aria-hidden='true'></i> <strong>".generate_port_link($this_port).'</strong>';
             $br = '<br />';
         }

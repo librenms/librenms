@@ -12,7 +12,7 @@ if ($_SESSION['userlevel'] != '10') {
     include 'includes/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
-        $user_data = dbFetchRow('SELECT * FROM users WHERE user_id = ?', array($vars['user_id']));
+        $user_data = get_user($vars['user_id']);
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
         // Perform actions if requested
         if ($vars['action'] == 'deldevperm') {
@@ -265,7 +265,7 @@ if ($_SESSION['userlevel'] != '10') {
             $users_details = get_user($vars['user_id']);
             if (!empty($users_details)) {
                 if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
-                    dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($vars['user_id']));
+                    set_user_pref('dashboard', $vars['dashboard']);
                     print_message("User default dashboard updated");
                 }
                 echo "<form class='form-horizontal' role='form' method='post' action=''>
@@ -372,9 +372,8 @@ if ($_SESSION['userlevel'] != '10') {
        <div class='form-group'>
            <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
            <div class='col-sm-4'><select class='form-control' name='dashboard'>";
-                $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?", array($vars['user_id']));
-                foreach (dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?", array($vars['user_id'],$vars['user_id'])) as $dash) {
-                    echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
+                foreach (get_dashboards($vars['user_id']) as $dash) {
+                    echo "<option value='".$dash['dashboard_id']."'".($dash['default'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
                 }
                 echo "</select>
            </div>
@@ -384,7 +383,7 @@ if ($_SESSION['userlevel'] != '10') {
 
                 if ($config['twofactor']) {
                     if ($vars['twofactorremove']) {
-                        if (dbUpdate(array('twofactor' => ''), users, 'user_id = ?', array($vars['user_id']))) {
+                        if (set_user_pref('twofactor', array(), $vars['user_id'])) {
                             echo "<div class='alert alert-success'>TwoFactor credentials removed.</div>";
                         } else {
                             echo "<div class='alert alert-danger'>Couldnt remove user's TwoFactor credentials.</div>";
@@ -392,18 +391,16 @@ if ($_SESSION['userlevel'] != '10') {
                     }
 
                     if ($vars['twofactorunlock']) {
-                        $twofactor          = dbFetchRow('SELECT twofactor FROM users WHERE user_id = ?', array($vars['user_id']));
-                        $twofactor          = json_decode($twofactor['twofactor'], true);
+                        $twofactor = get_user_pref('twofactor', array(), $vars['user_id']);
                         $twofactor['fails'] = 0;
-                        if (dbUpdate(array('twofactor' => json_encode($twofactor)), users, 'user_id = ?', array($vars['user_id']))) {
+                        if (set_user_pref('twofactor', $twofactor, $vars['user_id'])) {
                             echo "<div class='alert alert-success'>User unlocked.</div>";
                         } else {
                             echo "<div class='alert alert-danger'>Couldnt reset user's TwoFactor failures.</div>";
                         }
                     }
                     echo "<br/><div class='well'><h3>Two-Factor Authentication</h3>";
-                    $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE user_id = ?', array($vars['user_id']));
-                    $twofactor = json_decode($twofactor['twofactor'], true);
+                    $twofactor = get_user_pref('twofactor', array(), $vars['user_id']);
                     if ($twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time() - $twofactor['last']) < $config['twofactor_lock'])) {
                         echo "<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='".$vars['user_id']."'>

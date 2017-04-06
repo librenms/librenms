@@ -271,11 +271,14 @@ function GetContacts($results)
     }
     foreach ($users as $user) {
         if (empty($user['email'])) {
-            continue;
-        } elseif (empty($user['realname'])) {
+            continue; // no email, skip this user
+        }
+        if (empty($user['realname'])) {
             $user['realname'] = $user['username'];
         }
-        $user['level'] = get_userlevel($user['username']);
+        if (empty($user['level'])) {
+            $user['level'] = get_userlevel($user['username']);
+        }
         if ($config["alert"]["globals"] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
         } elseif ($config["alert"]["admins"] && $user['level'] == 10) {
