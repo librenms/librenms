@@ -130,6 +130,7 @@ if ($vars['subview'] == 'top10') {
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ?', array($acc['mac']));
         // $name = gethostbyaddr($addy['ipv4_address']); FIXME - Maybe some caching for this?
         $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', array($addy['ipv4_address']));
+        $arp_host = cleanPort($arp_host);
         if ($arp_host) {
             $arp_name  = generate_device_link($arp_host);
             $arp_name .= ' '.generate_port_link($arp_host);

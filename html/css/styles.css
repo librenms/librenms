@@ -838,6 +838,13 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin: 8px;
 }
 
+.infobox .rrd-pre {
+  background-color: #CCCCFF;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+
 .infobox-down {
 
 }
@@ -1895,7 +1902,7 @@ label {
 .widget_body {
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 5px);
+    height: calc(100% - 38px);
 }
 
 .device-availability, .service-availability {

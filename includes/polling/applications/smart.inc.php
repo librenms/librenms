@@ -8,9 +8,8 @@ $name = 'smart';
 $app_id = $app['app_id'];
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutputFull.5.115.109.97.114.116';
-$output = snmp_walk($device, $oid, $options, $mib);
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';
+$output = snmp_walk($device, $oid, $options);
 update_application($app, $output);
 
 $lines = explode("\n", $output);

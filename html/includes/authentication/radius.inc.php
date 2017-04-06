@@ -25,7 +25,7 @@ function authenticate($username, $password)
     }
 }
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
     return 0;
 }
@@ -52,7 +52,7 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '', $twofactor = 0)
+function adduser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
 {
     // Check to see if user is already added in the database
     global $config;
@@ -62,7 +62,7 @@ function adduser($username, $password, $level = 1, $email = '', $realname = '', 
         if ($config['radius']['default_level'] > 0) {
             $level = $config['radius']['default_level'];
         }
-        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor), 'users');
+        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd), 'users');
         if ($userid == false) {
             return false;
         } else {

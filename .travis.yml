@@ -11,7 +11,7 @@ matrix:
   - php: 5.5
     env: SKIP_STYLE_CHECK=1
   - php: 5.6
-    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
+    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true EXECUTE_BUILD_SCHEMA=true
 #  - php: hhvm
 #    env: SKIP_STYLE_CHECK=1
 
@@ -38,6 +38,7 @@ before_script:
   - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log --daemon --pid-file=/tmp/snmpsimd.pid
 
 after_success:
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_SCHEMA == "true" && bash scripts/deploy-schema.sh
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
 
 after_failure:

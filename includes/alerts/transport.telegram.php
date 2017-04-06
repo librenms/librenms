@@ -26,7 +26,8 @@ foreach ($opts as $chat_id => $data) {
     $curl = curl_init();
     set_curl_proxy($curl);
     $text = urlencode($obj['msg']);
-    curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text") );
+print_r($data);
+    curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text") );
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $ret = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
