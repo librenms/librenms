@@ -1475,6 +1475,13 @@ function list_arp()
             $hostname =  mres($_GET['device']);
             $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", array($device_id));
+        } elseif (str_contains($ip, '/')) {
+            $ipv4 = new Net_IPv4();
+            $net = $ipv4->parseAddress($ip);
+            $arp = dbFetchRows(
+                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
+                array(ip2long($net->netmask), ip2long($net->network))
+            );
         } else {
             $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", array($ip));
         }
