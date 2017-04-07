@@ -46,7 +46,7 @@ foreach ($oids as $index => $entry) {
 $systemCurrent = trim(snmp_get($device, 'systemCurrent.0', '-Oqv', 'ICT-MIB'), '" ');
 if (!empty($systemCurrent)) {
     $divisor = 1;
-    $index = 0;
+    $index = '7.0';
     $descr = 'System Current';
     $type = 'ict-pdu';
     $oid = '.1.3.6.1.4.1.39145.10.7.0';
