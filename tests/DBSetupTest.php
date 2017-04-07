@@ -75,7 +75,6 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
             end($files);
             $expected = (int)basename(current($files), '.sql');
             $this->assertEquals($expected, $schema, 'Schema not fully up-to-date');
-
         }
     }
 
