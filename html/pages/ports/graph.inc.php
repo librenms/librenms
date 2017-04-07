@@ -20,7 +20,7 @@ foreach ($ports as $port) {
     }
 
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $port = ifLabel($port, $device);
+        $port = cleanPort($port, $device);
 
         $graph_type = 'port_'.$subformat;
 

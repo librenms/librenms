@@ -5,9 +5,8 @@ $app_id = $app['app_id'];
 use LibreNMS\RRD\RrdDefinition;
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutputFull.8.112.111.115.116.103.114.101.115';
-$postgres = snmp_walk($device, $oid, $options, $mib);
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
+$postgres = snmp_walk($device, $oid, $options);
 update_application($app, $postgres);
 
 list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
