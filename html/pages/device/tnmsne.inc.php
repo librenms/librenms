@@ -9,12 +9,12 @@ $pagetitle[] = 'Hardware';
    <table id="tnmsne" class="table table-hover table-condensed tnmsne">
        <thead>
           <tr>
-	      <th data-column-id="neName">Name</th>
-	      <th data-column-id="neLocation">Location</th>
-	      <th data-column-id="neType">Type</th>
-	      <th data-column-id="neOpMode">Operation Mode</th>
-	      <th data-column-id="neAlarm">Alarm</th>
-	      <th data-column-id="neOpState">State</th>
+              <th data-column-id="neName">Name</th>
+              <th data-column-id="neLocation">Location</th>
+              <th data-column-id="neType">Type</th>
+              <th data-column-id="neOpMode">Operation Mode</th>
+              <th data-column-id="neAlarm">Alarm</th>
+              <th data-column-id="neOpState">State</th>
           </tr>
        </thead>
    </table>
@@ -23,18 +23,18 @@ $pagetitle[] = 'Hardware';
 <script>
     var grid = $("#tnmsne").bootgrid({
         ajax: true,
-	rowCount: [50,100,250,-1],
-	post: function()
-	{
-	    return {
-	        id: "tnmsneinfo",
-		device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
-	    };
-	},
-	url: "ajax_table.php",
-	formatters: {
-	},
-	templates: {
+        rowCount: [50,100,250,-1],
+        post: function()
+        {
+            return {
+                id: "tnmsneinfo",
+                device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
+            };
+        },
+        url: "ajax_table.php",
+        formatters: {
+        },
+        templates: {
         }
     });
 </script>

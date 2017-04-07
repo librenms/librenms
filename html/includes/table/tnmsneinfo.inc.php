@@ -64,9 +64,9 @@ if (isset($_POST['device_id'])) {
     // load data from database into response array
     $response = array();
     foreach (dbFetchRows($sql, $params) as $tnmsne) {
-        if($tnmsne['neOpMode'] == 'operation') {
+        if ($tnmsne['neOpMode'] == 'operation') {
             $neop = '<span style="min-width:40px; display:inlink-block;" class="label label-success">operation</span>';
-         } else {
+        } else {
             $neop = '<span style="min-width:40px; display:inlink-block;" class="label label-danger">' . $tnmsne['neOpMode'] . '</span>';
         }
         switch ($tnmsne['neAlarm']) {
@@ -90,14 +90,14 @@ if (isset($_POST['device_id'])) {
         } else {
             $opstate = '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-danger">'.$tnmsne['neOpState'].'</span></td>';
         }
-        $response[] = array(	
+        $response[] = array(
             'neName'     => $tnmsne['neName'],
             'neLocation' => $tnmsne['neLocation'],
             'neType'     => $tnmsne['neType'],
             'neOpMode'   => $neop,
             'neAlarm'    => $alarm,
             'neOpState'  => $opstate,
-      );
+        );
     }
 
     $output = array(
