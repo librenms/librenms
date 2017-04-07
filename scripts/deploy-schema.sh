@@ -2,7 +2,7 @@
 GH_REPO="@github.com/librenms/librenms.git"
 FULL_REPO="https://${GH_TOKEN}:x-oauth-basic$GH_REPO"
 
-DBTEST=1 ./scripts/build-schema.php > misc/db_schema.yaml
+DBTEST=1 ./scripts/build-schema.php
 STATUS=$(git status -s misc/db_schema.yaml)
 
 if [[ "$STATUS" != "" ]]; then
