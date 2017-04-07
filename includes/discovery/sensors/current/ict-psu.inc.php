@@ -26,14 +26,14 @@
 // Output Current
 // SNMPv2-SMI::enterprises.39145.11.8.0 = STRING: "0.4" -- outputCurrent
 
-$outputCurrent_oid = '.1.3.6.1.4.1.39145.11.8.0';
-$outputCurrent = trim(snmp_get($device, $outputCurrent_oid, '-Oqv'), '" ');
+$outputCurrent = trim(snmp_get($device, 'outputCurrent.0', '-Oqv', 'ICT-MIB'), '" ');
 if (!empty($outputCurrent)) {
     $divisor = 1;
-    $index = '11.8.0';
+    $index = 0;
+    $oid = '.1.3.6.1.4.1.39145.11.8.0';
     $descr = 'Output Current';
     $type = 'ict-psu';
-    $current = $outputCurrent / $divisor;
+    $currentValue = $outputCurrent / $divisor;
 
-    discover_sensor($valid['sensor'], 'current', $device, $outputCurrent_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }
