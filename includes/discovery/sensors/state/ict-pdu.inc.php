@@ -22,16 +22,8 @@
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
-function varDumpToString($var) {
-    ob_start();
-    var_dump($var);
-    $result = ob_get_clean();
-    return $result;
-}
 
 $oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-MIB');
-
-echo varDumpToString($oids);
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
@@ -58,14 +50,13 @@ if (is_array($oids)) {
         $fuse_state_oid = '.1.3.6.1.4.1.39145.10.8.1.4.' . $index;
         $fuse_number = (int)$index + 1;
         $descr = "Fuse #" . $fuse_number;
+
         $current_value_string = $entry[$state_name];
         if ($current_value_string == 'OK') {
             $current_value = 1;
         } else if ($current_value_string == 'OPEN') {
             $current_value = 2;
         }
-        echo "########## HERE ########### \n";
-        echo varDumpToString($current_value);
 
         discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current_value, 'snmp', $index);
 

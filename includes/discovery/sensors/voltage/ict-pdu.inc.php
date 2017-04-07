@@ -29,7 +29,7 @@ $systemVoltage = trim(snmp_get($device, $systemVoltage_oid, '-Oqv'), '" ');
 
 if (!empty($systemVoltage)) {
     $divisor = 1;
-    $index = '10.6.0';
+    $index = 0;
     $descr = 'System Voltage';
     $type = 'ict-pdu';
     $current_value = $systemVoltage / $divisor;

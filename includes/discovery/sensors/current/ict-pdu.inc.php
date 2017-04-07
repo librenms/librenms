@@ -26,8 +26,7 @@
 // Output Current
 $oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-MIB');
 
-foreach ($oids as $iter => $entry)
-{
+foreach ($oids as $index => $entry) {
     $output_number = (int)$entry['outputNumber'] + 1;
 
     $descr = 'Output Current #' . $output_number;
@@ -36,11 +35,10 @@ foreach ($oids as $iter => $entry)
     }
 
     $divisor = 1;
-    $oid = '.1.3.6.1.4.1.39145.10.8.1.3.'.$iter;
-    $index = '8.1.3.' . $iter;
+    $oid = '.1.3.6.1.4.1.39145.10.8.1.3.'.$index;
     $type = 'ict-pdu';
     $current = (float)$entry['outputCurrent'] / $divisor;
-    
+
     discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
@@ -49,7 +47,7 @@ $systemCurrent_oid = '.1.3.6.1.4.1.39145.10.7.0';
 $systemCurrent = trim(snmp_get($device, $systemCurrent_oid, '-Oqv'), '" ');
 if (!empty($systemCurrent)) {
     $divisor = 1;
-    $index = '10.7.0';
+    $index = 0;
     $descr = 'System Current';
     $type = 'ict-pdu';
     $current = $systemCurrent / $divisor;
