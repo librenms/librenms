@@ -25,8 +25,8 @@
 
 $hpe_ipdu_data = snmp_get_multi_oid($device, 'mpduFirmwareVersion.0 mpduSerialNumber.0 mpduModel.0', '-OUQs', 'CPQPOWER-MIB');
 
-$serial = $hpe_ipdu_data['mpduSerialNumber.1'];
-$version = $hpe_ipdu_data['mpduFirmwareVersion.1'];
-$hardware = $hpe_ipdu_data['mpduModel.1'];
+$serial = trim($hpe_ipdu_data['mpduSerialNumber.1'], '"');
+$version = trim($hpe_ipdu_data['mpduFirmwareVersion.1'], '"');
+$hardware = trim($hpe_ipdu_data['mpduModel.1'], '"');
 
 unset($hpe_ipdu_data);
