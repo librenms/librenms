@@ -651,6 +651,10 @@ $config['device_types'][$i]['text'] = 'Appliance';
 $config['device_types'][$i]['type'] = 'appliance';
 $config['device_types'][$i]['icon'] = 'appliance.png';
 
+$i++;
+$config['device_types'][$i]['text'] = 'Collaboration';
+$config['device_types'][$i]['type'] = 'collaboration';
+$config['device_types'][$i]['icon'] = 'collaboration.png';
 //
 // No changes below this line #
 //
