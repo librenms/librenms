@@ -6,7 +6,7 @@ $port['hostname']  = $device['hostname'];
 
 $if_id = $port['port_id'];
 
-$port = ifLabel($port);
+$port = cleanPort($port);
 
 if (!is_integer($i / 2)) {
     $row_colour = $list_colour_a;

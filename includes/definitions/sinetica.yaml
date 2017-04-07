@@ -2,6 +2,7 @@ os: sinetica
 text: 'Sinetica UPS'
 group: ups
 type: power
+icon: mitsubishi
 over:
     - { graph: device_current, text: Current }
 discovery:

@@ -17,7 +17,7 @@ $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id']))) {
-    $port   = get_port_by_id($_GET['id']);
+    $port   = cleanPort(get_port_by_id($_GET['id']));
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= " :: Port  ".generate_port_link($port);
@@ -31,12 +31,11 @@ header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
 $ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname=ifLabel($port);
-$ifname=$ifname['label']; //Interface name that will be showed on top right of graph
+$ifname=$port['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 
 if ($_GET['title']) {
-    $ifname = $_GET['title'];
+    $ifname = display($_GET['title']);
 }
 
 /********* Other conf *******/
@@ -75,7 +74,8 @@ $width=300;             //SVG internal width : do not modify
 
 /********* Graph DATA **************/
 print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
-<svg width="100%" height="100%" viewBox="0 0 <?php echo("$width $height") ?>" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="init(evt)">
+<svg width="100%" height="100%" viewBox="0 0 <?php echo("$width $height") ?>" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+     onload="init(evt)">
   <g id="graph">
     <rect id="bg" x1="0" y1="0" width="100%" height="100%" fill="white"/>
     <line id="axis_x" x1="0" y1="0" x2="0" y2="100%" <?php echo ($attribs['axis']) ?>/>
