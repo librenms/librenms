@@ -24,15 +24,15 @@
  */
 
 // System Voltage
-$systemVoltage_oid = '.1.3.6.1.4.1.39145.10.6.0';
-$systemVoltage = trim(snmp_get($device, $systemVoltage_oid, '-Oqv'), '" ');
+$systemVoltage = trim(snmp_get($device, 'systemVoltage.0', '-Oqv', 'ICT-MIB'), '" ');
 
 if (!empty($systemVoltage)) {
     $divisor = 1;
+    $oid = '.1.3.6.1.4.1.39145.10.6.0';
     $index = 0;
     $descr = 'System Voltage';
     $type = 'ict-pdu';
     $current_value = $systemVoltage / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $systemVoltage_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
 }

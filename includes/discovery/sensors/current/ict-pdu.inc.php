@@ -43,14 +43,14 @@ foreach ($oids as $index => $entry) {
 }
 
 // System Current
-$systemCurrent_oid = '.1.3.6.1.4.1.39145.10.7.0';
-$systemCurrent = trim(snmp_get($device, $systemCurrent_oid, '-Oqv'), '" ');
+$systemCurrent = trim(snmp_get($device, 'systemCurrent.0', '-Oqv', 'ICT-MIB'), '" ');
 if (!empty($systemCurrent)) {
     $divisor = 1;
     $index = 0;
     $descr = 'System Current';
     $type = 'ict-pdu';
+    $oid = '.1.3.6.1.4.1.39145.10.7.0';
     $current = $systemCurrent / $divisor;
 
-    discover_sensor($valid['sensor'], 'current', $device, $systemCurrent_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
