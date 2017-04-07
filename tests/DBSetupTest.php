@@ -29,12 +29,6 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends \PHPUnit_Framework_TestCase
 {
-
-    private static $schema;
-    private static $sql_mode;
-    private static $empty_db;
-//    protected $backupGlobals = false;
-
     public static function setUpBeforeClass()
     {
         //
@@ -52,6 +46,11 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function setUp()
+    {
+        dbConnect();
+    }
+
     public function testSetupDB()
     {
         if (getenv('DBTEST')) {
@@ -67,9 +66,8 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
     public function testSchema()
     {
         if (getenv('DBTEST')) {
-            global $config, $database_link;
-            echo "Test Database Link: " . mysqli_stat($database_link) . PHP_EOL;
-            echo "DB: " . dbFetchCell('SELECT DATABASE();') . PHP_EOL; // debug
+            global $config;
+
             $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
             $this->assertGreaterThan(0, $schema, "Database has no schema!");
 

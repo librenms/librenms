@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-global $config, $database_link;
+global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
@@ -46,14 +46,10 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
 
 
-echo "Bootstrap Database Link: " . mysqli_stat($database_link) . PHP_EOL;
-
 if (getenv('DBTEST')) {
-    global $config, $database_link, $empty_db, $schema;
+    global $empty_db, $schema;
+
     $sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", array($config['db_name'])) == 0);
     dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
@@ -62,21 +58,5 @@ if (getenv('DBTEST')) {
     } else {
         $cmd = '/usr/bin/env php ' . $config['install_dir'] . '/includes/sql-schema/update.php';
     }
-
-
     exec($cmd, $schema);
-
-    ini_set('display_errors', 0);
-    error_reporting(0);
-    echo "Databases: " . implode(',', dbFetchColumn('SHOW DATABASES;')) . PHP_EOL; // debug
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL & ~E_WARNING);
-    echo "Selecting: " . $config['db_name'] . PHP_EOL; // debug
-//            dbQuery("USE " . $config['db_name']);
-    mysqli_select_db($database_link, $config['db_name']);
-
-    echo "DB: " . dbFetchCell('SELECT DATABASE();') . PHP_EOL; // debug
-    print_r($schema); // debug
-
-    dbQuery("SET GLOBAL sql_mode='" . $sql_mode . "'");
 }

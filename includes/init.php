@@ -163,5 +163,3 @@ function module_selected($module, $modules)
 {
     return in_array($module, (array) $modules);
 }
-
-echo "Init Database Link: " . mysqli_stat($database_link) . PHP_EOL;
