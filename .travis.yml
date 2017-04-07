@@ -1,5 +1,7 @@
 sudo: required
 language: php
+services:
+  - mysql
 matrix:
   fast_finish: true
   include:
@@ -11,7 +13,7 @@ matrix:
   - php: 5.5
     env: SKIP_STYLE_CHECK=1
   - php: 5.6
-    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true EXECUTE_BUILD_SCHEMA=true
+    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true EXECUTE_BUILD_SCHEMA=false
 #  - php: hhvm
 #    env: SKIP_STYLE_CHECK=1
 
@@ -27,6 +29,7 @@ cache:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp
+  - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
 
 install:
   - composer install --prefer-dist --no-interaction

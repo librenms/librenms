@@ -28,5 +28,9 @@ if (getenv('DBTEST')) {
     sleep(60);//Sleep for 60 seconds to ensure db work has completed
 }
 
-$output = dump_db_schema();
-echo Symfony\Component\Yaml\Yaml::dump($output, 3, 2);
+$file = $install_dir . '/misc/db_schema.yaml';
+$yaml = Symfony\Component\Yaml\Yaml::dump(dump_db_schema(), 3, 2);
+
+if (file_put_contents($file, $yaml)) {
+    echo "Updated!\n";
+}
