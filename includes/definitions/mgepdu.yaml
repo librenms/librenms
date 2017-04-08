@@ -5,5 +5,5 @@ icon: mge
 mib_dir:
     - mge
 discovery:
-    - sysDescr:
-        - MGE Switched PDU
+    - sysObjectId:
+        - .1.3.6.1.4.1.705.2
