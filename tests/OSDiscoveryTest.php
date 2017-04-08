@@ -488,6 +488,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cumulus');
     }
 
+    public function testCyan()
+    {
+        $this->checkOS('cyan', 'cyan-z33');
+    }
+
     public function testCyberoamUtm()
     {
         $this->checkOS('cyberoam-utm');
