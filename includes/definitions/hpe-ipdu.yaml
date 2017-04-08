@@ -4,6 +4,8 @@ type: power
 icon: hpe
 over:
     - { graph: device_bits, text: Traffic }
+mib_dir:
+    - hp
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.232.165.5
