@@ -333,6 +333,11 @@ foreach ($bins as $bin) {
     }
 }
 
+// Check that rrdtool config version is what we see
+if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_version'], $versions['rrdtool_ver'], '>'))) {
+    print_fail('The rrdtool version you have specified is newer than what is installed.', "Either comment out \$config['rrdtool_version'] = {$config['rrdtool_version']}; or set \$config['rrdtool_version'] = {$versions['rrdtool_ver']};");
+}
+
 $disabled_functions = explode(',', ini_get('disable_functions'));
 $required_functions = array('exec','passthru','shell_exec','escapeshellarg','escapeshellcmd','proc_close','proc_open','popen');
 foreach ($required_functions as $function) {
