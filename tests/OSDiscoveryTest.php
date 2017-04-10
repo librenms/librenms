@@ -204,6 +204,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apc', 'apc-embedded-powernet');
     }
 
+    public function testApcMgeups()
+    {
+        $this->checkOS('apc-mgeups', 'mgeups-galaxy');
+    }
+
     public function testApic()
     {
         $this->checkOS('apic');
@@ -622,6 +627,17 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('dsm', 'dsm-ds916');
     }
 
+    public function testEatonMgeups()
+    {
+        $this->checkOS('eaton-mgeups', 'eaton-5p');
+        $this->checkOS('eaton-mgeups', 'eaton-5px');
+        $this->checkOS('eaton-mgeups', 'mgeups-ex2200');
+        $this->checkOS('eaton-mgeups', 'mgeups-pulsar');
+        $this->checkOS('eaton-mgeups', 'mgeups-evolution');
+        $this->checkOS('eaton-mgeups', 'mgeups-proxy');
+        $this->checkOS('eaton-mgeups', 'mgeups-comet');
+    }
+
     public function testEatonpdu()
     {
         $this->checkOS('eatonpdu');
@@ -630,8 +646,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testEatonups()
     {
         $this->checkOS('eatonups');
-        $this->checkOS('eatonups', 'eaton-5p');
-        $this->checkOS('eatonups', 'eaton-5px');
         $this->checkOS('eatonups', 'eaton-powerxpert');
     }
 
@@ -1133,16 +1147,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('mgepdu');
     }
 
-    public function testMgeups()
-    {
-        $this->checkOS('mgeups', 'mgeups-pulsar');
-        $this->checkOS('mgeups', 'mgeups-galaxy');
-        $this->checkOS('mgeups', 'mgeups-evolution');
-        $this->checkOS('mgeups', 'mgeups-ex2200');
-        $this->checkOS('mgeups', 'mgeups-proxy');
-        $this->checkOS('mgeups', 'mgeups-comet');
-    }
-
     public function testMicrosemitime()
     {
         $this->checkOS('microsemitime');
@@ -1434,11 +1438,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPowerwalker()
     {
         $this->checkOS('powerwalker');
-    }
-
-    public function testPowerware()
-    {
-        $this->checkOS('powerware');
     }
 
     public function testPrestige()
