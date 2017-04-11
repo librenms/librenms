@@ -48,7 +48,9 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        dbConnect();
+        if (getenv('DBTEST')) {
+            dbConnect();
+        }
     }
 
     public function testSetupDB()
@@ -120,7 +122,7 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateSchema()
     {
-        if (is_file('misc/db_schema.yaml')) {
+        if (getenv('DBTEST') && is_file('misc/db_schema.yaml')) {
             $master_schema = \Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents('misc/db_schema.yaml')
             );
