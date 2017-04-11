@@ -2,7 +2,7 @@
 /**
  * hpe-ipdu.inc.php
  *
- * LibreNMS os poller module for HPE iPDU
+ * LibreNMS sensors load discovery module for HPE iPDU
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,23 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$hpe_ipdu_data = snmp_get_multi_oid($device, 'mpduFirmwareVersion.0 mpduSerialNumber.0 mpduModel.0', '-OUQs', 'CPQPOWER-MIB');
 
-$serial = trim($hpe_ipdu_data['mpduSerialNumber.1'], '"');
-$version = trim($hpe_ipdu_data['mpduFirmwareVersion.1'], '"');
-$hardware = trim($hpe_ipdu_data['mpduModel.1'], '"');
+echo 'HPE iPDU Load ';
 
-unset($hpe_ipdu_data);
+$x=1;
+foreach ($pre_cache['hpe_ipdu'] as $index => $item) {
+    if (isset($item['mpduOutputPercentLoad'])) {
+        $oid = '.1.3.6.1.4.1.232.165.5.2.1.1.5.' . $index;
+        $current = $item['mpduOutputPercentLoad'];
+        discover_sensor($valid['sensor'], 'load', $device, $oid, 'mpduOutputPercentLoad.'.$index, 'hpe-ipdu', "MPDU #$x Load", 1, 1, null, null, null, null, $current);
+        $x++;
+    }
+}//end foreach
+
+unset(
+    $item,
+    $oid,
+    $index,
+    $item,
+    $x
+);

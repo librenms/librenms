@@ -2,7 +2,7 @@
 /**
  * hpe-ipdu.inc.php
  *
- * LibreNMS os poller module for HPE iPDU
+ * LibreNMS sensors pre-cache discovery module for HPE iPDU
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$hpe_ipdu_data = snmp_get_multi_oid($device, 'mpduFirmwareVersion.0 mpduSerialNumber.0 mpduModel.0', '-OUQs', 'CPQPOWER-MIB');
-
-$serial = trim($hpe_ipdu_data['mpduSerialNumber.1'], '"');
-$version = trim($hpe_ipdu_data['mpduFirmwareVersion.1'], '"');
-$hardware = trim($hpe_ipdu_data['mpduModel.1'], '"');
-
-unset($hpe_ipdu_data);
+if ($device['os'] === 'hpe-ipdu') {
+    $pre_cache['hpe_ipdu'] = snmpwalk_cache_oid($device, 'mpduOutputEntry', array(), 'CPQPOWER-MIB');
+    d_echo($pre_cache);
+}
