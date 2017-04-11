@@ -27,7 +27,7 @@ global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'nodb');
+$init_modules = array('web');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
@@ -37,6 +37,8 @@ if (getenv('DBTEST')) {
     if (!is_file($install_dir . '/config.php')) {
         exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
     }
+} else {
+    $init_modules[] = 'nodb';
 }
 
 require $install_dir . '/includes/init.php';
