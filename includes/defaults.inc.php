@@ -36,6 +36,7 @@ $config['mysql_log_level']       = 'ERROR';
 
 //MySQL port
 $config['db_port']               = 3306;
+$config['db_socket']             = null;
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
@@ -737,6 +738,7 @@ $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 $config['poller_modules']['loadbalancers']               = 0;
 $config['poller_modules']['mef']                         = 0;
+$config['poller_modules']['tnms-nbi']                    = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.

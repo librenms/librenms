@@ -5,11 +5,13 @@ if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= ' :: Port  '.generate_port_link($port);
-    if ($port['ifAlias'] != '') {
-        $title .= ', '.display($port['ifAlias']);
-    }
 
     $graph_title = shorthost($device['hostname']).'::'.strtolower(makeshortif($port['ifDescr']));
+
+    if (($port['ifAlias'] != '') && ($port['ifAlias'] != $port['ifDescr'])) {
+        $title .= ', '.display($port['ifAlias']);
+        $graph_title .= '::'.display($port['ifAlias']);
+    }
 
     $auth = true;
 

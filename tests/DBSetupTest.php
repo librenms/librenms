@@ -29,49 +29,52 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends \PHPUnit_Framework_TestCase
 {
-
-    private static $schema;
-    private static $sql_mode;
-    private static $db_created;
-    protected $backupGlobals = false;
-
     public static function setUpBeforeClass()
     {
-        if (getenv('DBTEST')) {
-            global $config;
-            self::$sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
-            dbQuery("SET NAMES 'utf8'");
-            dbQuery("SET CHARACTER SET 'utf8'");
-            dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
-            self::$db_created = dbQuery("CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci");
-            dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            dbQuery("USE " . $config['db_name']);
-            $build_base = $config['install_dir'] . '/build-base.php';
-            exec($build_base, $schema);
-            self::$schema = $schema;
-        }
+        //
     }
 
     public static function tearDownAfterClass()
     {
         if (getenv('DBTEST')) {
-            global $config;
+            global $config, $empty_db;
 
-            dbQuery("SET GLOBAL sql_mode='" . self::$sql_mode . "'");
-            if (self::$db_created) {
+
+            if ($empty_db) {
                 dbQuery("DROP DATABASE " . $config['db_name']);
             }
         }
     }
 
+    public function setUp()
+    {
+        dbConnect();
+    }
+
     public function testSetupDB()
     {
         if (getenv('DBTEST')) {
-            foreach (self::$schema as $output) {
+            global $schema;
+            foreach ($schema as $output) {
                 if (preg_match('/([1-9]+) errors/', $output) || preg_match('/Cannot execute query/', $output)) {
                     throw new PHPUnitException("Errors loading DB Schema: " . $output);
                 }
             }
+        }
+    }
+
+    public function testSchema()
+    {
+        if (getenv('DBTEST')) {
+            global $config;
+
+            $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
+            $this->assertGreaterThan(0, $schema, "Database has no schema!");
+
+            $files = glob($config['install_dir'] . '/sql-schema/*.sql');
+            end($files);
+            $expected = (int)basename(current($files), '.sql');
+            $this->assertEquals($expected, $schema, 'Schema not fully up-to-date');
         }
     }
 
@@ -112,6 +115,22 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
                 $error .= implode(' ', $data) . PHP_EOL;
             }
             $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
+        }
+    }
+
+    public function testValidateSchema()
+    {
+        if (is_file('misc/db_schema.yaml')) {
+            $master_schema = \Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents('misc/db_schema.yaml')
+            );
+
+            $current_schema = dump_db_schema();
+
+            $message = "Schema does not match the excpected schema defined by misc/db_schema.yaml\n";
+            $message .= "If you have changed the schema, make sure you update it with ./scripts/build-schema.php\n";
+
+            $this->assertEquals($master_schema, $current_schema, $message);
         }
     }
 }

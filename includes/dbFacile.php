@@ -17,6 +17,58 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+use LibreNMS\Exceptions\DatabaseConnectException;
+
+/**
+ * Connect to the database.
+ * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
+ *
+ * @param string $host
+ * @param string $user
+ * @param string $password
+ * @param string $database
+ * @param string $port
+ * @param string $socket
+ * @return mysqli
+ * @throws DatabaseConnectException
+ */
+function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
+{
+    global $config, $database_link;
+    $host = empty($host) ? $config['db_host'] : $host;
+    $user = empty($user) ? $config['db_user'] : $user;
+    $password = empty($password) ? $config['db_pass'] : $password;
+    $database = empty($database) ? $config['db_name'] : $database;
+    $port = empty($port) ? $config['db_port'] : $port;
+    $socket = empty($socket) ? $config['db_socket'] : $socket;
+
+    $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    if ($database_link === false) {
+        $error = mysqli_connect_error();
+        if ($error == 'No such file or directory') {
+            $error = 'Could not connect to ' . $host;
+        }
+        throw new DatabaseConnectException($error);
+    }
+
+    $database_db = mysqli_select_db($database_link, $config['db_name']);
+    if (!$database_db) {
+        $db_create_sql = "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+        mysqli_query($database_link, $db_create_sql);
+        $database_db = mysqli_select_db($database_link, $config['db_name']);
+    }
+
+    if (!$database_db) {
+        throw new DatabaseConnectException("Could not select database: $database. " . mysqli_error($database_link));
+    }
+
+    dbQuery("SET NAMES 'utf8'");
+    dbQuery("SET CHARACTER SET 'utf8'");
+    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+
+    return $database_link;
+}
+
 /*
  * Performs a query using the given string.
  * Used by the other _query functions.
