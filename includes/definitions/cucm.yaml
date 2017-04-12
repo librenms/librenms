@@ -1,6 +1,6 @@
 os: cucm
 text: 'Cisco Unified Communications Manager'
-type: tele
+type: collaboration
 icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
