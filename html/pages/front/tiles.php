@@ -33,7 +33,7 @@ list($user_dashboards, $shared_dashboards) = array_reduce($dashboards, function 
 // if the default dashboard doesn't exist, set it to the global default or to 0
 if (!isset($dashboards[$default_dash])) {
     $global_default = (int)$config['webui']['default_dashboard_id'];
-    $default_dash = isset($dashboards[$global_default]) ? $dashboards[$global_default] : 0;
+    $default_dash = isset($dashboards[$global_default]) ? $global_default : 0;
 }
 
 // if there are no possible dashboards, add one
@@ -591,7 +591,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         $.ajax({
             type: 'POST',
             url: 'ajax_dash.php',
-            data: {type: data_type, id: id, dimensions: {x:$("#widget_body_"+id).innerWidth()-20, y:$("#widget_body_"+id).innerHeight()-20}, settings:settings},
+            data: {type: data_type, id: id, dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50}, settings:settings},
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {

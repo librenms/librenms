@@ -2182,3 +2182,88 @@ function cache_peeringdb()
         echo 'Peering DB integration disabled' . PHP_EOL;
     }
 }
+
+/**
+ * Dump the database schema to an array.
+ * The top level will be a list of tables
+ * Each table contains the keys Columns and Indexes.
+ *
+ * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
+ * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
+ *
+ * @return array
+ */
+function dump_db_schema()
+{
+    global $config;
+
+    $output = array();
+
+    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
+        $table = $table['TABLE_NAME'];
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table' ORDER BY COLUMN_NAME") as $data) {
+            $column = $data['COLUMN_NAME'];
+            $output[$table]['Columns'][$column] = array(
+                'Field'   => $data['COLUMN_NAME'],
+                'Type'    => $data['COLUMN_TYPE'],
+                'Null'    => $data['IS_NULLABLE'] === 'YES',
+                'Default' => $data['COLUMN_DEFAULT'],
+                'Extra'   => $data['EXTRA'],
+            );
+        }
+
+        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+            $key_name = $key['Key_name'];
+            if (isset($output[$table]['Indexes'][$key_name])) {
+                $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
+            } else {
+                $output[$table]['Indexes'][$key_name] = array(
+                    'Name'    => $key['Key_name'],
+                    'Columns' => array($key['Column_name']),
+                    'Unique'  => !$key['Non_unique'],
+                    'Type'    => $key['Index_type'],
+                );
+            }
+        }
+    }
+    return $output;
+}
+
+/**
+ * Generate an SQL segment to create the column based on data from dump_db_schema()
+ *
+ * @param array $column_data The array of data for the column
+ * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
+ */
+function column_schema_to_sql($column_data)
+{
+    $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+    $default = $column_data['Default'] == '' ? '' : "DEFAULT '{$column_data['Default']}'";
+    if (str_contains($default, 'CURRENT_TIMESTAMP')) {
+        $default = str_replace("'", "", $default);
+    }
+    return trim("`{$column_data['Field']}` {$column_data['Type']} $null $default {$column_data['Extra']}");
+}
+
+/**
+ * Generate an SQL segment to create the index based on data from dump_db_schema()
+ *
+ * @param array $index_data The array of data for the index
+ * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
+ */
+function index_schema_to_sql($index_data)
+{
+    if ($index_data['Name'] == 'PRIMARY') {
+        $index = 'PRIMARY KEY (%s)';
+    } elseif ($index_data['Unique']) {
+        $index = "UNIQUE `{$index_data['Name']}` (%s)";
+    } else {
+        $index = "INDEX `{$index_data['Name']}` (%s)";
+    }
+
+    $columns = implode(',', array_map(function ($col) {
+        return "`$col`";
+    }, $index_data['Columns']));
+
+    return sprintf($index, $columns);
+}
