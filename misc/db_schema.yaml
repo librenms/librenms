@@ -1454,6 +1454,21 @@ syslog:
     datetime: { Name: datetime, Columns: [timestamp], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
+tnmsneinfo:
+  Columns:
+    device_id: { Field: device_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': false, Default: null, Extra: auto_increment }
+    neAlarm: { Field: neAlarm, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+    neID: { Field: neID, Type: int(32), 'Null': false, Default: null, Extra: '' }
+    neLocation: { Field: neLocation, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+    neName: { Field: neName, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+    neOpMode: { Field: neOpMode, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+    neOpState: { Field: neOpState, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+    neType: { Field: neType, Type: varchar(128), 'Null': false, Default: null, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+    neID: { Name: neID, Columns: [neID], Unique: false, Type: BTREE }
 toner:
   Columns:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: '0', Extra: '' }

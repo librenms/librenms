@@ -23,6 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+global $config;
+
 $install_dir = realpath(__DIR__ . '/..');
 
 $init_modules = array('web');
@@ -42,3 +44,19 @@ chdir($install_dir);
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
+
+
+if (getenv('DBTEST')) {
+    global $empty_db, $schema;
+
+    $sql_mode = dbFetchCell("SELECT @@global.sql_mode as sql_mode");
+    $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", array($config['db_name'])) == 0);
+    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
+    if ($empty_db) {
+        $cmd = $config['install_dir'] . '/build-base.php';
+    } else {
+        $cmd = '/usr/bin/env php ' . $config['install_dir'] . '/includes/sql-schema/update.php';
+    }
+    exec($cmd, $schema);
+}
