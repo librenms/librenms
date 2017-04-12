@@ -231,7 +231,7 @@ function get_domain_sid()
     global $config, $ldap_connection;
 
     // remove OUs, they don't have an SID
-    $dn_candidate = preg_replace('/OU=[^,]+,/', '', $config['auth_ad_base_dn']);
+    $dn_candidate = preg_replace('/^(OU=[^,]+,)+/', '', $config['auth_ad_base_dn']);
 
     $search = ldap_read(
         $ldap_connection,
