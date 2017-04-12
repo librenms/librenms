@@ -904,6 +904,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ibmtl');
     }
 
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
+    }
+
     public function testIctpsu()
     {
         $this->checkOS('ict-psu');
