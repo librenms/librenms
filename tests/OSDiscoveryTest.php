@@ -211,7 +211,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('applicationsware');
     }
-    
+
     public function testArdmoreencoder()
     {
         $this->checkOS('ardmore-encoder');
@@ -902,6 +902,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIbmtl()
     {
         $this->checkOS('ibmtl');
+    }
+
+
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
     }
 
     public function testIes()
