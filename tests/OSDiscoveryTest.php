@@ -206,7 +206,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('apic');
     }
-    
+
+    public function testApplicationsWare()
+    {
+        $this->checkOS('applicationsware');
+    }
+
     public function testArdmoreencoder()
     {
         $this->checkOS('ardmore-encoder');
@@ -486,6 +491,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCumulus()
     {
         $this->checkOS('cumulus');
+    }
+
+    public function testCyan()
+    {
+        $this->checkOS('cyan', 'cyan-z33');
     }
 
     public function testCyberoamUtm()
@@ -892,6 +902,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIbmtl()
     {
         $this->checkOS('ibmtl');
+    }
+
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
+    }
+
+    public function testIctpsu()
+    {
+        $this->checkOS('ict-psu');
     }
 
     public function testIes()

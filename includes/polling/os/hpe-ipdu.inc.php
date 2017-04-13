@@ -23,4 +23,10 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list(,$version) = explode('firmware version', $poll_device['sysDescr']);
+$hpe_ipdu_data = snmp_get_multi_oid($device, 'mpduFirmwareVersion.0 mpduSerialNumber.0 mpduModel.0', '-OUQs', 'CPQPOWER-MIB');
+
+$serial = trim($hpe_ipdu_data['mpduSerialNumber.1'], '"');
+$version = trim($hpe_ipdu_data['mpduFirmwareVersion.1'], '"');
+$hardware = trim($hpe_ipdu_data['mpduModel.1'], '"');
+
+unset($hpe_ipdu_data);
