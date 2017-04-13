@@ -806,6 +806,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('generex-ups', 'generex-ups3');
     }
 
+    public function testHelios()
+    {
+        $this->checkOS('helios');
+    }
+
     public function testHikvision()
     {
         $this->checkOS('hikvision');
