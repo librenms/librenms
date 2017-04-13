@@ -467,7 +467,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('comware');
         $this->checkOS('comware', 'comware1');
-        $this->checkOS('comware', 'comware-hp-c1234');
+        $this->checkOS('comware', 'comware-h3c');
     }
 
     public function testCoriant()
