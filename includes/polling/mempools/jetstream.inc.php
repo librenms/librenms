@@ -23,13 +23,11 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'jetstream') {
-    $oid = '.1.3.6.1.4.1.11863.6.4.1.2.1.1.2.' . $mempool['mempool_index'];
-    $used = snmp_get($device, $oid, '-OvQ');
-    $mempool['total'] = 100;
-    $mempool['free']  = ($mempool['total'] - $used);
-    $mempool['used']  = $used;
-}
+$oid = '.1.3.6.1.4.1.11863.6.4.1.2.1.1.2.' . $mempool['mempool_index'];
+$used = snmp_get($device, $oid, '-OvQ');
+$mempool['total'] = 100;
+$mempool['free']  = ($mempool['total'] - $used);
+$mempool['used']  = $used;
 
 unset(
     $oid,
