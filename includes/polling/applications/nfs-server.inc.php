@@ -222,11 +222,8 @@ $fields = array();
 foreach ($lines as $line)
 {
     $line_values     = explode(" ", $line);
-    $line_id         = $line_values[0];
-    
-    // remove the line_id
-    array_shift($line_values);
-    
+    $line_id         = array_shift($line_values);
+        
     switch ($line_id)
     {
     case 'rc':
@@ -249,11 +246,9 @@ foreach ($lines as $line)
             
         // the first value of the proc* is the amount of fields that will follow;
         // we check this, and if its incorrect, do not polute the chart with wrong values
-        $value_count = $line_values[0];
+        $value_count = array_shift($line_values);
 
         if ($value_count == count($keys_nfs_server[$line_id])) {
-            // pop the value_count
-            array_shift($line_values);
                 
             $fields = array_combine($keys_nfs_server[$line_id], $line_values);
             
@@ -269,9 +264,6 @@ foreach ($lines as $line)
 // push the default data to rrd
 $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def['default']);
 
-echo "defaults\n";
-print_r($tags);
-print_r($default_fields);
 data_update($device, 'app', $tags, $default_fields);
 
 unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
