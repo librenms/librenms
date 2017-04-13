@@ -661,11 +661,6 @@ $config['device_types'][$i]['text'] = 'Workstation';
 $config['device_types'][$i]['type'] = 'workstation';
 $config['device_types'][$i]['icon'] = 'workstation.png';
 
-$i++;
-$config['device_types'][$i]['text'] = 'Appliance';
-$config['device_types'][$i]['type'] = 'appliance';
-$config['device_types'][$i]['icon'] = 'appliance.png';
-
 //
 // No changes below this line #
 //
