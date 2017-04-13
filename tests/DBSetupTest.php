@@ -29,11 +29,6 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends \PHPUnit_Framework_TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        //
-    }
-
     public static function tearDownAfterClass()
     {
         if (getenv('DBTEST')) {
@@ -48,74 +43,77 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        dbConnect();
+        if (getenv('DBTEST')) {
+            dbConnect();
+        } else {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
     }
 
     public function testSetupDB()
     {
-        if (getenv('DBTEST')) {
-            global $schema;
-            foreach ($schema as $output) {
-                if (preg_match('/([1-9]+) errors/', $output) || preg_match('/Cannot execute query/', $output)) {
-                    throw new PHPUnitException("Errors loading DB Schema: " . $output);
-                }
+        global $schema;
+        foreach ($schema as $output) {
+            if (preg_match('/([1-9]+) errors/', $output) || preg_match('/Cannot execute query/', $output)) {
+                throw new PHPUnitException("Errors loading DB Schema: " . $output);
             }
         }
     }
 
     public function testSchema()
     {
-        if (getenv('DBTEST')) {
-            global $config;
+        global $config;
 
-            $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
-            $this->assertGreaterThan(0, $schema, "Database has no schema!");
+        $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
+        $this->assertGreaterThan(0, $schema, "Database has no schema!");
 
-            $files = glob($config['install_dir'] . '/sql-schema/*.sql');
-            end($files);
-            $expected = (int)basename(current($files), '.sql');
-            $this->assertEquals($expected, $schema, 'Schema not fully up-to-date');
-        }
+        $files = glob($config['install_dir'] . '/sql-schema/*.sql');
+        end($files);
+        $expected = (int)basename(current($files), '.sql');
+        $this->assertEquals($expected, $schema, 'Schema not fully up-to-date');
     }
 
     public function testCheckDBCollation()
     {
         global $config;
-        if (getenv('DBTEST')) {
-            $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
-            if (isset($collation[0])) {
-                $error = implode(' ', $collation[0]);
-            } else {
-                $error = '';
-            }
-            $this->assertEmpty($collation, 'Wrong Database Collation or Character set: ' . $error);
+
+        $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
+        if (isset($collation[0])) {
+            $error = implode(' ', $collation[0]);
+        } else {
+            $error = '';
         }
+        $this->assertEmpty($collation, 'Wrong Database Collation or Character set: ' . $error);
     }
 
     public function testCheckTableCollation()
     {
         global $config;
-        if (getenv('DBTEST')) {
-            $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
-            $error = '';
-            foreach ($collation as $id => $data) {
-                $error .= implode(' ', $data) . PHP_EOL;
-            }
-            $this->assertEmpty($collation, 'Wrong Table Collation or Character set: ' . $error);
+
+        $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+        $error = '';
+        foreach ($collation as $id => $data) {
+            $error .= implode(' ', $data) . PHP_EOL;
         }
+        $this->assertEmpty($collation, 'Wrong Table Collation or Character set: ' . $error);
     }
 
     public function testCheckColumnCollation()
     {
         global $config;
-        if (getenv('DBTEST')) {
-            $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
-            $error = '';
-            foreach ($collation as $id => $data) {
-                $error .= implode(' ', $data) . PHP_EOL;
-            }
-            $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
+
+        $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+        $error = '';
+        foreach ($collation as $id => $data) {
+            $error .= implode(' ', $data) . PHP_EOL;
         }
+        $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
+    }
+
+    public function testSqlMode()
+    {
+        global $sql_mode;
+        $this->assertNotNull($sql_mode, 'Query to save SQL Mode in bootstrap.php failed');
     }
 
     public function testValidateSchema()
