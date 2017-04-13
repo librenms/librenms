@@ -20,6 +20,8 @@
 
 namespace LibreNMS;
 
+use LibreNMS\Exceptions\DatabaseConnectException;
+
 class IRCBot
 {
 
@@ -365,7 +367,7 @@ class IRCBot
     }//end getUser()
 
 
-    private function connect($try)
+    private function connect($try = 0)
     {
         if ($try > $this->max_retry) {
             $this->log('Failed too many connection attempts, aborting');
@@ -437,15 +439,21 @@ class IRCBot
     private function chkdb()
     {
         if (!is_resource($this->sql)) {
-            if (($this->sql = mysqli_connect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'], null, $this->config['db_port'])) != false && mysqli_select_db($this->sql, $this->config['db_name'])) {
-                return true;
-            } else {
-                $this->log('Cannot connect to MySQL');
+            try {
+                $this->sql = dbConnect(
+                    $this->config['db_host'],
+                    $this->config['db_user'],
+                    $this->config['db_pass'],
+                    $this->config['db_name'],
+                    $this->config['db_port'],
+                    $this->config['db_socket']
+                );
+            } catch (DatabaseConnectException $e) {
+                $this->log('Cannot connect to MySQL: ' . $e->getMessage());
                 return die();
             }
-        } else {
-            return true;
         }
+        return true;
     }//end chkdb()
 
 

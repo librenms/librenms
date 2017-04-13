@@ -11,7 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-# header('Content-type: text/plain');
+header('Content-type: text/plain');
 
 $alert_id = $_POST['alert_id'];
 if (!is_numeric($alert_id)) {

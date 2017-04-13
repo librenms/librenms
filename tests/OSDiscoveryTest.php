@@ -207,6 +207,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('apic');
     }
 
+    public function testApplicationsWare()
+    {
+        $this->checkOS('applicationsware');
+    }
+
+    public function testArdmoreencoder()
+    {
+        $this->checkOS('ardmore-encoder');
+    }
+
     public function testAreca()
     {
         $this->checkOS('areca');
@@ -264,6 +274,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('avocent');
         $this->checkOS('avocent', 'avocent-alterpath');
+        $this->checkOS('avocent', 'avocent-cyclades-acs6000');
     }
 
     public function testAvtech()
@@ -456,7 +467,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('comware');
         $this->checkOS('comware', 'comware1');
-        $this->checkOS('comware', 'comware-hp-c1234');
+        $this->checkOS('comware', 'comware-h3c');
+    }
+
+    public function testCoriant()
+    {
+        $this->checkOS('coriant');
     }
 
     public function testCtcu()
@@ -475,6 +491,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCumulus()
     {
         $this->checkOS('cumulus');
+    }
+
+    public function testCyan()
+    {
+        $this->checkOS('cyan', 'cyan-z33');
     }
 
     public function testCyberoamUtm()
@@ -570,19 +591,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testDnos()
     {
         $this->checkOS('dnos');
-        $this->checkOS('dnos', 'dnos1');
-        $this->checkOS('dnos', 'dnos2');
-        $this->checkOS('dnos', 'dnos3');
-        $this->checkOS('dnos', 'dnos4');
-        $this->checkOS('dnos', 'dnos5');
-        $this->checkOS('dnos', 'dnos6');
-        $this->checkOS('dnos', 'dnos7');
-        $this->checkOS('dnos', 'dnos8');
-        $this->checkOS('dnos', 'dnos9');
-        $this->checkOS('dnos', 'dnos10');
-        $this->checkOS('dnos', 'dnos11');
-        $this->checkOS('dnos', 'dnos12');
-        $this->checkOS('dnos', 'dnos13');
     }
 
     public function testDrac()
@@ -693,7 +701,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testExtremeware()
     {
-        $this->checkOS('extremeware');
     }
 
     public function testF5()
@@ -804,6 +811,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hikvision');
     }
 
+    public function testHirschmann()
+    {
+        $this->checkOS('hirschmann');
+    }
+
     public function testHp3par()
     {
         $this->checkOS('informos');
@@ -817,6 +829,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testHpeIlo()
     {
         $this->checkOS('hpe-ilo');
+    }
+
+    public function testHpeIpdu()
+    {
+        $this->checkOS('hpe-ipdu');
     }
 
     public function testHpeMsl()
@@ -887,6 +904,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ibmtl');
     }
 
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
+    }
+
+    public function testIctpsu()
+    {
+        $this->checkOS('ict-psu');
+    }
+
     public function testIes()
     {
         $this->checkOS('ies');
@@ -954,6 +981,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testJuniperex2500os()
     {
         $this->checkOS('juniperex2500os');
+    }
+
+    public function testJuniperMss()
+    {
+        $this->checkOS('juniper-mss');
     }
 
     public function testJunose()
@@ -1160,6 +1192,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('netbotz', 'netbotz-2014');
         $this->checkOS('netbotz', 'netbotz-2016');
+        $this->checkOS('netbotz', 'netbotz-2017');
     }
 
     public function testNetgear()
@@ -1188,6 +1221,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testNetscaler()
     {
         $this->checkOS('netscaler');
+        $this->checkOS('netscaler', 'netscaler-sdx');
     }
 
     public function testNetvision()
@@ -1241,6 +1275,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('okilan');
     }
 
+    public function testOmnitronIConverter()
+    {
+        $this->checkOS('omnitron-iconverter');
+    }
+
     public function testOnefs()
     {
         $this->checkOS('onefs');
@@ -1260,6 +1299,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testOpengear()
     {
         $this->checkOS('opengear');
+        $this->checkOS('opengear', 'opengear1');
     }
 
     public function testOpenindiana()
@@ -1355,6 +1395,19 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('powerconnect', 'powerconnect-3019');
         $this->checkOS('powerconnect', 'powerconnect-3031');
         $this->checkOS('powerconnect', 'powerconnect-3041');
+        $this->checkOS('powerconnect', 'powerconnect1');
+        $this->checkOS('powerconnect', 'powerconnect2');
+        $this->checkOS('powerconnect', 'powerconnect3');
+        $this->checkOS('powerconnect', 'powerconnect4');
+        $this->checkOS('powerconnect', 'powerconnect5');
+        $this->checkOS('powerconnect', 'powerconnect6');
+        $this->checkOS('powerconnect', 'powerconnect7');
+        $this->checkOS('powerconnect', 'powerconnect8');
+        $this->checkOS('powerconnect', 'powerconnect9');
+        $this->checkOS('powerconnect', 'powerconnect10');
+        $this->checkOS('powerconnect', 'powerconnect11');
+        $this->checkOS('powerconnect', 'powerconnect12');
+        $this->checkOS('powerconnect', 'powerconnect13');
     }
 
     public function testPowervault()
@@ -1576,6 +1629,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('sonus-sbc');
         $this->checkOS('sonus-sbc', 'sonus-sbc1');
+        $this->checkOS('sonus-sbc', 'sonus-sbc1500');
     }
 
     public function testSophos()
@@ -1613,6 +1667,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('symbol');
     }
 
+    public function testTeradicipcoip()
+    {
+        $this->checkOS('teradici-pcoip');
+    }
+
     public function testTimos()
     {
         $this->checkOS('timos');
@@ -1625,6 +1684,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
         $this->checkOS('timos', 'timos9');
+        $this->checkOS('timos', 'timos10');
     }
 
     public function testTomato()
@@ -1750,6 +1810,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testXos()
     {
         $this->checkOS('xos');
+    }
+
+    public function testZebra()
+    {
+        $this->checkOS('zebra');
+        $this->checkOS('zebra', 'zebra1');
     }
 
     public function testZxr10()

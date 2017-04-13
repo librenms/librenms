@@ -157,9 +157,9 @@ function RunRules($device)
     }
     foreach (GetRules($device) as $rule) {
         c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
-        $inv = json_decode($rule['extra'], true);
-        if (isset($inv['invert'])) {
-            $inv = (bool) $inv['invert'];
+        $extra = json_decode($rule['extra'], true);
+        if (isset($extra['invert'])) {
+            $inv = (bool) $extra['invert'];
         } else {
             $inv = false;
         }
@@ -186,13 +186,18 @@ function RunRules($device)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
+        $extra['contacts'] = GetContacts($qry);
+        $extra['rule']     = $qry;
+        $extra = gzcompress(json_encode($extra), 9);
         if ($doalert) {
             if ($chk['state'] === "2") {
                 c_echo('Status: %ySKIP');
             } elseif ($chk['state'] >= "1") {
+                // NOCHG here doesn't mean no change full stop. It means no change to the alert state
+                // So we update the details column with any fresh changes to the alert output we might have.
+                dbUpdate(array('details' => $extra), 'alert_log', 'device_id = ? && rule_id = ?', array($device,$rule['id']));
                 c_echo('Status: %bNOCHG');
             } else {
-                $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
                 if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
                     if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
                         dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
@@ -266,11 +271,14 @@ function GetContacts($results)
     }
     foreach ($users as $user) {
         if (empty($user['email'])) {
-            continue;
-        } elseif (empty($user['realname'])) {
+            continue; // no email, skip this user
+        }
+        if (empty($user['realname'])) {
             $user['realname'] = $user['username'];
         }
-        $user['level'] = get_userlevel($user['username']);
+        if (empty($user['level'])) {
+            $user['level'] = get_userlevel($user['username']);
+        }
         if ($config["alert"]["globals"] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
         } elseif ($config["alert"]["admins"] && $user['level'] == 10) {
@@ -283,7 +291,7 @@ function GetContacts($results)
     $tmp_contacts = array();
     foreach ($contacts as $email => $name) {
         if (strstr($email, ',')) {
-            $split_contacts = preg_split("/[,\s]+/", $email);
+            $split_contacts = preg_split('/[,\s]+/', $email);
             foreach ($split_contacts as $split_email) {
                 if (!empty($split_email)) {
                     $tmp_contacts[$split_email] = $name;
@@ -292,6 +300,11 @@ function GetContacts($results)
         } else {
             $tmp_contacts[$email] = $name;
         }
+    }
+
+    # Send email to default contact if no other contact found
+    if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
+        $tmp_contacts[$config['alert']['default_mail']] = 'NOC';
     }
 
     return $tmp_contacts;

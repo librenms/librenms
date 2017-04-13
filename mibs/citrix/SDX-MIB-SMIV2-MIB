@@ -1,0 +1,1938 @@
+
+MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter32, Gauge32, Integer32, IpAddress, NOTIFICATION-TYPE,OBJECT-TYPE, TimeTicks, enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+		FROM SNMPv2-SMI
+	Ipv6Address
+		FROM IPV6-TC
+	 InetAddressType, InetAddress
+		FROM INET-ADDRESS-MIB;
+
+netScaler MODULE-IDENTITY
+	LAST-UPDATED "201312050000Z"
+	ORGANIZATION "Citrix Systems, Inc."
+	CONTACT-INFO  "Citrix Technical Assistance Center
+			Postal: Citrix Systems, Inc.
+				851 West Cypress Creek Road
+				Fort Lauderdale, Florida  33309
+				United States
+			Tel: +1-800-4-CITRIX (+1-800-424-8749)
+			E-mail: customercare@citrix.com"
+	DESCRIPTION "The enterprise specific MIB for NetScaler Management and Analytics System."
+	::= { enterprises 5951 }
+
+
+sdxRoot OBJECT IDENTIFIER
+	::= { netScaler 6}
+
+sdxEventGroup OBJECT IDENTIFIER
+::= { sdxRoot  1 }
+
+
+systemGroup OBJECT IDENTIFIER
+::= { sdxRoot  2 }
+
+systemPlatform OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Platform"
+	::= { systemGroup 1 }
+
+systemProduct OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Product Name"
+	::= { systemGroup 2 }
+
+systemBuildNumber OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Build Number"
+	::= { systemGroup 3 }
+
+systemSvmIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of systemSvmIPAddress"
+	::= { systemGroup 4 }
+systemSvmIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Management Service IP Address"
+	::= { systemGroup 5 }
+
+systemXenIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of systemXenIPAddress"
+	::= { systemGroup 6 }
+systemXenIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer IP Address"
+	::= { systemGroup 7 }
+
+systemNetmaskType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of systemNetmask"
+	::= { systemGroup 8 }
+systemNetmask OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Netmask"
+	::= { systemGroup 9 }
+
+systemGatewayType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of systemGateway"
+	::= { systemGroup 10 }
+systemGateway OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Gateway "
+	::= { systemGroup 11 }
+
+systemNetworkInterface OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Interface on which management needs to be enabled"
+	::= { systemGroup 12 }
+
+systemDns OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"DNS Server"
+	::= { systemGroup 13 }
+
+systemSysId OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"System Id"
+	::= { systemGroup 15 }
+
+systemSerial OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Serial Number"
+	::= { systemGroup 16 }
+
+systemCurrentTime OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current Time"
+	::= { systemGroup 17 }
+
+systemUptime OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Uptime"
+	::= { systemGroup 18 }
+
+systemBiosVersion OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"BIOS Version"
+	::= { systemGroup 19 }
+
+systemMaxThroughput OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Maximum Throughput in Mbps"
+	::= { systemGroup 20 }
+
+systemAvailableThroughput OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Available Throughput in Mbps"
+	::= { systemGroup 21 }
+
+systemHostId OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host Id"
+	::= { systemGroup 22 }
+
+systemCustomID OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Custom identification number for appliance"
+	::= { systemGroup 23 }
+
+
+sysHealthGroup OBJECT IDENTIFIER
+::= { systemGroup  1000 }
+
+hardwareResourceTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF HardwareResourceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"hardwareResourcetable" 
+	::= { sysHealthGroup 1 }
+
+hardwareResourceEntry OBJECT-TYPE 
+	SYNTAX  HardwareResourceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { hardwareResourceName, hardwareResourceHostIPAddressType, hardwareResourceHostIPAddress }
+	::= { hardwareResourceTable  1}
+
+HardwareResourceEntry ::= SEQUENCE {
+	hardwareResourceName OCTET STRING,
+	hardwareResourceHostIPAddressType InetAddressType,
+	hardwareResourceHostIPAddress InetAddress,
+	hardwareResourceCurrentValue OCTET STRING,
+	hardwareResourceExpectedValue OCTET STRING,
+	hardwareResourceUnit OCTET STRING,
+	hardwareResourceStatus OCTET STRING
+}
+
+hardwareResourceName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Resource name"
+	::= { hardwareResourceEntry 1 }
+
+hardwareResourceHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of hardwareResourceHostIPAddress"
+	::= { hardwareResourceEntry 2 }
+hardwareResourceHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IP Address"
+	::= { hardwareResourceEntry 3 }
+
+hardwareResourceCurrentValue OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current value of the resource"
+	::= { hardwareResourceEntry 4 }
+
+hardwareResourceExpectedValue OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Expected value of the resource"
+	::= { hardwareResourceEntry 5 }
+
+hardwareResourceUnit OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Measurement unit for the resource"
+	::= { hardwareResourceEntry 6 }
+
+hardwareResourceStatus OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Health status of the resource - OK/ERROR"
+	::= { hardwareResourceEntry 7 }
+
+softwareResourceTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF SoftwareResourceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"softwareResourcetable" 
+	::= { sysHealthGroup 2 }
+
+softwareResourceEntry OBJECT-TYPE 
+	SYNTAX  SoftwareResourceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { softwareResourceName, softwareResourceHostIPAddressType, softwareResourceHostIPAddress }
+	::= { softwareResourceTable  1}
+
+SoftwareResourceEntry ::= SEQUENCE {
+	softwareResourceName OCTET STRING,
+	softwareResourceHostIPAddressType InetAddressType,
+	softwareResourceHostIPAddress InetAddress,
+	softwareResourceCurrentValue OCTET STRING,
+	softwareResourceExpectedValue OCTET STRING,
+	softwareResourceUnit OCTET STRING,
+	softwareResourceStatus OCTET STRING
+}
+
+softwareResourceName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Resource name"
+	::= { softwareResourceEntry 1 }
+
+softwareResourceHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of softwareResourceHostIPAddress"
+	::= { softwareResourceEntry 2 }
+softwareResourceHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IP Address"
+	::= { softwareResourceEntry 3 }
+
+softwareResourceCurrentValue OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current value of the resource"
+	::= { softwareResourceEntry 4 }
+
+softwareResourceExpectedValue OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Expected value of the resource"
+	::= { softwareResourceEntry 5 }
+
+softwareResourceUnit OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Measurement unit for the resource"
+	::= { softwareResourceEntry 6 }
+
+softwareResourceStatus OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Health status of the resource - OK/ERROR"
+	::= { softwareResourceEntry 7 }
+
+diskTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF DiskEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"disktable" 
+	::= { sysHealthGroup 3 }
+
+diskEntry OBJECT-TYPE 
+	SYNTAX  DiskEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { diskName, diskHostIPAddressType, diskHostIPAddress }
+	::= { diskTable  1}
+
+DiskEntry ::= SEQUENCE {
+	diskName OCTET STRING,
+	diskHostIPAddressType InetAddressType,
+	diskHostIPAddress InetAddress,
+	diskTransactionRate OCTET STRING,
+	diskBlockReadRate OCTET STRING,
+	diskBlockWriteRate OCTET STRING,
+	diskTotalBlocksRead OCTET STRING,
+	diskTotalBlocksWritten OCTET STRING,
+	diskUtilized OCTET STRING,
+	diskSize OCTET STRING,
+	diskBayNumber OCTET STRING
+}
+
+diskName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of the Disk"
+	::= { diskEntry 1 }
+
+diskHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of diskHostIPAddress"
+	::= { diskEntry 2 }
+diskHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IP Address"
+	::= { diskEntry 3 }
+
+diskTransactionRate OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Transactions per second"
+	::= { diskEntry 4 }
+
+diskBlockReadRate OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Blocks read per second"
+	::= { diskEntry 5 }
+
+diskBlockWriteRate OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Blocks written per second"
+	::= { diskEntry 6 }
+
+diskTotalBlocksRead OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total blocks read"
+	::= { diskEntry 7 }
+
+diskTotalBlocksWritten OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total blocks written"
+	::= { diskEntry 8 }
+
+diskUtilized OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Utilization of the disk (bytes)"
+	::= { diskEntry 9 }
+
+diskSize OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Size of the disk (bytes)"
+	::= { diskEntry 10 }
+
+diskBayNumber OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Bay number"
+	::= { diskEntry 11 }
+
+srTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF SrEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"srtable" 
+	::= { sysHealthGroup 4 }
+
+srEntry OBJECT-TYPE 
+	SYNTAX  SrEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { srName, srBayNumber, srHostIPAddressType, srHostIPAddress }
+	::= { srTable  1}
+
+SrEntry ::= SEQUENCE {
+	srName OCTET STRING,
+	srBayNumber OCTET STRING,
+	srHostIPAddressType InetAddressType,
+	srHostIPAddress InetAddress,
+	srUtilized OCTET STRING,
+	srSize OCTET STRING,
+	srStatus OCTET STRING
+}
+
+srName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of the storage repository"
+	::= { srEntry 1 }
+
+srBayNumber OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Bay number"
+	::= { srEntry 2 }
+
+srHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of srHostIPAddress"
+	::= { srEntry 3 }
+srHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IP Address"
+	::= { srEntry 4 }
+
+srUtilized OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Physical utilization of the storage repository"
+	::= { srEntry 5 }
+
+srSize OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Physical size of the storage repository"
+	::= { srEntry 6 }
+
+srStatus OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Status of the storage repository - OK/ERROR"
+	::= { srEntry 7 }
+
+interfaceTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF InterfaceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"interfacetable" 
+	::= { sysHealthGroup 5 }
+
+interfaceEntry OBJECT-TYPE 
+	SYNTAX  InterfaceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { interfaceMappedPort, interfaceHostIPAddressType, interfaceHostIPAddress }
+	::= { interfaceTable  1}
+
+InterfaceEntry ::= SEQUENCE {
+	interfacePort OCTET STRING,
+	interfaceHostIPAddressType InetAddressType,
+	interfaceHostIPAddress InetAddress,
+	interfaceState OCTET STRING,
+	interfaceRxPackets OCTET STRING,
+	interfaceTxPackets OCTET STRING,
+	interfaceRxBytes OCTET STRING,
+	interfaceTxBytes OCTET STRING,
+	interfaceRxErrors OCTET STRING,
+	interfaceTxErrors OCTET STRING,
+	interfaceVfTotal Integer32,
+	interfaceVfAssigned Integer32,
+	interfaceMappedPort OCTET STRING
+}
+
+interfacePort OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Port Name Ex: 10/1"
+	::= { interfaceEntry 1 }
+
+interfaceHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of interfaceHostIPAddress"
+	::= { interfaceEntry 2 }
+interfaceHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IP Address"
+	::= { interfaceEntry 3 }
+
+interfaceState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of the Interface - UP/DOWN"
+	::= { interfaceEntry 4 }
+
+interfaceRxPackets OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Received packets"
+	::= { interfaceEntry 5 }
+
+interfaceTxPackets OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Transmitted packets"
+	::= { interfaceEntry 6 }
+
+interfaceRxBytes OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Received bytes"
+	::= { interfaceEntry 7 }
+
+interfaceTxBytes OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Transmitted bytes"
+	::= { interfaceEntry 8 }
+
+interfaceRxErrors OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Receiving errors"
+	::= { interfaceEntry 9 }
+
+interfaceTxErrors OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Transmission errors"
+	::= { interfaceEntry 10 }
+
+interfaceVfTotal OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Virtual Functions"
+	::= { interfaceEntry 11 }
+
+interfaceVfAssigned OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assigned Virtual Functions"
+	::= { interfaceEntry 12 }
+
+interfaceMappedPort OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Mapped Port Name Ex: eth0"
+	::= { interfaceEntry 13 }
+
+
+deviceGroup OBJECT IDENTIFIER
+::= { sdxRoot  3 }
+
+xenTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF XenEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"xentable" 
+	::= { deviceGroup 1 }
+
+xenEntry OBJECT-TYPE 
+	SYNTAX  XenEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { xenIpAddressType, xenIpAddress }
+	::= { xenTable  1}
+
+XenEntry ::= SEQUENCE {
+	xenIpAddressType InetAddressType,
+	xenIpAddress InetAddress,
+	xenHostname OCTET STRING,
+	xenDescription OCTET STRING,
+	xenVersion OCTET STRING,
+	xenUuid OCTET STRING,
+	xenNumberOfCPU Integer32,
+	xenCpuUsage OCTET STRING,
+	xenMemoryTotal OCTET STRING,
+	xenMemoryFree OCTET STRING,
+	xenMemoryUsage OCTET STRING,
+	xenTx OCTET STRING,
+	xenRx OCTET STRING,
+	xenUptime OCTET STRING,
+	xenSslCoresTotal Integer32,
+	xenIscsiIQN OCTET STRING,
+	xenEdition OCTET STRING,
+	xenExpiry OCTET STRING,
+	xenProductCode OCTET STRING,
+	xenSerialNumber OCTET STRING,
+	xenVersionLong OCTET STRING,
+	xenVersionShort OCTET STRING,
+	xenBuildNumber OCTET STRING,
+	xenBuildDate OCTET STRING
+}
+
+xenIpAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of xenIpAddress"
+	::= { xenEntry 1 }
+xenIpAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP Address for this managed device"
+	::= { xenEntry 2 }
+
+xenHostname OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign hostname to managed device, if this is not provided, name will be set as host name "
+	::= { xenEntry 3 }
+
+xenDescription OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Description of managed device"
+	::= { xenEntry 4 }
+
+xenVersion OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Version"
+	::= { xenEntry 5 }
+
+xenUuid OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"UUID of host"
+	::= { xenEntry 6 }
+
+xenNumberOfCPU OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of total CPU of host"
+	::= { xenEntry 7 }
+
+xenCpuUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU Usage (%) of host"
+	::= { xenEntry 8 }
+
+xenMemoryTotal OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total memory of host in MB"
+	::= { xenEntry 9 }
+
+xenMemoryFree OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Free memory available (MB) in host"
+	::= { xenEntry 10 }
+
+xenMemoryUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Memory Usage (%) of host"
+	::= { xenEntry 11 }
+
+xenTx OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Out Throughput (Mbps) of host"
+	::= { xenEntry 12 }
+
+xenRx OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"In Throughput (Mbps) of host"
+	::= { xenEntry 13 }
+
+xenUptime OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Uptime of device"
+	::= { xenEntry 14 }
+
+xenSslCoresTotal OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total SSL Cores available in host"
+	::= { xenEntry 15 }
+
+xenIscsiIQN OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"iSCSI IQN"
+	::= { xenEntry 16 }
+
+xenEdition OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Edition"
+	::= { xenEntry 17 }
+
+xenExpiry OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Expiry"
+	::= { xenEntry 18 }
+
+xenProductCode OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Product Code"
+	::= { xenEntry 19 }
+
+xenSerialNumber OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Serial Number"
+	::= { xenEntry 20 }
+
+xenVersionLong OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Version (full text)"
+	::= { xenEntry 21 }
+
+xenVersionShort OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Version"
+	::= { xenEntry 22 }
+
+xenBuildNumber OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Build Number"
+	::= { xenEntry 23 }
+
+xenBuildDate OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"XenServer Build Date"
+	::= { xenEntry 24 }
+
+netscalerTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF NetscalerEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"netscalertable" 
+	::= { deviceGroup 2 }
+
+netscalerEntry OBJECT-TYPE 
+	SYNTAX  NetscalerEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { nsIpAddressType, nsIpAddress, nsHostIPAddressType, nsHostIPAddress }
+	::= { netscalerTable  1}
+
+NetscalerEntry ::= SEQUENCE {
+	nsIpAddressType InetAddressType,
+	nsIpAddress InetAddress,
+	nsHostIPAddressType InetAddressType,
+	nsHostIPAddress InetAddress,
+	nsProfileName OCTET STRING,
+	nsName OCTET STRING,
+	nsNetmaskType InetAddressType,
+	nsNetmask InetAddress,
+	nsGatewayType InetAddressType,
+	nsGateway InetAddress,
+	nsHostname OCTET STRING,
+	nsDescription OCTET STRING,
+	nsVersion OCTET STRING,
+	nsUuid OCTET STRING,
+	nsInstanceState OCTET STRING,
+	nsVirtualFunctions OCTET STRING,
+	nsSslVirtualFunctions OCTET STRING,
+	nsVmState OCTET STRING,
+	nsNumberOfCPU Integer32,
+	nsVmMemoryTotal OCTET STRING,
+	nsUptime OCTET STRING,
+	nsNumberOfSSLCores Integer32,
+	nsCpuCoreMgmt OCTET STRING,
+	nsCpuCorePE OCTET STRING,
+	nsVmDescription OCTET STRING,
+	nsThroughput OCTET STRING,
+	nsNumberOfCores Integer32,
+	nsNsCPUUsage OCTET STRING,
+	nsNsMemoryUsage OCTET STRING,
+	nsNsTx OCTET STRING,
+	nsNsRx OCTET STRING,
+	nsHttpReq OCTET STRING,
+	nsUpsince OCTET STRING,
+	nsLicense OCTET STRING,
+	nsHaMasterState OCTET STRING,
+	nsHaIPAddressType InetAddressType,
+	nsHaIPAddress InetAddress,
+	nsNodeState OCTET STRING,
+	nsHaSync OCTET STRING,
+	nsPps OCTET STRING,
+	nsNumberOfSslCoresUp Integer32,
+	nsIfOby1 OCTET STRING,
+	nsIf0by2 OCTET STRING,
+	nsNsVLANId Integer32,
+	nsNsVLANTagged OCTET STRING,
+	nsVlanType Integer32
+}
+
+nsIpAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of nsIpAddress"
+	::= { netscalerEntry 1 }
+nsIpAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP Address for this managed device"
+	::= { netscalerEntry 2 }
+
+nsHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of nsHostIPAddress"
+	::= { netscalerEntry 3 }
+nsHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IPAddress where VM is provisioned"
+	::= { netscalerEntry 4 }
+
+nsProfileName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Profile Name that is attached with this managed device"
+	::= { netscalerEntry 5 }
+
+nsName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of managed device"
+	::= { netscalerEntry 6 }
+
+nsNetmaskType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of nsNetmask"
+	::= { netscalerEntry 7 }
+nsNetmask OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Netmask of managed device"
+	::= { netscalerEntry 8 }
+
+nsGatewayType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of nsGateway"
+	::= { netscalerEntry 9 }
+nsGateway OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Default Gateway of managed device"
+	::= { netscalerEntry 10 }
+
+nsHostname OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign hostname to managed device, if this is not provided, name will be set as host name "
+	::= { netscalerEntry 11 }
+
+nsDescription OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Description of managed device"
+	::= { netscalerEntry 12 }
+
+nsVersion OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Version"
+	::= { netscalerEntry 13 }
+
+nsUuid OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"UUID of VM Instance"
+	::= { netscalerEntry 14 }
+
+nsInstanceState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of device, UP only if device accessible"
+	::= { netscalerEntry 15 }
+
+nsVirtualFunctions OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Virtual Functions assigned to VM Instance"
+	::= { netscalerEntry 16 }
+
+nsSslVirtualFunctions OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"SSL Virtual Functions assigned to VM Instance"
+	::= { netscalerEntry 17 }
+
+nsVmState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of Virtual Machine (Running | Halted)"
+	::= { netscalerEntry 18 }
+
+nsNumberOfCPU OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of CPU that is assigned to VM Instance"
+	::= { netscalerEntry 19 }
+
+nsVmMemoryTotal OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Memory of VM Instance in MB"
+	::= { netscalerEntry 21 }
+
+nsUptime OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Uptime of device"
+	::= { netscalerEntry 26 }
+
+nsNumberOfSSLCores OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign number of ssl virtual functions to VM Instance"
+	::= { netscalerEntry 27 }
+
+nsCpuCoreMgmt OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Management CPU cores assigned to VM Instance"
+	::= { netscalerEntry 28 }
+
+nsCpuCorePE OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Packet Engine cores assigned to VM Instance"
+	::= { netscalerEntry 29 }
+
+nsVmDescription OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Description"
+	::= { netscalerEntry 30 }
+
+nsThroughput OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign throughput in Mbps to VM Instance"
+	::= { netscalerEntry 31 }
+
+nsNumberOfCores OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of cores that are assigned to VM Instance"
+	::= { netscalerEntry 32 }
+
+nsNsCPUUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU Usage (%) of NetScaler Instance"
+	::= { netscalerEntry 33 }
+
+nsNsMemoryUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Memory Usage (%)"
+	::= { netscalerEntry 35 }
+
+nsNsTx OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Out Throughput of NetScaler Instance in Mbps"
+	::= { netscalerEntry 36 }
+
+nsNsRx OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"In Throughput of NetScaler Instance in Mbps"
+	::= { netscalerEntry 37 }
+
+nsHttpReq OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"HTTP Requests/second"
+	::= { netscalerEntry 38 }
+
+nsUpsince OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Upsince of managed device"
+	::= { netscalerEntry 39 }
+
+nsLicense OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Feature License for NetScaler Instance, needs to be set while provisioning (standard, enterprise, platinum)"
+	::= { netscalerEntry 40 }
+
+nsHaMasterState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Master State (Primary/Secondary)"
+	::= { netscalerEntry 41 }
+
+nsHaIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of nsHaIPAddress"
+	::= { netscalerEntry 42 }
+nsHaIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Peer IP Address"
+	::= { netscalerEntry 43 }
+
+nsNodeState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Node State of NetScaler Instance"
+	::= { netscalerEntry 44 }
+
+nsHaSync OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"HA Synchronization State"
+	::= { netscalerEntry 45 }
+
+nsPps OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign packets per seconds to NetScaler Instance"
+	::= { netscalerEntry 46 }
+
+nsNumberOfSslCoresUp OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SSL Cores Up"
+	::= { netscalerEntry 47 }
+
+nsIfOby1 OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Network 0/1 on VM Instance"
+	::= { netscalerEntry 48 }
+
+nsIf0by2 OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Network 0/2 on VM Instance"
+	::= { netscalerEntry 49 }
+
+nsNsVLANId OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"VLAN Id"
+	::= { netscalerEntry 50 }
+
+nsNsVLANTagged OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"NSVLAN Tagged"
+	::= { netscalerEntry 51 }
+
+nsVlanType OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"VLAN Type, NS or L2 VLAN"
+	::= { netscalerEntry 52 }
+
+cloudBridgeInstanceTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF CloudBridgeInstanceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"cloudBridgeInstancetable" 
+	::= { deviceGroup 3 }
+
+cloudBridgeInstanceEntry OBJECT-TYPE 
+	SYNTAX  CloudBridgeInstanceEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { cbIpAddressType, cbIpAddress, cbHostIPAddressType, cbHostIPAddress }
+	::= { cloudBridgeInstanceTable  1}
+
+CloudBridgeInstanceEntry ::= SEQUENCE {
+	cbIpAddressType InetAddressType,
+	cbIpAddress InetAddress,
+	cbHostIPAddressType InetAddressType,
+	cbHostIPAddress InetAddress,
+	cbProfileName OCTET STRING,
+	cbName OCTET STRING,
+	cbNetmaskType InetAddressType,
+	cbNetmask InetAddress,
+	cbGatewayType InetAddressType,
+	cbGateway InetAddress,
+	cbHostname OCTET STRING,
+	cbDescription OCTET STRING,
+	cbVersion OCTET STRING,
+	cbInstanceState OCTET STRING,
+	cbUuid OCTET STRING,
+	cbVirtualFunctions OCTET STRING,
+	cbVmState OCTET STRING,
+	cbNumberOfCPU Integer32,
+	cbVmCPUUsage OCTET STRING,
+	cbVmMemoryTotal OCTET STRING,
+	cbVmMemoryFree OCTET STRING,
+	cbVmMemoryUsage OCTET STRING,
+	cbUptime OCTET STRING,
+	cbDiskAllocation OCTET STRING,
+	cbAPAIPADDRESSType InetAddressType,
+	cbAPAIPADDRESS InetAddress,
+	cbAPANetMaskType InetAddressType,
+	cbAPANetMask InetAddress,
+	cbAPAGatewayType InetAddressType,
+	cbAPAGateway InetAddress,
+	cbPluginIPADDRESSType InetAddressType,
+	cbPluginIPADDRESS InetAddress,
+	cbMgmtIPAddressType InetAddressType,
+	cbMgmtIPAddress InetAddress
+}
+
+cbIpAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbIpAddress"
+	::= { cloudBridgeInstanceEntry 1 }
+cbIpAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP Address for this managed device"
+	::= { cloudBridgeInstanceEntry 2 }
+
+cbHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbHostIPAddress"
+	::= { cloudBridgeInstanceEntry 3 }
+cbHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IPAddress where VM is provisioned"
+	::= { cloudBridgeInstanceEntry 4 }
+
+cbProfileName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Profile Name that is attached with this managed device"
+	::= { cloudBridgeInstanceEntry 5 }
+
+cbName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of managed device"
+	::= { cloudBridgeInstanceEntry 6 }
+
+cbNetmaskType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbNetmask"
+	::= { cloudBridgeInstanceEntry 7 }
+cbNetmask OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Netmask of managed device"
+	::= { cloudBridgeInstanceEntry 8 }
+
+cbGatewayType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbGateway"
+	::= { cloudBridgeInstanceEntry 9 }
+cbGateway OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Default Gateway of managed device"
+	::= { cloudBridgeInstanceEntry 10 }
+
+cbHostname OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign hostname to managed device, if this is not provided, name will be set as host name "
+	::= { cloudBridgeInstanceEntry 11 }
+
+cbDescription OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Description of managed device"
+	::= { cloudBridgeInstanceEntry 12 }
+
+cbVersion OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Version"
+	::= { cloudBridgeInstanceEntry 13 }
+
+cbInstanceState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of device, UP only if device accessible"
+	::= { cloudBridgeInstanceEntry 14 }
+
+cbUuid OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"UUID of VM Instance"
+	::= { cloudBridgeInstanceEntry 15 }
+
+cbVirtualFunctions OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Virtual Functions assigned to VM Instance"
+	::= { cloudBridgeInstanceEntry 16 }
+
+cbVmState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of Virtual Machine (Running | Halted)"
+	::= { cloudBridgeInstanceEntry 17 }
+
+cbNumberOfCPU OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of CPU that is assigned to VM Instance"
+	::= { cloudBridgeInstanceEntry 18 }
+
+cbVmCPUUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU Usage (%) of VM Instance"
+	::= { cloudBridgeInstanceEntry 19 }
+
+cbVmMemoryTotal OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Memory of VM Instance in MB"
+	::= { cloudBridgeInstanceEntry 20 }
+
+cbVmMemoryFree OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Free Memory (MB) available in VM Instance"
+	::= { cloudBridgeInstanceEntry 21 }
+
+cbVmMemoryUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Memory Usage (%) of VM Instance"
+	::= { cloudBridgeInstanceEntry 22 }
+
+cbUptime OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Uptime of device"
+	::= { cloudBridgeInstanceEntry 25 }
+
+cbDiskAllocation OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Disk allocation for VM Instance"
+	::= { cloudBridgeInstanceEntry 30 }
+
+cbAPAIPADDRESSType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAPAIPADDRESS"
+	::= { cloudBridgeInstanceEntry 47 }
+cbAPAIPADDRESS OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"aPA IP Address"
+	::= { cloudBridgeInstanceEntry 48 }
+
+cbAPANetMaskType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAPANetMask"
+	::= { cloudBridgeInstanceEntry 49 }
+cbAPANetMask OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"aPA Netmask"
+	::= { cloudBridgeInstanceEntry 50 }
+
+cbAPAGatewayType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAPAGateway"
+	::= { cloudBridgeInstanceEntry 51 }
+cbAPAGateway OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"aPA Gateway"
+	::= { cloudBridgeInstanceEntry 52 }
+
+cbPluginIPADDRESSType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbPluginIPADDRESS"
+	::= { cloudBridgeInstanceEntry 53 }
+cbPluginIPADDRESS OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Plugin IP Address"
+	::= { cloudBridgeInstanceEntry 54 }
+
+cbMgmtIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbMgmtIPAddress"
+	::= { cloudBridgeInstanceEntry 57 }
+cbMgmtIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Management IP Address for this Managed Device"
+	::= { cloudBridgeInstanceEntry 58 }
+
+cloudBridgeAcceleratorTable OBJECT-TYPE 
+	SYNTAX  SEQUENCE OF CloudBridgeAcceleratorEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"cloudBridgeAcceleratortable" 
+	::= { deviceGroup 4 }
+
+cloudBridgeAcceleratorEntry OBJECT-TYPE 
+	SYNTAX  CloudBridgeAcceleratorEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { cbAcceleratorIpAddressType, cbAcceleratorIpAddress, cbAcceleratorHostIPAddressType, cbAcceleratorHostIPAddress }
+	::= { cloudBridgeAcceleratorTable  1}
+
+CloudBridgeAcceleratorEntry ::= SEQUENCE {
+	cbAcceleratorIpAddressType InetAddressType,
+	cbAcceleratorIpAddress InetAddress,
+	cbAcceleratorHostIPAddressType InetAddressType,
+	cbAcceleratorHostIPAddress InetAddress,
+	cbAcceleratorProfileName OCTET STRING,
+	cbAcceleratorName OCTET STRING,
+	cbAcceleratorNetmaskType InetAddressType,
+	cbAcceleratorNetmask InetAddress,
+	cbAcceleratorGatewayType InetAddressType,
+	cbAcceleratorGateway InetAddress,
+	cbAcceleratorHostname OCTET STRING,
+	cbAcceleratorDescription OCTET STRING,
+	cbAcceleratorVersion OCTET STRING,
+	cbAcceleratorInstanceState OCTET STRING,
+	cbAcceleratorUuid OCTET STRING,
+	cbAcceleratorVmState OCTET STRING,
+	cbAcceleratorNumberOfCPU Integer32,
+	cbAcceleratorVmCPUUsage OCTET STRING,
+	cbAcceleratorVmMemoryTotal OCTET STRING,
+	cbAcceleratorVmMemoryFree OCTET STRING,
+	cbAcceleratorVmMemoryUsage OCTET STRING,
+	cbAcceleratorUptime OCTET STRING,
+	cbAcceleratorIpList OCTET STRING,
+	cbAcceleratorMgmtIPAddressType InetAddressType,
+	cbAcceleratorMgmtIPAddress InetAddress
+}
+
+cbAcceleratorIpAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAcceleratorIpAddress"
+	::= { cloudBridgeAcceleratorEntry 1 }
+cbAcceleratorIpAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP Address for this managed device"
+	::= { cloudBridgeAcceleratorEntry 2 }
+
+cbAcceleratorHostIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAcceleratorHostIPAddress"
+	::= { cloudBridgeAcceleratorEntry 3 }
+cbAcceleratorHostIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host IPAddress where VM is provisioned"
+	::= { cloudBridgeAcceleratorEntry 4 }
+
+cbAcceleratorProfileName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Profile Name that is attached with this managed device"
+	::= { cloudBridgeAcceleratorEntry 5 }
+
+cbAcceleratorName OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of managed device"
+	::= { cloudBridgeAcceleratorEntry 6 }
+
+cbAcceleratorNetmaskType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAcceleratorNetmask"
+	::= { cloudBridgeAcceleratorEntry 7 }
+cbAcceleratorNetmask OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Netmask of managed device"
+	::= { cloudBridgeAcceleratorEntry 8 }
+
+cbAcceleratorGatewayType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAcceleratorGateway"
+	::= { cloudBridgeAcceleratorEntry 9 }
+cbAcceleratorGateway OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Default Gateway of managed device"
+	::= { cloudBridgeAcceleratorEntry 10 }
+
+cbAcceleratorHostname OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Assign hostname to managed device, if this is not provided, name will be set as host name "
+	::= { cloudBridgeAcceleratorEntry 11 }
+
+cbAcceleratorDescription OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Description of managed device"
+	::= { cloudBridgeAcceleratorEntry 12 }
+
+cbAcceleratorVersion OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Device Version"
+	::= { cloudBridgeAcceleratorEntry 13 }
+
+cbAcceleratorInstanceState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of device, UP only if device accessible"
+	::= { cloudBridgeAcceleratorEntry 14 }
+
+cbAcceleratorUuid OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"UUID of VM Instance"
+	::= { cloudBridgeAcceleratorEntry 15 }
+
+cbAcceleratorVmState OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"State of Virtual Machine (Running | Halted)"
+	::= { cloudBridgeAcceleratorEntry 16 }
+
+cbAcceleratorNumberOfCPU OBJECT-TYPE 
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of CPU that is assigned to VM Instance"
+	::= { cloudBridgeAcceleratorEntry 17 }
+
+cbAcceleratorVmCPUUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU Usage (%) of VM Instance"
+	::= { cloudBridgeAcceleratorEntry 18 }
+
+cbAcceleratorVmMemoryTotal OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Memory of VM Instance in MB"
+	::= { cloudBridgeAcceleratorEntry 19 }
+
+cbAcceleratorVmMemoryFree OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Free Memory (MB) available in VM Instance"
+	::= { cloudBridgeAcceleratorEntry 20 }
+
+cbAcceleratorVmMemoryUsage OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Memory Usage (%) of VM Instance"
+	::= { cloudBridgeAcceleratorEntry 21 }
+
+cbAcceleratorUptime OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Uptime of device"
+	::= { cloudBridgeAcceleratorEntry 24 }
+
+cbAcceleratorIpList OBJECT-TYPE 
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Specify the list of CloudBridge IPs for which this device will act as a CloudBridge Accelerator."
+	::= { cloudBridgeAcceleratorEntry 31 }
+
+cbAcceleratorMgmtIPAddressType OBJECT-TYPE 
+	SYNTAX  InetAddressType
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of cbAcceleratorMgmtIPAddress"
+	::= { cloudBridgeAcceleratorEntry 38 }
+cbAcceleratorMgmtIPAddress OBJECT-TYPE 
+	SYNTAX  InetAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Management IP Address for this CloudBridge Accelerator Instance"
+	::= { cloudBridgeAcceleratorEntry 39 }
+
+
+END -- end of module MIB

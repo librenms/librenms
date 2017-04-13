@@ -10,6 +10,7 @@ $common_output[] = '
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="type">Type</th>
                 <th data-column-id="message">Message</th>
+                <th data-column-id="username">User</th>
             </tr>
         </thead>
     </table>

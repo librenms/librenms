@@ -82,8 +82,8 @@ $app->group(
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
+                        $app->get('/multiport/bits/:id', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
                         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');
-                        // api/v0/portgroups/$group
                     }
                 );
                 $app->group(
@@ -153,7 +153,7 @@ $app->group(
                         $app->group(
                             '/ip',
                             function () use ($app) {
-                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp');
+                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
                             }
                         );
                     }

@@ -11,8 +11,8 @@ function authenticate($username, $password)
 {
     global $config;
 
-    if (isset($_SERVER['REMOTE_USER'])) {
-        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
+    if (isset($_SERVER['REMOTE_USER']) || isset($_SERVER['PHP_AUTH_USER'])) {
+        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']) ?: mres($_SERVER['PHP_AUTH_USER']);
 
         $row = @dbFetchRow('SELECT username FROM `users` WHERE `username`=?', array($_SESSION['username']));
         if (isset($row['username']) && $row['username'] == $_SESSION['username']) {
@@ -50,12 +50,12 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '', $twofactor = 0)
+function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
 {
     if (!user_exists($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
-        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description, 'twofactor' => $twofactor), 'users');
+        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
         if ($userid == false) {
             return false;
         } else {

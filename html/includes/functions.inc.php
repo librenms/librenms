@@ -610,7 +610,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     global $config;
 
     $graph_array = array();
-    $port        = ifNameDescr($port);
+
     if (!$text) {
         $text = fixifName($port['label']);
     }
@@ -629,9 +629,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
     if ($port['ifAlias']) {
-        $content .= display($port['ifAlias']).'<br />';
+        $content .= addslashes(display($port['ifAlias'])).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1139,6 +1139,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
+            $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
             $fallback      = false;
         }
@@ -1408,30 +1409,24 @@ function array_to_htmljson($data)
 }
 
 /**
- * @param $eventlog_severity
- * @return $eventlog_severity_icon
+ * @param int $eventlog_severity
+ * @return string $eventlog_severity_icon
  */
 function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
             return "severity-ok"; //OK
-            break;
         case 2:
             return "severity-info"; //Informational
-            break;
         case 3:
             return "severity-notice"; //Notice
-            break;
         case 4:
             return "severity-warning"; //Warning
-            break;
         case 5:
             return "severity-critical"; //Critical
-            break;
         default:
             return "severity-unknown"; //Unknown
-            break;
     }
 } // end eventlog_severity
 
@@ -1440,12 +1435,17 @@ function eventlog_severity($eventlog_severity)
  */
 function set_image_type()
 {
+    return header('Content-type: ' . get_image_type());
+}
+
+function get_image_type()
+{
     global $config;
 
     if ($config['webui']['graph_type'] === 'svg') {
-        return header('Content-type: image/svg+xml');
+        return 'image/svg+xml';
     } else {
-        return header('Content-type: image/png');
+        return 'image/png';
     }
 }
 
@@ -1489,4 +1489,109 @@ function get_oxidized_nodes_list()
 function get_disks($device)
 {
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
+}
+
+/**
+ * Get the fail2ban jails for a device... just requires the device ID
+ * an empty return means either no jails or fail2ban is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_fail2ban_jails($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'type' => array('=', 'fail2ban'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $f2bc=$component->getComponents($device_id, $options);
+
+    if (isset($f2bc[$device_id])) {
+        $id = $component->getFirstComponentID($f2bc, $device_id);
+        return json_decode($f2bc[$device_id][$id]['jails']);
+    }
+
+    return array();
+}
+
+/**
+ * Get the Postgres databases for a device... just requires the device ID
+ * an empty return means Postres is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_postgres_databases($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'postgres'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $pgc=$component->getComponents($device_id, $options);
+
+    if (isset($pgc[$device_id])) {
+        $id = $component->getFirstComponentID($pgc, $device_id);
+        return json_decode($pgc[$device_id][$id]['databases']);
+    }
+
+    return array();
+}
+
+// takes the device array and app_id
+function get_disks_with_smart($device, $app_id)
+{
+    $all_disks=get_disks($device['device_id']);
+    $disks=array();
+    $all_disks_int=0;
+    while (isset($all_disks[$all_disks_int])) {
+        $disk=$all_disks[$all_disks_int]['diskio_descr'];
+        $rrd_filename = rrd_name($device['hostname'], array('app', 'smart', $app_id, $disk));
+        if (rrdtool_check_rrd_exists($rrd_filename)) {
+            $disks[]=$disk;
+        }
+        $all_disks_int++;
+    }
+    return $disks;
+}
+
+/**
+ * Gets all dashboards the user can access
+ * adds in the keys:
+ *   username - the username of the owner of each dashboard
+ *   default - the default dashboard for the logged in user
+ *
+ * @param int $user_id optionally get list for another user
+ * @return array list of dashboards
+ */
+function get_dashboards($user_id = null)
+{
+    $default = get_user_pref('dashboard');
+    $dashboards = dbFetchRows(
+        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
+        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
+    );
+
+    $usernames = array(
+        $_SESSION['user_id'] => $_SESSION['username']
+    );
+
+    $result = array();
+    foreach ($dashboards as $dashboard) {
+        $duid = $dashboard['user_id'];
+        if (!isset($usernames[$duid])) {
+            $user = get_user($duid);
+            $usernames[$duid] = $user['username'];
+        }
+
+        $dashboard['username'] = $usernames[$duid];
+        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
+
+        $result[$dashboard['dashboard_id']] = $dashboard;
+    }
+
+    return $result;
 }

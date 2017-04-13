@@ -823,20 +823,30 @@ function get_astext($asn)
     }
 }
 
-# Use this function to write to the eventlog table
+/**
+ * Log events to the event table
+ *
+ * @param string $text message describing the event
+ * @param array|int $device device array or device_id
+ * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+ * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+ * @param int $reference the id of the referenced entity.  Supported types: interface
+ */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
-        'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
-        'reference' => ($reference ? $reference : "NULL"),
-        'type' => ($type ? $type : "NULL"),
+    $insert = array('host' => ($device['device_id'] ?: 0),
+        'device_id' => ($device['device_id'] ?: 0),
+        'reference' => ($reference ?: "NULL"),
+        'type' => ($type ?: "NULL"),
         'datetime' => array("NOW()"),
         'severity' => $severity,
-        'message' => $text);
+        'message' => $text,
+        'username'  => $_SESSION['username'] ?: '',
+     );
 
     dbInsert($insert, 'eventlog');
 }
@@ -1270,24 +1280,34 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    global $config;
-
-    $proxy = '';
-    if (getenv('http_proxy')) {
-        $proxy = getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        $proxy = getenv('https_proxy');
-    } elseif (isset($config['callback_proxy'])) {
-        $proxy = $config['callback_proxy'];
-    } elseif (isset($config['http_proxy'])) {
-        $proxy = $config['http_proxy'];
-    }
+    $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
     $proxy = str_replace(array("http://", "https://"), "", $tmp);
     if (!empty($proxy)) {
         curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
+}
+
+/**
+ * Return the proxy url
+ *
+ * @return array|bool|false|string
+ */
+function get_proxy()
+{
+    global $config;
+    
+    if (getenv('http_proxy')) {
+        return getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        return getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        return $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        return $config['http_proxy'];
+    }
+    return false;
 }
 
 function target_to_id($target)
@@ -2081,4 +2101,215 @@ function update_device_logo(&$device)
         dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
         echo "Changed Icon! : $icon\n";
     }
+}
+
+/**
+ * Function to generate PeeringDB Cache
+ */
+function cache_peeringdb()
+{
+    global $config;
+    if ($config['peeringdb']['enabled'] === true) {
+        $peeringdb_url = 'https://peeringdb.com/api';
+        // We cache for 71 hours
+        $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600");
+        if ($cached == 0) {
+            $rand = rand(30, 600);
+            echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
+            sleep($rand);
+            foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
+                $asn = $as['bgpLocalAs'];
+                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
+                $json_data = $get->body;
+                $data = json_decode($json_data);
+                $ixs = $data->{'data'}{0}->{'netixlan_set'};
+                foreach ($ixs as $ix) {
+                    $ixid = $ix->{'ix_id'};
+                    $tmp_ix = dbFetchRow("SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?", array($ixid, $asn));
+                    if ($tmp_ix) {
+                        $pdb_ix_id = $tmp_ix['pdb_ix_id'];
+                        $update = array('name' => $ix->{'name'}, 'timestamp' => time());
+                        dbUpdate($update, 'pdb_ix', '`ix_id` = ? AND `asn` = ?', array($ixid, $asn));
+                    } else {
+                        $insert = array(
+                            'ix_id' => $ixid,
+                            'name' => $ix->{'name'},
+                            'asn' => $asn,
+                            'timestamp' => time()
+                        );
+                        $pdb_ix_id = dbInsert($insert, 'pdb_ix');
+                    }
+                    $keep = $pdb_ix_id;
+                    $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", array(), array('proxy' => get_proxy()));
+                    $ix_json = $get_ix->body;
+                    $ix_data = json_decode($ix_json);
+                    $peers = $ix_data->{'data'};
+                    foreach ($peers as $index => $peer) {
+                        $peer_name = get_astext($peer->{'asn'});
+                        $tmp_peer = dbFetchRow("SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?", array($peer->{'id'}, $ixid));
+                        if ($tmp_peer) {
+                            $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
+                            $update = array(
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4'  => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                            );
+                            dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', array($tmp_peer['pdb_ix_peers_id']));
+                        } else {
+                            $peer_insert = array(
+                                'ix_id'          => $ixid,
+                                'peer_id'        => $peer->{'id'},
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4' => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                                'timestamp'      => time()
+                            );
+                            $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
+                        }
+                    }
+                    $pdb_ix_peers_ids = implode(',', $peer_keep);
+                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
+                }
+                $pdb_ix_ids = implode(',', $keep);
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
+            }
+        } else {
+            echo "Cached PeeringDB data found....." . PHP_EOL;
+        }
+    } else {
+        echo 'Peering DB integration disabled' . PHP_EOL;
+    }
+}
+
+/**
+ * Dump the database schema to an array.
+ * The top level will be a list of tables
+ * Each table contains the keys Columns and Indexes.
+ *
+ * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
+ * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
+ *
+ * @return array
+ */
+function dump_db_schema()
+{
+    global $config;
+
+    $output = array();
+
+    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
+        $table = $table['TABLE_NAME'];
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table' ORDER BY COLUMN_NAME") as $data) {
+            $column = $data['COLUMN_NAME'];
+            $output[$table]['Columns'][$column] = array(
+                'Field'   => $data['COLUMN_NAME'],
+                'Type'    => $data['COLUMN_TYPE'],
+                'Null'    => $data['IS_NULLABLE'] === 'YES',
+                'Default' => $data['COLUMN_DEFAULT'],
+                'Extra'   => $data['EXTRA'],
+            );
+        }
+
+        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+            $key_name = $key['Key_name'];
+            if (isset($output[$table]['Indexes'][$key_name])) {
+                $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
+            } else {
+                $output[$table]['Indexes'][$key_name] = array(
+                    'Name'    => $key['Key_name'],
+                    'Columns' => array($key['Column_name']),
+                    'Unique'  => !$key['Non_unique'],
+                    'Type'    => $key['Index_type'],
+                );
+            }
+        }
+    }
+    return $output;
+}
+
+/**
+ * Generate an SQL segment to create the column based on data from dump_db_schema()
+ *
+ * @param array $column_data The array of data for the column
+ * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
+ */
+function column_schema_to_sql($column_data)
+{
+    $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+    $default = $column_data['Default'] == '' ? '' : "DEFAULT '{$column_data['Default']}'";
+    if (str_contains($default, 'CURRENT_TIMESTAMP')) {
+        $default = str_replace("'", "", $default);
+    }
+    return trim("`{$column_data['Field']}` {$column_data['Type']} $null $default {$column_data['Extra']}");
+}
+
+/**
+ * Generate an SQL segment to create the index based on data from dump_db_schema()
+ *
+ * @param array $index_data The array of data for the index
+ * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
+ */
+function index_schema_to_sql($index_data)
+{
+    if ($index_data['Name'] == 'PRIMARY') {
+        $index = 'PRIMARY KEY (%s)';
+    } elseif ($index_data['Unique']) {
+        $index = "UNIQUE `{$index_data['Name']}` (%s)";
+    } else {
+        $index = "INDEX `{$index_data['Name']}` (%s)";
+    }
+
+    $columns = implode(',', array_map(function ($col) {
+        return "`$col`";
+    }, $index_data['Columns']));
+
+    return sprintf($index, $columns);
+}
+
+/**
+ * Get an array of the schema files.
+ * schema_version => full_file_name
+ *
+ * @return mixed
+ */
+function get_schema_list()
+{
+    global $config;
+
+    // glob returns an array sorted by filename
+    $files = glob($config['install_dir'].'/sql-schema/*.sql');
+
+    // set the keys to the db schema version
+    return array_reduce($files, function ($array, $file) {
+        $array[basename($file, '.sql')] = $file;
+        return $array;
+    }, array());
+}
+
+/**
+ * Get the current database schema, will return 0 if there is no schema.
+ *
+ * @return int
+ */
+function get_db_schema()
+{
+    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+}
+
+/**
+ * Check if the database schema is up to date.
+ *
+ * @return bool
+ */
+function db_schema_is_current()
+{
+    $current = get_db_schema();
+
+    $schemas = get_schema_list();
+    end($schemas);
+    $latest = key($schemas);
+
+    return $current >= $latest;
 }

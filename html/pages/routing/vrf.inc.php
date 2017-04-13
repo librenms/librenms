@@ -150,6 +150,7 @@ if ($_SESSION['userlevel'] >= '5') {
                 unset($seperator);
 
                 foreach ($ports[$device['vrf_id']][$device['device_id']] as $port) {
+                    $port = cleanPort($port);
                     $port = array_merge($device, $port);
 
                     switch ($_GET['optc']) {
@@ -167,7 +168,7 @@ if ($_SESSION['userlevel'] >= '5') {
                             text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
                             print_port_thumbnail($port);
-                            echo "<div style='font-size: 9px;'>".substr(short_port_descr(display($port['ifAlias'])), 0, 22).'</div>
+                            echo "<div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 22).'</div>
                                 </div>';
                             break;
 

@@ -7,6 +7,8 @@ $name = 'ntp-server';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.116.112.45.115.101.114.118.101.114';
 $ntpserver_data = snmp_get($device, $oid, '-Oqv');
+$ntpserver_data = str_replace('"', '', $ntpserver_data);
+update_application($app, $ntpserver_data);
 list ($stratum, $offset, $frequency, $jitter, $noise, $stability, $uptime, $buffer_recv, $buffer_free, $buffer_used, $packets_drop, $packets_ignore, $packets_recv, $packets_sent) = explode("\n", $ntpserver_data);
 
 echo ' '.$name;

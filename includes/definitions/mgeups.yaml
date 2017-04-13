@@ -1,8 +1,8 @@
 os: mgeups
-text: 'MGE UPS'
+text: 'APC UPS'
 group: ups
 type: power
-icon: mge
+icon: apc
 mib_dir:
     - mge
 over:

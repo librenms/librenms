@@ -9,15 +9,13 @@ source: Installation/Installation-CentOS-7-Nginx.md
 ```bash
 yum install mariadb-server mariadb
 systemctl restart mariadb
-mysql -uroot -p
+mysql -uroot
 ```
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-GRANT ALL PRIVILEGES ON librenms.*
-  TO 'librenms'@'localhost'
-  IDENTIFIED BY '<password>'
-;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
 exit
 ```
@@ -74,6 +72,7 @@ systemctl restart php-fpm
 ```bash
 useradd librenms -d /opt/librenms -M -r
 usermod -a -G librenms nginx
+usermod -a -G librenms apache
 ```
 
 #### Clone repo

@@ -107,7 +107,7 @@ if ($_SESSION['userlevel'] < '5') {
     echo ' | Prefixes: Unicast (';
     if ($vars['graph'] == 'prefixes_ipv4unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
     }
 
     echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast'));
@@ -119,7 +119,7 @@ if ($_SESSION['userlevel'] < '5') {
 
     if ($vars['graph'] == 'prefixes_ipv6unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
     }
 
     echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast'));
@@ -190,7 +190,7 @@ if ($_SESSION['userlevel'] < '5') {
 
     print_optionbar_end();
 
-    echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>";
+    echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
     echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {

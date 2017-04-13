@@ -7,6 +7,8 @@ $name = 'ntp-client';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.116.112.45.99.108.105.101.110.116';
 $ntpclient = snmp_get($device, $oid, '-Oqv');
+$ntpclient = str_replace('"', '', $ntpclient);
+update_application($app, $ntpclient);
 
 echo ' '.$name;
 
