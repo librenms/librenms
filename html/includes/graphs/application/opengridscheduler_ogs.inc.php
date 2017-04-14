@@ -1,39 +1,35 @@
 <?php
-
-use LibreNMS\RRD\RrdDefinition;
-
-$name = 'ogs';
-$app_id = $app['app_id'];
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.3.111.103.115';
-
-echo ' ' . $name;
-
-// get data through snmp
-$ogs_data = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
-
-// let librenms know that we got good data
-update_application($app, $ogs_data);
-
-// define the rrd
-$rrd_name = array('app', $name, $app_id);
-$rrd_def = RrdDefinition::make()
-    ->addDataset('running_jobs', 'GAUGE', 0)
-    ->addDataset('pending_jobs', 'GAUGE', 0)
-    ->addDataset('suspend_jobs', 'GAUGE', 0)
-    ->addDataset('zombie_jobs', 'GAUGE', 0);
-
-// parse the data from the script
-$data = explode("\n", $ogs_data);
-$fields = array(
-    'running_jobs' => $data[0],
-    'pending_jobs' => $data[1],
-    'suspend_jobs' => $data[2],
-    'zombie_jobs' => $data[3],
+require 'includes/graphs/common.inc.php';
+$scale_min     = 0;
+$colours       = 'mixed';
+$unit_text     = 'Jobs';
+$unitlen       = 15;
+$bigdescrlen   = 15;
+$smalldescrlen = 15;
+$dostack       = 0;
+$printtotal    = 0;
+$addarea       = 1;
+$transparency  = 33;
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-ogs-'.$app['app_id'].'.rrd';
+$array = array(
+    'running_jobs' => array('descr' => 'running'),
+    'pending_jobs' => array('descr' => 'pending'),
+    'suspend_jobs' => array('descr' => 'suspend'),
+    'zombie_jobs' => array('descr' => 'zombie')
 );
 
-// push the data in an array and into the rrd
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+$i = 0;
 
-// cleanup
-unset($ogs_data, $rrd_name, $rrd_def, $data, $fields, $tags);
+if (is_file($rrd_filename)) {
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr']    = $var['descr'];
+        $rrd_list[$i]['ds']       = $ds;
+        $rrd_list[$i]['colour']   = $config['graph_colours'][$colours][$i];
+        $i++;
+    }
+} else {
+    echo "file missing: $rrd_filename";
+}
+
+require 'includes/graphs/generic_v3_multiline.inc.php';
