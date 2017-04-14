@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-'.$app['app_id'].'.rrd';
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-default-'.$app['app_id'].'.rrd';
 $array = array(
    // 'net_all' => array('descr' => 'total','colour' => '000000',), this is udp+tcp
     'net_udp' => array('descr' => 'udp','colour' => 'AA3F39',),

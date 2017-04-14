@@ -13,14 +13,17 @@ update_application($app, $nfsstats);
 
 $app_id = $app['app_id'];
 
-// nfs description
-$rrd_name['default'] = array('app', 'nfs-default', $app_id);
-$rrd_name['proc2'] = array('app', 'nfs-proc2', $app_id);
-$rrd_name['proc3'] = array('app', 'nfs-proc3', $app_id);
-$rrd_name['proc4'] = array('app', 'nfs-proc4', $app_id);
-$rrd_name['proc4ops'] = array('app', 'nfs-proc4ops', $app_id);
+// rrd names
+$rrd_name = array();
+$rrd_name['default'] = array('app', 'nfs-server-default', $app_id);
+$rrd_name['proc2'] = array('app', 'nfs-server-proc2', $app_id);
+$rrd_name['proc3'] = array('app', 'nfs-server-proc3', $app_id);
+$rrd_name['proc4'] = array('app', 'nfs-server-proc4', $app_id);
+$rrd_name['proc4ops'] = array('app', 'nfs-server-proc4ops', $app_id);
 
-$rrd_def['default'] = RrdDefinition::make()
+
+// rrd definitions
+$rrd_def_array['default'] = RrdDefinition::make()
         ->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
         ->addDataset('rc_misses', 'COUNTER', 0, 125000000000)
         ->addDataset('rc_nocache', 'COUNTER', 0, 125000000000)
@@ -65,8 +68,8 @@ $rrd_def['default'] = RrdDefinition::make()
         ->addDataset('rpc_badauth', 'COUNTER', 0, 125000000000)
         ->addDataset('rpc_badclnt', 'COUNTER', 0, 125000000000);
 
-$rrd_def['proc2'] = RrdDefinition::make()        
-        ->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
+$rrd_def_array['proc2'] = RrdDefinition::make()        
+		->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_getattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_setattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_root', 'COUNTER', 0, 125000000000)
@@ -85,7 +88,7 @@ $rrd_def['proc2'] = RrdDefinition::make()
         ->addDataset('proc2_readdir', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_fsstat', 'COUNTER', 0, 125000000000);
 
-$rrd_def['proc3'] = RrdDefinition::make()    
+$rrd_def_array['proc3'] = RrdDefinition::make()    
         ->addDataset('proc3_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_getattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_setattr', 'COUNTER', 0, 125000000000)
@@ -109,12 +112,12 @@ $rrd_def['proc3'] = RrdDefinition::make()
         ->addDataset('proc3_pathconf', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_commit', 'COUNTER', 0, 125000000000);
 
-$rrd_def['proc4'] = RrdDefinition::make()            
+$rrd_def_array['proc4'] = RrdDefinition::make()            
         ->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc4_compound', 'COUNTER', 0, 125000000000)
 ;
 
-$rrd_def['proc4ops'] = RrdDefinition::make()        
+$rrd_def_array['proc4ops'] = RrdDefinition::make()        
         ->addDataset('v4_op0-unused', 'COUNTER', 0, 125000000000)
         ->addDataset('v4_op1-unused', 'COUNTER', 0, 125000000000)
         ->addDataset('v4_op2-future', 'COUNTER', 0, 125000000000)
@@ -218,7 +221,7 @@ $keys_nfs_server = array(
 // then 'map' the values to the arrays from $keys_nfs_server
 $lines     = explode("\n", $nfsstats);
 $default_fields = array();
-$fields = array();
+
 foreach ($lines as $line)
 {
     $line_values     = explode(" ", $line);
@@ -253,18 +256,18 @@ foreach ($lines as $line)
             $fields = array_combine($keys_nfs_server[$line_id], $line_values);
             
             // create or push data to rrd
-            $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def[$line_id]);
-            data_update($device, 'app', $tags, $fields);
+            $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]);
+            
+			data_update($device, 'app', $tags, $fields);
 
         }
         break;
     }
 }
 
-// push the default data to rrd
-$tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def['default']);
-
+// push the default nfs server data to rrd
+$tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def_array['default']);
 data_update($device, 'app', $tags, $default_fields);
 
-unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
-
+// clean up scope
+unset($nfsstats, $rrd_name, $rrd_def_array, $default_fields, $fields, $tags);

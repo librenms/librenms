@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-'.$app['app_id'].'.rrd';
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-proc3-'.$app['app_id'].'.rrd';
 $array         = array(
                  'proc3_null' => array('descr' => 'Null'),
                  'proc3_getattr' => array('descr' => 'Get attributes'),

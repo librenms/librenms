@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-'.$app['app_id'].'.rrd';
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-proc4ops-'.$app['app_id'].'.rrd';
 $array         = array(
 						// 'v4_op0-unused' => array('descr' => 'v4_op0-unused'),
 						// 'v4_op1-unused' => array('descr' => 'v4_op1-unused'),

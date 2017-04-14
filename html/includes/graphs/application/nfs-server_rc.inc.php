@@ -9,7 +9,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-'.$app['app_id'].'.rrd';
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-default-'.$app['app_id'].'.rrd';
 $array = array(
     'rc_hits' => array('descr' => 'hits','colour' => 'B0262D'), // this is bad : retransmitting (red)
     'rc_misses' => array('descr' => 'misses','colour' => 'B36326'), // requires caching

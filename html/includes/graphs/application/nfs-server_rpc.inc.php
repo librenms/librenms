@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-'.$app['app_id'].'.rrd';
+$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-default-'.$app['app_id'].'.rrd';
 $array = array(
     'rpc_calls' => array('descr' => 'calls','colour' => '2C8437',), // green : good
     //'rpc_badcalls' => array('descr' => 'bad calls','colour' => '600604',), # this is a sum of nbadfmt, badauth and badclnt
