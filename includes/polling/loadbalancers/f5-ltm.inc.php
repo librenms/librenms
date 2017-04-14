@@ -46,30 +46,30 @@ $components = $keep;
 // Only collect SNMP data if we have enabled components
 if (count($components > 0)) {
     // Let's gather the stats..
-    $ltmVirtualServStatEntryPktsin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
-    $ltmVirtualServStatEntryPktsout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);
-    $ltmVirtualServStatEntryBytesin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
-    $ltmVirtualServStatEntryBytesout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
-    $ltmVirtualServStatEntryTotconns = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
+    $f5_stats['ltmVirtualServStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
+    $f5_stats['ltmVirtualServStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);
+    $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
+    $f5_stats['ltmVirtualServStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
+    $f5_stats['ltmVirtualServStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
 
-    $ltmPoolMemberStatEntryPktsin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
-    $ltmPoolMemberStatEntryPktsout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
-    $ltmPoolMemberStatEntryBytesin = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
-    $ltmPoolMemberStatEntryBytesout = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
-    $ltmPoolMemberStatEntryTotconns = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
+    $f5_stats['ltmPoolMemberStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
+    $f5_stats['ltmPoolMemberStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
+    $f5_stats['ltmPoolMemberStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
+    $f5_stats['ltmPoolMemberStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
+    $f5_stats['ltmPoolMemberStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
 
     // and check the status
-    $ltmVsStatusEntryState = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
-    $ltmVsStatusEntryMsg = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.5', 0);
+    $f5_stats['ltmVsStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
+    $f5_stats['ltmVsStatusEntryMsg'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.5', 0);
 
-    $ltmPoolMbrStatusEntryState = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
-    $ltmPoolMbrStatusEntryAvail = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
-    $ltmPoolMbrStatusEntryMsg = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
+    $f5_stats['ltmPoolMbrStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
+    $f5_stats['ltmPoolMbrStatusEntryAvail'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
+    $f5_stats['ltmPoolMbrStatusEntryMsg'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
 
-    $ltmPoolEntryMinup = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
-    $ltmPoolEntryMinupstatus = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
-    $ltmPoolEntryMinupaction = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
-    $ltmPoolEntryCurrentup = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
+    $f5_stats['ltmPoolEntryMinup'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
+    $f5_stats['ltmPoolEntryMinupstatus'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
+    $f5_stats['ltmPoolEntryMinupaction'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
+    $f5_stats['ltmPoolEntryCurrentup'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
@@ -88,11 +88,11 @@ if (count($components > 0)) {
                 ->addDataset('totconns', 'COUNTER', 0);
 
             $fields = array(
-                'pktsin' => $ltmVirtualServStatEntryPktsin['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.'.$UID],
-                'pktsout' => $ltmVirtualServStatEntryPktsout['1.3.6.1.4.1.3375.2.2.10.2.3.1.8.'.$UID],
-                'bytesin' => $ltmVirtualServStatEntryBytesin['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.'.$UID],
-                'bytesout' => $ltmVirtualServStatEntryBytesout['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.'.$UID],
-                'totconns' => $ltmVirtualServStatEntryTotconns['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.'.$UID],
+                'pktsin' => $f5_stats['ltmVirtualServStatEntryPktsin']['1.3.6.1.4.1.3375.2.2.10.2.3.1.6.'.$UID],
+                'pktsout' => $f5_stats['ltmVirtualServStatEntryPktsout']['1.3.6.1.4.1.3375.2.2.10.2.3.1.8.'.$UID],
+                'bytesin' => $f5_stats['ltmVirtualServStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.'.$UID],
+                'bytesout' => $f5_stats['ltmVirtualServStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.'.$UID],
+                'totconns' => $f5_stats['ltmVirtualServStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.'.$UID],
             );
 
             // Let's print some debugging info.
@@ -101,11 +101,11 @@ if (count($components > 0)) {
             d_echo("    Label: ".$label."\n");
 
             // Let's check the status.
-            $array['state'] = $ltmVsStatusEntryState['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$UID];
+            $array['state'] = $f5_stats['ltmVsStatusEntryState']['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$UID];
             if (($array['state'] == 2) || ($array['state'] == 3)) {
                 // The Virtual Server is unavailable.
                 $array['status'] = 2;
-                $array['error'] = $ltmVsStatusEntryMsg['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$UID];
+                $array['error'] = $f5_stats['ltmVsStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$UID];
             } else {
                 // All is good.
                 $array['status'] = 0;
@@ -116,10 +116,10 @@ if (count($components > 0)) {
                 ->addDataset('minup', 'GAUGE', 0)
                 ->addDataset('currup', 'GAUGE', 0);
 
-            $array['minup'] = $ltmPoolEntryMinup['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
-            $array['minupstatus'] = $ltmPoolEntryMinupstatus['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$UID];
-            $array['currentup'] = $ltmPoolEntryCurrentup['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
-            $array['minupaction'] = $ltmPoolEntryMinupaction['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
+            $array['minup'] = $f5_stats['ltmPoolEntryMinup']['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$UID];
+            $array['minupstatus'] = $f5_stats['ltmPoolEntryMinupstatus']['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$UID];
+            $array['currentup'] = $f5_stats['ltmPoolEntryCurrentup']['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
+            $array['minupaction'] = $f5_stats['ltmPoolEntryMinupaction']['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
 
             $fields = array(
                 'minup' => $array['minup'],
@@ -149,15 +149,15 @@ if (count($components > 0)) {
                 ->addDataset('bytesout', 'COUNTER', 0)
                 ->addDataset('totconns', 'COUNTER', 0);
 
-            $array['state'] = $ltmPoolMbrStatusEntryState['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];
-            $array['available'] = $ltmPoolMbrStatusEntryAvail['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$UID];
+            $array['state'] = $f5_stats['ltmPoolMbrStatusEntryState']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$UID];
+            $array['available'] = $f5_stats['ltmPoolMbrStatusEntryAvail']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$UID];
 
             $fields = array(
-                'pktsin' => $ltmPoolMemberStatEntryPktsin['1.3.6.1.4.1.3375.2.2.5.4.3.1.5.'.$UID],
-                'pktsout' => $ltmPoolMemberStatEntryPktsout['1.3.6.1.4.1.3375.2.2.5.4.3.1.7.'.$UID],
-                'bytesin' => $ltmPoolMemberStatEntryBytesin['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
-                'bytesout' => $ltmPoolMemberStatEntryBytesout['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
-                'totalconns' => $ltmPoolMemberStatEntryTotconns['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
+                'pktsin' => $f5_stats['ltmPoolMemberStatEntryPktsin']['1.3.6.1.4.1.3375.2.2.5.4.3.1.5.'.$UID],
+                'pktsout' => $f5_stats['ltmPoolMemberStatEntryPktsout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.7.'.$UID],
+                'bytesin' => $f5_stats['ltmPoolMemberStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
+                'bytesout' => $f5_stats['ltmPoolMemberStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
+                'totalconns' => $f5_stats['ltmPoolMemberStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
             );
 
             // Let's print some debugging info.
@@ -170,7 +170,7 @@ if (count($components > 0)) {
             if (($array['available'] == 1) && ($array['state'] == 3)) {
                 // Warning Alarm, the pool member is down.
                 $array['status'] = 1;
-                $array['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntryMsg['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$UID];
+                $array['error'] = "Pool Member is Down: ".$f5_stats['ltmPoolMbrStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$UID];
             } else {
                 // All is good.
                 $array['status'] = 0;
@@ -185,9 +185,18 @@ if (count($components > 0)) {
         data_update($device, $type, $tags, $fields);
     } // End foreach components
 
+    unset($f5_stats);
+
     // Write the Components back to the DB.
     $component->setComponentPrefs($device['device_id'], $components);
 } // end if count components
 
 // Clean-up after yourself!
-unset($type, $components, $component, $options);
+unset(
+    $type,
+    $components,
+    $component,
+    $options,
+    $error_poolaction,
+    $keep
+);

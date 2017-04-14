@@ -167,6 +167,16 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </li>';
         }
 
+        if ($device['os'] == 'coriant') {
+            if (@dbFetchCell("SELECT COUNT(id) FROM tnmsneinfo WHERE device_id = '".$device['device_id']."'") > '0') {
+                echo '<li class="'.$select['tnmsne'].'">
+                    <a href="'.generate_device_url($device, array('tab' => 'tnmsne')).'">
+                    <i class="fa fa-link fa-lg icon-theme"  aria-hidden="true"></i> Hardware
+                    </a>
+                    </li>';
+            }
+        }
+
         // $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
         if ($device['os'] == 'netscaler') {
             // Netscaler

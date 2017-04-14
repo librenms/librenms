@@ -206,7 +206,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('apic');
     }
-    
+
+    public function testApplicationsWare()
+    {
+        $this->checkOS('applicationsware');
+    }
+
     public function testArdmoreencoder()
     {
         $this->checkOS('ardmore-encoder');
@@ -462,7 +467,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('comware');
         $this->checkOS('comware', 'comware1');
-        $this->checkOS('comware', 'comware-hp-c1234');
+        $this->checkOS('comware', 'comware-h3c');
     }
 
     public function testCoriant()
@@ -486,6 +491,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCumulus()
     {
         $this->checkOS('cumulus');
+    }
+
+    public function testCyan()
+    {
+        $this->checkOS('cyan', 'cyan-z33');
     }
 
     public function testCyberoamUtm()
@@ -821,6 +831,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('hpe-ilo');
     }
 
+    public function testHpeIpdu()
+    {
+        $this->checkOS('hpe-ipdu');
+    }
+
     public function testHpeMsl()
     {
         $this->checkOS('hpe-msl');
@@ -887,6 +902,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIbmtl()
     {
         $this->checkOS('ibmtl');
+    }
+
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
+    }
+
+    public function testIctpsu()
+    {
+        $this->checkOS('ict-psu');
     }
 
     public function testIes()
@@ -956,6 +981,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testJuniperex2500os()
     {
         $this->checkOS('juniperex2500os');
+    }
+
+    public function testJuniperMss()
+    {
+        $this->checkOS('juniper-mss');
     }
 
     public function testJunose()
@@ -1245,6 +1275,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('okilan');
     }
 
+    public function testOmnitronIConverter()
+    {
+        $this->checkOS('omnitron-iconverter');
+    }
+
     public function testOnefs()
     {
         $this->checkOS('onefs');
@@ -1264,6 +1299,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testOpengear()
     {
         $this->checkOS('opengear');
+        $this->checkOS('opengear', 'opengear1');
     }
 
     public function testOpenindiana()
@@ -1631,6 +1667,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('symbol');
     }
 
+    public function testTeradicipcoip()
+    {
+        $this->checkOS('teradici-pcoip');
+    }
+
     public function testTimos()
     {
         $this->checkOS('timos');
@@ -1643,6 +1684,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('timos', 'timos7');
         $this->checkOS('timos', 'timos8');
         $this->checkOS('timos', 'timos9');
+        $this->checkOS('timos', 'timos10');
     }
 
     public function testTomato()

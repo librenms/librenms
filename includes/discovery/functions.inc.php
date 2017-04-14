@@ -65,7 +65,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
             device_by_id_cache($remote_device_id, 1);
             if ($remote_device_id && is_array($device) && !empty($method)) {
                 $extra_log = '';
-                $int = ifNameDescr($interface);
+                $int = cleanPort($interface);
                 if (is_array($int)) {
                     $extra_log = ' (port ' . $int['label'] . ') ';
                 }
@@ -319,7 +319,13 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             log_event('Sensor Warn Low Limit Updated: ' . mres($class) . ' ' . mres($type) . ' ' . mres($index) . ' ' . mres($descr) . ' (' . $low_warn_limit . ')', $device, 'sensor', 3, $sensor_id);
         }
 
-        if ($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'] && $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] && $entPhysicalIndex == $sensor_entry['entPhysicalIndex']) {
+        if ($oid == $sensor_entry['sensor_oid'] &&
+            $descr == $sensor_entry['sensor_descr'] &&
+            $multiplier == $sensor_entry['sensor_multiplier'] &&
+            $divisor == $sensor_entry['sensor_divisor'] &&
+            $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] &&
+            $entPhysicalIndex == $sensor_entry['entPhysicalIndex']
+        ) {
             echo '.';
         } else {
             $update = array(

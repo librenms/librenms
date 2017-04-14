@@ -50,12 +50,12 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '', $twofactor = 0)
+function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
 {
     if (!user_exists($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
-        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description, 'twofactor' => $twofactor), 'users');
+        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
         if ($userid == false) {
             return false;
         } else {

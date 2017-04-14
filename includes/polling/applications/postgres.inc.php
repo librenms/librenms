@@ -4,6 +4,8 @@ $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
+echo "postgres";
+
 $options      = '-O qv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
@@ -55,3 +57,77 @@ $fields = array(
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
+
+//process each database
+$db_lines=explode("\n", $postgres);
+$db_lines_int=17;
+$found_dbs=array();
+
+while (isset($db_lines[$db_lines_int])) {
+    list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
+        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname) = explode(" ", $db_lines[$db_lines_int]);
+
+    $rrd_name = array('app', $name, $app_id, $dbname);
+
+    $found_dbs[]=$dbname;
+
+    $fields = array(
+        'backends' => $backends,
+        'commits' => $commits,
+        'rollbacks' => $rollbacks,
+        'read' => $read,
+        'hit' => $hit,
+        'idxscan' => $idxscan,
+        'idxtupread' => $idxtupread,
+        'idxtupfetch' => $idxtupfetch,
+        'idxblksread' => $idxblksread,
+        'idxblkshit' => $idxblkshit,
+        'seqscan' => $seqscan,
+        'seqtupread' => $seqtupread,
+        'ret' => $ret,
+        'fetch' => $fetch,
+        'ins' => $ins,
+        'upd' => $upd,
+        'del' => $del
+    );
+
+    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    data_update($device, 'app', $tags, $fields);
+
+    $db_lines_int++;
+}
+
+//
+// component processing for postgres
+//
+$device_id=$device['device_id'];
+
+$options=array(
+    'filter' => array(
+        'device_id' => array('=', $device_id),
+        'type' => array('=', 'postgres'),
+    ),
+);
+
+$component=new LibreNMS\Component();
+$pg_components=$component->getComponents($device_id, $options);
+
+if (empty($found_dbs)) {
+    if (isset($pg_components[$device_id])) {
+        foreach ($pg_components[$device_id] as $component_id => $_unused) {
+                 $component->deleteComponent($component_id);
+        }
+    }
+} else {
+    if (isset($pg_components[$device_id])) {
+        $pgc = $pg_components[$device_id];
+    } else {
+        $pgc = $component->createComponent($device_id, 'postgres');
+    }
+
+    $id = $component->getFirstComponentID($pgc);
+    $pgc[$id]['label'] = 'Postgres';
+    $pgc[$id]['databases'] = json_encode($found_dbs);
+
+    $component->setComponentPrefs($device_id, $pgc);
+}
