@@ -12,8 +12,8 @@ $addarea       = 1;
 $transparency  = 33;
 $rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-server-proc4-'.$app['app_id'].'.rrd';
 $array         = array(
-					 'proc4_null' => array('descr' => 'Null','colour' => '630606'), // these should be very low 
-					 'proc4_compound' => array('descr' => 'Compound','colour' => '50C150') // basically this are 1 or more ops
+                     'proc4_null' => array('descr' => 'Null','colour' => '630606'), // these should be very low 
+                     'proc4_compound' => array('descr' => 'Compound','colour' => '50C150') // basically this are 1 or more ops
                 );
 
 $i = 0;

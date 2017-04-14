@@ -69,7 +69,7 @@ $rrd_def_array['default'] = RrdDefinition::make()
         ->addDataset('rpc_badclnt', 'COUNTER', 0, 125000000000);
 
 $rrd_def_array['proc2'] = RrdDefinition::make()        
-		->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
+        ->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_getattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_setattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_root', 'COUNTER', 0, 125000000000)
@@ -114,8 +114,7 @@ $rrd_def_array['proc3'] = RrdDefinition::make()
 
 $rrd_def_array['proc4'] = RrdDefinition::make()            
         ->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
-        ->addDataset('proc4_compound', 'COUNTER', 0, 125000000000)
-;
+        ->addDataset('proc4_compound', 'COUNTER', 0, 125000000000);
 
 $rrd_def_array['proc4ops'] = RrdDefinition::make()        
         ->addDataset('v4_op0-unused', 'COUNTER', 0, 125000000000)
@@ -258,7 +257,7 @@ foreach ($lines as $line)
             // create or push data to rrd
             $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]);
             
-			data_update($device, 'app', $tags, $fields);
+            data_update($device, 'app', $tags, $fields);
 
         }
         break;
