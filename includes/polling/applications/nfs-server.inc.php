@@ -1,4 +1,5 @@
 <?php
+// nfs server stats processor 
 
 use LibreNMS\RRD\RrdDefinition;
 
@@ -24,7 +25,7 @@ $rrd_name['proc4ops'] = array('app', 'nfs-server-proc4ops', $app_id);
 
 // rrd definitions
 $rrd_def_array['default'] = RrdDefinition::make()
-        ->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
+    ->addDataset('rc_hits', 'COUNTER', 0, 125000000000)
         ->addDataset('rc_misses', 'COUNTER', 0, 125000000000)
         ->addDataset('rc_nocache', 'COUNTER', 0, 125000000000)
         ->addDataset('fh_lookup', 'COUNTER', 0, 125000000000)
@@ -68,7 +69,7 @@ $rrd_def_array['default'] = RrdDefinition::make()
         ->addDataset('rpc_badauth', 'COUNTER', 0, 125000000000)
         ->addDataset('rpc_badclnt', 'COUNTER', 0, 125000000000);
 
-$rrd_def_array['proc2'] = RrdDefinition::make()        
+$rrd_def_array['proc2'] = RrdDefinition::make()
         ->addDataset('proc2_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_getattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_setattr', 'COUNTER', 0, 125000000000)
@@ -88,7 +89,7 @@ $rrd_def_array['proc2'] = RrdDefinition::make()
         ->addDataset('proc2_readdir', 'COUNTER', 0, 125000000000)
         ->addDataset('proc2_fsstat', 'COUNTER', 0, 125000000000);
 
-$rrd_def_array['proc3'] = RrdDefinition::make()    
+$rrd_def_array['proc3'] = RrdDefinition::make()
         ->addDataset('proc3_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_getattr', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_setattr', 'COUNTER', 0, 125000000000)
@@ -112,11 +113,11 @@ $rrd_def_array['proc3'] = RrdDefinition::make()
         ->addDataset('proc3_pathconf', 'COUNTER', 0, 125000000000)
         ->addDataset('proc3_commit', 'COUNTER', 0, 125000000000);
 
-$rrd_def_array['proc4'] = RrdDefinition::make()            
+$rrd_def_array['proc4'] = RrdDefinition::make()
         ->addDataset('proc4_null', 'COUNTER', 0, 125000000000)
         ->addDataset('proc4_compound', 'COUNTER', 0, 125000000000);
 
-$rrd_def_array['proc4ops'] = RrdDefinition::make()        
+$rrd_def_array['proc4ops'] = RrdDefinition::make()
         ->addDataset('v4_op0-unused', 'COUNTER', 0, 125000000000)
         ->addDataset('v4_op1-unused', 'COUNTER', 0, 125000000000)
         ->addDataset('v4_op2-future', 'COUNTER', 0, 125000000000)
@@ -221,46 +222,42 @@ $keys_nfs_server = array(
 $lines     = explode("\n", $nfsstats);
 $default_fields = array();
 
-foreach ($lines as $line)
-{
+foreach ($lines as $line) {
     $line_values     = explode(" ", $line);
     $line_id         = array_shift($line_values);
         
-    switch ($line_id)
-    {
-    case 'rc':
-    case 'fh':
-    case 'io':
-    case 'th':
-    case 'ra':
-    case 'net': 
-    case 'rpc': 
-        // combine keys + values, and then merge it in $fields array
-        $default_fields = array_merge($default_fields, array_combine($keys_nfs_server[$line_id], $line_values));
-        break;
-    case 'proc2': 
-    case 'proc3': 
-    case 'proc4':
-    case 'proc4ops': 
-        // note : proc2 is dropped for kernels 3.10.0+ (centos 7+)
-        // note : proc4ops has changed a few times, and getting the keys is difficult
-        // 		 I only use the version which reports 59 value's (centos 6)
+    switch ($line_id) {
+        case 'rc':
+        case 'fh':
+        case 'io':
+        case 'th':
+        case 'ra':
+        case 'net':
+        case 'rpc':
+            // combine keys + values, and then merge it in $fields array
+            $default_fields = array_merge($default_fields, array_combine($keys_nfs_server[$line_id], $line_values));
+            break;
+        case 'proc2':
+        case 'proc3':
+        case 'proc4':
+        case 'proc4ops':
+            // note : proc2 is dropped for kernels 3.10.0+ (centos 7+)
+            // note : proc4ops has changed a few times, and getting the keys is difficult
+            // 		 I only use the version which reports 59 value's (centos 6)
             
-        // the first value of the proc* is the amount of fields that will follow;
-        // we check this, and if its incorrect, do not polute the chart with wrong values
-        $value_count = array_shift($line_values);
+            // the first value of the proc* is the amount of fields that will follow;
+            // we check this, and if its incorrect, do not polute the chart with wrong values
+            $value_count = array_shift($line_values);
 
-        if ($value_count == count($keys_nfs_server[$line_id])) {
-                
-            $fields = array_combine($keys_nfs_server[$line_id], $line_values);
+            if ($value_count == count($keys_nfs_server[$line_id])) {
+                $fields = array_combine($keys_nfs_server[$line_id], $line_values);
             
-            // create or push data to rrd
-            $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]);
+                // create or push data to rrd
+                $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]);
             
-            data_update($device, 'app', $tags, $fields);
-
-        }
-        break;
+                data_update($device, 'app', $tags, $fields);
+            }
+            break;
     }
 }
 

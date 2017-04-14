@@ -72,7 +72,7 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
-			
+            
         case 'nfs-server':
             return 'NFS Server';
 

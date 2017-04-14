@@ -15,7 +15,7 @@ $array = array(
    // 'net_all' => array('descr' => 'total','colour' => '000000',), this is udp+tcp
     'net_udp' => array('descr' => 'udp','colour' => 'AA3F39',),
     'net_tcp' => array('descr' => 'tcp','colour' => '2C8437',),
-    // 'net_tcpconn' => array('descr' => 'tcp conn','colour' => '576996',), this is tcp connections 
+    // 'net_tcpconn' => array('descr' => 'tcp conn','colour' => '576996',), this is tcp connections
 );
 
 $i = 0;
