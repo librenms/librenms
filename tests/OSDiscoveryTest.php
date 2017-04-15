@@ -181,6 +181,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('aos');
         $this->checkOS('aos', 'aos1');
+        $this->checkOS('aos', 'aos-omnistack');
     }
 
     public function testAosEmu2()
@@ -236,6 +237,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testArubaos()
     {
         $this->checkOS('arubaos');
+        $this->checkOS('arubaos', 'arubaos-aosw');
     }
 
     public function testAsa()

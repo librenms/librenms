@@ -8,9 +8,6 @@ over:
 poller_modules:
     aruba-controller: 1
 discovery:
-    - sysDescr:
-        - 'ArubaOS'
-    - 
-      sysDescr: 'AOS-W'
-      sysObjectId: '.1.3.6.1.4.1.6486.800'
-
+    - sysObjectId:
+        - .1.3.6.1.4.1.14823. #ArubaOS
+        - .1.3.6.1.4.1.6486.800.1.1.2.2.2. #AOS-W
