@@ -1087,6 +1087,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('macosx', 'macosx-sierra');
     }
 
+    public function testMagnum()
+    {
+        $this->checkOS('magnum');
+    }
+
     public function testMaipu()
     {
         $this->checkOS('mypoweros');
