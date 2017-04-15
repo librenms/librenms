@@ -78,7 +78,13 @@ if ($enabled == 1) {
         WHERE `sysDescr` IS NOT NULL AND `sysObjectID` IS NOT NULL GROUP BY `os`, `sysDescr`, `sysObjectID`');
 
     // sanitize sysDescr
-    $device_info = array_map(function ($entry) {
+    $skip_os = array('qnap');
+    $device_info = array_map(function ($entry) use ($skip_os) {
+        // skip some os
+        if (in_array($entry['os'], $skip_os)) {
+            return $entry;
+        }
+
         // remove hostnames from linux and macosx
         $entry['sysDescr'] = preg_replace_callback('/^(Linux |Darwin |FreeBSD )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
             return $matches[1] . 'hostname ' .$matches[2];
