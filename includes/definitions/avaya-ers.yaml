@@ -6,3 +6,9 @@ mib_dir:
     - nortel
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+      sysObjectId: .1.3.6.1.4.1.45.
+      sysDescr:
+          - 'Ethernet Routing Switch'
+          - 'ERS'
