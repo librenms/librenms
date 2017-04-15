@@ -1283,6 +1283,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testOnefs()
     {
         $this->checkOS('onefs');
+        $this->checkOS('onefs', 'onefs-v8');
     }
 
     public function testOns()
