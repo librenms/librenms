@@ -20,8 +20,6 @@
             "The usage of memory size in %."
 */
 
-if ($device['os'] == 'moxa-etherdevice') {
-    $mempool['total'] = snmp_get($device, "totalMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
-    $mempool['used'] = snmp_get($device, "usedMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
-    $mempool['free'] = snmp_get($device, "freeMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
-}
+$mempool['total'] = snmp_get($device, "totalMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
+$mempool['used'] = snmp_get($device, "usedMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
+$mempool['free'] = snmp_get($device, "freeMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');

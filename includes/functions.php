@@ -2267,3 +2267,49 @@ function index_schema_to_sql($index_data)
 
     return sprintf($index, $columns);
 }
+
+/**
+ * Get an array of the schema files.
+ * schema_version => full_file_name
+ *
+ * @return mixed
+ */
+function get_schema_list()
+{
+    global $config;
+
+    // glob returns an array sorted by filename
+    $files = glob($config['install_dir'].'/sql-schema/*.sql');
+
+    // set the keys to the db schema version
+    return array_reduce($files, function ($array, $file) {
+        $array[basename($file, '.sql')] = $file;
+        return $array;
+    }, array());
+}
+
+/**
+ * Get the current database schema, will return 0 if there is no schema.
+ *
+ * @return int
+ */
+function get_db_schema()
+{
+    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+}
+
+/**
+ * Check if the database schema is up to date.
+ *
+ * @return bool
+ */
+function db_schema_is_current()
+{
+    $current = get_db_schema();
+
+    $schemas = get_schema_list();
+    end($schemas);
+    $latest = key($schemas);
+
+    return $current >= $latest;
+}

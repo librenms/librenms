@@ -230,9 +230,12 @@ function get_domain_sid()
 {
     global $config, $ldap_connection;
 
+    // Extract only the domain components
+    $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', $config['auth_ad_base_dn']);
+
     $search = ldap_read(
         $ldap_connection,
-        $config['auth_ad_base_dn'],
+        $dn_candidate,
         '(objectClass=*)',
         array('objectsid')
     );

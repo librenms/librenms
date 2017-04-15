@@ -2,8 +2,6 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_options .= ' -l 0 -E ';
-
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfibre-mib-rx');
 
 if (rrdtool_check_rrd_exists($rrdfilename)) {

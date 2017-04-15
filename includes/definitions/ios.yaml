@@ -8,6 +8,14 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
+discovery:
+    -
+      sysDescr:
+          - 'Cisco Internetwork Operating System Software'
+          - 'IOS (tm)'
+          - 'Cisco IOS Software'
+          - 'Global Site Selector'
+      sysDescr_regex: '/^((?!LINUX_IOSD).)*$/' #IOS-XE adding more regex will break detection, modify instead
 bad_ifXEntry:
     - cisco1941
     - cisco886Va

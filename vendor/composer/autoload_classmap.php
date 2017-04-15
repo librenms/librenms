@@ -388,6 +388,7 @@ return array(
     'HTMLPurifier_Zipper' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier/Zipper.php',
     'LibreNMS\\Component' => $baseDir . '/LibreNMS/Component.php',
     'LibreNMS\\ComposerHelper' => $baseDir . '/LibreNMS/ComposerHelper.php',
+    'LibreNMS\\Exceptions\\DatabaseConnectException' => $baseDir . '/LibreNMS/Exceptions/DatabaseConnectException.php',
     'LibreNMS\\Exceptions\\FileExistsException' => $baseDir . '/LibreNMS/Exceptions/FileExistsException.php',
     'LibreNMS\\Exceptions\\HostExistsException' => $baseDir . '/LibreNMS/Exceptions/HostExistsException.php',
     'LibreNMS\\Exceptions\\HostIpExistsException' => $baseDir . '/LibreNMS/Exceptions/HostIpExistsException.php',
