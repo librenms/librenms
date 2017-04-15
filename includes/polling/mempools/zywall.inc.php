@@ -10,13 +10,11 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'zywall') {
-    d_echo('Zywall');
-    $perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
-    if (is_numeric($perc)) {
-        $mempool['perc'] = $perc;
-        $mempool['used'] = $perc;
-        $mempool['total'] = 100;
-        $mempool['free'] = 100 - $perc;
-    }
+d_echo('Zywall');
+$perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
+if (is_numeric($perc)) {
+    $mempool['perc'] = $perc;
+    $mempool['used'] = $perc;
+    $mempool['total'] = 100;
+    $mempool['free'] = 100 - $perc;
 }
