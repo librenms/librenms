@@ -257,6 +257,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAvayaipo()
     {
         $this->checkOS('avaya-ipo');
+        $this->checkOS('avaya-ipo', 'avaya-ipo-server');
     }
 
     public function testAvayavsp()
@@ -268,6 +269,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('avaya-vsp', 'avaya-vsp-8404');
         $this->checkOS('avaya-vsp', 'avaya-vsp-7254xsq');
         $this->checkOS('avaya-vsp', 'avaya-vsp-7254xtq');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-7024xls');
     }
 
     public function testAvocent()
