@@ -8,7 +8,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114'
 
 echo ' ' . $name;
 
-$nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$nfsstats = snmp_get($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 update_application($app, $nfsstats);
 
