@@ -35,7 +35,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
-
+1. [NFS-server](#nfs-server) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -698,3 +698,15 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
+
+##### NFS-server
+Export the NFS stats from as server.
+
+##### SNMP Extend
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add :
+```
+extend nfs-server /bin/cat /proc/net/rpc/nfsd
+```
+note : find out where cat is located using : `which cat`
+
+2. reload snmpd service to activate the configuration

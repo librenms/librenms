@@ -34,4 +34,3 @@ if (is_file($rrd_filename)) {
 }
 
 require 'includes/graphs/generic_v3_multiline.inc.php';
-
