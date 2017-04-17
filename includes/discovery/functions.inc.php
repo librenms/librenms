@@ -1006,7 +1006,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+        if (isset($config['os'][$device['os']]['rfc1628_compat']) && $config['os'][$device['os']]['rfc1628_compat']) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
