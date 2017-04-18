@@ -113,7 +113,7 @@ main () {
         # only try to su if we are root (or sudo)
         if [[ "$EUID" -eq 0 ]]; then
             echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
-            su -l "$LIBRENMS_USER" -c "$DAILY_SCRIPT $@"
+            sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
             exit;
         fi
 

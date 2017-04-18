@@ -196,6 +196,11 @@ LibreNMS contributors:
 - Deeps (deepseth)
 - Jari Schäfer <jari.schaefer@gmail.com> (jarischaefer)
 - Jan-Philipp Litza <janphilipp@litza.de> (jplitza)
+- Chris Putnam <chrisputnam@gmail.com> (putnam)
+- Jonathan Price <jonathan@jonathanprice.uk> (Pricetx)
+- Remy de Boer <remy@slowpoke.nl> (remydb)
+- Ben Klang <ben@alkaloid.net> (bklang)
+- Svenn D'Hert <admin at svennd.be> (svennd)
 
 Observium was written by:
 - Adam Armstrong

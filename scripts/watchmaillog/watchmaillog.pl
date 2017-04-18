@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # Daemon used to watch the maillog messages for certain messages and trigger events when
 # certain messages occur
