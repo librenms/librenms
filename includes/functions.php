@@ -141,20 +141,24 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
+        if ($check = ends_with($key, '_except')) {
+            $key = substr($key, 0, -7);
+        }
+
         if ($key == 'sysObjectId') {
-            if (!starts_with($sysObjectId, $value)) {
+            if (starts_with($sysObjectId, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (!str_contains($sysDescr, $value)) {
+            if (str_contains($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (!preg_match_any($sysDescr, $value)) {
+            if (preg_match_any($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysObjectId_regex') {
-            if (!preg_match_any($sysObjectId, $value)) {
+            if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
         }
