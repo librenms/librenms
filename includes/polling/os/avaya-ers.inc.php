@@ -16,6 +16,11 @@ if ($version == '') {
     }
 }
 
+//Get Serial Numebr
+$serial = snmp_get($device, 'SNMPv2-SMI::enterprises.45.1.6.3.1.6.0', '-Oqvn');
+$serial = explode(' on', $serial);
+$serial = $serial[0];
+
 // Get hardware details
 $sysDescr = $poll_device['sysDescr'];
 
@@ -38,3 +43,4 @@ if ($stack_size > 1) {
 $version  = str_replace('"', '', $version);
 $features = str_replace('"', '', $features);
 $hardware = str_replace('"', '', $hardware);
+$serial = str_replace('"', '', $serial);
