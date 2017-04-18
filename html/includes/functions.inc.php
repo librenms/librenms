@@ -829,7 +829,7 @@ function generate_ap_link($args, $text = null, $type = null)
 {
     global $config;
 
-    $args = ifNameDescr($args);
+    $args = cleanPort($args);
     if (!$text) {
         $text = fixIfName($args['label']);
     }
