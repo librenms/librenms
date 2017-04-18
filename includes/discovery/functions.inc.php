@@ -79,7 +79,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), null, null, 5);
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', 5);
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
