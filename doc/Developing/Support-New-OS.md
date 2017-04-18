@@ -524,6 +524,7 @@ List of SNMP data types:
 | Type              | Value         |
 | ----------------- | ------------- |
 | OCTET STRING      | 4             |
+| HEX STRING        | 4x            |
 | Integer32         | 2             |
 | NULL              | 5             |
 | OBJECT IDENTIFIER | 6             |
@@ -533,6 +534,8 @@ List of SNMP data types:
 | TimeTicks         | 67            |
 | Opaque            | 68            |
 | Counter64         | 70            |
+
+Hex encoded strings (4x) should be used for any strings that contain line returns
 
 You can run `./scripts/pre-commit.php -u` to run the unit tests to check your code.
 If you would like to run tests locally against a full snmpsim instance, run `./scripts/pre-commit.php -u --snmpsim`.
