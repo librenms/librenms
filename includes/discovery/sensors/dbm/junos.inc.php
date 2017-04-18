@@ -40,4 +40,33 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
         discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
+    if (is_numeric($entry['jnxDomCurrentModuleLaneCount'])) {
+        for ($x=0; $x<$entry['jnxDomCurrentModuleLaneCount']; $x++) {
+            $lane = $pre_cache['junos_multilane_oids'][$index.'.'.$x];
+            if (is_numeric($lane['jnxDomCurrentLaneRxLaserPower']) && $lane['jnxDomCurrentLaneRxLaserPower'] != 0 && $lane['jnxDomCurrentLaneTxLaserOutputPower'] != 0) {
+                $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.6.'.$index.'.'.$x;
+                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' lane ' . $x . ' Rx Power';
+                $limit_low = $entry['jnxDomCurrentRxLaserPowerLowAlarmThreshold']/$divisor;
+                $warn_limit_low = $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold']/$divisor;
+                $limit = $entry['jnxDomCurrentRxLaserPowerHighAlarmThreshold']/$divisor;
+                $warn_limit = $entry['jnxDomCurrentRxLaserPowerHighWarningThreshold']/$divisor;
+                $current = $lane['jnxDomCurrentLaneRxLaserPower']/$divisor;
+                $entPhysicalIndex = $index;
+                $entPhysicalIndex_measured = 'ports';
+                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            }
+            if (is_numeric($lane['jnxDomCurrentLaneTxLaserOutputPower']) && $lane['jnxDomCurrentLaneTxLaserOutputPower'] && $lane['jnxDomCurrentLaneRxLaserPower']) {
+                $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.'.$index.'.'.$x;
+                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' lane ' . $x . ' Tx Power';
+                $limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold']/$divisor;
+                $warn_limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']/$divisor;
+                $limit = $entry['jnxDomCurrentModuleTemperatureHighAlarmThreshold']/$divisor;
+                $warn_limit = $entry['jnxDomCurrentModuleTemperatureHighWarningThreshold']/$divisor;
+                $current = $lane['jnxDomCurrentLaneTxLaserOutputPower']/$divisor;
+                $entPhysicalIndex = $index;
+                $entPhysicalIndex_measured = 'ports';
+                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            }
+        }
+    }
 }

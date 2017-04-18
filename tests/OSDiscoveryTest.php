@@ -181,6 +181,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('aos');
         $this->checkOS('aos', 'aos1');
+        $this->checkOS('aos', 'aos-omnistack');
     }
 
     public function testAosEmu2()
@@ -206,7 +207,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('apic');
     }
-    
+
+    public function testApplicationsWare()
+    {
+        $this->checkOS('applicationsware');
+    }
+
     public function testArdmoreencoder()
     {
         $this->checkOS('ardmore-encoder');
@@ -231,6 +237,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testArubaos()
     {
         $this->checkOS('arubaos');
+        $this->checkOS('arubaos', 'arubaos-aosw');
     }
 
     public function testAsa()
@@ -252,6 +259,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testAvayaipo()
     {
         $this->checkOS('avaya-ipo');
+        $this->checkOS('avaya-ipo', 'avaya-ipo-server');
     }
 
     public function testAvayavsp()
@@ -263,6 +271,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('avaya-vsp', 'avaya-vsp-8404');
         $this->checkOS('avaya-vsp', 'avaya-vsp-7254xsq');
         $this->checkOS('avaya-vsp', 'avaya-vsp-7254xtq');
+        $this->checkOS('avaya-vsp', 'avaya-vsp-7024xls');
     }
 
     public function testAvocent()
@@ -462,7 +471,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('comware');
         $this->checkOS('comware', 'comware1');
-        $this->checkOS('comware', 'comware-hp-c1234');
+        $this->checkOS('comware', 'comware-h3c');
     }
 
     public function testCoriant()
@@ -801,6 +810,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('generex-ups', 'generex-ups3');
     }
 
+    public function testHelios()
+    {
+        $this->checkOS('helios');
+    }
+
     public function testHikvision()
     {
         $this->checkOS('hikvision');
@@ -897,6 +911,16 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testIbmtl()
     {
         $this->checkOS('ibmtl');
+    }
+
+    public function testIctpdu()
+    {
+        $this->checkOS('ict-pdu');
+    }
+
+    public function testIctpsu()
+    {
+        $this->checkOS('ict-psu');
     }
 
     public function testIes()
@@ -1065,6 +1089,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('macosx');
         $this->checkOS('macosx', 'macosx-sierra');
+    }
+
+    public function testMagnum()
+    {
+        $this->checkOS('magnum');
     }
 
     public function testMaipu()
@@ -1268,6 +1297,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testOnefs()
     {
         $this->checkOS('onefs');
+        $this->checkOS('onefs', 'onefs-v8');
     }
 
     public function testOns()
