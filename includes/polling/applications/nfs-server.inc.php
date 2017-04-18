@@ -1,5 +1,17 @@
 <?php
-// nfs server stats processor 
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage nfs-server
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     SvennD <svennd@svennd.be>
+*/
 
 use LibreNMS\RRD\RrdDefinition;
 
@@ -8,7 +20,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114'
 
 echo ' ' . $name;
 
-$nfsstats = snmp_get($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$nfsstats = snmp_get($device, $oid, '-Oqv');
 
 update_application($app, $nfsstats);
 
