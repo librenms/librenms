@@ -403,7 +403,7 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-loca
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ogs /etc/snmp/os-updates.sh
+extend ogs /etc/snmp/rocks.sh
 ```
 
 ### OS Updates
