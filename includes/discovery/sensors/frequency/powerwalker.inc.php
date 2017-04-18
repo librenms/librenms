@@ -26,7 +26,7 @@
 if ($device['os'] === 'powerwalker') {
     echo("PowerWalker ");
 
-    if (is_numeric($pw_oids['upsInputFrequency'][1])) {
+    if (is_numeric($pre_cache['powerwalker']['upsInputFrequency'][1])) {
         $descr = 'Input Voltage';
         $oid = '.1.3.6.1.2.1.33.1.3.3.1.2.1';
         discover_sensor($valid['sensor'], 'frequency', $device, $oid, 2, 'powerwalker', $descr, '1', '1', null, null, null, null, $value);
