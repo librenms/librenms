@@ -1,4 +1,18 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage opengridscheduler
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     SvennD <svennd@svennd.be>
+*/
+
 require 'includes/graphs/common.inc.php';
 $scale_min     = 0;
 $colours       = 'mixed';
@@ -10,17 +24,18 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-ogs-'.$app['app_id'].'.rrd';
+$rrd_filename  = rrd_name($device['hostname'], array('app', 'ogs', $app['app_id']));
+
 $array = array(
     'running_jobs' => array('descr' => 'running'),
     'pending_jobs' => array('descr' => 'pending'),
     'suspend_jobs' => array('descr' => 'suspend'),
-    'zombie_jobs' => array('descr' => 'zombie')
+//    'zombie_jobs' => array('descr' => 'zombie') // this is a bad naming, zombies in sge are cached finished jobs
 );
 
 $i = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $var['descr'];

@@ -1,4 +1,17 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage opengridscheduler
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     SvennD <svennd@svennd.be>
+*/
 
 use LibreNMS\RRD\RrdDefinition;
 
@@ -9,7 +22,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.3.111.103.115';
 echo ' ' . $name;
 
 // get data through snmp
-$ogs_data = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$ogs_data = snmp_get($device, $oid, '-Oqv');
 
 // let librenms know that we got good data
 update_application($app, $ogs_data);
