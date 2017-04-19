@@ -829,7 +829,7 @@ function generate_ap_link($args, $text = null, $type = null)
 {
     global $config;
 
-    $args = ifNameDescr($args);
+    $args = cleanPort($args);
     if (!$text) {
         $text = fixIfName($args['label']);
     }
@@ -1511,6 +1511,31 @@ function get_fail2ban_jails($device_id)
     if (isset($f2bc[$device_id])) {
         $id = $component->getFirstComponentID($f2bc, $device_id);
         return json_decode($f2bc[$device_id][$id]['jails']);
+    }
+
+    return array();
+}
+
+/**
+ * Get the Postgres databases for a device... just requires the device ID
+ * an empty return means Postres is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_postgres_databases($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'postgres'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $pgc=$component->getComponents($device_id, $options);
+
+    if (isset($pgc[$device_id])) {
+        $id = $component->getFirstComponentID($pgc, $device_id);
+        return json_decode($pgc[$device_id][$id]['databases']);
     }
 
     return array();

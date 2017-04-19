@@ -141,20 +141,24 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
+        if ($check = ends_with($key, '_except')) {
+            $key = substr($key, 0, -7);
+        }
+
         if ($key == 'sysObjectId') {
-            if (!starts_with($sysObjectId, $value)) {
+            if (starts_with($sysObjectId, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (!str_contains($sysDescr, $value)) {
+            if (str_contains($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (!preg_match_any($sysDescr, $value)) {
+            if (preg_match_any($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysObjectId_regex') {
-            if (!preg_match_any($sysObjectId, $value)) {
+            if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
         }
@@ -2266,4 +2270,50 @@ function index_schema_to_sql($index_data)
     }, $index_data['Columns']));
 
     return sprintf($index, $columns);
+}
+
+/**
+ * Get an array of the schema files.
+ * schema_version => full_file_name
+ *
+ * @return mixed
+ */
+function get_schema_list()
+{
+    global $config;
+
+    // glob returns an array sorted by filename
+    $files = glob($config['install_dir'].'/sql-schema/*.sql');
+
+    // set the keys to the db schema version
+    return array_reduce($files, function ($array, $file) {
+        $array[basename($file, '.sql')] = $file;
+        return $array;
+    }, array());
+}
+
+/**
+ * Get the current database schema, will return 0 if there is no schema.
+ *
+ * @return int
+ */
+function get_db_schema()
+{
+    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+}
+
+/**
+ * Check if the database schema is up to date.
+ *
+ * @return bool
+ */
+function db_schema_is_current()
+{
+    $current = get_db_schema();
+
+    $schemas = get_schema_list();
+    end($schemas);
+    $latest = key($schemas);
+
+    return $current >= $latest;
 }

@@ -164,7 +164,7 @@ function RunRules($device)
             $inv = false;
         }
         d_echo(PHP_EOL);
-        $chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
+        $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         if (empty($rule['query'])) {
             $rule['query'] = GenSQL($rule['rule']);
         }
@@ -186,18 +186,21 @@ function RunRules($device)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
-        $extra['contacts'] = GetContacts($qry);
-        $extra['rule']     = $qry;
-        $extra = gzcompress(json_encode($extra), 9);
         if ($doalert) {
             if ($chk['state'] === "2") {
                 c_echo('Status: %ySKIP');
             } elseif ($chk['state'] >= "1") {
+                c_echo('Status: %bNOCHG');
                 // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                 // So we update the details column with any fresh changes to the alert output we might have.
-                dbUpdate(array('details' => $extra), 'alert_log', 'device_id = ? && rule_id = ?', array($device,$rule['id']));
-                c_echo('Status: %bNOCHG');
+                $alert_log           = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device, $rule['id']));
+                $details             = json_decode(gzuncompress($alert_log['details']), true);
+                $details['contacts'] = GetContacts($qry);
+                $details['rule']     = $qry;
+                $details             = gzcompress(json_encode($details), 9);
+                dbUpdate(array('details' => $details), 'alert_log', 'id = ?', array($alert_log['id']));
             } else {
+                $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
                 if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
                     if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
                         dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');

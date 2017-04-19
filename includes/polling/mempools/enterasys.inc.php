@@ -10,11 +10,9 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "enterasys") {
-    $free = snmp_get($device, 'etsysResourceStorageAvailable.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
-    $total  = snmp_get($device, 'etsysResourceStorageSize.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
+$free = snmp_get($device, 'etsysResourceStorageAvailable.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
+$total  = snmp_get($device, 'etsysResourceStorageSize.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
 
-    $mempool['used'] = (($total - $free) * 1024);
-    $mempool['free'] = ($free * 1024);
-    $mempool['total'] = ($total * 1024);
-}
+$mempool['used'] = (($total - $free) * 1024);
+$mempool['free'] = ($free * 1024);
+$mempool['total'] = ($total * 1024);
