@@ -37,7 +37,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-
+        global $debug;
+        $debug = true;
         ob_start();
         $os = getHostOS($this->genDevice($community));
         $output = ob_get_contents();
