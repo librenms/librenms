@@ -1346,7 +1346,7 @@ services:
     service_message: { Field: service_message, Type: text, 'Null': false, Default: null, Extra: '' }
     service_param: { Field: service_param, Type: text, 'Null': false, Default: null, Extra: '' }
     service_status: { Field: service_status, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
-    service_type: { Field: service_type, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
+    service_type: { Field: service_type, Type: varchar(16), 'Null': false, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     service_host: { Name: service_host, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1454,6 +1454,7 @@ syslog:
     datetime: { Name: datetime, Columns: [timestamp], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
+    priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
