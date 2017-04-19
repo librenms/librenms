@@ -239,6 +239,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('arubaos');
         $this->checkOS('arubaos', 'arubaos-aosw');
+        $this->checkOS('arubaos', 'arubaos-powerconnect');
     }
 
     public function testAsa()
