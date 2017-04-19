@@ -108,7 +108,9 @@ if (!$where) {
     exit;
 }
 
-require 'includes/sql-schema/update.php';
+if (get_lock('schema') === false) {
+    require 'includes/sql-schema/update.php';
+}
 
 $discovered_devices = 0;
 

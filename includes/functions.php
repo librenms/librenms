@@ -2317,3 +2317,50 @@ function db_schema_is_current()
 
     return $current >= $latest;
 }
+
+/**
+ * Get the lock status for a given name
+ * @param $name
+ * @return bool
+ */
+function get_lock($name)
+{
+    global $config;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    if (file_exists($lock_file)) {
+        $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
+        $lpid = trim(file_get_contents($lock_file));
+        if (in_array($lpid, $pids)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Set the lock status for a given name
+ * @param $name
+ */
+function set_lock($name)
+{
+    global $config;
+    $lock = false;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    $lock = get_lock($name);
+
+    if ($lock === true) {
+        echo "$lock_file exists, exiting\n";
+        exit(1);
+    } else {
+        file_put_contents($lock_file, getmypid());
+    }
+}
+
+/**
+ * Clean up lock file for a given name
+ * @param $name
+ */
+function clean_lock($name)
+{
+    unlink($config['install_dir']."/.$name.lock");
+}
