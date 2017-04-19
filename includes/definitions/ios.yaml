@@ -17,6 +17,7 @@ discovery:
           - 'Global Site Selector'
       sysDescr_except:
           - 'LINUX_IOSD'
+          - 'IOS-XE'
 bad_ifXEntry:
     - cisco1941
     - cisco886Va
