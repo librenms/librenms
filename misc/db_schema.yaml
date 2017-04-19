@@ -1346,7 +1346,7 @@ services:
     service_message: { Field: service_message, Type: text, 'Null': false, Default: null, Extra: '' }
     service_param: { Field: service_param, Type: text, 'Null': false, Default: null, Extra: '' }
     service_status: { Field: service_status, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
-    service_type: { Field: service_type, Type: varchar(16), 'Null': false, Default: null, Extra: '' }
+    service_type: { Field: service_type, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     service_host: { Name: service_host, Columns: [device_id], Unique: false, Type: BTREE }
