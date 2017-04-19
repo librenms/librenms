@@ -410,6 +410,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('celvin');
     }
 
+    public function testCienaSDS()
+    {
+        $this->checkOS('ciena-sds');
+    }
+
     public function testCimc()
     {
         $this->checkOS('cimc');
