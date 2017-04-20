@@ -2,7 +2,7 @@
 /**
  * geist-watchdog.inc.php
  *
- * LibreNMS OS poller module for Geist Watchdog
+ * LibreNMS voltage discovery module for Geist Watchdog
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$serial = snmp_get($device, 'climateSerial', '-Oqv', 'GEIST-MIB-V3');
+$value = snmp_get($device, 'climateVolts', '-Oqv', 'GEIST-MIB-V3');
+$current_oid = '.1.3.6.1.4.1.21239.2.2.1.14.1';
+$descr = 'Voltage';
+discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, 'climateVolts', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
