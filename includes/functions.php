@@ -2344,7 +2344,6 @@ function get_lock($name)
 function set_lock($name)
 {
     global $config;
-    $lock = false;
     $lock_file = $config['install_dir']."/.$name.lock";
     $lock = get_lock($name);
 
@@ -2362,5 +2361,6 @@ function set_lock($name)
  */
 function clean_lock($name)
 {
+    global $config;
     unlink($config['install_dir']."/.$name.lock");
 }
