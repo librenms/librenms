@@ -201,6 +201,7 @@ LibreNMS contributors:
 - Remy de Boer <remy@slowpoke.nl> (remydb)
 - Ben Klang <ben@alkaloid.net> (bklang)
 - Svenn D'Hert <admin at svennd.be> (svennd)
+- Dominik Bay <db@rrbone.net> (eimann)
 
 Observium was written by:
 - Adam Armstrong
