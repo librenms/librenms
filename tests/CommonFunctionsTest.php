@@ -119,4 +119,13 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<b>Bold</b>', display('<b>Bold</b>', $tmp_config));
         $this->assertEquals('', display('<script>alert("test")</script>', $tmp_config));
     }
+
+    public function testStringToClass()
+    {
+        $this->assertSame('LibreNMS\OS\Os', str_to_class('OS', 'LibreNMS\\OS\\'));
+        $this->assertSame('SpacesName', str_to_class('spaces name'));
+        $this->assertSame('DashName', str_to_class('dash-name'));
+        $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
+        $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
+    }
 }

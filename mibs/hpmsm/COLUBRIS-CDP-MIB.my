@@ -1,0 +1,233 @@
+-- ****************************************************************************
+--  COLUBRIS-CDP-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks CDP MIB file.
+
+--
+-- ****************************************************************************
+
+
+COLUBRIS-CDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisCdpMIB   MODULE-IDENTITY
+    LAST-UPDATED    "200402200000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks CDP MIB."
+
+    ::= { colubrisMgmtV2 9 }
+
+
+-- colubrisCdpMIB definition
+colubrisCdpMIBObjects OBJECT IDENTIFIER ::= { colubrisCdpMIB 1 }
+
+-- colubris CDP groups
+coCdpCache     OBJECT IDENTIFIER ::= { colubrisCdpMIBObjects 1 }
+coCdpGlobal    OBJECT IDENTIFIER ::= { colubrisCdpMIBObjects 2 }
+
+
+-- The CDP Address Cache Group
+coCdpCacheTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoCdpCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The (conceptual) table containing the cached information
+                 obtained from CDP messages. In tabular form to allow
+                 multiple instances on an agent. This table applies to
+                 access controllers only."
+    ::= { coCdpCache 1 }
+
+coCdpCacheEntry OBJECT-TYPE
+    SYNTAX      CoCdpCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry (conceptual row) in the coCdpCacheTable. A row
+                 contains the information received via CDP on one interface
+                 from one device.  Entries appear when a CDP advertisement is
+                 received from a neighbor device.
+                 coCdpCacheDeviceIndex - Uniquely identify a device inside the
+                                         CDP table."
+    INDEX       { coCdpCacheDeviceIndex }
+    ::= { coCdpCacheTable 1 }
+
+CoCdpCacheEntry ::= SEQUENCE
+{
+    coCdpCacheDeviceIndex             Integer32,
+    coCdpCacheLocalInterface          DisplayString,
+    coCdpCacheAddress                 MacAddress,
+    coCdpCacheDeviceId                DisplayString,
+    coCdpCacheTimeToLive              Unsigned32,
+    coCdpCacheCapabilities            DisplayString,
+    coCdpCacheVersion                 DisplayString,
+    coCdpCachePlatform                DisplayString,
+    coCdpCachePortId                  DisplayString
+}
+
+coCdpCacheDeviceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value for each device from which CDP messages
+                 are received."
+    ::= { coCdpCacheEntry 1 }
+
+coCdpCacheLocalInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the name of the interface that received the CDP message."
+    ::= { coCdpCacheEntry 2 }
+
+coCdpCacheAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Ethernet address of the device that sent the CDP message."
+    ::= { coCdpCacheEntry 3 }
+
+coCdpCacheDeviceId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Device-ID string as reported in the most recent CDP
+                 message. A zero-length string indicates that no Device-ID field (TLV) 
+                 was reported in the most recent CDP message."
+    ::= { coCdpCacheEntry 4 }
+
+coCdpCacheTimeToLive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the number of seconds to keep the remote device in the
+                 cache table after receiving the CDP message."
+    ::= { coCdpCacheEntry 5 }
+
+coCdpCacheCapabilities OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the device's functional capabilities as reported in the
+                 most recent CDP message. Possible values are:
+
+                   R - layer 3 router
+
+                   T - a layer 2 transparent bridge 
+
+                   B - a layer 2 source-root bridge
+
+                   S - a layer 2 switch (non-spanning tree)
+
+                   r - a layer 3 (non routing) host
+
+                   I - does not forward IGMP Packets to non-routers
+
+                   H - a layer 1 repeater
+
+                 A zero-length string indicates no Capabilities field (TLV) was 
+                 reported in the most recent CDP message."
+    ::= { coCdpCacheEntry 6 }
+
+coCdpCacheVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Version string as reported in the most recent CDP
+                 message. A zero-length string indicates no Version field (TLV) 
+                 was reported in the most recent CDP message."
+    ::= { coCdpCacheEntry 7 }
+
+coCdpCachePlatform OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Device's Hardware Platform as reported in the most
+                 recent CDP message. A zero-length string indicates that no Platform
+                 field (TLV) was reported in the most recent CDP message."
+    ::= { coCdpCacheEntry 8 }
+
+coCdpCachePortId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Port-ID string as reported in the most recent CDP
+                 message. This will typically be the value of the ifName
+                 object (e.g., 'Ethernet0'). A zero-length string indicates no 
+                 Port-ID field (TLV) was reported in the most recent CDP message."
+    ::= { coCdpCacheEntry 9 }
+
+-- CDP global configuration
+coCdpGlobalMessageInterval OBJECT-TYPE
+    SYNTAX      Integer32 (5..254)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the interval at which CDP messages will be generated."
+    DEFVAL      { 60 }
+    ::= { coCdpGlobal 1 }
+
+coCdpGlobalHoldTime OBJECT-TYPE
+    SYNTAX      Integer32 (10..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the amount of time the receiving device holds CDP messages."
+    DEFVAL     { 180 }
+    ::= { coCdpGlobal 2 }
+
+-- conformance information
+colubrisCdpMIBConformance OBJECT IDENTIFIER ::= { colubrisCdpMIB 2 }
+colubrisCdpMIBCompliances OBJECT IDENTIFIER ::= { colubrisCdpMIBConformance 1 }
+colubrisCdpMIBGroups      OBJECT IDENTIFIER ::= { colubrisCdpMIBConformance 2 }
+
+-- compliance statements
+colubrisCdpMIBCompliance MODULE-COMPLIANCE
+    STATUS      current 
+    DESCRIPTION "The compliance statement for the CDP MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisCdpMIBGroup
+                    }
+    ::= { colubrisCdpMIBCompliances 1 }
+
+-- units of conformance
+colubrisCdpMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coCdpCacheLocalInterface, 
+                    coCdpCacheAddress,
+                    coCdpCacheDeviceId,
+                    coCdpCacheTimeToLive,
+                    coCdpCacheCapabilities,
+                    coCdpCacheVersion,
+                    coCdpCachePlatform,
+                    coCdpCachePortId,
+                    coCdpGlobalMessageInterval,
+                    coCdpGlobalHoldTime
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for use with CDP."
+    ::= { colubrisCdpMIBGroups 1 }
+
+END

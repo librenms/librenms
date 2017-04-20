@@ -7,5 +7,3 @@ discovery:
         - Apple AirPort
         - Apple Base Station
         - Base Station V3.84
-poller_modules:
-    wifi: 1

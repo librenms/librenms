@@ -1756,3 +1756,18 @@ function set_user_pref($name, $value, $user_id = null)
 
     return $result;
 }
+
+/**
+ * Generate a class name from a lowercase string containing - or _
+ * Remove - and _ and camel case words
+ *
+ * @param string $name The string to convert to a class name
+ * @param string $namespace namespace to prepend to the name for example: LibreNMS\
+ * @return string  Class name
+ */
+function str_to_class($name, $namespace = null)
+{
+    $pre_format = str_replace(array('-', '_'), ' ', $name);
+    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
+    return $namespace . $class;
+}

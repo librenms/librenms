@@ -4,6 +4,7 @@
  * LibreNMS
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
+ * Copyright (c) 2017 Tony Murray <https://github.com/murrant>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,16 +20,15 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !isset($_POST['data'])) {
-    echo 'error with data';
-    exit;
-} else {
-    $update = dbUpdate(array($_POST['value_type'] => $_POST['data'], 'sensor_custom' => 'Yes'), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'], $_POST['device_id']));
-    if (!empty($update) || $update == '0') {
-        echo 'success';
-        exit;
-    } else {
-        echo 'error';
-        exit;
-    }
+for ($x = 0; $x < count($_POST['sensor_id']); $x++) {
+    dbUpdate(
+        array(
+            'sensor_limit' => $_POST['sensor_limit'][$x],
+            'sensor_limit_low' => $_POST['sensor_limit_low'][$x],
+            'sensor_alert' => $_POST['sensor_alert'][$x]
+        ),
+        'wireless_sensors',
+        '`sensor_id` = ?',
+        array($_POST['sensor_id'][$x])
+    );
 }
