@@ -18,6 +18,9 @@ if ($device['os'] == 'enterasys') {
             $free = $ram['etsysResourceStorageAvailable'];
             $total = $ram['etsysResourceStorageSize'];
             $descr = $ram['etsysResourceStorageDescr'];
+            if ($index > 1000) {
+                $descr = "Slot #" . substr($index, -1) . " $descr";
+            }
             if (is_numeric($free) && is_numeric($total)) {
                 discover_mempool($valid_mempool, $device, $index, 'enterasys', $descr, '1', $mem_id, null);
             }
