@@ -1643,7 +1643,7 @@ function set_numeric($value, $default = 0)
 
 function check_git_exists()
 {
-    if (`which git`) {
+    if (`git`) {
         return true;
     } else {
         return false;
