@@ -37,7 +37,8 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-
+        global $debug;
+        $debug = true;
         ob_start();
         $os = getHostOS($this->genDevice($community));
         $output = ob_get_contents();
@@ -238,6 +239,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('arubaos');
         $this->checkOS('arubaos', 'arubaos-aosw');
+        $this->checkOS('arubaos', 'arubaos-powerconnect');
     }
 
     public function testAsa()
@@ -407,6 +409,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testCelvin()
     {
         $this->checkOS('celvin');
+    }
+
+    public function testCienaSDS()
+    {
+        $this->checkOS('ciena-sds');
     }
 
     public function testCimc()
@@ -951,6 +958,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('iosxe');
         $this->checkOS('iosxe', 'iosxe-asr1000');
+        $this->checkOS('iosxe', 'iosxe-c4500');
     }
 
     public function testIosxr()

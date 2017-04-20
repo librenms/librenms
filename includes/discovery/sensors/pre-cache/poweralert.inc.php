@@ -10,7 +10,5 @@
  * the source code distribution for details.
  */
 
-if (isset($config['os'][$device['os']]['rfc1628_compat']) && $config['os'][$device['os']]['rfc1628_compat']) {
-    $pre_cache['poweralert_serial'] = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
-    d_echo($pre_cache);
-}
+echo 'tlUpsSnmpCardSerialNum ';
+$pre_cache['poweralert_serial'] = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
