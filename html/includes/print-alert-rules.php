@@ -19,14 +19,18 @@ if (isset($_POST['create-default'])) {
         'disabled'  => 0,
         'name'      => 'Devices up/down',
     );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%devices.uptime < "300" && %macros.device = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Device rebooted',
-    );
+
+    if ($config['os'][$device['os']]['bad_uptime'] !== true) {
+        $default_rules[] = array(
+            'device_id' => '-1',
+            'rule'      => '%devices.uptime < "300" && %macros.device = "1"',
+            'severity'  => 'critical',
+            'extra'     => '{"mute":false,"count":"1","delay":"300"}',
+            'disabled'  => 0,
+            'name'      => 'Device rebooted',
+        );
+    }
+
     $default_rules[] = array(
         'device_id' => '-1',
         'rule'      => '%bgpPeers.bgpPeerState != "established" && %macros.device_up = "1"',
