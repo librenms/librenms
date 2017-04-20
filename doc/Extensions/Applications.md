@@ -230,7 +230,7 @@ extend memcached /etc/snmp/memcached
 #### Agent
 1. Install the script to your agent: `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin -O /usr/lib/check_mk_agent/local/munin`
 2. Make the script executable (`chmod +x /usr/lib/check_mk_agent/local/munin`)
-3. Create the munin scripts dir: `mkdir -p /usr/share/munin`
+3. Create the munin scripts dir: `mkdir -p /usr/share/munin/munin-scripts`
 4. Install your munin scripts into the above directory.
 
 To create your own custom munin scripts, please see this example:
