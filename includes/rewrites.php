@@ -22,7 +22,7 @@ function rewrite_location($location)
                 break;
             }
         }
-     }  
+    }  
 
     if (isset($config['location_map'][$location])) {
         $location = $config['location_map'][$location];
