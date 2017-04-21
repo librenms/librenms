@@ -138,6 +138,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     if ($device['snmpver'] == 'v1' || (isset($device['os'], $config['os'][$device['os']]['nobulk']) && $config['os'][$device['os']]['nobulk'])) {
         $snmpcmd = $config['snmpwalk'];
     } else {
+        $options = preg_replace('/-CI/', '', $options);
         $snmpcmd = $config['snmpbulkwalk'];
         $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
