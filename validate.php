@@ -116,7 +116,7 @@ if ($git_found === true) {
 }
 
 // Check php modules we use to make sure they are loaded
-$extensions = array('pcre','curl','session','snmp','mcrypt');
+$extensions = array('pcre','curl','session','mcrypt');
 foreach ($extensions as $extension) {
     if (extension_loaded($extension) === false) {
         $missing_extensions[] = $extension;

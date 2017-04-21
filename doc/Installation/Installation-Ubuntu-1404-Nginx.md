@@ -60,7 +60,7 @@ This host is where the web server and SNMP poller run.  It could be the same mac
 
 Install the required software:
 
-    apt-get install nginx-full php5-fpm php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl php5-mcrypt php5-json php-net-ipv4 php-net-ipv6 snmp snmpd graphviz fping imagemagick whois mtr-tiny nmap python-mysqldb rrdtool git
+    apt-get install nginx-full php5-fpm php5-cli php5-mysql php5-gd php-pear php5-curl php5-mcrypt php5-json php-net-ipv4 php-net-ipv6 snmp snmpd graphviz fping imagemagick whois mtr-tiny nmap python-mysqldb rrdtool git
 
 The packages listed above are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04/14.04.
 
