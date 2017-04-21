@@ -78,7 +78,6 @@ if ($all && $return === 0) {
 }
 exit($return); //return the combined/single return value of tests
 
-
 /**
  * Run the specified check and return the return value.
  * Make sure it isn't skipped by SKIP_TYPE_CHECK env variable and hasn't been run already
@@ -232,7 +231,7 @@ function check_unit($passthru = false, $command_only = false, $fail_fast = false
 
     $proc_snmpsimd = null;
     if ($snmpsim) {
-        echo 'Starting snmpsimd...' .  PHP_EOL;
+        echo 'Starting snmpsimd... ' .  PHP_EOL;
         $proc_snmpsimd = new Proc($snmpsim_cmd);
     }
 
@@ -246,7 +245,7 @@ function check_unit($passthru = false, $command_only = false, $fail_fast = false
         if ($phpunit_ret > 0) {
             echo "failed\n";
             echo implode(PHP_EOL, $phpunit_output) . PHP_EOL;
-            echo 'snmpsimd: output at /tmp/snmpsimd.log';
+            echo 'snmpsimd: debug output at /tmp/snmpsimd.log';
         } else {
             echo "success\n";
         }
