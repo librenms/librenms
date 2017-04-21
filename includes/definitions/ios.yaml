@@ -15,6 +15,7 @@ discovery:
           - 'IOS (tm)'
           - 'Cisco IOS Software'
           - 'Global Site Selector'
+          - 'Cisco Firewall Services Module'
       sysDescr_except:
           - 'LINUX_IOSD'
           - 'IOS-XE'
