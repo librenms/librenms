@@ -23,11 +23,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-// SNMPv2-MIB::sysDescr.0 = STRING: Etherwan 6TX+2G Managed Switch, Firmware rev: 1.94.3 05/11/15 16:31:18
-
-$description = $poll_device['sysDescr'];
-
-preg_match('~(?\'hardware\'.*?),\sFirmware\srev:\s(?\'version\'.*) \d\d\/\d\d\/\d\d~', $description, $matches);
+preg_match('~(?\'hardware\'.*?),\sFirmware\srev:\s(?\'version\'.*) \d\d\/\d\d\/\d\d~', $poll_device['sysDescr'], $matches);
 
 if ($matches['hardware']) {
     $hardware = $matches['hardware'];
