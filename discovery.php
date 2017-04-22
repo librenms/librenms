@@ -20,15 +20,6 @@ $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
-    $versions = version_info(false);
-    echo "Version info:\n";
-    $cur_sha = $versions['local_sha'];
-    echo "Commit SHA: $cur_sha\n";
-    echo "DB Schema: ".$versions['db_schema']."\n";
-    echo "PHP: ".$versions['php_ver']."\n";
-    echo "MySQL: ".$versions['mysql_ver']."\n";
-    echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-    echo "SNMP: ".$versions['netsnmp_ver']."\n";
 }
 
 if (isset($options['h'])) {
@@ -71,6 +62,20 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
+    $versions = version_info(false);
+    echo <<<EOH
+===================================
+Version info:
+Commit SHA: {$versions['local_sha']}
+Commit Date: {$versions['local_date']}
+DB Schema: {$versions['db_schema']}
+PHP: {$versions['php_ver']}
+MySQL: {$versions['mysql_ver']}
+RRDTool: {$versions['rrdtool_ver']}
+SNMP: {$versions['netsnmp_ver']}
+==================================
+EOH;
+
     echo "DEBUG!\n";
     if (isset($options['v'])) {
         $vdebug = true;
