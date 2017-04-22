@@ -6,7 +6,16 @@ Options FollowSymlinks Multiviews
 AddType image/svg+xml .svg
 <IfModule mod_filter.c>
   <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
     AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xsd
+    AddOutputFilterByType DEFLATE text/xsl
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE image/x-icon
   </IfModule>
 </IfModule>
 
