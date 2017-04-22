@@ -986,6 +986,12 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('iosxr');
     }
 
+    public function testIpecs()
+    {
+        $this->checkOS('ipecs', 'ipecs-ucp100');
+        $this->checkOS('ipecs', 'ipecs-ucp600');
+    }
+
     public function testIpoman()
     {
         $this->checkOS('ipoman');
