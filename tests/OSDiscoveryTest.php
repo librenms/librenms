@@ -700,6 +700,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ericsson-es');
     }
 
+    public function testEtherwan()
+    {
+        $this->checkOS('etherwan');
+    }
+
     public function testExinda()
     {
         $this->checkOS('exinda');
