@@ -394,6 +394,10 @@ Regex Matching:
 ```php
 $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
 ```
+Regex Match Substitution:
+```php
+$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK";
+```
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
 ### Interfaces to be ignored
