@@ -474,6 +474,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('cometsystem-p85xx');
     }
 
+    public function testCommanderPlus()
+    {
+        $this->checkOS('commander-plus');
+    }
+
     public function testComware()
     {
         $this->checkOS('comware');
