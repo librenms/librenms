@@ -667,6 +667,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('edgeswitch', 'unifiswitch');
     }
 
+    public function testEltexOLT()
+    {
+        $this->checkOS('eltex-olt');
+    }
+
     public function testEndian()
     {
         $this->checkOS('endian');
