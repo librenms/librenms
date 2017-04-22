@@ -824,6 +824,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('gamatronicups');
     }
 
+    public function testGeistWatchdog()
+    {
+        $this->checkOS('geist-watchdog');
+    }
+
     public function testGenerexUps()
     {
         $this->checkOS('generex-ups');
