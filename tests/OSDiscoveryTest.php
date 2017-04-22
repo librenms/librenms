@@ -684,6 +684,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('engenius', 'engenius2');
     }
 
+    public function testEnlogicPDU()
+    {
+        $this->checkOS('enlogic-pdu');
+    }
+
     public function testEnterasys()
     {
         $this->checkOS('enterasys');
