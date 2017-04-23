@@ -733,4 +733,4 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 
 4. Restart snmpd on your host
 
-5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab.
+5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab or wait for it to be auto-discovered.
