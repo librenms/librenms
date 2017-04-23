@@ -115,6 +115,9 @@ function nicecase($item)
         case 'opengridscheduler':
             return 'Open Grid Scheduler';
 
+        case 'sdfsinfo':
+            return 'SDFS info';
+
         default:
             return ucfirst($item);
     }
