@@ -722,7 +722,7 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 A small shell script (written in PHP) that exportfs SDFS volume info.
 
 ###### SNMP Extend
-1. Copy the [sdfsinfo](https://github.com/librenms/librenms-agent/blob/master/snmp/sdfsinfo) to `/etc/snmpd/` on SDFS enabled host.
+1. Copy the [sdfsinfo](https://github.com/librenms/librenms-agent/blob/master/snmp/sdfsinfo) to `/etc/snmp/` on SDFS enabled host.
 
 2. Make the script executable (chmod +x /etc/snmp/sdfsinfo)
 
