@@ -1,17 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: crc
- * Date: 4/23/17
- * Time: 5:40 AM
- */
+/*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @package    LibreNMS
+* @link       http://librenms.org
+* @copyright  2017 crcro
+* @author     Cercel Valentin <crc@nuamchefazi.ro>
+*/
 
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'sdfsinfo';
 $app_id = $app['app_id'];
-$options      = '-O qv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.115.100.102.115.105.110.102.111';
+$options = '-O qv';
+$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.115.100.102.115.105.110.102.111';
 
 d_echo($name);
 
