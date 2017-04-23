@@ -24,14 +24,15 @@ require 'includes/graphs/common.inc.php';
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Blocks';
-$unitlen       = 25;
+$unitlen       = 6;
 $bigdescrlen   = 25;
-$smalldescrlen = 25g;
+$smalldescrlen = 25;
 $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+
 $array    = array(
     'dup_data' => array('descr' => 'Duplicate data wrote (GB)','colour' => '000000',),
     'blocks_unique' => array('descr' => 'Unique blocks (GB)','colour' => '2A7A12',),

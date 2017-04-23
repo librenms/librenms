@@ -24,7 +24,7 @@ require 'includes/graphs/common.inc.php';
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Rates';
-$unitlen       = 20;
+$unitlen       = 6;
 $bigdescrlen   = 20;
 $smalldescrlen = 20;
 $dostack       = 0;

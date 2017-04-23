@@ -35,8 +35,6 @@ $rrd_def = RrdDefinition::make()
 
 list($files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate)=explode("\n", $sdfsinfo);
 
-
-
 $fields = array(
     'files' => $files,
     'vol_capacity' => $vol_capacity,

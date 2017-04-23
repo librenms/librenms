@@ -36,6 +36,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
+1. [SDFS info](#sdfs-info) - SNMP extend
 
 
 ### Apache
@@ -715,3 +716,21 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
+
+
+### SDFS info
+A small shell script (written in PHP) that exportfs SDFS volume info.
+
+###### SNMP Extend
+1. Copy the [sdfsinfo](https://github.com/librenms/librenms-agent/blob/master/snmp/sdfsinfo) to `/etc/snmpd/` on SDFS enabled host.
+
+2. Make the script executable (chmod +x /etc/snmp/sdfsinfo)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend sdfsinfo /etc/snmp/sdfsinfo
+```
+
+4. Restart snmpd on your host
+
+5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab.

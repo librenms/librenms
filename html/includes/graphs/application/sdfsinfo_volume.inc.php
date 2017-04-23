@@ -24,7 +24,7 @@ require 'includes/graphs/common.inc.php';
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Volume';
-$unitlen       = 25;
+$unitlen       = 6;
 $bigdescrlen   = 25;
 $smalldescrlen = 25;
 $dostack       = 0;
