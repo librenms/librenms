@@ -21,6 +21,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
+1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
@@ -388,6 +389,22 @@ extend nvidia /etc/snmp/nvidia
 The GPU numbering on the graphs will correspond to how the nvidia-smi sees them as being.
 
 For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
+
+### Open Grid Scheduler
+Shell script to track the OGS/GE jobs running on clusters.
+
+#### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/rocks.sh
+```
+
+2. Make the script executable (chmod +x /etc/snmp/rocks.sh)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend ogs /etc/snmp/rocks.sh
+```
 
 ### OS Updates
 A small shell script that checks your system package manager for any available updates. Supports apt-get/pacman/yum/zypper package managers).
