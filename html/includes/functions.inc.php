@@ -112,6 +112,9 @@ function nicecase($item)
         case 'php-fpm':
             return 'PHP-FPM';
 
+        case 'opengridscheduler':
+            return 'Open Grid Scheduler';
+
         default:
             return ucfirst($item);
     }
