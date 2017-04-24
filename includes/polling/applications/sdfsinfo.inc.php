@@ -46,7 +46,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('actual_savings', 'GAUGE', 0)
     ->addDataset('comp_rate', 'GAUGE', 0);
 
-list($files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate)=explode("\n", $sdfsinfo);
+list($files, $vol_capacity, $vol_logic_size, $vol_max_load, $dup_data, $blocks_unique, $blocks_compressed, $cluster_copies, $dedup_rate, $actual_savings, $comp_rate)=explode(" ", $sdfsinfo);
 
 $fields = array(
     'files' => $files,
