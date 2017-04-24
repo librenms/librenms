@@ -394,6 +394,12 @@ Regex Matching:
 ```php
 $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
 ```
+Regex Match Substitution:
+```php
+$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK [lat, long]";
+```
+If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match Substition yields "Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, long]". This allows you to keep the SysLocation string short and keeps Rack/Room/Building information intact after the substitution.
+
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
 ### Interfaces to be ignored
