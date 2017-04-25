@@ -1757,6 +1757,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('tpconductor');
     }
 
+    public function testTpdin()
+    {
+        $this->checkOS('tpdin');
+    }
+
     public function testTplink()
     {
         $this->checkOS('tplink');
