@@ -62,7 +62,7 @@ mib_dir:
     - cisco
 ```
 
-`poller_modules`: This is a list of poller modules to either enable (1) or disable (0):
+`poller_modules`: This is a list of poller modules to either enable (1) or disable (0). Check `includes/defaults.inc.php` to see which modules are enabled/disabled by default.
 
 ```yaml
 poller_modules:
@@ -71,7 +71,7 @@ poller_modules:
     cisco-ace-loadbalancer: 0
 ```
 
-`discovery_modules`: This is the list of discovery modules to either enable (1) or disable (0):
+`discovery_modules`: This is the list of discovery modules to either enable (1) or disable (0). Check `includes/defaults.inc.php` to see which modules are enabled/disabled by default.
 
 ```yaml
 discovery_modules:
@@ -79,6 +79,7 @@ discovery_modules:
      cisco-sla: 1
      cisco-mac-accounting: 0
 ```
+
 
 ##### Discovery Logic
 YAML is converted to an array in PHP.  Consider the following YAML:
@@ -121,7 +122,7 @@ So, considering the example:
 
 ### Poller
 
-OS polling is done within php and is where we detect certain values.
+OS polling is done within `includes/polling/os/$os.inc.php` and is where we detect certain values.
  
 ```php
 <?php
@@ -131,11 +132,13 @@ $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "pro
 
 ```
 
-`$version`: This is used to show the version of the OS running.
+`$version`: The version of the OS running on the device.
 
-`$hardware`: This is used to show the hardware version for the device.
+`$hardware`: The hardware version for the device. For example: 'WS-C3560X-24T-S'
 
-`$serial`: This is used to show the serial number of the main device.
+`$features`: Features for the device, for example a list of cards in the slots of a modular chassis.
+
+`$serial`: The main serial number of the device.
 
 ### MIBs
 
@@ -152,6 +155,7 @@ Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported
 - A vector image should not contain padding.  
 - The file should not be larger than 20 Kb. Simplify paths to reduce large files.
 - Use plain SVG without gzip compression.
+- The SVG root element must not contain length and width attributes, only viewBox.
 
 ##### Icon
 - Save the icon SVG to `html/images/os/$os.svg`.
@@ -168,7 +172,7 @@ Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported
 
 Hints for [Inkscape](https://inkscape.org/):
 
-- You can open a PDF to extract the logo.
+- You can open a PDF or EPS to extract the logo.
 - Ungroup elements to isolate the logo.
 - Use `Path -> Simplify` to simplify paths of large files.
 - Use `File -> Document Properties… -> Resize page to content…` to remove padding.
