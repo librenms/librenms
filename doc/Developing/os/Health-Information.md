@@ -6,22 +6,22 @@ Currently we have support for the following health metrics along with the values
 
 | Class                           | Measurement                 |
 | ------------------------------- | --------------------------- |
-| current                         | A                           |
-| frequency                       | Hz                          |
-| runtime                         | Min                         |
-| humidity                        | %                           |
-| fanspeed                        | rpm                         |
-| power                           | W                           |
-| voltage                         | V                           |
-| temperature                     | C                           |
-| dbm                             | dBm                         |
-| charge                          | %                           |
-| load                            | %                           |
-| state                           | #                           |
-| signal                          | dBm                         |
 | airflow                         | cfm                         |
+| charge                          | %                           |
+| current                         | A                           |
+| dbm                             | dBm                         |
+| fanspeed                        | rpm                         |
+| frequency                       | Hz                          |
+| humidity                        | %                           |
+| load                            | %                           |
+| power                           | W                           |
+| runtime                         | Min                         |
+| signal                          | dBm                         |
+| state                           | #                           |
+| temperature                     | C                           |
+| voltage                         | V                           |
 
-The directory structure for sensor information is `includes/discovery/sensors/$class/$os`. The format of all 
+The directory structure for sensor information is `includes/discovery/sensors/$class/$os.inc.php`. The format of all 
 of the sensors follows the same code format which is to call the `discover_sensor()` function - with the 
 exception of state which requires additional code.
 
@@ -47,7 +47,7 @@ exception of state which requires additional code.
   - $entPhysicalIndex_measured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.
 
 For the majority of devices, this is all that's required to add support for a sensor. Polling is done based on the data gathered using `discover_sensor()`.
-If custom polling is needed then the file format is similar to discovery: `includes/polling/sensors/$class/$os`. Whilst it's possible to performa additional 
+If custom polling is needed then the file format is similar to discovery: `includes/polling/sensors/$class/$os.inc.php`. Whilst it's possible to perform additional 
 snmp queries within polling this should be avoided where possible. The value for the OID is already available as `$sensor_value`.
 
 Graphing is performed automatically for sensors, no custom graphing is required or supported.
