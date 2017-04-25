@@ -66,6 +66,7 @@ if (!$where) {
     echo "Debugging and testing options:\n";
     echo "-r                                           Do not create or update RRDs\n";
     echo "-f                                           Do not insert data into InfluxDB\n";
+    echo "-o                                           Do not insert data into OpenTSDB\n";
     echo "-d                                           Enable debugging output\n";
     echo "-v                                           Enable verbose debugging output\n";
     echo "-m                                           Specify module(s) to be run\n";
@@ -114,6 +115,10 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
+if (isset($options['o'])) {
+    $config['noopentsdb'] = true;
+}
+
 if (isset($options['g'])) {
     $config['nographite'] = true;
 }
@@ -122,6 +127,12 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
+}
+
+if ($config['noopentsdb'] !== true && $config['opentsdb']['enable'] === true) {
+    $opentsdb = opentsdb_connect();
+} else {
+    $opentsdb = false;
 }
 
 if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {

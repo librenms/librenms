@@ -36,10 +36,20 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
+if (isset($options['o'])) {
+    $config['noopentsdb'] = true;
+}
+
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
+}
+
+if ($config['noopentsdb'] !== true && $config['opentsdb']['enable'] === true) {
+    $opentsdb = opentsdb_connect();
+} else {
+    $opentsdb = false;
 }
 
 rrdtool_initialize();

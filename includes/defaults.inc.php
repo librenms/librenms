@@ -898,6 +898,11 @@ $config['ignore_unmapable_port'] = false;
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
 
+//OpenTSDB default configuration
+$config['opentsdb']['enable'] = false;
+$config['opentsdb']['host'] = 'localhost';
+$config['opentsdb']['port'] = 4242;
+
 // Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
 $config['xirrus_disable_stations']  = false;
 

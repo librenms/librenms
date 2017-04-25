@@ -30,3 +30,5 @@ rrd
 /vendor
 composer.phar
 librenms_theme
+*.iml
+.idea/
