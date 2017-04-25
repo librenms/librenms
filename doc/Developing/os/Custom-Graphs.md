@@ -131,4 +131,4 @@ $unit_text = 'Users';
 require 'includes/graphs/generic_simplex.inc.php';
 ```
 
-That should be it, after data is started to be collected graphs should appear in the WebUI.
+That should be it, after data has started to be collected graphs should appear in the WebUI.
