@@ -18,9 +18,15 @@ if (is_array($ipmi_rows)) {
             $remote = " -H " . $ipmi['host'] . " -U '" . $ipmi['user'] . "' -P '" . $ipmi['password'] . "' -L USER";
         }
 
-        $results = external_exec($config['ipmitool'] . ' -I ' . $ipmi['type'] . ' -c ' . $remote . ' sdr 2>/dev/null');
-        d_echo($results);
-        echo " done.\n";
+        // Check to see if we know which IPMI interface to use
+        // so we dont use wrong arguments for ipmitool
+        if ($ipmi['type'] != '') {
+            $results = external_exec($config['ipmitool'] . ' -I ' . $ipmi['type'] . ' -c ' . $remote . ' sdr 2>/dev/null');
+            d_echo($results);
+            echo " done.\n";
+        } else {
+            echo " type not yet discovered.\n";
+        }
 
         foreach (explode("\n", $results) as $row) {
             list($desc, $value, $type, $status) = explode(',', $row);
