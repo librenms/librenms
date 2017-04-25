@@ -62,6 +62,7 @@ We can do that within a file to share our work and contribute in the development
 ```bash
 sql-schema/xxx.sql
 php includes/sql-schema/update.php
+./scripts/build-schema.php
 ```
 
 Or put the SQL commands directly in Mysql or PhpMyadmin for our tests:
