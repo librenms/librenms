@@ -206,6 +206,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
 
     public function testApcMgeups()
     {
+        $this->checkOS('apc-mgeups');
         $this->checkOS('apc-mgeups', 'mgeups-galaxy');
     }
 
