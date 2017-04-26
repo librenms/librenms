@@ -30,7 +30,7 @@ d_echo("DB Schema update started....\n");
 
 if (db_schema_is_current()) {
     d_echo("DB Schema already up to date.\n");
-    clean_lock('schema');
+    release_lock('schema');
     return;
 }
 
@@ -97,4 +97,4 @@ if ($updating) {
     }
 }
 
-clean_lock('schema');
+release_lock('schema');

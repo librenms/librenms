@@ -60,7 +60,7 @@ if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'End  : '.date('r')."\r\n";
 }
 
-clean_lock('alerts');
+release_lock('alerts');
 
 function ClearStaleAlerts()
 {

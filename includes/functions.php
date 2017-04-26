@@ -2356,10 +2356,10 @@ function set_lock($name)
 }
 
 /**
- * Clean up lock file for a given name
+ * Release lock file for a given name
  * @param $name
  */
-function clean_lock($name)
+function release_lock($name)
 {
     global $config;
     unlink($config['install_dir']."/.$name.lock");
