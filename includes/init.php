@@ -104,6 +104,19 @@ if ($config['memcached']['enable'] === true) {
 }
 
 if (!module_selected('nodb', $init_modules)) {
+    // Check for testing database
+    if (getenv('DBTEST')) {
+        if (isset($config['test_db_name'])) {
+            $config['db_name'] = $config['test_db_name'];
+        }
+        if (isset($config['test_db_user'])) {
+            $config['db_user'] = $config['test_db_user'];
+        }
+        if (isset($config['test_db_pass'])) {
+            $config['db_pass'] = $config['test_db_pass'];
+        }
+    }
+
     // Connect to database
     try {
         dbConnect();
