@@ -165,7 +165,7 @@ if (!empty($oids_disks)) {
             array($disks_state_index_id,'history-of-failures',1,7,1),
             array($disks_state_index_id,'unsupported-version',1,8,1),
         );
-        foreach ($disks_states as $value) {
+        foreach ($disk_states as $value) {
             $insert = array(
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
