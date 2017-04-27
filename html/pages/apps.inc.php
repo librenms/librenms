@@ -232,6 +232,12 @@ $graphs['smart'] = array(
     'id233',
 );
 
+$graphs['sdfsinfo'] = array(
+    'volume',
+    'blocks',
+    'rates',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
