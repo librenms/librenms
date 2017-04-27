@@ -12,10 +12,16 @@ $graph_array['legend']      = 'no';
 $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ? ORDER BY hostname', array($vars['app']));
 
 foreach ($app_devices as $app_device) {
+    if($app_device['sysName'] != '') {
+        $graph_title = $app_device['sysName'];
+    } else {
+        $graph_title = shorthost($app_device['hostname']);
+    }
+
     echo '<div class="panel panel-default">
         <div class="panel-heading">
         <h3 class="panel-title">
-        '.generate_device_link($app_device, shorthost($app_device['hostname']), array('tab' => 'apps', 'app' => $vars['app'])).'
+        '.generate_device_link($app_device, $graph_title, array('tab' => 'apps', 'app' => $vars['app'])).'
         <div class="pull-right"><small class="muted">'.$app_device['app_instance'].' '.$app_device['app_status'].'</small></div>
         </h3>
         </div>
