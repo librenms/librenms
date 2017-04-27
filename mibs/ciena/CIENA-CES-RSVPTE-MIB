@@ -1,0 +1,484 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-RSVPTE-MIB.my
+ --
+
+ CIENA-CES-RSVPTE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+  	TimeTicks, Integer32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   	DisplayString, MacAddress, RowStatus, TruthValue, TEXTUAL-CONVENTION			
+	FROM SNMPv2-TC	
+	CienaGlobalState
+	FROM CIENA-TC							
+	cienaCesConfig,cienaCesNotifications 
+	FROM CIENA-SMI;
+	
+
+ cienaCesRsvpteMIB MODULE-IDENTITY
+	    LAST-UPDATED "201607150000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  	115 North Sullivan Road
+			Spokane Valley, WA 99037
+		        USA		 		
+		        Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+
+	    DESCRIPTION
+		"This MIB module is for the RSVP-TE configuration for MPLS tunnels"
+            
+	    REVISION
+	    	"201607150000Z"
+	    DESCRIPTION
+		"Modified the description of cienaCesRsvpteRecoveryTime
+		and cienaCesRsvpteRestartTime under cienaCesRsvpteObjects."
+
+	    REVISION
+	    	"201607140000Z"
+	    DESCRIPTION
+		"Modified the attribute cienaCesRsvpteGRStatus to cienaCesRsvpteGRAdminStatus.
+		Added the attribute cienaCesRsvpteGROperStatus under cienaCesRsvpteObjects."
+ 
+	    REVISION
+	    	"201607040000Z"
+	    DESCRIPTION
+		"Added the attribute cienaCesRsvpteGRStatus under cienaCesRsvpteObjects.
+		Modified the default values of cienaCesRsvpteRecoveryTime and
+		cienaCesRsvpteRestartTime under cienaCesRsvpteObjects."
+
+	    REVISION
+	    	"201305080000Z"
+	    DESCRIPTION
+		"Modified the status of cienaCesRsvpteRfrshSlewDenom and cienaCesRsvpteRfrshSlewNumerator to 
+		deprecated under cienaCesRsvpteObjects. Modified the status of cienaCesRsvpteIfMtu to deprecated under 
+		cienaCesRsvpteIfTable. Added objects cienaCesRsvpteRefreshSlewDenominator and cienaCesRsvpteRefreshSlewNumerator 
+		under cienaCesRsvpteObjects. "
+
+	    REVISION
+	    	"201102020000Z"
+	    DESCRIPTION
+		"Initial version."
+
+	    ::= { cienaCesConfig 16 }
+
+
+--
+-- Textual convention
+--
+ AdvertisedLabel ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Advertised Label"
+     SYNTAX       INTEGER {
+                    implicitnull(1),
+                    nonreserved(99)
+                   } 
+
+ RsvpOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The current operational state of RSVP-TE."
+    SYNTAX      INTEGER {
+                  operStatusUp(1),       -- active
+                  operStatusDown(2),     -- inactive
+                  operStatusGoingUp(3),  -- activating
+                  operStatusGoingDown(4),-- deactivating
+                  operStatusActFailed(5) -- activation failed
+                }
+
+ RsvpGRMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The current GR operational state of RSVP-TE."
+    SYNTAX      INTEGER {
+                  helpNeighbor(1),
+                  restartCapable(2),
+                  notApplicable(3)
+                  
+                }
+
+
+ --
+ -- Node definitions
+ --
+	
+  cienaCesRsvpteMIBObjects OBJECT IDENTIFIER ::= { cienaCesRsvpteMIB 1 }
+ cienaCesRsvpteObjects    OBJECT IDENTIFIER ::= { cienaCesRsvpteMIBObjects 1 }
+ cienaCesRsvpte           OBJECT IDENTIFIER ::= { cienaCesRsvpteMIBObjects 2 }
+
+ cienaCesRsvpteAdminStatus OBJECT-TYPE
+      SYNTAX      CienaGlobalState
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The desired administrative status of RSVP-TE."
+      ::= { cienaCesRsvpteObjects 1 }
+
+ cienaCesRsvpteOperStatus OBJECT-TYPE
+      SYNTAX      RsvpOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The current operational status of RSVP-TE."
+      ::= { cienaCesRsvpteObjects 2 }
+      
+ cienaCesRsvpteRetryInterval OBJECT-TYPE
+      SYNTAX      Unsigned32 (3..65)
+      UNITS       "seconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The persistent tunnel retry interval.
+           This is the interval between the first failure of a persistent
+           tunnel and the first attempt to re-establish the tunnel.
+           This cannot be changed while the administrative status is enabled 
+           or the operational status is up."
+      DEFVAL      { 3 }
+      ::= { cienaCesRsvpteObjects 3 }
+
+ cienaCesRsvpteRetryInfiniteState OBJECT-TYPE
+      SYNTAX      INTEGER {
+      				on(1),
+      				off(2)
+      				}      
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The persistent tunnel retry infinity.
+           This is the state which when on, triggers RSVP-TE to try to restore the tunnels
+           infinite times. This object can only be set if RSVP-TE is globally disabled."
+      DEFVAL      { on }
+      ::= { cienaCesRsvpteObjects 4 }
+
+ cienaCesRsvpteRetryMax OBJECT-TYPE
+      SYNTAX      INTEGER (1..255)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The maximum number of retry attempts that will be made before a
+           persistent tunnel is deemed inoperable. Once in this state,
+           a management agent should set mplsTunnelAdminStatus to 'up' to
+           attempt to re-establish the tunnel. This field is not used when 
+           cienaCesRsvpteRetryInfiniteState is on."
+      DEFVAL      { 10 }
+      ::= { cienaCesRsvpteObjects 5 }
+
+
+ cienaCesRsvpteRefreshInterval OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The RSVP-TE value, R, which is used to set the average
+        interval between refresh path and RESV messages."
+      DEFVAL { 30000 }
+      ::= { cienaCesRsvpteObjects 6 }
+
+ cienaCesRsvpteRefreshMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The RSVP-TE value, K, which is the number of unresponded path
+        or RESV refresh attempts that must be made, spaced by
+        the refresh interval, before the state is deemed to have
+        timed out."
+      DEFVAL { 3 }
+      ::= { cienaCesRsvpteObjects 7 }
+
+ cienaCesRsvpteRfrshSlewDenom OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      deprecated
+      DESCRIPTION
+       "This object is deprecated and the new object to provide this information is
+       cienaCesRsvpteRefreshSlewDenominator in this table."
+      DEFVAL { 10 }
+      ::= { cienaCesRsvpteObjects 8 }
+
+ cienaCesRsvpteRfrshSlewNumerator OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      deprecated
+      DESCRIPTION
+       "This object is deprecated and the new object to provide this information is
+       cienaCesRsvpteRefreshSlewNumerator in this table."
+      DEFVAL { 3 }
+      ::= { cienaCesRsvpteObjects 9 }
+
+ cienaCesRsvpteBlockadeMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The RSVP-TE value, Kb, which is the number of refresh timeout
+        periods after which the blockade state is deleted."
+      DEFVAL { 2 }
+      ::= { cienaCesRsvpteObjects 10 }
+
+ cienaCesRsvpteLSPSetupPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The setup priority to apply to LSPs that are not
+        signaling this parameter. 0 represents the highest
+        priority and 7 the lowest. The value of this object must be
+        numerically greater than or equal to (lower or equal priority)
+        than the value of the holding priority object."
+      DEFVAL { 4 }
+      ::= { cienaCesRsvpteObjects 11 }
+
+ cienaCesRsvpteLSPHoldingPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "The holding priority to apply to LSPs that are not
+       signaling this parameter. 0 represents the highest
+       priority and 7 the lowest. The value of this object must be
+       numerically less than or equal to (higher or equal priority)
+       than the value of the holding priority object."
+      DEFVAL { 3 }
+      ::= { cienaCesRsvpteObjects 12 }
+
+ cienaCesRsvpteUseHopByHop OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate that RSVP-TE should use the hop by hop
+         addressing scheme for the PATH and PATH-TEAR messages it
+         sends. If set, then the IP addresses used in the IP header
+         of the PATH messages forwarded by RSVP-TE set the source as the
+         local outgoing interface IP address, and set the destination as
+         the next hop router IP address."
+      DEFVAL { false }
+      ::= { cienaCesRsvpteObjects 13 }
+
+ cienaCesRsvpteRestartCapable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "A flag to indicate whether the local node should advertise
+           itself as restart capable."
+      DEFVAL { true }
+      ::= { cienaCesRsvpteObjects 14 }
+
+ cienaCesRsvpteRestartTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The time in milliseconds that the local node takes to
+         restart RSVP-TE and the communication channel used for
+         RSVP-TE communication. This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         Only used if cienaCesRsvpteRestartCapable is set to true.
+
+         For devices which only act as the Helper node, this timer
+         is unused and will return value 0."
+      DEFVAL { 60000 }
+      ::= { cienaCesRsvpteObjects 15 }
+
+ cienaCesRsvpteRecoveryTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The period of time in milliseconds that the local node
+         would like neighbors to take to resyncronize RSVP-TE and
+         MPLS forwarding information after the re-establishment of
+         Hello connectivity. This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         A value of zero indicates that the node does not support
+         resynchronization following failure of the local node.
+
+         A value of 0xFFFFFFFF indicates an infinite recovery time.
+
+         Only used if cienaCesRsvpteRestartCapable is set to true.
+
+         For devices which only act as the Helper node, this timer
+         is unused and will return value 0."
+      DEFVAL { 120000 }
+      ::= { cienaCesRsvpteObjects 16 }
+
+ cienaCesRsvpteMinPeerRestart OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The mininum period of time in milliseconds that RSVP-TE
+         should wait for a restart capable neighbor to regain
+         Hello connectivity before invoking procedures related to
+         communication loss.
+
+         RSVP-TE waits for the maximum of this time and the
+         restart_time advertised in the RESTART_CAP object in Hello
+         messages from the neighbor."
+      DEFVAL { 0 }
+      ::= { cienaCesRsvpteObjects 17 }
+
+  cienaCesRsvpteRefreshSlewDenominator OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The denominator of the fraction, SlewMax, which is the
+        maximum allowable increase in the refresh interval, R, to
+        prevent state timeout while changing R. R is increased by
+        this fraction until it reaches the new desired value."
+      DEFVAL { 10 }
+      ::= { cienaCesRsvpteObjects 18 }
+
+ cienaCesRsvpteRefreshSlewNumerator OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The numerator of the fraction, SlewMax, which is the maximum
+        allowable increase in the refresh interval, R, to prevent
+        state timeout while changing R. R is increased by this
+        fraction until it reaches the new desired value."
+      DEFVAL { 3 }
+      ::= { cienaCesRsvpteObjects 19 }
+
+ cienaCesRsvpteGRAdminStatus OBJECT-TYPE
+      SYNTAX      CienaGlobalState
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "RSVP-TE Graceful restart status (Enabled/Disabled)."
+      ::= { cienaCesRsvpteObjects 20 }
+
+ cienaCesRsvpteGRMode OBJECT-TYPE
+     SYNTAX      RsvpGRMode
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "RSVP-TE Graceful restart Operational status."
+    ::= { cienaCesRsvpteObjects 21 }
+
+
+ cienaCesRsvpteIfTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CienaCesRsvpteIfEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A table of interfaces on which RSVP-TE can be enabled."
+      ::= { cienaCesRsvpte 1 }
+    
+ cienaCesRsvpteIfEntry OBJECT-TYPE
+      SYNTAX      CienaCesRsvpteIfEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in the RSVP-TE interface table."
+           INDEX       { cienaCesRsvpteIfIndex }
+      ::= { cienaCesRsvpteIfTable 1 }
+
+ CienaCesRsvpteIfEntry ::= SEQUENCE {
+      cienaCesRsvpteIfIndex           	INTEGER,
+      cienaCesRsvpteIfName            	OCTET STRING,
+      cienaCesRsvpteIfIpAddr          	IpAddress,
+      cienaCesRsvpteIfMtu             	INTEGER,
+      cienaCesRsvpteIfAdminStatus     	CienaGlobalState,
+      cienaCesRsvpteIfOperStatus      	INTEGER,
+      cienaCesRsvpteIfHelloInterval   	Unsigned32,
+      cienaCesRsvpteIfHelloTolerance  	Unsigned32,
+      cienaCesRsvpteIfAdvertisedLabel 	AdvertisedLabel	
+ }
+
+
+ cienaCesRsvpteIfIndex OBJECT-TYPE
+      SYNTAX      INTEGER (1..4096)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Interface index."
+      ::= { cienaCesRsvpteIfEntry 1 }
+
+ cienaCesRsvpteIfName OBJECT-TYPE
+      SYNTAX      OCTET STRING (SIZE (0..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Interface name."
+      ::= { cienaCesRsvpteIfEntry 2 }
+
+
+ cienaCesRsvpteIfIpAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Interface IP address."
+      ::= { cienaCesRsvpteIfEntry 3 }
+
+ cienaCesRsvpteIfMtu OBJECT-TYPE
+      SYNTAX      INTEGER (1500..9216)
+      MAX-ACCESS  read-only
+      STATUS      deprecated
+      DESCRIPTION
+          "This object is deprecated and no longer in use."
+      ::= { cienaCesRsvpteIfEntry 4 }
+
+ cienaCesRsvpteIfAdminStatus OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE administrative status on this interface."
+      ::= { cienaCesRsvpteIfEntry 5 }
+
+ cienaCesRsvpteIfOperStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                     up(1),
+                     down(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE operational status on this interface."
+      ::= { cienaCesRsvpteIfEntry 6 }
+
+ cienaCesRsvpteIfHelloInterval OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..30)    
+      UNITS	      "seconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "RSVP-TE Hello message interval."
+      DEFVAL	  { 0 }      
+      ::= { cienaCesRsvpteIfEntry 7 }
+
+  cienaCesRsvpteIfHelloTolerance OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..10)
+      MAX-ACCESS  read-only
+      STATUS      current            
+      DESCRIPTION
+          "RSVP-TE Hello tolerance defines the number of Hello intervals that can pass without receiving a
+           successful Hello message from a partner before the Hello session times out."
+      DEFVAL	  { 3 }     
+      ::= { cienaCesRsvpteIfEntry 8 }
+ 
+ cienaCesRsvpteIfAdvertisedLabel OBJECT-TYPE
+      SYNTAX      AdvertisedLabel
+      MAX-ACCESS  read-only
+      STATUS      current            
+      DESCRIPTION
+          "This object indicates what kind of label will be advertised by RSVP-TE for a 
+          Label Request received on this L3 interface."
+      DEFVAL	  { 99 }     
+      ::= { cienaCesRsvpteIfEntry 9 }
+ 
+ END
+ 
+--
+-- CIENA-CES-RSVPTE-MIB

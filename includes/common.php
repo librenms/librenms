@@ -1643,7 +1643,8 @@ function set_numeric($value, $default = 0)
 
 function check_git_exists()
 {
-    if (`which git`) {
+    exec('git > /dev/null 2>&1', $response, $exit_code);
+    if ($exit_code === 1) {
         return true;
     } else {
         return false;

@@ -194,6 +194,10 @@ $graphs['squid'] = array(
     'cputime',
 );
 
+$graphs['opengridscheduler'] = array(
+    'ogs'
+);
+
 $graphs['fbsd-nfs-server'] = array(
     'stats',
     'cache',
