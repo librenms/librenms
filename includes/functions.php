@@ -371,6 +371,7 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
+    oxidized_reload_nodes();
     return $ret;
 }
 
@@ -718,7 +719,6 @@ function createHost(
 
     $device_id = dbInsert($device, 'devices');
     if ($device_id) {
-        oxidized_reload_nodes();
         return $device_id;
     }
 
@@ -1559,7 +1559,7 @@ function oxidized_reload_nodes()
     global $config;
 
     if ($config['oxidized']['enabled'] === true && $config['oxidized']['reload_nodes'] === true && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload.json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);

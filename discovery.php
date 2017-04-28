@@ -131,6 +131,10 @@ $proctime = substr($run, 0, 5);
 
 if ($discovered_devices) {
     dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices, 'poller' => $config['distributed_poller_name']), 'perf_times');
+    if ($doing === 'new') {
+        // We have added a new device by this point so we might want to do some other work
+        oxidized_reload_nodes();
+    }
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";
