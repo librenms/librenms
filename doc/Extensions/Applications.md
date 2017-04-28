@@ -30,6 +30,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [SDFS info](#sdfs-info) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
@@ -715,3 +716,24 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
+
+
+### SDFS info
+A small shell script that exportfs SDFS volume info.
+
+###### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/sdfsinfo -O /etc/snmp/sdfsinfo
+```
+
+2. Make the script executable (chmod +x /etc/snmp/sdfsinfo)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend sdfsinfo /etc/snmp/sdfsinfo
+```
+
+4. Restart snmpd on your host
+
+5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab or wait for it to be auto-discovered.
