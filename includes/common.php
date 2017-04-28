@@ -1756,3 +1756,19 @@ function set_user_pref($name, $value, $user_id = null)
 
     return $result;
 }
+
+if (!function_exists("array_column")) {
+    /**
+     * Quick and dirty implementation of array_column from PHP 5.5
+     *
+     * @param $array
+     * @param $column_name
+     * @return array
+     */
+    function array_column($array, $column_name)
+    {
+        return array_map(function ($element) use ($column_name) {
+            return $element[$column_name];
+        }, $array);
+    }
+}

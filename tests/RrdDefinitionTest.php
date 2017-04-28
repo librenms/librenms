@@ -72,4 +72,100 @@ class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $def);
     }
+
+    public function testEmptyData()
+    {
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('one', 'GAUGE')
+            ->addDataset('two', 'COUNTER');
+
+        $this->assertSame(array('one' => 'U', 'two' => 'U'), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make();
+        $rrd_def->setValue('something', 1);
+        $this->assertSame(array(), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make();
+        $rrd_def->setData(array('else' => 1));
+        $this->assertSame(array(), $rrd_def->getData());
+    }
+
+    public function testGetData()
+    {
+        $expected = array('one' => 234, 'two' => 543);
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('one', 'GAUGE')
+            ->addDataset('two', 'COUNTER');
+
+        $rrd_def->setValue('one', 234);
+        $rrd_def->setValue('two', 543);
+
+        $this->assertSame($expected, $rrd_def->getData());
+    }
+
+    public function testSetValue()
+    {
+        $rrd_def = RrdDefinition::make()->addDataset('non-existent', 'GAUGE');
+        $rrd_def->setValue('something-else', 1);
+        $rrd_def->setValue(100, 1);
+        $this->assertSame(array('non-existent' => 'U'), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('int', 'GAUGE');
+        $rrd_def->setValue('int', 1337);
+        $this->assertSame(array('int' => 1337), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('float', 'GAUGE');
+        $rrd_def->setValue('float', 1.42);
+        $this->assertSame(array('float' => 1.42), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('numeric', 'GAUGE');
+        $rrd_def->setValue('numeric', '1024.42');
+        $this->assertSame(array('numeric' => 1024.42), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('string', 'GAUGE');
+        $rrd_def->setValue('string', 'string');
+        $this->assertSame(array('string' => 'U'), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('negative', 'GAUGE');
+        $rrd_def->setValue('negative', -42);
+        $this->assertSame(array('negative' => -42), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('null', 'GAUGE');
+        $rrd_def->setValue('null', null);
+        $this->assertSame(array('null' => 'U'), $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()->addDataset('numeric_index', 'GAUGE');
+        $rrd_def->setValue(0, 1);
+        $this->assertSame(array('numeric_index' => 1), $rrd_def->getData());
+    }
+
+    public function testSetData()
+    {
+        $expected = array('one' => 1, 'two' => 2, 'three' => 3);
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('one', 'GAUGE')
+            ->addDataset('two', 'COUNTER')
+            ->addDataset('three', 'COUNTER');
+        $rrd_def->setData($expected);
+        $this->assertSame($expected, $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('one', 'GAUGE')
+            ->addDataset('two', 'COUNTER')
+            ->addDataset('three', 'COUNTER');
+
+        $rrd_def->setData(array('three' => 3, 'one' => 1));
+        $this->assertSame(array('one' => 1, 'two' => 'U', 'three' => 3), $rrd_def->getData());
+
+        $rrd_def->setData(array(1 => 2));
+        $this->assertSame($expected, $rrd_def->getData());
+
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('one', 'GAUGE')
+            ->addDataset('two', 'COUNTER')
+            ->addDataset('three', 'COUNTER');
+
+        $rrd_def->setData(array_values($expected));
+        $this->assertSame($expected, $rrd_def->getData());
+    }
 }

@@ -31,6 +31,7 @@ class RrdDefinition
 {
     private static $types = array('GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE');
     private $dataSets = array();
+    private $data = array();
 
     /**
      * Make a new empty RrdDefinition
@@ -58,17 +59,90 @@ class RrdDefinition
         if (empty($name)) {
             d_echo("DS must be set to a non-empty string.");
         }
+        $escaped_name = $this->escapeName($name);
 
         $ds = array();
-        $ds[] = $this->escapeName($name);
+        $ds[] = $escaped_name;
         $ds[] = $this->checkType($type);
         $ds[] = is_null($heartbeat) ? $config['rrd']['heartbeat'] : $heartbeat;
         $ds[] = is_null($min) ? 'U' : $min;
         $ds[] = is_null($max) ? 'U' : $max;
 
         $this->dataSets[] = $ds;
+        $this->data[$escaped_name] = 'U'; // Initialize the data array as undefined data
 
         return $this;
+    }
+
+    /**
+     * Set a single data value.
+     * $dsname may be the index of the dataset, but this is not recommended
+     *
+     * @param string|int $dsname The name of the dataset to set the value for
+     * @param int|null $value value
+     * @return bool
+     */
+    public function setValue($dsname, $value)
+    {
+        // value sanity checks
+        if (is_numeric($value)) {
+            $value = $value + 0;
+        } else {
+            if (!is_null($value)) {
+                d_echo("Error: Value must be numeric or null! Given: $value");
+            }
+            $value = 'U';
+        }
+
+        // check and set string based keys
+        $escaped_name = $this->escapeName($dsname);
+        if (isset($this->data[$escaped_name])) {
+            $this->data[$escaped_name] = $value;
+            return true;
+        }
+
+        // check and set numeric based keys
+        if (is_numeric($dsname) && isset($this->dataSets[$dsname])) {
+            $this->data[$this->dataSets[$dsname][0]] = $value;
+            return true;
+        }
+
+        d_echo("Invalid dsname: $dsname");
+        return false;
+    }
+
+    /**
+     * Set an array of data values
+     * If using a numeric dsname index, it is recommended to set all data.
+     * Using a string dsname index allows for partial data sets.
+     *
+     * @param array $data An array with keys of the dsname and values of the data value
+     */
+    public function setData($data)
+    {
+        // if a numeric, sequential array is give match it up with the same order as dsnames
+        if (array_keys($data) === array_keys($this->dataSets)) {
+            $data = array_combine($this->getDsNames(), $data);
+        }
+
+        foreach ($data as $dsname => $value) {
+            $this->setValue($dsname, $value);
+        }
+    }
+
+    /**
+     * Get an array of data to send to the data_update() function
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function getDsNames()
+    {
+        return array_column($this->dataSets, 0);
     }
 
     /**

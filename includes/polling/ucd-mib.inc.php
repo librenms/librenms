@@ -38,15 +38,13 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
         ->addDataset('nice', 'COUNTER', 0)
         ->addDataset('idle', 'COUNTER', 0);
 
-    $fields = array(
-        'user'    => $ss['ssCpuRawUser'],
-        'system'  => $ss['ssCpuRawSystem'],
-        'nice'    => $ss['ssCpuRawNice'],
-        'idle'    => $ss['ssCpuRawIdle'],
-    );
+    $rrd_def->setValue('user', $ss['ssCpuRawUser']);
+    $rrd_def->setValue('system', $ss['ssCpuRawSystem']);
+    $rrd_def->setValue('nice', $ss['ssCpuRawNice']);
+    $rrd_def->setValue('idle', $ss['ssCpuRawIdle']);
 
     $tags = compact('rrd_def');
-    data_update($device, 'ucd_cpu', $tags, $fields);
+    data_update($device, 'ucd_cpu', $tags, $rrd_def->getData());
 
     $graphs['ucd_cpu'] = true;
 }
@@ -74,12 +72,10 @@ foreach ($collect_oids as $oid) {
         $rrd_name = 'ucd_'.$oid;
         $rrd_def = RrdDefinition::make()->addDataset('value', 'COUNTER', 0);
 
-        $fields = array(
-            'value' => $ss[$oid],
-        );
+        $rrd_def->setValue('value', $ss[$oid]);
 
         $tags = compact('oid', 'rrd_name', 'rrd_def');
-        data_update($device, 'ucd_cpu', $tags, $fields);
+        data_update($device, 'ucd_cpu', $tags, $rrd_def->getData());
 
         $graphs['ucd_cpu'] = true;
     }
@@ -117,17 +113,9 @@ if (is_numeric($ss['ssRawInterrupts'])) {
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
+// order is important for data below
 $snmpdata = snmp_get_multi($device, 'memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0', '-OQUs', 'UCD-SNMP-MIB');
 if (is_array($snmpdata[0])) {
-    list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
-    foreach (array_keys($snmpdata[0]) as $key) {
-        $$key = $snmpdata[0][$key];
-    }
-}
-
-$snmpdata = $snmpdata[0];
-
-if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('totalswap', 'GAUGE', 0, 10000000000)
         ->addDataset('availswap', 'GAUGE', 0, 10000000000)
@@ -138,19 +126,10 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
         ->addDataset('buffered', 'GAUGE', 0, 10000000000)
         ->addDataset('cached', 'GAUGE', 0, 10000000000);
 
-    $fields = array(
-        'totalswap'    => $memTotalSwap,
-        'availswap'    => $memAvailSwap,
-        'totalreal'    => $memTotalReal,
-        'availreal'    => $memAvailReal,
-        'totalfree'    => $memTotalFree,
-        'shared'       => $memShared,
-        'buffered'     => $memBuffer,
-        'cached'       => $memCached,
-    );
+    $rrd_def->setData(array_values($snmpdata[0]));
 
     $tags = compact('rrd_def');
-    data_update($device, 'ucd_mem', $tags, $fields);
+    data_update($device, 'ucd_mem', $tags, $rrd_def->getData());
 
     $graphs['ucd_memory'] = true;
 }
@@ -160,27 +139,22 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
 // UCD-SNMP-MIB::laLoadInt.1 = INTEGER: 206
 // UCD-SNMP-MIB::laLoadInt.2 = INTEGER: 429
 // UCD-SNMP-MIB::laLoadInt.3 = INTEGER: 479
-$load_raw = snmp_get_multi($device, 'laLoadInt.1 laLoadInt.2 laLoadInt.3', '-OQUs', 'UCD-SNMP-MIB');
+$load_raw = snmp_get_multi_oid($device, 'laLoadInt.1 laLoadInt.2 laLoadInt.3', '-OQUs', 'UCD-SNMP-MIB');
 
 // Check to see that the 5-min OID is actually populated before we make the rrd
-if (is_numeric($load_raw[2]['laLoadInt'])) {
+if (is_numeric($load_raw['laLoadInt.2'])) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('1min', 'GAUGE', 0, 5000)
         ->addDataset('5min', 'GAUGE', 0, 5000)
         ->addDataset('15min', 'GAUGE', 0, 5000);
 
-    $fields = array(
-        '1min'   => $load_raw[1]['laLoadInt'],
-        '5min'   => $load_raw[2]['laLoadInt'],
-        '15min'  => $load_raw[3]['laLoadInt'],
-    );
+    $rrd_def->setData(array_values($load_raw));
 
     $tags = compact('rrd_def');
-    data_update($device, 'ucd_load', $tags, $fields);
+    data_update($device, 'ucd_load', $tags, $rrd_def->getData());
 
     $graphs['ucd_load'] = 'TRUE';
 }
 
 unset($ss, $load_raw, $snmpdata);
-unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached);
 unset($key, $collect_oids, $rrd_name, $rrd_def, $oid);
