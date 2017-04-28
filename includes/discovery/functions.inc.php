@@ -88,7 +88,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
 //end discover_new_device()
 
-function discover_device($device, $options = null)
+function discover_device(&$device, $options = null)
 {
     global $config, $valid;
 
