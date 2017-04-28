@@ -1,5 +1,5 @@
 <?php
 
-$table = 'sensors';
+$table = 'wireless_sensors';
 
 include 'sensors-common.php';

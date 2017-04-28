@@ -110,66 +110,104 @@ class WirelessSensor extends Sensor
         }
     }
 
-    public static function getTypes()
+    /**
+     * Return a list of valid types with metadata about each type
+     * $class => array(
+     *  'short' - short text for this class
+     *  'long'  - long text for this class
+     *  'unit'  - units used by this class 'dBm' for example
+     *  'icon'  - font awesome icon used by this class
+     * )
+     * @param bool $valid filter this list by valid types in the database
+     * @param int $device_id when filtering, only return types valid for this device_id
+     * @return array
+     */
+    public static function getTypes($valid = false, $device_id = null)
     {
         // Add new types here
+        // FIXME I'm really bad with icons, someone please help!
         static $types = array(
             'clients' => array(
                 'short' => 'Clients',
                 'long' => 'Client Count',
                 'unit' => '',
+                'icon' => 'tablet',
             ),
             'quality' => array(
                 'short' => 'Quality',
                 'long' => 'Quality',
                 'unit' => '%',
+                'icon' => 'feed',
             ),
             'capacity' => array(
                 'short' => 'Capacity',
                 'long' => 'Capacity',
                 'unit' => '%',
+                'icon' => 'feed',
             ),
             'ccq' => array(
                 'short' => 'CCQ',
                 'long' => 'Client Connection Quality',
                 'unit' => '%',
+                'icon' => 'wifi',
             ),
             'noise-floor' => array(
                 'short' => 'Noise Floor',
                 'long' => 'Noise Floor',
                 'unit' => 'dBm/Hz',
+                'icon' => 'signal',
             ),
             'rssi' => array(
                 'short' => 'RSSI',
                 'long' => 'Received Signal Strength Indicator',
                 'unit' => 'dBm',
+                'icon' => 'signal',
             ),
             'rate' => array(
                 'short' => 'Rate',
                 'long' => 'TX/RX Rate',
                 'unit' => 'Mbps',
+                'icon' => 'tachometer',
             ),
             'signal' => array(
                 'short' => 'Signal',
                 'long' => 'Signal Strength',
                 'unit' => 'dBm',
+                'icon' => 'signal',
             ),
             'power' => array(
                 'short' => 'Power',
                 'long' => 'TX/RX Power',
                 'unit' => 'dBm',
+                'icon' => 'bolt',
             ),
             'distance' => array(
                 'short' => 'Distance',
                 'long' => 'Distance',
                 'unit' => 'km',
+                'icon' => 'space-shuttle',
             ),
             'frequency' => array(
                 'short' => 'Frequency',
                 'long' => 'Frequency',
                 'unit' => 'MHz',
+                'icon' => 'line-chart',
             ),
         );
+
+        if ($valid) {
+            $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';
+            $params = array();
+            if (isset($device_id)) {
+                $sql .= ' WHERE `device_id`=?';
+                $params[] = $device_id;
+            }
+            $sql .= ' GROUP BY `sensor_class`';
+
+            $sensors = dbFetchColumn($sql, $params);
+            return array_intersect_key($types, array_flip($sensors));
+        }
+
         return $types;
     }
 
