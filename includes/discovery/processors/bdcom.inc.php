@@ -24,13 +24,12 @@
  */
 
 if ($device['os'] == 'bdcom') {
-
     echo 'BDCOM, NMS-PROCESS-MIB';
 
     $usage = snmp_get($device, '.1.3.6.1.4.1.3320.9.109.1.1.1.1.5.1', '-Ovqn');
 
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.3320.9.109.1.1.1.1.5.1', '0', 'bdcom', 'CPU, '1', $usage, null, null);
+        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.3320.9.109.1.1.1.1.5.1', '0', 'bdcom', 'CPU', '1', $usage, null, null);
     }
 }
 

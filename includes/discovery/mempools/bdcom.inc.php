@@ -25,7 +25,6 @@
  */
 
 if ($device['os'] == 'bdcom') {
-
     echo 'BDCOM, NMS-MEMORY-POOL:';
 
     $total = snmp_get($device, '.1.3.6.1.4.1.3320.9.48.2.0', '-OvQ');
