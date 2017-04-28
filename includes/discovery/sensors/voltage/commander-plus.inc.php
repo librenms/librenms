@@ -2,7 +2,7 @@
 /**
  * commander-plus.inc.php
  *
- * LibreNMS current discovery module for Commander Plus
+ * LibreNMS voltage discovery module for Commander Plus
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,11 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$current  = snmp_get($device, 'batteryCurrent.0', '-Oqv', 'CCPOWER-MIB');
-$oid = '.1.3.6.1.4.1.18642.1.2.2.1.0';
-$descr = 'Battery current';
-$divisor = 1;
+$oid        = '.1.3.6.1.4.1.18642.1.2.1.1.0';
+$descr      = 'Rectifier Voltage';
+$divisor    = 10;
 $multiplier = 1;
-discover_sensor($valid['sensor'], 'current', $device, $oid, 'batteryCurrent', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);
-
-$current    = snmp_get($device, 'rectifierLoadCurrent.0', '-Oqv', 'CCPOWER-MIB');
-$oid        = '.1.3.6.1.4.1.18642.1.2.1.2.0';
-$descr      = 'Rectifier Current';
-$divisor    = 1;
-$multiplier = 1;
-$limit_low  = 0;
-$limit      = 5000;
-discover_sensor($valid['sensor'], 'current', $device, $oid, 'rectifierLoadCurrent', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);
+$limit_low  = 24;
+$limit      = 57;
+$current    = snmp_get($device, 'rectifierFloatVoltage.0', '-Oqv', 'CCPOWER-MIB');
+discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'rectifierFloatVoltage', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);
