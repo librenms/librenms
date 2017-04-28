@@ -1648,6 +1648,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('sinetica');
     }
 
+    public function testSiteMonitor()
+    {
+        $this->checkOS('sitemonitor');
+    }
+
     public function testMegatec()
     {
         $this->checkOS('netagent2');
