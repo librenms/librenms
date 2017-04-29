@@ -1,0 +1,295 @@
+ATPC-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,Gauge32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    AlarmLevelT,EnableStatusT
+        FROM ExaltComm
+    radioConfig, almLocal, almRemote, performance, perfLocal, perfRemote
+        FROM ExaltComProducts;
+
+    advSystemConfig OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This is the device specific advanced configuration section."
+        ::= { radioConfig 5 }
+
+    atpc OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "ATPC configuration."
+        ::= { advSystemConfig 7 }
+
+    atpcEnable OBJECT-TYPE
+        SYNTAX              EnableStatusT 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "ATPC Enable."
+        ::= { atpc 1 }
+
+    atpcRSLThreshold OBJECT-TYPE
+        SYNTAX              Integer32 (-900..-500)
+        UNITS               "Tenths dBm" 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "ATPC RSL Thershold."
+        ::= { atpc 2 }
+
+    atpcMaxTxPower OBJECT-TYPE
+        SYNTAX              Integer32 (0..400)
+        UNITS               "Tenths dBm" 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "ATPC Max TX Power."
+        ::= { atpc 3 }
+
+    atpcTimerControl OBJECT-TYPE
+        SYNTAX              EnableStatusT 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "ATPC Timer Control."
+        ::= { atpc 4 }
+
+    atpcOverloadProtection OBJECT-TYPE
+        SYNTAX              EnableStatusT 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Overload Protection."
+        ::= { atpc 5 }
+
+    atpcOverloadProtectionRslThreshold OBJECT-TYPE
+        SYNTAX              Integer32 (-400..-200)
+        UNITS               "Tenths dBm" 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Overload Protection RSL Threshold."
+        ::= { atpc 6 }
+
+    atpcRslHighWmEventTrigger OBJECT-TYPE
+        SYNTAX              Integer32 (-400..-200)
+        UNITS               "Tenths dBm" 
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "RSL High Watermark Event Trigger."
+        ::= { atpc 7 }
+
+    commitAtpcSettings OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This command allows saving or clear the ATPC configuration.
+                            Option strings to be written are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { atpc 1000 }
+
+    locAtpcAlarms OBJECT IDENTIFIER  ::= { almLocal 6 }
+    remAtpcAlarms OBJECT IDENTIFIER  ::= { almRemote 6 }
+    perfLocalAtpc OBJECT IDENTIFIER  ::= { performance 5 }
+--   perfRemoteAtpc OBJECT IDENTIFIER ::= { performance 6 }
+
+    locAtpcMaxPower OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Local ATPC Max Power Alarm."
+        ::= { locAtpcAlarms 1 }
+
+    remAtpcMaxPower OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Remote ATPC Max Power Alarm."
+        ::= { remAtpcAlarms 1 }
+
+-- ATPC Performance 
+    locMaxPowerElapsedTime OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Elapsed time at maximum power ,as a formatted
+                             string. "
+        ::= { perfLocalAtpc  1 }
+
+    locAtpcActiveElapsedTime OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Elapsed ATPC active time ,as a formatted
+                             string. "
+        ::= { perfLocalAtpc  2 }
+
+    locTimeSinceResetAtpc OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Elapsed time,since ATPC is reset. "
+        ::= { perfLocalAtpc  3 }
+
+    nearEndReceive OBJECT IDENTIFIER  ::= { perfLocalAtpc 4 }
+
+    nearAtpcThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local ATPC RSL Threshold in dBm"
+        ::= { nearEndReceive  1 }
+
+    nearOverloadThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local Overload Protection RSL Threshold in dBm"
+        ::= { nearEndReceive  2 }
+
+    nearCurrentRSL OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local raw RSL level in dBm"
+        ::= { nearEndReceive  3 }
+
+    farEndTransmit OBJECT IDENTIFIER  ::= { perfLocalAtpc 5 }
+
+    farTxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote Radio Transmit Power set by a user in dBm"
+        ::= { farEndTransmit  1 }
+
+    farCurrentTxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote Transmit Power controlled by ATPC in dBm"
+        ::= { farEndTransmit  2 }
+
+    farAtpcMaxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote ATPC Max Power in dBm set by a user"
+        ::= { farEndTransmit  3 }
+
+    farEndReceive OBJECT IDENTIFIER  ::= { perfLocalAtpc 6 }
+
+    farAtpcThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote ATPC RSL Threshold in dBm"
+        ::= { farEndReceive  1 }
+
+    farOverloadThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote Overload Protection RSL Threshold in dBm"
+        ::= { farEndReceive  2 }
+
+    farCurrentRSL OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Remote raw RSL level in dBm"
+        ::= { farEndReceive  3 }
+
+    nearEndTransmit OBJECT IDENTIFIER  ::= { perfLocalAtpc 7 }
+
+    nearTxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local Radio Transmit Power set by a user in dBm"
+        ::= { nearEndTransmit  1 }
+
+    nearCurrentTxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local Transmit Power controlled by ATPC in dBm"
+        ::= { nearEndTransmit  2 }
+
+    nearAtpcMaxPower OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Local ATPC Max Power in dBm set by a user"
+        ::= { nearEndTransmit  3 }
+
+    locResetElapsedTime OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Write 'reset' to locResetElapsedTime to clear the ATPC statistics."
+        ::= { perfLocalAtpc 1000 }
+
+
+--    remMaxPowerElapsedTime OBJECT-TYPE
+--        SYNTAX              DisplayString
+--        MAX-ACCESS          read-only
+--        STATUS              current
+--        DESCRIPTION         "Elapsed time at maximum power ,as a formatted
+--                             string. "
+--        ::= { perfRemoteAtpc  1 }
+
+--    remAtpcActiveElapsedTime OBJECT-TYPE
+--        SYNTAX              DisplayString
+--        MAX-ACCESS          read-only
+--        STATUS              current
+--        DESCRIPTION         "Elapsed ATPC active time ,as a formatted
+--                             string. "
+--        ::= { perfRemoteAtpc  2 }
+
+--    remTimeSinceResetAtpc OBJECT-TYPE
+--       SYNTAX              DisplayString
+--        MAX-ACCESS          read-only
+--        STATUS              current
+--        DESCRIPTION         "Elapsed time,since ATPC is reset. "
+--        ::= { perfRemoteAtpc  3 }
+
+    locAtpcFarEndTxPwr OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Local Far End Transmitted Power."
+        ::= { perfLocal 31 }
+
+    locAtpcFarEndTxPwrStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Local Far End Transmitted Power."
+        ::= { perfLocal 32 }
+
+    locMaxAtpcFarEndTxTimestamp OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Local Max Far End Transmitted Power Timestamp."
+        ::= { perfLocal 33 }
+
+
+    remAtpcFarEndTxPwr OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Remote Far End Transmitted Power."
+        ::= { perfRemote 31 }
+
+    remAtpcFarEndTxPwrStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Remote Far End Transmitted Power."
+        ::= { perfRemote 32 }
+
+    remMaxAtpcFarEndTxTimestamp OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Remote Max Far End Transmitted Power Timestamp."
+        ::= { perfRemote 33 }
+
+END
