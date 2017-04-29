@@ -28,10 +28,17 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
 use LibreNMS\OS;
 
-class Unifi extends OS implements WirelessClientsDiscovery, WirelessCcqDiscovery, WirelessCcqPolling
+class Unifi extends OS implements
+    WirelessClientsDiscovery,
+    WirelessCcqDiscovery,
+    WirelessCcqPolling,
+    WirelessPowerDiscovery,
+    WirelessUtilizationDiscovery
 {
     private $ccqDivisor = 10;
 
@@ -70,7 +77,7 @@ class Unifi extends OS implements WirelessClientsDiscovery, WirelessCcqDiscovery
                 $data['oids'],
                 'unifi',
                 $index,
-                strtoupper($index) . ' Radio',
+                strtoupper($index) . ' Radio Clients',
                 $data['count'],
                 1,
                 1,
@@ -117,7 +124,7 @@ class Unifi extends OS implements WirelessClientsDiscovery, WirelessCcqDiscovery
                 $sensors[] = new WirelessSensor(
                     'ccq',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.41112.1.6.1.2.1.3.'.$index,
+                    '.1.3.6.1.4.1.41112.1.6.1.2.1.3.' . $index,
                     'unifi',
                     $index,
                     'SSID: ' . $ssids[$index],
@@ -148,5 +155,90 @@ class Unifi extends OS implements WirelessClientsDiscovery, WirelessCcqDiscovery
         }
 
         return $data;
+    }
+
+    /**
+     * Discover wireless tx or rx power. This is in dBm. Type is power.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessPower()
+    {
+        $power_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiVapTxPower', array(), 'UBNT-UniFi-MIB');
+        if (empty($power_oids)) {
+            return array();
+        }
+        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
+
+        // pick one oid for each radio, hopefully ssids don't change... not sure why this is supplied by vap
+        $sensors = array();
+        foreach ($power_oids as $index => $entry) {
+            $radio_name = $vap_radios[$index];
+            if (!isset($sensors[$radio_name])) {
+                $sensors[$radio_name] = new WirelessSensor(
+                    'power',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
+                    'unifi',
+                    $radio_name,
+                    'Tx Power: ' . strtoupper($radio_name) . ' Radio',
+                    $entry['unifiVapTxPower']
+                );
+            }
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless utilization.  This is in %. Type is utilization.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessUtilization()
+    {
+        $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioCuTotal', array(), 'UBNT-UniFi-MIB');
+        if (empty($util_oids)) {
+            return array();
+        }
+        $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioCuSelfRx', $util_oids, 'UBNT-UniFi-MIB');
+        $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioCuSelfTx', $util_oids, 'UBNT-UniFi-MIB');
+        $radio_names = $this->getCacheByIndex('unifiRadioRadio', 'UBNT-UniFi-MIB');
+
+        $sensors = array();
+        foreach ($radio_names as $index => $name) {
+            $radio_name = strtoupper($name) . ' Radio';
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.1.1.6.' . $index,
+                'unifi',
+                'tot-' . $index,
+                'Total Util: ' . $radio_name,
+                $util_oids[$index]['unifiRadioCuTotal']
+            );
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.1.1.7.' . $index,
+                'unifi',
+                'sr-' . $index,
+                'Self Rx Util: ' . $radio_name,
+                $util_oids[$index]['unifiRadioCuSelfRx']
+            );
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.1.1.8.' . $index,
+                'unifi',
+                'st-' . $index,
+                'Self Tx Util: ' . $radio_name,
+                $util_oids[$index]['unifiRadioCuSelfTx']
+            );
+        }
+
+        return $sensors;
     }
 }

@@ -145,6 +145,12 @@ class WirelessSensor extends Sensor
                 'unit' => '%',
                 'icon' => 'feed',
             ),
+            'utilization' => array(
+                'short' => 'Utilization',
+                'long' => 'utilization',
+                'unit' => '%',
+                'icon' => 'percent',
+            ),
             'ccq' => array(
                 'short' => 'CCQ',
                 'long' => 'Client Connection Quality',
