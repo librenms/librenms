@@ -1603,6 +1603,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('sanos');
     }
 
+    public function testScopia()
+    {
+        $this->checkOS('scopia');
+    }
+
     public function testScreenos()
     {
         $this->checkOS('screenos');
