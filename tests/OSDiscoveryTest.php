@@ -358,6 +358,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('bnt', 'bnt1');
     }
 
+    public function testBreeze()
+    {
+        $this->checkOS('breeze');
+    }
+
     public function testBrother()
     {
         $this->checkOS('brother');
