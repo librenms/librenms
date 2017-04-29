@@ -325,3 +325,7 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
+
+What is the Difference between Disable Device and Ignore a Device?
+Disable stops all polling.
+Ignore disables alerts.
