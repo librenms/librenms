@@ -25,6 +25,7 @@ source: Support/FAQ.md
  - [Why is my EdgeRouter device not detected?](#faq25)
  - [Why are some of my disks not showing?](#faq26)
  - [Why are my disks reporting an incorrect size?](#faq27)
+ - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -250,6 +251,11 @@ There is a known issue for net-snmp, which causes it to report incorrect disk si
 
 `realStorageUnits 0`
 
+#### <a name="faq28"> What is the Difference between Disable Device and Ignore a Device?</a>
+
+  - Disable stops polling.
+  - Ignore disables alerting.
+
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
 Please see [Supporting a new OS](../Developing/Support-New-OS.md)
@@ -325,7 +331,3 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
-
-What is the Difference between Disable Device and Ignore a Device?
-Disable stops all polling.
-Ignore disables alerts.
