@@ -34,5 +34,5 @@ interface WirelessSignalPolling
      * @param array $sensors Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessRssi(array $sensors);
+    public function pollWirelessSignal(array $sensors);
 }

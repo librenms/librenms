@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessNoiseFloorPolling.php
+ * WirelessNoiseDiscovery.php
  *
- * Custom polling interface for wireless noise floor
+ * Discover wireless Noise sensors in dBm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,15 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\Polling\Sensors;
+namespace LibreNMS\Interfaces\Discovery\Sensors;
 
-interface WirelessNoiseFloorPolling
+interface WirelessNoiseDiscovery
 {
     /**
-     * Poll wireless noise floor
-     * The returned array should be sensor_id => value pairs
+     * Discover wireless noise.  This is in dBm. Type is noise.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @return array Sensors
      */
-    public function pollWirelessNoiseFloor(array $sensors);
+    public function discoverWirelessNoise();
 }

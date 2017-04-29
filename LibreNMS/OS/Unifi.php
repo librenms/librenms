@@ -42,8 +42,6 @@ class Unifi extends OS implements WirelessClientsDiscovery, WirelessCcqDiscovery
      */
     public function discoverWirelessClients()
     {
-        // TODO clients could be discovered by ssid instead of or in addition to radio type
-
         $client_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiVapNumStations', array(), 'UBNT-UniFi-MIB');
         if (empty($client_oids)) {
             return array();

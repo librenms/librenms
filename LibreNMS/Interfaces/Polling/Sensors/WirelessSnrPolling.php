@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessNoiseFloorPolling.php
+ * WirelessSnrPolling.php
  *
- * Custom polling interface for wireless noise floor
+ * Custom polling interface for wireless Signal-to-Noise Ratio
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 
 namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessNoiseFloorPolling
+interface WirelessSnrPolling
 {
     /**
-     * Poll wireless noise floor
+     * Poll wireless SNR in dB
      * The returned array should be sensor_id => value pairs
      *
      * @param array $sensors Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessNoiseFloor(array $sensors);
+    public function pollWirelessSnr(array $sensors);
 }

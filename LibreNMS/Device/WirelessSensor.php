@@ -151,10 +151,22 @@ class WirelessSensor extends Sensor
                 'unit' => '%',
                 'icon' => 'wifi',
             ),
+            'noise' => array(
+                'short' => 'Noise',
+                'long' => 'Noise',
+                'unit' => 'dB',
+                'icon' => 'signal',
+            ),
             'noise-floor' => array(
                 'short' => 'Noise Floor',
                 'long' => 'Noise Floor',
                 'unit' => 'dBm/Hz',
+                'icon' => 'signal',
+            ),
+            'snr' => array(
+                'short' => 'SNR',
+                'long' => 'Signal-to-Noise Ratio',
+                'unit' => 'dB',
                 'icon' => 'signal',
             ),
             'rssi' => array(
@@ -190,7 +202,7 @@ class WirelessSensor extends Sensor
             'frequency' => array(
                 'short' => 'Frequency',
                 'long' => 'Frequency',
-                'unit' => 'MHz',
+                'unit' => 'GHz',
                 'icon' => 'line-chart',
             ),
         );

@@ -109,7 +109,7 @@ class Airos extends OS implements
     }
 
     /**
-     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

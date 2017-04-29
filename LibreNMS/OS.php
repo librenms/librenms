@@ -96,7 +96,9 @@ class OS
     public static function make(&$device)
     {
         $class = str_to_class($device['os'], 'LibreNMS\\OS\\');
+        d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
         if (class_exists($class)) {
+            d_echo("OS initialized: $class\n");
             return new $class($device);
         }
 
