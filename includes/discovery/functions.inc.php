@@ -365,7 +365,7 @@ function sensor_low_limit($class, $current)
             break;
 
         case 'humidity':
-            $limit = '70';
+            $limit = '30';
             break;
 
         case 'frequency':
@@ -386,6 +386,9 @@ function sensor_low_limit($class, $current)
 
         case 'signal':
             $limit = -80;
+            break;
+        case 'airflow':
+            $limit = ($current * 0.95);
             break;
     }//end switch
 
@@ -437,6 +440,9 @@ function sensor_limit($class, $current)
 
         case 'load':
             $limit = 80;
+            break;
+        case 'airflow':
+            $limit = ($current * 1.05);
             break;
     }//end switch
 
