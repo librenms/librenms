@@ -358,6 +358,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('bnt', 'bnt1');
     }
 
+    public function testBreeze()
+    {
+        $this->checkOS('breeze');
+    }
+
     public function testBrother()
     {
         $this->checkOS('brother');
@@ -738,6 +743,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testExinda()
     {
         $this->checkOS('exinda');
+    }
+
+    public function testExtendAir()
+    {
+        $this->checkOS('extendair');
     }
 
     public function testExtrahop()
@@ -1601,6 +1611,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testSanos()
     {
         $this->checkOS('sanos');
+    }
+
+    public function testScopia()
+    {
+        $this->checkOS('scopia');
     }
 
     public function testScreenos()

@@ -18,6 +18,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
 1. [NGINX](#nginx) - Agent
+1. [NFS-server](#nfs-server) - SNMP extend
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
@@ -37,7 +38,6 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
-
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -335,6 +335,17 @@ extend nginx /etc/snmp/nginx-stats
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
+##### NFS-server
+Export the NFS stats from as server.
+
+##### SNMP Extend
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add :
+```
+extend nfs-server /bin/cat /proc/net/rpc/nfsd
+```
+note : find out where cat is located using : `which cat`
+
+2. reload snmpd service to activate the configuration
 
 ### NTP Client
 A shell script that gets stats from ntp client.
