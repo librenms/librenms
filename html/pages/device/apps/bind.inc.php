@@ -22,6 +22,7 @@
  * @license GPL
  * @package LibreNMS
  * @subpackage Apps
+ * @updated in 2017 by Zane C. Bowers-Hadley <vvelox@vvelox.net>
  */
 
 global $config;
