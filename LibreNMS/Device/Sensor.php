@@ -113,18 +113,20 @@ class Sensor implements DiscoveryModule, PollerModule
         $this->high_warn = $high_warn;
         $this->low_warn = $low_warn;
 
+        $sensor = $this->toArray();
         // validity not checked yet
         if (is_null($this->current)) {
-            $data = static::fetchSensorData(
-                device_by_id_cache($device_id),
-                array($this->toArray())
-            );
+            $sensor['sensor_oids'] = $this->oids;
+            $sensors = array($sensor);
+
+            $prefetch = static::fetchSnmpData(device_by_id_cache($device_id), $sensors);
+            $data = static::processSensorData($sensors, $prefetch);
 
             $this->current = current($data);
             $this->valid = is_numeric($this->current);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($this->toArray(), true));
+        d_echo('Discovered ' . get_called_class() . ' ' . print_r($sensor, true));
     }
 
     /**
@@ -261,13 +263,39 @@ class Sensor implements DiscoveryModule, PollerModule
     public static function poll(OS $os)
     {
         $table = static::$table;
-        $sensors = dbFetchColumn(
-            "SELECT `sensor_class` FROM `$table` WHERE `device_id` = ? GROUP BY `sensor_class`",
-            array($os->getDeviceId())
+
+        // fetch and group sensors, decode oids
+        $sensors = array_reduce(
+            dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ?", array($os->getDeviceId())),
+            function ($carry, $sensor) {
+                $sensor['sensor_oids'] = json_decode($sensor['sensor_oids']);
+                $carry[$sensor['sensor_class']][] = $sensor;
+                return $carry;
+            },
+            array()
         );
 
-        foreach ($sensors as $type) {
-            static::pollSensorType($os, $type);
+        foreach ($sensors as $type => $type_sensors) {
+            // check for custom polling
+            $typeInterface = static::getPollingInterface($type);
+            if (!interface_exists($typeInterface)) {
+                echo "ERROR: Polling Interface doesn't exist! $typeInterface\n";
+            }
+
+            // fetch custom data
+            if ($os instanceof $typeInterface) {
+                unset($sensors[$type]);  // remove from sensors array to prevent double polling
+                static::pollSensorType($os, $type, $type_sensors);
+            }
+        }
+
+        // pre-fetch all standard sensors
+        $standard_sensors = call_user_func_array('array_merge', $sensors);
+        $pre_fetch = static::fetchSnmpData($os->getDevice(), $standard_sensors);
+
+        // poll standard sensors
+        foreach ($sensors as $type => $type_sensors) {
+            static::pollSensorType($os, $type, $type_sensors, $pre_fetch);
         }
     }
 
@@ -275,83 +303,40 @@ class Sensor implements DiscoveryModule, PollerModule
      * Poll all sensors of a specific class
      *
      * @param OS $os
-     * @param $type
+     * @param string $type
+     * @param array $sensors
+     * @param array $prefetch
      */
-    protected static function pollSensorType($os, $type)
+    protected static function pollSensorType($os, $type, $sensors, $prefetch = array())
     {
         echo "$type:\n";
 
-        $table = static::$table;
-        $sensors = dbFetchRows(
-            "SELECT * FROM `$table` WHERE `sensor_class` = ? AND `device_id` = ?",
-            array($type, $os->getDeviceId())
-        );
-
+        // process data or run custom polling
         $typeInterface = static::getPollingInterface($type);
-        if (!interface_exists($typeInterface)) {
-            echo "ERROR: Polling Interface doesn't exist! $typeInterface\n";
-        }
-
-        // fetch data
         if ($os instanceof $typeInterface) {
             d_echo("Using OS polling for $type\n");
             $function = static::getPollingMethod($type);
             $data = $os->$function($sensors);
         } else {
-            $data = static::fetchSensorData($os->getDevice(), $sensors);
+            $data = static::processSensorData($sensors, $prefetch);
         }
 
         d_echo($data);
 
-        // update data
-        foreach ($sensors as $sensor) {
-            $sensor_value = $data[$sensor['sensor_id']];
-
-            echo "  {$sensor['sensor_descr']}: $sensor_value\n";
-
-            // update rrd and database
-            $rrd_name = array(
-                static::$data_name,
-                $sensor['sensor_class'],
-                $sensor['sensor_type'],
-                $sensor['sensor_index']
-            );
-            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
-
-            $fields = array(
-                'sensor' => isset($sensor_value) ? $sensor_value : 'U',
-            );
-
-            $tags = array(
-                'sensor_class' => $sensor['sensor_class'],
-                'sensor_type' => $sensor['sensor_type'],
-                'sensor_descr' => $sensor['sensor_descr'],
-                'sensor_index' => $sensor['sensor_index'],
-                'rrd_name' => $rrd_name,
-                'rrd_def' => $rrd_def
-            );
-            data_update($os->getDevice(), static::$data_name, $tags, $fields);
-
-            $update = array(
-                'sensor_prev' => $sensor['sensor_current'],
-                'sensor_current' => $sensor_value,
-                'lastupdate' => array('NOW()'),
-            );
-            dbUpdate($update, $table, "`sensor_id` = ?", array($sensor['sensor_id']));
-        }
+        self::recordSensorData($os, $sensors, $data);
     }
 
     /**
-     * Fetch data for the specified sensors
-     * TODO: optimize
+     * Fetch snmp data from the device
+     * Return an array keyed by oid
      *
-     * @param $device
-     * @param $sensors
+     * @param array $device
+     * @param array $sensors
      * @return array
      */
-    protected static function fetchSensorData($device, $sensors)
+    private static function fetchSnmpData($device, $sensors)
     {
-        $oids = self::prepSensorOids($sensors, get_device_oid_limit($device));
+        $oids = self::getOidsFromSensors($sensors, get_device_oid_limit($device));
 
         $snmp_data = array();
         foreach ($oids as $oid_chunk) {
@@ -359,10 +344,26 @@ class Sensor implements DiscoveryModule, PollerModule
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
+        return $snmp_data;
+    }
+
+
+    /**
+     * Process the snmp data for the specified sensors
+     * Returns an array sensor_id => value
+     *
+     * @param $sensors
+     * @param $prefetch
+     * @return array
+     * @internal param $device
+     */
+    protected static function processSensorData($sensors, $prefetch)
+    {
         $sensor_data = array();
         foreach ($sensors as $sensor) {
-            $requested_oids = array_flip(json_decode($sensor['sensor_oids']));
-            $data = array_intersect_key($snmp_data, $requested_oids);
+            // pull out the data for this sensor
+            $requested_oids = array_flip($sensor['sensor_oids']);
+            $data = array_intersect_key($prefetch, $requested_oids);
 
             // if no data set null and continue to the next sensor
             if (empty($data)) {
@@ -404,11 +405,11 @@ class Sensor implements DiscoveryModule, PollerModule
      * @param int $chunk How many oids per chunk.  Default 10.
      * @return array
      */
-    private static function prepSensorOids($sensors, $chunk = 10)
+    private static function getOidsFromSensors($sensors, $chunk = 10)
     {
         // Sort the incoming oids and sensors
         $oids = array_reduce($sensors, function ($carry, $sensor) {
-            return array_merge($carry, json_decode($sensor['sensor_oids']));
+            return array_merge($carry, $sensor['sensor_oids']);
         }, array());
 
         // only unique oids and chunk
@@ -521,6 +522,52 @@ class Sensor implements DiscoveryModule, PollerModule
         }
         if (!empty($delete)) {
             dbDelete($table, $where, $params);
+        }
+    }
+
+    /**
+     * Record sensor data in the database and data stores
+     *
+     * @param $os
+     * @param $sensors
+     * @param $data
+     */
+    protected static function recordSensorData(OS $os, $sensors, $data)
+    {
+        foreach ($sensors as $sensor) {
+            $sensor_value = $data[$sensor['sensor_id']];
+
+            echo "  {$sensor['sensor_descr']}: $sensor_value\n";
+
+            // update rrd and database
+            $rrd_name = array(
+                static::$data_name,
+                $sensor['sensor_class'],
+                $sensor['sensor_type'],
+                $sensor['sensor_index']
+            );
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
+
+            $fields = array(
+                'sensor' => isset($sensor_value) ? $sensor_value : 'U',
+            );
+
+            $tags = array(
+                'sensor_class' => $sensor['sensor_class'],
+                'sensor_type' => $sensor['sensor_type'],
+                'sensor_descr' => $sensor['sensor_descr'],
+                'sensor_index' => $sensor['sensor_index'],
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def
+            );
+            data_update($os->getDevice(), static::$data_name, $tags, $fields);
+
+            $update = array(
+                'sensor_prev' => $sensor['sensor_current'],
+                'sensor_current' => $sensor_value,
+                'lastupdate' => array('NOW()'),
+            );
+            dbUpdate($update, static::$table, "`sensor_id` = ?", array($sensor['sensor_id']));
         }
     }
 }

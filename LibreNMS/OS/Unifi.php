@@ -70,14 +70,14 @@ class Unifi extends OS implements
         $sensors = array();
 
         // discover client counts by radio
-        foreach ($radios as $index => $data) {
+        foreach ($radios as $name => $data) {
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
                 $data['oids'],
                 'unifi',
-                $index,
-                strtoupper($index) . ' Radio Clients',
+                $name,
+                strtoupper($name) . ' Radio Clients',
                 $data['count'],
                 1,
                 1,
