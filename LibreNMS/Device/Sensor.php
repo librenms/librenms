@@ -344,6 +344,11 @@ class Sensor implements DiscoveryModule, PollerModule
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
+        // deal with string values that may be surrounded by quotes
+        array_walk($snmp_data, function (&$oid) {
+            $oid = trim($oid, '"') + 0;
+        });
+
         return $snmp_data;
     }
 
@@ -431,12 +436,43 @@ class Sensor implements DiscoveryModule, PollerModule
             $function = static::getDiscoveryMethod($type);
             $sensors = $os->$function();
         } else {
-            $sensors = array();  // TODO default implementation here or use Traits
+            $sensors = array();  // delete non existent sensors
         }
 
-        static::sync($os->getDeviceId(), $type, $sensors);
+        self::checkForDuplicateSensors($sensors);
+
+        self::sync($os->getDeviceId(), $type, $sensors);
 
         echo PHP_EOL;
+    }
+
+    private static function checkForDuplicateSensors($sensors)
+    {
+        $duplicate_check = array();
+        $dup = false;
+
+        foreach ($sensors as $sensor) {
+            /** @var Sensor $sensor */
+            $key = $sensor->getUniqueId();
+            if (isset($duplicate_check[$key])) {
+                c_echo('%rERROR: %nA sensor already exists at this index ' . $key . PHP_EOL);
+                $dup = true;
+            }
+            $duplicate_check[$key] = 1;
+        }
+
+        return $dup;
+    }
+
+    /**
+     * Returns a string that must be unique for each sensor
+     * type (class), subtype (type), index (index)
+     *
+     * @return string
+     */
+    private function getUniqueId()
+    {
+        return $this->type . '-' . $this->subtype . '-' . $this->index;
     }
 
     protected static function getDiscoveryInterface($type)
