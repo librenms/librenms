@@ -15,6 +15,7 @@ source: General/Changelog.md
 * Added opengridscheduler job tracker ([#6419](https://github.com/librenms/librenms/issues/6419))
 * Added location map regex replace pattern only ([#6485](https://github.com/librenms/librenms/issues/6485))
 * Added nfs-server application ([#6320](https://github.com/librenms/librenms/issues/6320))
+* Added support for Active Directory bind user ([#6255](https://github.com/librenms/librenms/pull/6255))
 
 #### Bugfixes
 * Actually reload oxidized when we should not when we think we should ([#6515](https://github.com/librenms/librenms/issues/6515))
@@ -43,6 +44,8 @@ source: General/Changelog.md
 * Updated cisco and juniper component macros to exclude disabled sensors ([#6493](https://github.com/librenms/librenms/issues/64649393))
 * Added more safety checking into create_state_index() ([#6516](https://github.com/librenms/librenms/issues/6516))
 * Fixed inconsistent device discovery ([#6518](https://github.com/librenms/librenms/issues/6518))
+* Fixed notifications by email to Active Directory admins ([#6134](https://github.com/librenms/librenms/issues/6134))
+* Fixed API token for Active Directory admins ([#6255](https://github.com/librenms/librenms/issues/6255))
 
 #### Documentation
 * Added FAQ on what disabled/ignored means for devices
