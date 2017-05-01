@@ -10,9 +10,13 @@
  * the source code distribution for details.
  */
 
-$version = str_replace('"', '', snmp_get($device, "asyncOSAppliances.2.2.3.0", "-OQv", "IRONPORT-SMI"));
-$serial = preg_replace('/^[\w\s\.,:-]*Serial\s#:\s/', '', $poll_device['sysDescr']);
+list($hardware,$version,,$serial) = explode(',', $device['sysDescr']);
 
-if (preg_match('/^Cisco[\w\s]*/', $poll_device['sysDescr'], $regexp_result)) {
-    $hardware = $regexp_result[0];
-}
+preg_match('/\w[\d]+\w?/', $hardware, $regexp_results);
+$hardware = $regexp_results[0];
+
+preg_match('/[\d\.-]+/', $version, $regexp_results);
+$version = $regexp_results[0];
+
+preg_match('/[[\w]+-[\w]+/', $serial, $regexp_results);
+$serial = $regexp_results[0];
