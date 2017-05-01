@@ -113,7 +113,7 @@ main () {
         # only try to su if we are root (or sudo)
         if [[ "$EUID" -eq 0 ]]; then
             echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
-            su -l "$LIBRENMS_USER" -c "$DAILY_SCRIPT $@"
+            sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
             exit;
         fi
 
@@ -170,6 +170,7 @@ main () {
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
+                status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
             cleanup)
                 # Cleanups

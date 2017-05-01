@@ -30,14 +30,9 @@ any other means), you assert that:
   systems.
 
 
-To agree with these assertions, please submit a GitHub pull request against
-[AUTHORS.md][5], adding or altering a **single line** *containing your name,
-email address, and GitHub user id* in the file (so that it can be matched to
-your commits), and stating in the *commit log* (not the pull request text):
-
-```
-I agree to the conditions of the Contributor Agreement contained in doc/General/Contributing.md.
-```
+To agree with these assertions, when you submit your first pull request you 
+will be asked after submitting to sign the CLA, you do this by following the 
+link provided in the PR and agreeing to the CLA using your GitHub account. 
 
 Local patches
 -------------
@@ -71,7 +66,7 @@ the package information to the header.
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2016 Internet Widgitz Pty Ltd <info@widgitz.com>
+ * @copyright  2017 Internet Widgitz Pty Ltd <info@widgitz.com>
  * @author     Me <me@infowidgitz.com>
 
 ```

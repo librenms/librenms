@@ -5,11 +5,10 @@ $app_id = $app['app_id'];
 use LibreNMS\RRD\RrdDefinition;
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$queueOID     = 'nsExtendOutputFull.5.109.97.105.108.113';
-$detailOID    = 'nsExtendOutputFull.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
-$mailq = snmp_walk($device, $queueOID, $options, $mib);
-$detail= snmp_walk($device, $detailOID, $options, $mib);
+$queueOID     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';
+$detailOID    = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
+$mailq = snmp_walk($device, $queueOID, $options);
+$detail= snmp_walk($device, $detailOID, $options);
 update_application($app, $mailq);
 
 list($incomingq, $activeq, $deferredq, $holdq) = explode("\n", $mailq);

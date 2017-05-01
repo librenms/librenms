@@ -133,16 +133,16 @@ if ($device['os_group'] == 'cisco') {
                         }
 
                         if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
-                            $limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
+                            $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         // Warning Limit
                         if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
-                            $warn_limit = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
+                            $warn_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
-                            $warn_limit_low = ($entry['entSensorThresholdValue'] * $multiplier / $divisor);
+                            $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
                 }//end if

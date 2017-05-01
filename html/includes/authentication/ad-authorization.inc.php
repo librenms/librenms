@@ -54,7 +54,7 @@ function authenticate($username, $password)
 }
 
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
     // not supported so return 0
     return 0;
@@ -82,11 +82,11 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '', $twofactor = 0)
+function adduser($username, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
 {
     // Check to see if user is already added in the database
     if (!user_exists_in_db($username)) {
-        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
+        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'user_id' => get_userid($username)), 'users');
         if ($userid == false) {
             return false;
         } else {

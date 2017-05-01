@@ -1,0 +1,1157 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-TIME-SYNC-MIB.my
+ --
+
+ CIENA-CES-TIME-SYNC-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+    Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    cienaCesConfig, cienaCesNotifications 
+        FROM CIENA-SMI
+    CienaGlobalState
+        FROM CIENA-TC
+    cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM CIENA-GLOBAL-MIB
+    cienaCesModuleSlotName
+        FROM CIENA-CES-MODULE-MIB;
+
+
+ cienaCesTimeSyncMIB MODULE-IDENTITY
+        LAST-UPDATED "201601210000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "   Mib Meister
+            115 North Sullivan Road
+            Spokane Valley, WA 99037
+                USA
+                Phone:  +1 509 242 9000
+            Email:  support@ciena.com"
+        DESCRIPTION
+            "This MIB module defines objects and associated notifications
+             for the System Timing feature."
+
+        REVISION
+            "201601210000Z"
+        DESCRIPTION
+            "Updating the description of cienaCesSyncInputPUStateChangeNotification,
+            cienaCesSyncInputProtectionGroupStateChangeNotification and
+            cienaCesSyncModuleSlotClockStateChangeNotification."
+
+        REVISION
+            "201509280000Z"
+        DESCRIPTION
+            "Adding cienaCesInputPUGPSBITSSignalSsmLocation to cienaCesSyncInputProtectionUnitEntry.
+            Adding 'sa8(6)' into cienaCesOutputBITSSignalSsmlocation."
+
+        REVISION
+            "201504200000Z"
+        DESCRIPTION
+            "Adding 'unusable' to SyncRefOperationalStatus."
+
+        REVISION
+            "201504100000Z"
+        DESCRIPTION
+            "Updating cienaCesSyncInputProtectionGroupStateChangeNotification trap."
+
+        REVISION
+            "201503190000Z"
+        DESCRIPTION
+            "Updating cienaCesSyncModuleSlotClockStateChangeNotification trap."
+
+        REVISION
+            "201503110000Z"
+        DESCRIPTION
+            "Aligning SyncRefOperationalStatus."
+
+        REVISION
+            "201502040000Z"
+        DESCRIPTION
+            "Updating SyncBITSSignalFormat."
+
+        REVISION
+            "201501230000Z"
+        DESCRIPTION
+            "Adding cienaCesInputPGOperationalQualityLevel object."
+
+        REVISION
+            "201501070000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncModuleSlotClockStateChangeNotification trap."
+             
+        REVISION
+            "201404250000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncPTPOutputTimestampMode object."
+
+        REVISION
+            "201403250000Z"
+        DESCRIPTION
+            "Aligning SyncRefOperationalStatus and cienaCesInputPGOperationalStatus with current implementation."
+
+        REVISION
+            "201312030000Z"
+        DESCRIPTION
+            "Adding PTP boundary clock support."
+
+        REVISION
+            "201305170000Z"
+        DESCRIPTION
+            "Adding 'warmup' status to SyncRefOperationalStatus."
+
+        REVISION
+            "201305070000Z"
+        DESCRIPTION
+            "Adding TDM reference support."
+
+        REVISION
+            "201304200000Z"
+        DESCRIPTION
+            "Adding 'signalfailure' status to SyncRefOperationalStatus."
+
+        REVISION
+            "201304160000Z"
+        DESCRIPTION
+            "Adding PTP and GPS support. Adding cienaCesInputPGTimingType to
+            the cienaCesSyncInputProtectionGroupTable. Adding 'notready' status
+            to SyncRefOperationalStatus."
+
+        REVISION
+            "201304080000Z"
+        DESCRIPTION
+            "Deprecated cienaCesInputPGPreferredReference and cienaCesInputPGState."
+
+        REVISION
+            "201303080000Z"
+        DESCRIPTION
+            "Added Override-priority parameter for input reference."
+
+        REVISION
+            "201206200000Z"
+        DESCRIPTION
+            "Initial version."
+
+        ::= { cienaCesConfig 28 }
+
+ --
+ -- Textual convention
+ --
+
+ SsmStratumLevel ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "International and North American SSM Values"
+     SYNTAX       INTEGER 
+                  {
+                     unknown(1),
+                     prc(2), 
+                     ssua(3),
+                     ssub(4),
+                     sec(5),
+                     dnu(6),
+                     prs(7),
+                     stu(8),
+                     st2(9),
+                     tnc(10),
+                     st3e(11),
+                     st3(12),
+                     smc(13),
+                     st4(14),
+                     dus(15),
+                     prov(16)
+                  }
+
+ SyncInterfaceProtocol ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Interface protocol of an input/output reference."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     bits(2),
+                     synce(3),
+                     ptp(4),
+                     gps(5),
+                     tdm(6)
+                  }
+
+ SyncBITSSignalMode ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Station Clock BITS signal mode."
+     SYNTAX       INTEGER
+                  {
+                     modeunknown(1),
+                     modet1(2),
+                     modee1(3),
+                     modej1(4),
+                     mode2048khz(5),
+                     mode64kcc(6),
+                     mode6312khz(7)
+                  }
+
+ SyncBITSSignalFormat ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Station Clock BITS signal format.  Esf and sf are applied to t1 signal
+                   only where as ccs and cas are applied to e1 signal."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     cas(2),
+                     cascrc(3),
+                     esf(4),
+                     fas(5),
+                     fascrc(6),
+                     sf(7),
+                     e1crc(8),
+                     e1nocrc(9)
+                  }
+
+ SyncBITSSignalEncoding ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Encoding method used on T1/E1 BITS signal."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     b8zs(2),
+                     ami(3),
+                     hdb3(4)
+                  }
+
+ SyncRefOperationalStatus ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Operational status of an input/output reference."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     active(2),
+                     selected(3),
+                     lossofsignal(4),
+                     lossofframe(5),
+                     alarmindicationsignal(6),
+                     hardwarefault(7),
+                     hardwarenotconfigured(8),
+                     qlbelowthreshold(9),
+                     rxtimeout(10),
+                     notauthenticated(11),
+                     loopbacktx(12),
+                     loopbackrx(13),
+                     linkflap(14),
+                     notready(15),
+                     signalfailure(16),
+                     warmup(17),
+                     qlnotconfigured(18),
+                     noconnectivity(19),
+                     unsupportedhardware(20),
+                     unusable(21)
+                  }
+
+ SyncTimingType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "The timing domain; frequency, phase or time of day."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     frequency(2),
+                     phase(3),
+                     tod(4),
+                     phaseandtod(5)
+                  }
+
+ SyncPTPRatePps ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "The PTP rate in pps."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     rate1over16pps(2),
+                     rate1over8pps(3),
+                     rate1over4pps(4),
+                     rate1over2pps(5),
+                     rate1pps(6),
+                     rate2pps(7),
+                     rate4pps(8),
+                     rate8pps(9),
+                     rate16pps(10),
+                     rate32pps(11),
+                     rate64pps(12),
+                     rate128pps(13)
+                  }
+
+ SyncGPSFreqClock ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "The frequency of the clock for a GPS input/output reference,
+                   set when the reference is configured with a clock mode of frequency."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     clock10mhz(2),
+                     clock2048khz(3),
+                     clock1544khz(4)
+                  }
+
+ SyncPTPEncapType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "The PTP encapsulation type."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     udpoveripv4(2),
+                     udpoveripv6(3),
+                     ieee802dot3(4)
+                  }
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesTimeSyncMIBObjects   OBJECT IDENTIFIER ::= { cienaCesTimeSyncMIB 1 }
+ cienaCesTimeSyncObjects      OBJECT IDENTIFIER ::= { cienaCesTimeSyncMIBObjects 1 }
+
+ -- Notifications   
+ cienaCesTimeSyncMIBNotificationPrefix  OBJECT IDENTIFIER ::=  { cienaCesNotifications 28 } 
+ cienaCesTimeSyncMIBNotifications       OBJECT IDENTIFIER ::=  { cienaCesTimeSyncMIBNotificationPrefix 0 }
+
+
+--
+-- Global objects 
+--
+    
+ cienaCesSyncAdminState OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Globally enable/disable Sync"
+    ::= { cienaCesTimeSyncObjects 1 }
+
+ cienaCesSyncOptionType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   option1(2),
+                   option2(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indication of which set of SSM values being used.  Option 1 is
+         for International standard and Option 2 is for North American."
+    ::= { cienaCesTimeSyncObjects 2 }
+
+ cienaCesSyncRevertiveMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   revertive(2),
+                   nonrevertive(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Revertive mode."
+    ::= { cienaCesTimeSyncObjects 3 }
+
+ cienaCesSyncWaitToRestoreTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User configured timer for a timing reference source to wait
+         before transitioning from bad to good clock signal."
+    ::= { cienaCesTimeSyncObjects 4 }
+
+ cienaCesSyncHoldoverInterval OBJECT-TYPE
+   SYNTAX      INTEGER
+               {
+                  unknown(1),
+                  indefinite(2),
+                  twentyfourhours(3)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "User configured interval after which holdover quality level changes."
+   ::= { cienaCesTimeSyncObjects 10 }
+
+--
+-- SyncInputProtectionGroupTable
+--
+
+cienaCesSyncInputProtectionGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesSyncInputProtectionGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of protection groups for input timing reference."
+    ::= {  cienaCesTimeSyncObjects 5 }
+
+cienaCesSyncInputProtectionGroupEntry OBJECT-TYPE
+    SYNTAX      CienaCesSyncInputProtectionGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a protection
+         group for input timing reference"
+    INDEX       { cienaCesInputPGEntityId }
+    ::= { cienaCesSyncInputProtectionGroupTable 1 }
+
+CienaCesSyncInputProtectionGroupEntry ::= SEQUENCE {
+        cienaCesInputPGEntityId                  Integer32,
+        cienaCesInputPGEntityName                DisplayString,
+        cienaCesInputPGPreferredReference        DisplayString,
+        cienaCesInputPGSelectedReference         DisplayString,
+        cienaCesInputPGForcedReference           DisplayString,
+        cienaCesInputPGThresholdQualityLevel     SsmStratumLevel,
+        cienaCesInputPGState                     CienaGlobalState,
+        cienaCesInputPGStateDuration             DisplayString,
+        cienaCesInputPGReferenceSwitchCount      Unsigned32,
+        cienaCesInputPGOperationalStatus         INTEGER,
+        cienaCesInputPGTimingType                SyncTimingType,
+        cienaCesInputPGOperationalQualityLevel   SsmStratumLevel
+        }
+
+ cienaCesInputPGEntityId OBJECT-TYPE
+    SYNTAX      Integer32 (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of this input protection group."
+    ::= { cienaCesSyncInputProtectionGroupEntry 1 }
+
+ cienaCesInputPGEntityName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique name of this input protection group."
+    ::= { cienaCesSyncInputProtectionGroupEntry 2 }
+
+ cienaCesInputPGPreferredReference OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Preferred timing reference source, configured by users."
+    ::= { cienaCesSyncInputProtectionGroupEntry 3 }
+
+ cienaCesInputPGSelectedReference OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System selected timing reference source."
+    ::= { cienaCesSyncInputProtectionGroupEntry 4 }
+
+ cienaCesInputPGForcedReference OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System was forced to used this timing reference source."
+    ::= { cienaCesSyncInputProtectionGroupEntry 5 }
+
+ cienaCesInputPGThresholdQualityLevel OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specified Quality Level threshold for a reference source
+         being selected."
+    ::= { cienaCesSyncInputProtectionGroupEntry 6 }
+
+ cienaCesInputPGState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Configured state of this protection group."
+    ::= { cienaCesSyncInputProtectionGroupEntry 7 }
+
+ cienaCesInputPGStateDuration OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Duration since the system entered current state."
+    ::= { cienaCesSyncInputProtectionGroupEntry 8 }
+
+ cienaCesInputPGReferenceSwitchCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of timing reference switching since the system stared up."
+    ::= { cienaCesSyncInputProtectionGroupEntry 9 }
+
+ cienaCesInputPGOperationalStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   freerun(2),
+                   holdover(3),
+                   locked(4),
+                   acquiringlock(5),
+                   holdoverexpired(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of this protection group."
+    ::= { cienaCesSyncInputProtectionGroupEntry 10 }
+
+ cienaCesInputPGTimingType OBJECT-TYPE
+    SYNTAX      SyncTimingType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The timing domain (freq/phase/tod) that this protection group belongs to."
+    ::= { cienaCesSyncInputProtectionGroupEntry 11 }
+
+cienaCesInputPGOperationalQualityLevel OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational Quality Level of the protection group."
+    ::= { cienaCesSyncInputProtectionGroupEntry 12 }
+
+--
+-- SyncInputProtectionUnitTable
+--
+
+cienaCesSyncInputProtectionUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesSyncInputProtectionUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of protection units for input timing reference."
+    ::= {  cienaCesTimeSyncObjects 6 }
+
+cienaCesSyncInputProtectionUnitEntry OBJECT-TYPE
+    SYNTAX      CienaCesSyncInputProtectionUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a protection
+         unit for input timing reference."
+    INDEX       { cienaCesInputPUEntityId }
+    ::= { cienaCesSyncInputProtectionUnitTable 1 }
+
+CienaCesSyncInputProtectionUnitEntry ::= SEQUENCE {
+        cienaCesInputPUEntityId                  Integer32,
+        cienaCesInputPUEntityName                DisplayString,
+        cienaCesInputPUPGEntityName              DisplayString,
+        cienaCesInputPUTimingInterfaceName       DisplayString,
+        cienaCesInputPUTimingInterfaceProtocol   SyncInterfaceProtocol,
+        cienaCesInputPUUserPriority              Unsigned32,
+        cienaCesInputPUOperationalQL             SsmStratumLevel,
+        cienaCesInputPUForcedQL                  SsmStratumLevel,
+        cienaCesInputPUReceivedQL                SsmStratumLevel,
+        cienaCesInputPUSsmEnabled                INTEGER,
+        cienaCesInputPUOperationalStatus         SyncRefOperationalStatus,
+        cienaCesInputPUBITSSignalMode            SyncBITSSignalMode,
+        cienaCesInputPUBITSSignalFormat          SyncBITSSignalFormat,
+        cienaCesInputPUBITSSignalEncoding        SyncBITSSignalEncoding,
+        cienaCesInputPUUserOverridePriority      Unsigned32,
+        cienaCesInputPUPTPEncapType              SyncPTPEncapType,
+        cienaCesInputPUGPSClockMode              SyncTimingType,
+        cienaCesInputPUGPSFreqClock              SyncGPSFreqClock,
+        cienaCesInputPUBITSSignalSsmLocation     INTEGER
+        }
+
+ cienaCesInputPUEntityId OBJECT-TYPE
+    SYNTAX      Integer32 (1..48)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 1 }
+
+ cienaCesInputPUEntityName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique name of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 2 }
+
+ cienaCesInputPUPGEntityName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The identifier of the input protection group(s) which this input
+         protection unit belongs to."
+    ::= { cienaCesSyncInputProtectionUnitEntry 3 }
+
+ cienaCesInputPUTimingInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface name of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 4 }
+
+ cienaCesInputPUTimingInterfaceProtocol OBJECT-TYPE
+    SYNTAX      SyncInterfaceProtocol
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface protocol of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 5 }
+
+ cienaCesInputPUUserPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user configured priority of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 6 }
+
+ cienaCesInputPUOperationalQL OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational clock quality level of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 7 }
+
+ cienaCesInputPUForcedQL OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User configured clock quality level that this input protection unit
+         is forced to operate at."
+    ::= { cienaCesSyncInputProtectionUnitEntry 8 }
+
+ cienaCesInputPUReceivedQL OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual received clock quality level of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 9 }
+
+ cienaCesInputPUSsmEnabled OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   disabled(2),
+                   enabled(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable reading of actual received clock quality level for 
+         this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 10 }
+
+ cienaCesInputPUOperationalStatus OBJECT-TYPE
+    SYNTAX      SyncRefOperationalStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 11 }
+
+ cienaCesInputPUBITSSignalMode OBJECT-TYPE
+    SYNTAX      SyncBITSSignalMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Mode, set if BITS signal is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 12 }
+
+ cienaCesInputPUBITSSignalFormat OBJECT-TYPE
+    SYNTAX      SyncBITSSignalFormat
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Format, set if BITS signal is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 13 }
+
+ cienaCesInputPUBITSSignalEncoding OBJECT-TYPE
+    SYNTAX      SyncBITSSignalEncoding
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal encoding, set if BITS signal is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 14 }
+
+ cienaCesInputPUUserOverridePriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user configured override-priority of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 15 }
+
+ cienaCesInputPUPTPEncapType OBJECT-TYPE
+    SYNTAX      SyncPTPEncapType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Encapsulation Type, set if a PTP input is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 16 }
+
+ cienaCesInputPUGPSClockMode OBJECT-TYPE
+    SYNTAX      SyncTimingType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GPS clock mode, set if a GPS input is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 17 }
+
+ cienaCesInputPUGPSFreqClock OBJECT-TYPE
+    SYNTAX      SyncGPSFreqClock
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GPS frequency clock, set if a GPS input is used as a protection unit and the 
+        cienaCesInputPUGPSClockMode is set to frequency."
+    ::= { cienaCesSyncInputProtectionUnitEntry 18 }
+
+ cienaCesInputPUBITSSignalSsmLocation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   sa4(2),
+                   sa5(3),
+                   sa6(4),
+                   sa7(5),
+                   sa8(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Ssm Location, set if BITS signal is used as an input reference."
+    ::= { cienaCesSyncInputProtectionUnitEntry 19 }
+
+--
+-- SyncOutputTable
+--
+
+cienaCesSyncOutputTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesSyncOutputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of output timing references."
+    ::= {  cienaCesTimeSyncObjects 7 }
+
+cienaCesSyncOutputEntry OBJECT-TYPE
+    SYNTAX      CienaCesSyncOutputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information for an output 
+         timing reference."
+    INDEX       { cienaCesOutputEntityId }
+    ::= { cienaCesSyncOutputTable 1 }
+
+CienaCesSyncOutputEntry ::= SEQUENCE {
+        cienaCesOutputEntityId                  Integer32,
+        cienaCesOutputEntityName                DisplayString,
+        cienaCesOutputTimingInterfaceName       DisplayString,
+        cienaCesOutputTimingInterfaceProtocol   SyncInterfaceProtocol,
+        cienaCesOutputOperationalQL             SsmStratumLevel,
+        cienaCesOutputOperationalStatus         SyncRefOperationalStatus,
+        cienaCesOutputBITSSignalMode            SyncBITSSignalMode,
+        cienaCesOutputBITSSignalFormat          SyncBITSSignalFormat,
+        cienaCesOutputBITSSignalEncoding        SyncBITSSignalEncoding,
+        cienaCesOutputBITSSignalLineBuildout    INTEGER,
+        cienaCesOutputBITSSignalSsmLocation     INTEGER,
+        cienaCesOutputGPSClockMode              SyncTimingType,
+        cienaCesOutputGPSFreqClock              SyncGPSFreqClock,
+        cienaCesOutputPTPEncapType              SyncPTPEncapType
+        }
+
+ cienaCesOutputEntityId OBJECT-TYPE
+    SYNTAX      Integer32 (1..48)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of this output reference entity."
+    ::= { cienaCesSyncOutputEntry 1 }
+
+ cienaCesOutputEntityName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique name of this output reference entity."
+    ::= { cienaCesSyncOutputEntry 2 }
+
+ cienaCesOutputTimingInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface name of this output reference."
+    ::= { cienaCesSyncOutputEntry 3 }
+
+ cienaCesOutputTimingInterfaceProtocol OBJECT-TYPE
+    SYNTAX      SyncInterfaceProtocol
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface protocol of this output reference."
+    ::= { cienaCesSyncOutputEntry 4 }
+
+ cienaCesOutputOperationalQL OBJECT-TYPE
+    SYNTAX      SsmStratumLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational clock quality level of this output reference."
+    ::= { cienaCesSyncOutputEntry 5 }
+
+ cienaCesOutputOperationalStatus OBJECT-TYPE
+    SYNTAX      SyncRefOperationalStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of this output reference."
+    ::= { cienaCesSyncOutputEntry 6 }
+
+ cienaCesOutputBITSSignalMode OBJECT-TYPE
+    SYNTAX      SyncBITSSignalMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Mode, set if BITS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 7 }
+
+ cienaCesOutputBITSSignalFormat OBJECT-TYPE
+    SYNTAX      SyncBITSSignalFormat
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Format, set if BITS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 8 }
+
+ cienaCesOutputBITSSignalEncoding OBJECT-TYPE
+    SYNTAX      SyncBITSSignalEncoding
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal encoding, set if BITS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 9 }
+
+ cienaCesOutputBITSSignalLineBuildout OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   lbo133(2),
+                   lbo266(3),
+                   lbo399(4),
+                   lbo533(5),
+                   lbo655(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Line Buildout, set if BITS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 10 }
+
+ cienaCesOutputBITSSignalSsmLocation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   sa4(2),
+                   sa5(3),
+                   sa6(4),
+                   sa7(5),
+                   sa8(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BITS Signal Ssm Location, set if BITS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 11 }
+
+ cienaCesOutputGPSClockMode OBJECT-TYPE
+    SYNTAX      SyncTimingType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GPS clock mode, set if a GPS signal is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 12 }
+
+ cienaCesOutputGPSFreqClock OBJECT-TYPE
+    SYNTAX      SyncGPSFreqClock
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GPS frequency clock, set if a GPS signal is used as an output reference and the 
+        cienaCesOutputGPSClockMode is set to frequency."
+    ::= { cienaCesSyncOutputEntry 13}
+
+  cienaCesOutputPTPEncapType OBJECT-TYPE
+    SYNTAX      SyncPTPEncapType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Encapsulation Type, set if a PTP output is used as an output reference."
+    ::= { cienaCesSyncOutputEntry 14 }
+--
+-- cienaCesSyncPTPConfig 
+--
+
+ cienaCesSyncPTPConfig       OBJECT IDENTIFIER ::= { cienaCesTimeSyncObjects 8 }
+ cienaCesSyncPTPGlobalConfig OBJECT IDENTIFIER ::= { cienaCesSyncPTPConfig 1 }
+ cienaCesSyncPTPInputConfig  OBJECT IDENTIFIER ::= { cienaCesSyncPTPConfig 2 }
+ cienaCesSyncPTPOutputConfig OBJECT IDENTIFIER ::= { cienaCesSyncPTPConfig 3 }
+ 
+--
+-- cienaCesSyncPTPGlobalConfig 
+--
+
+ cienaCesSyncPTPAddrMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   unicast(2),
+                   multicast(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Address Mode."
+    ::= { cienaCesSyncPTPGlobalConfig 1 }
+
+ cienaCesSyncPTPTagPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP tag priority"
+    ::= { cienaCesSyncPTPGlobalConfig 2 }
+
+ cienaCesSyncPTPProtocolVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   v2(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Protocol Version."
+    ::= { cienaCesSyncPTPGlobalConfig 3 }
+
+ cienaCesSyncPTPProfileVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   version1dot0(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Profile Version."
+    ::= { cienaCesSyncPTPGlobalConfig 4 }
+
+ cienaCesSyncPTPProfileIdentifier OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP profile identifier address."
+    ::= { cienaCesSyncPTPGlobalConfig 5 }
+
+ cienaCesSyncPTPDomainNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP domain number."
+    ::= { cienaCesSyncPTPGlobalConfig 6 }
+
+ cienaCesSyncPTPClockType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   ocslave(2),
+                   bc(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Clock Type."
+    ::= { cienaCesSyncPTPGlobalConfig 7 }
+
+ cienaCesSyncPTPClockID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP clock identifier."
+    ::= { cienaCesSyncPTPGlobalConfig 8 }
+
+ cienaCesSyncPTPDscp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP DSCP."
+    ::= { cienaCesSyncPTPGlobalConfig 9 }
+
+--
+-- cienaCesSyncPTPInputConfig 
+--
+
+ cienaCesSyncPTPInputUnicastReqDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "PTP input unicast request duration in seconds."
+    ::= { cienaCesSyncPTPInputConfig 1 }
+
+ cienaCesSyncPTPInputAnnounceRxLossNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP input announce Rx loss num (announce intervals)."
+    ::= { cienaCesSyncPTPInputConfig 2 }
+
+ cienaCesSyncPTPInputAnnounceTxRateReq OBJECT-TYPE
+    SYNTAX      SyncPTPRatePps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP input announce Tx rate request (pps)."
+    ::= { cienaCesSyncPTPInputConfig 3 }
+
+ cienaCesSyncPTPInputSyncTxRateReq OBJECT-TYPE
+    SYNTAX      SyncPTPRatePps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP input sync Tx rate request (pps)."
+    ::= { cienaCesSyncPTPInputConfig 4 }
+
+ cienaCesSyncPTPInputDelayReqTxRate OBJECT-TYPE
+    SYNTAX      SyncPTPRatePps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP input delay request Tx rate (pps)."
+    ::= { cienaCesSyncPTPInputConfig 5 }
+
+--
+-- cienaCesSyncPTPOutputConfig 
+--
+
+ cienaCesSyncPTPOutputMaxSlaveSessions OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Maximum number of allowed PTP slave sessions for PTP outputs."
+    ::= { cienaCesSyncPTPOutputConfig 1 }
+
+ cienaCesSyncPTPOutputTimestampMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   onestep(2),
+                   twostep(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP timestamp mode."
+    ::= { cienaCesSyncPTPOutputConfig 2 }
+
+--
+-- cienaCesSyncGPSConfig 
+--
+
+ cienaCesSyncGPSConfig       OBJECT IDENTIFIER ::= { cienaCesTimeSyncObjects 9 }
+ cienaCesSyncGPSOutputConfig OBJECT IDENTIFIER ::= { cienaCesSyncGPSConfig 1 }
+ 
+--
+-- cienaCesSyncGPSOutputConfig 
+--
+
+ cienaCesSyncGPSOutput1ppsPulseWidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 1pps pulse width, in microseconds, for GPS output references (applicable to phase)."
+    ::= { cienaCesSyncGPSOutputConfig 1 }
+
+--
+-- cienaCesSyncModuleSlotClockStatus
+--
+
+ cienaCesSyncModuleSlotClockStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   lossoflock(2),
+                   lockedtoprimaryctx(3),
+                   lockedtosecondaryctx(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Lock status of module slot."
+    ::= { cienaCesTimeSyncObjects 11 }
+
+ --
+ -- notifications
+ --
+
+ cienaCesSyncInputPUStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesInputPUEntityName,
+               cienaCesInputPUPGEntityName,
+               cienaCesInputPUTimingInterfaceName,
+               cienaCesInputPUTimingInterfaceProtocol,
+               cienaCesInputPUOperationalStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "Sent when a configured timing reference transitions states." 
+    ::= { cienaCesTimeSyncMIBNotifications 1 }
+ 
+ cienaCesSyncInputProtectionGroupStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesInputPGEntityName,
+               cienaCesInputPGOperationalStatus,
+               cienaCesInputPGSelectedReference
+            }
+    STATUS  current
+    DESCRIPTION
+        "Sent when a configured protection-group transitions states." 
+    ::= { cienaCesTimeSyncMIBNotifications 2 }
+ 
+cienaCesSyncModuleSlotClockStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesModuleSlotName,
+               cienaCesSyncModuleSlotClockStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "Sent when a slot other than the primary CTX experiences a timing state change. Only applicable in SAOS 8.x." 
+    ::= { cienaCesTimeSyncMIBNotifications 3 }
+ 
+  END
+ 
+ --
+ -- CIENA-CES-TIME-SYNC-MIB
+ --
+ 

@@ -27,6 +27,8 @@
  * @param array $modules Which modules to initialize
  */
 
+global $config;
+
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
@@ -47,6 +49,7 @@ require_once $install_dir . '/includes/common.php';
 require $install_dir . '/includes/dbFacile.php';
 require $install_dir . '/includes/rrdtool.inc.php';
 require $install_dir . '/includes/influxdb.inc.php';
+require $install_dir . '/includes/graphite.inc.php';
 require $install_dir . '/includes/datastore.inc.php';
 require $install_dir . '/includes/billing.php';
 require $install_dir . '/includes/syslog.php';
@@ -101,17 +104,30 @@ if ($config['memcached']['enable'] === true) {
 }
 
 if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
-    if (!$database_link) {
-        echo '<h2>MySQL Error</h2>';
-        echo mysqli_connect_error();
-        die;
+    // Check for testing database
+    if (getenv('DBTEST')) {
+        if (isset($config['test_db_name'])) {
+            $config['db_name'] = $config['test_db_name'];
+        }
+        if (isset($config['test_db_user'])) {
+            $config['db_user'] = $config['test_db_user'];
+        }
+        if (isset($config['test_db_pass'])) {
+            $config['db_pass'] = $config['test_db_pass'];
+        }
     }
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+
+    // Connect to database
+    try {
+        dbConnect();
+    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+        if (isCli()) {
+            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+        } else {
+            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+        }
+        exit(2);
+    }
 
     // pull in the database config settings
     mergedb();

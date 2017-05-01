@@ -10,13 +10,11 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "hpblmos") {
-    //UCD-SNMP-MIB::memAvailReal.0
-    $free = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, '.1.3.6.1.4.1.2021.4.6.0', '-Oqv')), 10);
-    //UCD-SNMP-MIB::memTotalReal.0
-    $total = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, '.1.3.6.1.4.1.2021.4.5.0', '-Oqv')), 10);
-    $used = $total - $free;
-    $mempool['total'] = $total;
-    $mempool['free'] = $free;
-    $mempool['used'] = $total - $free;
-}
+//UCD-SNMP-MIB::memAvailReal.0
+$free = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, '.1.3.6.1.4.1.2021.4.6.0', '-Oqv')), 10);
+//UCD-SNMP-MIB::memTotalReal.0
+$total = intval(preg_replace('/[^0-9]+/', '', snmp_get($device, '.1.3.6.1.4.1.2021.4.5.0', '-Oqv')), 10);
+$used = $total - $free;
+$mempool['total'] = $total;
+$mempool['free'] = $free;
+$mempool['used'] = $total - $free;

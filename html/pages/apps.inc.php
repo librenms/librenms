@@ -109,6 +109,20 @@ $graphs['nfs-v3-stats'] = array(
     'rpc',
 );
 
+$graphs['nfs-server'] = array(
+    'stats_v2',
+    'stats',
+    'stats_v4',
+    'v4ops',
+    'io',
+    'fh',
+    'rc',
+    'ra',
+    'net',
+    'net_tcp_conns',
+    'rpc',
+);
+
 $graphs['os-updates'] = array(
     'packages',
 );
@@ -194,6 +208,10 @@ $graphs['squid'] = array(
     'cputime',
 );
 
+$graphs['opengridscheduler'] = array(
+    'ogs'
+);
+
 $graphs['fbsd-nfs-server'] = array(
     'stats',
     'cache',
@@ -208,6 +226,30 @@ $graphs['fbsd-nfs-client'] = array(
 
 $graphs['unbound'] = array(
     'queries',
+);
+
+$graphs['smart'] = array(
+    'id5',
+    'id10',
+    'id173',
+    'id183',
+    'id184',
+    'id187',
+    'id188',
+    'id190',
+    'id194',
+    'id196',
+    'id197',
+    'id198',
+    'id199',
+    'id231',
+    'id233',
+);
+
+$graphs['sdfsinfo'] = array(
+    'volume',
+    'blocks',
+    'rates',
 );
 
 print_optionbar_start();

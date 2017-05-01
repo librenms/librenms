@@ -14,7 +14,16 @@ function rewrite_location($location)
             }
         }
     }
-    
+
+    if (is_array($config['location_map_regex_sub'])) {
+        foreach ($config['location_map_regex_sub'] as $reg => $val) {
+            if (preg_match($reg, $location)) {
+                $location = preg_replace($reg, $val, $location);
+                break;
+            }
+        }
+    }
+
     if (isset($config['location_map'][$location])) {
         $location = $config['location_map'][$location];
     }
@@ -56,17 +65,21 @@ function rewrite_entity_descr($descr)
 }
 
 
-function ifNameDescr($interface, $device = null)
-{
-    return ifLabel($interface, $device);
-}
-
-
-function ifLabel($interface, $device = null)
+/**
+ * Clean port values for html display
+ * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
+ *
+ * @param array $interface
+ * @param null|array $device
+ * @return mixed
+ */
+function cleanPort($interface, $device = null)
 {
     global $config;
 
     $interface['ifAlias'] = display($interface['ifAlias']);
+    $interface['ifName']  = display($interface['ifName']);
+    $interface['ifDescr'] = display($interface['ifDescr']);
 
     if (!$device) {
         $device = device_by_id_cache($interface['device_id']);

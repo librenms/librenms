@@ -72,7 +72,7 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($hostname, $vars['port']));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -149,7 +149,7 @@ function get_graph_generic_by_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -527,7 +527,7 @@ function get_graph_by_portgroup()
     unset($seperator);
     $vars['type'] = 'multiport_bits_separate';
     $vars['id']   = $if_list;
-    $app->response->headers->set(set_image_type());
+    $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
@@ -1465,26 +1465,35 @@ function list_arp()
     $code     = 404;
     $message  = '';
     $ip       = $router['ip'];
+    $hostname = mres($_GET['device']);
     $total    = 0;
     if (empty($ip)) {
         $message = "No valid IP provided";
+    } elseif ($ip === "all" && empty($hostname)) {
+        $message = "Device argument is required when requesting all entries";
     } else {
         $code = 200;
         $status = 'ok';
         if ($ip === "all") {
-            $hostname =  mres($_GET['device']);
             $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", array($device_id));
+        } elseif (str_contains($ip, '/')) {
+            $ipv4 = new Net_IPv4();
+            $net = $ipv4->parseAddress($ip);
+            $arp = dbFetchRows(
+                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
+                array(ip2long($net->netmask), ip2long($net->network))
+            );
         } else {
             $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", array($ip));
         }
-        $total  = count($arp);
+        $total = count($arp);
     }
     $output  = array(
         'status'  => $status,
         'err-msg' => $message,
         'count'   => $total,
-        'arp'  => $arp,
+        'arp'     => $arp,
     );
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');

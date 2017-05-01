@@ -183,11 +183,11 @@ $no_refresh = true;
                         <span class="message"></span>
                     </div>
                     <div class="form-group">
-                        <label for="pushover_value">Boxcar Access token</label>
+                        <label for="boxcar_value">Boxcar Access token</label>
                         <input type="text" class="form-control" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token">
                     </div>
                     <div class="form-group">
-                        <label for="pushover_extra">Boxcar options (specify one per line key=value)</label>
+                        <label for="boxcar_extra">Boxcar options (specify one per line key=value)</label>
                         <textarea class="form-control" name="boxcar_extra" id="boxcar_extra" placeholder="Enter the config options"></textarea>
                     </div>
                 </form>
@@ -200,6 +200,34 @@ $no_refresh = true;
     </div>
 </div>
 <!-- End Boxcar Modal -->
+
+<!-- Telegram Modal -->
+<div class="modal fade" id="new-config-telegram" role="dialog" aria-hidden="true" title="Create new config item">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form role="form" class="new_config_form">
+                    <div class="form-group">
+                        <span class="message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="telegram_value">Telegram Chat ID</label>
+                        <input type="text" class="form-control" name="telegram_value" id="telegram_value" placeholder="Enter the Telegram Chat ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="telegram_token">Telegram Token</label>
+                        <input type="text" class="form-control" name="telegram_token" id="telegram_token" placeholder="Enter the Telegram Token">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="submit-telegram">Add config</button>
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Telegram Modal -->
 
 <?php
 if (isset($_GET['error'])) {
@@ -864,6 +892,69 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 </div>
             </div>
         </div>
+        <!-- Telegram -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#telegram_transport_expand"><i class="fa fa-caret-down"></i> Telegram transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="telegram" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="telegram_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-telegram">Add Telegram config</button>
+                        </div>
+                    </div>';
+$telegram_chatids = get_config_like_name('alert.transports.telegram.%.chat_id');
+foreach ($telegram_chatids as $index => $chat_id) {
+    $telegram_token   = get_config_by_name('alert.transports.telegram.'.$chat_id['config_id'].'.token');
+    echo '<div id="'.$chat_id['config_id'].'">
+                        <div class="form-group has-feedback">
+                            <label for="telegram_chat_id" class="col-sm-4 control-label">Telegram Chat ID</label>
+                            <div class="col-sm-4">
+                                <input id="telegram_chat_id" class="form-control" type="text" name="global-config-input" value="'.$chat_id['config_value'].'" data-config_id="'.$chat_id['config_id'].'">
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label for="telegram_token" class="col-sm-4 control-label">Telegram token</label>
+                            <div class="col-sm-4">
+                                <input id="telegram_token" class="form-control" type="text" name="telegram_token" value="'.$telegram_token['config_value'].'" data-config_id="'.$chat_id['config_id'].'">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-telegram-config" name="del-telegram-call" data-config_id="'.$chat_id['config_id'].'"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                    </div>';
+}//end foreach
+
+echo '<div id="telegram_chat_id_template" class="hide">
+                        <div class="form-group has-feedback">
+                            <label for="telegram_chat_id" class="col-sm-4 control-label api-method">Telegram Chat ID</label>
+                            <div class="col-sm-4">
+                                <input id="telegram_chat_id" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
+                                <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label for="telegram_token" class="col-sm-4 control-label">Telegram token</label>
+                            <div class="col-sm-4">
+                                <input id="telegram_token" class="form-control" type="text" name="telegram_token" value="" data-config_id="">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-telegram-config" id="del-telegram-call" name="del-telegram-call" data-config_id=""><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pushbullet -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
@@ -1216,6 +1307,48 @@ echo '
                     </div>
                 </div>
             </div>
+        </div>';
+$syslog_host     = get_config_by_name('alert.transports.syslog.syslog_host');
+$syslog_port    = get_config_by_name('alert.transports.syslog.syslog_port');
+$syslog_facility   = get_config_by_name('alert.transports.syslog.syslog_facility');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#syslog_transport_expand"><i class="fa fa-caret-down"></i> Syslog transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="syslog" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="syslog_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="syslog_host" class="col-sm-4 control-label">Syslog Host </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_host" class="form-control" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="syslog_port" class="col-sm-4 control-label">Syslog Port </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="syslog_facility" class="col-sm-4 control-label">Syslog Facility </label>
+                        <div class="col-sm-4">
+                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -1488,6 +1621,42 @@ echo '
         });
     });// End Add Boxcar config
 
+
+    // Add Telegram config
+    itemIndex = 0;
+    $("button#submit-telegram").click(function(){
+        var config_value = $('#telegram_value').val();
+        var config_extra = $('#telegram_token').val();
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: {type: "config-item", action: 'add-telegram', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    itemIndex++;
+                    var $template = $('#telegram_chat_id_template'),
+                        $clone    = $template
+                            .clone()
+                            .removeClass('hide')
+                            .attr('id',data.config_id)
+                            .attr('telegram-appkey-index', itemIndex)
+                            .insertBefore($template);
+                    $clone.find('[id="telegram_chat_id"]').attr('data-config_id',data.config_id);
+                    $clone.find('[id="del-telegram-call"]').attr('data-config_id',data.config_id);
+                    $clone.find('[name="global-config-input"]').attr('value', config_value);
+                    $clone.find('[name="telegram_token"]').attr('value', config_extra);
+                    $("#new-config-telegram").modal('hide');
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function(){
+                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+            }
+        });
+    });// End Add Telegram config
+
     // Delete api config
     $(document).on('click', 'button[name="del-api-call"]', function(event) {
         var config_id = $(this).data('config_id');
@@ -1613,6 +1782,28 @@ echo '
             }
         });
     });// End delete Boxcar config
+
+
+    // Delete Telegram config
+    $(document).on('click', 'button[name="del-telegram-call"]', function(event) {
+        var config_id = $(this).data('config_id');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "config-item", action: 'remove-telegram', config_id: config_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $("#"+config_id).remove();
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+            }
+        });
+    });// End delete Telegram config
 
     $( 'select[name="global-config-select"]').change(function(event) {
         event.preventDefault();

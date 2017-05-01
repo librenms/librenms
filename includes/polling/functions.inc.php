@@ -209,10 +209,10 @@ function poll_device($device, $options)
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
+    $db_ip = inet_pton($ip);
 
-    if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
+    if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
-        $db_ip = inet_pton($ip);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
 
@@ -467,6 +467,8 @@ function get_main_serial($device)
         $serial_output = snmp_get_multi($device, 'entPhysicalSerialNum.1 entPhysicalSerialNum.1001', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
         if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
+        } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
+            return $serial_output[1000]['entPhysicalSerialNum'];
         } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
             return $serial_output[1001]['entPhysicalSerialNum'];
         }
