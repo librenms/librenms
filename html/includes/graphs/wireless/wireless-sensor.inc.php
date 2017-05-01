@@ -32,19 +32,29 @@ if ($unit_long == $sensor['sensor_descr']) {
     $unit_long = '';
 }
 
-$output_def = 'sensor';
 $col_w = 7 + strlen($unit);
 $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
-$factor = 1;
-
 
 $rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 
-if ($unit == 'Hz') {
+$num = '%5.2lf'; // default: float
+$output_def = 'sensor';
+$factor = 1;
+if ($unit === '') {
+    $num = '%5.0lf';
+} elseif ($unit == 'bps') {
+    $num = '%5.3lf%s';
+} elseif ($unit == 'Hz') {
+    $num = '%5.3lf%s';
     $factor = 1000000;
     $output_def = 'sensorhz';
-    $rrd_options .= " CDEF:sensorhz=sensor,$factor,*";
+    $rrd_options .= " CDEF:$output_def=sensor,$factor,*";
+} elseif ($unit == 'm') {
+    $num = '%5.3lf%s';
+    $factor = 1000;
+    $output_def = 'sensorm';
+    $rrd_options .= " CDEF:$output_def=sensor,$factor,*";
 }
 
 $rrd_options .= " LINE1.5:$output_def#0000cc:'$sensor_descr_fixed'";
@@ -66,13 +76,6 @@ if ($vars['width'] > 300) {
 }
 
 // ---- legend ----
-
-$num = '%5.2lf'; // default: float
-if ($unit === '') {
-    $num = '%5.0lf';
-} elseif ($unit == 'bps' || $unit == 'Hz') {
-    $num = '%5.3lf%s';
-}
 
 $rrd_options .= " GPRINT:$output_def:LAST:'$num$unit'";
 $rrd_options .= " GPRINT:$output_def:MIN:'$num$unit'";
