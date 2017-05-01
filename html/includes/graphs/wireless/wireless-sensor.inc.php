@@ -28,36 +28,30 @@ require 'includes/graphs/common.inc.php';
 // escape % characters
 $unit = preg_replace('/(?<!%)%(?!%)/', '%%', $unit);
 
-$num = '%5.1lf'; // default: float
-if (isset($unit_type)) {
-    if ($unit_type == 'int') {
-        $num = '%5.0lf';
-    } elseif ($unit_type == 'si') {
-        // replaces the manual unit
-        $num .= '%s';
-        $unit = '';
-    }
-}
-
 if ($unit_long == $sensor['sensor_descr']) {
     $unit_long = '';
 }
 
+$sensor_def = 'sensor';
 $col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
-
 $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
 
+
+$rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
+
+if ($unit == 'Hz') {
+    $rrd_options .= " CDEF:sensorhz=sensor,1000000,*";
+}
+
+
 $rrd_options .= " LINE1.5:sensor#cc0000:'$sensor_descr_fixed'";
 
 if ($scale_min >= 0) {
     $rrd_options .= " AREA:sensor#cc000055";
 }
 
-$rrd_options .= " GPRINT:sensor:LAST:$num$unit";
-$rrd_options .= " GPRINT:sensor:MIN:$num$unit";
-$rrd_options .= " GPRINT:sensor:MAX:$num$unit\\l";
+// ---- limits ----
 
 if (is_numeric($sensor['sensor_limit'])) {
     $rrd_options .= ' HRULE:'.$sensor['sensor_limit'].'#999999::dashes';
@@ -66,3 +60,16 @@ if (is_numeric($sensor['sensor_limit'])) {
 if (is_numeric($sensor['sensor_limit_low'])) {
     $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes';
 }
+
+// ---- legend ----
+
+$num = '%5.1lf'; // default: float
+if ($unit === '') {
+    $num = '%5.0lf';
+} elseif ($unit == 'bps' || $unit == 'Hz') {
+    $num .= '%s';
+}
+
+$rrd_options .= " GPRINT:sensor:LAST:'$num$unit'";
+$rrd_options .= " GPRINT:sensor:MIN:'$num$unit'";
+$rrd_options .= " GPRINT:sensor:MAX:'$num$unit'\\l";

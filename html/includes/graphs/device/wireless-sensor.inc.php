@@ -29,14 +29,10 @@ require 'includes/graphs/common.inc.php';
 $unit = preg_replace('/(?<!%)%(?!%)/', '%%', $unit);
 
 $num = '%5.1lf'; // default: float
-if (isset($unit_type)) {
-    if ($unit_type == 'int') {
-        $num = '%5.0lf';
-    } elseif ($unit_type == 'si') {
-        // replaces the manual unit
-        $num .= '%s';
-        $unit = '';
-    }
+if ($unit === '') {
+    $num = '%5.0lf';
+} elseif ($unit == 'bps' || $unit == 'Hz') {
+    $num .= '%s';
 }
 
 $sensors = dbFetchRows(
@@ -60,8 +56,8 @@ foreach ($sensors as $index => $sensor) {
     $rrd_file = rrd_name($device['hostname'], array('wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']));
     $rrd_options .= " DEF:sensor{$sensor['sensor_id']}=$rrd_file:sensor:AVERAGE";
     $rrd_options .= " LINE1.5:sensor{$sensor['sensor_id']}#$colour:'$sensor_descr_fixed'";
-    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:LAST:$num$unit";
-    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MIN:$num$unit";
-    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MAX:$num$unit\\l ";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:LAST:'$num$unit'";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MIN:'$num$unit'";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MAX:'$num$unit'\\l ";
     $iter++;
 }//end foreach

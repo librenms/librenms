@@ -70,10 +70,7 @@ class AirosAf extends OS implements
                 $tx_oid,
                 'airos-af',
                 'tx',
-                'Tx Frequency',
-                null,
-                1,
-                1000
+                'Tx Frequency'
             ),
             new WirelessSensor(
                 'frequency',
@@ -81,10 +78,7 @@ class AirosAf extends OS implements
                 $rx_oid,
                 'airos-af',
                 'rx',
-                'Rx Frequency',
-                null,
-                1,
-                1000
+                'Rx Frequency'
             ),
         );
     }
@@ -119,28 +113,8 @@ class AirosAf extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.6.1'; // UBNT-AirFIBER-MIB::txCapacity.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.5.1'; // UBNT-AirFIBER-MIB::rxCapacity.1
         return array(
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $tx_oid,
-                'airos',
-                'tx',
-                'Tx Capacity',
-                null,
-                1,
-                1048576
-            ),
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $rx_oid,
-                'airos',
-                'rx',
-                'Rx Capacity',
-                null,
-                1,
-                1048576
-            ),
+            new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'airos', 'tx', 'Tx Capacity'),
+            new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos', 'rx', 'Rx Capacity'),
         );
     }
 }

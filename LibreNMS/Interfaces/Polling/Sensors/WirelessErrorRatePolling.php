@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessRatePolling.php
+ * WirelessErrorRatePolling.php
  *
- * Custom polling interface for wireless rates
+ * Custom polling interface for wireless bit error rate in bps
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 
 namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessRatePolling
+interface WirelessErrorRatePolling
 {
     /**
-     * Poll wireless rates in bps
+     * Poll wireless bit error rate as bps
      * The returned array should be sensor_id => value pairs
      *
      * @param array $sensors Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessRate(array $sensors);
+    public function pollWirelessErrorRatio(array $sensors);
 }

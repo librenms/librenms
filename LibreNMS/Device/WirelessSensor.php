@@ -182,15 +182,21 @@ class WirelessSensor extends Sensor
                 'icon' => 'signal',
             ),
             'error-ratio' => array(
-                'short' => 'BER',
-                'long' => 'Bit Error Ratio',
+                'short' => 'Error Ratio',
+                'long' => 'Bit/Packet Error Ratio',
                 'unit' => '%',
+                'icon' => 'exclamation-triangle',
+            ),
+            'error-rate' => array(
+                'short' => 'BER',
+                'long' => 'Bit Error Rate',
+                'unit' => 'bps',
                 'icon' => 'exclamation-triangle',
             ),
             'rate' => array(
                 'short' => 'Rate',
                 'long' => 'TX/RX Rate',
-                'unit' => 'Mbps',
+                'unit' => 'bps',
                 'icon' => 'tachometer',
             ),
             'signal' => array(
@@ -214,7 +220,7 @@ class WirelessSensor extends Sensor
             'frequency' => array(
                 'short' => 'Frequency',
                 'long' => 'Frequency',
-                'unit' => 'GHz',
+                'unit' => 'MHz',
                 'icon' => 'line-chart',
             ),
         );

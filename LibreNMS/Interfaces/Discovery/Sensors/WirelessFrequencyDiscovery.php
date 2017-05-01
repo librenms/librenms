@@ -2,7 +2,7 @@
 /**
  * WirelessFrequencyDiscovery.php
  *
- * Discover Frequency Sensors as GHz
+ * Discover Frequency Sensors as MHz
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Discovery\Sensors;
 interface WirelessFrequencyDiscovery
 {
     /**
-     * Discover wireless frequency.  This is in GHz. Type is frequency.
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

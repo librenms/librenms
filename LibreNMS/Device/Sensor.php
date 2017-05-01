@@ -562,6 +562,23 @@ class Sensor implements DiscoveryModule, PollerModule
     }
 
     /**
+     * Return a list of valid types with metadata about each type
+     * $class => array(
+     *  'short' - short text for this class
+     *  'long'  - long text for this class
+     *  'unit'  - units used by this class 'dBm' for example
+     *  'icon'  - font awesome icon used by this class
+     * )
+     * @param bool $valid filter this list by valid types in the database
+     * @param int $device_id when filtering, only return types valid for this device_id
+     * @return array
+     */
+    public static function getTypes($valid = false, $device_id = null)
+    {
+        return array();
+    }
+
+    /**
      * Record sensor data in the database and data stores
      *
      * @param $os
@@ -570,10 +587,12 @@ class Sensor implements DiscoveryModule, PollerModule
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {
+        $types = static::getTypes();
+
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value\n";
+            echo "  {$sensor['sensor_descr']}: $sensor_value {$types[$sensor['sensor_class']]['unit']}\n";
 
             // update rrd and database
             $rrd_name = array(
@@ -582,7 +601,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index']
             );
-            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
 
             $fields = array(
                 'sensor' => isset($sensor_value) ? $sensor_value : 'U',

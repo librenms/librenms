@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -33,11 +34,48 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Mimosa extends OS implements
+    WirelessErrorRatioDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessNoiseDiscovery,
     WirelessSnrDiscovery
 {
+    /**
+     * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessErrorRatio()
+    {
+        $tx_oid = '.1.3.6.1.4.1.43356.2.1.2.7.3.0'; // MIMOSA-NETWORKS-BFIVE-MIB::mimosaPerTxRate
+        $rx_oid = '.1.3.6.1.4.1.43356.2.1.2.7.4.0'; // MIMOSA-NETWORKS-BFIVE-MIB::mimosaPerRxRate
+        return array(
+            new WirelessSensor(
+                'error-ratio',
+                $this->getDeviceId(),
+                $tx_oid,
+                'mimosa',
+                'tx',
+                'Tx Packet Error Ratio',
+                null,
+                1,
+                100
+            ),
+            new WirelessSensor(
+                'error-ratio',
+                $this->getDeviceId(),
+                $rx_oid,
+                'mimosa',
+                'rx',
+                'Rx Packet Error Ratio',
+                null,
+                1,
+                100
+            ),
+        );
+    }
+
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -66,12 +104,15 @@ class Mimosa extends OS implements
                     'mimosa',
                     $index,
                     sprintf($descr, $this->getPolarization($polar[$index])),
-                    $frequency,
-                    1,
-                    1000
+                    $frequency
                 )
             );
         }
+    }
+
+    private function getPolarization($polarization)
+    {
+        return $polarization == 'horizontal' ? 'Horiz.' : 'Vert.';
     }
 
     /**
@@ -165,10 +206,5 @@ class Mimosa extends OS implements
             );
         }
         return $sensors;
-    }
-
-    private function getPolarization($polarization)
-    {
-        return $polarization == 'horizontal' ? 'Horiz.' : 'Vert.';
     }
 }

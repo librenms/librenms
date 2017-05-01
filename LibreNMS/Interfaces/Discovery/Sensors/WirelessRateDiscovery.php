@@ -2,7 +2,7 @@
 /**
  * WirelessRateDiscovery.php
  *
- * Discover wireless rate sensors in megabits per second
+ * Discover wireless rate sensors in bits per second
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Discovery\Sensors;
 interface WirelessRateDiscovery
 {
     /**
-     * Discover wireless rate. This is in Mbps. Type is rate.
+     * Discover wireless rate. This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array

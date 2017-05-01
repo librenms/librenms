@@ -28,6 +28,5 @@ $scale_min = '0';
 
 $unit_long = 'Clients';
 $unit = '';
-$unit_type = 'int';
 
 include 'wireless-sensor.inc.php';

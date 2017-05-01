@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Polling\Sensors;
 interface WirelessFrequencyPolling
 {
     /**
-     * Poll wireless frequency as GHz
+     * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
      * @param array $sensors Array of sensors needed to be polled

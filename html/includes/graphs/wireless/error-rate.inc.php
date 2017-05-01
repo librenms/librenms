@@ -1,9 +1,8 @@
 <?php
 
 $scale_min = '0';
-//$scale_max = '1000';
 
-$unit_long = 'Rate (bps)';
+$unit_long = 'Error Ratio (bps)';
 $unit = 'bps';
 
 include 'wireless-sensor.inc.php';

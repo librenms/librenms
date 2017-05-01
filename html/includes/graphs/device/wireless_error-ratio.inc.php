@@ -5,6 +5,6 @@ $scale_max = '100';
 
 $class     = 'error-ratio';
 $unit      = '%%';
-$unit_long = 'Bit Error Ratio';
+$unit_long = 'Error Ratio';
 
 require 'includes/graphs/device/wireless-sensor.inc.php';

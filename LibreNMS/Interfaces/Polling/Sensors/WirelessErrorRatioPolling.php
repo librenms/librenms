@@ -2,7 +2,7 @@
 /**
  * WirlessErrorRatioPolling.php
  *
- * Custom polling interface for wireless bit error ratio
+ * Custom polling interface for wireless bit/packet error ratio
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Polling\Sensors;
 interface WirelessErrorRatioPolling
 {
     /**
-     * Poll wireless bit error ratio as percent
+     * Poll wireless bit/packet error ratio as percent
      * The returned array should be sensor_id => value pairs
      *
      * @param array $sensors Array of sensors needed to be polled
