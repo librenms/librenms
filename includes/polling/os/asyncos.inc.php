@@ -20,7 +20,3 @@ $version = $regexp_results[0];
 
 preg_match('/[[\w]+-[\w]+/', $serial, $regexp_results);
 $serial = $regexp_results[0];
-<<<<<<< HEAD
-
-=======
->>>>>>> e7a49dd092e9abeb0604a31b46eb5a86fbdb4b40
