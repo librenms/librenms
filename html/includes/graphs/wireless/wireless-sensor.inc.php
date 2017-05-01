@@ -32,33 +32,37 @@ if ($unit_long == $sensor['sensor_descr']) {
     $unit_long = '';
 }
 
-$sensor_def = 'sensor';
+$output_def = 'sensor';
 $col_w = 7 + strlen($unit);
 $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
+$factor = 1;
 
 
 $rrd_options .= " COMMENT:'". str_pad($unit_long, 35) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 
 if ($unit == 'Hz') {
-    $rrd_options .= " CDEF:sensorhz=sensor,1000000,*";
+    $factor = 1000000;
+    $output_def = 'sensorhz';
+    $rrd_options .= " CDEF:sensorhz=sensor,$factor,*";
 }
 
+$rrd_options .= " LINE1.5:$output_def#0000cc:'$sensor_descr_fixed'";
 
-$rrd_options .= " LINE1.5:sensor#cc0000:'$sensor_descr_fixed'";
-
-if ($scale_min >= 0) {
-    $rrd_options .= " AREA:sensor#cc000055";
+if (isset($scale_min) && $scale_min >= 0) {
+    $rrd_options .= " AREA:$output_def#0000cc55";
 }
 
 // ---- limits ----
 
-if (is_numeric($sensor['sensor_limit'])) {
-    $rrd_options .= ' HRULE:'.$sensor['sensor_limit'].'#999999::dashes';
-}
+if ($vars['width'] > 300) {
+    if (is_numeric($sensor['sensor_limit'])) {
+        $rrd_options .= ' LINE1:'.$sensor['sensor_limit']*$factor.'#cc000060::dashes';
+    }
 
-if (is_numeric($sensor['sensor_limit_low'])) {
-    $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes';
+    if (is_numeric($sensor['sensor_limit_low'])) {
+        $rrd_options .= ' LINE1:'.$sensor['sensor_limit_low']*$factor.'#cc000060::dashes';
+    }
 }
 
 // ---- legend ----
@@ -70,6 +74,6 @@ if ($unit === '') {
     $num .= '%s';
 }
 
-$rrd_options .= " GPRINT:sensor:LAST:'$num$unit'";
-$rrd_options .= " GPRINT:sensor:MIN:'$num$unit'";
-$rrd_options .= " GPRINT:sensor:MAX:'$num$unit'\\l";
+$rrd_options .= " GPRINT:$output_def:LAST:'$num$unit'";
+$rrd_options .= " GPRINT:$output_def:MIN:'$num$unit'";
+$rrd_options .= " GPRINT:$output_def:MAX:'$num$unit'\\l";
