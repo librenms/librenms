@@ -67,11 +67,11 @@ if ($vars['width'] > 300) {
 
 // ---- legend ----
 
-$num = '%5.1lf'; // default: float
+$num = '%5.2lf'; // default: float
 if ($unit === '') {
     $num = '%5.0lf';
 } elseif ($unit == 'bps' || $unit == 'Hz') {
-    $num .= '%s';
+    $num = '%5.3lf%s';
 }
 
 $rrd_options .= " GPRINT:$output_def:LAST:'$num$unit'";

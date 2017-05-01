@@ -3,7 +3,7 @@
 $scale_min = '0';
 
 $class     = 'frequency';
-$unit      = '';
+$unit      = 'Hz';
 $unit_long = 'Hz';
 
 require 'includes/graphs/device/wireless-sensor.inc.php';
