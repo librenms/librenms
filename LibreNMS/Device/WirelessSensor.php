@@ -181,6 +181,12 @@ class WirelessSensor extends Sensor
                 'unit' => 'dBm',
                 'icon' => 'signal',
             ),
+            'error-ratio' => array(
+                'short' => 'BER',
+                'long' => 'Bit Error Ratio',
+                'unit' => '%',
+                'icon' => 'exclamation-triangle',
+            ),
             'rate' => array(
                 'short' => 'Rate',
                 'long' => 'TX/RX Rate',

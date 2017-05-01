@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
@@ -33,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSignalDiscovery;
 use LibreNMS\OS;
 
 class Extendair extends OS implements
+    WirelessErrorRatioDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRateDiscovery,
@@ -118,6 +120,20 @@ class Extendair extends OS implements
             new WirelessSensor('signal', $this->getDeviceId(), $oid, 'extendair', 0, 'Current Signal'),
             new WirelessSensor('signal', $this->getDeviceId(), $min_oid, 'extendair', 'min', 'Min Signal'),
             new WirelessSensor('signal', $this->getDeviceId(), $max_oid, 'extendair', 'max', 'Max Signal'),
+        );
+    }
+
+    /**
+     * Discover wireless bit error ratio.  This is in percent. Type is error-ratio.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessErrorRatio()
+    {
+        $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.1.0'; // ExaltComProducts::remCurrentBER.0
+        return array(
+            new WirelessSensor('error-ratio', $this->getDeviceId(), $oid, 'extendair', 0, 'Bit Error Ratio'),
         );
     }
 }
