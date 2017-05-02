@@ -137,6 +137,8 @@ $config['core_descr'] = 'core';
 // Add custom core descriptions (can be an array)
 $config['custom_descr'] = '';
 // Add custom interface descriptions (can be an array)
+$config['int_all_ports'] = 1;
+// Enable All Ports (disable for large installations)
 $config['int_transit'] = 1;
 // Enable Transit Types
 $config['int_peering'] = 1;
