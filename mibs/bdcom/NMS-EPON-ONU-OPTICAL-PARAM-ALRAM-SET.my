@@ -1,0 +1,527 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-OPTICAL-PARAM-ALARM-SET.MIB: NMS EPON OLT CHIP STATUS TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-ONU-OPTICAL-PARAM-ALARM-SET DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEponOnu                                  FROM NMS-EPON-ONU
+    RowStatus                   	    	FROM SNMPv2-TC;
+
+               onuOpticsParameterAlarmSet         OBJECT IDENTIFIER ::= { nmsEponOnu 6 }
+                         
+
+               onuOpticsParameterAlarmSetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF OnuOpticsParameterAlarmSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon onu Optics Parameter Alarm Set table entries."
+                   ::= { onuOpticsParameterAlarmSet 1 }
+
+               onuOpticsParameterAlarmSetEntry OBJECT-TYPE
+                   SYNTAX OnuOpticsParameterAlarmSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon onu Optics Parameter AlarmSet property table."
+                   INDEX { ifIndex }
+               ::= { onuOpticsParameterAlarmSetTable 1 }
+
+               OnuOpticsParameterAlarmSetEntry ::=
+                   SEQUENCE {
+                       ifIndex
+                           INTEGER,
+                       txPowerAlarmUpLimitEnable
+                           INTEGER,
+                       txPowerAlarmUpLimitThreshold
+                           INTEGER,
+                       txPowerAlarmUpLimitClearThreshold
+                           INTEGER,
+                       txPowerAlarmUpLimitRowStatus
+                       	   RowStatus,
+                       txPowerAlarmLowLimitEnable
+                           INTEGER,
+                       txPowerAlarmLowLimitThreshold
+                           INTEGER,
+                       txPowerAlarmLowLimitClearThreshold
+                           INTEGER,
+                       txPowerAlarmLowLimitRowStatus
+                           RowStatus,
+                       rxPowerAlarmUpLimitEnable
+                           INTEGER,
+                       rxPowerAlarmUpLimitThreshold
+                           INTEGER,
+		       rxPowerAlarmUpLimitClearThreshold
+                           INTEGER,
+		       rxPowerAlarmUpLimitRowStatus
+                           RowStatus,
+                       rxPowerAlarmLowLimitEnable
+                           INTEGER,
+                       rxPowerAlarmLowLimitThreshold
+                           INTEGER,
+                       rxPowerAlarmLowLimitClearThreshold
+                           INTEGER,
+                       rxPowerAlarmLowLimitRowStatus
+                           RowStatus,
+                       temperatureAlarmUpLimitEnable
+                           INTEGER,
+                       temperatureAlarmUpLimitThreshold
+                           INTEGER,
+                       temperatureAlarmUpLimitClearThreshold
+                           INTEGER,
+                       temperatureAlarmUpLimitRowStatus
+                           RowStatus,
+                       temperatureAlarmLowLimitEnable
+                           INTEGER,
+                       temperatureAlarmLowLimitThreshold
+                           INTEGER,
+                       temperatureAlarmLowLimitClearThreshold
+                           INTEGER,
+                       temperatureAlarmLowLimitRowStatus
+                           RowStatus,
+                       voltageAlarmUpLimitEnable
+                           INTEGER,
+                       voltageAlarmUpLimitThreshold
+                           INTEGER,
+                       voltageAlarmUpLimitClearThreshold
+                           INTEGER,
+                       voltageAlarmUpLimitRowStatus
+                           RowStatus,
+                       voltageAlarmLowLimitEnable
+                           INTEGER,
+                       voltageAlarmLowLimitThreshold
+                           INTEGER,
+                       voltageAlarmLowLimitClearThreshold
+                           INTEGER,
+                       voltageAlarmLowLimitRowStatus
+                           RowStatus,
+                       currentAlarmUpLimitEnable
+                           INTEGER,
+                       currentAlarmUpLimitThreshold
+                           INTEGER,
+                       currentAlarmUpLimitClearThreshold
+                           INTEGER,
+                       currentAlarmUpLimitRowStatus
+                           RowStatus,
+                       currentAlarmLowLimitEnable
+                           INTEGER,
+                       currentAlarmLowLimitThreshold
+                           INTEGER,
+                       currentAlarmLowLimitClearThreshold
+                           INTEGER,
+                       currentAlarmLowLimitRowStatus
+                           RowStatus
+
+		}
+             
+
+               ifIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The only llid of ONU device in System."
+                   ::= { onuOpticsParameterAlarmSetEntry 1 } 
+
+               txPowerAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON hign TX power. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 2 } 
+
+
+               txPowerAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of tx power alarm. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { onuOpticsParameterAlarmSetEntry 3 } 
+
+               txPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of tx power alarm. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { onuOpticsParameterAlarmSetEntry 4 } 
+              
+               txPowerAlarmUpLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of tx power upper alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 5 } 
+
+               txPowerAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low TX power. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 6 } 
+
+               txPowerAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of tx power alarm. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { onuOpticsParameterAlarmSetEntry 7 } 
+
+               txPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold tx power alarm cleared. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { onuOpticsParameterAlarmSetEntry 8 } 
+              
+               txPowerAlarmLowLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of tx power low alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 9 } 
+
+               rxPowerAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON hign RX power. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 10 } 
+
+               rxPowerAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of rx power alarm. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { onuOpticsParameterAlarmSetEntry 11 } 
+
+               rxPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold rx power alarm cleared. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { onuOpticsParameterAlarmSetEntry 12 } 
+
+               rxPowerAlarmUpLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of rx power upper alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 13 } 
+
+               rxPowerAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low RX power. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 14 } 
+
+               rxPowerAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of rx power alarm. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { onuOpticsParameterAlarmSetEntry 15 } 
+
+
+               rxPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold rx power alarm cleared. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { onuOpticsParameterAlarmSetEntry 16 } 
+
+
+               rxPowerAlarmLowLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of rx power low alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 17 } 
+
+
+               temperatureAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high temperature. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 18 } 
+
+
+               temperatureAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of temperature alarm. The unit is 0.1 degree. The range is -1280-1280. Default is 1280."
+                   ::= { onuOpticsParameterAlarmSetEntry 19 } 
+
+
+               temperatureAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold temperature alarm cleared. The unit is 0.1 degree. The range is -1280-1280. Default is 1280."
+                   ::= { onuOpticsParameterAlarmSetEntry 20 } 
+
+
+               temperatureAlarmUpLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of temperature upper alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 21 } 
+
+
+               temperatureAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low temperature. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 22 } 
+
+
+               temperatureAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of temperature alarm. The unit is 0.1 degree. The range is -1280-1280. Default is -1280."
+                   ::= { onuOpticsParameterAlarmSetEntry 23 } 
+
+
+               temperatureAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold temperature alarm cleared. The unit is 0.1 degree. The range is -1280-1280. Default is -1280."
+                   ::= { onuOpticsParameterAlarmSetEntry 24 } 
+
+
+               temperatureAlarmLowLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of temperature low alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 25 } 
+
+
+               voltageAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high voltage. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 26 } 
+
+
+               voltageAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of voltage alarm. The unit is 0.1V. The range is 0-65. Default is 65."
+                   ::= { onuOpticsParameterAlarmSetEntry 27 } 
+
+
+               voltageAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold voltage alarm cleared. The unit is 0.1V. The range is 0-65. Default is 65."
+                   ::= { onuOpticsParameterAlarmSetEntry 28 } 
+
+
+               voltageAlarmUpLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                  STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of voltage upper alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 29 } 
+
+
+               voltageAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low voltage. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 30 } 
+
+
+               voltageAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of voltage alarm. The unit is 0.1V. The range is 0-65. Default is 0."
+                   ::= { onuOpticsParameterAlarmSetEntry 31 } 
+
+
+               voltageAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold voltage alarm cleared. The unit is 0.1V. The range is 0-65. Default is 0."
+                   ::= { onuOpticsParameterAlarmSetEntry 32 } 
+
+
+               voltageAlarmLowLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of voltage low alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 33 } 
+
+
+               currentAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high current. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 34 } 
+
+
+               currentAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of current alarm. The unit is 0.1mA. The range is 0-1310. Default is 1310."
+                   ::= { onuOpticsParameterAlarmSetEntry 35 } 
+
+
+               currentAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold current alarm cleared. The unit is 0.1mA. The range is 0-1310. Default is 1310."
+                   ::= { onuOpticsParameterAlarmSetEntry 36 } 
+
+
+               currentAlarmUpLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of current upper alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 37 } 
+
+
+               currentAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low current. 1-enable, 2-disable. Default is disable."
+                   ::= { onuOpticsParameterAlarmSetEntry 38 } 
+
+
+               currentAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of current alarm. The unit is 0.1mA. The range is 0-1310. Default is 0."
+                   ::= { onuOpticsParameterAlarmSetEntry 39 } 
+
+
+               currentAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold current alarm cleared. The unit is 0.1mA. The range is 0-1310. Default is 0."
+                   ::= { onuOpticsParameterAlarmSetEntry 40 } 
+
+
+               currentAlarmLowLimitRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The row status of current low alarm."
+                   ::= { onuOpticsParameterAlarmSetEntry 41 } 
+
+
+
+
+
+
+
+
+
+END
+
+
+
+
+

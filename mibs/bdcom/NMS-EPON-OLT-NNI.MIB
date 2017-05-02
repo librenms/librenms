@@ -1,0 +1,124 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-NNI.MIB:  NMS OLT-NNI MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-NNI DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, PhysAddress, TimeTicks
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI;
+          
+               nmsEponOltNni         OBJECT IDENTIFIER ::= { nmsEPONGroup 8 }
+
+               nmseponoltnniTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltNniEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt NNI interface table entries."
+                   ::= { nmsEponOltNni 1 }
+
+               nmsEponOltNniEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltNniEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt NNI table."
+                   INDEX { nniIfIndex }
+               ::= { nmseponoltnniTable 1 }
+
+               NMSEponOltNniEntry ::=
+                   SEQUENCE {
+                       nniIfIndex
+                           INTEGER,
+                       isRouter
+                           INTEGER,
+                       mcstQuerierExpireTime
+                           TimeTicks,
+                       ifDuplix
+                           INTEGER,
+                       nniIfSpeed
+                           INTEGER,
+                       nniIfFlowControl
+                           INTEGER                       
+                   }
+
+
+
+               nniIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT NNI interface index allocated by system."
+                   ::= { nmsEponOltNniEntry 1 } 
+
+               isRouter OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          no(0),
+                          static(1),
+                          dynamic(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "If OLT NNI interface is a routing inreface or not."
+                   ::= { nmsEponOltNniEntry 2 } 
+
+               mcstQuerierExpireTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT NNI interface MCST querier expire time."
+                   ::= { nmsEponOltNniEntry 3 } 
+
+               ifDuplix OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   auto(0),
+                                   full(1),
+                                   half(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT NNI port duplix mode."
+                   ::= { nmsEponOltNniEntry 4 } 
+
+               nniIfSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   auto(0),
+                                   speed_10m(1),
+                                   speed_100m(2),
+                                   speed_1000m(3),
+                                   speed_10000m(4) 	
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT NNI port speed. Default value is auto(0)."
+                   ::= { nmsEponOltNniEntry 5 } 
+
+               nniIfFlowControl OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   disable(0),
+                                   enable(1)                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT NNI port flowcontrol. Default value is disable(0)."
+                   ::= { nmsEponOltNniEntry 6 } 
+
+
+
+
+END
