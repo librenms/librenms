@@ -176,6 +176,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         $this->checkOS('akcp');
         $this->checkOS('akcp', 'akcp1');
+        $this->checkOS('akcp', 'akcp-securityprobe');
     }
 
     public function testAos()
