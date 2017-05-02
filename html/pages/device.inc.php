@@ -125,6 +125,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </li>';
         }
 
+        if (@dbFetchCell('SELECT COUNT(*) FROM `wireless_sensors` WHERE `device_id`=?', array($device['device_id'])) > '0') {
+            echo '<li role="presentation" '.$select['wireless'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'wireless')).'">
+                <i class="fa fa-wifi fa-lg icon-theme"  aria-hidden="true"></i> Wireless
+                </a>
+                </li>';
+        }
+
         if (@dbFetchCell("SELECT COUNT(accesspoint_id) FROM access_points WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li role="presentation" '.$select['accesspoints'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'accesspoints')).'">

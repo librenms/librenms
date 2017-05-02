@@ -1592,3 +1592,33 @@ widgets:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [widget_id], Unique: true, Type: BTREE }
     widget: { Name: widget, Columns: [widget], Unique: true, Type: BTREE }
+wireless_sensors:
+  Columns:
+    access_point_id: { Field: access_point_id, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: '0', Extra: '' }
+    entPhysicalIndex: { Field: entPhysicalIndex, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
+    entPhysicalIndex_measured: { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
+    lastupdate: { Field: lastupdate, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
+    sensor_aggregator: { Field: sensor_aggregator, Type: varchar(16), 'Null': false, Default: sum, Extra: '' }
+    sensor_alert: { Field: sensor_alert, Type: tinyint(1), 'Null': false, Default: '1', Extra: '' }
+    sensor_class: { Field: sensor_class, Type: varchar(64), 'Null': false, Default: null, Extra: '' }
+    sensor_current: { Field: sensor_current, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_custom: { Field: sensor_custom, Type: 'enum(''No'',''Yes'')', 'Null': false, Default: 'No', Extra: '' }
+    sensor_deleted: { Field: sensor_deleted, Type: tinyint(1), 'Null': false, Default: '0', Extra: '' }
+    sensor_descr: { Field: sensor_descr, Type: varchar(255), 'Null': true, Default: null, Extra: '' }
+    sensor_divisor: { Field: sensor_divisor, Type: int(11), 'Null': false, Default: '1', Extra: '' }
+    sensor_id: { Field: sensor_id, Type: int(11), 'Null': false, Default: null, Extra: auto_increment }
+    sensor_index: { Field: sensor_index, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
+    sensor_limit: { Field: sensor_limit, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_limit_low: { Field: sensor_limit_low, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_limit_low_warn: { Field: sensor_limit_low_warn, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_limit_warn: { Field: sensor_limit_warn, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_multiplier: { Field: sensor_multiplier, Type: int(11), 'Null': false, Default: '1', Extra: '' }
+    sensor_oids: { Field: sensor_oids, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
+    sensor_prev: { Field: sensor_prev, Type: float, 'Null': true, Default: null, Extra: '' }
+    sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
+    sensor_class: { Name: sensor_class, Columns: [sensor_class], Unique: false, Type: BTREE }
+    sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
+    sensor_type: { Name: sensor_type, Columns: [sensor_type], Unique: false, Type: BTREE }

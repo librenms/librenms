@@ -64,23 +64,6 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     $tags = compact('rrd_name', 'rrd_def');
     data_update($device, 'aruba-controller', $tags, $fields);
 
-    // also save the info about how many clients in the same place as the wireless module
-    $rrd_name = 'wificlients-radio1';
-    $rrd_def = 'S:wificlients:GAUGE:'.$config['rrd']['heartbeat'].':-273:10000';
-
-    $fields = array(
-        'wificlients' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
-    );
-
-    $tags = array(
-        'radio' => '1',
-        'rrd_name' => $rrd_name,
-        'rrd_def' => $rrd_def
-    );
-    data_update($device, 'wificlients', $tags, $fields);
-
-    $graphs['wifi_clients'] = true;
-
 
     $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', array($device['device_id']));
 
