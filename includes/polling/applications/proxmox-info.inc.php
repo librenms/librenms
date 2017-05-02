@@ -33,10 +33,11 @@ $app_id = $app['app_id'];
 //}
 if (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
     $options = '-O qv -t 360000000000';
-    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.11.112.114.111.120.109.111.120.45.108.120.99';
+//    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.11.112.114.111.120.109.111.120.45.108.120.99';
+    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.12.112.114.111.120.109.111.120.45.105.110.102.111';
     $proxmox = snmp_get($device, $oid, $options);
     $proxmox = preg_replace('/^.+\n/', '', $proxmox);
-    $proxmox = str_replace("<<<app-proxmox-lxc>>>\n", '', $proxmox);
+    $proxmox = str_replace("<<<app-proxmox-info>>>\n", '', $proxmox);
 }
 
 if ($proxmox) {
@@ -56,11 +57,21 @@ if ($proxmox) {
         foreach ($pmxlines as $vm) {
             $vm = str_replace('"', '', $vm);
             //list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode(' ', $vm, 5);
-            list($vmid, $vmstatus, $vmdesc, $vmpid, $vmmem, $vmmemmax, $vmmemuse, $vmcpu, $vmstorage) = explode(' ', $vm, 9);
+            list($vmid, $vmstatus, $vmdesc, $vmtype, $vmcpus, $vmuptime, $vmpid, $vmmem, $vmmaxmem, $vmdisk, $vmmaxdisk) = explode(' ', $vm, 11);
             print "Proxmox ($pmxcluster): $vmdesc: $vmstatus/$vmmem/$vmcpu/$vmstorage\n";
 
             $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
             data_update($device, 'app', $tags, $fields);
+
+            $vmmem = intval($vmmem);
+            $vmmaxmem = intval($vmmaxmem);
+            $vmdisk = intval($vmdisk);
+            $vmmaxdisk = intval($vmmaxdisk);
+
+            $vmmemuse = round(($vmmem / $vmmaxmem) * 100, 2);
+            $vmdiskuse = round(($vmdisk / $vmmaxdisk) * 100, 2);
+
+            print "VMUSE: $vmmemuse $vmdiskuse";
 
             if (proxmox_lxc_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate(
@@ -68,13 +79,18 @@ if ($proxmox) {
                     'device_id' => $device['device_id'],
                     'last_seen' => array('NOW()'),
                     'description' => $vmdesc,
-                    'status' => $vmstatus,
+                    'vmid' => $vmid,
+                    'vmstatus' => $vmstatus,
+                    'vmtype' => $vmtype,
+                    'vmcpus' => $vmcpus,
+                    'vmuptime' => $vmuptime,
                     'vmpid' => $vmpid,
-                    'vmramcurr' => $vmmem,
-                    'vmrammax' => $vmmemmax,
-                    'vmramuse' => $vmmemuse,
-                    'vmcpu' => $vmcpu,
-                    'vmstorage' => $vmstorage
+                    'vmmem' => $vmmem,
+                    'vmmaxmem' => $vmmaxmem,
+                    'vmdisk' => $vmdisk,
+                    'vmmaxdisk' => $vmmaxdisk,
+                    'vmmemuse' => $vmmemuse,
+                    'vmdiskuse' => $vmdiskuse,
                     ), "proxmox", '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster)
                 );
             } else {
@@ -84,13 +100,17 @@ if ($proxmox) {
                     'vmid' => $vmid,
                     'description' => $vmdesc,
                     'device_id' => $device['device_id'],
-                    'status' => $vmstatus,
+                    'vmstatus' => $vmstatus,
+                    'vmtype' => $vmtype,
+                    'vmcpus' => $vmcpus,
+                    'vmuptime' => $vmuptime,
                     'vmpid' => $vmpid,
-                    'vmramcurr' => $vmmem,
-                    'vmrammax' => $vmmemmax,
-                    'vmramuse' => $vmmemuse,
-                    'vmcpu' => $vmcpu,
-                    'vmstorage' => $vmstorage
+                    'vmmem' => $vmmem,
+                    'vmmaxmem' => $vmmaxmem,
+                    'vmdisk' => $vmdisk,
+                    'vmmaxdisk' => $vmmaxdisk,
+                    'vmmemuse' => $vmmemuse,
+                    'vmdiskuse' => $vmdiskuse,
                     ), "proxmox"
                 );
             }
