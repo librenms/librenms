@@ -258,6 +258,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('asuswrt-merlin');
     }
 
+    public function testAsyncOS()
+    {
+        $this->checkOS('asyncos');
+    }
+
     public function testAvayaers()
     {
         $this->checkOS('avaya-ers');
