@@ -1,0 +1,350 @@
+-- ****************************************************************************
+--  COLUBRIS-USER-SESSION-MIB definitions
+--
+--  Copyright (c) 2007, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks User Session MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-USER-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32, Unsigned32, Counter32, Gauge32, Counter64
+        FROM    SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSIDOrNone
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisUserSessionMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200703050000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks User Session MIB."
+
+    ::= { colubrisMgmtV2 36 }
+
+
+-- colubrisUserSessionMIB definition
+colubrisUserSessionMIBObjects OBJECT IDENTIFIER ::= { colubrisUserSessionMIB 1 }
+
+-- user session groups
+coUserSessionInfoGroup       OBJECT IDENTIFIER ::= { colubrisUserSessionMIBObjects 1 }
+coUserSessionStGroup         OBJECT IDENTIFIER ::= { colubrisUserSessionMIBObjects 2 }
+
+
+-- A collection of objects providing global information on
+-- the users on the system.
+coUserSessACUserMaxCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the maximum number of concurrent
+                 authenticated AC users."
+    ::= { coUserSessionInfoGroup 1 }
+
+coUserSessNonACUserMaxCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the maximum number of concurrent
+                 authenticated non AC users."
+    ::= { coUserSessionInfoGroup 2 }
+
+coUserSessACUserCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the number of currently authenticated AC users."
+    ::= { coUserSessionInfoGroup 3 }
+
+coUserSessNonACUserCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the number of currently authenticated non AC users."
+    ::= { coUserSessionInfoGroup 4 }
+
+
+-- A collection of objects providing status information on
+-- the users on the system.
+coUserSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoUserSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing specific information for users authenticated
+                 (AC and non-AC) by the authentication system."
+    ::= {  coUserSessionStGroup 1 }
+
+coUserSessionEntry OBJECT-TYPE
+    SYNTAX      CoUserSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about a particular user that has been authenticated
+                 by the authentication system.
+                 coUserSessIndex - Uniquely identifies a user in the table."
+    INDEX       { coUserSessIndex }
+    ::= { coUserSessionTable 1 }
+
+CoUserSessionEntry ::= SEQUENCE
+{
+    coUserSessIndex                      Integer32,
+    coUserSessUserName                   OCTET STRING,
+    coUserSessClientIpAddress            IpAddress,
+    coUserSessSessionDuration            Counter32,
+    coUserSessIdleTime                   Counter32,
+    coUserSessMAPGroupName               OCTET STRING,
+    coUserSessVSCName                    OCTET STRING,
+    coUserSessSSID                       ColubrisSSIDOrNone,
+    coUserSessVLAN                       Integer32,
+    coUserSessPHYType                    INTEGER,
+    coUserSessAuthType                   INTEGER,
+    coUserSessCalledStationID            OCTET STRING,
+    coUserSessCallingStationID           OCTET STRING,
+    coUserSessRADIUSServerProfileName    OCTET STRING,
+    coUserSessRADIUSServerIpAddress      IpAddress,
+    coUserSessBytesSent                  Counter64,
+    coUserSessBytesReceived              Counter64,
+    coUserSessPacketsSent                Counter32,
+    coUserSessPacketsReceived            Counter32
+}
+
+coUserSessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of a user in the coUserSessionTable."
+    ::= { coUserSessionEntry 1 }
+
+coUserSessUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..252))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's name."
+    ::= { coUserSessionEntry 2 }
+
+coUserSessClientIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's IP address."
+    ::= { coUserSessionEntry 3 }
+
+coUserSessSessionDuration OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates how long the user's session has been active.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 4 }
+
+coUserSessIdleTime OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates for how long the user's session has been idle.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 5 }
+
+coUserSessMAPGroupName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's MultiService Access Point Group
+                 Name."
+    ::= { coUserSessionEntry 6 }
+
+coUserSessVSCName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's Virtual Service Community Name."
+    ::= { coUserSessionEntry 7 }
+
+coUserSessSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSIDOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's Access Point SSID (ONLY when
+                 Location-aware is enabled and properly configured).
+                 If this information is not available, a zero-Length
+                 string is returned."
+    ::= { coUserSessionEntry 8 }
+
+coUserSessVLAN OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the VLAN currently assigned to the user."
+    ::= { coUserSessionEntry 9 }
+
+coUserSessPHYType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    ieee802dot11a(1),
+                    ieee802dot11b(2),
+                    ieee802dot11g(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the user's radio type."
+    ::= { coUserSessionEntry 10 }
+
+coUserSessAuthType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    ac(1),
+                    nonAc(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User's authentication type."
+    ::= { coUserSessionEntry 11 }
+
+coUserSessCalledStationID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..252))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's called station ID."
+    ::= { coUserSessionEntry 12 }
+
+coUserSessCallingStationID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..252))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's calling station ID."
+    ::= { coUserSessionEntry 13 }
+
+coUserSessRADIUSServerProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the RADIUS server profile name used to
+                 authenticate the user."
+    ::= { coUserSessionEntry 14 }
+
+coUserSessRADIUSServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the RADIUS server IP address used to
+                 authenticate the user."
+    ::= { coUserSessionEntry 15 }
+
+coUserSessBytesSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of bytes sent by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 16 }
+
+coUserSessBytesReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of bytes received by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 17 }
+
+coUserSessPacketsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of IP packets sent by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 18 }
+
+coUserSessPacketsReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of IP packets received by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { coUserSessionEntry 19 }
+
+
+-- user session notifications
+userSessionMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisUserSessionMIB 2 }
+userSessionMIBNotifications OBJECT IDENTIFIER ::= { userSessionMIBNotificationPrefix 0 }
+
+-- conformance information
+colubrisUserSessionMIBConformance OBJECT IDENTIFIER ::= { colubrisUserSessionMIB 3 }
+colubrisUserSessionMIBCompliances OBJECT IDENTIFIER ::= { colubrisUserSessionMIBConformance 1 }
+colubrisUserSessionMIBGroups      OBJECT IDENTIFIER ::= { colubrisUserSessionMIBConformance 2 }
+
+-- compliance statements
+colubrisUserSessionMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris User Session MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisUserSessionInfoMIBGroup,
+                        colubrisUserSessionStMIBGroup
+                    }
+    ::= { colubrisUserSessionMIBCompliances 1 }
+
+-- units of conformance
+colubrisUserSessionInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coUserSessACUserMaxCount,
+                    coUserSessNonACUserMaxCount,
+                    coUserSessACUserCount,
+                    coUserSessNonACUserCount
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing global information
+                 for the User Session MIB."
+    ::= { colubrisUserSessionMIBGroups 1 }
+
+colubrisUserSessionStMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coUserSessUserName,
+                    coUserSessClientIpAddress,
+                    coUserSessSessionDuration,
+                    coUserSessIdleTime,
+                    coUserSessMAPGroupName,
+                    coUserSessVSCName,
+                    coUserSessSSID,
+                    coUserSessVLAN,
+                    coUserSessPHYType,
+                    coUserSessAuthType,
+                    coUserSessCalledStationID,
+                    coUserSessCallingStationID,
+                    coUserSessRADIUSServerProfileName,
+                    coUserSessRADIUSServerIpAddress,
+                    coUserSessBytesSent,
+                    coUserSessBytesReceived,
+                    coUserSessPacketsSent,
+                    coUserSessPacketsReceived
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the user session MIB
+                 capability."
+    ::= { colubrisUserSessionMIBGroups 2 }
+END

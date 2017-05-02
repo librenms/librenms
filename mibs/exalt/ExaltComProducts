@@ -1,0 +1,1740 @@
+ExaltComProducts DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    exaltcommunications, EthMainStatusT, EthAuxStatusT, AuxNmsMode,
+    EthPortMode, Te1StatusT, Te1LboT, EnableStatusT,
+    Te1LineCodeT, Te1LoopBackModeT, AlarmLevelT,
+    Led4ColorT, VlanStatusT, VlanGroupT, ExaltEnableT, AcmModulationT,
+    FileTransferTypeT, FileTransferStartT, NtpClientEnableT, TimeZoneT
+        FROM ExaltComm
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+    productsMIB MODULE-IDENTITY
+        LAST-UPDATED        "201304291021Z"
+        ORGANIZATION        "Exalt"
+        CONTACT-INFO        "Exalt Wireless Inc.
+                            250 E Hacienda Ave.,
+                            Campbell, CA, 95008
+                            USA"
+
+        DESCRIPTION         "Exalt devices"
+
+        REVISION            "201304291021Z"
+        DESCRIPTION         "This is the Exalt Products mib. rev:1.01"
+        ::= { exaltcommunications 1 }
+
+    PwType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT	    "255a"
+        STATUS		    current
+        DESCRIPTION         "This is a PW field."
+        SYNTAX		    OCTET STRING (SIZE(8..16))
+
+
+
+    productsMIBNotifications OBJECT IDENTIFIER ::= { productsMIB 1 }
+
+    productsMIBObjects OBJECT IDENTIFIER ::= { productsMIB 2 }
+
+    radioInfo OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "Common Radio Information to all Exalt devices."
+        ::= { productsMIBObjects 1 }
+
+    modelName OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..20))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "A descriptive name for the Radio.  See Web, Radio Information, Model Name."
+        ::= { radioInfo 1 }
+
+    partNumber OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..20))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Part Number of the Radio.  See Web, Radio Information, Part Number."
+        ::= { radioInfo 2 }
+
+    serialNumber OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..20))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Serial Number.  See Web, Radio Inforamtion, Serial Number."
+        ::= { radioInfo 3 }
+
+    interfaceType OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..30))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Interfaces available on this radio.  Ethernet, T1/E1, etc.
+                            See Web, Radio Information, Interface Type."
+        ::= { radioInfo 4 }
+
+    firmwareVersion OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Firmware Version.  See Web, Radio Information, Firmware Version."
+        ::= { radioInfo 5 }
+
+    bootVersion OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Boot Code Version.  See Web, Radio Information, Boot Version."
+        ::= { radioInfo 6 }
+
+    rdkDbVer OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Device RDK Database Version. See Web, Radio Information, RDK Database Version."
+        ::= { radioInfo 11 }
+
+    txFreqRange OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Tx Frequency Range.
+                            FDD radios have a Tx and Rx frequency range.
+                            See Web, Radio Information, RF Transmit range.
+                            TDD radios have one frequency range.
+                            See Web, Radio Information, RF Frequency Band."
+        ::= { radioInfo 12 }
+
+    rxFreqRange OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Rx Frequency Range.
+                            FDD radios have a Tx and Rx frequency range.
+                            See Web, Radio Information, RF Receive range.
+                            TDD radios have one frequency range.
+                            See Web, Radio Information, RF Frequency Band."
+        ::= { radioInfo 13 }
+
+    rfFreqBand OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Device Frequency Band (Range).
+                            TDD radios have N/A value in this field.
+                            FDD radios have TX High or TX Low depending on used diplexer and Transmit frequency.
+                            See Web, Radio Information, Tx Band."
+        ::= { radioInfo 14 }
+
+    hwId OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Device Hardware ID number. See Web, Radio Information, Hardware ID number"
+        ::= { radioInfo 15 }
+
+    modelNumber OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Model Number of the Radio. See Web, Radio Information, Model Number"
+        ::= { radioInfo 16 }
+
+    licenseFeatures OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..128))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The list of the features enabled by License Key"
+        ::= { radioInfo 17 }
+
+    radioAdmin OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "Radio Administration parameters."
+        ::= { productsMIBObjects 2 }
+
+    sysDate OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(10))
+        UNITS               "MM/DD/YYYY"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Radio System Date, MM/DD/YYYY.  See Web, Administration, Settings, Date.
+                            To make permanent, write save to commitAdminSettings after change.
+                            After commit, SNMP restarts and will be down for 30 seconds."
+        ::= { radioAdmin 1 }
+
+    sysTime OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Radio System Time, HH:MM:SS, as 24 hours.  See Web, Administration, Settings, Time.
+                            To make permanent, write save to commitAdminSettings after change.
+                            After commit, SNMP restarts and will be down for 30 seconds."
+        ::= { radioAdmin 2 }
+
+    radioName OBJECT IDENTIFIER ::= { radioAdmin 3 }
+
+    rnLocal OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The user specifiable Radio Name for this radio.
+                            See Web, Administration, Settings, Radio Name.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioName 1 }
+
+    rnRemote OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Radio Name of the Radio at the far end of this RF Link.
+                            Can only be set at that radio.  See Web, Administration, Settings, Radio Name."
+        ::= { radioName 2 }
+
+    linkName OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The user specifiable Link Name for this radio.
+                            See Web, Administration, Settings, Link Name.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 4 }
+
+    linkSecKey OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(12))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Link Security Key must match on both ends of an RF Link for traffic to pass.
+                            See Web, Administration, Settings, Link Security Key.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 5 }
+
+    adminPassword OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The password for admin login to Web/CLI.
+                            See Web, Administration, Settings, Admin Password.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 6 }
+
+    userPassword OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The password for user login to Web/CLI.
+                            See Web, Administration, Settings, User Password.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 7 }
+
+    ipAddress OBJECT IDENTIFIER ::= { radioAdmin 8 }
+
+    ipLocal OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address of local radio.
+                            This IP address is used to manage radio.
+                            See Web, Administration, Settings, IP Address.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { ipAddress 1 }
+
+    ipRemote OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The IP address of the remote Radio.
+                            This IP address is used to manage Remote radio.
+                            Can only be set at that radio. See Web, Administration, Settings, IP Address."
+        ::= { ipAddress 2 }
+
+    subnetMask OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Subnet Mask for IP address of local radio.
+                            See Web, Administration, Settings, IP Mask.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 9 }
+
+    ipAddressNetmask OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(9..18))
+        UNITS               "IP/NN Where NN=00 To 32"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address and Subnet Mask of local radio. ie 10.0.0.1/24.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 10 }
+
+    defaultGateway OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Default Gateway for local radio port.
+                            See Web, Administration, Settings, Default Gateway.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 11 }
+
+    aesEnable OBJECT-TYPE
+        SYNTAX		    INTEGER {
+                                aesDisable( 0 ),
+                                aesEnable( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The AES enable(0)/disable(1).
+                            AES (Advance Encryption Standard) can be implemented to provide additional 
+                            data security for the wireless link. 
+                            This function requires an upgrade license key (purchased separately).
+                            See Web, Administration, Settings, AES Settings, Enable AES.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 12 }
+
+    aesKey OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The symmetric AES key for encrypt/decrypt payload data.
+                            Different bitlength encryption license keys (for example, 128-bit and 256-bit)
+                            are available, depending on model type and license type.
+                            AES Key should match both on local radio and far end radio.
+                            See Web, Administration, Settings, AES Settings, AES Key.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 13 }
+
+
+    licKey OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The license key which defines radio features and capabilities.
+                            See Web, Administration, Settings, License Key.
+                            To make permanent, write save to commitAdminSettings after change."
+        ::= { radioAdmin 14 }
+
+    -- rdkKey OBJECT-TYPE ::= { radioAdmin 15 }
+    -- domainName OBJECT-TYPE ::= { radioAdmin 16 }
+
+    snmpConfig OBJECT IDENTIFIER ::= { radioAdmin 17 }
+
+    trapIpaddr1 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 1 }
+
+    trapIpaddrEnable1 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 2 }
+
+    trapIpaddr2 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 3 }
+
+    trapIpaddrEnable2 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 4 }
+
+    trapIpaddr3 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 5 }
+
+    trapIpaddrEnable3 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 6 }
+
+    trapIpaddr4 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 7 }
+
+    trapIpaddrEnable4 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 8 }
+
+    trapAuth OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Authentication trap enable(1)/disable(0).
+                            This is an SNMP standard trap when password information for SNMP is incorrect.
+                            See Web, Administration, SNMP, Traps, Authentication Trap."
+        ::= { snmpConfig 9 }
+
+    trapReboot OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Reboot trap enable(0)/disable(1).
+                            This trap is sent after any radio reboot to inform the manager of the reboot status.
+                            See Web, Administration, SNMP, Traps, Radio Reboot Trap."
+        ::= { snmpConfig 10 }
+
+    trapLocLinkStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local Link Status trap enable(0)/disable(1).
+                            This trap is sent when Link is in errored state (equivalent to the Link LED).
+                            See Web, Administration, SNMP, Traps, Local Link Status Trap."
+        ::= { snmpConfig 11 }
+
+    trapLocAlarmStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local Alarm Status trap enable(0)/disable(1).
+                            This trap is sent when local radio Status is in errored state 
+                            (equivalent to the Status LED).
+                            See Web, Administration, SNMP, Traps, Local Radio Status Trap."
+        ::= { snmpConfig 12 }
+
+    trapRemAlarmStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Remote Alarm Status trap enable(0)/disable(1).
+                            This trap is sent when remote radio Status is in errored state 
+                            (equivalent to the Status LED).
+                            See Web, Administration, SNMP, Traps, Remote Radio Status Trap."
+        ::= { snmpConfig 13 }
+
+    trapLocTempStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local Temperature Status trap enable(0)/disable(1).
+                            This trap is sent when the internal temperature reaches the warning point.
+                            See Web, Administration, SNMP, Traps, Temperature Status Trap."
+        ::= { snmpConfig 14 }
+
+    trapv1Enable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv1 Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 1.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv1 Traps."
+        ::= { snmpConfig 15 }
+
+    trapv2cEnable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv2c Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 2c.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv2c Traps."
+        ::= { snmpConfig 16 }
+
+    trapv3Enable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv3 Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 3.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv3 Traps."
+        ::= { snmpConfig 17 }
+
+    trapLocRslStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local RSL Status trap enable(0)/disable(1).
+                            This trap is sent when the local RSL drops below the value set in the
+                            RSL Threshold Value (dBm) field.
+                            See Web, Administration, SNMP, Traps, Local RSL Status Trap."
+        ::= { snmpConfig 18 }
+
+    trapLocRslThreshold OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local RSL Threshold.
+                            Exalt recommends that this trap be set to a value 5dBm or 10dBm above 
+                            the threshold as a warning that the system has faded and may be approaching an outage.
+                            See Web, Administration, SNMP, Traps, Threshold Value."
+        ::= { snmpConfig 19 }
+
+    commitSnmpSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Option strings to be written are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { snmpConfig 1000 }
+
+
+    ntp OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "NTP and Time zone configuration."
+        ::= { radioAdmin 18 }
+
+    ntpClientEnable OBJECT-TYPE
+        SYNTAX              NtpClientEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "this mib to enable/disable the NTP client in the radio.
+                             0 - disable NTP client. 
+                             1 - enable with 1 NTP server. 
+                             2 - enable with 2 NTP servers.
+                             3 - enable with 3 NTP servers.
+                             4 - enable with 4 NTP servers."
+
+        ::= { ntp 1 }
+
+    ntpServer1IpAddr OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(7..15))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address for the first NTP server in xxx.xxx.xxx.xxx format"
+
+        ::= { ntp 2 }
+
+    ntpServer2IpAddr OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(7..15))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address for the second NTP server in xxx.xxx.xxx.xxx format"
+        ::= { ntp 3 }
+
+    ntpServer3IpAddr OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(7..15))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address for the third NTP server in xxx.xxx.xxx.xxx format"
+        ::= { ntp 4 }
+
+    ntpServer4IpAddr OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(7..15))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address for the forth NTP server in xxx.xxx.xxx.xxx format"
+        ::= { ntp 5 }
+
+    ntpTimeZoneSelect OBJECT-TYPE
+        SYNTAX              TimeZoneT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION        "Time Zone selection.
+
+                            0 - (GMT-11:00) Samoa
+                            1 - (GMT-10.00) Hawaii
+                            2 - (GMT-09:00) Alaska
+                            3 - (GMT-08:00) Pacific Time
+                            4 - (GMT-07:00) Arizona
+                            5 - (GMT-07:00) Montain Time
+                            6 - (GMT-06:00) Central Time
+                            7 - (GMT-05:00) Eastern Time
+                            8 - (GMT-05:00) Indiana (East)
+                            9 - (GMT-04:00) Atlantic Time (Canada)
+                            10- (GMT) Coordinated Universal Time
+                            11- (GMT) London
+                            12- (GMT+01:00) Berlin
+                            13- (GMT+01:00) Belgrade
+                            14- (GMT+01:00) Paris
+                            15- (GMT+02:00) Cairo
+                            16- (GMT+02:00) Helsinki
+                            17- (GMT+03:00) Baghdad
+                            18- (GMT+03:00) Moscow
+                            19- (GMT+03:30) Tehran
+                            20- (GMT+04:30) Kabul
+                            21- (GMT+05:00) Karachi
+                            22- (GMT+07:00) Bangkok
+                            23- (GMT+08:00) Shanghai
+                            24- (GMT+08:00) Taipei
+                            25- (GMT+09:00) Tokyo
+                            26- (GMT+09:00) Seoul
+                            27- (GMT+10:00) Sydney
+                            28- (GMT+10:00) Vladivostok"
+
+        ::= { ntp 6 }
+
+    commitNtpSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This command allows saving or clear the NTP and Tome Zone configuration.
+                            If the save includes the change of time zone, the radio will automatically reboot
+                            to take effect the newly selected time zone. 
+                            Option strings to be written are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { ntp 1000 }
+
+    commitAdminSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Commit Administration settings command. Valid values: 'save', 'clear'.
+                            Configuration changes via SNMP do not take effect until 
+                            'save' (Commit) command is sent to this parameter.
+                            'clear' (Cancel) command is used to cancel configuration changes before commit operation.
+                            In case of invalid configuration this parameter contains text description of the problem."
+        ::= { radioAdmin 1000 }
+
+    radioConfig OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "The Radio Configuration Section."
+        ::= { productsMIBObjects 3 }
+
+    systemConfig OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "This is the device specific configuration section."
+        ::= { radioConfig 1 }
+
+    commitSystemSettings OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Commit System Configuration settings command. Valid values: 'save', 'clear'.
+                            Configuration changes via SNMP do not take effect until 
+                            'save' (Commit) command is sent to this parameter.
+                            'clear' (Cancel) command is used to cancel configuration changes before commit operation.
+                            In case of invalid configuration this parameter contains text description of the problem."
+        ::= { systemConfig 1000 }
+
+    interface OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "Radio Interfaces Configuration section."
+        ::= { radioConfig 2 }
+
+    te1 OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "T1,E1 interfaces Configuration section.
+                            Section allows to configure T1/E1 ports on the radio if any."
+        ::= { interface 2 }
+
+    te1NumChannels OBJECT-TYPE
+        SYNTAX              Gauge32
+        UNITS               "channels"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Number of T1 or E1 channels supported by the Radio."
+        ::= { te1 1 }
+
+    te1NumActiveChannels OBJECT-TYPE
+        SYNTAX              Gauge32
+        UNITS               "channels"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Current number of channels available, based
+                             on bandwitdh of the RF link and the license key."
+        ::= { te1 2 }
+
+    selectT1orE1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                t1( 0 ),
+                                e1( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Select operation mode of T1/E1 interfaces. Either T1(0) or E1(1).
+                            See Web, Configuration, Interface, T1/E1, Set To E1/T1 Mode button."
+        ::= { te1 3 }
+
+    te1Interfaces OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Te1InterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Attributes for T1 or E1 ports."
+        ::= { te1 4 }
+
+    te1Interface OBJECT-TYPE
+        SYNTAX              Te1InterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "An entry in the T1/E1 Attribute table."
+        INDEX               {
+                                te1Status, t1LBO, te1AIS, t1LineCode, te1LoopBackMode
+                            }
+        ::= { te1Interfaces 1 }
+
+    Te1InterfacesEntry ::= SEQUENCE {
+        te1Status
+            Te1StatusT,
+        t1LBO
+            Te1LboT,
+        te1AIS
+            Te1StatusT,
+        t1LineCode
+            Te1LineCodeT,
+        te1LoopBackMode
+            Te1LoopBackModeT
+    }
+
+    te1Status OBJECT-TYPE
+        SYNTAX              Te1StatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The T1/E1 status: enable(1)/disable(0).
+                            Parameter allows to enable/disable each individual T1 channel.
+                            See Web, Configuration, Interface, T1/E1, Status.
+                            To make permanent, write save to commitTe1Settings after change."
+        ::= { te1Interface 1 }
+
+    t1LBO OBJECT-TYPE
+        SYNTAX              Te1LboT
+        UNITS               "feet"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Line Build Out length range.
+                            Valid values (ft): lbo0to133(0), lbo133to266(1), lbo266to399(2), lbo399to533(3), lbo533to655(4).
+                            See Web, Configuration, Interface, T1/E1, LBO.
+                            To make permanent, write save to commitTe1Settings after change."
+        ::= { te1Interface 2 }
+
+    te1AIS OBJECT-TYPE
+        SYNTAX              Te1StatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The T1/E1 AIS enabled flag: enable(1)/disable(0).
+                            If enabled, the radio places an AIS code on the output of the associated interface 
+                            if and when the link fails or when there is no E1 signal available from the far
+                            end to provide the user at the local end.
+                            See Web, Configuration, Interface, T1/E1, AIS.
+                            To make permanent, write save to commitTe1Settings after change."
+        ::= { te1Interface 3 }
+
+    t1LineCode OBJECT-TYPE
+        SYNTAX              Te1LineCodeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The T1/E1 Line Code type: b8zs(0), ami(1). 
+                            See Web, Configuration, Interface, T1/E1, AIS, Line Code.
+                            To make permanent, write save to commitTe1Settings after change."
+        ::= { te1Interface 4 }
+
+    te1LoopBackMode OBJECT-TYPE
+        SYNTAX              Te1LoopBackModeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Loop Back Mode for a T1/E1 interface.
+                            Valid values: disabled(0), ExternalLocal(1), ExternalRemote(2), Internal(3).
+                            All loopback configurations control the loop at the Line Interface integrated circuit,
+                            which is the device wired directly to the front panel ports.
+                            See Web, Configuration, Interface, T1/E1, AIS, Loopback.
+                            To make permanent, write save to commitTe1Settings after change."
+        ::= { te1Interface 5 }
+
+    commitTe1Settings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Commit TE1 Configuration settings command. Valid values: 'save', 'clear'.
+                            Configuration changes to TE1 ports via SNMP do not take effect until 
+                            'save' (Commit) command is sent to this parameter.
+                            'clear' (Cancel) command is used to cancel configuration changes before commit operation.
+                            In case of invalid configuration this parameter contains text description of the problem."
+        ::= { te1 1000 }
+
+    fileManagement OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "The File Management Section. 
+                            This section allows to initiate Upload/Download firmware/configuration/logs, 
+                            perform Firmware activation procedure."
+        ::= { radioConfig 3 }
+
+    currentFwFilename OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..100))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The file name of the currently running firmware.
+                            See Web, Administration, File Management, File Activation, Current File."
+        ::= { fileManagement 1 }
+
+    alternateFwFilename OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..100))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The file name of the alternate firmware image.
+                            See Web, Administration, File Management, File Activation, Alternative File."
+        ::= { fileManagement 2 }
+
+    swapFWimage OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Swap the firmware images and restart radio.
+                            To perform swap operation 'swap' command needs to be sent to this parameter.
+                            For ExtendAirG2 to perform revert to factory operation 'factory' command needs to be sent.
+                            Radio will become unavailable for several minutes."
+        ::= { fileManagement 3 }
+
+    fileTransfer OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "The File Transfer Section.
+                            This section allows to initiate Upload/Download firmware/configuration/logs 
+                            over TFTP protocol."
+        ::= { fileManagement 4 }
+
+    factoryFwFilename OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..100))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The file name of the factory firmware image.
+                            See Web, Administration, File Management, File Activation, Factory File."
+        ::= { fileManagement 5 }
+
+    tftpServerIp            OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(7..15))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The TFTP Server IP address.
+                            "
+        ::= { fileTransfer 1 }
+
+    uploadFilename          OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..127))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The name of the file for upload operation.
+                            For configuration file uploadFilename should be always 'config.xml'.
+                            uploadFilename value should match the file name in TFTP server folder."
+        ::= { fileTransfer 2 }
+
+    transferType            OBJECT-TYPE
+        SYNTAX              FileTransferTypeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The file transfer type.
+                            Valid values:
+                              - uploadFirmware(0)
+                              - uploadConfig(1)
+                              - uploadRDD(2) (Valid only for TDD radios)
+                              - downloadFirmware(3)
+                              - downloadConfig(4)
+                              - downloadMIBs(5)
+                              - downloadEventLogs(6).
+                            The actual operation starts via updating transferStart parameter value."
+        ::= { fileTransfer 3 }
+
+    transferStart           OBJECT-TYPE
+        SYNTAX              FileTransferStartT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TransferStart parameter is used to initiate file transfer operation.
+                            Send startTransfer(1) to this parameter."
+        ::= { fileTransfer 4 }
+
+    transferStatus          OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..127))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The current file transfer status."
+        ::= { fileTransfer 5 }
+
+    radioMonitor OBJECT-IDENTITY
+        STATUS		current
+        DESCRIPTION         "Monitor Various components."
+        ::= { productsMIBObjects 4 }
+
+    -- gps OBJECT IDENTIFIER ::= { radioMonitor 1 }
+    -- satelliteInView OBJECT-TYPE ::= { gps 1 }
+    alarms OBJECT IDENTIFIER ::= { radioMonitor 2 }
+
+
+    almLocal OBJECT IDENTIFIER     ::=  { alarms 3 }
+    locSysAlarms OBJECT IDENTIFIER  ::= { almLocal 1 }
+    locEthAlarms OBJECT IDENTIFIER  ::= { almLocal 2 }
+    locTe1Alarms OBJECT IDENTIFIER  ::= { almLocal 3 }
+ --   gigEAlarms OBJECT IDENTIFIER ::= { locAlarms 4 }
+ --   locDS3Alarms OBJECT IDENTIFIER  ::= { locAlarms 5 }
+ --   locV35Alarms OBJECT IDENTIFIER  ::= { locAlarms 6 }
+ --   locOduAlarms OBJECT IDENTIFIER  ::= { locAlarms 7 }
+
+    locLinkState OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Link Status Alarm.
+                            Possible values:
+                             - almNORMAL(0) - Error-free connection (BER<10e-6)
+                             - almMINOR(1)  - Errorred connection (BER<10e-3)
+                             - almMAJOR(2) - No link (BER>10e-3)
+                            See Web, Monitor, Alarms, Link"
+        ::= { locSysAlarms 1 }
+
+    locTempAlarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Temperature Alarm state.
+                            Possible values:
+                             - almNORMAL(0) - Normal temprature range
+                             - almMINOR(1)  - Exceeding normal temprature range
+                            See Web, Monitor, Alarms, Temperature"
+        ::= { locSysAlarms 2 }
+
+    locCurrentTemp OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "C"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Internal Temperature in Celsius."
+        ::= { locSysAlarms 3 }
+
+    locCurrentTempS OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Internal Temperature as a string. "
+        ::= { locSysAlarms 4 }
+
+    -- locCollocAlarm OBJECT-TYPE ::= { locSysAlarms 8 }
+    -- remCollocAlarm OBJECT-TYPE ::= { remSysAlarms 8 }
+
+    locLinkSecMismatch OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "This is link security mismatch alarm.
+                            This alarm tells if the Link Security Key is matching or not.
+                            Possible values:
+                             - almNORMAL(0) - Link Secutiry keys match
+                             - almMAJOR(2) - Link Secutiry keys do not match
+                            "
+        ::= { locSysAlarms 9 }
+
+    locLinkStateV OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Vertical Link Status Alarm. -<g89><>"
+        ::= { locSysAlarms 15 }
+
+    locLinkStateH OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Horizontal Link Status Alarm. -<g89><>"
+        ::= { locSysAlarms 16 }
+
+-- T1/E1
+     locTe1LinkSummary   OBJECT-TYPE
+        SYNTAX              Led4ColorT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The T1/E1 Link Summary LED color. "
+        ::= { locTe1Alarms 1 }
+
+    locTE1Alarms OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Te1Alarms1Entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "The Local T1/E1 Interface Alarms."
+        ::= { locTe1Alarms 2 }
+
+    locTe1AlarmsEntry OBJECT-TYPE
+        SYNTAX              Te1Alarms1Entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "T1/E1 Alarms table Entry."
+        INDEX               {
+                                locTe1Alarm
+                            }
+        ::= { locTE1Alarms 1 }
+
+    Te1Alarms1Entry ::= SEQUENCE {
+        locTe1Alarm
+            AlarmLevelT
+    }
+
+    locTe1Alarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Alarms state for the Local T1/E1 Channel.
+                            Possible values:
+                             - almNORMAL(0) - Enabled and connection present
+                             - almMAJOR(2) - Enabled and no connection present
+                             - almDisable(3) - Disabled and no connection present
+                             - almNotAvailable(4) - T1/E1 channel is not available
+                            See Web, Monitor, Alarms, T1/E1 Input"
+        ::= { locTe1AlarmsEntry 1 }
+
+-- end of te1 local alarms
+
+    almRemote OBJECT IDENTIFIER     ::= { alarms 4 }
+    remSysAlarms OBJECT IDENTIFIER  ::= { almRemote 1 }
+    remEthAlarms OBJECT IDENTIFIER  ::= { almRemote 2 }
+    remTe1Alarms OBJECT IDENTIFIER  ::= { almRemote 3 }
+
+    remLinkState OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Link Status Alarm for far end radio.
+                            Possible values:
+                             - almNORMAL(0) - Error-free connection (BER<10e-6)
+                             - almMINOR(1)  - Errorred connection (BER<10e-3)
+                             - almMAJOR(2) - No link (BER>10e-3)
+                             - almNotAvailable(4) - Telemetry is down
+                            See Web, Monitor, Alarms, Link"
+        ::= { remSysAlarms 1 }
+
+    remTempAlarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Temperature Alarm state for far end radio.
+                            Possible values:
+                             - almNORMAL(0) - Normal temprature range
+                             - almMINOR(1)  - Exceeding normal temprature range
+                             - almNotAvailable(4) - Telemetry is down
+                            See Web, Monitor, Alarms, Temperature"
+        ::= { remSysAlarms 2 }
+
+    remCurrentTemp OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "C"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Internal Temperature in Celsius for far end radio. "
+        ::= { remSysAlarms 3 }
+
+    remCurrentTempS OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The internal Temperature as a string for far end radio. "
+        ::= { remSysAlarms 4 }
+
+--    remCollocAlarm OBJECT-TYPE         ::= { remSysAlarms 8 }
+
+    remLinkSecMismatch OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "This is link security mismatch alarm.
+                            This alarm tells if the Link Security Key is matching or not.
+                            Possible values:
+                             - almNORMAL(0) - Link Secutiry keys match
+                             - almMAJOR(2) - Link Secutiry keys do not match
+                             - almNotAvailable(4) - Telemetry is down
+                            "
+        ::= { remSysAlarms 9 }
+
+    remLinkStateV OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Vertical Link Status Alarm. -<g89><>"
+        ::= { remSysAlarms 15 }
+
+    remLinkStateH OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Horizontal Link Status Alarm. -<g89><>"
+        ::= { remSysAlarms 16 }
+
+-- remote Te1 alarms
+    remTe1LinkSummary OBJECT-TYPE
+        SYNTAX              Led4ColorT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The T1/E1 Link Summary LED color. "
+        ::= { remTe1Alarms 1 }
+
+    remTE1Alarms OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Te1AlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "The Remotel T1/E1 Interface Alarms."
+        ::= { remTe1Alarms  2 }
+
+    remTe1AlarmsEntry OBJECT-TYPE
+        SYNTAX              Te1AlarmsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "T1/E1 Alarms table Entry."
+        INDEX               {
+                                remTe1Alarm
+                            }
+        ::= { remTE1Alarms 1 }
+
+    Te1AlarmsEntry ::= SEQUENCE {
+        remTe1Alarm
+            AlarmLevelT
+    }
+
+    remTe1Alarm OBJECT-TYPE
+        SYNTAX              AlarmLevelT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Alarms state for the Local T1/E1 Channel of far end radio.
+                            Possible values:
+                             - almNORMAL(0) - Enabled and connection present
+                             - almMAJOR(2) - Enabled and no connection present
+                             - almDisable(3) - Disabled and no connection present
+                             - almNotAvailable(4) - Telemetry is down or T1/E1 channel is not available
+                            See Web, Monitor, Alarms, T1/E1 Input"
+        ::= { remTe1AlarmsEntry 1 }
+
+-- end remote Te1 alarms
+
+
+    performance OBJECT IDENTIFIER ::= { radioMonitor 3 }
+
+    perfLocal OBJECT IDENTIFIER ::= { performance 1 }
+
+    perfRemote OBJECT IDENTIFIER ::= { performance 2 }
+
+
+    locCurrentBER OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "BER * 1000000.0"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Curent Bit-Error Rate as scaled integer for local radio.
+                            The BER multiplied by 1,000,000.
+                            If the link is operating perfectly, this should indicate zero.
+                            See Web, Monitor, Performance, Current BER"
+        ::= { perfLocal 1 }
+
+    locCurrentBERstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Current Bit-Error Rate as a string. "
+        ::= { perfLocal 2 }
+
+    locCurrentRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current RSL is the measurement of the received signal level.
+                            When the RSL falls below the threshold specification, 
+                            the link disconnects and will not reconnect until 
+                            the RSL is above the threshold specification.
+                            See Web, Monitor, Performance, Current RSL"
+        ::= { perfLocal 3 }
+
+    locCurrentRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Current RSL as a string."
+        ::= { perfLocal 4 }
+
+    locErrorDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Error Duration indicates the total number of seconds that occurred where 
+                            there was at least one bit error since the last time that 
+                            the radio statistics counter was reset.
+                            See Web, Monitor, Performance, Errored Seconds"
+        ::= { perfLocal 5 }
+
+    locErrorDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Error Duration as a formatted string."
+        ::= { perfLocal 6 }
+
+    locUnavailDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Unavailable Duration keeps track of every second where the BER equals or exceeds 1x10-3, 
+                            as well as any seconds where there is a complete loss of radio communication.
+                            See Web, Monitor, Performance, Unavailable Seconds"
+        ::= { perfLocal 7 }
+
+    locUnavailDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Unavailable Duration as a formatted string."
+        ::= { perfLocal 8 }
+
+    locMinRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL indicates the worst (lowest) received signal level 
+                            that occurred since the last counter reset.
+                            See Web, Monitor, Performance, Minimum RSL"
+        ::= { perfLocal 9 }
+
+    locMinRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL value as a string."
+        ::= { perfLocal 10 }
+
+    locMinRSLtimestamp OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL Timestamp indicates the date and time when the Minimum RSL occurred.
+                            See Web, Monitor, Performance, Minimum RSL Timestamp"
+        ::= { perfLocal 11 }
+
+    locMaxRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Maximum RSL indicates the best (highest) RSL 
+                            that occurred since the last counter reset.
+                            See Web, Monitor, Performance, Maximum RSL"
+        ::= { perfLocal 12 }
+
+    locMaxRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Maximum RSL level As string."
+        ::= { perfLocal 13 }
+
+    locSampleDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Sample Duration indicates the amount of time passed since the last counter reset.
+                            See Web, Monitor, Performance, Time Since Reset"
+        ::= { perfLocal 14 }
+
+    locSampleDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Sample Duration value as a formatted string."
+        ::= { perfLocal 15 }
+ 
+    locEthPerfInterfaces    OBJECT-TYPE
+        SYNTAX              SEQUENCE OF LocEthPerfInterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Performance characteristics of local Ethernet interfaces"
+        ::= { perfLocal 16 }
+
+    locEthPerfInterfacesEntry     OBJECT-TYPE
+        SYNTAX              LocEthPerfInterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "An entry in the Performance characteristics of local Ethernet interfaces table"
+        INDEX               {
+                                locEthUtilizationIn,
+                                locEthUtilizationOut,
+                                locEthSpeed
+                            }
+        ::= { locEthPerfInterfaces 1 }
+
+    LocEthPerfInterfacesEntry ::= SEQUENCE {
+        locEthUtilizationIn   Integer32,
+        locEthUtilizationOut  Integer32,
+        locEthSpeed           DisplayString
+    }
+
+    locEthUtilizationIn     OBJECT-TYPE
+        SYNTAX              Integer32 (0..100)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Inbound ethernet utilization (%).
+                            See Web, Analysis, Ethernet Utilization."
+        ::= { locEthPerfInterfacesEntry 1 }
+
+    locEthUtilizationOut    OBJECT-TYPE
+        SYNTAX              Integer32 (0..100)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Outbound ethernet utilization (%).
+                            See Web, Analysis, Ethernet Utilization."
+        ::= { locEthPerfInterfacesEntry 2 }
+
+    locEthSpeed    OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current Ethernet Speed.
+                            See Web, Monitor, Ethernet Performance."
+        ::= { locEthPerfInterfacesEntry 3 }
+ 
+    locEthUtilizationWatermarkEnabled OBJECT-TYPE
+        SYNTAX              ExaltEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet utilization watermark enable(1)/disable(0).
+                            See Web, Analysis, Ethernet Utilization, Ethernet Utilization Watermark."
+        ::= { perfLocal 17 }
+
+    locEthUtilizationWatermark OBJECT-TYPE
+        SYNTAX              Integer32 (0..100)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet utilization watermark level (%).
+                            See Web, Analysis, Ethernet Utilization, Watermark level."
+        ::= { perfLocal 18 }
+
+    locEthUtilizationWatermarkTrapEnabled OBJECT-TYPE
+        SYNTAX              ExaltEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet utilization watermark trap enable(1)/disable(0).
+                            The watermark trap function allows administrators to receive an SNMP trap
+                            when watermark conditions are exceeded.
+                            See Web, Analysis, Ethernet Utilization, Enable Ethernet Utilization Trap."
+        ::= { perfLocal 19 }
+
+    locEthUtilizationWatermarkTrapDuration OBJECT-TYPE
+        SYNTAX              Integer32 (0..1440)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ethernet utilization trap limit in minutes/day (0-1440 minutes).
+                            See Web, Analysis, Ethernet Utilization, Send trap if watermark hit duration exceeds."
+        ::= { perfLocal 20 }
+ 
+    locMaximumTxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The highest/maximum Tx modulation when ACM is enabled since the last counter reset.
+                            See Web, Monitor, Performance, Tx modulation."
+       ::= { perfLocal 100 }
+    
+    locActiveTxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The active Tx modulation when ACM is enabled.
+                            See Web, Monitor, Performance, Tx modulation."
+       ::= { perfLocal 101 }
+    
+    locMinimumTxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The lowest/minimum Tx modulation when ACM is enabled since the last counter reset.
+                            See Web, Monitor, Performance, Tx modulation."
+       ::= { perfLocal 102 }
+    
+    
+    locMaximumRxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The highest/maximum Rx modulation when ACM is enabled since the last counter reset.
+                            See Web, Monitor, Performance, Rx modulation."
+       ::= { perfLocal 103 }
+    
+    
+    locActiveRxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The active Rx modulation when ACM is enabled.
+                            See Web, Monitor, Performance, Rx modulation."
+       ::= { perfLocal 104 }
+    
+    
+    locMinimumRxModulation OBJECT-TYPE
+       SYNTAX               AcmModulationT
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The lowest/minimum Rx modulation when ACM is enabled since the last counter reset.
+                            See Web, Monitor, Performance, Rx modulation."
+       ::= { perfLocal 105 }
+    
+    
+    --
+    -- ACM Tx/Rx Ethernet throughtput
+    --
+    
+    locMaximumTxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The highest/maximum Tx Ethernet throughput in Mbps when ACM is enabled 
+                            since the last counter reset.
+                            See Web, Monitor, Performance, Tx Ethernet Throughput."
+       ::= { perfLocal 106 }
+    
+    
+    locActiveTxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The active Tx Ethernet throughput in Mbps when ACM is enabled.
+                            See Web, Monitor, Performance, Tx Ethernet Throughput."
+       ::= { perfLocal 107 }
+    
+    
+    locMinimumTxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The lowest/minimum Tx Ethernet throughput in Mbps when ACM is enabled
+                            since the last counter reset.
+                            See Web, Monitor, Performance, Tx Ethernet Throughput."
+       ::= { perfLocal 108 }
+    
+    
+    locMaximumRxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The highest/maximum Rx Ethernet throughput in Mbps when ACM is enabled
+                            since the last counter reset.
+                            See Web, Monitor, Performance, Rx Ethernet Throughput."
+       ::= { perfLocal 109 }
+    
+    
+    locActiveRxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The active Rx Ethernet throughput in Mbps when ACM is enabled.
+                            See Web, Monitor, Performance, Rx Ethernet Throughput."
+       ::= { perfLocal 110 }
+    
+    
+    locMinimumRxEthernetThroughput OBJECT-TYPE
+       SYNTAX               INTEGER
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION          "The lowest/minimum Rx Ethernet throughput in Mbps when ACM is enabled
+                            since the last counter reset.
+                            See Web, Monitor, Performance, Rx Ethernet Throughput."
+       ::= { perfLocal 111 }
+    
+    locResetStats OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Write 'reset' to locResetStats to clear the Performance statistics."
+        ::= { perfLocal 1000 }
+
+
+    remCurrentBER OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "BER * 1000000.0"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Curent Bit-Error Rate as scaled integer for far end radio.
+                            The BER multiplied by 1,000,000.
+                            If the link is operating perfectly, this should indicate zero.
+                            See Web, Monitor, Performance, Current BER"
+        ::= { perfRemote 1 }
+
+    remCurrentBERstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Current Bit-Error Rate as a string. Far end radio"
+        ::= { perfRemote 2 }
+
+    remCurrentRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current RSL is the measurement of the received signal level.
+                            When the RSL falls below the threshold specification, 
+                            the link disconnects and will not reconnect until 
+                            the RSL is above the threshold specification.
+                            See Web, Monitor, Performance, Current RSL"
+        ::= { perfRemote 3 }
+
+    remCurrentRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Current RSL as a string."
+        ::= { perfRemote 4 }
+
+    remErrorDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Error Duration indicates the total number of seconds that occurred where 
+                            there was at least one bit error since the last time that 
+                            the radio statistics counter was reset.
+                            See Web, Monitor, Performance, Errored Seconds, Remote column."
+        ::= { perfRemote 5 }
+
+    remErrorDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Error Duration as a formatted string. Far end radio."
+        ::= { perfRemote 6 }
+
+    remUnavailDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Unavailable Duration keeps track of every second where the BER equals or exceeds 1x10-3, 
+                            as well as any seconds where there is a complete loss of radio communication.
+                            See Web, Monitor, Performance, Unavailable Seconds"
+        ::= { perfRemote 7 }
+
+    remUnavailDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Unavailable Duration as a formatted string. Far end radio."
+        ::= { perfRemote 8 }
+
+    remMinRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL indicates the worst (lowest) received signal level 
+                            that occurred since the last counter reset.
+                            See Web, Monitor, Performance, Minimum RSL, Remote column."
+        ::= { perfRemote 9 }
+
+    remMinRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL value as a string. Far end radio."
+        ::= { perfRemote 10 }
+
+    remMinRSLtimestamp OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minimum RSL Timestamp indicates the date and time when the Minimum RSL occurred.
+                            See Web, Monitor, Performance, Minimum RSL Timestamp, Remote column."
+        ::= { perfRemote 11 }
+
+    remMaxRSL OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Maximum RSL indicates the best (highest) RSL 
+                            that occurred since the last counter reset.
+                            See Web, Monitor, Performance, Maximum RSL, Remote column."
+        ::= { perfRemote 12 }
+
+    remMaxRSLstr OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "dBm"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Maximum RSL level As string. Far end radio."
+        ::= { perfRemote 13 }
+
+    remSampleDuration OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Seconds"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Sample Duration indicates the amount of time passed since the last counter reset.
+                            See Web, Monitor, Performance, Time Since Reset, Remote column."
+        ::= { perfRemote 14 }
+
+    remSampleDurationStr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Sample Duration value as a formatted string. Far end radio."
+        ::= { perfRemote 15 }
+
+    remResetStats OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Write 'reset' to remResetStats to clear the Performance statistics."
+        ::= { perfRemote 1000 }
+
+    userThroughput OBJECT IDENTIFIER ::= { radioMonitor 5 }
+
+    aggregateUserThroughput OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "MBit/s"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Aggregated User Throughput. 
+                            For FDD radios this parameter is always equal to fullDuplexEthernetThroughput."
+        ::= { userThroughput 1 }
+
+    inboundEthernetThroughput OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "MBit/s"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Inbound Ethernet Throughput.
+                            For FDD radios this parameter is always N/A."
+        ::= { userThroughput 2 }
+
+    outboundEthernetThroughput OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "MBit/s"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Outbound Ethernet Throughput.
+                            For FDD radios this parameter is always N/A."
+        ::= { userThroughput 3 }
+
+    fullDuplexEthernetThroughput OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "MBit/s"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Full Duplex Ethernet Throughput is determined by 
+                            the combination of settings for Mode and Bandwidth.
+                            See Web, Monitor, User Throughput, Full Duplex Ethernet Throughput."
+        ::= { userThroughput 4 }
+
+    radioReboot OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..100))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Reboot the radio device.
+                            Send 'reboot' to radioReboot parameter to reboot the radio device."
+        ::= { productsMIBObjects 1000 }
+
+    productsMIBConformance OBJECT IDENTIFIER ::= { productsMIB 3 }
+
+    productsMIBCompliances OBJECT IDENTIFIER ::= { productsMIBConformance 1 }
+
+    productsMIBGroups OBJECT IDENTIFIER ::= { productsMIBConformance 2 }
+
+    productsAllObjects OBJECT-GROUP
+        OBJECTS	{
+        		modelName,
+        		partNumber,
+        		serialNumber,
+        		interfaceType,
+        		firmwareVersion,
+			bootVersion,
+        		rfFreqBand,
+        		sysDate,
+        		sysTime,
+        		rnLocal,
+        		rnRemote,
+        		linkName,
+        		linkSecKey,
+        		adminPassword,
+        		userPassword,
+        		ipLocal,
+        		ipRemote,
+        		subnetMask,
+        		ipAddressNetmask,
+        		defaultGateway,
+        		commitAdminSettings,
+        		te1NumChannels,
+        		te1NumActiveChannels,
+        		selectT1orE1,
+        		commitTe1Settings,
+        		currentFwFilename,
+        		alternateFwFilename,
+        		swapFWimage,
+        		locLinkState,
+                        locLinkStateV,
+                        locLinkStateH,
+        		locTe1LinkSummary,
+        		locTempAlarm,
+        		locCurrentTemp,
+        		locCurrentTempS,
+		        locLinkSecMismatch,
+        		remLinkState,
+                        remLinkStateV,
+                        remLinkStateH,
+        		remTe1LinkSummary,
+        		remTempAlarm,
+        		remCurrentTemp,
+        		remCurrentTempS,
+		        remLinkSecMismatch,
+        		locCurrentBER,
+        		locCurrentBERstr,
+        		locCurrentRSL,
+        		locCurrentRSLstr,
+        		locErrorDuration,
+        		locErrorDurationStr,
+        		locUnavailDuration,
+        		locUnavailDurationStr,
+        		locMinRSL,
+        		locMinRSLstr,
+        		locMinRSLtimestamp,
+        		locMaxRSL,
+        		locMaxRSLstr,
+        		locSampleDuration,
+        		locSampleDurationStr,
+        		locResetStats,
+        		remCurrentBER,
+        		remCurrentBERstr,
+        		remCurrentRSL,
+        		remCurrentRSLstr,
+        		remErrorDuration,
+        		remErrorDurationStr,
+        		remUnavailDuration,
+        		remUnavailDurationStr,
+        		remMinRSL,
+        		remMinRSLstr,
+        		remMinRSLtimestamp,
+        		remMaxRSL,
+        		remMaxRSLstr,
+        		remSampleDuration,
+        		remSampleDurationStr,
+        		remResetStats,
+        		radioReboot,
+        		te1Status,
+        		t1LBO,
+        		te1AIS,
+        		t1LineCode,
+        		te1LoopBackMode,
+        		locTe1Alarm,
+        		remTe1Alarm,
+			aesEnable,
+			licKey,
+                aggregateUserThroughput,
+                inboundEthernetThroughput,
+                outboundEthernetThroughput,
+                fullDuplexEthernetThroughput,
+                locEthUtilizationIn,
+                locEthUtilizationOut,
+                locEthUtilizationWatermarkEnabled,
+                locEthUtilizationWatermark,
+                locEthUtilizationWatermarkTrapEnabled,
+                locEthUtilizationWatermarkTrapDuration
+        	}
+        STATUS		    current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { productsMIBGroups 1 }
+
+END
+

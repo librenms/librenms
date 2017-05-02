@@ -1,6 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
+use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
 $service_status   = get_service_status();
@@ -409,6 +410,25 @@ foreach (array_keys($menu_sensors) as $item) {
           </ul>
         </li>
 <?php
+
+$valid_wireless_types = WirelessSensor::getTypes(true);
+
+if (!empty($valid_wireless_types)) {
+    echo '<li class="dropdown">
+          <a href="wireless/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+          <i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
+          <ul class="dropdown-menu">';
+
+    foreach ($valid_wireless_types as $type => $meta) {
+        echo '<li><a href="wireless/metric='.$type.'/">';
+        echo '<i class="fa fa-'.$meta['icon'].' fa-fw fa-lg" aria-hidden="true"></i> ';
+        echo $meta['short'];
+        echo '</a></li>';
+    }
+
+    echo '</ul></li>';
+}
+
 
 $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
 
