@@ -30,15 +30,13 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSignalDiscovery;
 use LibreNMS\OS;
 
 class Extendair extends OS implements
     WirelessErrorRatioDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
-    WirelessRateDiscovery,
-    WirelessSignalDiscovery
+    WirelessRateDiscovery
 {
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
@@ -48,9 +46,19 @@ class Extendair extends OS implements
      */
     public function discoverWirelessErrorRatio()
     {
-        $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.1.0'; // ExaltComProducts::remCurrentBER.0
+        $oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.1.0'; // ExaltComProducts::locCurrentBER.0
         return array(
-            new WirelessSensor('error-ratio', $this->getDeviceId(), $oid, 'extendair', 0, 'Bit Error Ratio'),
+            new WirelessSensor(
+                'error-ratio',
+                $this->getDeviceId(),
+                $oid,
+                'extendair',
+                0,
+                'Bit Error Ratio',
+                null,
+                1,
+                1000000
+            ),
         );
     }
 
@@ -69,8 +77,8 @@ class Extendair extends OS implements
                 'frequency',
                 $this->getDeviceId(),
                 $tx_oid,
-                'extendair',
-                'tx',
+                'extendair-tx',
+                0,
                 'Tx Frequency',
                 null,
                 1,
@@ -80,8 +88,8 @@ class Extendair extends OS implements
                 'frequency',
                 $this->getDeviceId(),
                 $rx_oid,
-                'extendair',
-                'rx',
+                'extendair-rx',
+                0,
                 'Rx Frequency',
                 null,
                 1,
@@ -98,9 +106,11 @@ class Extendair extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $oid = '.1.3.6.1.4.1.25651.1.2.3.1.57.1.0'; // ExtendAirG2::extendAirG2TxPower.0
+        $tx_oid = '.1.3.6.1.4.1.25651.1.2.3.1.57.1.0'; // ExtendAirG2::extendAirG2TxPower.0
+        $rx_oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.3.0'; // ExaltComProducts::locCurrentRSL.0
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'extendair', 0, 'Tx Power', null, 1, 10),
+            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'extendair-tx', 0, 'Tx Power', null, 1, 10),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'extendair-rx', 0, 'Signal Level'),
         );
     }
 
@@ -122,26 +132,8 @@ class Extendair extends OS implements
                 0,
                 'Aggregate User Throughput',
                 null,
-                1048576
+                1000000
             ),
-        );
-    }
-
-    /**
-     * Discover wireless signal strength. This is in dBm. Type is signal.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessSignal()
-    {
-        $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.3.0'; // ExaltComProducts::remCurrentRSL.0
-        $min_oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.9.0'; // ExaltComProducts::locMinRSL.0
-        $max_oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.12.0'; // ExaltComProducts::locMaxRSL.0
-        return array(
-            new WirelessSensor('signal', $this->getDeviceId(), $oid, 'extendair', 0, 'Current Signal'),
-            new WirelessSensor('signal', $this->getDeviceId(), $min_oid, 'extendair', 'min', 'Min Signal'),
-            new WirelessSensor('signal', $this->getDeviceId(), $max_oid, 'extendair', 'max', 'Max Signal'),
         );
     }
 }

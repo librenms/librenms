@@ -28,8 +28,9 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
@@ -37,7 +38,8 @@ class Mimosa extends OS implements
     WirelessErrorRatioDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
-    WirelessNoiseDiscovery,
+    WirelessNoiseFloorDiscovery,
+    WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
     /**
@@ -55,8 +57,8 @@ class Mimosa extends OS implements
                 'error-ratio',
                 $this->getDeviceId(),
                 $tx_oid,
-                'mimosa',
-                'tx',
+                'mimosa-tx',
+                0,
                 'Tx Packet Error Ratio',
                 null,
                 1,
@@ -66,8 +68,8 @@ class Mimosa extends OS implements
                 'error-ratio',
                 $this->getDeviceId(),
                 $rx_oid,
-                'mimosa',
-                'rx',
+                'mimosa-rx',
+                0,
                 'Rx Packet Error Ratio',
                 null,
                 1,
@@ -116,12 +118,12 @@ class Mimosa extends OS implements
     }
 
     /**
-     * Discover wireless noise.  This is in dBm. Type is noise.
+     * Discover wireless noise floor.  This is in dBm. Type is noise-floor.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    public function discoverWirelessNoise()
+    public function discoverWirelessNoiseFloor()
     {
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxNoise', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
@@ -129,7 +131,7 @@ class Mimosa extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'noise',
+                'noise-floor',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.4.' . $index,
                 'mimosa',
@@ -158,8 +160,8 @@ class Mimosa extends OS implements
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.2.' . $index,
-                'mimosa',
-                'tx-' . $index,
+                'mimosa-tx',
+                $index,
                 sprintf('Tx Power: %s Chain', $this->getPolarization($polar[$index])),
                 $entry['mimosaTxPower']
             );
@@ -172,10 +174,48 @@ class Mimosa extends OS implements
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.3.' . $index,
-                'mimosa',
-                'rx-' . $index,
+                'mimosa-rx',
+                $index,
                 sprintf('Rx Power: %s Chain', $this->getPolarization($polar[$index])),
                 $entry['mimosaRxPower']
+            );
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless rate. This is in bps. Type is rate.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessRate()
+    {
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaTxPhy', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxPhy', $oids, 'MIMOSA-NETWORKS-BFIVE-MIB');
+
+        $sensors = array();
+        foreach ($oids as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.6.2.1.2.' . $index,
+                'mimosa-tx',
+                $index,
+                "Stream $index Tx Rate",
+                $entry['mimosaTxPhy'],
+                1000000
+            );
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.6.2.1.5.' . $index,
+                'mimosa-rx',
+                $index,
+                "Stream $index Rx Rate",
+                $entry['mimosaRxPhy'],
+                1000000
             );
         }
 

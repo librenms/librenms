@@ -144,9 +144,11 @@ class Airos extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $oid = '.1.3.6.1.4.1.41112.1.4.1.1.6.1'; //UBNT-AirMAX-MIB::ubntRadioTxPower.1
+        $tx_oid = '.1.3.6.1.4.1.41112.1.4.1.1.6.1'; //UBNT-AirMAX-MIB::ubntRadioTxPower.1
+        $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.5.1'; //UBNT-AirMAX-MIB::ubntWlStatSignal.1
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'airos', 1, 'Tx Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos', 1, 'Tx Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'airos', 1, 'Signal Level'),
         );
     }
 
@@ -207,19 +209,5 @@ class Airos extends OS implements
         }
 
         return $sensors;
-    }
-
-    /**
-     * Discover wireless signal strength. This is in dBm. Type is signal.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessSignal()
-    {
-        $oid = '.1.3.6.1.4.1.41112.1.4.5.1.5.1'; //UBNT-AirMAX-MIB::ubntWlStatSignal.1
-        return array(
-            new WirelessSensor('signal', $this->getDeviceId(), $oid, 'airos', 1, 'Signal'),
-        );
     }
 }

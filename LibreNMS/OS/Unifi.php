@@ -28,15 +28,19 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Unifi extends OS implements
     WirelessClientsDiscovery,
     WirelessCcqDiscovery,
     WirelessCcqPolling,
+    WirelessFrequencyDiscovery,
+    WirelessFrequencyPolling,
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
@@ -146,6 +150,10 @@ class Unifi extends OS implements
      */
     public function pollWirelessCcq(array $sensors)
     {
+        if (empty($sensors)) {
+            return array();
+        }
+
         $ccq_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiVapCcq', array(), 'UBNT-UniFi-MIB');
 
         $data = array();
@@ -155,6 +163,49 @@ class Unifi extends OS implements
         }
 
         return $data;
+    }
+
+    /**
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessFrequency()
+    {
+        $data = snmpwalk_cache_oid($this->getDevice(), 'unifiVapChannel', array(), 'UBNT-UniFi-MIB');
+        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
+
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            $radio = $vap_radios[$index];
+            if (isset($sensors[$radio])) {
+                continue;
+            }
+            $sensors[$radio] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.2.1.4.' . $index,
+                'unifi',
+                $radio,
+                strtoupper($radio) . ' Radio Frequency',
+                WirelessSensor::channelToFrequency($entry['unifiVapChannel'])
+            );
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * Poll wireless frequency as MHz
+     * The returned array should be sensor_id => value pairs
+     *
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
+     */
+    public function pollWirelessFrequency(array $sensors)
+    {
+        return $this->pollWirelessChannelAsFrequency($sensors);
     }
 
     /**
@@ -180,7 +231,7 @@ class Unifi extends OS implements
                     'power',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
-                    'unifi',
+                    'unifi-tx',
                     $radio_name,
                     'Tx Power: ' . strtoupper($radio_name) . ' Radio',
                     $entry['unifiVapTxPower']
@@ -214,8 +265,8 @@ class Unifi extends OS implements
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.6.' . $index,
-                'unifi',
-                'tot-' . $index,
+                'unifi-total',
+                $index,
                 'Total Util: ' . $radio_name,
                 $util_oids[$index]['unifiRadioCuTotal']
             );
@@ -223,8 +274,8 @@ class Unifi extends OS implements
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.7.' . $index,
-                'unifi',
-                'sr-' . $index,
+                'unifi-rx',
+                $index,
                 'Self Rx Util: ' . $radio_name,
                 $util_oids[$index]['unifiRadioCuSelfRx']
             );
@@ -232,8 +283,8 @@ class Unifi extends OS implements
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.8.' . $index,
-                'unifi',
-                'st-' . $index,
+                'unifi-tx',
+                $index,
                 'Self Tx Util: ' . $radio_name,
                 $util_oids[$index]['unifiRadioCuSelfTx']
             );

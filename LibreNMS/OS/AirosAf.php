@@ -68,16 +68,16 @@ class AirosAf extends OS implements
                 'frequency',
                 $this->getDeviceId(),
                 $tx_oid,
-                'airos-af',
-                'tx',
+                'airos-af-tx',
+                1,
                 'Tx Frequency'
             ),
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
                 $rx_oid,
-                'airos-af',
-                'rx',
+                'airos-af-rx',
+                1,
                 'Rx Frequency'
             ),
         );
@@ -96,9 +96,9 @@ class AirosAf extends OS implements
         $rx1_oid = '.1.3.6.1.4.1.41112.1.3.2.1.14.1'; // UBNT-AirFIBER-MIB::rxPower1.1
 
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos-af', 'tx', 'Tx Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx0_oid, 'airos-af', 'rx0', 'Rx Chain 0 Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx1_oid, 'airos-af', 'rx1', 'Rx Chain 1 Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos-af-tx', 1, 'Tx Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx0_oid, 'airos-af-rx', 0, 'Rx Chain 0 Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx1_oid, 'airos-af-rx', 1, 'Rx Chain 1 Power'),
         );
     }
 
@@ -113,8 +113,8 @@ class AirosAf extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.6.1'; // UBNT-AirFIBER-MIB::txCapacity.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.5.1'; // UBNT-AirFIBER-MIB::rxCapacity.1
         return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'airos', 'tx', 'Tx Capacity'),
-            new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos', 'rx', 'Rx Capacity'),
+            new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Capacity'),
+            new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Capacity'),
         );
     }
 }

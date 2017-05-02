@@ -28,26 +28,19 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Routeros extends OS implements WirelessClientsDiscovery, WirelessNoiseFloorDiscovery, WirelessCcqDiscovery
+class Routeros extends OS implements
+    WirelessCcqDiscovery,
+    WirelessClientsDiscovery,
+    WirelessFrequencyDiscovery,
+    WirelessNoiseFloorDiscovery,
+    WirelessRateDiscovery
 {
     private $data;
-
-    /**
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function discoverWirelessClients()
-    {
-        return $this->discoverSensor(
-            'clients',
-            'mtxrWlApClientCount',
-            '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
-        );
-    }
 
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -68,6 +61,35 @@ class Routeros extends OS implements WirelessClientsDiscovery, WirelessNoiseFloo
      *
      * @return array Sensors
      */
+    public function discoverWirelessClients()
+    {
+        return $this->discoverSensor(
+            'clients',
+            'mtxrWlApClientCount',
+            '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
+        );
+    }
+
+    /**
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessFrequency()
+    {
+        return $this->discoverSensor(
+            'frequency',
+            'mtxrWlApFreq',
+            '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
+        );
+    }
+
+    /**
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessNoiseFloor()
     {
         return $this->discoverSensor(
@@ -77,6 +99,40 @@ class Routeros extends OS implements WirelessClientsDiscovery, WirelessNoiseFloo
         );
     }
 
+    /**
+     * Discover wireless rate. This is in bps. Type is rate.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessRate()
+    {
+        $data = $this->fetchData();
+
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.2.' . $index,
+                'mikrotik-tx',
+                $index,
+                'SSID: ' . $entry['mtxrWlApSsid'] . ' Tx',
+                $entry['mtxrWlApTxRate']
+            );
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.3.' . $index,
+                'mikrotik-rx',
+                $index,
+                'SSID: ' . $entry['mtxrWlApSsid'] . ' Rx',
+                $entry['mtxrWlApRxRate']
+            );
+        }
+
+        return $sensors;
+    }
 
     private function fetchData()
     {

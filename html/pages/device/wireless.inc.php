@@ -84,9 +84,9 @@ if ($vars['metric'] == 'overview') {
             $sensor_limit = ((int)$sensor['sensor_limit']) . $unit;
             $sensor_limit_low = ((int)$sensor['sensor_limit_low']) . $unit;
         } else {
-            $sensor_current = format_si($sensor['sensor_current'] * $factor, 2, 2) . $unit;
-            $sensor_limit = format_si($sensor['sensor_limit'] * $factor, 2, 2) . $unit;
-            $sensor_limit_low = format_si($sensor['sensor_limit_low'] * $factor, 2, 2) . $unit;
+            $sensor_current = format_si($sensor['sensor_current'] * $factor, 3) . $unit;
+            $sensor_limit = format_si($sensor['sensor_limit'] * $factor, 3) . $unit;
+            $sensor_limit_low = format_si($sensor['sensor_limit_low'] * $factor, 3) . $unit;
         }
 
         echo "<div class='panel panel-default'>

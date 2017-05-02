@@ -435,6 +435,11 @@ class Sensor implements DiscoveryModule, PollerModule
         if ($os instanceof $typeInterface) {
             $function = static::getDiscoveryMethod($type);
             $sensors = $os->$function();
+            if (!is_array($sensors)) {
+                c_echo("%RERROR:%n $function did not return an array! Skipping discovery.");
+                $sensors = array();
+            }
+
         } else {
             $sensors = array();  // delete non existent sensors
         }
@@ -455,7 +460,7 @@ class Sensor implements DiscoveryModule, PollerModule
             /** @var Sensor $sensor */
             $key = $sensor->getUniqueId();
             if (isset($duplicate_check[$key])) {
-                c_echo('%rERROR: %nA sensor already exists at this index ' . $key . PHP_EOL);
+                c_echo("%R ERROR:%n A sensor already exists at this index $key ");
                 $dup = true;
             }
             $duplicate_check[$key] = 1;

@@ -54,7 +54,7 @@ class Ciscowlc extends OS implements WirelessClientsDiscovery
                 'clients',
                 $this->getDeviceId(),
                 $oid,
-                'ciscowlc',
+                'ciscowlc-ssid',
                 $index,
                 'SSID: ' . $ssids[$index],
                 $count
@@ -67,7 +67,7 @@ class Ciscowlc extends OS implements WirelessClientsDiscovery
                 $this->getDeviceId(),
                 $total_oids,
                 'ciscowlc',
-                'total',
+                0,
                 'Clients: Total',
                 $total
             );

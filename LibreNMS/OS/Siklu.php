@@ -47,7 +47,6 @@ class Siklu extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        //
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),

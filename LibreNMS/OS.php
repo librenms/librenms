@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use LibreNMS\Device\Discovery\Sensors\WirelessSensorDiscovery;
 use LibreNMS\Device\Discovery\Sensors\WirelessSensorPolling;
+use LibreNMS\Device\WirelessSensor;
 use LibreNMS\OS\Generic;
 
 class OS
@@ -103,5 +104,32 @@ class OS
         }
 
         return new Generic($device);
+    }
+
+    /**
+     * Poll a channel based OID, but return data in MHz
+     *
+     * @param $sensors
+     * @return array
+     */
+    protected function pollWirelessChannelAsFrequency($sensors)
+    {
+        if (empty($sensors)) {
+            return array();
+        }
+
+        $oids = array();
+        foreach ($sensors as $sensor) {
+            $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
+        }
+
+        $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+
+        $data = array();
+        foreach ($oids as $id => $oid) {
+            $data[$id] = WirelessSensor::channelToFrequency($snmp_data[$oid]);
+        }
+
+        return $data;
     }
 }
