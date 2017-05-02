@@ -1,0 +1,129 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-MULTICAST-FORWARD.MIB:  NMS EPON OLT MULTICAST FORWARD MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-MULTICAST-FORWARD DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, TimeTicks
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOltMulticastForward         OBJECT IDENTIFIER ::= { nmsEPONGroup 4 }
+
+
+               nmseponoltmulticastforwardTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltMulticastForwardEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt multicast forwarding table entries."
+                   ::= { nmsEponOltMulticastForward 1 }
+
+               nmsEponOltMulticastForwardEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltMulticastForwardEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt multicast forwarding table."
+                   INDEX { oltVlanId,oltMcIpAddress,oltLlidDiid  }
+               ::= { nmseponoltmulticastforwardTable 1 }
+
+               NMSEponOltMulticastForwardEntry ::=
+                   SEQUENCE {
+                       oltVlanId
+                           INTEGER,
+                       oltMcIpAddress
+                           IpAddress,
+                       oltMcMacAddress
+                           MacAddress,
+                       oltMcType
+                           INTEGER,
+                       oltLlidDiid
+                           INTEGER,
+                       oltExpiryTime
+                           TimeTicks,
+                       oltForwardRowStatus
+                           RowStatus
+                   }
+
+          -- The following section describes the components of the
+          -- table.
+
+               oltVlanId OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT vlan id, as one of the index together with oltMcIpAddress and oltLlidDiid."
+                   ::= { nmsEponOltMulticastForwardEntry 1 } 
+			
+               oltMcIpAddress OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The IP multicast group ddress for which this entry contains information. As one of the index together with oltVlanId and oltLlidDiid."
+                   ::= { nmsEponOltMulticastForwardEntry 2 } 
+			
+               oltMcMacAddress OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The MAC multicast group address auto converted from mcstForwardIPAddress for which this entry contains information."
+                   ::= { nmsEponOltMulticastForwardEntry 3 } 
+
+               oltMcType OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          static(0),
+                          dynamic(1)
+                               	    }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The mode for which this entry contains information. 0 means the entry is added by user, and 1 means the entry is added by learning from IGMP report packet."
+                   ::= { nmsEponOltMulticastForwardEntry 4 } 
+
+               oltLlidDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The IP multicast group ddress for which this entry contains information. As one of the index together with oltVlanId and oltLlidDiid."
+                   ::= { nmsEponOltMulticastForwardEntry 5 } 
+
+               oltExpiryTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The minimum amount of time remaining before this entry will be aged out. 
+                            A value of 0 indicates that the entry is only present because igmpCacheSelf
+                             is true and that if the router left the group, this entry would be aged out
+                              immediately. Note that some implementations may process membership reports
+                               from the local system in the same way as reports from other hosts, 
+                               so a value of 0 is not required."
+                   ::= { nmsEponOltMulticastForwardEntry 6 } 
+
+               oltForwardRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT multicast forwarding table row status."
+                   ::= { nmsEponOltMulticastForwardEntry 7 } 
+
+			
+
+END

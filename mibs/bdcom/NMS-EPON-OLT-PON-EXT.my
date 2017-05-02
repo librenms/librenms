@@ -1,0 +1,206 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-PON-EXT.MIB:  NMS OLT-COMM MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-PON-EXT DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    RowStatus
+		    	FROM SNMPv2-TC;
+
+--ponOpticsParameterTable
+               ponOpticsParameterTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF PonOpticsParameterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt pon optical property table entries."
+                   ::= { nmsEPONGroup 107 }
+
+               ponOpticsParameterEntry OBJECT-TYPE
+                   SYNTAX PonOpticsParameterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt pon optical property table."
+                   INDEX { ponIfIndex }
+               ::= { ponOpticsParameterTable 1 }
+
+               PonOpticsParameterEntry ::=
+                   SEQUENCE {
+                       ponIfIndex
+                           INTEGER,
+                       linkStatus
+                           INTEGER,
+                       txPower
+                           INTEGER,
+                       txPowerUpLimit
+                           INTEGER,
+                       txPowerLowLimit
+                           INTEGER,
+                       temperature
+                           INTEGER,
+                       vlotage
+                           INTEGER,
+                       curr
+                           INTEGER                           
+                   }
+
+               ponIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The only diid of PON port in System."
+                   ::= { ponOpticsParameterEntry 1 } 
+		    
+               linkStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   link-up(1),
+                                   link-down(2)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The link status of interface. 1-link up, 2-link down."
+                   ::= { ponOpticsParameterEntry 2 } 
+		    
+               txPower OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The tx power of optical module. The unit is 0.1DBm."
+                   ::= { ponOpticsParameterEntry 3 } 
+		    
+               txPowerUpLimit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of tx power alarm. The unit is 0.1DBm."
+                   ::= { ponOpticsParameterEntry 4 } 
+		    
+               txPowerLowLimit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of tx power alarm. The unit is 0.1DBm."
+                   ::= { ponOpticsParameterEntry 5 } 
+		    
+               temperature OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Optical module temperature. The unit is 1/256 degree."
+                   ::= { ponOpticsParameterEntry 6 } 
+		    
+               vlotage OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Optical module volt. The unit is 0.1mV."
+                   ::= { ponOpticsParameterEntry 7 } 
+		    
+               curr OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Optical module bias current. The unit is 2mA."
+                   ::= { ponOpticsParameterEntry 8 } 
+
+
+
+--ponOpticsRxPowerTable
+               ponOpticsRxPowerTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF PonOpticsRxPowerEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt pon optical Rx Power table entries."
+                   ::= { nmsEPONGroup 108 }
+
+               ponOpticsRxPowerEntry OBJECT-TYPE
+                   SYNTAX PonOpticsRxPowerEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt pon optical Rx Power property table."
+                   INDEX { onuIfIndex }
+               ::= { ponOpticsRxPowerTable 1 }
+
+               PonOpticsRxPowerEntry ::=
+                   SEQUENCE {
+                       onuIfIndex
+                           INTEGER,
+                       onuLinkStatus
+                           INTEGER,
+                       rxPower
+                           INTEGER,
+                       rxPowerUpLimit
+                           INTEGER,
+                       rxPowerLowLimit
+                           INTEGER
+                   }
+
+               ponIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The only diid of PON port in System."
+                   ::= { ponOpticsRxPowerEntry 1 } 
+		    
+               onuLinkStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   link-up(1),
+                                   link-down(2)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The link status of onu. 1-link up, 2-link down."
+                   ::= { ponOpticsRxPowerEntry 2 } 
+
+               rxPower OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The rx power of optical module. The unit is 0.1DBm."
+                   ::= { ponOpticsRxPowerEntry 3 } 
+		    
+               rxPowerUpLimit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of rx power alarm. The unit is 0.1DBm."
+                   ::= { ponOpticsRxPowerEntry 4 } 
+		    
+               rxPowerLowLimit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of rx power alarm. The unit is 0.1DBm."
+                   ::= { ponOpticsRxPowerEntry 5 } 
+		    
+          
+END
