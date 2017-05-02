@@ -8,18 +8,28 @@ echo '<td class="list">';
     echo $vm['description'];
 echo '</td>';
 
-if ($vm['status'] == 'stopped') {
+if ($vm['vmstatus'] == 'stopped') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
-} elseif ($vm['status'] == 'running') {
+} elseif ($vm['vmstatus'] == 'running') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">ON</span></td>';
 } else {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">?</span></td>';
 }
 
-if ($vm['status'] == 'running') {
+if ($vm['vmstatus'] == 'running') {
     echo '<td class="list">';
     if (!empty($vm['cluster'])) {
         echo $vm['cluster'];
+    }
+    echo '</td>';
+    echo '<td class="list">';
+    if (!empty($vm['vmtype'])) {
+        echo $vm['vmtype'];
+    }
+    echo '</td>';
+    echo '<td class="list">';
+    if (!empty($vm['vmcpus'])) {
+        echo $vm['vmcpus'];
     }
     echo '</td>';
     echo '<td class="list">';
@@ -28,36 +38,47 @@ if ($vm['status'] == 'running') {
     }
     echo '</td>';
     echo '<td class="list">';
-    if (!empty($vm['vmramcurr'])) {
-        echo $vm['vmramcurr'];
+    if (!empty($vm['vmmem'])) {
+        echo $vm['vmmem'];
         echo " MB";
     }
     echo '</td>';
     echo '<td class="list">';
-    if (!empty($vm['vmrammax'])) {
-        echo $vm['vmrammax'];
+    if (!empty($vm['vmmaxmem'])) {
+        echo $vm['vmmaxmem'];
         echo " MB";
     }
     echo '</td>';
     echo '<td class="list">';
-    if (isset($vm['vmramuse'])) {
-        echo $vm['vmramuse'];
+    if (isset($vm['vmmemuse'])) {
+        echo $vm['vmmemuse'];
         echo " %";
     }
     echo '</td>';
     echo '<td class="list">';
-    if (isset($vm['vmcpu'])) {
-        echo $vm['vmcpu'];
-        echo " %";
+    if (!empty($vm['vmdisk'])) {
+         echo $vm['vmdisk'];
+         echo " MB";
     }
     echo '</td>';
     echo '<td class="list">';
-    if (!empty($vm['vmstorage'])) {
-         echo $vm['vmstorage'];
+    if (!empty($vm['vmmaxdisk'])) {
+         echo $vm['vmmaxdisk'];
+         echo " MB";
+    }
+    echo '</td>';
+    echo '<td class="list">';
+    if (!empty($vm['vmdiskuse'])) {
+         echo $vm['vmdiskuse'];
          echo " %";
     }
     echo '</td>';
 } else {
+    echo '<td class="list"></td>';
+    echo '<td class="list"></td>';
+    echo '<td class="list"></td>';
+    echo '<td class="list"></td>';
+    echo '<td class="list"></td>';
     echo '<td class="list"></td>';
     echo '<td class="list"></td>';
     echo '<td class="list"></td>';
