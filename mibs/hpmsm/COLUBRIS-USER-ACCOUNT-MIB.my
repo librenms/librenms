@@ -1,0 +1,180 @@
+-- ****************************************************************************
+--  COLUBRIS-USER-ACCOUNT-MIB definitions
+--
+--  Copyright (c) 2007, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris User Account file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-USER-ACCOUNT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM    SNMPv2-SMI
+    DisplayString
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisUserAccountMIB MODULE-IDENTITY
+    LAST-UPDATED    "200704180000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris User Account MIB."
+
+    ::= { colubrisMgmtV2 35 }
+
+
+-- colubrisUserAccountMIB definition
+colubrisUserAccountMIBObjects OBJECT IDENTIFIER ::= { colubrisUserAccountMIB 1 }
+
+-- colubris User Account groups
+coUserAccountStatusGroup    OBJECT IDENTIFIER ::= { colubrisUserAccountMIBObjects 1 }
+
+-- The User Account Status Group
+coUserAccountStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoUserAccountStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "User account attributes."
+    ::= { coUserAccountStatusGroup 1 }
+
+coUserAccountStatusEntry OBJECT-TYPE
+    SYNTAX      CoUserAccountStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coUserAccountStatusTable.
+                 coUserAccIndex - Uniquely identifies a user account on
+                                  the MultiService Controller."
+    INDEX       { coUserAccIndex }
+    ::= { coUserAccountStatusTable 1 }
+
+CoUserAccountStatusEntry ::= SEQUENCE
+{
+    coUserAccIndex                 Integer32,
+    coUserAccUserName              DisplayString,
+    coUserAccPlanName              DisplayString,
+    coUserAccRemainingOnlineTime   Integer32,
+    coUserAccFirstLoginTime        DisplayString,
+    coUserAccRemainingSessionTime  Integer32,
+    coUserAccStatus                INTEGER,
+    coUserAccExpirationTime        DisplayString
+}
+
+coUserAccIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of the user account."
+    ::= { coUserAccountStatusEntry 1 }
+
+coUserAccUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User name corresponding to the user account."
+    ::= { coUserAccountStatusEntry 2 }
+
+coUserAccPlanName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The name of the subscription plan name associated to
+                 this account."
+    ::= { coUserAccountStatusEntry 3 }
+
+coUserAccRemainingOnlineTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The online remaining time for this account."
+    ::= { coUserAccountStatusEntry 4 }
+
+coUserAccFirstLoginTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "First login time recorded for this account."
+    ::= { coUserAccountStatusEntry 5 }
+
+coUserAccRemainingSessionTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time before next logout."
+    ::= { coUserAccountStatusEntry 6 }
+
+coUserAccStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    valid(1),
+                    invalid(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current Status of the user account based on the rules
+                 defined in the subscription plan."
+    ::= { coUserAccountStatusEntry 7 }
+
+coUserAccExpirationTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This field include the Date and time of the account
+                 expiration based on the subscription plan."
+    ::= { coUserAccountStatusEntry 8 }
+
+
+-- User Account notifications
+colubrisUserAccountMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisUserAccountMIB 2 }
+colubrisUserAccountMIBNotifications OBJECT IDENTIFIER ::= { colubrisUserAccountMIBNotificationPrefix 0 }
+
+
+-- conformance information
+colubrisUserAccountMIBConformance OBJECT IDENTIFIER ::= { colubrisUserAccountMIB 3 }
+colubrisUserAccountMIBCompliances OBJECT IDENTIFIER ::= { colubrisUserAccountMIBConformance 1 }
+colubrisUserAccountMIBGroups      OBJECT IDENTIFIER ::= { colubrisUserAccountMIBConformance 2 }
+
+
+-- compliance statements
+colubrisUserAccountMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the User Account MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisUserAccountStatusMIBGroup
+                    }
+    ::= { colubrisUserAccountMIBCompliances 1 }
+
+-- units of conformance
+colubrisUserAccountStatusMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coUserAccUserName,
+                    coUserAccPlanName,
+                    coUserAccRemainingOnlineTime,
+                    coUserAccFirstLoginTime,
+                    coUserAccRemainingSessionTime,
+                    coUserAccStatus,
+                    coUserAccExpirationTime
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for User Account status."
+    ::= { colubrisUserAccountMIBGroups 1 }
+
+END

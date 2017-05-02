@@ -6,5 +6,6 @@ During all of these examples we will be using the OS of `pulse` as the example O
 >  - [Adding the initial detection.](os/Initial-Detection.md)
 >  - [Adding Memory and CPU information.](os/Mem-CPU-Information.md)
 >  - [Adding Health / Sensor information.](os/Health-Information.md)
+>  - [Adding Wireless Sensor information.](os/Wireless-Sensors.md)
 >  - [Adding custom graphs.](os/Custom-Graphs.md)
 >  - [Adding Unit tests (required).](os/Test-Units.md)
