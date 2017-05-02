@@ -58,7 +58,7 @@ class Unifi extends OS implements
             return array();
         }
         $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
-        $ssids = $this->getCacheByIndex('unifiVapEssId', 'UBNT-UniFi-MIB');
+        $ssid_ids = $this->getCacheByIndex('unifiVapEssId', 'UBNT-UniFi-MIB');
 
         $radios = array();
         foreach ($client_oids as $index => $entry) {
@@ -81,7 +81,7 @@ class Unifi extends OS implements
                 $data['oids'],
                 'unifi',
                 $name,
-                strtoupper($name) . ' Radio Clients',
+                "Clients ($name)",
                 $data['count'],
                 1,
                 1,
@@ -94,15 +94,31 @@ class Unifi extends OS implements
         }
 
         // discover client counts by SSID
+        $ssids = array();
         foreach ($client_oids as $index => $entry) {
+            $ssid = $ssid_ids[$index];
+            if (!empty($ssid)) {
+                if (isset($ssids[$ssid])) {
+                    $ssids[$ssid]['oids'][] = '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index;
+                    $ssids[$ssid]['count'] += $entry['unifiVapNumStations'];
+                } else {
+                    $ssids[$ssid] = array(
+                        'oids' => array('.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index),
+                        'count' => $entry['unifiVapNumStations'],
+                    );
+                }
+            }
+        }
+
+        foreach ($ssids as $ssid => $data) {
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index,
+                $data['oids'],
                 'unifi',
-                $index,
-                'SSID: ' . $ssids[$index],
-                $entry['unifiVapNumStations']
+                $ssid,
+                'SSID: ' . $ssid,
+                $data['count']
             );
         }
 
@@ -120,6 +136,7 @@ class Unifi extends OS implements
         if (empty($ccq_oids)) {
             return array();
         }
+        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
         $ssids = $this->getCacheByIndex('unifiVapEssId', 'UBNT-UniFi-MIB');
 
         $sensors = array();
@@ -131,7 +148,7 @@ class Unifi extends OS implements
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.3.' . $index,
                     'unifi',
                     $index,
-                    'SSID: ' . $ssids[$index],
+                    "SSID: {$ssids[$index]} ({$vap_radios[$index]})",
                     min($entry['unifiVapCcq'] / $this->ccqDivisor, 100),
                     1,
                     $this->ccqDivisor
@@ -188,7 +205,7 @@ class Unifi extends OS implements
                 '.1.3.6.1.4.1.41112.1.6.1.2.1.4.' . $index,
                 'unifi',
                 $radio,
-                strtoupper($radio) . ' Radio Frequency',
+                "Frequency ($radio)",
                 WirelessSensor::channelToFrequency($entry['unifiVapChannel'])
             );
         }
@@ -233,7 +250,7 @@ class Unifi extends OS implements
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
                     'unifi-tx',
                     $radio_name,
-                    'Tx Power: ' . strtoupper($radio_name) . ' Radio',
+                    "Tx Power ($radio_name)",
                     $entry['unifiVapTxPower']
                 );
             }
@@ -260,14 +277,13 @@ class Unifi extends OS implements
 
         $sensors = array();
         foreach ($radio_names as $index => $name) {
-            $radio_name = strtoupper($name) . ' Radio';
             $sensors[] = new WirelessSensor(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.6.' . $index,
                 'unifi-total',
                 $index,
-                'Total Util: ' . $radio_name,
+                "Total Util ($name)",
                 $util_oids[$index]['unifiRadioCuTotal']
             );
             $sensors[] = new WirelessSensor(
@@ -276,7 +292,7 @@ class Unifi extends OS implements
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.7.' . $index,
                 'unifi-rx',
                 $index,
-                'Self Rx Util: ' . $radio_name,
+                "Self Rx Util ($name)",
                 $util_oids[$index]['unifiRadioCuSelfRx']
             );
             $sensors[] = new WirelessSensor(
@@ -285,7 +301,7 @@ class Unifi extends OS implements
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.8.' . $index,
                 'unifi-tx',
                 $index,
-                'Self Tx Util: ' . $radio_name,
+                "Self Tx Util ($name)",
                 $util_oids[$index]['unifiRadioCuSelfTx']
             );
         }
