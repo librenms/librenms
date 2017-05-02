@@ -19,9 +19,9 @@
 if ($device['os'] == 'bdcom') {
     echo 'BDCOM, NMS-PROCESS-MIB: ';
 
-    $usage = snmp_get($device, 'nmspmCPUTotal5min.1', '-OvQ', 'NMS-PROCESS-MIB');
+    $usage = snmp_get($device, 'nmspmCPUTotal5min.1', '-Ovq', 'NMS-PROCESS-MIB');
 
-    if (is_numeric($usage)) {
+    if (is_numeric($usage['nmspmCPUTotal5min.1'])) {
         discover_processor($valid['processor'], $device, 'NMS-PROCESS-MIB::nmspmCPUTotal5min.1', '0', 'bdcom', 'CPU', '1', $usage, null, null);
     }
 }
