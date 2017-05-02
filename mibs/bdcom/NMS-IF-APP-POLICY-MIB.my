@@ -1,0 +1,129 @@
+-- *****************************************************************
+-- NMS-IF-APP-POLICY-MIB.my:  NMS IF-APP-POLICY MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-IF-APP-POLICY-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    nmsMgmt
+			FROM NMS-SMI
+		    RowStatus
+		    	FROM SNMPv2-TC;
+		    
+          
+               nmsIfAppPolicy         OBJECT IDENTIFIER ::= { nmsMgmt 65 }
+
+               nmsIfAppPolicyTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSIfAppPolicyEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of interface application policy table entries."
+                   ::= { nmsIfAppPolicy 1 }
+
+               nmsIfAppPolicyEntry OBJECT-TYPE
+                   SYNTAX  NMSIfAppPolicyEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            interface property table."
+                   INDEX { ponIfIndex }
+               ::= { nmsIfAppPolicyTable 1 }
+               
+
+               NMSIfAppPolicyEntry ::=
+                   SEQUENCE {
+                       nmsIfIndex
+                           INTEGER,
+                       nmsIfDescr
+                           DisplayString,
+                       nmsIfInMacACL
+                           DisplayString,
+                       nmsIfOutMacACL
+                           DisplayString,
+                       nmsIfInIpACL
+                           DisplayString,
+                       nmsIfOutIpACL
+                           DisplayString,
+                       nmsIfInQosPolicyName
+                           DisplayString,
+                       nmsIfOutQosPolicyName
+                           DisplayString,                      
+                   }
+
+          nmsIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each interface. The same value as ifIndex of ifTable in RFC1213."
+              ::= { nmsIfAppPolicyEntry 1 }
+               
+          nmsIfDescr OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string containing information of interface. The same value as ifDesc of ifTable in RFC1213. "
+              ::= { nmsIfAppPolicyEntry 2 }
+
+          nmsIfInMacACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface input MAC address ACL."
+              ::= { nmsIfAppPolicyEntry 3 } 
+
+          nmsIfOutMacACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface output MAC address ACL."
+              ::= { nmsIfAppPolicyEntry 4 } 
+
+          nmsIfInIpACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface input IP address ACL."
+              ::= { nmsIfAppPolicyEntry 5 } 
+
+          nmsIfOutIpACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface output IP address ACL."
+              ::= { nmsIfAppPolicyEntry 6 } 
+
+          nmsIfInQosPolicyName OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface input QoS policy name."
+              ::= { nmsIfAppPolicyEntry 7 } 
+
+          nmsIfOutQosPolicyName OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface output QoS policy name."
+              ::= { nmsIfAppPolicyEntry 8 } 
+
+               
+               
+END

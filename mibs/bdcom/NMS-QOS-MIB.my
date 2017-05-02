@@ -1,0 +1,754 @@
+-- *****************************************************************
+-- qos MIB -  The MIB for Switch Product
+--
+-- Oct 2009 nie
+
+-- Copyright (c) 2009 by  Co., Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+   
+-- ********************************************************************************
+--  Log for Switch MIB.
+--
+--  Oct 22 2009
+--  1. Add policyMapTable            
+--   
+--  Jul 12 2011
+--  1. Add policyMapApplyTable,globalCosMapTable,portCosMapTable,wrrBandwidthTable,portRateControlTable and RED
+
+
+-- ********************************************************************************   
+ 
+NMS-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-TYPE, 
+	Counter32,
+	Gauge32,
+	Counter64,
+	Integer32, 
+	TimeTicks, 
+	mib-2, 
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	DisplayString, 
+	PhysAddress, 
+	TruthValue, 
+	RowStatus, 
+	TimeStamp, 
+	AutonomousType, 
+	TestAndIncr 
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, 
+	OBJECT-GROUP        
+		FROM SNMPv2-CONF 
+	nms
+				FROM NMS-SMI;	
+  
+qos	MODULE-IDENTITY
+    	LAST-UPDATED	"20110712"
+    	ORGANIZATION	" nms Co., Ltd."
+    	CONTACT-INFO	" nms Co., Ltd."
+    	DESCRIPTION     "."
+	::= { nms 150 }
+
+
+--  policyMap  Table       
+policyMapTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF policyMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of policyMapEntry entries. 
+				 Each rule contains Classify informations for making qos(Quality of Service) policyMap."
+		::= { qos 1 }
+
+		policyMapEntry	OBJECT-TYPE
+				SYNTAX		policyMapEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing rule Classify and rule action information.A no-existing 
+							 policy map name means to creat a new policy Map."
+				INDEX		{ policyMapName }
+				::= { policyMapTable 1 }
+
+		policyMapEntry	::= SEQUENCE {
+							policyMapName				DisplayString,
+							policyMapcreate				DisplayString, 
+							policyMapdelete             TruthValue,
+  							classifyIpv4AclDel			TruthValue, 
+							classifyIpv4AclName			DisplayString, 
+							classifyMacAclDel			TruthValue, 
+							classifyMacAclName			DisplayString, 
+							classifyIpv4DscpValue		Integer32,
+							classifyVlanValue			Integer32,
+							classify2VlanValue			Integer32,
+							classifyInnerVlanValue		Integer32,
+							classify2InnerVlanValue		Integer32,
+							classifyCosValue			Integer32,
+							classifyICosValue			Integer32,
+							classifyEthernetType        Integer32,
+							classifyAny					TruthValue,
+							actionBandwidthValue		Integer32,
+							actionCosValue				Integer32,
+							actionQueueValue			Integer32,
+							actionDscpValue				Integer32,
+							actionOuterVlanOp			Integer32,
+							actionOuterVlanValue		Integer32,
+							actionInnerVlanOp			Integer32,
+							actionInnerVlanValue		Integer32,
+							actionRedirctPortValue		Integer32,
+							actionMirrorSessionValue	Integer32,
+ 						    actionStat					TruthValue,
+						    actionDiscardable			TruthValue,
+						    actionDrop					TruthValue,   
+						    actionForward				TruthValue
+					}
+
+			policyMapName		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"A unique string for each Policy Map up to 20 characters. 
+								 This string is a index of Policy Map Table. "
+						::= { policyMapEntry 1 }  
+			policyMapcreate		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"A unique string for each Policy Map up to 20 characters. 
+								 This string is a index of Policy Map Table. "
+						::= { policyMapEntry 2 }  
+			policyMapdelete		OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"policyMap delete flag.True (1) will delete the policy map."
+						::= { policyMapEntry 3 }  
+		--	policyMapRowStatus		OBJECT-TYPE
+		--					SYNTAX		INTEGER {
+		--								none(0),
+		--								active(1),
+		--								create(2),
+		--								modify(3),
+		--								destroy(4)
+		--							}
+		--					MAX-ACCESS	read-create
+		--					STATUS		current
+		--					DESCRIPTION	"This object is used to create a new row or modify or delete an existing row 
+		--								in this table. A rule created by being set this object to 'create'. When
+		--								'active' is set, the system will validate the rule. Before a rule can be 
+		--									deleted or modify, (by setting this object to 'delete' or 'modify')"
+		--						 	 --it must be first unreferenced from all associated lines.(when 'active-applied' is set, a rule cann't be deleted or modified)."
+		--					::= { dsQosRuleEntry 13 }   
+		classifyIpv4AclDel		OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"policyMap classify setting flag. True or False (0).If classifyIpv4Acl is set true, 
+									the Ipv4Acl given by classifyIpv4AclName will be deleted from the classify."
+						::= { policyMapEntry 4 } 
+		classifyIpv4AclName		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"A unique string for the ipv4acl name up to 20 characters. "
+						::= { policyMapEntry 5 }
+		classifyMacAclDel		OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"policyMap setting classify flag. True (1) or False (0).If classifyMacAcl is set true, 
+									the macacl given by classifyMacAclName will be deleted from the classify."
+						::= { policyMapEntry 6 } 
+		classifyMacAclName		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"A unique string for the mac acl name up to 20 characters. "
+						::= { policyMapEntry 7 } 
+		--classifyIpv4Dscp		OBJECT-TYPE
+		--				SYNTAX		TruthValue
+		--				MAX-ACCESS	read-create
+		--				STATUS		current
+		--				DESCRIPTION	"policyMap classify setting flag. True (1) or False (0).If classifyIpv4Dscp is set true, 
+		--							the Ipv4Dscp will use as the classify."
+		--				::= { policyMapEntry 7 } 
+        classifyIpv4DscpValue	OBJECT-TYPE
+						SYNTAX		Integer32 (0..63)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The dscp value of Policy Map Table. It can be from 0 to 63.-1 is a invalid vlaue meaning 
+						dscp will not be a classify."
+						::= { policyMapEntry 8 }
+		--classifyVlan	OBJECT-TYPE
+		--				SYNTAX		TruthValue
+		--				MAX-ACCESS	read-create
+		--				STATUS		current
+		--				DESCRIPTION	"policyMap classify setting flag. True (1) or False (0).If classifyVlan is set true, 
+		--							the Vlan will use as the classify."
+		--				::= { policyMapEntry 9 }   
+		classifyVlanValue	OBJECT-TYPE
+						SYNTAX		Integer32 (1..4094)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The vlan value of Policy Map Table. It can be from 1 to 4094.-1 is a invalid vlaue 
+						meaning vlan will not be a classify."
+						::= { policyMapEntry 9 }  
+		classify2VlanValue	OBJECT-TYPE
+						SYNTAX		Integer32 (1..4094)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The vlan value of Policy Map Table. It can be from 1 to 4094.-1 is a invalid vlaue 
+						meaning vlan will not be a classify."
+						::= { policyMapEntry 10 }
+		--classifyInnerVlan	OBJECT-TYPE
+		--				SYNTAX		TruthValue
+		--				MAX-ACCESS	read-create
+		--				STATUS		current
+		--				DESCRIPTION	"policyMap classify setting flag. True (1) or False (0).If classifyInnerVlan is set true, 
+		--							the IVlan will use as the classify."
+		--				::= { policyMapEntry 11 } 
+		classifyInnerVlanValue	OBJECT-TYPE
+						SYNTAX		Integer32 (1..4094)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The inner vlan value of Policy Map Classify Table. It can be from 1 to 4094.-1 is a 
+						invalid vlaue meaning InnerVlan will not be a classify."
+						::= { policyMapEntry 11 }  
+		classify2InnerVlanValue	OBJECT-TYPE
+						SYNTAX		Integer32 (1..4094)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The inner vlan value of Policy Map Classify Table. It can be from 1 to 4094.-1 is a 
+						invalid vlaue meaning InnerVlan will not be a classify."
+						::= { policyMapEntry 12 } 
+		--classifyCos		OBJECT-TYPE
+		--				SYNTAX		TruthValue
+		--				MAX-ACCESS	read-create
+		--				STATUS		current
+		--				DESCRIPTION	"policyMap classify setting flag. True (1) or False (0).If classifyCos is set true, 
+		--							the cos will use as the classify."
+		--				::= { policyMapEntry 13 } 
+		classifyCosValue		OBJECT-TYPE
+						SYNTAX		Integer32 (0..7)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The cos value of Policy Map Classify Table. It can be from 0 to 7.-1 is a 
+						invalid vlaue meaning Cos will not be a classify."
+						::= { policyMapEntry 13 } 
+		--classifyICos	OBJECT-TYPE
+		--				SYNTAX		TruthValue
+		--				MAX-ACCESS	read-create
+		--				STATUS		current
+		--				DESCRIPTION	"policyMap classify setting flag. True (1) or False (0).If classifyICos is set true, 
+		--							the icos will use as the classify."
+		--				::= { policyMapEntry 15 } 
+		classifyICosValue	OBJECT-TYPE
+						SYNTAX		Integer32 (0..7)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The inner cos value of Policy Map Classify Table. It can be from 0 to 7.-1 is a 
+						invalid vlaue meaning ICos will not be a classify."
+						::= { policyMapEntry 14 }
+		classifyEthernetType	OBJECT-TYPE
+						SYNTAX		Integer32 (0..65535)
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The EthernetType value of Policy Map Classify Table. It can be from 0 to 0xffff.-1 is a 
+						invalid EthernetType meaning ICos will not be a classify."
+						::= { policyMapEntry 15 }						
+        classifyAny     OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The Classify of Policy Map. True (1) or False (0).  If the Classify of Policy Map  
+									is set true, all traffics will be ruled by the setting action."
+						::= { policyMapEntry 16 }
+		-- action setting  
+			--	actionBandwidth			OBJECT-TYPE
+			--							SYNTAX		TruthValue
+			--							MAX-ACCESS	read-create
+			--							STATUS		current
+			--							DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionBandwidth is set true, 
+			--								the actionr of metering will take effect."
+			--							::= { policyMapEntry 18 } 
+				actionBandwidthValue	OBJECT-TYPE
+										SYNTAX		Integer32(0..1000)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The bandwidth value of rule-matched traffics. It can be configured 
+														in Mega bps and can be from 0 to 1000.-1 is a invalid vlaue 
+														meaning Bandwidth will not be a action."
+										::= { policyMapEntry 17}
+				--actionCos		  		OBJECT-TYPE
+				--						SYNTAX		TruthValue
+				--						MAX-ACCESS	read-create
+				--						STATUS		current
+				---						DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionCos is set true, 
+				--							the action of changing cos  will take effect.."
+				--						::= { policyMapEntry 20 } 	 
+				actionCosValue			OBJECT-TYPE
+										SYNTAX		Integer32(0..7)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The cos value of rule-matched traffics  . It ranges from 0 to 7.-1 is a invalid vlaue 
+														meaning Cos will not be a action."
+										::= { policyMapEntry 18 }	
+				--actionQueue		  		OBJECT-TYPE
+				--						SYNTAX		TruthValue
+				--						MAX-ACCESS	read-create
+				--						STATUS		current
+				--						DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionQueue is set true, 
+				--							the action of changing queue  will take effect."
+				--						::= { policyMapEntry 22 } 	 				    					
+				actionQueueValue	OBJECT-TYPE
+										SYNTAX		Integer32(0..3)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The queue value of rule-matched traffics. It ranges from 0 to 3 or 7.-1 is a invalid vlaue 
+														meaning Queue will not be a action."
+										::= { policyMapEntry 19 } 
+				--actionDscp		  		OBJECT-TYPE
+				--						SYNTAX		TruthValue
+				--						MAX-ACCESS	read-create
+				--						STATUS		current
+				----						DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionDscp is set true, 
+				--							the action of changing dscp will take effect."
+				--						::= { policyMapEntry 24 }
+				actionDscpValue	OBJECT-TYPE
+										SYNTAX		Integer32(0..63)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The dscp value of rule-matched traffics. It ranges from 0 to 63.-1 is a invalid vlaue 
+														meaning Dscp will not be a action."
+										::= { policyMapEntry 20} 
+				actionOuterVlanOp		  	OBJECT-TYPE
+										SYNTAX		Integer32{
+													not-configured(0), 
+													replace(1),
+													add(2)
+													delete(3)
+										}
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The operation for actionOuterVlanValue."
+										::= { policyMapEntry 21 } 
+				actionOuterVlanValue	OBJECT-TYPE
+										SYNTAX		Integer32(1..4094)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The outer vlan will to added to the rule-matched traffics .It ranges 
+													from 1 to 4094.-1 is a invalid vlaue meaning OuterVlan will not be a 
+													action."
+										::= { policyMapEntry 22 }
+				actionInnerVlanOp		OBJECT-TYPE
+										SYNTAX		Integer32{
+													not-configured(0), 
+													replace(1),
+													add(2)
+													--delete(3)
+										}
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The operation for actionInnerVlanValue."
+										::= { policyMapEntry 23 }
+	
+				actionInnerVlanValue	OBJECT-TYPE
+										SYNTAX		Integer32(1..4094)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The inner vlan of the rule-matched traffics . It ranges from 1 to 
+										4094.-1 is a invalid vlaue meaning InnerVlan will not be a action."
+										::= { policyMapEntry 24 }
+				--actionRedirctPort		OBJECT-TYPE
+				--						SYNTAX		TruthValue
+				--						MAX-ACCESS	read-create
+				--						STATUS		current
+				--						DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionRedirctPort is set true, 
+				--							the action of redircting traffics will take effect."
+				--						::= { policyMapEntry 21 }
+								
+				actionRedirctPortValue	OBJECT-TYPE
+										SYNTAX		Integer32(1..29)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The logical redirect egress port number of rule-matched traffics. 
+													-1 is a invalid vlaue meaning RedirctPort will not be a action."
+										::= { policyMapEntry 25 }  
+				--actionMirrorSession		OBJECT-TYPE
+				--						SYNTAX		TruthValue
+				--						MAX-ACCESS	read-create
+				--						STATUS		current
+				--						DESCRIPTION	"policyMap action setting flag. True (1) or False (0).If actionMirrorSession is set true, 
+				--							the action of mirroring traffics to a session will take effect."
+				--						::= { policyMapEntry 20 }
+                --
+				actionMirrorSessionValue	OBJECT-TYPE
+										SYNTAX		Integer32(1..4)
+										MAX-ACCESS	read-write
+										STATUS		current
+										DESCRIPTION	"The session number of rule-matched traffics. 
+													It can be from 1 to 4.-1 is a invalid vlaue meaning 
+													MirrorSession will not be a action."
+										::= { policyMapEntry 26 }
+		       --actionMonitor	OBJECT-TYPE
+			   ---					SYNTAX		TruthValue	
+			   --					MAX-ACCESS	read-write
+				--					STATUS		current
+				--					DESCRIPTION	"The mirror action of rule taffics. True (1) or False (0).
+				--					 			 If the mirror action is set true, the traffics will be send to mirror
+				--					 			 destination port."
+				--					::= { policyMapEntry 21 }
+				actionStat	OBJECT-TYPE
+									SYNTAX		TruthValue	
+									MAX-ACCESS	read-write
+									STATUS		current
+									DESCRIPTION	"The stat action of rule taffics. True (1) or False (0).
+									 			 If the stat action is set true, the traffics will be statisticed."
+									::= { policyMapEntry 27 }
+		     	actionDiscardable	OBJECT-TYPE
+									SYNTAX		TruthValue	
+									MAX-ACCESS	read-write
+									STATUS		current
+									DESCRIPTION	"The discardable action of rule taffics. True (1) or False (0).
+									 			 If the discardable action is set true, the traffics will be discarded
+									 			 first when congestion occurs."
+									::= { policyMapEntry 28 }
+		         actionDrop	OBJECT-TYPE
+									SYNTAX		TruthValue	
+									MAX-ACCESS	read-write
+									STATUS		current
+									DESCRIPTION	"The drop action of rule taffics. True (1) or False (0).
+									 			 If the drop action is set true, the traffics will be drop."
+									::= { policyMapEntry 29 }				
+                 actionForward	OBJECT-TYPE
+									SYNTAX		TruthValue	
+									MAX-ACCESS	read-write
+									STATUS		current
+									DESCRIPTION	"The drop action of rule taffics. True (1) or False (0).
+									 			 If the forward action is set true, the traffics will be forward."
+									::= { policyMapEntry 30 }
+
+--  policyMapApplyTable  Table       
+policyMapApplyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF policyMapApplyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of policyMapApplyEntry entries. 
+				 Qos(Quality of Service) policyMap applyed on a port."
+		::= { qos 2 }
+
+		policyMapApplyEntry	OBJECT-TYPE
+				SYNTAX		policyMapApplyEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing a qos(Quality of Service) policyMap applyed on a port."
+				INDEX		{ portIndex }
+				::= { policyMapApplyTable 1 }
+
+		policyMapApplyEntry	::= SEQUENCE {
+							portIndex				Integer32,
+							policyName				DisplayString, 
+							policyApplyCancel       Integer32,
+  							policyDirection			TruthValue 
+					}
+
+			portIndex		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port number. 
+								 This number is a index of policy map apply Table. "
+						::= { policyMapApplyEntry 1 }  
+			policyName		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Policy map name."
+						::= { policyMapApplyEntry 2 }  
+			policyApplyCancel		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Set 1 to cancel this entry."
+						::= { policyMapApplyEntry 3 }  
+			policyDirection			OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Ingress(1) and egress(0)."
+						::= { policyMapApplyEntry 4 }  
+ 
+--  globalCosMapTable  Table       
+globalCosMapTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF globalCosMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Global cos map Table."
+		::= { qos 3 }
+
+		globalCosMapEntry	OBJECT-TYPE
+				SYNTAX		globalCosMapEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing a cos and queue."
+				INDEX		{ globalCosMapCos }
+				::= { globalCosMapTable 1 }
+
+		globalCosMapEntry	::= SEQUENCE {
+							globalCosMapCos				Integer32,
+							globalCosMapQueue			Integer32 
+					}
+
+			globalCosMapCos		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"Cos.It ranges 0 to 7
+								 This number is a index of global cos map Table."
+						::= { globalCosMapEntry 1 }  
+			globalCosMapQueue		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Queue.It ranges 1 to 8."
+						::= { globalCosMapEntry 2 }  
+
+--  portCosMapTable  Table       
+portCosMapTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF portCosMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Port cos map Table."
+		::= { qos 4 }
+
+		portCosMapEntry	OBJECT-TYPE
+				SYNTAX		portCosMapEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing a port, cos and queue."
+				INDEX		{ portPortIndex }
+				::= { portCosMapTable 1 }
+
+		portCosMapEntry	::= SEQUENCE {
+							portPortIndex			Integer32,
+							portCosMapCos			Integer32,  
+							portCosMapQueue			Integer32
+					}
+
+			portPortIndex		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"Port number.
+								 This number is a index of port cos map Table. "
+						::= { portCosMapEntry 1 }  
+			portCosMapCos		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"Cos.It ranges 0 to 7 "
+						::= { portCosMapEntry 2 }  
+ 			portCosMapQueue		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Queue.It ranges 1 to 8 "
+						::= { portCosMapEntry 3 }  
+
+ --  qosEntry        
+schedulerPolicy	OBJECT-TYPE
+		SYNTAX		INTEGER{
+		                        sp(1),
+		                        wrr(2),
+		                        wfq(3),
+		                        drr(4),
+		                        fcfs(5),
+		                        hybrid1(6),
+		                        hybrid12(7),
+		                        sp-exoam(8)
+		                        }
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION	"Queue schedule mode. 1-SP, 2-WRR, 3-WFQ, 4-DRR, 5-FCFS, 6-Hybrid1, 7-Hybrid2, 8-SP-EXOAM.  Default is SP."
+		::= { qos 5 }
+
+ --  wrrBandwidthTable  Table       
+wrrBandwidthTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF wrrBandwidthEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The weight for each queue,used in both WRR(in packet) and DRR(in kbytes) mode."
+		::= { qos 6 }
+
+		wrrBandwidthEntry	OBJECT-TYPE
+				SYNTAX		wrrBandwidthEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"The weight for each queue."
+				INDEX		{ queue }
+				::= { wrrBandwidthTable 1 }
+
+		wrrBandwidthEntry	::= SEQUENCE {
+							queue						Integer32,
+							maxBandwidthWeight			Integer32,  
+							bandwidthWeight				Integer32
+					}
+
+			queue					OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"Queue.
+								 This number is a index of port wrr bandwidth table."
+						::= { wrrBandwidthEntry 1 }  
+			maxBandwidthWeight		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"The max weight that can set."
+						::= { wrrBandwidthEntry 2 }  
+ 			bandwidthWeight		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Weight.It ranges 1 to maxBandwidthWeight."
+						::= { wrrBandwidthEntry 3 }  
+ 
+ --  portRateControlTable  Table       
+portRateControlTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF portRateControlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Port ratelimit Table."
+		::= { qos 7 }
+
+		portRateControlEntry	OBJECT-TYPE
+				SYNTAX		portRateControlEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"Each entry contains the ratelimit(both ingress and egress) for a port."
+				INDEX		{ portRateIndex }
+				::= { portRateControlTable 1 }
+
+		portRateControlEntry	::= SEQUENCE {
+							portRateIndex						Integer32,
+							portIngressType						Integer32,  
+							portEgressType						Integer32,
+                            portIngressRate                     Integer32,
+                            portEgressRate                      Integer32,
+                            portRateLimitUnitDescr              DisplayString,
+                            portIngressBurst                    Integer32,
+                            portEgressBurst                     Integer32
+					}
+
+			portRateIndex				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"Port number.
+								 This number is a index of port rate control table."
+						::= { portRateControlEntry 1 }  
+			portIngressType				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit ingress type.No limit(0),limit by kbytes(1),limit by percent(2). "
+						::= { portRateControlEntry 2 }  
+ 			portEgressType				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit egress type.No limit(0),limit by kbytes(1),limit by percent(2). "
+						::= { portRateControlEntry 3 }  
+			portIngressRate				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit ingress rate.When ingress type is 1,it ranges 1 to maxrate(described in portRateLimitUnitDescr).
+								 When ingress type is 2,it ranges 1 to 100."
+						::= { portRateControlEntry 4 }  
+			portEgressRate				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit egress rate.When egress type is 1,it ranges 1 to maxrate(described in portRateLimitUnitDescr).
+								 When egress type is 2,it ranges 1 to 100."
+ 						::= { portRateControlEntry 5 }  
+			portRateLimitUnitDescr		OBJECT-TYPE
+						SYNTAX		DisplayString
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"This string describes how to set rate when the type is 1. "
+						::= { portRateControlEntry 6 }  
+			portIngressBurst			OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit ingress burst.It has three levels composed of low,middle and high.
+								 When level is 1,it means high. And 2 means middle, while 3 means low."
+						::= { portRateControlEntry 7 }  
+			portEgressBurst				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit egress burst.It has three levels composed of low,middle and high.
+								 When level is 1,it means high. And 2 means middle, while 3 means low."
+ 						::= { portRateControlEntry 8 }  
+						
+ --  RED       
+RED	OBJECT IDENTIFIER ::= { qos 8 }
+
+			REDType				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"RED(Random Early Detection) Type.NONE(0), sRED(1) and WRED(2). "
+						::= { RED 1 }  
+			REDEnable				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED Enable.Enable(1) and disable(0)."
+						::= { RED 2 }  
+ 			REDQueue				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED queue.It ranges -1 to 7,and -1 means all queue is in RED."
+						::= { RED 3 }  
+			REDDroplevel				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED droplevel.Means the color in RED.It ranges -1 to 2.All color(-1),green(0),yellow(1) and red(2),"
+						::= { RED 4 }  
+			REDLowlimit				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED lowlimit by percent.Means the point to start discard.It ranges 0 to 100."
+						::= { RED 5 }  
+ 			REDSlope		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED slope.It has different meaning in sRED and WRED.
+								For sRED,it means drop rate,ranges 0 to 7.Number 0 means 100% drop,and others means probabilistic drop.
+								For WRED,it means droprate slope,ranges 0 to 90.The drop rate is 0 in low limit point,and then increase by slope."
+						::= { RED 6 }     						
+						
+
+ --  defaultCoS        
+defaultCoS	OBJECT-TYPE
+		SYNTAX		INTEGER(0..7)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION	"Port default cos value. The range is 0-7. Default is 0."
+		::= { qos 9 }
+
+						
+ 
+END

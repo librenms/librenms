@@ -1,0 +1,152 @@
+-- *****************************************************************
+-- NMS-POWER-EXT-MIB: NMS POWER EXT MIB
+--
+-- JUL 2011
+-- Edit by LIUQIANG
+-- Copyright (c) 2011 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-POWER-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF    
+        DisplayString				FROM RFC1213-MIB
+    nmsMgmt                                 FROM NMS-SMI;      
+    
+
+
+               powerExt         OBJECT IDENTIFIER ::= { nmsMgmt 251 }
+               
+              
+-- Notifications
+          power1Status OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          down(0), 
+                          up(1)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status: down(0), up(1) ."
+              ::= { powerExt 1 }
+          
+          power2Status OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          down(0), 
+                          up(1)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status , down(0), up(1) ."
+              ::= { powerExt 2 }
+
+        
+          
+
+	powerExtNotifications OBJECT IDENTIFIER
+                                ::= { powerExt 3 }
+
+
+	powerExtNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       power1Status,
+                       power2Status
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when power status changes."
+    		::= { powerExtNotifications 1 }
+                
+               PowerDeviceTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF  PowerDeviceTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of  Power-Device entries."
+                   ::= { powerExt 4 }
+
+               PowerDeviceTableEntry OBJECT-TYPE
+                   SYNTAX  PowerDeviceTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Power-Device ."
+                   INDEX { PowerDeviceIndex }
+               ::= { PowerDeviceTable 1 }
+
+               PowerDeviceTableEntry ::=
+                   SEQUENCE {
+                       PowerDeviceIndex
+                           INTEGER,
+                       PowerDeviceType
+                           INTEGER,
+                       PowerDeviceDescr
+                       	   DisplayString,
+                       PowerDeviceStatus
+                       	   INTEGER,
+                   	   PowerShelfNum
+                       	   INTEGER
+
+                  }
+              PowerDeviceIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of Power-Device"
+                   ::= { PowerDeviceTableEntry 1 }
+
+
+               PowerDeviceType OBJECT-TYPE
+                   SYNTAX  INTEGER  { 
+                                    EMPTY-SHELF(0)                                  
+                                   }
+
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of Power-Device ."
+                   ::= { PowerDeviceTableEntry 2 }
+
+
+
+               PowerDeviceDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Text description of this Power-Device."
+                   ::= { PowerDeviceTableEntry 3 }
+
+               PowerDeviceStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                                    ON(1),
+                                    OFF(2)                                    
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "When value is ON(1), that means Power-Device is working; when value is OFF(2) means Power-Device is out of working."
+                   ::= { PowerDeviceTableEntry 4 }
+                   
+                PowerShelfNum   OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                                    A(1),
+                                    B(2)                                    
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Powerdevice belong to which shelf."
+                   ::= { PowerDeviceTableEntry 5 }
+
+          
+                
+                
+              
+END
