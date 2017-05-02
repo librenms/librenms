@@ -119,7 +119,7 @@ class Sensor implements DiscoveryModule, PollerModule
             $sensor['sensor_oids'] = $this->oids;
             $sensors = array($sensor);
 
-            $prefetch = static::fetchSnmpData(device_by_id_cache($device_id), $sensors);
+            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), $sensors);
             $data = static::processSensorData($sensors, $prefetch);
 
             $this->current = current($data);
@@ -291,7 +291,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
         // pre-fetch all standard sensors
         $standard_sensors = call_user_func_array('array_merge', $sensors);
-        $pre_fetch = static::fetchSnmpData($os->getDevice(), $standard_sensors);
+        $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
 
         // poll standard sensors
         foreach ($sensors as $type => $type_sensors) {

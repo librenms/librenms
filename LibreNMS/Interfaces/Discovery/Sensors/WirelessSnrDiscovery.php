@@ -29,7 +29,7 @@ interface WirelessSnrDiscovery
 {
     /**
      * Discover wireless SNR.  This is in dB. Type is snr.
-     * Formula: SNR = Signal/Rx Power - Noise Floor
+     * Formula: SNR = Signal or Rx Power - Noise Floor
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

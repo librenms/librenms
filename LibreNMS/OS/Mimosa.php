@@ -30,17 +30,17 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSpeedDiscovery;
 use LibreNMS\OS;
 
 class Mimosa extends OS implements
     WirelessErrorRatioDiscovery,
     WirelessFrequencyDiscovery,
-    WirelessPowerDiscovery,
     WirelessNoiseFloorDiscovery,
-    WirelessRateDiscovery,
-    WirelessSnrDiscovery
+    WirelessPowerDiscovery,
+    WirelessSnrDiscovery,
+    WirelessSpeedDiscovery
 {
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
@@ -125,6 +125,7 @@ class Mimosa extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
+        // FIXME: is Noise different from Noise Floor?
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxNoise', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
 
@@ -152,10 +153,11 @@ class Mimosa extends OS implements
     public function discoverWirelessPower()
     {
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaTxPower', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxPower', $oids, 'MIMOSA-NETWORKS-BFIVE-MIB');
 
         $sensors = array();
-        $tx_oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaTxPower', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
-        foreach ($tx_oids as $index => $entry) {
+        foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -165,11 +167,6 @@ class Mimosa extends OS implements
                 sprintf('Tx Power: %s Chain', $this->getPolarization($polar[$index])),
                 $entry['mimosaTxPower']
             );
-        }
-
-
-        $rx_oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxPower', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
-        foreach ($rx_oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),

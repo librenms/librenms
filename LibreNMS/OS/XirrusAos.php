@@ -86,12 +86,12 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->discoverSensor('noise-floor', 'realtimeMonitorIfaceName', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
+        return $this->discoverSensor('noise-floor', 'realtimeMonitorNoiseFloor', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
     }
 
     /**
      * Discover wireless SNR.  This is in dB. Type is snr.
-     * Formula: SNR = Signal/Rx Power - Noise Floor
+     * Formula: SNR = Signal or Rx Power - Noise Floor
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

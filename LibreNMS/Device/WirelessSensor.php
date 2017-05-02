@@ -151,23 +151,17 @@ class WirelessSensor extends Sensor
                 'unit' => '%',
                 'icon' => 'percent',
             ),
+            'speed' => array(
+                'short' => 'Speed',
+                'long' => 'TX/RX Speed',
+                'unit' => 'bps',
+                'icon' => 'tachometer',
+            ),
             'ccq' => array(
                 'short' => 'CCQ',
                 'long' => 'Client Connection Quality',
                 'unit' => '%',
                 'icon' => 'wifi',
-            ),
-            'noise' => array(
-                'short' => 'Noise',
-                'long' => 'Noise',
-                'unit' => 'dB',
-                'icon' => 'signal',
-            ),
-            'noise-floor' => array(
-                'short' => 'Noise Floor',
-                'long' => 'Noise Floor',
-                'unit' => 'dBm/Hz',
-                'icon' => 'signal',
             ),
             'snr' => array(
                 'short' => 'SNR',
@@ -179,6 +173,18 @@ class WirelessSensor extends Sensor
                 'short' => 'RSSI',
                 'long' => 'Received Signal Strength Indicator',
                 'unit' => 'dBm',
+                'icon' => 'signal',
+            ),
+            'power' => array(
+                'short' => 'Power/Signal',
+                'long' => 'TX/RX Power or Signal',
+                'unit' => 'dBm',
+                'icon' => 'bolt',
+            ),
+            'noise-floor' => array(
+                'short' => 'Noise Floor',
+                'long' => 'Noise Floor',
+                'unit' => 'dBm/Hz',
                 'icon' => 'signal',
             ),
             'error-ratio' => array(
@@ -193,35 +199,17 @@ class WirelessSensor extends Sensor
                 'unit' => 'bps',
                 'icon' => 'exclamation-triangle',
             ),
-            'rate' => array(
-                'short' => 'Rate',
-                'long' => 'TX/RX Rate',
-                'unit' => 'bps',
-                'icon' => 'tachometer',
-            ),
-            'signal' => array(
-                'short' => 'Signal',
-                'long' => 'Signal Strength',
-                'unit' => 'dBm',
-                'icon' => 'signal',
-            ),
-            'power' => array(
-                'short' => 'Power',
-                'long' => 'TX/RX Power',
-                'unit' => 'dBm',
-                'icon' => 'bolt',
+            'frequency' => array(
+                'short' => 'Frequency',
+                'long' => 'Frequency',
+                'unit' => 'MHz',
+                'icon' => 'line-chart',
             ),
             'distance' => array(
                 'short' => 'Distance',
                 'long' => 'Distance',
                 'unit' => 'km',
                 'icon' => 'space-shuttle',
-            ),
-            'frequency' => array(
-                'short' => 'Frequency',
-                'long' => 'Frequency',
-                'unit' => 'MHz',
-                'icon' => 'line-chart',
             ),
         );
 
