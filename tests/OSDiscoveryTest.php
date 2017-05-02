@@ -859,9 +859,9 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('gamatronicups');
     }
 
-    public function testGedigitalenergy()
+    public function testGeups()
     {
-        $this->checkOS('ge-digitalenergy');
+        $this->checkOS('ge-ups');
     }
 
     public function testGeistWatchdog()
