@@ -2,7 +2,7 @@ source: Developing/os/Test-Units.md
 
 We have a testing unit for new OS', please ensure you add a test for any new OS' or updates to existing OS discovery.
 
-All that you need to do is create an snmprec file in tests/snmpsim with the proper name. If the adding the first test for
+All that you need to do is create an snmprec file in tests/snmpsim with the proper name. If adding the first test for
 this os, simply use the os name `pulse.snmprec` for example.  If you need to add multiple test files, you can add an
 underscore after the os name followed by a description, typically a model name.  For example: `pulse_mag2600.snmprec`.
 You can copy `skel.snmprec` to your intended name and fill in the data to make things a little easier.
