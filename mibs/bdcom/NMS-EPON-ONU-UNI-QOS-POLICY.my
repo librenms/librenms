@@ -1,0 +1,95 @@
+-- *****************************************************************
+-- NMS-EPON-Onu-Uni-Qos-Policy.MIB:  NMS LLID Onu Uni Qos Policy MIB file
+-- MAR 2010
+-- *****************************************************************
+--
+
+NMS-EPON-ONU-UNI-QOS-POLICY DEFINITIONS ::= BEGIN
+
+            IMPORTS
+            IpAddress
+				FROM RFC1155-SMI
+		    OBJECT-TYPE
+				FROM RFC-1212
+            DisplayString
+				FROM RFC1213-MIB
+		    nmsEPONGroup
+				FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,QosPolicy
+		    	FROM SNMPv2-TC;
+          
+                  nmsEponOnuUniQosPolicy        OBJECT IDENTIFIER ::= { nmsEPONGroup 106}
+             
+                nmsEponOnuUniQosPolicyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF nmsEponOnuUniQosPolicyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of nmsEponOnuUniQosPolicyEntry entries. 
+				 The port-based security mac address information."
+					::= { nmsEponOnuUniQosPolicy 1 }		
+	                       
+		nmsEponOnuUniQosPolicyEntry	OBJECT-TYPE
+				SYNTAX		nmsEponOnuUniQosPolicyEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	
+							"Policy Map Apply operation.(OnuIfIndex_OnuQosPolicy)to Apply a  
+		                   Policy Map.For example,'07_q1'will apply the policy map 'q1' to Onu which pon port diid is 7.
+		                   For 3305, the EPON will return a error symbol to indicate 
+		                   a unsuccessful operation. " 				
+		                 INDEX		{ OnuIfIndex,OnuUniIfIndex,OnuQosPolicy}
+				::= { nmsEponOnuUniQosPolicyTable 1 }
+       
+		nmsEponOnuUniQosPolicyEntry	::= SEQUENCE { 
+                   	OnuIfIndex		INTEGER,
+                   	OnuUniIfIndex           INTEGER,        
+		       	OnuUniQosPolicy		DisplayString,
+		        OnuUniQosPolicyCreate	INTEGER, 
+                        OnuUniQosPolicyDel	TruthValue
+  				}
+            
+		  
+               OnuIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "LLID interface id, unique in system."
+                   ::= { nmsEponOnuUniQosPolicyEntry 1 } 
+               
+               OnuUniIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "Onu Uni interface id, unique in system."
+                   ::= { nmsEponOnuUniQosPolicyEntry 2 } 
+               
+               OnuUniQosPolicy OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "A unique string for each Policy Map up to 20 characters. 
+ 							This string is part of index of Table."
+                   ::= { nmsEponOnuUniQosPolicyEntry 3 } 
+
+               OnuUniQosPolicyCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+		                   "Onu  Policy Map create flag,True(1) will delete the Policy Map. " 
+		           ::= { nmsEponOnuUniQosPolicyEntry 4 }  
+               OnuUniQosPolicyDel OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Onu  Policy Map delete flag,True(1) will delete the Policy Map."
+                   ::= { nmsEponOnuUniQosPolicyEntry 5} 
+             
+             
+
+              	
+END		

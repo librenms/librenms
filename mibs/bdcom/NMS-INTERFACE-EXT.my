@@ -1,0 +1,1093 @@
+-- file: NMS-INTERFACE-EXT.mib
+-- Nov. 26 2008
+-- liuqiang@nms.com.cn
+-- Nov. 1 2011
+-- haojiangtao@nms.com.cn
+
+NMS-INTERFACE-EXT DEFINITIONS ::= BEGIN
+
+            IMPORTS
+    			Counter
+           			FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212
+			ifIndex
+				FROM RFC1213-MIB
+			nmsMgmt
+				FROM NMS-SMI
+            MacAddress,TruthValue,DisplayString
+				FROM SNMPv2-TC;
+ nmsIfExtMIB  MODULE-IDENTITY
+        LAST-UPDATED    "20030918"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+
+        DESCRIPTION
+            "This MIB module defines the extended interface access properties."
+        ::= { nmsMgmt 64 }
+
+	nmsIfExtObjects   OBJECT IDENTIFIER ::= { nmsIfExtMIB 1 }
+
+
+
+          ifExtTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF ifExtEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { nmsIfExtObjects 1 }
+
+          ifExtEntry OBJECT-TYPE
+              SYNTAX  ifExtEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing objects of interface properties in NMS device ."
+              INDEX   { ifExtIndex }
+              ::= { ifExtTable 1 }
+
+          ifExtEntry ::=
+              SEQUENCE {
+                  ifExtIndex    INTEGER,
+                  ifExtCRCCount    Counter,
+                  ifDefaultCos   INTEGER,
+                  ifBFlowCtrl    INTEGER
+              }
+
+          ifExtIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each interface, which is cited from ifIndex property in ifTable."
+
+              ::= { ifExtEntry 1 }
+
+          ifExtCRCCount OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Count of interface discarded control message "
+              ::= { ifExtEntry 2 }
+
+          ifDefaultCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface default CoS.The valid value should be 0-7.Value 8 means off."
+              ::= { ifExtEntry 3 }
+
+          ifBFlowCtrl OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              on(1),
+                              off(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Port flow control.1-on.2-off."
+              ::= { ifExtEntry 4 }
+
+
+	  	nmsIfExtStates   OBJECT IDENTIFIER ::= { nmsIfExtMIB 2 }
+
+          ifExtStatesTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF ifExtStatesEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface states entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { nmsIfExtStates 1 }
+
+          ifExtStatesEntry OBJECT-TYPE
+              SYNTAX  ifExtStatesEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing interface states in NMS device ."
+              INDEX   { ifExtIndex }
+              ::= { ifExtStatesTable 1 }
+
+          ifExtStatesEntry ::=
+              SEQUENCE {
+                  ifExtIndex	INTEGER,
+                  ifExtSpeed	INTEGER,
+                  ifExtDuplex	INTEGER,
+                  ifExtAutoneg	INTEGER
+              }
+
+          ifExtIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each interface."
+
+              ::= { ifExtStatesEntry 1 }
+
+           ifExtSpeed OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Speed configure.Only can be set when ifExtAutoneg is 0.
+                      Auto(1) is default value,10Mbps(10),100Mbps(100),1000Mbps(1000),10000Mbps(10000)."
+
+              ::= { ifExtStatesEntry 2 }
+
+          ifExtDuplex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Duplex configure.Only can be set when ifExtAutoneg is 0.
+                      Auto(1) is default value,Half(2) and Full(3)."
+
+              ::= { ifExtStatesEntry 3 }
+
+          ifExtAutoneg OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Auto negotiation configure.
+                      Enable(1) is default value,which means speed and duplex can't be set.
+                      Set a value 1 also make speed and duplex to be Auto(1).
+                      Disable(0) means speed and duplex can be set now."
+
+              ::= { ifExtStatesEntry 4 }
+
+	  	nmsIfExtFdb   OBJECT IDENTIFIER ::= { nmsIfExtMIB 3 }
+
+          ifExtFdbTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF ifExtFdbEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of learned mac address for interfaces."
+              ::= { nmsIfExtFdb 1 }
+
+          ifExtFdbEntry OBJECT-TYPE
+              SYNTAX  ifExtFdbEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing learned mac address for interfaces in NMS device ."
+              INDEX   { ifExtIndex }
+              ::= { ifExtFdbTable 1 }
+
+          ifExtFdbEntry ::=
+              SEQUENCE {
+                  ifExtIndex	INTEGER,
+                  ifExtVid		INTEGER,
+                  ifExtAddress	MacAddress
+              }
+
+          ifExtIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each interface."
+
+              ::= { ifExtFdbEntry 1 }
+
+           ifExtVid OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Vlan for the mac."
+
+              ::= { ifExtFdbEntry 2 }
+
+          ifExtAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Mac address."
+
+              ::= { ifExtFdbEntry 3 }
+
+
+	  	nmsIfExtStatistics   OBJECT IDENTIFIER ::= { nmsIfExtMIB 4 }
+
+          ifExtStatisticsTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfExtStatisticsEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of port up/down statistics and enable/disable of sending trap for interfaces."
+              ::= { nmsIfExtStatistics 1 }
+
+          ifExtStatisticsEntry OBJECT-TYPE
+              SYNTAX  IfExtStatisticsEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing port up/down statistics and enable/disable of sending trap for interfaces."
+              INDEX   { ifExtStatisticsIndex }
+              ::= { ifExtStatisticsTable 1 }
+
+          IfExtStatisticsEntry ::=
+              SEQUENCE {
+                  ifExtStatisticsIndex	INTEGER,
+                  ifExtDesc		DisplayString,
+                  ifExtPortUpCount      INTEGER,
+                  ifExtPortDownCount      INTEGER,
+                  ifMedium              INTEGER,
+                  ifIn5MinBitRate       Counter64,
+                  ifIn5MinPktRate       Counter64,
+                  ifOut5MinBitRate       Counter64,
+                  ifOut5MinPktRate       Counter64,
+                  ifIPMACBridgedPckts       Counter64,
+                  ifIPMACRoutedPckts       Counter64,
+                  ifIPMCInDroppedPckts       Counter64,
+                  ifIPMCOutDroppedPckts       Counter64,
+                  ifEherStatsPkts64Octets       Counter64,
+                  ifEherStatsPkts65to127Octets       Counter64,
+                  ifEherStatsPkts128to255Octets       Counter64,
+                  ifEherStatsPkts256to511Octets       Counter64,
+                  ifEherStatsPkts512to1023Octets       Counter64,
+                  ifEherStatsPkts1024to1518Octets       Counter64,
+                  ifEherStatsPkts1519to1521Octets       Counter64,
+                  ifEherStatsPkts1522to2047Octets       Counter64,
+                  ifEherStatsPkts2048to4095Octets       Counter64,
+                  ifEherStatsPkts4096to9216Octets       Counter64,
+                  ifEherStatsUndersizePkts              Counter64,
+                  ifEherStatsOversizePkts               Counter64,
+                  ifEherStatsJabbers                    Counter64,
+                  ifEherStatsPkts                       Counter64,
+                  ifEherStatsOcters                     Counter64,
+                  ifEherStatsFragments                  Counter64,
+                  ifEherStatsBoardcastPkts              Counter64,
+                  iftherStatsMulticastPkts              Counter64,
+                  ifEherStatsDropEvents                 Counter64,
+                  ifEherStatsConlisions                 Counter64,
+                  ifEherStatsCRCAlignErrors             Counter64,
+                  ifHCInMulticastPkts                   Counter64,
+                  ifHCInBroadcastPkts                   Counter64,
+                  ifHCOutMulticastPkts                  Counter64,
+                  ifHCOutBroadcastPkts                  Counter64,
+                  ifDot3StatsAlignmentErrors            Counter64,
+                  ifDot3StatsFCSErrors                  Counter64,
+                  ifDot3StatsSingleCollisionFrames      Counter64,
+                  ifDot3StatsMultipleCollisionFrames    Counter64,
+                  ifDot3StatsSQETTestErrors             Counter64,
+                  ifDot3StatsDifferedTransmissions      Counter64,
+                  ifDot3StatsLateCollisions             Counter64,
+                  ifDot3StatsExecssiveCollisions        Counter64,
+                  ifDot3StatsInternalMacTransmitErrors  Counter64,
+                  ifDot3StatsCarrierSenseErrors         Counter64,
+                  ifDot3StatsFrameTooLongs              Counter64,
+                  ifDot3StatsInternalMacReceiveErrors   Counter64,
+                  ifDot3StatsSymbolErrors               Counter64,
+                  ifDot3StatsControllnUnknownOpcodes	Counter64,
+                  ifDot3StatsInPauseFrames				Counter64,
+                  ifDot3StatsOutPauseFrames				Counter64,
+                  ifEtherStatsTXNoErrors				Counter64,
+                  ifEtherStatsRXNoErrors				Counter64,
+                  ifMiscIpv4InOctets					Counter64,
+                  ifMiscIpv4OutOctets					Counter64,
+                  ifMiscIpv6InOctets					Counter64,
+                  ifMiscIpv6OutOctets					Counter64,
+                  ifMiscIpv4InPkts						Counter64,
+                  ifMiscIpv4OutPkts						Counter64,
+                  ifMiscIpv6InPkts						Counter64,
+                  ifMiscIpv6OutPkts						Counter64
+              }
+          ifExtStatisticsIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each interface."
+
+              ::= { ifExtStatisticsEntry 1 }
+
+          ifExtDesc OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A port description for each interface."
+
+              ::= { ifExtStatisticsEntry 2 }
+
+          ifExtPortUpCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A count for port up since device is up."
+
+              ::= { ifExtStatisticsEntry 3 }
+
+          ifExtPortDownCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A count for port down since device is up."
+
+              ::= { ifExtStatisticsEntry 4 }
+
+          ifMedium OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              fiber(1),
+                              copper(2),
+                              auto(4)
+                             }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface medium. fiber(1), copper(2), auto(4)."
+
+              ::= { ifExtStatisticsEntry 5 }
+
+          ifIn5MinBitRate OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Mean input bit rate of the last 5 minutes."
+
+              ::= { ifExtStatisticsEntry 6 }
+
+          ifIn5MinPktRate OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Mean input packet rate of the last 5 minutes."
+
+              ::= { ifExtStatisticsEntry 7 }
+
+          ifOut5MinBitRate OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Mean output bit rate of the last 5 minutes."
+
+              ::= { ifExtStatisticsEntry 8 }
+
+          ifOut5MinPktRate OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Mean output packet rate of the last 5 minutes."
+
+              ::= { ifExtStatisticsEntry 9 }
+
+          ifIPMACBridgedPckts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "IP multicast layer 2 switching packges count."
+
+              ::= { ifExtStatisticsEntry 10 }
+
+          ifIPMACRoutedPckts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "IP multicast routing packges count."
+
+              ::= { ifExtStatisticsEntry 11 }
+
+          ifIPMCInDroppedPckts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "IP multicast receiving dropped packges count."
+
+              ::= { ifExtStatisticsEntry 12 }
+
+          ifIPMCOutDroppedPckts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "IP multicast sending dropped packges count."
+
+              ::= { ifExtStatisticsEntry 13 }
+
+          ifEherStatsPkts64Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 0 to 64."
+
+              ::= { ifExtStatisticsEntry 14 }
+
+          ifEherStatsPkts65to127Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 65 to 127."
+
+              ::= { ifExtStatisticsEntry 15 }
+
+          ifEherStatsPkts128to255Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 128 to 255."
+
+              ::= { ifExtStatisticsEntry 16 }
+
+          ifEherStatsPkts256to511Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 256 to 511."
+
+              ::= { ifExtStatisticsEntry 17 }
+
+          ifEherStatsPkts512to1023Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 512 to 1023."
+
+              ::= { ifExtStatisticsEntry 18 }
+
+          ifEherStatsPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 1024 to 1518."
+
+              ::= { ifExtStatisticsEntry 19 }
+
+          ifEherStatsPkts1519to1521Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 1519 to 1521."
+
+              ::= { ifExtStatisticsEntry 20 }
+
+          ifEherStatsPkts1522to2047Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 1522 to 2047."
+
+              ::= { ifExtStatisticsEntry 21 }
+
+          ifEherStatsPkts2048to4095Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 2048 to 4095."
+
+              ::= { ifExtStatisticsEntry 22 }
+
+          ifEherStatsPkts4096to9216Octets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Ethernet packages count size from 4096 to 9216."
+
+              ::= { ifExtStatisticsEntry 23 }
+
+          ifEherStatsUndersizePkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages count below size ."
+              ::= { ifExtStatisticsEntry 24 }
+
+          ifEherStatsOversizePkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages count over size ."
+              ::= { ifExtStatisticsEntry 25 }
+
+          ifEherStatsJabbers OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages count over size and FCS error ."
+              ::= { ifExtStatisticsEntry 26 }
+
+          ifEherStatsPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages count totally."
+              ::= { ifExtStatisticsEntry 27 }
+
+          ifEherStatsOcters OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet octets count totally."
+              ::= { ifExtStatisticsEntry 28 }
+
+          ifEherStatsFragments OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages count with fragment."
+              ::= { ifExtStatisticsEntry 29 }
+
+          ifEherStatsBoardcastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with broadcasting."
+              ::= { ifExtStatisticsEntry 30 }
+
+          iftherStatsMulticastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with multicasting."
+              ::= { ifExtStatisticsEntry 31 }
+
+          ifEherStatsDropEvents OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with drop events."
+              ::= { ifExtStatisticsEntry 32 }
+
+          ifEherStatsConlisions OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with collisions."
+              ::= { ifExtStatisticsEntry 33 }
+
+          ifEherStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with CRC alignment error."
+              ::= { ifExtStatisticsEntry 34 }
+
+          ifHCInMulticastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with receiving multicast."
+              ::= { ifExtStatisticsEntry 35 }
+
+          ifHCInBroadcastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with receiving broadcasting."
+              ::= { ifExtStatisticsEntry 36 }
+
+          ifHCOutMulticastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with sending multicast."
+              ::= { ifExtStatisticsEntry 37 }
+
+          ifHCOutBroadcastPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packages with sending broadcasting."
+              ::= { ifExtStatisticsEntry 38 }
+
+          ifDot3StatsAlignmentErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 packages with alignment error."
+              ::= { ifExtStatisticsEntry 39 }
+
+          ifDot3StatsFCSErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 packages with FCS error."
+              ::= { ifExtStatisticsEntry 40 }
+
+          ifDot3StatsSingleCollisionFrames OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with single collision."
+              ::= { ifExtStatisticsEntry 41 }
+
+          ifDot3StatsMultipleCollisionFrames OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with multiple collision ."
+              ::= { ifExtStatisticsEntry 42 }
+
+          ifDot3StatsSQETTestErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with SQET test error ."
+              ::= { ifExtStatisticsEntry 43 }
+
+          ifDot3StatsDifferedTransmissions OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with SQET test error ."
+              ::= { ifExtStatisticsEntry 44 }
+
+          ifDot3StatsLateCollisions OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with later collisions."
+              ::= { ifExtStatisticsEntry 45 }
+
+          ifDot3StatsExecssiveCollisions OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with excessive collisions."
+              ::= { ifExtStatisticsEntry 46 }
+
+          ifDot3StatsInternalMacTransmitErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with internal mac transmitting error."
+              ::= { ifExtStatisticsEntry 47 }
+
+          ifDot3StatsCarrierSenseErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with carrier sense error."
+              ::= { ifExtStatisticsEntry 48 }
+
+          ifDot3StatsFrameTooLongs OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with too long size ."
+              ::= { ifExtStatisticsEntry 49 }
+
+           ifDot3StatsInternalMacReceiveErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with internal mac receive error."
+              ::= { ifExtStatisticsEntry 50 }
+
+           ifDot3StatsSymbolErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with symbol error."
+              ::= { ifExtStatisticsEntry 51 }
+
+           ifDot3StatsControllnUnknownOpcodes OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 frames with unknown opcodes."
+              ::= { ifExtStatisticsEntry 52 }
+
+           ifDot3StatsInPauseFrames OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 pause frames received."
+              ::= { ifExtStatisticsEntry 53 }
+
+           ifDot3StatsOutPauseFrames OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet dot 3 pause frames sent."
+              ::= { ifExtStatisticsEntry 54 }
+
+           ifEtherStatsTXNoErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packets send no error."
+              ::= { ifExtStatisticsEntry 55 }
+
+           ifEtherStatsRXNoErrors OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ethernet packets send no error."
+              ::= { ifExtStatisticsEntry 56 }
+
+           ifMiscIpv4InOctets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv4 octets received."
+              ::= { ifExtStatisticsEntry 57 }
+
+           ifMiscIpv4OutOctets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv4 octets sent."
+              ::= { ifExtStatisticsEntry 58 }
+
+           ifMiscIpv6InOctets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv6 octets received."
+              ::= { ifExtStatisticsEntry 59 }
+
+           ifMiscIpv6OutOctets OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv6 octets sent."
+              ::= { ifExtStatisticsEntry 60 }
+
+           ifMiscIpv4InPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv4 packets received."
+              ::= { ifExtStatisticsEntry 61 }
+
+           ifMiscIpv4OutPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv4 packets sent."
+              ::= { ifExtStatisticsEntry 62 }
+
+           ifMiscIpv6InPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv6 packets received."
+              ::= { ifExtStatisticsEntry 63 }
+
+           ifMiscIpv6OutPkts OBJECT-TYPE
+              SYNTAX  Counter64
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Ipv6 packets sent."
+              ::= { ifExtStatisticsEntry 64 }
+
+	   nmsIfException   OBJECT IDENTIFIER ::= { nmsIfExtStatistics 2 }
+
+          ifDisableCause OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              loopback_detected(1),
+                              bpdu_guard(2),
+                              oam_remote_failure(3),
+                              oam_link_monitor(4),
+                              system_mac_addr_filtered(5),
+                              inconsistent_ring_port(6),
+                              link_unstable(7)
+                             }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface exception cause. That maybe exception or recover from exception."
+              ::= { nmsIfException 1 }
+
+          ifDisableAction OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              disable(1),
+                              enable(2)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface action. disable(1), enable(2)."
+              ::= { nmsIfException 2 }
+
+          ifDisableRecoveryTime OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface disable recovery time. Unit is second."
+              ::= { nmsIfException 3 }
+
+
+
+
+	ifExceptionNotifications OBJECT IDENTIFIER  ::= { nmsIfException 4 }
+
+	ifExceptionNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ifExtStatisticsIndex,
+                       ifDisableCause,
+                       ifDisableAction,
+                       ifDisableRecoveryTime
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when port exception or recovery from exception occurs."
+    		::= { ifExceptionNotifications 1 }
+
+
+          ifExtGlobalLinkTrapSwitch OBJECT-TYPE
+              SYNTAX  INTEGER{
+                            global_disable(0),
+              		    global_enable(1)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A global value for setting port link trap sending operation. 0: disable sending link up/down trap, 1: enable sending link up/down trap."
+              ::= { nmsIfExtStatistics 3 }
+
+	  	nmsIfExtProtect   OBJECT IDENTIFIER ::= { nmsIfExtMIB 5 }
+
+          ifExtProtectTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfExtProtectEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of port Protect ."
+              ::= { nmsIfExtProtect 1 }
+
+          ifExtProtectEntry OBJECT-TYPE
+              SYNTAX  IfExtProtectEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing port Protect enable/disable."
+              INDEX   { ifExtProtectIndex }
+              ::= { ifExtProtectTable 1 }
+
+          IfExtProtectEntry ::=
+              SEQUENCE {
+                  ifExtProtectIndex	INTEGER,
+                  ifExtProtectStatus    INTEGER
+              }
+
+          ifExtProtectIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each interface."
+
+              ::= { ifExtProtectEntry 1 }
+
+          ifExtProtectStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      on(1),
+              		      off(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface protected Status. "
+
+              ::= { ifExtProtectEntry 2 }
+
+	  nmsIfDscpMap   OBJECT IDENTIFIER ::= { nmsIfExtMIB 6 }
+
+          nmsIfDscpMapTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NMSIfDscpMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of dscp map ."
+              ::= { nmsIfDscpMap 1 }
+
+          nmsIfDscpMapEntry OBJECT-TYPE
+              SYNTAX  NMSIfDscpMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing dscp map."
+              INDEX   { nmsIfDscpMapIndex }
+              ::= { nmsIfDscpMapTable 1 }
+
+          NMSIfDscpMapEntry ::=
+              SEQUENCE {
+                  nmsIfDscpMapIndex	INTEGER,
+                  dscpDscpMap   	INTEGER,
+                  dscpPrioMap		INTEGER
+              }
+
+          nmsIfDscpMapIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each dscp."
+
+              ::= { nmsIfDscpMapEntry 1 }
+
+          dscpDscpMap OBJECT-TYPE
+              SYNTAX  INTEGER(0..64)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "DSCP to DSCP map.The valid value should be 0-63.Value 64 means off."
+
+              ::= { nmsIfDscpMapEntry 2 }
+
+          dscpPrioMap OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "DSCP to priority map.The valid value should be 0-7.Value 8 means off."
+
+              ::= { nmsIfDscpMapEntry 3 }
+
+	  nmsIfCreateInterface   OBJECT IDENTIFIER ::= { nmsIfExtMIB 7 }
+
+	   nmsIfCrtIfCommand   OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              emptycommand(0),
+                              prepare(1),
+                              cancel(2),
+                              create(3),
+                              destroy(4)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Command"
+	   		::= { nmsIfCreateInterface 1 }  
+
+	   nmsIfCrtIfType   OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              emptytype(0),
+                              vlan(1),
+                              portchannel(2),
+                              null(3),
+                              loopback(4),
+                              supervlan(5)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "interface type"
+	   		::= { nmsIfCreateInterface 2 }  
+
+	   nmsIfCrtIfSequence   OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Sequence"
+	   		::= { nmsIfCreateInterface 3 }
+
+
+END
+

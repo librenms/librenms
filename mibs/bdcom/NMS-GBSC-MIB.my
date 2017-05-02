@@ -1,0 +1,162 @@
+NMS-GBSC-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+            FROM SNMPv2-SMI
+        
+     	Gauge,TimeTicks
+      		FROM RFC1155-SMI
+                  
+        DisplayString
+			FROM RFC1213-MIB
+        nmsMgmt
+            FROM NMS-SMI 
+        PhysAddress 
+            FROM SNMPv2-TC;
+                        
+nmsGbscHostMIB  MODULE-IDENTITY
+        LAST-UPDATED    "20090317"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+                "Definition for host 
+                "
+        ::= { nmsMgmt 101 }
+
+
+
+nmsGbscHostsObjects   OBJECT IDENTIFIER ::= { nmsGbscHostMIB 1 } 
+
+	--new define for 17 series broadband router: nat host table        
+	          NMSGBSCHostsEntry ::= SEQUENCE {
+			    nmsGBSCHostsID                      INTEGER,
+			    nmsGBSCHostsAddr                    IpAddress,  
+			    nmsGBSCHostsCurrentNatItems         INTEGER, 
+			    nmsGBSCHostsMaxTranslationItems     INTEGER,
+			    nmsGBSCHostsUpLoadRate              INTEGER,	
+			    nmsGBSCHostsDownLoadRate			   INTEGER,
+			    nmsGBSCHostsUpLoadTotalFlow     	   Counter,
+			    nmsGBSCHostsDownLoadTotalFlow	   Counter,
+			    nmsGBSCHostsUpLoadLostPks     	   Counter,
+			    nmsGBSCHostsDownLoadLostPks	       Counter,      
+			    nmsGBSCHostsServiceStatus           BIT STRING
+			    
+		  }    
+		  
+         nmsGBSCHostsTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NMSGBSCHostsEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "the index of GBSC Hosts Table."
+              ::= { nmsGbscHostsObjects 1 }          
+              
+          nmsGBSCHostsEntry OBJECT-TYPE
+              SYNTAX  NMSGBSCHostsEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about an active GBSC Hosts on this NAT device."
+              INDEX   { nmsGBSCHostsID }
+              ::= { nmsGBSCHostsTable 1 }
+              
+		  nmsGBSCHostsID OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The ID for this GBSC Hosts."
+			    ::= { nmsGBSCHostsEntry 1 }
+			    
+		  nmsGBSCHostsAddr OBJECT-TYPE
+			    SYNTAX     IpAddress
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The IP address for certain GBSC host"
+			    ::= { nmsGBSCHostsEntry 2 }
+
+		  nmsGBSCHostsCurrentNatItems OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-write
+			    STATUS     current
+			    DESCRIPTION
+			            "The current translation items for every GBSC host."
+			    ::= { nmsGBSCHostsEntry 3 }
+			    
+		  nmsGBSCHostsMaxTranslationItems OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-write
+			    STATUS     current
+			    DESCRIPTION
+			            "The maximal translation items for every GBSC host."
+			    ::= { nmsGBSCHostsEntry 4 }
+
+		  nmsGBSCHostsUpLoadRate OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The upload rate for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 5 }
+
+		  nmsGBSCHostsDownLoadRate OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The download rate for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 6 }
+          
+          nmsGBSCHostsUpLoadTotalFlow OBJECT-TYPE
+			    SYNTAX     Counter
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The total upload flow for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 7 }
+
+		  nmsGBSCHostsDownLoadTotalFlow OBJECT-TYPE
+			    SYNTAX     Counter
+			    ACCESS	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The total download flow for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 8 }     
+              
+              
+          nmsGBSCHostsUpLoadLostPks OBJECT-TYPE
+			    SYNTAX     Counter
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The total upload lost packages for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 9 }      
+			    
+          nmsGBSCHostsDownLoadLostPks OBJECT-TYPE
+			    SYNTAX     Counter
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The total download lost packages for certain GBSC host."
+			    ::= { nmsGBSCHostsEntry 10 }
+			    
+         nmsGBSCHostsServiceStatus OBJECT-TYPE
+              SYNTAX  BIT STRING
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The GBSC host Service status.Every bit means a service status."
+              ::= { nmsGBSCHostsEntry 11 }
+     
+
+ 
+
+
+           
+END
+
