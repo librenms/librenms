@@ -8,5 +8,5 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectId_regex:
-        - '/^.1.3.6.1.4.1.1916.2.(6[5-9]|[7-9][0-9]|[0-9]{3})$/'
+    - sysObjectId:
+        - .1.3.6.1.4.1.1916.2.
