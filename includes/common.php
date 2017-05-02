@@ -1584,7 +1584,12 @@ function load_all_os($restricted = array())
         $list = $restricted;
     } else {
         $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+        if (count($list) == count($config['os'])) {
+            // already fully loaded
+            return;
+        }
     }
+
     foreach ($list as $file) {
         $tmp = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($file)
