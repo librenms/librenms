@@ -480,6 +480,11 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->checkOS('ciscowlc', 'ciscowlc2');
     }
 
+    public function testClearPass()
+    {
+        $this->checkOS('clearpass');
+    }
+
     public function testCmts()
     {
         $this->checkOS('cmts');
