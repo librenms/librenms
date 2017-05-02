@@ -439,7 +439,6 @@ class Sensor implements DiscoveryModule, PollerModule
                 c_echo("%RERROR:%n $function did not return an array! Skipping discovery.");
                 $sensors = array();
             }
-
         } else {
             $sensors = array();  // delete non existent sensors
         }

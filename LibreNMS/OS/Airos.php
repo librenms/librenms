@@ -36,7 +36,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSignalDiscovery;
 use LibreNMS\OS;
 
 class Airos extends OS implements
@@ -49,8 +48,7 @@ class Airos extends OS implements
     WirelessPowerDiscovery,
     WirelessQualityDiscovery,
     WirelessRateDiscovery,
-    WirelessRssiDiscovery,
-    WirelessSignalDiscovery
+    WirelessRssiDiscovery
 {
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
@@ -147,8 +145,8 @@ class Airos extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.4.1.1.6.1'; //UBNT-AirMAX-MIB::ubntRadioTxPower.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.5.1'; //UBNT-AirMAX-MIB::ubntWlStatSignal.1
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos', 1, 'Tx Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'airos', 1, 'Signal Level'),
+            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Power'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Signal Level'),
         );
     }
 
