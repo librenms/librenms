@@ -9,6 +9,7 @@ $sections = array(
     'ipv6' => 'IPv6 Address',
     'mac'  => 'MAC Address',
     'arp'  => 'ARP Table',
+    'fdb'  => 'FDB Table'
 );
 
 if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
