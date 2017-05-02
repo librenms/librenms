@@ -425,14 +425,14 @@ class Sensor implements DiscoveryModule, PollerModule
 
     protected static function discoverType(OS $os, $type)
     {
-        echo "$type: ";
-
         $typeInterface = static::getDiscoveryInterface($type);
         if (!interface_exists($typeInterface)) {
             echo "ERROR: Discovery Interface doesn't exist! $typeInterface\n";
         }
 
-        if ($os instanceof $typeInterface) {
+        $have_discovery = $os instanceof $typeInterface;
+        if ($have_discovery) {
+            echo "$type: ";
             $function = static::getDiscoveryMethod($type);
             $sensors = $os->$function();
             if (!is_array($sensors)) {
@@ -447,7 +447,9 @@ class Sensor implements DiscoveryModule, PollerModule
 
         self::sync($os->getDeviceId(), $type, $sensors);
 
-        echo PHP_EOL;
+        if ($have_discovery) {
+            echo PHP_EOL;
+        }
     }
 
     private static function checkForDuplicateSensors($sensors)
