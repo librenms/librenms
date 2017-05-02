@@ -30,8 +30,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSpeedDiscovery;
 use LibreNMS\OS;
 
 class Mimosa extends OS implements
@@ -39,8 +39,8 @@ class Mimosa extends OS implements
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
     WirelessPowerDiscovery,
-    WirelessSnrDiscovery,
-    WirelessSpeedDiscovery
+    WirelessRateDiscovery,
+    WirelessSnrDiscovery
 {
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.

@@ -151,9 +151,9 @@ class WirelessSensor extends Sensor
                 'unit' => '%',
                 'icon' => 'percent',
             ),
-            'speed' => array(
-                'short' => 'Speed',
-                'long' => 'TX/RX Speed',
+            'rate' => array(
+                'short' => 'Rate',
+                'long' => 'TX/RX Rate',
                 'unit' => 'bps',
                 'icon' => 'tachometer',
             ),
