@@ -1,0 +1,814 @@
+-- *****************************************************************
+-- ASYNCOS-MAIL-MIB
+--
+-- Copyright (c) 2005-2011 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+ASYNCOS-MAIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Gauge32,
+    Integer32
+        FROM SNMPv2-SMI
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    asyncOSMail
+        FROM IRONPORT-SMI;
+
+asyncOSMailObjects MODULE-IDENTITY
+    LAST-UPDATED    "201103070000Z"
+    ORGANIZATION    "IronPort Systems"
+    CONTACT-INFO
+        "       Cisco IronPort Email and Web Security
+                Customer Service
+
+        Postal: 950 Elm Avenue
+                San Bruno, CA 94066
+                USA
+
+           Tel: +1 (650) 989-6533
+
+        E-mail: customercare@ironport.com"
+    DESCRIPTION
+        "MIB for Cisco IronPort Mail Gateway/Email Security Appliances"
+    REVISION        "201103070000Z"
+    DESCRIPTION
+        "Disambiguate requirements for legacy OIDs
+         and improve overall MIB documentation to better
+         match Cisco MIB style."
+    REVISION        "201007010000Z"
+    DESCRIPTION
+        "Adding new traps:
+         - hsmInitializationFailure
+         - hsmResetLoginFailure"
+    REVISION        "200904070000Z"
+    DESCRIPTION
+        "Fixing various MIB parsing errors."
+    REVISION        "200901150000Z"
+    DESCRIPTION
+        "Adding new traps:
+         - connectivityFailure
+         - memoryUtilizationExceeded
+         - cpuUtilizationExceeded"
+    REVISION        "200503070000Z"
+    DESCRIPTION
+        "SNMP v1/2c/3 support for mail appliances"
+    REVISION        "200501090000Z"
+    DESCRIPTION
+        "Intial Release."
+    ::= { asyncOSMail 1 }
+
+
+asyncOSMailNotifications OBJECT IDENTIFIER ::= { asyncOSMail 2 }
+
+perCentMemoryUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides a general idea of how much memory is
+         being consumed by the appliance software."
+    ::= { asyncOSMailObjects 1 }
+
+perCentCPUUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides a general idea of how busy the CPU is
+         according to the appliance software, within the last 5
+         seconds of utilization. This measurement may or may not
+         reflect the overall CPU utilization of the appliance, and
+         may or may not be a per-process or a per-thread CPU
+         utilization value."
+    ::= { asyncOSMailObjects 2 }
+
+-- This is only meaningful on ESA/MGA appliances.
+perCentDiskIOUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides a general idea of how much disk I/O has
+         been generated within the last 5-15 seconds."
+    ::= { asyncOSMailObjects 3 }
+
+-- This is only meaningful on ESA/MGA appliances.
+perCentQueueUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Percent of total queue capacity used."
+    ::= { asyncOSMailObjects 4 }
+
+-- This is only meaningful on ESA/MGA appliances.
+queueAvailabilityStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   queueSpaceAvailable(1),
+                   queueSpaceShortage(2),
+                   queueFull(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Queue space status: enough space, queue near full or queue full."
+    ::= { asyncOSMailObjects 5 }
+
+-- This is only meaningful on ESA/MGA appliances.
+resourceConservationReason OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   noResourceConservation(1),
+                   memoryShortage(2),
+                   queueSpaceShortage(3),
+                   queueFull(4)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Reason system is in Resource Conservation Mode."
+    ::= { asyncOSMailObjects 6 }
+
+-- This is only meaningful on ESA/MGA appliances.
+memoryAvailabilityStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   memoryAvailable(1),
+                   memoryShortage(2),
+                   memoryFull(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Mail Transfer process's memory availability status."
+    ::= { asyncOSMailObjects 7 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PowerSupplyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of one or power supply entries."
+    ::= { asyncOSMailObjects 8 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyEntry OBJECT-TYPE
+    SYNTAX     PowerSupplyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing the status of a power supply and the
+         corresponding power supply configuration redundancy state."
+    INDEX { powerSupplyIndex }
+    ::= { powerSupplyTable 1 }
+
+PowerSupplyEntry ::=
+    SEQUENCE {
+        powerSupplyIndex      Integer32,
+        powerSupplyStatus     INTEGER,
+        powerSupplyRedundancy INTEGER,
+        powerSupplyName       DisplayString
+    }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..8)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Unique index for a power supply source. This index is for
+         SNMP purposes only; it has no intrinsic value."
+    ::= { powerSupplyEntry 1 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   powerSupplyNotInstalled(1),
+                   powerSupplyHealthy(2),
+                   powerSupplyNoAC(3),
+                   powerSupplyFaulty(4)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Represents the status of a power supply.
+
+         powerSupplyNotInstalled -
+                The power supply is not detected by the chassis as
+                being physically present.
+         powerSupplyHealthy -
+                The power supply is physically present and is
+                actively servicing the appliance with power.
+         powerSupplyNoAC -
+                The power supply is physically present but is not
+                actively servicing the appliance with power.
+         powerSupplyFaulty -
+                The power supply is failed per the vendor defined
+                operating specifications for the power supply.
+        "
+    ::= { powerSupplyEntry 2 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyRedundancy OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   powerSupplyRedundancyOK(1),
+                   powerSupplyRedundancyLost(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Represents the status of a collection of one or more power
+         supplies.
+
+         powerSupplyRedundancyOK -
+                All power supplies are in a powerSupplyHealthy state.
+         powerSupplyRedundancyLost -
+                One or more power supplies are in a
+                powerSupplyNotInstalled, powerSupplyNoAC, or
+                powerSupplyFaulty state.
+         "
+    ::= { powerSupplyEntry 3 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual name for a power supply."
+    ::= { powerSupplyEntry 4 }
+
+-- This is only meaningful on non-virtualized platforms.
+temperatureTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TemperatureEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of chassis temperature sensor states."
+    ::= { asyncOSMailObjects 9 }
+
+-- This is only meaningful on non-virtualized platforms.
+temperatureEntry OBJECT-TYPE
+    SYNTAX     TemperatureEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the temperature sensor table representing the
+         status of the corresponding sensor in or on the appliance."
+    INDEX { temperatureIndex }
+    ::= { temperatureTable 1 }
+
+TemperatureEntry ::=
+    SEQUENCE {
+        temperatureIndex Integer32,
+        degreesCelsius   Integer32,
+        temperatureName  DisplayString
+    }
+
+-- This is only meaningful on non-virtualized platforms.
+temperatureIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..64)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Unique index for the temperature sensor being instrumented.
+         This index is for SNMP purposes only; it has no intrinsic
+         value."
+    ::= { temperatureEntry 1 }
+
+-- This is only meaningful on non-virtualized platforms.
+degreesCelsius OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Temperature reading for the sensor being instrumented in
+         Centrigrade units. This is correct according to the relative
+         accuracy of the sensor being instrumented."
+    ::= { temperatureEntry 2 }
+
+-- This is only meaningful on non-virtualized platforms.
+temperatureName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Textual description for sensor being instrumented.
+         This description is a short textual label, suitable as a
+         human-sensible identification for the rest of the
+         information in the entry."
+    ::= { temperatureEntry 3 }
+
+-- This is only meaningful on non-virtualized platforms.
+fanTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of chassis fan entries."
+    ::= { asyncOSMailObjects 10 }
+
+-- This is only meaningful on non-virtualized platforms.
+fanEntry OBJECT-TYPE
+    SYNTAX     FanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the chassis fan table with the speed of a fan
+         in the chassis, as well as the name of the corresponding
+         fan."
+    INDEX { fanIndex }
+    ::= { fanTable 1 }
+
+FanEntry ::=
+    SEQUENCE {
+        fanIndex Integer32,
+        fanRPMs  Gauge32,
+        fanName  DisplayString
+    }
+
+-- This is only meaningful on non-virtualized platforms.
+fanIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..64)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Unique index of the chassis fan being instrumented. This
+         index is for SNMP purposes only; it has no intrinsic
+         value."
+    ::= { fanEntry 1 }
+
+-- This is only meaningful on non-virtualized platforms.
+fanRPMs OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Speed in RPMs of a chassis fan being instrumented. The speed
+         that corresponds to a fan failure varies depending on the
+         vendor specification and airflow requirements for the
+         appliance it's instrumented in, but in general when fanRPMs
+         reports 0 RPMs the respective fan has failed."
+    ::= { fanEntry 2 }
+
+-- This is only meaningful on non-virtualized platforms.
+fanName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual name of the chassis fan being instrumented."
+    ::= { fanEntry 3 }
+
+-- This is only meaningful on ESA/MGA appliances.
+workQueueMessages OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of messages in the work queue."
+    ::= { asyncOSMailObjects 11 }
+
+keyExpirationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF KeyExpirationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of Feature Key expiration entries."
+    ::= { asyncOSMailObjects 12 }
+
+keyExpirationEntry OBJECT-TYPE
+    SYNTAX     KeyExpirationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing a Feature Key, its expiration status, and
+         whether or not the Feature Key is perpetual."
+    INDEX { keyExpirationIndex }
+    ::= { keyExpirationTable 1 }
+
+KeyExpirationEntry ::=
+    SEQUENCE {
+        keyExpirationIndex    Integer32,
+        keyDescription        DisplayString,
+        keyIsPerpetual        TruthValue,
+        keySecondsUntilExpire Gauge32
+    }
+
+keyExpirationIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..1024)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Unique index for a Feature Key applicable to the appliance.
+         This index is for SNMP purposes only; it has no intrinsic
+         value."
+    ::= { keyExpirationEntry 1 }
+
+keyDescription OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Textual description for a Feature Key applicable to the
+         appliance."
+    ::= { keyExpirationEntry 2 }
+
+keyIsPerpetual OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Boolean value represented by True if Feature Key is
+         perpetual, or False if the Feature Key is normal or
+         expired."
+    ::= { keyExpirationEntry 3 }
+
+keySecondsUntilExpire OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Seconds until the valid Feature Key expires. Only applies
+         to non-perpetual Feature Keys, and is 0 when the Feature
+         Key has expired."
+    ::= { keyExpirationEntry 4 }
+
+updateTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UpdateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of one or more update entries."
+    ::= { asyncOSMailObjects 13 }
+
+updateEntry OBJECT-TYPE
+    SYNTAX     UpdateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing a name and number of successful and failed
+         updates for a service, including but not limited to: spam
+         or virus definitions and timezone updates."
+    INDEX { updateIndex }
+    ::= { updateTable 1 }
+
+UpdateEntry ::=
+    SEQUENCE {
+        updateIndex       Integer32,
+        updateServiceName DisplayString,
+        updates           Counter32,
+        updateFailures    Counter32
+    }
+
+updateIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..1024)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Unique index for an update service. This index is for SNMP
+         purposes only; it has no intrinsic value."
+    ::= { updateEntry 1 }
+
+updateServiceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual name for an update entry."
+    ::= { updateEntry 2 }
+
+updates OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of successful attempts that have occurred when
+         updating a service."
+    ::= { updateEntry 3 }
+
+updateFailures OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of failed attempts that have occurred when updating
+         a service."
+    ::= { updateEntry 4 }
+
+-- This is only meaningful on ESA/MGA appliances.
+oldestMessageAge OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds the oldest message has been in queue"
+    ::= { asyncOSMailObjects 14 }
+
+-- This is only meaningful on ESA/MGA appliances.
+outstandingDNSRequests OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of DNS requests that have been sent but for which no
+         reply has been received."
+    ::= { asyncOSMailObjects 15 }
+
+-- This is only meaningful on ESA/MGA appliances.
+pendingDNSRequests OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of DNS requests waiting to be sent."
+    ::= { asyncOSMailObjects 16 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidEvents OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of RAID events that have occurred since the
+         last appliance power on event."
+    ::= { asyncOSMailObjects 17 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RaidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Unique index for a drive being instrumented in the appliance.
+         This index is for SNMP purposes only; it has no intrinsic
+         value."
+    ::= { asyncOSMailObjects 18 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidEntry OBJECT-TYPE
+    SYNTAX     RaidEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the RAID table representing the status of a drive
+         attached to a RAID controller in the appliance."
+    INDEX { raidIndex }
+    ::= { raidTable 1 }
+
+RaidEntry ::=
+    SEQUENCE {
+        raidIndex     Integer32,
+        raidStatus    INTEGER,
+        raidID        DisplayString,
+        raidLastError DisplayString
+    }
+
+-- This is only meaningful on non-virtualized platforms.
+raidIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..1024)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Unique index for a drive attached to a RAID controller in the
+         appliance. This index is for SNMP purposes only; it has no
+         intrinsic value."
+    ::= { raidEntry 1 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   driveHealthy(1),
+                   driveFailure(2),
+                   driveRebuild(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Represents the status of a a drive attached to a RAID
+         controller in the appliance.
+
+         driveHealthy -
+                 The corresponding drive is connected to the RAID
+                 controller and functioning as a healthy member in
+                 the RAID volume.
+         driveFailure -
+                 The drive is either disconnected from the RAID
+                 controller, or has failed to operate within
+                 thresholds defined in vendor specifications for the
+                 drive and the controller.
+         driveRebuild -
+                 The corresponding drive is connected to the RAID
+                 controller. It is being rebuilt according to the
+                 RAID controller specific rebuild algorithm for the
+                 current operating mode of the RAID volume.
+         "
+    ::= { raidEntry 2 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidID OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual name for a drive attached to a RAID controller in
+         the appliance."
+    ::= { raidEntry 3 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidLastError OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The textual description of the last error message reported
+         by the RAID controller or corresponding driver if one has
+         occurred.
+
+         This is 'No Error' if the corresponding drive's state is
+         driveHealthy, or a controller or driver defined specific
+         textual description if the drive's state is not
+         driveHealthy."
+    ::= { raidEntry 4 }
+
+openFilesOrSockets OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object notes how many files or sockets are open on the
+         appliance. In normal operating conditions, the measurement
+         is taken at least once every 5-15 seconds."
+    ::= { asyncOSMailObjects 19 }
+
+-- This is only meaningful on ESA/MGA appliances.
+mailTransferThreads OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of threads that perform some task related to
+         transferring mail."
+    ::= { asyncOSMailObjects 20 }
+
+connectionURL OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The URL which will be used to test HTTP URL connectivity."
+    ::= { asyncOSMailObjects 21 }
+
+-- This is only meaningful on devices with Hardware Security Module present.
+hsmErrorReason OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A textual reason describing the last HSM authentication
+         error."
+    ::= { asyncOSMailObjects 22 }
+
+
+--
+--  Notifications
+--
+
+-- This is only meaningful on ESA/MGA appliances.
+resourceConservationMode NOTIFICATION-TYPE
+    OBJECTS    { resourceConservationReason }
+    STATUS     current
+    DESCRIPTION
+        "Memory or queue utilization caused system to enter resource
+         conservation mode."
+    ::= { asyncOSMailNotifications 1 }
+
+-- This is only meaningful on non-virtualized platforms.
+powerSupplyStatusChange NOTIFICATION-TYPE
+    OBJECTS    { powerSupplyStatus }
+    STATUS     current
+    DESCRIPTION
+        "A powerSupplyStatusChange notification is sent when power
+         supply with powerSupplyName changes states, as per one of
+         the states available in powerSupplyStatus. This
+         notification contains the opaque type for powerSupplyName
+         of the power supply which has changed state."
+    ::= { asyncOSMailNotifications 2 }
+
+-- This is only meaningful on non-virtualized platforms.
+highTemperature NOTIFICATION-TYPE
+    OBJECTS    { temperatureName }
+    STATUS     current
+    DESCRIPTION
+        "A highTemperature notification is sent when the temperature
+         of an instrumented sensor in the chassis has exceeded vendor
+         defined specifications. This notification contains the
+         opaque type for the temperatureName of the sensor which has
+         failed."
+    ::= { asyncOSMailNotifications 3 }
+
+-- This is only meaningful on non-virtualized platforms.
+fanFailure NOTIFICATION-TYPE
+    OBJECTS    { fanName }
+    STATUS     current
+    DESCRIPTION
+        "A fanFailure notification is sent when the speed of the fan
+         is not operating per the vendor defined specifications, as
+         discussed in fanRPMs. This notification contains the opaque
+         type for the fanName of the fan which has failed."
+    ::= { asyncOSMailNotifications 4 }
+
+keyExpiration NOTIFICATION-TYPE
+    OBJECTS    { keyDescription }
+    STATUS     current
+    DESCRIPTION
+        "A keyExpiration notification is sent when the corresponding
+         Feature Key is pending expiration or has expired. This
+         notification contains the opaque type for the keyDescription
+         of the Feature Key that is pending expiration or has
+         expired."
+    ::= { asyncOSMailNotifications 5 }
+
+updateFailure NOTIFICATION-TYPE
+    OBJECTS    { updateServiceName }
+    STATUS     current
+    DESCRIPTION
+        "An updateFailure notification is sent when a service fails
+         to update properly. This notification contains the opaque
+         type for the updateServiceName of the update service that
+         has failed."
+    ::= { asyncOSMailNotifications 6 }
+
+-- This is only meaningful on non-virtualized platforms.
+raidStatusChange NOTIFICATION-TYPE
+    OBJECTS    { raidID }
+    STATUS     current
+    DESCRIPTION
+        "A raidStatusChange notification is sent when drive with
+         raidID changes states, as per one of the states available
+         in raidStatus. This notification contains the opaque type
+         for raidID of the drive which has changed state."
+    ::= { asyncOSMailNotifications 7 }
+
+connectivityFailure NOTIFICATION-TYPE
+    OBJECTS    { connectionURL }
+    STATUS     current
+    DESCRIPTION
+        "A connectivityFailure notification is sent when the URL
+         denoted by configured connectionURL is unreachable, or the
+         request returned an HTTP code was not between 200,
+         inclusive, and 300, exclusive. The connectionURL configured
+         is returned when the notification is triggered."
+    ::= { asyncOSMailNotifications 8 }
+
+memoryUtilizationExceeded NOTIFICATION-TYPE
+    OBJECTS    { perCentMemoryUtilization }
+    STATUS     current
+    DESCRIPTION
+        "A memoryUtilizationExceeded notification is sent when the
+         value in perCentMemoryUtilization has exceeded the
+         configured memory usage threshold. The percentage that
+         exceeded the threshold in perCentMemoryUtilization is
+         returned via the notification."
+    ::= { asyncOSMailNotifications 9 }
+
+cpuUtilizationExceeded NOTIFICATION-TYPE
+    OBJECTS    { perCentCPUUtilization }
+    STATUS     current
+    DESCRIPTION
+        "A cpuUtilizationExceeded notification is sent when the
+         value in perCentCPUUtilization has exceeded the configured
+         CPU usage threshold. The percentage that exceeded the
+         threshold in perCentCPUUtilization is returned via the
+         notification."
+    ::= { asyncOSMailNotifications 10 }
+
+-- This is only meaningful on devices with Hardware Security Module present.
+hsmInitializationFailure NOTIFICATION-TYPE
+    OBJECTS    { hsmErrorReason }
+    STATUS     current
+    DESCRIPTION
+        "A hsmInitializationFailure notification is sent when the
+         Hardware Security Module card cannot be initialized. The
+         initialization error in hsmErrorReason is returned via
+         the notification."
+    ::= { asyncOSMailNotifications 11 }
+
+-- This is only meaningful on devices with Hardware Security Module present.
+hsmResetLoginFailure NOTIFICATION-TYPE
+    OBJECTS    { hsmErrorReason }
+    STATUS     current
+    DESCRIPTION
+        "A hsmResetLoginFailure notification is sent when the
+         Hardware Security Module card is reset due to multiple
+         Crypto Officer login failures. The reset login error in
+         hsmErrorReason is returned via the notification."
+    ::= { asyncOSMailNotifications 12 }
+
+END
