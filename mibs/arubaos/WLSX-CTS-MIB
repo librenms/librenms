@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 WLSX-CTS-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -32,7 +33,7 @@ WLSX-CTS-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxCtsMIB MODULE-IDENTITY 
-       LAST-UPDATED "0704101823Z"
+       LAST-UPDATED "0708060518Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -43,7 +44,7 @@ WLSX-CTS-MIB DEFINITIONS ::= BEGIN
            "This MIB module defines MIB objects which provide
             information about the Controller Transport Service (Cts) in the 
 			Aruba controller."
-       REVISION        "0704101823Z"
+       REVISION        "0708060518Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 11 }
