@@ -2,7 +2,7 @@
 
 echo 'MIKROTIK-MIB ';
 
-$divisor = 10.0;
+$divisor = 1.0;
 $type    = 'mikrotik';
 $insert_index = 0;
 
