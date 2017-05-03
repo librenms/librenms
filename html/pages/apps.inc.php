@@ -228,6 +228,24 @@ $graphs['unbound'] = array(
     'queries',
 );
 
+$graphs['bind']      = array(
+    'incoming',
+    'outgoing',
+    'rr_positive',
+    'rr_negative',
+    'rtt',
+    'resolver_failure',
+    'resolver_qrs',
+    'resolver_naf',
+    'server_received',
+    'server_results',
+    'server_issues',
+    'cache_hm',
+    'adb_in',
+    'sockets_active',
+    'sockets_errors',
+);
+
 $graphs['smart'] = array(
     'id5',
     'id10',
