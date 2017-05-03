@@ -965,6 +965,10 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
             return 1;
         }
+    } elseif ($device['os'] == 'eaton-mgeups') {
+        if ($sensor_type == 'load') {
+            return 1;
+        }
     }
 
     return 10; //default
