@@ -1,0 +1,331 @@
+-- *****************************************************************
+-- NMS-VLAN-EXT-MIB.my: NMS VLAN EXT MIB
+--
+-- January 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-VLAN-EXT-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32,Counter64             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeStamp,
+    TruthValue                                  FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt, nmslocal                                   	FROM NMS-SMI
+    IpAddress, Counter                          FROM RFC1155-SMI
+    DisplayString, PhysAddress,ifIndex		FROM RFC1213-MIB
+    VlanIndex                                   FROM Q-BRIDGE-MIB
+    EnabledStatus                               FROM P-BRIDGE-MIB;
+
+--definition of nms device VLAN extended informations
+
+               nmsvlanExt         OBJECT IDENTIFIER ::= { nmsMgmt 182 }
+               
+               
+               dot1qVlanTransparentMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vlan global transport mode.Not supported in S8500 series. "
+                   ::= { nmsvlanExt 1 }
+               
+               dot1qVlanUntagged OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vlan global transport mode.Not supported in S8500 series. "
+                   ::= { nmsvlanExt 2 }
+                   
+
+               dot1qPortVlanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF Dot1qPortVlanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of dot1qVlan operation."
+                   ::= { nmsvlanExt 3 }
+
+               dot1qPortVlanTableEntry OBJECT-TYPE
+                   SYNTAX  Dot1qPortVlanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of dot1qVlan operation."
+                   INDEX { ifIndex }
+               ::= { dot1qPortVlanTable 1 }
+
+               Dot1qPortVlanTableEntry ::=
+                   SEQUENCE {
+                       dot1qPvid
+                           VlanIndex,
+                       dot1qPortType
+                           INTEGER,
+                       dot1qPortSwitchingMode
+                       	   INTEGER,
+                       dot1qPortAllowedVlans
+                       	   OCTET STRING,
+                       dot1qPortUntaggedVlans
+                       	   OCTET STRING,
+                       dot1qPortAcceptableFrameTypes
+                           INTEGER,
+		       dot1qPortIngressFiltering                       
+                           TruthValue,
+                       dot1qPortGvrpStatus
+                           EnabledStatus,
+		       dot1qPortGvrpFailedRegistrations 
+		           Counter64,       
+		       dot1qPortGvrpLastPduOrigin
+                       	   PhysAddress,
+                       dot1qUplinkPortTpid
+                           INTEGER		                          
+                  }
+
+	
+               dot1qPvid OBJECT-TYPE
+                   SYNTAX VlanIndex
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "The PVID, the VLAN ID assigned to untagged frames or
+                       Priority-Tagged frames received on this port."
+                   REFERENCE
+                       "IEEE 802.1Q/D11 Section 12.10.1.1, the same name with Q-BRIDGE-MIB"
+                   DEFVAL { 1 }
+                   ::= { dot1qPortVlanTableEntry 1 }
+                   
+               dot1qPortType OBJECT-TYPE
+                   SYNTAX  INTEGER{FastEthernet(2), 
+                                   GigaEthernet(3), 
+                                   TGigaEthernet(4), 
+                                   EPON(5), 
+                                   EPONLLID(6), 
+                                   PortChannel(11)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port vlan type."
+                   ::= { dot1qPortVlanTableEntry 2 }
+                   
+               dot1qPortSwitchingMode OBJECT-TYPE
+                   SYNTAX  INTEGER{Access(1), 
+                                   Trunk(2), 
+                                   Dot1qTunnel(3), 
+                                   Dot1qTranslatingTunnel(4), 
+                                   Dot1qTunnelUplink(5)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port vlan mode."
+                   ::= { dot1qPortVlanTableEntry 3 }
+               
+               dot1qPortAllowedVlans OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port allowed vlan list."
+                   ::= { dot1qPortVlanTableEntry 4 }
+               
+               dot1qPortUntaggedVlans OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port untagged vlan list."
+                   ::= { dot1qPortVlanTableEntry 5 }
+
+               dot1qPortAcceptableFrameTypes OBJECT-TYPE
+                   SYNTAX INTEGER {
+                       admitAll(1),
+                       admitOnlyVlanTagged(2)
+                       }
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "When this is admitOnlyVlanTagged(2) the device will
+                       discard untagged frames or Priority-Tagged frames
+                       received on this port.  When admitAll(1), untagged
+                       frames or Priority-Tagged frames received on this port
+                       will be accepted and assigned to the PVID for this port.
+                       
+                       This control does not affect VLAN independent BPDU
+                       frames, such as GVRP and STP.  It does affect VLAN
+                       dependent BPDU frames, such as GMRP."
+                   REFERENCE
+                       "IEEE 802.1Q/D11 Section 12.10.1.3"
+                   DEFVAL { admitAll }
+                   ::= { dot1qPortVlanTableEntry 6 }
+
+                dot1qPortIngressFiltering OBJECT-TYPE
+                    SYNTAX TruthValue
+                    ACCESS read-write
+                    STATUS mandatory
+                    DESCRIPTION
+                        "When this is true(1) the device will discard incoming
+                        frames for VLANs which do not include this Port in its
+                        Member set.  When false(2), the port will accept all
+                        incoming frames.
+                        
+                        This control does not affect VLAN independent BPDU
+                        frames, such as GVRP and STP.  It does affect VLAN
+                        dependent BPDU frames, such as GMRP."
+                    REFERENCE
+                        "IEEE 802.1Q/D11 Section 12.10.1.4"
+                    DEFVAL { false }
+                    ::= { dot1qPortVlanTableEntry 7 }
+
+
+                dot1qPortGvrpStatus OBJECT-TYPE
+                    SYNTAX EnabledStatus
+                    ACCESS read-write
+                    STATUS mandatory
+                    DESCRIPTION
+                        "The state of GVRP operation on this port.  The value
+                        enabled(1) indicates that GVRP is enabled on this port,
+                        as long as dot1qGvrpStatus is also enabled for this
+                        device.  When disabled(2) but dot1qGvrpStatus is still
+                        enabled for the device, GVRP is disabled on this port:
+                        any GVRP packets received will be silently discarded and
+                        no GVRP registrations will be propagated from other
+                        ports.  This object affects all GVRP Applicant and
+                        Registrar state machines on this port.  A transition
+                        from disabled(2) to enabled(1) will cause a reset of all
+                        GVRP state machines on this port."
+                    DEFVAL { enabled }
+                    ::= { dot1qPortVlanTableEntry 8 }
+
+                dot1qPortGvrpFailedRegistrations OBJECT-TYPE
+                    SYNTAX Counter64
+                    ACCESS read-only
+                    STATUS mandatory
+                    DESCRIPTION
+                        "The total number of failed GVRP registrations, for any
+                        reason, on this port."
+                    ::= { dot1qPortVlanTableEntry 9 }
+                
+                dot1qPortGvrpLastPduOrigin OBJECT-TYPE
+                    SYNTAX PhysAddress
+                    ACCESS read-only
+                    STATUS mandatory
+                    DESCRIPTION
+                        "The Source MAC Address of the last GVRP message
+                        received on this port."
+                    ::= { dot1qPortVlanTableEntry 10 }
+
+                dot1qUplinkPortTpid OBJECT-TYPE
+                    SYNTAX INTEGER
+                    ACCESS read-write
+                    STATUS mandatory
+                    DESCRIPTION
+                        "Default value is 0x8100. Note: only when the value of 'dot1qPortSwitchingMode' is 'Dot1qTunnelUplink', this value is available."
+                    ::= { dot1qPortVlanTableEntry 11 }
+                    
+                    
+
+
+
+
+               dot1qPortVlanTranslateTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF Dot1qPortVlanTranslateTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of dot1q Port Vlan Translate Table operation."
+                   ::= { nmsvlanExt 4 }
+
+               dot1qPortVlanTranslateTableEntry OBJECT-TYPE
+                   SYNTAX  Dot1qPortVlanTranslateTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of dot1qVlan Translate operation. Attention:
+                             When VLAN is created, dttTeMode,dttTeOldVlanId¡¢dttTeNewVlanId 
+                             should be provided, and dttTePri is optional. When item is 
+                             deleted, only dttTeMode and dttTeOldVlanId needs to provide."
+                   INDEX { ifIndex, dttTeOldVlanId}
+               ::= { dot1qPortVlanTranslateTable 1 }
+
+               Dot1qPortVlanTranslateTableEntry ::=
+                   SEQUENCE {
+                       dttTeMode
+                           INTEGER,
+                       dttTeOldVlanId
+                           INTEGER,
+                       dttTeNewVlanId
+                       	   INTEGER,
+                       dttTePri
+                       	   INTEGER,
+                       dttTeRowStatus
+                           RowStatus
+                  }
+
+               dttTeMode OBJECT-TYPE
+                   SYNTAX  INTEGER{DttTeModeFlat(1),
+				   DttTeModeQinQ(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port vlan translation item mode. The default value is DttTeModeQinQ(2)."
+                   ::= { dot1qPortVlanTranslateTableEntry 1 }
+             
+               dttTeOldVlanId OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port old vlan id to be translated."
+                   ::= { dot1qPortVlanTranslateTableEntry 2 }
+             
+               dttTeNewVlanId OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port new vlan id to be translated."
+                   ::= { dot1qPortVlanTranslateTableEntry 3 }
+             
+               dttTePri OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port new vlan id priority to be translated."
+                   ::= { dot1qPortVlanTranslateTableEntry 4 }
+             
+               dttTeRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "value for port vlan translation row status."
+                   ::= { dot1qPortVlanTranslateTableEntry 5 }
+             
+
+               dot1qTunnel OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enabled(1),
+				    disabled(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Dot1qTunnel enable operation.  enabled(1),disabled(2). Default value is disable."
+                   ::= { nmsvlanExt 5 }
+                   
+
+
+
+END

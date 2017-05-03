@@ -1,0 +1,80 @@
+--NMS-EPON-OLT-MULTICAST-VLAN.MIB
+-- *****************************************************************
+-- NMS-EPON-OLT-MULTICAST-VLAN.MIB:  NMS EPON OLT MULTICAST VLAN MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-MULTICAST-VLAN DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, TimeTicks
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOltMulticastVlan         OBJECT IDENTIFIER ::= { nmsEPONGroup 5 }
+
+               nmseponoltmulticastvlanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltMulticastVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt multicast forwarding table entries."
+                   ::= { nmsEponOltMulticastVlan 1 }
+
+               nmsEponOltMulticastVlanEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltMulticastVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt multicast forwarding table."
+                   INDEX { oltMcVlanId,oltMcIpAddress  }
+               ::= { nmseponoltmulticastvlanTable 1 }
+
+               NMSEponOltMulticastVlanEntry ::=
+                   SEQUENCE {
+                       oltMcVlanId
+                           INTEGER,
+                       oltMcVlanIpAddress
+                           IpAddress,
+                       oltMcVlanRowStatus
+                           RowStatus
+                   }
+          -- The following section describes the components of the
+          -- table.
+
+               oltMcVlanId OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT multicast vlan id, as one of the index together with oltMcIpAddress."
+                   ::= { nmsEponOltMulticastVlanEntry 1 } 
+			
+               oltMcVlanIpAddress OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The IP multicast group address for which this entry contains information. As one of the index together with oltMcVlanId."
+                   ::= { nmsEponOltMulticastVlanEntry 2 } 
+			
+               oltMcVlanRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT multicast vlan table row status."
+                   ::= { nmsEponOltMulticastVlanEntry 3 } 
+
+
+
+END

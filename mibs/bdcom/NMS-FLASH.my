@@ -1,0 +1,276 @@
+-- *****************************************************************
+-- NMS-FLASH.my:  NMS Flash MIB file
+--
+-- 
+-- *****************************************************************
+--
+
+               NMS-FLASH DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    TimeTicks
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI;
+          
+               nmslflash              OBJECT IDENTIFIER ::= { nmslocal 10 }
+
+    
+          -- This group is present in all products which contain flash"
+
+               nmsflashSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Total Size in Octets of Flash memory"
+                   ::= { nmslflash 1 }
+
+               nmsflashFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Unused Size in Octets of Flash memory"
+                   ::= { nmslflash 2 }
+
+               nmsflashController OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Provides the type of Flash controller 
+                           (either CCTL or CCTL2) installed in the 
+                           router."
+                   ::= { nmslflash 3 }
+
+               nmsflashCard OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Provides the type of Flash Card installed
+                           in the router. For example, the type of 
+                           Flash Card could be either CSC-MS or 
+                           CSC-MC+."
+                   ::= { nmslflash 4 }
+
+               nmsflashVPP OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        installed(1),
+                        missing(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "State of the VPP DIP jumper on the Flash
+                           memory card. Files can be written to the
+                           Flash memory card only if the VPP DIP
+                           jumper is turned on."
+                   ::= { nmslflash 5 }
+
+               nmsflashErase OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Request to erase flash memory"
+                   ::= { nmslflash 6 }
+
+               nmsflashEraseTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Indicates the value of sysUptime the last
+                           time Flash memory was erased. If the flash
+                           had not been erased after powerup it has a
+                           value of 0 days 00:00:00."
+                   ::= { nmslflash 7 }
+
+               nmsflashEraseStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        flashOpInProgress(1),
+                        flashOpSuccess(2),
+                        flashOpFailure(3),
+                        flashReadOnly(4),
+                        flashOpenFailure(5),
+                        bufferAllocationFailure(6),
+                        noOpAfterPowerOn(7)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Status of current or last flash erasing"
+                   ::= { nmslflash 8 }
+
+               nmsflashToNet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write flash entry to tftp server. Value
+                           should be the name of the flash entry to
+                           send. Instance is the IP address of the tftp
+                           host."
+                   ::= { nmslflash 9 }
+
+               nmsflashToNetTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Indicates the value of sysUpTime the last
+                            time a file was transfered from Flash memory
+                            on the router to a TFTP host. Returns
+                            0 days 00:00:00 if there had been no transfer
+                            since powerup."
+                   ::= { nmslflash 10 }
+
+               nmsflashToNetStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        flashOpInProgress(1),
+                        flashOpSuccess(2),
+                        flashOpFailure(3),
+                        flashReadOnly(4),
+                        flashOpenFailure(5),
+                        bufferAllocationFailure(6),
+                        noOpAfterPowerOn(7)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Status of current or last flash to net
+                           transfer"
+                   ::= { nmslflash 11 }
+
+               nmsnetToFlash OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write flash entry from tftp server. Value
+                           should be the name of the flash entry to
+                           write. Instance is the IP address of the tftp
+                           host."
+                   ::= { nmslflash 12 }
+
+               nmsnetToFlashTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Indicates the value of sysUpTime the last
+                           time file was copied from a Trivial File
+                           Transfer Protocol(TFTP) server to the Flash
+                           memory on the router. Returns 0 days 00:00:00
+                           if there had been no transfers since powerup."
+                   ::= { nmslflash 13 }
+
+               nmsnetToFlashStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        flashOpInProgress(1),
+                        flashOpSuccess(2),
+                        flashOpFailure(3),
+                        flashReadOnly(4),
+                        flashOpenFailure(5),
+                        bufferAllocationFailure(6),
+                        noOpAfterPowerOn(7)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Status of current or last net to flash
+                           transfer"
+                   ::= { nmslflash 14 }
+
+               nmsflashStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        busy(1),
+                        available(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Status of the availability of flash"
+                   ::= { nmslflash 15 }
+
+               nmsflashEntries OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of entries in the flash directory"
+                   ::= { nmslflash 16 }
+
+
+               -- Local Flash file Table
+
+          -- This group contains information on a per file basis
+
+               nmslflashFileDirTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSLflashFileDirEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            " A list of flash file entries."
+                   ::= { nmslflash 17 }
+
+               nmslflashFileDirEntry OBJECT-TYPE
+                   SYNTAX NMSLflashFileDirEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of flash eprom objects"
+                   INDEX { flashEntries }
+               ::= { nmslflashFileDirTable 1 }
+
+               NMSLflashFileDirEntry ::=
+                   SEQUENCE {
+                       nmsflashDirName
+                           DisplayString,
+                       nmsflashDirSize
+                           INTEGER,
+                       nmsflashDirStatus
+                           INTEGER
+                   }
+
+          -- The following section describes the components of the
+          -- table.
+
+               nmsflashDirName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Name associated with the flash entry"
+                   ::= { nmslflashFileDirEntry 1 }
+
+               nmsflashDirSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Size in Octets of a flash entry"
+                   ::= { nmslflashFileDirEntry 2 }
+
+               nmsflashDirStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        valid(1),
+                        deleted(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Indicates the status of the entry"
+                   ::= { nmslflashFileDirEntry 3 }
+
+               -- End of table
+
+
+END
+
