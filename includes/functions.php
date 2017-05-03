@@ -100,9 +100,14 @@ function getHostOS($device)
     // check yaml files
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
+        $os = basename($file, '.yaml');
+        if (isset($config['os'][$os])) {
+            $tmp = $config['os'][$os];
+        } else {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents($file)
+            );
+        }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
