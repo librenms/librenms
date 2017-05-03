@@ -15,8 +15,6 @@
  * See COPYING for more details.
  */
 
-set_lock('schema');
-
 if (!isset($debug)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = array();
@@ -25,6 +23,8 @@ if (!isset($debug)  && php_sapi_name() == 'cli') {
     $options = getopt('d');
     $debug = isset($options['d']);
 }
+
+set_lock('schema');
 
 d_echo("DB Schema update started....\n");
 
