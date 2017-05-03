@@ -30,21 +30,7 @@ require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-$lock = false;
-if (file_exists($config['install_dir'].'/.alerts.lock')) {
-    $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
-    $lpid = trim(file_get_contents($config['install_dir'].'/.alerts.lock'));
-    if (in_array($lpid, $pids)) {
-        $lock = true;
-    }
-}
-
-if ($lock === true) {
-    exit(1);
-} else {
-    file_put_contents($config['install_dir'].'/.alerts.lock', getmypid());
-}
-
+set_lock('alerts');
 
 if (isset($options['d'])) {
     echo "DEBUG!\n";
@@ -74,7 +60,7 @@ if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'End  : '.date('r')."\r\n";
 }
 
-unlink($config['install_dir'].'/.alerts.lock');
+release_lock('alerts');
 
 function ClearStaleAlerts()
 {
