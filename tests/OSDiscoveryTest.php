@@ -1384,7 +1384,6 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     public function testPixos()
     {
         $this->checkOS('pixos');
-        $this->checkOS('pixos', 'Cisco Firewall Services Module');
     }
 
     public function testPktj()
