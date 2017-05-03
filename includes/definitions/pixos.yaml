@@ -43,3 +43,4 @@ discovery_modules:
 discovery:
     - sysDescr:
         - Cisco PIX
+        - Cisco Firewall Services Module
