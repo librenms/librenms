@@ -47,14 +47,13 @@ if ($rowCount != -1) {
 $sql = "SELECT * $sql";
 
 foreach (dbFetchRows($sql, $param) as $sensor) {
+    $alert = '';
     if (!isset($sensor['sensor_current'])) {
         $sensor['sensor_current'] = 'NaN';
-    } else {
-        if ($sensor['sensor_current'] >= $sensor['sensor_limit']) {
-            $alert = '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>';
-        } else {
-            $alert = '';
-        }
+    } elseif ((!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) ||
+        (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low'])
+    ) {
+        $alert = '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>';
     }
 
     // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
@@ -81,7 +80,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $overlib_content = '<div style="width: 580px;"><h2>'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
     foreach (array('day', 'week', 'month', 'year') as $period) {
         $graph_array['from'] = $config['time'][$period];
-        $overlib_content    .= str_replace('"', "\'", generate_graph_tag($graph_array));
+        $overlib_content    .= str_replace('"', "\\'", generate_graph_tag($graph_array));
     }
 
     $overlib_content .= '</div>';
