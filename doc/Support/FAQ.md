@@ -25,6 +25,7 @@ source: Support/FAQ.md
  - [Why is my EdgeRouter device not detected?](#faq25)
  - [Why are some of my disks not showing?](#faq26)
  - [Why are my disks reporting an incorrect size?](#faq27)
+ - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -249,6 +250,11 @@ Restart snmpd and LibreNMS should populate the additional disk after a fresh dis
 There is a known issue for net-snmp, which causes it to report incorrect disk size and disk usage when the size of the disk (or raid) are larger then 16TB, a workaround has been implemented but is not active on Centos 6.8 by default due to the fact that this workaround breaks official SNMP specs, and as such could cause unexpected behaviour in other SNMP tools. You can activate the workaround by adding to /etc/snmp/snmpd.conf :
 
 `realStorageUnits 0`
+
+#### <a name="faq28"> What is the Difference between Disable Device and Ignore a Device?</a>
+
+  - Disable stops polling.
+  - Ignore disables alerting.
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 

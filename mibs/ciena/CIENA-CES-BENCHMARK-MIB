@@ -1,0 +1,3612 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-BENCHMARK-MIB.my
+ --
+ --
+
+ CIENA-CES-BENCHMARK-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     Unsigned32, Integer32, Counter64, OBJECT-TYPE, 
+     MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+     RowStatus, TruthValue, DisplayString, MacAddress, TEXTUAL-CONVENTION,
+     DateAndTime
+            FROM SNMPv2-TC
+     InetAddressType, InetAddress ,InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+     cienaCesNotifications, cienaCesConfig, cienaCesStatistics
+            FROM CIENA-SMI
+     cienaGlobalSeverity, cienaGlobalMacAddress
+            FROM CIENA-GLOBAL-MIB;
+
+ cienaCesBenchmarkMIB MODULE-IDENTITY
+            LAST-UPDATED "201610140000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+               "   Mib Meister
+               115 North Sullivan Road
+               Spokane Valley, WA 99037
+               USA
+               Phone:  +1 509 242 9000
+               Email:  support@ciena.com"
+            DESCRIPTION  "The MIB module for managing RFC2544/Y1564 service benchmark testing."
+
+            REVISION     "201611110000Z"
+            DESCRIPTION  "The maximumLineRate(3) value for cienaCesBenchmarkProfileEntryFrameLossStartBw is not supported."
+            REVISION     "201610140000Z"
+            DESCRIPTION  "Add new entity attribute cienaCesBenchmarkEntityEntryReflectorMacValidation
+                          to support MAC-agnostic reflector."
+            REVISION     "201610070000Z"
+            DESCRIPTION  "Updated the description of cienaCesBenchmarkProfileEntryTpid and made
+                          cienaCesBenchmarkEntityStatsEntryClear obsolete. Entity statistics shall
+                          now be cleared using new attribute cienaCesBenchmarkEntityEntryClearStats"
+            REVISION     "201610040000Z"
+            DESCRIPTION  "Fix VID range to allow up to maximum value of 4094"
+            REVISION     "201609070000Z"
+            DESCRIPTION  "Updated default values for various objects to help with 'createAndGo' operations"
+            REVISION     "201606010000Z"
+            DESCRIPTION  "Added Trap cienaCesBenchmarkTestIterationCompleted."
+            REVISION     "201605130000Z"
+            DESCRIPTION  "Updated cienaCesBenchmarkTestStarted, cienaCesBenchmarkTestStopped,
+                          cienaCesBenchmarkTestCompleted, cienaCesBenchmarkTestFailedThroughputKpi,
+                          cienaCesBenchmarkTestFailedFramelossKpi, cienaCesBenchmarkTestFailedLatencyKpi
+                          and cienaCesBenchmarkTestFailedPdvKpi traps to include cienaGlobalSeverity and 
+                          cienaGlobalMacAddress."
+            REVISION     "201604260000Z"
+            DESCRIPTION  "Add new throughput test state, txMaxThroughputForYellowTest, to 
+                          CienaCesBenchmarkThroughputTestState's definition. Used on green
+                          session when the associated yellow session is running its throughput
+                          test."
+            REVISION     "201603300000Z"
+            DESCRIPTION  "Add cienaCesBenchmarkEmixCharSetTable"
+            REVISION     "201603140000Z"
+            DESCRIPTION  "Add attribute cienaCesBenchmarkTestInstanceEntryAssocEntityId which 
+                          points back to the entity ID associated with the test instance."
+            REVISION     "201603100000Z"
+            DESCRIPTION  "Add a special note to the description of 
+                          cienaCesBenchmarkGenTestSessionAllocationEntry
+                          for the case when test traffic is untagged."
+            REVISION     "201603030000Z"
+            DESCRIPTION  "Fix description for cienaCesBenchmarkEntityStatsEntryClear
+                          and cienaCesBenchmarkTestInstanceEntryTotalIntervals attributes"
+            REVISION     "201602240000Z"
+            DESCRIPTION  "Added evcOutOfService to the Entity Mode enum"
+            REVISION     "201602090000Z"
+            DESCRIPTION  "Initial creation. Based on WWP-LEOS-BENCHMARK-MIB update 201412180000Z"
+            ::= { cienaCesConfig 39 }
+
+ --
+ -- Textual convention
+ --
+ CienaCesBenchmarkLatencyPdvTestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Test state for latency and packet delay variation tests."
+     SYNTAX       INTEGER {
+                      idle(1),
+                      sendingTraffic(2),
+                      waitingForTimestampData(3),
+                      waitingForResidualPackets(4),
+                      processingResults(5),
+                      stoppedByIntervalTimer(6),
+                      stoppedByDurationTimer(7),
+                      stoppedByUser(8),
+                      done(9)
+                  }
+
+ CienaCesBenchmarkThroughputTestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Throughput test states" 
+     SYNTAX       INTEGER {
+                      idle(1),
+                      running(2),
+                      waitingForResidualPackets(3),
+                      processingResults(4),
+                      stoppedByIntervalTimer(5),
+                      stoppedByDurationTimer(6),
+                      stoppedByUser(7),
+                      done(8),
+                      txMaxThroughputForYellowTest(9)
+                   }
+
+CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Frame loss test states"
+     SYNTAX       INTEGER {
+                      idle(1),
+                      runningFirstTest(2),
+                      waitingForResidualFirstPackets(3),
+                      processingFirstResults(4),
+                      runningSecondTest(5),
+                      waitingForResidualSecondPackets(6),
+                      processingSecondResults(7),
+                      stoppedByIntervalTimer(8),
+                      stoppedByDurationTimer(9),
+                      stoppedByUser(10),
+                      done(11)
+                  }
+
+ CienaCesBenchmarkRfc2544TestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "RFC 2544 test suite state."
+     SYNTAX       INTEGER {
+                      idle(1),
+                      running(2),
+                      stoppedByIntervalTimer(3),
+                      stoppedByDurationTimer(4),
+                      stoppedByUser(5),
+                      done(6)
+                  }
+
+ CienaCesBenchmarkY1564TestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Y1564 test suite state."
+     SYNTAX       INTEGER {
+                      idle(1),
+                      running(2),
+                      stoppedByIntervalTimer(3),
+                      stoppedByDurationTimer(4),
+                      stoppedByUser(5),
+                      done(6)
+                  }
+
+ CienaCesBenchmarkColorTest ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Defines which traffic color needs to be tested. Green 
+                   test traffic is generated with DEI bit set to 0 and
+                   uses the profile bandwidth parameter as the starting
+                   bandwidth; yellow test traffic is generated with DEI bit
+                   set to 1 and uses the profile excess-bandwidth parameter
+                   as the starting bandwidth. When testing for red, the test
+                   stream has its DEI bit set to 1 and the starting bandwidth
+                   is (excess-bandwidth * 1.25)"
+     SYNTAX       INTEGER {
+                      green(1),
+                      yellow(2),
+                      greenYellow(3),
+                      greenYellowRed(4)
+                  }
+
+ CienaCesBenchmarkKpiResult ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Provides a pass or fail for the test results compared to
+                   the selected KPI profile's pass crieteria for the test."
+     SYNTAX       INTEGER {
+                      notAvailable(1),
+                      pass(2),
+                      fail(3)
+                  }
+
+ CienaCesBenchmarkAdminState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Administrative state of an object."
+     SYNTAX       INTEGER {
+                     disabled(1),
+                     enabled(2)
+                  }
+
+ CienaCesBenchmarkThroughputKpiPercent ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d-4"
+     STATUS       current
+     DESCRIPTION  "Percent of bandwidth that the maximum throughput result
+                   shouldn't go below for the test to be considered a pass.
+                   The value is given as an integer but represent a 4 decimal
+                   point percent. Ex: 0.2000 is reported as 2000."
+     SYNTAX        Unsigned32
+
+ CienaCesBenchmarkFramelossKpiPercent ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d-4"
+     STATUS       current
+     DESCRIPTION  "Percent of the frameloss test staring bandwidth, the frame
+                   loss shouldn't exceed for the test to be considered a pass.
+                   The value is given as an integer but represent a 4 decimal
+                   point percent. Ex: 0.2000 is reported as 2000."
+     SYNTAX        Unsigned32
+
+ CienaCesBenchmarkThroughputResult ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d-2"
+     STATUS       current
+     DESCRIPTION  "Throughput results in Mbps are sent as unsigned integer
+                   multiplied by 100 to provide a 2 decimal point accuracy.
+                   If result is 123.45 Mbps, it is sent as 12345 and should
+                   be divided by 100 by the SNMP application retrieving the
+                   data."
+     SYNTAX        Unsigned32
+
+ CienaCesBenchmarkFramelossResult ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d-2"
+     STATUS       current
+     DESCRIPTION  "Frame loss results in Percent of frame loss start bandwidth
+                   are sent as unsigned integer multitplied by 100 to provide a
+                   2 decimal point accuracy.
+                   If result is 12.34 %, it is sent as 1234 and should
+                   be divided by 100 by the SNMP application retrieving the
+                   data."
+     SYNTAX        Unsigned32
+
+ CienaCesBenchmarkPcpBitmap ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "x"
+     STATUS       current
+     DESCRIPTION  "Bitmap of the VLAN PCP (Priority Code ) value to test
+                   with. When The RFC2544 test is selected in the profile,
+                   only 1 PCP bit can be set. For other tests, a test 
+                   session will be run simultaneously for each PCP set
+                   in the bitmap. In the later case, the bandwidth will
+                   be distributed among the set PCPs according to the
+                   selected PCP Bandwidth allocation profile. If no
+                   such profile is configured, the bandwidth will evenly
+                   be distributed among all set PCPs."
+     SYNTAX        BITS {
+                     pcp0(0),
+                     pcp1(1),
+                     pcp2(2),
+                     pcp3(3),
+                     pcp4(4),
+                     pcp5(5),
+                     pcp6(6),
+                     pcp7(7)
+                   }
+
+ cienaCesBenchmarkMIBObjects OBJECT IDENTIFIER ::= { cienaCesBenchmarkMIB 1 }
+
+ cienaCesBenchmarkModule OBJECT IDENTIFIER ::= { cienaCesBenchmarkMIBObjects 1 } 
+
+ cienaCesBenchmarkGlobalObjects  OBJECT IDENTIFIER ::= { cienaCesBenchmarkModule 1 }
+
+ cienaCesBenchmarkNotifications  OBJECT IDENTIFIER ::= { cienaCesNotifications 39 }
+
+ cienaCesBenchmarkGlobalAdminState OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkAdminState
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Administrative state of the benchmark feature
+                 at the global level."
+     ::= { cienaCesBenchmarkGlobalObjects 1 }
+
+ cienaCesBenchmarkGlobalGeneratorDefaultEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Default EMIX sequence to be used on a test instance
+                 when no EMIX is specified in the test instance 
+                 targeted test profile. This applies to generator
+                 test instances only."
+     ::= { cienaCesBenchmarkGlobalObjects 2 }
+
+ cienaCesBenchmarkGlobalGeneratorDefaultKpiProfileId OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Default KPI profile to be used to analyze the results
+                 of a test instance when no KPI profile is specifed in
+                 the targeted test profile. This applies to generator
+                 test instances only."
+     ::= { cienaCesBenchmarkGlobalObjects 3 }
+
+ cienaCesBenchmarkGlobalGeneratorDefaultBwAllocProfileId OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Default bandwidth allocation profile to be used with
+                 a test instance when no bandwidth allocation profile is
+                 specified in the targeted test profile. This applies to
+                 generator test instances only."
+     ::= { cienaCesBenchmarkGlobalObjects 4 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigEntities       OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of entities that can be created on
+                 this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 5 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigTestInstances  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of test instances that can be created on
+                 this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 6 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigTestProfiles   OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of test profiles that can be created on
+                 this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 7 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigKpiProfiles    OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of KPI profiles that can be created on
+                 this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 8 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigBwAllocProfiles OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of bandwidth distribution profiles
+                 that can be created on this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 9 }
+
+ cienaCesBenchmarkGlobalPlatformMaxConfigEmixSequences  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of EMIX sequences that can be created on
+                 this platform, including the system created ones."
+     ::= { cienaCesBenchmarkGlobalObjects 10 }
+
+ cienaCesBenchmarkGlobalPlatformMaxSimultaneousRunningTests OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of test instances that can be running
+                 simultaneously on this platform."
+     ::= { cienaCesBenchmarkGlobalObjects 11 }
+
+ cienaCesBenchmarkGlobalConfiguredEntities             OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of entities currently configured."
+     ::= { cienaCesBenchmarkGlobalObjects 12 }
+
+ cienaCesBenchmarkGlobalConfiguredTestInstances        OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of test instances currently configured."
+     ::= { cienaCesBenchmarkGlobalObjects 13 }
+
+ cienaCesBenchmarkGlobalConfiguredProfiles             OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of test profiles currently configured."
+     ::= { cienaCesBenchmarkGlobalObjects 14 }
+
+ cienaCesBenchmarkGlobalConfiguredEmixSequences        OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of EMIX sequences currently configured, including
+                 the system created ones."
+     ::= { cienaCesBenchmarkGlobalObjects 15 }
+
+ cienaCesBenchmarkGlobalConfiguredKpiProfiles         OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of KPI profiles currently configured."
+     ::= { cienaCesBenchmarkGlobalObjects 16 }
+
+ cienaCesBenchmarkGlobalConfiguredBwAllocProfiles      OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of bandwidth distribution profiles currently
+                 configured."
+     ::= { cienaCesBenchmarkGlobalObjects 17 }
+
+ cienaCesBenchmarkGlobalEnabledTestInstances          OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of test instances currently enabled across
+                 the platform."
+     ::= { cienaCesBenchmarkGlobalObjects 18 }
+
+ cienaCesBenchmarkGlobalGeneratorRunningTestInstances OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of generator test instances currently running
+                 across the platform."
+     ::= { cienaCesBenchmarkGlobalObjects 19 }
+
+ --
+ -- the Benchmark Entity Config and Status
+ --
+ cienaCesBenchmarkEntityTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEntityEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of benchmark entity entries."
+     ::= { cienaCesBenchmarkModule 2 }
+                
+ cienaCesBenchmarkEntityEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEntityEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK Entity characteristics."
+     INDEX { cienaCesBenchmarkEntityEntryId }
+     ::= { cienaCesBenchmarkEntityTable 1 } 
+
+ CienaCesBenchmarkEntityEntry ::= SEQUENCE {
+     cienaCesBenchmarkEntityEntryId                           Integer32,
+     cienaCesBenchmarkEntityEntryName                         DisplayString,
+     cienaCesBenchmarkEntityEntryRole                         INTEGER,
+     cienaCesBenchmarkEntityEntryPortId                       Integer32,
+     cienaCesBenchmarkEntityEntryMode                         INTEGER,
+     cienaCesBenchmarkEntityEntryAdminState                   CienaCesBenchmarkAdminState,
+     cienaCesBenchmarkEntityEntryLocalMac                     MacAddress,
+     cienaCesBenchmarkEntityEntrySlotId                       Integer32,
+     cienaCesBenchmarkEntityEntryReflectorVendorType          INTEGER,
+     cienaCesBenchmarkEntityEntryReflectionLevel              INTEGER,
+     cienaCesBenchmarkEntityEntryGeneratorHFrameSize          Integer32,
+     cienaCesBenchmarkEntityEntryMaxConfigTestInstances       Integer32,
+     cienaCesBenchmarkEntityEntryMaxSimultaneousTestInstances Integer32,
+     cienaCesBenchmarkEntityEntryOperEnabled                  TruthValue,
+     cienaCesBenchmarkEntityEntryNumTestInstancesConfigured   Integer32,
+     cienaCesBenchmarkEntityEntryNumTestInstancesEnabled      Integer32,
+     cienaCesBenchmarkEntityEntryGenNumTestInstancesRunning   Integer32,
+     cienaCesBenchmarkEntityEntryBwAvailable                  Integer32,
+     cienaCesBenchmarkEntityEntryGenBwUsedByRunningTests      Integer32,
+     cienaCesBenchmarkEntityEntryAvailableHwSessions          Integer32,
+     cienaCesBenchmarkEntityEntryAllocatedHwSessions          Integer32,
+     cienaCesBenchmarkEntityEntryRowStatus                    RowStatus,
+     cienaCesBenchmarkEntityEntryClearStats                   TruthValue,
+     cienaCesBenchmarkEntityEntryReflectorMacValidation       TruthValue
+ }
+
+ cienaCesBenchmarkEntityEntryId     OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Entity unique ID"
+     ::= { cienaCesBenchmarkEntityEntry 1 }
+
+ cienaCesBenchmarkEntityEntryName   OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (1..46))
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Name of the benchmark entity as entered when created."
+     ::= { cienaCesBenchmarkEntityEntry 2 }
+
+ cienaCesBenchmarkEntityEntryRole   OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            none(1),
+                            reflector(2),
+                            generator(3)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Entity role"
+     DEFVAL             { reflector }
+     ::= { cienaCesBenchmarkEntityEntry 3 }   
+
+ cienaCesBenchmarkEntityEntryPortId OBJECT-TYPE
+     SYNTAX             Integer32 (1..65535)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Entity port under test"
+     ::= { cienaCesBenchmarkEntityEntry 4 }   
+     
+ cienaCesBenchmarkEntityEntryMode OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            none(1),
+                            inService(2),
+                            outOfService(3),
+                            vidOutOfService(4),
+                            evcOutOfService(5)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Entity mode"
+     DEFVAL             { inService }
+     ::= { cienaCesBenchmarkEntityEntry 5 }   
+
+ cienaCesBenchmarkEntityEntryAdminState OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkAdminState
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Entity admin state."
+     DEFVAL             { disabled }
+     ::= { cienaCesBenchmarkEntityEntry 6 }
+
+ cienaCesBenchmarkEntityEntryLocalMac OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "The FPGA internal test port assigned mac address."
+     ::= { cienaCesBenchmarkEntityEntry 7 }
+
+ cienaCesBenchmarkEntityEntrySlotId OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "The slot Id of the line module associated
+                 with this entity."
+     ::= { cienaCesBenchmarkEntityEntry 8 }
+
+ cienaCesBenchmarkEntityEntryReflectorVendorType  OBJECT-TYPE
+     SYNTAX             INTEGER {
+                           other(1),
+                           ciena(2)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Indicator as to what type of equipment is generating the 
+                 test traffic on the remote end."
+     DEFVAL             { ciena }
+     ::= { cienaCesBenchmarkEntityEntry 9 }
+
+ cienaCesBenchmarkEntityEntryReflectionLevel  OBJECT-TYPE
+     SYNTAX             INTEGER {
+                           none(1),
+                           l2only(2),
+                           l2ToL3IPv4only(3),
+                           l2ToL3IPv6only(4),
+                           l2ToL4IPv4only(5),
+                           l2ToL4IPv6only(6),
+                           l2ToL4(7)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "For reflector entities, this indicates the minimum reflection
+                 level required. If test traffic is going over an ethernet L2
+                 cloud, l2-only is fine. But if the test traffic is going over
+                 an IP network, the reflector needs to be able to swap L2 and
+                 L3 fields. Depending on the type of IP network, the user
+                 needs to configured IPv4 or IPv6. L2 to L4 will swap MAC 
+                 addresses, IP addresses and src and destination L4 port.
+                 Depending on the reflection level required, a different device
+                 is used to implement the reflector."
+     ::= { cienaCesBenchmarkEntityEntry 10 }
+
+ cienaCesBenchmarkEntityEntryGeneratorHFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32 (64..9216)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Maximum frame size that should be generated by the generator
+                 device. This H frame size should to leave enough room for
+                 extra encapsulation bytes that will be pushed onto the 
+                 packet by the switch when pushing this test packet out 
+                 the network side port.
+                 The generator device will ensure that any frame size list
+                 or EMIX used during the test is adjusted accordingly"
+     ::= { cienaCesBenchmarkEntityEntry 11 }
+
+ cienaCesBenchmarkEntityEntryMaxConfigTestInstances  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of test instances that can
+                 be configured on this entity."
+     ::= { cienaCesBenchmarkEntityEntry 12 }
+
+ cienaCesBenchmarkEntityEntryMaxSimultaneousTestInstances OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum number of test instances that can
+                 be enabled (reflector) or running (generator)
+                 on this entity, given the availability of 
+                 hw sessions."
+     ::= { cienaCesBenchmarkEntityEntry 13 }
+
+ cienaCesBenchmarkEntityEntryOperEnabled OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Entity operational enable/disable. An entity
+                 is operationally enabled when the feature is
+                 enabled, the entity is enabled and at least one
+                 test instance associated with that entity is 
+                 enabled (reflector) or running (generator)"
+     ::= { cienaCesBenchmarkEntityEntry 14 }
+
+ cienaCesBenchmarkEntityEntryNumTestInstancesConfigured    OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Number of test instances currently configured
+                        on this entity."
+     ::= { cienaCesBenchmarkEntityEntry 15 }
+
+ cienaCesBenchmarkEntityEntryNumTestInstancesEnabled       OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Number of test instances currently enabled."
+     ::= { cienaCesBenchmarkEntityEntry 16 }
+
+ cienaCesBenchmarkEntityEntryGenNumTestInstancesRunning  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Number of test instances currently running."
+     ::= { cienaCesBenchmarkEntityEntry 17 }
+
+ cienaCesBenchmarkEntityEntryBwAvailable              OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Bandwidth available for test traffic if 
+                        a reflector. Bandwidth remaining for other
+                        test instances to be started if a generator."
+     ::= { cienaCesBenchmarkEntityEntry 18 }
+
+ cienaCesBenchmarkEntityEntryGenBwUsedByRunningTests  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Bandwidth currently used by test instances
+                        currently running, in Mbps."
+     ::= { cienaCesBenchmarkEntityEntry 19 }
+
+ cienaCesBenchmarkEntityEntryAvailableHwSessions    OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "Maximum number of simultaneous hardware sessions available 
+                        on this platform."
+     ::= { cienaCesBenchmarkEntityEntry 20 }
+     
+ cienaCesBenchmarkEntityEntryAllocatedHwSessions    OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "The number of allocated hardware sessions"
+     ::= { cienaCesBenchmarkEntityEntry 21 }     
+
+ cienaCesBenchmarkEntityEntryRowStatus              OBJECT-TYPE
+     SYNTAX             RowStatus
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Used to manage the creation and deletion of the
+                        conceptual rows in this table.  To create a row in
+                        this table, set this object to 'createAndGo'.
+                        To delete a row in this table, set this object to
+                        'destroy'.  If the entry exists, it is displayed
+                        as 'active'."
+     ::= { cienaCesBenchmarkEntityEntry 22 }
+
+ cienaCesBenchmarkEntityEntryClearStats  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Set to true to clear all global fpga counters for the given entity.
+                 Clear is only allowed for a reflector if no test instances are
+                 enabled, and for a generator if no test instances are running. The
+                 value is reset to false once the transaction is completed."
+     ::= { cienaCesBenchmarkEntityEntry 23 }
+
+ cienaCesBenchmarkEntityEntryReflectorMacValidation  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "This attribute is only valid for the reflector entity and indicates
+                 whether the reflector verifies that the destination MAC of the test
+                 frames matches the MAC address associated with  benchamrk reflector
+                 entity. MAC Validation can only be disabled (False) in out-if-service or
+                 evc/vid-out-of-service mode."
+     ::= { cienaCesBenchmarkEntityEntry 24 }
+
+ --
+ -- BENCHMARK Entity Stats table
+ --
+ cienaCesBenchmarkEntityStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEntityStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of benchmark entity statistics entries."
+     ::= { cienaCesBenchmarkModule 3 }
+                
+ cienaCesBenchmarkEntityStatsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEntityStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK Entity characteristics."
+     INDEX { cienaCesBenchmarkEntityEntryId }
+     ::= { cienaCesBenchmarkEntityStatsTable 1 } 
+
+ CienaCesBenchmarkEntityStatsEntry ::= SEQUENCE {
+     cienaCesBenchmarkEntityStatsEntryClear                  TruthValue,
+     cienaCesBenchmarkEntityStatsEntryPortTxBytes            Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxPkts             Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxCrcErrorPkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxUcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxMcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxBcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxUndersizePkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxOversizePkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxFragmentsPkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxJabbersPkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxPausePkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxDropPkts         Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxDiscardPkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTxLOutRangePkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx64OctsPkts       Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx65To127Pkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx128To255Pkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx256To511Pkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx512To1023Pkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx1024To1518Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx1519To2047Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx2048To4095Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortTx4096To9216Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxBytes            Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxPkts             Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxExDeferPkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxDeferPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxGiantPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxUnderRunPkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxCrcErrorPkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxLCheckErrorPkts  Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxLOutRangePkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxPausePkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxUcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxMcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRxBcastPkts        Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx64OctsPkts       Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx65To127Pkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx128To255Pkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx256To511Pkts     Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx512To1023Pkts    Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx1024To1518Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx1519To2047Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx2048To4095Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryPortRx4096To9216Pkts   Counter64,
+     cienaCesBenchmarkEntityStatsEntryFpgaMissClassPkts      Counter64,
+     cienaCesBenchmarkEntityStatsEntryFpgaCrcErrPkts         Counter64,
+     cienaCesBenchmarkEntityStatsEntryFpgaUdpChkSumErrPkts   Counter64
+ }
+ 
+ cienaCesBenchmarkEntityStatsEntryClear  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             obsolete
+     DESCRIPTION
+                "Set to true to clear all port and/or global fpga
+                 counters for the given entity. Clear is only allowed
+                 for a reflector if no test instances are enabled, and
+                 for a generator if no test instances are running.
+                 The value is reset to False once the transaction is completed.
+                 This has been obsoleted by cienaCesBenchmarkEntityEntryClearStats."
+     ::= { cienaCesBenchmarkEntityStatsEntry 1 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxBytes            OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of bytes transmitted by the benchmark port"
+     ::= { cienaCesBenchmarkEntityStatsEntry 2 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxPkts             OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets transmitted by the benchmark port"
+     ::= { cienaCesBenchmarkEntityStatsEntry 3 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxCrcErrorPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets with CRC errors"
+     ::= { cienaCesBenchmarkEntityStatsEntry 4 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxUcastPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of unicast packets transmitted by the benchmark port"
+     ::= { cienaCesBenchmarkEntityStatsEntry 5 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxMcastPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of multicast packets transmitted by the benchmark port"
+     ::= { cienaCesBenchmarkEntityStatsEntry 6 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxBcastPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of broadcast packets transmitted by the benchmark port"
+     ::= { cienaCesBenchmarkEntityStatsEntry 7 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxUndersizePkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              less than 64 octets long (excluding framing bits,
+              but including FCS octets) and were otherwise well
+              formed."
+     ::= { cienaCesBenchmarkEntityStatsEntry 8 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxOversizePkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              longer than 1518 octets (excluding framing bits,
+              but including FCS octets) and were otherwise
+              well formed."
+     ::= { cienaCesBenchmarkEntityStatsEntry 9 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxFragmentsPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were less
+              than 64 octets in length (excluding framing bits but
+              including FCS octets) and had either a bad Frame
+              Check Sequence (FCS) with an integral number of
+              octets (FCS Error) or a bad FCS with a non-integral
+              number of octets (Alignment Error)."
+     ::= { cienaCesBenchmarkEntityStatsEntry 10 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxJabbersPkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of packets received that were
+              longer than 1518 octets (excluding framing bits,
+              but including FCS octets), and had either a bad
+              Frame Check Sequence (FCS) with an integral number
+              of octets (FCS Error) or a bad FCS with a
+              non-integral number of octets (Alignment Error)."
+     ::= { cienaCesBenchmarkEntityStatsEntry 11 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxPausePkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The transmit pause packets for the port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 12 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxDropPkts        OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of dropped packets on the benchmark port when
+              traffic profiles are enabled (311v only)."
+    ::= { cienaCesBenchmarkEntityStatsEntry 13 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxDiscardPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of discarded packets."
+    ::= { cienaCesBenchmarkEntityStatsEntry 14 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTxLOutRangePkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The transmit length out of range packet count."
+    ::= { cienaCesBenchmarkEntityStatsEntry 15 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx64OctsPkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 64-byte packets transmitted on the benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 16 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx65To127Pkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 64 to 127-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 17 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx128To255Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 128 to 255-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 18 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx256To511Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 256 to 511-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 19 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx512To1023Pkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 512 to 1023-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 20 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx1024To1518Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 1024 to 1518-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 21 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx1519To2047Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 1519 to 2047-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 22 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx2048To4095Pkts OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 2048 to 4095-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 23 }
+
+ cienaCesBenchmarkEntityStatsEntryPortTx4096To9216Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of 4096 to 9216-byte packets transmitted on the
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 24 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxBytes           OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of bytes received on the benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 25 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxPkts            OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets received on the benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 26 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxExDeferPkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of excessive deferred packets."
+    ::= { cienaCesBenchmarkEntityStatsEntry 27 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxDeferPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of deferred packets."
+    ::= { cienaCesBenchmarkEntityStatsEntry 28 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxGiantPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of too big packets."
+    ::= { cienaCesBenchmarkEntityStatsEntry 29 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxUnderRunPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Underrun packet count for the benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 30 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxCrcErrorPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets received with CRC errors."
+    ::= { cienaCesBenchmarkEntityStatsEntry 31 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxLCheckErrorPkts OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Number of packets with length check errors."
+    ::= { cienaCesBenchmarkEntityStatsEntry 32 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxLOutRangePkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The number of frames received by the benchmark port
+              that exceeded the maximum permitted frame size."
+    ::= { cienaCesBenchmarkEntityStatsEntry 33 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxPausePkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total receive pause packets for the port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 34 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxUcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of unicast packets received by benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 35 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxMcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of multicast packets received by benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 36 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRxBcastPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of broadcast packets received by benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 37 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx64OctsPkts      OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 64-byte packets received by benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 38 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx65To127Pkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 65 to 127-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 39 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx128To255Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 128 to 255-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 40 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx256To511Pkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 256 to 511-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 41 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx512To1023Pkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 512 to 1023-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 42 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx1024To1518Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 1024 to 1518-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 43 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx1519To2047Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 1519 to 2047-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 44 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx2048To4095Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 2048 to 4095-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 45 }
+
+ cienaCesBenchmarkEntityStatsEntryPortRx4096To9216Pkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The total number of 4096 to 9216-byte packets received by
+              benchmark port."
+    ::= { cienaCesBenchmarkEntityStatsEntry 46 }
+
+ cienaCesBenchmarkEntityStatsEntryFpgaMissClassPkts   OBJECT-TYPE
+     SYNTAX             Counter64
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Test packets received that didn't match any enabled
+                 test session."
+     ::= { cienaCesBenchmarkEntityStatsEntry 47 }
+
+ cienaCesBenchmarkEntityStatsEntryFpgaCrcErrPkts      OBJECT-TYPE
+     SYNTAX             Counter64
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Test packets received with CRC errors"
+     ::= { cienaCesBenchmarkEntityStatsEntry 48 }
+
+ cienaCesBenchmarkEntityStatsEntryFpgaUdpChkSumErrPkts  OBJECT-TYPE
+     SYNTAX             Counter64
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Test packets received with UDP checksum errors"
+     ::= { cienaCesBenchmarkEntityStatsEntry 49 }
+
+ --
+ -- EMIX Sequence Table
+ --
+ cienaCesBenchmarkEmixSequenceTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEmixSequenceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of configured EMIX sequences
+              on this node."
+     ::= { cienaCesBenchmarkModule 4 }
+
+ cienaCesBenchmarkEmixSequenceEntry   OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEmixSequenceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "EMIX sequence entry."
+     INDEX { cienaCesBenchmarkEmixSequenceId }
+     ::= { cienaCesBenchmarkEmixSequenceTable 1 }
+
+ CienaCesBenchmarkEmixSequenceEntry ::= SEQUENCE {
+     cienaCesBenchmarkEmixSequenceId            Integer32,
+     cienaCesBenchmarkEmixSequenceName          DisplayString,
+     cienaCesBenchmarkEmixSequence              DisplayString,
+     cienaCesBenchmarkEmixSequenceUFrameSize    Integer32,
+     cienaCesBenchmarkEmixSequenceNumOfRef      Integer32,
+     cienaCesBenchmarkEmixSequenceUserCreated   TruthValue,
+     cienaCesBenchmarkEmixSequenceRowStatus     RowStatus
+ }
+
+ cienaCesBenchmarkEmixSequenceId           OBJECT-TYPE
+     SYNTAX       Integer32  (1..32)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Unique Id of the EMIX sequence entry"
+     ::= { cienaCesBenchmarkEmixSequenceEntry 1 }
+
+ cienaCesBenchmarkEmixSequenceName         OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (1..46))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Name of this EMIX sequence"
+     ::= { cienaCesBenchmarkEmixSequenceEntry 2 }
+
+ cienaCesBenchmarkEmixSequence             OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (1..16))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "EMIX sequence which is a sequence of up to
+                   16 letters from the following set, that can
+                   be repeated, where each letter is associated with
+                   the frame size below it:
+                        a    b    c    d    e    f    g    h    u     v   w   x 
+                       64   128  256  512  1024 1280 1518 MTU custom 84  68  88 
+                   The u frame size is user configurable via the
+                   cienaCesBenchmarkEmixSequenceUFrameSize attribute
+                   while the h frame size is the maximum frame size
+                   configured at the entity level. If the h frame size is
+                   not configured at the entity level, h takes the value of
+                   the maximum frame size of the port under test.
+                   Letter v is the minimum frame size for IPv6 untagged or dot1q
+                   test frames, w is the minimum for IPv4 qinq test frames, and
+                   x is the minimum for IPv6 qinq test frames.
+                   The EMIX character set is available via table
+                   cienaCesBenchmarkEmixCharacterSetTable."
+     ::= { cienaCesBenchmarkEmixSequenceEntry 3 }
+
+ cienaCesBenchmarkEmixSequenceUFrameSize   OBJECT-TYPE
+     SYNTAX       Integer32 (64..9216)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "The frame size associated with the u letter
+                   in the given sequence. The default value is
+                   594."
+     ::= { cienaCesBenchmarkEmixSequenceEntry 4 }
+
+ cienaCesBenchmarkEmixSequenceNumOfRef     OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION  "Number of generator test profiles currently
+                   using this EMIX sequence for testing.
+                   If this is the default EMIX sequence
+                   set in the generator, that also count
+                   as one reference."
+     ::= { cienaCesBenchmarkEmixSequenceEntry 5 }
+
+ cienaCesBenchmarkEmixSequenceUserCreated  OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION  "Flag indicating whether this sequence was 
+                   created by the user or by the system at
+                   initialization. Only user created sequences
+                   are editable."
+     ::= { cienaCesBenchmarkEmixSequenceEntry 6 }
+
+ cienaCesBenchmarkEmixSequenceRowStatus   OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Used to manage the creation and deletion of the
+                   conceptual rows in this table.  To create a row in
+                   this table, set this object to 'createAndGo'.
+                   To delete a row in this table, set this object to
+                   'destroy'.  If the entry exists, it is displayed
+                   as 'active'."
+     ::= { cienaCesBenchmarkEmixSequenceEntry 7 }
+
+ ---
+ --- EMIX Sequence Frame Size Table per Entity
+ ---
+ cienaCesBenchmarkEmixFrameSizeTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEmixFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of frame sizes associated
+              with the specified EMIX sequence Id."
+     ::= { cienaCesBenchmarkModule 5 }
+
+ cienaCesBenchmarkEmixFrameSizeEntry  OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEmixFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Frame size associated with given EMIX 
+                  sequence ID and frame size index on a given Entity"
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkEmixSequenceId,
+             cienaCesBenchmarkEmixFrameSizeIndex }
+     ::= { cienaCesBenchmarkEmixFrameSizeTable 1 }
+
+ CienaCesBenchmarkEmixFrameSizeEntry ::= SEQUENCE {
+     cienaCesBenchmarkEmixFrameSizeIndex           Integer32,
+     cienaCesBenchmarkEmixFrameSizeEntryFrameSize  Integer32
+ }
+
+ cienaCesBenchmarkEmixFrameSizeIndex     OBJECT-TYPE
+     SYNTAX       Integer32  (1..16)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Index of frame size in array of frame sizes
+                  for the given EMIX sequence."
+     ::= { cienaCesBenchmarkEmixFrameSizeEntry 1 }
+
+ cienaCesBenchmarkEmixFrameSizeEntryFrameSize OBJECT-TYPE
+     SYNTAX       Integer32  (64..9216)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Frame size associated with the letter at the
+                  position given by cienaCesBenchmarkEmixFrameSizeIndex
+                  in the EMIX sequence with Id
+                  cienaCesBenchmarkEmixSequenceId."
+     ::= { cienaCesBenchmarkEmixFrameSizeEntry 2 }
+
+ ---
+ --- EMIX Sequence Average Frame Size per Generator Entity
+ ---
+ cienaCesBenchmarkEmixAvgFrameSizeTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEmixAvgFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the average frame size associated
+              with the specified EMIX sequence Id on a given Entity."
+     ::= { cienaCesBenchmarkModule 6 }
+
+ cienaCesBenchmarkEmixAvgFrameSizeEntry  OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEmixAvgFrameSizeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Average frame size associated with given EMIX 
+                  sequence ID and Entity. Only valid for Generator
+                  entities."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkEmixSequenceId }
+     ::= { cienaCesBenchmarkEmixAvgFrameSizeTable 1 }
+
+ CienaCesBenchmarkEmixAvgFrameSizeEntry ::= SEQUENCE {
+     cienaCesBenchmarkEmixAvgFrameSize  Integer32
+ }
+
+ cienaCesBenchmarkEmixAvgFrameSize   OBJECT-TYPE
+     SYNTAX       Integer32  (64..9216)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Average frame size for the EMIX sequence with
+                  Id cienaCesBenchmarkEmixSequenceId on the
+                  generator entity with Id cienaCesBenchmarkEntityEntryId."
+     ::= { cienaCesBenchmarkEmixAvgFrameSizeEntry 1 }
+ 
+ ---
+ --- KPI Profile Table
+ ---
+ cienaCesBenchmarkKpiProfileTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkKpiProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of configured Key Performance
+              Indicator profiles on this node."
+     ::= { cienaCesBenchmarkModule 7 }
+
+ cienaCesBenchmarkKpiProfileEntry   OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkKpiProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Hw session allocation entry."
+     INDEX { cienaCesBenchmarkKpiProfileId }
+     ::= { cienaCesBenchmarkKpiProfileTable 1 }
+
+ CienaCesBenchmarkKpiProfileEntry ::= SEQUENCE {
+     cienaCesBenchmarkKpiProfileId            Integer32,
+     cienaCesBenchmarkKpiProfileName          DisplayString,
+     cienaCesBenchmarkKpiProfileNumOfRef      Integer32,
+     cienaCesBenchmarkKpiProfileRowStatus     RowStatus
+ }
+
+ cienaCesBenchmarkKpiProfileId            OBJECT-TYPE
+     SYNTAX       Integer32 (1..32)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Unique Id of the KPI profile entry"
+     ::= { cienaCesBenchmarkKpiProfileEntry 1 }
+
+ cienaCesBenchmarkKpiProfileName          OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (1..46))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Name of a the KPI profile"
+     ::= { cienaCesBenchmarkKpiProfileEntry 2 }
+
+ cienaCesBenchmarkKpiProfileNumOfRef      OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION  "Number of generator test profiles currently
+                   using this KPI profile for results analysis.
+                   If this is the default KPI profile set in
+                   the generator, that also count as one reference."
+     ::= { cienaCesBenchmarkKpiProfileEntry 3 }
+
+ cienaCesBenchmarkKpiProfileRowStatus    OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Used to manage the creation and deletion of the 
+                   conceptual rows in this table.  To create a row in
+                   this table, set this object to 'createAndGo'.
+                   To delete a row in this table, set this object to 
+                   'destroy'.  If the entry exists, it is displayed 
+                   as 'active'."
+     ::= { cienaCesBenchmarkKpiProfileEntry 4 }
+
+ ---
+ --- KPI value per PCP per Color Table
+ ---
+ cienaCesBenchmarkKpiPcpColorTable        OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkKpiPcpColorEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of configured Key Performance
+              Indicator per KPI profile, per PCP and per Color."
+     ::= { cienaCesBenchmarkModule 8 }
+
+ cienaCesBenchmarkKpiPcpColorEntry        OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkKpiPcpColorEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Entry for the KPI values for the given KPI profile,
+                  PCP and color."
+     INDEX { cienaCesBenchmarkKpiProfileId,
+             cienaCesBenchmarkKpiPcpIndex,
+             cienaCesBenchmarkKpiColorIndex }
+     ::= { cienaCesBenchmarkKpiPcpColorTable 1 }
+
+ CienaCesBenchmarkKpiPcpColorEntry ::= SEQUENCE {
+     cienaCesBenchmarkKpiPcpIndex      Integer32,
+     cienaCesBenchmarkKpiColorIndex    Integer32,
+     cienaCesBenchmarkKpiPcp           Integer32,
+     cienaCesBenchmarkKpiColor         CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkKpiThroughput    CienaCesBenchmarkThroughputKpiPercent,
+     cienaCesBenchmarkKpiFrameloss     CienaCesBenchmarkFramelossKpiPercent,
+     cienaCesBenchmarkKpiLatency       Integer32,
+     cienaCesBenchmarkKpiPdv           Integer32
+ }
+
+ cienaCesBenchmarkKpiPcpIndex        OBJECT-TYPE
+     SYNTAX       Integer32  (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Index for the PCP"
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 1 }
+
+ cienaCesBenchmarkKpiColorIndex      OBJECT-TYPE
+     SYNTAX       Integer32  (1..2)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Index for the PCP"
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 2 }
+
+ cienaCesBenchmarkKpiPcp             OBJECT-TYPE
+     SYNTAX       Integer32  (0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "PCP value associated with this entry"
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 3 }
+
+ cienaCesBenchmarkKpiColor           OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkColorTest
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Traffic color, green or yellow, associated with these
+                  KPIs."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 4 }
+
+ cienaCesBenchmarkKpiThroughput      OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkThroughputKpiPercent
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Throughput KPI for the given KPI profile, PCP and color
+                  expressed in percent of bandwidth * 10000 to provide a 4
+                  decimal point value."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 5 }
+
+ cienaCesBenchmarkKpiFrameloss       OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkFramelossKpiPercent
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Frameloss KPI for the given KPI profile, PCP and color
+                  expressed in percent of bandwidth * 10000 to provide a 4
+                  decimal point value."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 6 }
+
+ cienaCesBenchmarkKpiLatency         OBJECT-TYPE
+     SYNTAX       Integer32
+     UNITS       "microseconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Maximum latency in micro-seconds that the latency result
+                  should not exceed in order for the test to be considered
+                  a pass."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 7 }
+
+ cienaCesBenchmarkKpiPdv             OBJECT-TYPE
+     SYNTAX       Integer32
+     UNITS       "microseconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Maximum PDV in micro-seconds that the PDV test result
+                  should not exceed in order for the test to be 
+                  considered a pass."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 8 }
+
+ ---
+ --- Bandwidth Allocation Profile Table
+ ---
+ cienaCesBenchmarkBwAllocProfileTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkBwAllocProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of configured bandwidth
+              allocation profiles on this node."
+     ::= { cienaCesBenchmarkModule 9 }
+
+ cienaCesBenchmarkBwAllocProfileEntry   OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkBwAllocProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BW allocation profile entry"
+     INDEX { cienaCesBenchmarkBwAllocProfileId }
+     ::= { cienaCesBenchmarkBwAllocProfileTable 1 }
+
+ CienaCesBenchmarkBwAllocProfileEntry ::= SEQUENCE {
+     cienaCesBenchmarkBwAllocProfileId            Integer32,
+     cienaCesBenchmarkBwAllocProfileName          DisplayString,
+     cienaCesBenchmarkBwAllocProfileNumOfRef      Integer32,
+     cienaCesBenchmarkBwAllocProfileRowStatus     RowStatus
+ }
+
+ cienaCesBenchmarkBwAllocProfileId       OBJECT-TYPE
+     SYNTAX       Integer32  (1..32)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Unique Id of the bandwidth allocation
+                  profile entry"
+     ::= { cienaCesBenchmarkBwAllocProfileEntry 1 }
+
+ cienaCesBenchmarkBwAllocProfileName     OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (1..46))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Name of a the bandwidth allocation
+                   profile"
+     ::= { cienaCesBenchmarkBwAllocProfileEntry 2 }
+
+ cienaCesBenchmarkBwAllocProfileNumOfRef OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION  "Number of generator test profiles currently
+                   using this bandwidth allocation profile
+                   for testing.
+                   If this is the default BW allocation
+                   profile set in the generator, that also count
+                   as one reference."
+     ::= { cienaCesBenchmarkBwAllocProfileEntry 3 }
+
+ cienaCesBenchmarkBwAllocProfileRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "Used to manage the creation and deletion of the
+                   conceptual rows in this table.  To create a row in
+                   this table, set this object to 'createAndGo'.
+                   To delete a row in this table, set this object to
+                   'destroy'.  If the entry exists, it is displayed
+                   as 'active'."
+     ::= { cienaCesBenchmarkBwAllocProfileEntry 4 }
+
+ ---
+ --- BW allocation value per profile per PCP
+ ---
+ cienaCesBenchmarkBwRatioTable        OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkBwRatioEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the list of configured bandwidth
+              ratio per profile, per PCP."
+     ::= { cienaCesBenchmarkModule 10 }
+
+ cienaCesBenchmarkBwRatioEntry          OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkBwRatioEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Entry for bandwidth percent per BW Allocation 
+                  profile and PCP"
+     INDEX { cienaCesBenchmarkBwAllocProfileId,
+             cienaCesBenchmarkBwRatioPcpIndex }
+     ::= { cienaCesBenchmarkBwRatioTable 1 }
+
+ CienaCesBenchmarkBwRatioEntry ::= SEQUENCE {
+     cienaCesBenchmarkBwRatioPcpIndex    Integer32,
+     cienaCesBenchmarkBwRatioPcp         Integer32,
+     cienaCesBenchmarkBwRatio            Integer32
+ }
+
+ cienaCesBenchmarkBwRatioPcpIndex  OBJECT-TYPE
+     SYNTAX       Integer32  (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Index for the PCP"
+     ::= { cienaCesBenchmarkBwRatioEntry 1 }
+
+ cienaCesBenchmarkBwRatioPcp      OBJECT-TYPE
+     SYNTAX       Integer32  (0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "PCP value associated with this entry."
+     ::= { cienaCesBenchmarkBwRatioEntry 2 }
+
+ cienaCesBenchmarkBwRatio         OBJECT-TYPE
+     SYNTAX       Integer32 (0..100)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Ratio of test bandwidth to allocate to the
+                  test session with this PCP value."
+     ::= { cienaCesBenchmarkBwRatioEntry 3 }
+
+ --
+ -- BENCHMARK Profile table
+ --
+ cienaCesBenchmarkProfileTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of profile entries."
+     ::= { cienaCesBenchmarkModule 11 }
+                
+ cienaCesBenchmarkProfileEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK Profile characteristics."
+     INDEX { cienaCesBenchmarkProfileEntryId }
+     ::= { cienaCesBenchmarkProfileTable 1 } 
+
+ CienaCesBenchmarkProfileEntry ::= SEQUENCE {
+     cienaCesBenchmarkProfileEntryId                  Integer32,
+     cienaCesBenchmarkProfileEntryName                DisplayString,
+     -- Configuration parameters
+     cienaCesBenchmarkProfileEntryBandwidth           Integer32,
+     cienaCesBenchmarkProfileEntryExcessBandwidth     Integer32,
+     cienaCesBenchmarkProfileEntryInterval            INTEGER,
+     cienaCesBenchmarkProfileEntryDuration            INTEGER,
+     cienaCesBenchmarkProfileEntrySetFrameSizeList    DisplayString,
+     cienaCesBenchmarkProfileEntryMaxSearches         Integer32,
+     cienaCesBenchmarkProfileEntryMaxSamples          Integer32,
+     cienaCesBenchmarkProfileEntrySamplingInterval    Integer32,
+     cienaCesBenchmarkProfileEntryFrameLossStartBw    INTEGER,
+     cienaCesBenchmarkProfileEntryVidValidation       TruthValue,
+     cienaCesBenchmarkProfileEntryPcpValidation       TruthValue,
+     cienaCesBenchmarkProfileEntryColorValidation     TruthValue,
+     cienaCesBenchmarkProfileEntryKpiProfileId        Integer32,
+     cienaCesBenchmarkProfileEntryBwAllocProfileId    Integer32,
+     cienaCesBenchmarkProfileEntryEmixSequenceId      Integer32,
+     -- Payload parameters
+     cienaCesBenchmarkProfileEntryEncapType           INTEGER,
+     cienaCesBenchmarkProfileEntryPduType             INTEGER,
+     cienaCesBenchmarkProfileEntryDstmac              MacAddress,
+     cienaCesBenchmarkProfileEntrySVid                Integer32,
+     cienaCesBenchmarkProfileEntrySPcp                CienaCesBenchmarkPcpBitmap,
+     cienaCesBenchmarkProfileEntrySColor              CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkProfileEntryCVid                Integer32,
+     cienaCesBenchmarkProfileEntryCPcp                CienaCesBenchmarkPcpBitmap,
+     cienaCesBenchmarkProfileEntryCColor              CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkProfileEntryTpid                Integer32,
+     cienaCesBenchmarkProfileEntryDscp                Integer32, 
+     cienaCesBenchmarkProfileEntrySrcInetAddrType     InetAddressType,
+     cienaCesBenchmarkProfileEntrySrcInetAddr         InetAddress,
+     cienaCesBenchmarkProfileEntryDstInetAddrType     InetAddressType,
+     cienaCesBenchmarkProfileEntryDstInetAddr         InetAddress,
+     cienaCesBenchmarkProfileEntryCustomPayload       OCTET STRING,
+     -- Traffic test parameters
+     cienaCesBenchmarkProfileEntryThroughputTest      TruthValue,
+     cienaCesBenchmarkProfileEntryFramelossTest       TruthValue,
+     cienaCesBenchmarkProfileEntryLatencyTest         TruthValue,
+     cienaCesBenchmarkProfileEntryPdvTest             TruthValue,
+     cienaCesBenchmarkProfileEntryBurstTest           TruthValue,
+     cienaCesBenchmarkProfileEntryRfc2544Suite        TruthValue,
+     cienaCesBenchmarkProfileEntryY1564Test           TruthValue,
+     -- Operational status
+     cienaCesBenchmarkProfileEntryHwSessionsRequired  Integer32,
+     cienaCesBenchmarkProfileEntryNumOfRef            Integer32,
+     cienaCesBenchmarkProfileEntryRowStatus           RowStatus
+ } 
+
+ cienaCesBenchmarkProfileEntryId                  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Index for BENCHMARK profile records."
+     ::= { cienaCesBenchmarkProfileEntry 1 }   
+     
+ cienaCesBenchmarkProfileEntryName                OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (1..46))
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Name of the profile as entered when created."
+     ::= { cienaCesBenchmarkProfileEntry 2 }
+
+ cienaCesBenchmarkProfileEntryBandwidth           OBJECT-TYPE
+     SYNTAX             Integer32 (1..10000)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Maximum bandwidth to use when generating green test
+                 traffic for the profile."
+     ::= { cienaCesBenchmarkProfileEntry 3 }
+
+ cienaCesBenchmarkProfileEntryExcessBandwidth    OBJECT-TYPE
+     SYNTAX             Integer32 (0..10000)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Maximum bandwidth to use when generating yellow test
+                        traffic for the profile. When testing for red color,
+                        this bandwidth is multiplied by 1.25"
+     DEFVAL             { 0 }
+     ::= { cienaCesBenchmarkProfileEntry 4 }
+
+ cienaCesBenchmarkProfileEntryInterval           OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            t15min(1),
+                            t1hr(2),
+                            t6hr(3),
+                            tCompletion(4),
+                            t2hr(5)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Interval between the start of one test group to the start
+                 of the next test group."
+     DEFVAL             { tCompletion }
+     ::= { cienaCesBenchmarkProfileEntry 5 }
+
+ cienaCesBenchmarkProfileEntryDuration           OBJECT-TYPE    
+     SYNTAX             INTEGER {
+                            t15min(1),
+                            t1hr(2),
+                            t6hr(3),
+                            t24hr(4),
+                            tIndefinite(5),
+                            tOnce(6)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Duration of the testing. The test group is repeated until
+                 the duration ends. When indefinite is set, test group is
+                 run only once to completion"
+     DEFVAL             { tOnce }
+     ::= { cienaCesBenchmarkProfileEntry 6 }
+
+ cienaCesBenchmarkProfileEntrySetFrameSizeList   OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (0..255))
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Used to replace the existing frame size table with the specified list.
+                 More than one values can be listed and are separated by commas."
+     ::= { cienaCesBenchmarkProfileEntry 7 }
+
+ cienaCesBenchmarkProfileEntryMaxSearches        OBJECT-TYPE
+     SYNTAX             Integer32 (1..16)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "For the throughput test, this is the maximum number of
+                 searches to find a transmit rate without drops for a
+                 given frame size."
+     DEFVAL             { 7 }
+     ::= { cienaCesBenchmarkProfileEntry 8 }
+
+ cienaCesBenchmarkProfileEntryMaxSamples         OBJECT-TYPE
+     SYNTAX             Integer32 (2..20)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "For the latency and PDV tests, this is the number of
+                 samples to take in order to determine the min, avg
+                 and max latency and avg PDV."
+     DEFVAL             { 10 }
+     ::= { cienaCesBenchmarkProfileEntry 9 }
+
+ cienaCesBenchmarkProfileEntrySamplingInterval   OBJECT-TYPE
+     SYNTAX             Integer32 (1..600)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "For the latency and PDV tests, this is the interval,
+                 in 100ms, to wait between samples."
+     DEFVAL             { 1 }
+     ::= { cienaCesBenchmarkProfileEntry 10 }
+
+ cienaCesBenchmarkProfileEntryFrameLossStartBw   OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            profileBandwidth(1),
+                            maximumThroughput(2),
+                            maximumLineRate(3)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "For the frame loss test, this indicates which bandwidth
+                 value to use as the starting bandwidth; the maximum
+                 bandwidth determined via the throughput test, the
+                 bandwidth parameter configured in the profile, or
+                 the maximum bandwidth of the link.
+                 The value maximumLineRate(3) is not supported."
+     DEFVAL             { maximumThroughput }
+     ::= { cienaCesBenchmarkProfileEntry 11 }
+
+ cienaCesBenchmarkProfileEntryVidValidation     OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Indicates whether VID validation is performed in 
+                 the classifier or not on the returning packet. If vid
+                 validation is set to false, PCP and Color validation are
+                 ignored and automatically become false."
+     DEFVAL             { true }
+     ::= { cienaCesBenchmarkProfileEntry 12 }
+
+ cienaCesBenchmarkProfileEntryPcpValidation     OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Used to indicate whether the PCP value of the
+                        test packet should be used to classifier the reflected
+                        packets or not. When color remarking is used, this should
+                        be set to false. Default is true."
+     DEFVAL             { true }
+     ::= { cienaCesBenchmarkProfileEntry 13 }
+
+ cienaCesBenchmarkProfileEntryColorValidation   OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Used to indicate whether the color bit of the
+                        test packet should be used to classifier the reflected
+                        packets or not. In color unaware testing, this should
+                        be set to false. Default is true."
+     DEFVAL             { true }
+     ::= { cienaCesBenchmarkProfileEntry 14 }
+ 
+ cienaCesBenchmarkProfileEntryKpiProfileId      OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Name of a valid KPI profile, from the 
+                        cienaCesBenchmarkKpiProfileTable, to use when
+                        analysing the test results for this profile."
+     ::= { cienaCesBenchmarkProfileEntry 15 }
+
+ cienaCesBenchmarkProfileEntryBwAllocProfileId   OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Id of a valid Bandwidth Allocation profile,
+                        from the cienaCesBenchmarkBwAllocProfileTable,
+                        used for distributing the profile bandwidth amongst
+                        the configured PCP values for this profile when running
+                        tests."
+     ::= { cienaCesBenchmarkProfileEntry 16 }
+
+ cienaCesBenchmarkProfileEntryEmixSequenceId    OBJECT-TYPE
+     SYNTAX             Integer32 (0..32)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Id of a valid EMIX sequence configured in the
+                        cienaCesBenchmarkEmixSequenceTable, to use when y1564
+                        is selected. The EMIX sequence is used instead of the
+                        frame size list if and only if y1564 is selected."
+     ::= { cienaCesBenchmarkProfileEntry 17 }
+
+ cienaCesBenchmarkProfileEntryEncapType        OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            untagged(1),
+                            dot1q(2),
+                            qinq(3)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Encapsulation type to use for generated packets."
+     DEFVAL             { untagged }
+     ::= { cienaCesBenchmarkProfileEntry 18 }
+
+ cienaCesBenchmarkProfileEntryPduType   OBJECT-TYPE
+     SYNTAX             INTEGER {
+                           ethernet(1),
+                           ip(2),
+                           udpecho(3)
+                        }
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Vlan tag protocol identifier to use for the generated packets."
+     DEFVAL             { ethernet }
+     ::= { cienaCesBenchmarkProfileEntry 19 }
+
+ cienaCesBenchmarkProfileEntryDstmac   OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "MAC address to use as the destination MAC address on
+                 the generated packets."
+     ::= { cienaCesBenchmarkProfileEntry 20 }
+
+ cienaCesBenchmarkProfileEntrySVid      OBJECT-TYPE
+     SYNTAX             Integer32 (0..4094)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "S-VLAN ID to used for generated packets when encapType is set to QinQ"
+     ::= { cienaCesBenchmarkProfileEntry 21 }
+
+ cienaCesBenchmarkProfileEntrySPcp      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkPcpBitmap
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Bitmap of the S-VLAN PCP (Priority Code Point) value to 
+                 test with. When RFC2544 test is enabled, only one 
+                 PCP can be set in the mask. Otherwise, a test session
+                 will be run for each PCP bit set. Used when the encapType
+                 set to QinQ"
+     DEFVAL      { pcp0 }
+     ::= { cienaCesBenchmarkProfileEntry 22 }
+
+ cienaCesBenchmarkProfileEntrySColor    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Color of the S-VLAN tag for the test traffic. This is 
+                        directly related to the value of the DEI bit 
+                        configured in the VLAN tag of the test traffic. Green
+                        traffic will have its DEI bit set to 0 while Yellow
+                        traffic will have its DEI bit set to 1.
+                        Green test traffic is generated based on the bandwidth
+                        configured in the test profile. Yellow traffic is
+                        generated based on the excess-bandwidth parameter.
+                        Finally, if the user selects green-yellow-red, the
+                        yellow traffic is generated at 1.25 * excess-bandwidth.
+                        This is used only when encapType is set to QinQ"
+     ::= { cienaCesBenchmarkProfileEntry 23 }
+
+ cienaCesBenchmarkProfileEntryCVid      OBJECT-TYPE
+     SYNTAX             Integer32 (0..4094)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "C-VLAN ID to used for generated packets when encapType is set to
+                 QinQ or dot1q."
+     ::= { cienaCesBenchmarkProfileEntry 24 }
+
+ cienaCesBenchmarkProfileEntryCPcp      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkPcpBitmap
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Bitmap of the C-VLAN PCP (Priority Code Point) value to 
+                 test with. When RFC2544 test is enabled, only one 
+                 PCP can be set in the mask. Otherwise, a test session
+                 will be run for each PCP bit set. Only used when the
+                 encapType is set to dot1q. In the QinQ type, the c-pcp 
+                 of the test packet takes the same value as the s-pcp to
+                 simplify software."
+     DEFVAL      { pcp0 }
+     ::= { cienaCesBenchmarkProfileEntry 25 }
+
+ cienaCesBenchmarkProfileEntryCColor    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Color of the C-VLAN tag for the test traffic. This is 
+                        directly related to the value of the DEI bit 
+                        configured in the VLAN tag of the test traffic. Green
+                        traffic will have its DEI bit set to 0 while Yellow
+                        traffic will have its DEI bit set to 1.
+                        Green test traffic is generated based on the bandwidth
+                        configured in the test profile. Yellow traffic is
+                        generated based on the excess-bandwidth parameter.
+                        Finally, if the user selects green-yellow-red, the
+                        yellow traffic is generated at 1.25 * excess-bandwidth.
+                        This is used only when encapType is set to dot1q.
+                        In a QinQ configuration, the c-dei bit is set to the
+                        same value as the s-dei bit in order to simplify
+                        software."
+     ::= { cienaCesBenchmarkProfileEntry 26 }
+     
+ cienaCesBenchmarkProfileEntryTpid      OBJECT-TYPE
+     SYNTAX             Integer32 (0..65535)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Vlan tag protocol identifier to use for the generated packets.
+                 The following TPID values are supported by benchmark:
+                        0x8100
+                        0x9100
+                        0x88A8"
+     DEFVAL      { 33024 }
+     ::= { cienaCesBenchmarkProfileEntry 27 }
+
+ cienaCesBenchmarkProfileEntryDscp      OBJECT-TYPE
+     SYNTAX             Integer32 (0..63)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "IP DSCP value to use for the generated packets."
+     DEFVAL      { 0 }
+     ::= { cienaCesBenchmarkProfileEntry 28 }
+
+ cienaCesBenchmarkProfileEntrySrcInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Specifies the type of address cienaCesBenchmarkProfileEntrySrcInetAddr belongs to.
+              When set to:
+                ipv4 : cienaCesBenchmarkProfileEntrySrcInetAddr should be compliant with 
+                       InetAddressIPv4 from RFC 4001
+                ipv6 : cienaCesBenchmarkProfileEntrySrcInetAddr should be compliant with
+                       InetAddressIPv6 from RFC 4001.
+              The InetAddressType and the InetAddress must be set as part of the same SNMP 
+              SET request."
+     ::= { cienaCesBenchmarkProfileEntry 29 }
+
+ cienaCesBenchmarkProfileEntrySrcInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Specifies the unicast source IP address to use in IP test packet.
+              The InetAddress specified here is compliant with RFC 4001.
+              The InetAddressType and the InetAddress must be set as part of the same SNMP 
+              SET request."              
+     ::= { cienaCesBenchmarkProfileEntry 30 }
+
+ cienaCesBenchmarkProfileEntryDstInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Specifies the type of address cienaCesBenchmarkProfileEntryDstInetAddr belongs to.
+              When set to:
+                ipv4 : cienaCesBenchmarkProfileEntryDstInetAddr should be compliant with 
+                       InetAddressIPv4 from RFC 4001
+                ipv6 : cienaCesBenchmarkProfileEntryDstInetAddr should be compliant with
+                       InetAddressIPv6 from RFC 4001.
+              The InetAddressType and the InetAddress must be set as part of the same SNMP 
+              SET request."                       
+     ::= { cienaCesBenchmarkProfileEntry 31 }
+
+ cienaCesBenchmarkProfileEntryDstInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Specifies the unicast destination IP address to use in IP test packet.
+              The InetAddress specified here is compliant with RFC 4001.
+              The InetAddressType and the InetAddress must be set as part of the same SNMP 
+              SET request."              
+     ::= { cienaCesBenchmarkProfileEntry 32 }
+
+ cienaCesBenchmarkProfileEntryCustomPayload  OBJECT-TYPE 
+     SYNTAX             OCTET STRING (SIZE (0..256))
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Custom payload to be used on the generated packets."
+     ::= { cienaCesBenchmarkProfileEntry 33 }
+
+ cienaCesBenchmarkProfileEntryThroughputTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Run throughput test"
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 34 }
+
+ cienaCesBenchmarkProfileEntryFramelossTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Run frame loss test"
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 35 }
+
+ cienaCesBenchmarkProfileEntryLatencyTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Run latency test"
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 36 }
+
+ cienaCesBenchmarkProfileEntryPdvTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Run packet delay variation test"
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 37 }
+
+ cienaCesBenchmarkProfileEntryBurstTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION
+                "Run packet burst test"
+     ::= { cienaCesBenchmarkProfileEntry 38 }
+
+ cienaCesBenchmarkProfileEntryRfc2544Suite OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION        "Run RFC2544 test suite which includes throughput, frame
+                         loss and latency tests"
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 39 }
+
+ cienaCesBenchmarkProfileEntryY1564Test   OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "The Y1564 test includes the throughput, frameloss,
+                        latency and PDV tests are is run using the configured
+                        EMIX sequence. If the profile's EMIX sequence is
+                        not configured, the default generator EMIX sequence is
+                        used. Y1564 and RFC2544 are mutually exclusive."
+     DEFVAL             { false }
+     ::= { cienaCesBenchmarkProfileEntry 40 }
+
+ cienaCesBenchmarkProfileEntryHwSessionsRequired  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION       "This represents the number of hardware sessions 
+                        required to enable/run a test instance using 
+                        this profile according to the profile's current
+                        configuration.
+                        One hardware session is required for each outer tag
+                        PCP and color configured.
+                        Ex 1) Encap type set to dot1q, c-pcp is 0,3 and 
+                              c-color is set to green, 2 PCPs * 1 color =
+                              2 hw sessions.
+                        Ex 2) Encap type set to qinq, s-pcp is 0,4,5 and
+                              s-color is set to green-yellow, then you
+                              need 3 PCPs * 2 colors = 6 hw sessions.
+                        Ex 3) Encap type set to untagged, only 1 hw session
+                              is required."
+     ::= { cienaCesBenchmarkProfileEntry 41 }
+
+ cienaCesBenchmarkProfileEntryNumOfRef   OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION       "Number of generator test instances currently
+                        using this test profile for testing."
+     ::= { cienaCesBenchmarkProfileEntry 42 }
+
+ cienaCesBenchmarkProfileEntryRowStatus  OBJECT-TYPE
+     SYNTAX             RowStatus
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "Used to manage the creation and deletion of the 
+                        conceptual rows in this table.  To create a row in
+                        this table, set this object to 'createAndGo'.
+                        To delete a row in this table, set this object to 
+                        'destroy'.  If the entry exists, it is displayed 
+                        as 'active'."
+     ::= { cienaCesBenchmarkProfileEntry 43 }
+ 
+ --
+ -- Test Instance Table
+ --
+ cienaCesBenchmarkTestInstanceTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkTestInstanceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of test instance entries."
+     ::= { cienaCesBenchmarkModule 12 }
+
+ cienaCesBenchmarkTestInstanceEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkTestInstanceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK test instance characteristics."
+     INDEX { cienaCesBenchmarkTestInstanceEntryId }
+     ::= { cienaCesBenchmarkTestInstanceTable 1 }
+
+ CienaCesBenchmarkTestInstanceEntry ::= SEQUENCE {
+     cienaCesBenchmarkTestInstanceEntryId                   Integer32,
+     cienaCesBenchmarkTestInstanceEntryName                 DisplayString,
+     cienaCesBenchmarkTestInstanceEntrySubPortId            Integer32,
+     cienaCesBenchmarkTestInstanceEntryProfileId            Integer32,
+     cienaCesBenchmarkTestInstanceEntrySvid                 Integer32,
+     cienaCesBenchmarkTestInstanceEntryCvid                 Integer32,
+     cienaCesBenchmarkTestInstanceEntryUntagged             TruthValue,
+     cienaCesBenchmarkTestInstanceEntryDstMac               MacAddress,
+     cienaCesBenchmarkTestInstanceEntryAdminState           CienaCesBenchmarkAdminState,
+     cienaCesBenchmarkTestInstanceEntryStarted              TruthValue,
+     cienaCesBenchmarkTestInstanceEntryCurrentInterval      Integer32,
+     cienaCesBenchmarkTestInstanceEntryTotalIntervals       Integer32,
+     cienaCesBenchmarkTestInstanceEntryLastIterStart        DateAndTime,
+     cienaCesBenchmarkTestInstanceEntryClearStats           TruthValue,
+     cienaCesBenchmarkTestInstanceEntryRowStatus            RowStatus,
+     cienaCesBenchmarkTestInstanceEntryAssocEntityId        Integer32
+ }
+
+ cienaCesBenchmarkTestInstanceEntryId          OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Unique identifier for the test instance."
+     ::= { cienaCesBenchmarkTestInstanceEntry 1 }
+
+ cienaCesBenchmarkTestInstanceEntryName        OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (1..46))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Unique name given to the test instance at creation time."
+     ::= { cienaCesBenchmarkTestInstanceEntry 2 }
+
+ cienaCesBenchmarkTestInstanceEntrySubPortId   OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "ID of the sub-port to base this test instance on. The sub-port has
+              to be a child of the port under test associated with an existing 
+              entity."
+     ::= { cienaCesBenchmarkTestInstanceEntry 3 }
+
+ cienaCesBenchmarkTestInstanceEntryProfileId   OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Id of an existing test profile to be used with the test instance as
+              the template for testing. A test profile ID has to be specified if
+              this test instance is associated with a generator entity. If it's a
+              reflector test instance, a profile ID CANNOT be specified, it has
+              to remain set 0."
+     ::= { cienaCesBenchmarkTestInstanceEntry 4 }
+
+ cienaCesBenchmarkTestInstanceEntrySvid       OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "S VLAN ID to use for testing.
+              For generator test instances, this over-writes the value defined in 
+              the referenced test profile if applicable (encap-type set to qinq).
+              For reflector test instances, this has to be set to a valid s-vid
+              accepted by the associated sub-port. A value of 0xFFFF indicates ANY s-vid.
+              A value of 0 indicates untagged or single-tagged traffic."
+     ::= { cienaCesBenchmarkTestInstanceEntry 5 }
+
+ cienaCesBenchmarkTestInstanceEntryCvid       OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "C VLAN ID to use for testing.
+              For generator test instances, this over-writes the value defined in the 
+              referenced test profile if applicable (encap-type set to dot1q or qinq).
+              For reflector test instances, this has to be set to a valid c-vid
+              accepted by the associated sub-port. A value of 0xFFFF indicates ANY
+              c-vid, while a value of 0 indicates untagged (s-vid also has to be set
+              to 0)."
+     ::= { cienaCesBenchmarkTestInstanceEntry 6 }
+
+ cienaCesBenchmarkTestInstanceEntryUntagged   OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "When set to true, this indicates that the test instance
+              is to be associated with untagged data traffic. When this
+              is set, the cvid and svid parameters must be 0."
+     ::= { cienaCesBenchmarkTestInstanceEntry 7 }
+ 
+ cienaCesBenchmarkTestInstanceEntryDstMac     OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Destination MAC address to use for generator test instances. When set,
+              this over writes the value specified in the referenced test profile.
+              This field is not applicable for reflector test instances."
+     ::= { cienaCesBenchmarkTestInstanceEntry 8 }
+
+ cienaCesBenchmarkTestInstanceEntryAdminState OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkAdminState
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Indicates the administrative state of the test instance. Upon enabling
+              a test instance, resources are allocated in hardware. For reflector test
+              instances, this triggers the start of reflection of any test traffic
+              received that matches the specified svid:cvid combination on the 
+              specified sub-port."
+     ::= { cienaCesBenchmarkTestInstanceEntry 9 }
+
+ cienaCesBenchmarkTestInstanceEntryStarted    OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Applicable to generator test instances, this indicates whether testing is
+              in progress or not. Setting this attribute to true will initiate 
+              testing."
+     ::= { cienaCesBenchmarkTestInstanceEntry 10 }
+
+ cienaCesBenchmarkTestInstanceEntryCurrentInterval   OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION 
+             "Applicable to generator test instances, this indicates the 
+              number of intervals of the selected tests have been run, 
+              including the current one, in relation to the total number of
+              intervals to complete. This is based on the profile's
+              interval and duration configured."
+     ::= { cienaCesBenchmarkTestInstanceEntry 11 }
+
+ cienaCesBenchmarkTestInstanceEntryTotalIntervals    OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Applicable to generator test instances, this indicates the 
+              total number of intervals of the selected tests to be run
+              by a single start command on the test instance. This is 
+              based on the profile's interval and duration configured.
+              A value of 0 should be interpreted as unknown and -1 as
+              indefinite."
+     ::= { cienaCesBenchmarkTestInstanceEntry 12 }
+
+ cienaCesBenchmarkTestInstanceEntryLastIterStart     OBJECT-TYPE
+     SYNTAX       DateAndTime
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Date and time of the last iteration that started since the 
+              last time the system was rebooted or the statistics were
+              cleared on the test instance."
+     ::= { cienaCesBenchmarkTestInstanceEntry 13 }
+
+ cienaCesBenchmarkTestInstanceEntryClearStats        OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Set to true to clear the results and counters for the
+              test instance."
+     ::= { cienaCesBenchmarkTestInstanceEntry 14 }
+
+ cienaCesBenchmarkTestInstanceEntryRowStatus         OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the conceptual rows in this table.
+              To create a row in this table, set this object to 'createAndGo'.
+              To delete a row in this table, set this object to 'destroy'.
+              If the entry exists, it is displayed as 'active'."
+     ::= { cienaCesBenchmarkTestInstanceEntry 15 }
+
+ cienaCesBenchmarkTestInstanceEntryAssocEntityId    OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "ID of the entity this test instance is associated with 
+              (cienaCesBenchmarkEntityEntryId)"
+     ::= { cienaCesBenchmarkTestInstanceEntry 16 }
+
+ ---
+ --- Generator Test Session Allocation and Status Table
+ --- 
+ cienaCesBenchmarkGenTestSessionAllocationTable   OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionAllocationEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the allocation of hw test session per 
+              generator test instance Id, PCP and color."
+     ::= { cienaCesBenchmarkModule 13 }
+
+ cienaCesBenchmarkGenTestSessionAllocationEntry   OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionAllocationEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Test session (aka hardware session) allocation entry.
+              SPECIAL NOTE: It is important to know that when the associated
+              test profile's encapsulation type is set to untagged,
+              the last two elements of the index (PCP and color) are fixed
+              at 1.1. The management software needs to query using index
+              <entidyId>.<testInstandceId>.1.1 in this case, since
+              PCP and color are irrelevant in the untagged test traffic
+              scenario."
+
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionPcpIndex,
+             cienaCesBenchmarkGenTestSessionColorIndex }
+     ::= { cienaCesBenchmarkGenTestSessionAllocationTable 1 }
+
+ CienaCesBenchmarkGenTestSessionAllocationEntry ::= SEQUENCE {
+     cienaCesBenchmarkGenTestSessionPcpIndex            Integer32,
+     cienaCesBenchmarkGenTestSessionColorIndex          Integer32,
+     cienaCesBenchmarkGenTestSessionPcp                 Integer32,
+     cienaCesBenchmarkGenTestSessionColor               CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkGenTestSessionId                  Integer32,
+     cienaCesBenchmarkGenTestSessionEmixSequenceId      Integer32,
+     cienaCesBenchmarkGenTestSessionCurrentPktSize      Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputTestState CienaCesBenchmarkThroughputTestState,
+     cienaCesBenchmarkGenTestSessionFramelossTestState  CienaCesBenchmarkFramelossTestState,
+     cienaCesBenchmarkGenTestSessionLatencyTestState    CienaCesBenchmarkLatencyPdvTestState,
+     cienaCesBenchmarkGenTestSessionPdvTestState        CienaCesBenchmarkLatencyPdvTestState,
+     cienaCesBenchmarkGenTestSessionRfc2544TestState    CienaCesBenchmarkRfc2544TestState,
+     cienaCesBenchmarkGenTestSessionY1564TestState      CienaCesBenchmarkY1564TestState,
+     cienaCesBenchmarkGenTestSessionCurrentRate         Integer32,
+     cienaCesBenchmarkGenTestSessionSamplesCompleted    Integer32
+ }
+
+ cienaCesBenchmarkGenTestSessionPcpIndex          OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "PCP Index."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionColorIndex        OBJECT-TYPE
+     SYNTAX       Integer32 (1..2)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Color Index."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionPcp               OBJECT-TYPE
+     SYNTAX       Integer32 (0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "PCP value associated with this hw session"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 3 }
+
+ cienaCesBenchmarkGenTestSessionColor             OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkColorTest
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Color of test traffic associated with this hardware
+                  session"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 4 }
+
+ cienaCesBenchmarkGenTestSessionId                 OBJECT-TYPE
+     SYNTAX       Integer32 (0..127)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Id of the hardware session allocated to the given
+                  test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 5 }
+
+ cienaCesBenchmarkGenTestSessionEmixSequenceId    OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "EMIX sequence Id used with this session. If zero, 
+                  it indicates that the the frame size list is being used
+                  for the test and cienaCesBenchmarkGenTestSessionCurrentPktSize
+                  indicates which packet size is currently being tested."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionCurrentPktSize     OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Packet size in bytes currently used by the running test."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionThroughputTestState OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkThroughputTestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the throughput test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionFramelossTestState OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkFramelossTestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the frameloss test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionLatencyTestState   OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkLatencyPdvTestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the latency test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 10 }
+
+ cienaCesBenchmarkGenTestSessionPdvTestState       OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkLatencyPdvTestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the PDV test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 11 }
+
+ cienaCesBenchmarkGenTestSessionRfc2544TestState  OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkRfc2544TestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the RFC2544 test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 12 }
+
+ cienaCesBenchmarkGenTestSessionY1564TestState    OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkY1564TestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the Y1564 test for this hardware session
+                  defined by the test instance id, pcp and color"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 13 }
+
+ cienaCesBenchmarkGenTestSessionCurrentRate       OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Traffic rate currently used to generate packets as percent
+                  of the line rate"
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 14 }
+
+ cienaCesBenchmarkGenTestSessionSamplesCompleted  OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "When latency and/or pdv is running, this indicates how 
+                  many samples have been gathered so far."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 15 }
+
+ --
+ -- Test Instance Stats Table
+ --
+ cienaCesBenchmarkTestInstanceStatsTable      OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkTestInstanceStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+              "Table of test instance packet statistics entries."
+     ::= { cienaCesBenchmarkModule 14 }
+
+ cienaCesBenchmarkTestInstanceStatsEntry      OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkTestInstanceStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Benchmark test instance packet statistics"
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId }
+     ::= { cienaCesBenchmarkTestInstanceStatsTable 1 }
+ 
+ CienaCesBenchmarkTestInstanceStatsEntry ::= SEQUENCE {
+     cienaCesBenchmarkTestInstanceStatsRxPkts                   Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxIpv4Pkts               Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxIpv4UdpPkts            Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxIpv6Pkts               Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxIpv6UdpPkts            Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxNonIpPkts              Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxUnrecognizedPkts       Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxDuplicatePkts          Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxDuplicatePktsOverflow  TruthValue,
+     cienaCesBenchmarkTestInstanceStatsRxOOOPkts                Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxOOOPktsOverflow        TruthValue,
+     cienaCesBenchmarkTestInstanceStatsRxDiscSeqNumPkts         Counter64,
+     cienaCesBenchmarkTestInstanceStatsRxDiscSeqNumPktsOverflow TruthValue,
+     cienaCesBenchmarkTestInstanceStatsRxUdpCheckSumPkts        Counter64,
+     cienaCesBenchmarkTestInstanceStatsTxPkts                   Counter64
+ }
+
+ cienaCesBenchmarkTestInstanceStatsRxPkts              OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of received packets for 
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 1 }
+
+ cienaCesBenchmarkTestInstanceStatsRxIpv4Pkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of IPv4 packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 2 }
+
+ cienaCesBenchmarkTestInstanceStatsRxIpv4UdpPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of IPv4 UDP packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 3 }
+
+ cienaCesBenchmarkTestInstanceStatsRxIpv6Pkts          OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of IPv6 packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 4 }
+
+ cienaCesBenchmarkTestInstanceStatsRxIpv6UdpPkts       OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of IPv6 UDP packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 5 }
+
+ cienaCesBenchmarkTestInstanceStatsRxNonIpPkts         OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of non-IP packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 6 }
+
+ cienaCesBenchmarkTestInstanceStatsRxUnrecognizedPkts  OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of unrecognized packets received for
+              this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 7 }
+
+ cienaCesBenchmarkTestInstanceStatsRxDuplicatePkts     OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of packets received with a duplicate
+              this test instance." 
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 8 }
+
+ cienaCesBenchmarkTestInstanceStatsRxDuplicatePktsOverflow  OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "When set to true, this indicates that the duplicate
+              pkt counter has rolled over in hardware and therefore,
+              cienaCesBenchmarkTestInstanceStatsRxDuplicatePkts might
+              not be accurate."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 9 }
+
+ cienaCesBenchmarkTestInstanceStatsRxOOOPkts           OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of packets received with an out of 
+              order sequence number. The sequence number was less
+              than the expected sequence number for this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 10 }
+
+ cienaCesBenchmarkTestInstanceStatsRxOOOPktsOverflow   OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "When set to true, this indicates that the out of order
+              pkt counter has rolled over in hardware and therefore,
+              cienaCesBenchmarkTestInstanceStatsRxOOOPkts might
+              not be accurate."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 11 }
+
+ cienaCesBenchmarkTestInstanceStatsRxDiscSeqNumPkts    OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of packets received with a sequence number
+              greater then the expected sequence number for this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 12 }
+
+ cienaCesBenchmarkTestInstanceStatsRxDiscSeqNumPktsOverflow  OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "When set to true, this indicates that the discontinuity
+              in sequence number pkt counter has rolled over in hardware
+              and therefore, cienaCesBenchmarkTestInstanceStatsRxDiscSeqNumPkts
+              might not be accurate."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 13 }
+
+ cienaCesBenchmarkTestInstanceStatsRxUdpCheckSumPkts   OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of UDP packets received with a UDP checksum
+              error."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 14 }
+
+ cienaCesBenchmarkTestInstanceStatsTxPkts              OBJECT-TYPE
+     SYNTAX       Counter64
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Total number of packets transmitted for this test instance."
+     ::= { cienaCesBenchmarkTestInstanceStatsEntry 15 }
+
+ --
+ -- Benchmark Generator Test Session Throughput Results
+ --
+ cienaCesBenchmarkGenTestSessionThroughputResultsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionThroughputResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK generator test session throughput results in Mbps."
+     ::= { cienaCesBenchmarkModule 15 }
+                
+ cienaCesBenchmarkGenTestSessionThroughputResultsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionThroughputResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK generator test session throughput results."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionThroughputResultsPcpIndex,
+             cienaCesBenchmarkGenTestSessionThroughputResultsColorIndex,
+             cienaCesBenchmarkGenTestSessionThroughputResultsFrameSizeIndex }
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsTable 1 } 
+
+ CienaCesBenchmarkGenTestSessionThroughputResultsEntry ::= SEQUENCE { 
+     cienaCesBenchmarkGenTestSessionThroughputResultsPcpIndex        Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsColorIndex      Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsFrameSizeIndex  Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsPcp             Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsColor           CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkGenTestSessionThroughputResultsFrameSize       Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsEmixSequenceId  Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsMin             CienaCesBenchmarkThroughputResult,
+     cienaCesBenchmarkGenTestSessionThroughputResultsMax             CienaCesBenchmarkThroughputResult,
+     cienaCesBenchmarkGenTestSessionThroughputResultsAvg             CienaCesBenchmarkThroughputResult,
+     cienaCesBenchmarkGenTestSessionThroughputResultsIterations      Integer32,
+     cienaCesBenchmarkGenTestSessionThroughputResultsKpiResult       CienaCesBenchmarkKpiResult
+ } 
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsPcpIndex   OBJECT-TYPE
+     SYNTAX             Integer32 (1..8)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION       "Index of the PCP value"
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsColorIndex OBJECT-TYPE
+     SYNTAX             Integer32 (1..2)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION       "Color index."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             Integer32 (1..10)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Frame size index for which those throughput results are
+                 for. When EMIX is used, in which case 
+                 cienaCesBenchmarkGenTestSessionThroughputResultsEmixSequenceId is
+                 not NULL, there is only one frame size index for
+                 the given test instance Id, pcp and color. In such a case, the 
+                 frame size index will be 0 and frame size will also be 0."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 3 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsPcp        OBJECT-TYPE
+     SYNTAX             Integer32 (0..7)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "PCP value of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 4 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsColor      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Color of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 5 }
+
+  cienaCesBenchmarkGenTestSessionThroughputResultsFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes. If 0, then the 
+                 cienaCesBenchmarkGenTestSessionThroughputResultsEmixSequenceId
+                 indicates the ID of the EMIX sequence used for the test"
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (1..32)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "ID of the EMIX sequence that was used for running the
+                 test which produced these results. When 0,
+                 frame size indicates the size of the test frame
+                 associated with these results."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsMin     OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkThroughputResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Minimum throughput recorded for the given packet size 
+                 in Mbps * 100. The value is multiplied by 100 to be able
+                 to send the results as an integer but should be divided
+                 by 100 when displayed to provide a 2 decimal point accuracy.
+                 A result of 123.45 is sent as 12345."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsMax     OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkThroughputResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum throughput recorded for the given packet size
+                 in Mbps * 100. The value is multiplied by 100 to be able
+                 to send the results as an integer but should be divided
+                 by 100 when displayed to provide a 2 decimal point accuracy.
+                 A result of 123.45 is sent as 12345."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsAvg     OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkThroughputResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average throughput recorded for the given packet size
+                 in Mbps * 100. The value is multiplied by 100 to be able
+                 to send the results as an integer but should be divided
+                 by 100 when displayed to provide a 2 decimal point accuracy.
+                 A result of 123.45 is sent as 12345."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 10 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsIterations OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of times the test has been run for this packet size."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 11 }
+
+ cienaCesBenchmarkGenTestSessionThroughputResultsKpiResult  OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Pass or fail results for the test which is determined
+                 by comparing the max throughput against the selected 
+                 KPI test instance's throughput pass criteria. If no KPI test instance
+                 is selected for the given test instance Id, the result will
+                 be 'notApplicable'."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 12 }
+
+ --
+ -- Benchmark Generator Test Session Frameloss Results
+ --
+ cienaCesBenchmarkGenTestSessionFramelossResultsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionFramelossResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK generator test session frameloss results."
+     ::= { cienaCesBenchmarkModule 16 }
+                
+ cienaCesBenchmarkGenTestSessionFramelossResultsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionFramelossResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK generator test session frameloss results."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionFramelossResultsPcpIndex,
+             cienaCesBenchmarkGenTestSessionFramelossResultsColorIndex,
+             cienaCesBenchmarkGenTestSessionFramelossResultsFrameSizeIndex,
+             cienaCesBenchmarkGenTestSessionFramelossResultsRateIndex }
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsTable 1 } 
+
+ CienaCesBenchmarkGenTestSessionFramelossResultsEntry ::= SEQUENCE {
+     cienaCesBenchmarkGenTestSessionFramelossResultsPcpIndex         Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsColorIndex       Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsFrameSizeIndex   Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsRateIndex        Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsPcp              Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsColor            CienaCesBenchmarkColorTest,  
+     cienaCesBenchmarkGenTestSessionFramelossResultsFrameSize        Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsEmixSequenceId   Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsRate             Integer32,
+     cienaCesBenchmarkGenTestSessionFramelossResultsFirst            CienaCesBenchmarkFramelossResult,
+     cienaCesBenchmarkGenTestSessionFramelossResultsSecond           CienaCesBenchmarkFramelossResult,
+     cienaCesBenchmarkGenTestSessionFramelossResultsKpiResult        CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionFramelossResultsResult           CienaCesBenchmarkFramelossResult
+ } 
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsPcpIndex   OBJECT-TYPE
+     SYNTAX             Integer32 (1..8)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "PCP index."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsColorIndex OBJECT-TYPE
+     SYNTAX             Integer32 (1..2)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Color index."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             Integer32 (1..10)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Frame size index."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 3 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsRateIndex  OBJECT-TYPE
+     SYNTAX             Integer32 (1..10)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Rate index."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 4 }
+ 
+ cienaCesBenchmarkGenTestSessionFramelossResultsPcp        OBJECT-TYPE
+     SYNTAX             Integer32 (0..7)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "PCP value of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 5 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsColor      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Color of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes. If 0, then the 
+                 cienaCesBenchmarkGenTestSessionFramelossResultsEmixSequenceId
+                 indicates the ID of the EMIX sequence used for the test"
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (1..32)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "ID of the EMIX sequence that was used for running the
+                 test which produced these results. When 0,
+                 frame size indicates the size of the test frame
+                 associated with these results."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsRate       OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Rate in percent of line rate."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsFirst     OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkFramelossResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Percentage of frames lost on first test sequence."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 10 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsSecond    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkFramelossResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Percentage of frames lost on second test sequence."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 11 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsKpiResult  OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Pass or fail results for the test which is determined
+                 by comparing the frameloss result against the selected 
+                 KPI test instance's frameloss pass criteria. If no KPI test instance
+                 is selected for the given test instance Id, the result will
+                 be 'notApplicable'."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 12 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsResult    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkFramelossResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Percentage of frames lost on the largest test sequence results."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 13 }
+     
+ --
+ -- Benchmark Generator Test Session Latency Results
+ --
+ cienaCesBenchmarkGenTestSessionLatencyResultsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionLatencyResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK generator test session latency results in usec."
+     ::= { cienaCesBenchmarkModule 17 }
+                
+ cienaCesBenchmarkGenTestSessionLatencyResultsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionLatencyResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK generator test session latency results."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionLatencyResultsPcpIndex,
+             cienaCesBenchmarkGenTestSessionLatencyResultsColorIndex,
+             cienaCesBenchmarkGenTestSessionLatencyResultsFrameSizeIndex }
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsTable 1 } 
+
+ CienaCesBenchmarkGenTestSessionLatencyResultsEntry ::= SEQUENCE { 
+     cienaCesBenchmarkGenTestSessionLatencyResultsPcpIndex        Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsColorIndex      Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsFrameSizeIndex  Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsPcp             Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsColor           CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkGenTestSessionLatencyResultsFrameSize       Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsEmixSequenceId  Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsMin             Unsigned32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsMax             Unsigned32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsAvg             Unsigned32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsSamples         Integer32,
+     cienaCesBenchmarkGenTestSessionLatencyResultsKpiResult       CienaCesBenchmarkKpiResult 
+ } 
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsPcpIndex   OBJECT-TYPE
+     SYNTAX             Integer32 (1..8)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "PCP index."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsColorIndex OBJECT-TYPE
+     SYNTAX             Integer32 (1..2)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Color index."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             Integer32 (1..10)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Frame size index."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 3 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsPcp        OBJECT-TYPE
+     SYNTAX             Integer32 (0..7)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "PCP value of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 4 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsColor      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Color of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 5 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (1..32)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "ID of the EMIX sequence that was used for running the
+                 test which produced these results. When 0,
+                 frame size indicates the size of the test frame
+                 associated with these results."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsMin     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Minimum latency recorded for the given packet size."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsMax     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Maximum latency recorded for the given packet size."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsAvg     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average latency recorded for the given packet size."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 10 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsSamples OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of samples taken during the test."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 11 }
+
+ cienaCesBenchmarkGenTestSessionLatencyResultsKpiResult  OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Pass or fail results for the test which is determined
+                 by comparing the frameloss result against the selected 
+                 KPI test instance's latency pass criteria. If no KPI test instance
+                 is selected for the given test instance Id, the result will
+                 be 'notApplicable'."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 12 }
+
+ --
+ -- Benchmark Test Session Packet Delay Variation Results
+ --
+ cienaCesBenchmarkGenTestSessionPdvResultsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionPdvResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK generator test session packet delay 
+              variation results in usec."
+     ::= { cienaCesBenchmarkModule 18 }
+                
+ cienaCesBenchmarkGenTestSessionPdvResultsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionPdvResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK generator test session packet delay variation results."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionPdvResultsPcpIndex,
+             cienaCesBenchmarkGenTestSessionPdvResultsColorIndex,
+             cienaCesBenchmarkGenTestSessionPdvResultsFrameSizeIndex }
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsTable 1 } 
+
+ CienaCesBenchmarkGenTestSessionPdvResultsEntry ::= SEQUENCE { 
+     cienaCesBenchmarkGenTestSessionPdvResultsPcpIndex        Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsColorIndex      Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsFrameSizeIndex  Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsPcp             Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsColor           CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkGenTestSessionPdvResultsFrameSize       Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsEmixSequenceId  Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsAvg             Unsigned32,
+     cienaCesBenchmarkGenTestSessionPdvResultsSamples         Integer32,
+     cienaCesBenchmarkGenTestSessionPdvResultsKpiResult       CienaCesBenchmarkKpiResult
+ } 
+
+ cienaCesBenchmarkGenTestSessionPdvResultsPcpIndex   OBJECT-TYPE
+     SYNTAX             Integer32 (1..8)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "PCP index."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsColorIndex OBJECT-TYPE
+     SYNTAX             Integer32 (1..2)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Color index."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsFrameSizeIndex  OBJECT-TYPE
+     SYNTAX             Integer32 (1..10)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Frame size index associated to those PDV stats."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 3 }   
+     
+ cienaCesBenchmarkGenTestSessionPdvResultsPcp        OBJECT-TYPE
+     SYNTAX             Integer32 (0..7)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "PCP value of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 4 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsColor      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Color of the test packets associated with those
+                 results."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 5 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (1..32)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "ID of the EMIX sequence that was used for running the
+                 test which produced these results. When 0,
+                 frame size indicates the size of the test frame
+                 associated with these results."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsAvg        OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average PDV recorded for the given packet size."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsSamples    OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of samples used for the test."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionPdvResultsKpiResult  OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Pass or fail results for the test which is determined
+                 by comparing the frameloss result against the selected 
+                 KPI test instance's throughput PDV criteria. If no KPI test instance
+                 is selected for the given test instance Id, the result will
+                 be 'notApplicable'."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 10 }
+
+ --
+ -- Benchmark EMIX character set table
+ --
+ cienaCesBenchmarkEmixCharacterSetTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkEmixCharacterSetEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK EMIX character set providing the
+              list of characters that can be used in an EMIX sequence
+              along with their corresponding frame size."
+     ::= { cienaCesBenchmarkModule 19 }
+                
+ cienaCesBenchmarkEmixCharacterSetEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkEmixCharacterSetEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK EMIX character and its associated frame size."
+     INDEX { cienaCesBenchmarkEmixCharacterSetEntryIndex }
+     ::= { cienaCesBenchmarkEmixCharacterSetTable 1 } 
+
+ CienaCesBenchmarkEmixCharacterSetEntry ::= SEQUENCE { 
+     cienaCesBenchmarkEmixCharacterSetEntryIndex              Integer32,
+     cienaCesBenchmarkEmixCharacterSetEntryCharacter          DisplayString,
+     cienaCesBenchmarkEmixCharacterSetEntryFrameSize          DisplayString
+ } 
+
+ cienaCesBenchmarkEmixCharacterSetEntryIndex       OBJECT-TYPE
+     SYNTAX             Integer32 (1..26)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Character index."
+     ::= { cienaCesBenchmarkEmixCharacterSetEntry 1 }
+
+ cienaCesBenchmarkEmixCharacterSetEntryCharacter   OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (1))
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "EMIX character that can be used for creating an EMIX sequence.
+                 The character set currently includes: a b c d e f g h u v w x  "
+     ::= { cienaCesBenchmarkEmixCharacterSetEntry 2 }
+
+ cienaCesBenchmarkEmixCharacterSetEntryFrameSize   OBJECT-TYPE
+     SYNTAX             DisplayString (SIZE (1..6))
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Frame size associated with the character. For h, the frame size
+                 is the port under test's MTU and the u character is a custom
+                 frame size configurable for each EMIX. The u frame size can take 
+                 a value of 64 to 10000 and defaults to 594. If u is bigger than
+                 the MTU of the port under test, it will be reduced to the same
+                 size as h." 
+     ::= { cienaCesBenchmarkEmixCharacterSetEntry 3 }
+
+ --
+ -- Trap definitions
+ --
+ cienaCesBenchmarkTestStarted   NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkEntityEntryPortId,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkTestInstanceEntrySvid,
+                 cienaCesBenchmarkTestInstanceEntryCvid,
+                 cienaCesBenchmarkTestInstanceEntryDstMac
+               }
+     STATUS    current
+     DESCRIPTION
+              "The start command has been issued for the given benchmark generator
+               test instance, either via CLI or SNMP. The cienaCesBenchmarkEntityEntryPortId
+               specifies the port under test when the test instance was started;
+               the s-vid, c-vid and destination mac address used to build the test 
+               packet are also provided."
+     ::= { cienaCesBenchmarkNotifications 1 }
+
+ cienaCesBenchmarkTestStopped  NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName
+               }
+     STATUS    current
+     DESCRIPTION
+              "The specified generator test instance has been manually stopped by
+               the user, either via CLI or SNMP, before the testing completed."
+     ::= { cienaCesBenchmarkNotifications 2 }
+   
+ cienaCesBenchmarkTestCompleted NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName
+               }
+     STATUS    current
+     DESCRIPTION
+              "The testing for the specified generator test instance has finished the
+               configured number of iterations as configured in the referenced
+               profile interval and duration."
+     ::= { cienaCesBenchmarkNotifications 3 }
+
+ cienaCesBenchmarkTestFailedThroughputKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileId,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceId,
+                cienaCesBenchmarkGenTestSessionThroughputResultsMax 
+               }
+     STATUS    current
+     DESCRIPTION
+              "The throughput test result for the specified generator test
+               instance is below the specified throughput KPI value for
+               the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 4 }
+
+ cienaCesBenchmarkTestFailedFramelossKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileId,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceId,
+                 cienaCesBenchmarkGenTestSessionFramelossResultsResult
+               }
+     STATUS    current
+     DESCRIPTION
+              "The frameloss test result for the specified generator test 
+               instance exceeds the specified throughput KPI value for
+               the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 5 }
+
+ cienaCesBenchmarkTestFailedLatencyKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileId,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceId,
+                 cienaCesBenchmarkGenTestSessionLatencyResultsMax 
+               }
+     STATUS    current
+     DESCRIPTION
+              "The latency test result for the specified generator test
+               instance exceeds the specified throughput KPI value for
+               the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 6 }
+
+ cienaCesBenchmarkTestFailedPdvKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileId,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceId,
+                 cienaCesBenchmarkGenTestSessionPdvResultsAvg
+               }
+     STATUS    current
+     DESCRIPTION
+              "The throughput test result for the specified generator test
+               instance is below the specified throughput KPI value for
+               the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 7 }
+
+ cienaCesBenchmarkTestIterationCompleted NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryId,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkGenTestSessionThroughputResultsIterations
+               }
+     STATUS    current
+     DESCRIPTION
+              "An iteration of tests for the given test instance has just completed."
+     ::= { cienaCesBenchmarkNotifications  8 }
+
+ END

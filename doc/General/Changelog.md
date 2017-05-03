@@ -1,4 +1,127 @@
 source: General/Changelog.md
+## 1.27
+*(2017-04-29)*
+
+#### Features
+* Added sdfsinfo application support ([#6494](https://github.com/librenms/librenms/issues/6494))
+* Allow _except suffix in yaml os discovery ([#6444](https://github.com/librenms/librenms/issues/6444))
+* Added check_mssql_health.inc.php for service checks ([#6415](https://github.com/librenms/librenms/issues/6415))
+* Added rrdtool version check to compare installed version with defined version ([#6381](https://github.com/librenms/librenms/issues/6381))
+* Added ability to validate database schema ([#6303](https://github.com/librenms/librenms/issues/6303))
+* Support powerdns-recursor SNMP extend ([#6290](https://github.com/librenms/librenms/issues/6290))
+* Added cisco-vpdn to poller modules ([#6300](https://github.com/librenms/librenms/issues/6300))
+* Support non-standard unix socket ([#5724](https://github.com/librenms/librenms/issues/5724))
+* Added multi DB support to the Postgres app ([#6222](https://github.com/librenms/librenms/issues/6222))
+* Added opengridscheduler job tracker ([#6419](https://github.com/librenms/librenms/issues/6419))
+* Added location map regex replace pattern only ([#6485](https://github.com/librenms/librenms/issues/6485))
+* Added nfs-server application ([#6320](https://github.com/librenms/librenms/issues/6320))
+* Added support for Active Directory bind user ([#6255](https://github.com/librenms/librenms/pull/6255))
+
+#### Bugfixes
+* Actually reload oxidized when we should not when we think we should ([#6515](https://github.com/librenms/librenms/issues/6515))
+* Don't run ipmitool without knowing a type  ([#6504](https://github.com/librenms/librenms/issues/6504))
+* Updated ipv4/ipv6 discovery to exclude IPs with invalid port_ids ([#6495](https://github.com/librenms/librenms/issues/6495))
+* Updated enterasys mempools disco/polling to support multiple ram devices ([#6458](https://github.com/librenms/librenms/issues/6458))
+* Service filenames are snipped when longer than 16 characters ([#6459](https://github.com/librenms/librenms/issues/6459))
+* Updated use of ifNameDescr() to cleanPort() ([#6454](https://github.com/librenms/librenms/issues/6454))
+* Allow line returns in snmprec files with the 4x data type ([#6443](https://github.com/librenms/librenms/issues/6443))
+* Update Shebangs and daily.sh for FreeBSD compatibility ([#6413](https://github.com/librenms/librenms/issues/6413))
+* Cisco Entity Sensor Threshold's returns 0 ([#6440](https://github.com/librenms/librenms/issues/6440))
+* Updated enterasys proc discovery by setting correct index ([#6422](https://github.com/librenms/librenms/issues/6422))
+* Allow unit tests without a sql server ([#6398](https://github.com/librenms/librenms/issues/6398))
+* Fix broken mysql application polling ([#6317](https://github.com/librenms/librenms/issues/6317))
+* Move user preferences dashboard and twofactor out of users table ([#6286](https://github.com/librenms/librenms/issues/6286))
+* Fixed CPU/Mem polling for Cyberoam-UTM devices ([#6315](https://github.com/librenms/librenms/issues/6315))
+* Fixed F5 ports not using hc counters ([#6294](https://github.com/librenms/librenms/issues/6294))
+* Added semicolons in build.sql schema file ([#6284](https://github.com/librenms/librenms/issues/6284))
+* Fixed height of widget boxes ([#6282](https://github.com/librenms/librenms/issues/6282))
+* Update applications poller to use numeric oid instead of nsExtendOutputFull ([#6277](https://github.com/librenms/librenms/issues/6277))
+* Compare existing device ip to host lookup like for like ([#6316](https://github.com/librenms/librenms/issues/6316))
+* Fix whitespace display on RRDTool Command ([#6345](https://github.com/librenms/librenms/issues/6345))
+* Vlan port mappings not removed ([#6423](https://github.com/librenms/librenms/issues/6423))
+* Fix alerts not honouring interval over 5m ([#6438](https://github.com/librenms/librenms/issues/6438))
+* Improve CiscoSB polling time ([#6447](https://github.com/librenms/librenms/issues/6447))
+* Updated cisco and juniper component macros to exclude disabled sensors ([#6493](https://github.com/librenms/librenms/issues/64649393))
+* Added more safety checking into create_state_index() ([#6516](https://github.com/librenms/librenms/issues/6516))
+* Fixed inconsistent device discovery ([#6518](https://github.com/librenms/librenms/issues/6518))
+* Fixed notifications by email to Active Directory admins ([#6134](https://github.com/librenms/librenms/issues/6134))
+* Fixed API token for Active Directory admins ([#6255](https://github.com/librenms/librenms/issues/6255))
+
+#### Documentation
+* Added FAQ on what disabled/ignored means for devices
+* Updated install docs + perf to support compressing file types and using http/2 ([#6466](https://github.com/librenms/librenms/issues/6466))
+* Update install docs to remove deprecated GRANT usage
+* Update to remove the old method of signing the CLA ([#6479](https://github.com/librenms/librenms/issues/6479))
+* Updated Support-New-OS doc to provide clearer information ([#6492](https://github.com/librenms/librenms/issues/6492))
+
+#### Refactoring
+* Use sysDescr to simplify the vyatta detection ([#6455](https://github.com/librenms/librenms/issues/6455))
+* Move siklu os detection to yaml ([#6431](https://github.com/librenms/librenms/issues/6431))
+* Move rfc1628_compat into os yaml ([#6424](https://github.com/librenms/librenms/issues/6424))
+* Move Engenius discovery to yaml ([#6428](https://github.com/librenms/librenms/issues/6428))
+* Move cometsystem-p85xx ([#6427](https://github.com/librenms/librenms/issues/6427))
+* Update some snmpwalks for ports polling to improve speed ([#6341](https://github.com/librenms/librenms/issues/6341))
+* Moved ifLabel -> cleanPort and updated the usage ([#6288](https://github.com/librenms/librenms/issues/6288))
+* Update ucd-diskio discovery to use index + descr as unique identifies [#4670](https://github.com/librenms/librenms/issues/4670) ([#6270](https://github.com/librenms/librenms/issues/6270))
+* Changed MGE UPS to APC UPS (mgeups -> apc) ([#6260](https://github.com/librenms/librenms/issues/6260))
+* Change Cisco UCM category from tele to collaboration ([#6297](https://github.com/librenms/librenms/issues/6297))
+* Move aos discovery to yaml ([#6425](https://github.com/librenms/librenms/issues/6425))
+* Move the rest of avaya os detection to yaml ([#6426](https://github.com/librenms/librenms/issues/6426))
+* Move cometsystem-p85xx to yaml ([#6427](https://github.com/librenms/librenms/issues/6427))
+* Move Engenius discovery to yaml ([#6428](https://github.com/librenms/librenms/issues/6428))
+* Added 'Video' device group and moved Axis cameras to this group' ([#6397](https://github.com/librenms/librenms/issues/6397))
+* Remove unecessary OS checks in proc / mem polling ([#6414](https://github.com/librenms/librenms/issues/6414))
+* Only run pre-cache for the current OS ([#6453](https://github.com/librenms/librenms/issues/6453))
+* Move ios detection to yaml using new sysDescr_except ([#6460](https://github.com/librenms/librenms/issues/6460))
+* Eaton/MGE UPS reorganization ([#6388](https://github.com/librenms/librenms/issues/6388))
+
+#### Devices
+* Added more health sensors for c&c power commanders ([#6517](https://github.com/librenms/librenms/issues/6517))
+* Added support for Tycon Systems TPDIN units ([#6506](https://github.com/librenms/librenms/issues/6506))
+* Added basic detection for Packetflux SiteMonitor ([#6498](https://github.com/librenms/librenms/issues/6498))
+* Added detection for Ericsson UPC devices ([#6472](https://github.com/librenms/librenms/issues/6472))
+* Added basic detection for Geist Watchdog ([#6467](https://github.com/librenms/librenms/issues/6467))
+* Added support for enLogic PDUs ([#6464](https://github.com/librenms/librenms/issues/6464))
+* Added support for Eltex OLT devices ([#6457](https://github.com/librenms/librenms/issues/6457))
+* Added Etherwan managed switches ([#6488](https://github.com/librenms/librenms/issues/6488))
+* Added signal sensor for opengear devices ([#6401](https://github.com/librenms/librenms/issues/6401))
+* Added support for Teradici PCoIP card ([#6347](https://github.com/librenms/librenms/issues/6347))
+* Added basic support for Omnitron iConverters ([#6336](https://github.com/librenms/librenms/issues/6336))
+* Added support for AvediaStream Encoder ([#6306](https://github.com/librenms/librenms/issues/6306))
+* Added ArubaOS PowerConnect detection ([#6463](https://github.com/librenms/librenms/issues/6463))
+* Added HPE iPDU detection ([#6334](https://github.com/librenms/librenms/issues/6334))
+* Moved dnos health disco to powerconnect ([#6331](https://github.com/librenms/librenms/issues/6331))
+* Added Nokia (Alcatel-Lucent) SAS-Sx 7210 support ([#6344](https://github.com/librenms/librenms/issues/6344))
+* Added Opengear ACM7008 detection ([#6349](https://github.com/librenms/librenms/issues/6349))
+* Added detection fro Juniper MSS ([#6335](https://github.com/librenms/librenms/issues/6335))
+* Added sensors + additional info for HPE iPDU ([#6382](https://github.com/librenms/librenms/issues/6382))
+* Added Basic Ciena (Cyan) Z-Series detection ([#6385](https://github.com/librenms/librenms/issues/6385))
+* Added Coriant Network Hardware Page. ([#6187](https://github.com/librenms/librenms/issues/6187))
+* Added support for Vanguard ApplicationsWare ([#6387](https://github.com/librenms/librenms/issues/6387))
+* Added ICT Digital Power Supply support ([#6369](https://github.com/librenms/librenms/issues/6369))
+* Added ICT DC Distribution Panel support ([#6379](https://github.com/librenms/librenms/issues/6379))
+* Added more detection for Comware ([#6386](https://github.com/librenms/librenms/issues/6386))
+* Added Multi-lane optics on Juniper equipment ([#6377](https://github.com/librenms/librenms/issues/6377))
+* Added detection and sensor support for EMC OneFS v8 ([#6416](https://github.com/librenms/librenms/issues/6416))
+* Added detection for IgniteNet HeliOS ([#6417](https://github.com/librenms/librenms/issues/6417))
+* Added basic detection for Tandberg Magnum tape units ([#6421](https://github.com/librenms/librenms/issues/6421))
+* Added detection for Ciena packet switches ([#6462](https://github.com/librenms/librenms/issues/6462))
+* Added Cisco SG355-10P support ([#6477](https://github.com/librenms/librenms/issues/6477))
+* Added mem/cpu support for TiMOS ([#6483](https://github.com/librenms/librenms/issues/6483))
+* Added support for C&C Commander Plus units ([#6478](https://github.com/librenms/librenms/issues/6478))
+* Added Equallogic add disk status ([#6497](https://github.com/librenms/librenms/issues/6497))
+
+#### WebUI
+* Updated bgp table to use bootstrap properly ([#6406](https://github.com/librenms/librenms/issues/6406))
+* Update poller_modules_perf to not show OS disabled module graphs ([#6276](https://github.com/librenms/librenms/issues/6276))
+* Select the correct dashboard when there are no defaults. ([#6339](https://github.com/librenms/librenms/issues/6339))
+* Fix redirect on login for instances behind reverse proxies ([#6371](https://github.com/librenms/librenms/issues/6371))
+* Fixed the display date for the current version ([#6474](https://github.com/librenms/librenms/issues/6474))
+
+#### API
+* Allow cidr network searches of the ARP table ([#6378](https://github.com/librenms/librenms/issues/6378))
+
+---
 
 ## 1.26
 *(2017-03-25)*

@@ -65,9 +65,10 @@ foreach ($vrfs_lite_cisco as $vrf) {
         } //end foreach
     } //end if
 
-    $sql = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id";
-
-    foreach (dbFetchRows($sql) as $row) {
+    $sql = 'SELECT `ipv6_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv6_addresses`';
+    $sql .= ' LEFT JOIN `ports` ON `ipv6_addresses`.`port_id` = `ports`.`port_id`';
+    $sql .= ' WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL';
+    foreach (dbFetchRows($sql, array($device['device_id'])) as $row) {
         $full_address  = $row['ipv6_address'].'/'.$row['ipv6_prefixlen'];
         $port_id       = $row['port_id'];
         $valid_address = $full_address.'-'.$port_id;

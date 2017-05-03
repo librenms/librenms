@@ -1,0 +1,128 @@
+ExtendAirG2 DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    RadioSourceT, BandwidthT, ModulationT, 
+    RadioTxPwr11gT, BuzTimeoutT, DiplexerConfigG2T, ExaltEnableT, 
+    AcmBaseModulationT, AcmTargetModulationT, AcmPolicyT, AcmPowerBoostEnableT
+        FROM ExaltComm
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    systemConfig
+        FROM ExaltComProducts
+    DisplayString
+        FROM SNMPv2-TC;
+
+    extendAirG2 MODULE-IDENTITY
+        LAST-UPDATED	    "201304261021Z"
+        ORGANIZATION	    "Exalt"
+        CONTACT-INFO        "Exalt Wireless Inc.
+                            250 E Hacienda Ave.,
+                            Campbell, CA, 95008
+                            USA"
+        DESCRIPTION         "This is the Device Specific configuration for
+                            the ExtendAirG2 Licensed radio."
+
+        REVISION	    "201304261021Z"
+        DESCRIPTION         "This is rev. 1.00"
+        ::= { systemConfig 57 }
+
+
+    extendAirG2TxPower OBJECT-TYPE
+        SYNTAX              RadioTxPwr11gT
+        UNITS               "Tenths of dBm."
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Transmit Power level multiplied by 10.0 -<g45><s11>"
+        ::= { extendAirG2 1 }
+
+    extendAirG2Bandwidth OBJECT-TYPE
+        SYNTAX              BandwidthT
+        UNITS               "kHz"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The RF bandwidth. -<g47><s12 *1>"
+        ::= { extendAirG2 2 }
+
+    extendAirG2Modulation OBJECT-TYPE
+        SYNTAX              ModulationT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The Mode. -<g52><s14 *1>"
+        ::= { extendAirG2 3 }
+
+    extendAirG2TXfrequency OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(2..9))
+        UNITS               "MHz"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The TX Frequency/ -<g46 TX><s15 TX>."
+        ::= { extendAirG2 4 }
+
+    extendAirG2RXfrequency OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(2..9))
+        UNITS               "MHz"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The RX Frequency/ -<g46 RX><s15 RX>."
+        ::= { extendAirG2 5 }
+
+    extendAirG2DiplexerConfiguration OBJECT-TYPE
+        SYNTAX              DiplexerConfigG2T
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The diplexer (label 701-802) configuration/ -<g310><s197>."
+        ::= { extendAirG2 6 }
+
+    extendAirG2InsertionLoss OBJECT-TYPE
+        SYNTAX              Integer32 (0..200)
+        UNITS               "Hundredth dBm"
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Inserion Loss is applicable for 'OTHER' diplexer entities only/ -<g528><s28 * 100>." 
+        ::= { extendAirG2 7 }
+
+    extendAirG2BuzTimeout OBJECT-TYPE
+        SYNTAX              BuzTimeoutT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This sets buzzer timeout period. User Options are: buzzer off, 
+	                     10 minutes or 2 hours."
+        ::= { extendAirG2 8 }
+
+    extendAirG2AcmMode OBJECT-TYPE
+        SYNTAX              ExaltEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "ACM Mode enable/disable."
+        ::= { extendAirG2 9 }
+
+    extendAirG2AcmPolicy OBJECT-TYPE
+        SYNTAX              AcmPolicyT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The ACM Policy (Conservative/agressive)."
+        ::= { extendAirG2 10 }
+	                     
+    extendAirG2AcmBaseModulation OBJECT-TYPE
+        SYNTAX              AcmBaseModulationT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The ACM Base Mode."
+        ::= { extendAirG2 11 }
+
+    extendAirG2AcmTargetModulation OBJECT-TYPE
+        SYNTAX              AcmTargetModulationT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The ACM Target Mode."
+        ::= { extendAirG2 12 }
+
+    extendAirG2AcmPowerBoostMode OBJECT-TYPE
+        SYNTAX              AcmPowerBoostEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The ACM Power Boost Mode."
+        ::= { extendAirG2 15 }
+
+END

@@ -1,0 +1,1711 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-TCE-RADIUS-CLIENT-MIB.my
+ --
+ --
+
+ CIENA-CES-RADIUS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS       
+   Counter32, Gauge32, IpAddress, Unsigned32, Integer32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY       
+       FROM SNMPv2-SMI        
+   DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION
+       FROM SNMPv2-TC                  
+   cienaCesStatistics
+       FROM CIENA-SMI
+   CienaGlobalState
+   	 FROM CIENA-TC
+   InetAddressType, InetAddress
+       FROM INET-ADDRESS-MIB;
+   
+ cienaCesRadiusClientMIB MODULE-IDENTITY
+        LAST-UPDATED "201602170000Z"
+            ORGANIZATION "Ciena Corp."
+            CONTACT-INFO
+        	"  Mib Meister
+               115 North Sullivan Road
+               Spokane Valley, WA 99037
+               USA            
+               Phone:  +1 509 242 9000
+               Email:  support@ciena.com"
+            DESCRIPTION
+               "This module defines the objects used by the RADIUS client."
+
+            REVISION "201602170000Z"
+            DESCRIPTION
+               "Updated DESCRIPTION of cienaCesRadiusUserLoginStatus, 
+               cienaCesRadiusUserLoginAcctStatus, cienaCesRadiusDot1xAuthStatus,
+               and cienaCesRadiusDot1xAcctStatus."
+
+            REVISION "201507220000Z"
+            DESCRIPTION
+               "Changed the RADIUS authentication string range to accept a zero length string."
+
+            REVISION "201506220000Z"
+            DESCRIPTION
+               "Added cienaCesRadiusUserLoginAuthSecret, cienaCesRadiusUserLoginAcctAuthSecret,
+	        cienaCesRadiusDot1xAuthAuthSecret, cienaCesRadiusDot1xAcctAuthSecret"
+
+            REVISION "201406120000Z"
+            DESCRIPTION
+               "Added cienaCesRadiusUserLoginAcct"
+
+            REVISION "201401020000Z"
+            DESCRIPTION
+               "Added independent Inet addressing and Unsigned32 imports.
+                Deprecated cienaCesRadiusClientTimeout, cienaCesRadiusClientRetries, cienaCesRadiusClientAuthKey, 
+                cienaCesRadiusClientAuthKeyUnset, cienaCesRadiusClientSearchType, and cienaCesRadiusClientServerTable.  
+                Added cienaCesRadiusUserLoginTable, cienaCesRadiusDot1XAuthTable, cienaCesRadiusDot1XAcctTable"
+
+            REVISION "201204170000Z"
+            DESCRIPTION
+               "Corrected the maximum RADIUS authentication string length from 127 to 64 characters."
+
+            REVISION "201005180000Z"
+            DESCRIPTION
+                    "Initial creation."
+            ::= { cienaCesStatistics 3 }
+ 
+
+
+ RadiusString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Used to represent the RADIUS authentication string."
+    SYNTAX       OCTET STRING (SIZE (0 | 8..64))
+
+ --
+ -- Node definitions
+ --
+ 
+ cienaCesRadiusClientMIBObjects OBJECT IDENTIFIER ::= { cienaCesRadiusClientMIB 1 }
+ 
+ cienaCesRadiusClient OBJECT IDENTIFIER ::= {cienaCesRadiusClientMIBObjects 1 } 
+ cienaCesRadiusClientGlobal OBJECT IDENTIFIER ::= {cienaCesRadiusClient 1 }
+ cienaCesRadiusClientServer OBJECT IDENTIFIER ::= {cienaCesRadiusClient 2 }
+
+ cienaCesRadiusUserLogin OBJECT IDENTIFIER ::= {cienaCesRadiusClient 3 }
+ cienaCesRadiusUserLoginGlobal OBJECT IDENTIFIER ::= {cienaCesRadiusUserLogin 1 }
+
+ cienaCesRadiusDot1xAuth OBJECT IDENTIFIER ::= {cienaCesRadiusClient 4 }
+ cienaCesRadiusDot1xAuthGlobal OBJECT IDENTIFIER ::= {cienaCesRadiusDot1xAuth 1 }
+
+ cienaCesRadiusDot1xAcct OBJECT IDENTIFIER ::= {cienaCesRadiusClient 5 }
+ cienaCesRadiusDot1xAcctGlobal OBJECT IDENTIFIER ::= {cienaCesRadiusDot1xAcct 1 }
+
+ cienaCesRadiusUserLoginAcct OBJECT IDENTIFIER ::= {cienaCesRadiusClient 6 }
+ cienaCesRadiusUserLoginAcctGlobal OBJECT IDENTIFIER ::= {cienaCesRadiusUserLoginAcct 1 }
+
+ -- Notifications 
+  
+ cienaCesRadiusClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesRadiusClientMIB 2 } 
+ cienaCesRadiusClientMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesRadiusClientMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesRadiusClientMIBConformance OBJECT IDENTIFIER ::= { cienaCesRadiusClientMIB 3 } 
+ cienaCesRadiusClientMIBCompliances OBJECT IDENTIFIER ::= { cienaCesRadiusClientMIBConformance 1 }      
+ cienaCesRadiusClientMIBGroups      OBJECT IDENTIFIER ::= { cienaCesRadiusClientMIBConformance 2 }
+         
+ 
+ cienaCesRadiusAdminState OBJECT-TYPE     
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "Setting this object administratively enables or disables the RADIUS client."
+     ::= { cienaCesRadiusClientGlobal 1 }
+
+ cienaCesRadiusOperState OBJECT-TYPE     
+     SYNTAX        CienaGlobalState
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+        "This object returns the operational state of the RADIUS client."
+     ::= { cienaCesRadiusClientGlobal 2 }
+
+ cienaCesRadiusClientTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+        "This is the time in seconds between re-transmissions
+         to the RADIUS server."
+     DEFVAL { 1 }
+     ::= { cienaCesRadiusClientGlobal 3 }
+      
+ cienaCesRadiusClientRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+        "Indicates the number of times the RADIUS server should be
+         tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesRadiusClientGlobal 4 } 
+ 
+ cienaCesRadiusClientAuthKey OBJECT-TYPE
+     SYNTAX        RadiusString
+     MAX-ACCESS    read-write
+     STATUS        deprecated
+     DESCRIPTION
+        "The authenticaion key to be used for RADIUS servers.
+        Retrieving the value of this object via SNMP returns 
+        an empty string for security reasons."
+     ::= { cienaCesRadiusClientGlobal 5 }
+  
+  cienaCesRadiusClientAuthKeyUnset OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-write
+     STATUS        deprecated
+     DESCRIPTION
+        "Setting this object to true clears the value of 
+         cienaCesRadiusClientAuthKey.
+         Reading this object always returns a value of false."
+     ::= { cienaCesRadiusClientGlobal 6 }
+
+  cienaCesRadiusClientSearchType OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        cached(1),
+                        priority(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        deprecated
+     DESCRIPTION
+             "This object sets the search type of the RADIUS client."
+     ::= { cienaCesRadiusClientGlobal 7 }
+
+--
+-- Radius Client Server Table
+--     
+
+ cienaCesRadiusClientServerTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesRadiusClientServerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         deprecated
+     DESCRIPTION
+        "Lists the possible RADIUS servers. 
+         While creating an entry, cienaCesRadiusRadiusClientServerStatus and 
+         cienaCesRadiusClientServerAddr must be specified. The SNMP multiple 
+         set operation must be used to create an entry."
+     ::= { cienaCesRadiusClientServer 1 }
+      
+  
+ cienaCesRadiusClientServerEntry OBJECT-TYPE
+     SYNTAX       CienaCesRadiusClientServerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+        "RADIUS server entry."
+     INDEX { cienaCesRadiusClientServerIndex}
+     ::= { cienaCesRadiusClientServerTable 1 }
+      
+ CienaCesRadiusClientServerEntry ::= SEQUENCE {
+     cienaCesRadiusClientServerIndex             				   Integer32,     
+     cienaCesRadiusClientServerAddr                            DisplayString,     
+     cienaCesRadiusClientServerResolvedAddr                    IpAddress,
+     cienaCesRadiusClientServerPriority             			   Integer32,
+     cienaCesRadiusClientServerAuthPort                        Integer32,     
+     cienaCesRadiusClientServerRoundTripTime                   TimeTicks,
+     cienaCesRadiusClientServerAccessRequests                  Counter32,
+     cienaCesRadiusClientServerAccessRetransmissions           Counter32,
+     cienaCesRadiusClientServerAccessAccepts                   Counter32,
+     cienaCesRadiusClientServerAccessRejects                   Counter32,
+     cienaCesRadiusClientServerAccessChallenges                Counter32,
+     cienaCesRadiusClientServerMalformedAccessResponses        Counter32,
+     cienaCesRadiusClientServerBadAuthenticators               Counter32,
+     cienaCesRadiusClientServerPendingRequests                 Gauge32,
+     cienaCesRadiusClientServerTimeouts                        Counter32,
+     cienaCesRadiusClientServerUnknownTypes                    Counter32,
+     cienaCesRadiusClientServerPacketsDropped                  Counter32,
+     cienaCesRadiusClientServerApplication                   	INTEGER,
+     cienaCesRadiusClientServerStatus                          RowStatus     
+	}
+
+ cienaCesRadiusClientServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+        "Specifies the index of this table."
+     ::= { cienaCesRadiusClientServerEntry 1 }
+   
+ cienaCesRadiusClientServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       deprecated
+     DESCRIPTION
+        "Host name or IP address of the RADIUS server."
+     ::= { cienaCesRadiusClientServerEntry 2 }
+
+ cienaCesRadiusClientServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+        "Specifies the resolved IP address if cienaCesRadiusClientServerAddr is set to
+         host name. If cienaCesRadiusClientServerAddr is set to IP address, 
+         then cienaCesRadiusClientServerResolvedAddr contains the same 
+         information as cienaCesRadiusClientServerAddr."
+     ::= { cienaCesRadiusClientServerEntry 3 }
+ 
+  cienaCesRadiusClientServerPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       deprecated
+     DESCRIPTION
+        "Specifies the priority of RADIUS servers configured on the device."
+     ::= { cienaCesRadiusClientServerEntry 4 } 
+
+ cienaCesRadiusClientServerAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      deprecated
+      DESCRIPTION
+         "The destination UDP port number to which RADIUS
+         messages should be sent. The RADIUS server is not 
+         used for authentication if this port number is 0."
+      DEFVAL { 1812 }
+      ::= { cienaCesRadiusClientServerEntry 5 }
+
+ cienaCesRadiusClientServerRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that matched it from this RADIUS
+             authentication server."
+      ::= { cienaCesRadiusClientServerEntry 6 }
+
+ cienaCesRadiusClientServerAccessRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesRadiusClientServerEntry 7 }
+
+ cienaCesRadiusClientServerAccessRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { cienaCesRadiusClientServerEntry 8 }
+
+ cienaCesRadiusClientServerAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusClientServerEntry 9 }
+
+ cienaCesRadiusClientServerAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusClientServerEntry  10 }
+
+ cienaCesRadiusClientServerAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusClientServerEntry 11 }
+
+ cienaCesRadiusClientServerMalformedAccessResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesRadiusClientServerEntry 12 }
+
+ cienaCesRadiusClientServerBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesRadiusClientServerEntry 13 }
+
+ cienaCesRadiusClientServerPendingRequests OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             destined for this server that have not yet timed out
+             or received a response. This variable is incremented
+             when an Access-Request is sent and decremented due to
+             receipt of an Access-Accept, Access-Reject, 
+             Access-Challenge, a timeout, or retransmission."
+      ::= { cienaCesRadiusClientServerEntry 14 }
+
+ cienaCesRadiusClientServerTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS deprecated
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesRadiusClientServerEntry  15 }
+
+ cienaCesRadiusClientServerUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesRadiusClientServerEntry  16 }
+
+ cienaCesRadiusClientServerPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+            "The number of RADIUS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesRadiusClientServerEntry  17}
+ 
+  cienaCesRadiusClientServerApplication OBJECT-TYPE
+      SYNTAX      INTEGER {
+                     userLogin(1),
+                     all(2)
+               }
+      MAX-ACCESS  read-create
+      STATUS      deprecated
+      DESCRIPTION
+            "This object specifies how the RADIUS server should be used for authentication."
+      DEFVAL   {all}
+      ::= { cienaCesRadiusClientServerEntry  18}
+      
+     
+ cienaCesRadiusClientServerStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        deprecated
+      DESCRIPTION
+            "To create a row in this table, a manager must
+            set this object to createAndGo(4).
+
+            To create an entry, cienaCesRadiusClientServerStatus and 
+            cienaCesRadiusClientServerAddr must be specified. The SNMP 
+            multiple set operation must be used to create the entry.
+
+            To disable a RADIUS server, set the 
+            cienaCesRadiusClientServerStatus object to 'notInService' state."
+      ::= { cienaCesRadiusClientServerEntry 19 } 
+
+
+--
+-- Radius User Login Global
+--
+
+ cienaCesRadiusUserLoginTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "This is the time in seconds between re-transmissions
+         to the RADIUS server."
+     DEFVAL { 1 }
+     ::= { cienaCesRadiusUserLoginGlobal 1 }
+      
+ cienaCesRadiusUserLoginRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "Indicates the number of times the RADIUS server should be
+         tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesRadiusUserLoginGlobal 2 } 
+ 
+ cienaCesRadiusUserLoginAuthKey OBJECT-TYPE
+     SYNTAX        RadiusString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "The authenticaion key to be used for RADIUS servers.
+        Retrieving the value of this object via SNMP returns 
+        an empty string for security reasons."
+     ::= { cienaCesRadiusUserLoginGlobal 3 }
+  
+  cienaCesRadiusUserLoginSearchType OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        cached(1),
+                        priority(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object sets the search type of the RADIUS client."
+     ::= { cienaCesRadiusUserLoginGlobal 4 }
+
+   cienaCesRadiusUserLoginAuthSecret OBJECT-TYPE
+     SYNTAX       OCTET STRING(SIZE(0..259))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "Used to set the pre-encrypted secret for user-login auth.
+         When read, this object returns the encrypted secret."
+     ::= { cienaCesRadiusUserLoginGlobal 5 }
+--
+-- Radius User Login Table
+--
+
+ cienaCesRadiusUserLoginTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesRadiusUserLoginEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+        "Lists the possible RADIUS user login servers. 
+         While creating an entry, cienaCesRadiusUserLoginStatus and 
+         cienaCesRadiusUserLoginAddr must be specified. The SNMP multiple 
+         set operation must be used to create an entry."
+     ::= { cienaCesRadiusUserLogin 2 }
+      
+  
+ cienaCesRadiusUserLoginEntry OBJECT-TYPE
+     SYNTAX       CienaCesRadiusUserLoginEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "RADIUS user login entry."
+     INDEX { cienaCesRadiusUserLoginIndex }
+     ::= { cienaCesRadiusUserLoginTable 1 }
+      
+ CienaCesRadiusUserLoginEntry ::= SEQUENCE {
+     cienaCesRadiusUserLoginIndex                  			Integer32,
+     cienaCesRadiusUserLoginResolvedInetAddrType            InetAddressType,
+     cienaCesRadiusUserLoginResolvedInetAddress             InetAddress,
+     cienaCesRadiusUserLoginAddr                            DisplayString,
+     cienaCesRadiusUserLoginPriority             			   Integer32,
+     cienaCesRadiusUserLoginAuthPort                        Integer32,
+     cienaCesRadiusUserLoginClearStatistics                 TruthValue,
+     cienaCesRadiusUserLoginRoundTripTime                   TimeTicks,
+     cienaCesRadiusUserLoginRequests                        Counter32,
+     cienaCesRadiusUserLoginRetransmissions                 Counter32,
+     cienaCesRadiusUserLoginAccessAccepts                   Counter32,
+     cienaCesRadiusUserLoginAccessRejects                   Counter32,
+     cienaCesRadiusUserLoginAccessChallenges                Counter32,
+     cienaCesRadiusUserLoginAccountingResponses             Counter32,
+     cienaCesRadiusUserLoginMalformedResponses              Counter32,
+     cienaCesRadiusUserLoginBadAuthenticators               Counter32,
+     cienaCesRadiusUserLoginTimeouts                        Counter32,
+     cienaCesRadiusUserLoginUnknownTypes                    Counter32,
+     cienaCesRadiusUserLoginPacketsDropped                  Counter32,
+     cienaCesRadiusUserLoginStatus                          RowStatus     
+	}
+
+ cienaCesRadiusUserLoginIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Specifies the index of this table."
+     ::= { cienaCesRadiusUserLoginEntry 1 }
+
+ cienaCesRadiusUserLoginResolvedInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "Specifies the resolved IP address type.  This OID is used in conjunction 
+            with cienaCesRadiusUserLoginInetAddrress.
+            When set to :
+            ipv4 : cienaCesRadiusUserLoginResolvedInetAddress should be compliant with InetAddressIPv4 
+            ipv6 : cienaCesRadiusUserLoginResolvedInetAddress should be compliant with InetAddressIPv6 "
+     ::= { cienaCesRadiusUserLoginEntry 2 }
+ 
+ cienaCesRadiusUserLoginResolvedInetAddress OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	   "Specifies the resolved IP address if cienaCesRadiusUserLoginAddr is set to host name.
+            If cienaCesRadiusUserLoginAddr is set to ip address then 
+            cienaCesRadiusUserLoginResolvedInetAddress will contain same information as 
+            cienaCesRadiusUserLoginAddr.
+            This OID should be used in conjuction with cienaCesRadiusUserLoginResolvedInetAddrType."
+     ::= { cienaCesRadiusUserLoginEntry 3 }
+
+ cienaCesRadiusUserLoginAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Host name or IP address of the RADIUS server."
+     ::= { cienaCesRadiusUserLoginEntry 4 }
+ 
+  cienaCesRadiusUserLoginPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Specifies the priority of RADIUS servers configured on the device."
+     ::= { cienaCesRadiusUserLoginEntry 5 } 
+
+ cienaCesRadiusUserLoginAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The destination UDP port number to which RADIUS
+         messages should be sent. The RADIUS server is not 
+         used for authentication if this port number is 0."
+      DEFVAL { 1812 }
+      ::= { cienaCesRadiusUserLoginEntry 6 }
+
+ cienaCesRadiusUserLoginClearStatistics OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+           "This object clears the statistics for a server."
+
+     ::= { cienaCesRadiusUserLoginEntry 7 }
+
+ cienaCesRadiusUserLoginRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that matched it from this RADIUS
+             authentication server."
+      ::= { cienaCesRadiusUserLoginEntry 8 }
+
+ cienaCesRadiusUserLoginRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesRadiusUserLoginEntry 9 }
+
+ cienaCesRadiusUserLoginRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { cienaCesRadiusUserLoginEntry 10 }
+
+ cienaCesRadiusUserLoginAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginEntry 11 }
+
+ cienaCesRadiusUserLoginAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginEntry  12 }
+
+ cienaCesRadiusUserLoginAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginEntry 13 }
+
+ cienaCesRadiusUserLoginAccountingResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginEntry 14 }
+
+ cienaCesRadiusUserLoginMalformedResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesRadiusUserLoginEntry 15 }
+
+ cienaCesRadiusUserLoginBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesRadiusUserLoginEntry 16 }
+
+ cienaCesRadiusUserLoginTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesRadiusUserLoginEntry  17 }
+
+ cienaCesRadiusUserLoginUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesRadiusUserLoginEntry  18 }
+
+ cienaCesRadiusUserLoginPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesRadiusUserLoginEntry  19 }
+      
+ cienaCesRadiusUserLoginStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "To create a row in this table, a manager must specify
+            cienaCesRadiusUserLoginAddr and set this object to createAndGo(4).
+            The RADIUS server will initially be administratively disabled.
+
+            To administratively enable the RADIUS server, set this object to
+            active(1). To administratively disable the RADIUS server set this
+            object to notInService(2)."
+      ::= { cienaCesRadiusUserLoginEntry 20 } 
+
+--
+-- Radius User Login Acct Global
+--
+
+ cienaCesRadiusUserLoginAcctAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object administratively enables/disables the RADIUS user login accounting client on the device."
+     ::= { cienaCesRadiusUserLoginAcctGlobal 1 }
+
+ cienaCesRadiusUserLoginAcctTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "This is the time in seconds between re-transmissions
+         to the RADIUS server."
+     DEFVAL { 1 }
+     ::= { cienaCesRadiusUserLoginAcctGlobal 2 }
+      
+ cienaCesRadiusUserLoginAcctRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "Indicates the number of times the RADIUS server should be
+         tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesRadiusUserLoginAcctGlobal 3 } 
+ 
+ cienaCesRadiusUserLoginAcctAuthKey OBJECT-TYPE
+     SYNTAX        RadiusString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "The authenticaion key to be used for RADIUS servers.
+        Retrieving the value of this object via SNMP returns 
+        an empty string for security reasons."
+     ::= { cienaCesRadiusUserLoginAcctGlobal 4 }
+  
+  cienaCesRadiusUserLoginAcctSearchType OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        cached(1),
+                        priority(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object sets the search type of the RADIUS client."
+     ::= { cienaCesRadiusUserLoginAcctGlobal 5 }
+
+   cienaCesRadiusUserLoginAcctAuthSecret OBJECT-TYPE
+     SYNTAX       OCTET STRING(SIZE(0..259))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "Used to set the pre-encrypted secret for user-login accounting
+         auth. When read, this object returns the encrypted secret."
+     ::= { cienaCesRadiusUserLoginAcctGlobal 6 }
+
+--
+-- Radius User Login Acct Table
+--
+
+ cienaCesRadiusUserLoginAcctTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesRadiusUserLoginAcctEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+        "Lists the possible RADIUS user login servers. 
+         While creating an entry, cienaCesRadiusUserLoginAcctStatus and 
+         cienaCesRadiusUserLoginAcctAddr must be specified. The SNMP multiple 
+         set operation must be used to create an entry."
+     ::= { cienaCesRadiusUserLoginAcct 2 }
+      
+  
+ cienaCesRadiusUserLoginAcctEntry OBJECT-TYPE
+     SYNTAX       CienaCesRadiusUserLoginAcctEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "RADIUS user login entry."
+     INDEX { cienaCesRadiusUserLoginAcctIndex }
+     ::= { cienaCesRadiusUserLoginAcctTable 1 }
+      
+ CienaCesRadiusUserLoginAcctEntry ::= SEQUENCE {
+     cienaCesRadiusUserLoginAcctIndex                  			Integer32,
+     cienaCesRadiusUserLoginAcctResolvedInetAddrType            InetAddressType,
+     cienaCesRadiusUserLoginAcctResolvedInetAddress             InetAddress,
+     cienaCesRadiusUserLoginAcctAddr                            DisplayString,
+     cienaCesRadiusUserLoginAcctPriority             			   Integer32,
+     cienaCesRadiusUserLoginAcctAuthPort                        Integer32,
+     cienaCesRadiusUserLoginAcctClearStatistics                 TruthValue,
+     cienaCesRadiusUserLoginAcctRoundTripTime                   TimeTicks,
+     cienaCesRadiusUserLoginAcctRequests                        Counter32,
+     cienaCesRadiusUserLoginAcctRetransmissions                 Counter32,
+     cienaCesRadiusUserLoginAcctAccessAccepts                   Counter32,
+     cienaCesRadiusUserLoginAcctAccessRejects                   Counter32,
+     cienaCesRadiusUserLoginAcctAccessChallenges                Counter32,
+     cienaCesRadiusUserLoginAcctAccountingResponses             Counter32,
+     cienaCesRadiusUserLoginAcctMalformedResponses              Counter32,
+     cienaCesRadiusUserLoginAcctBadAuthenticators               Counter32,
+     cienaCesRadiusUserLoginAcctTimeouts                        Counter32,
+     cienaCesRadiusUserLoginAcctUnknownTypes                    Counter32,
+     cienaCesRadiusUserLoginAcctPacketsDropped                  Counter32,
+     cienaCesRadiusUserLoginAcctStatus                          RowStatus     
+	}
+
+ cienaCesRadiusUserLoginAcctIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Specifies the index of this table."
+     ::= { cienaCesRadiusUserLoginAcctEntry 1 }
+
+ cienaCesRadiusUserLoginAcctResolvedInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "Specifies the resolved IP address type.  This OID is used in conjunction 
+            with cienaCesRadiusUserLoginAcctInetAddrress.
+            When set to :
+            ipv4 : cienaCesRadiusUserLoginAcctResolvedInetAddress should be compliant with InetAddressIPv4 
+            ipv6 : cienaCesRadiusUserLoginAcctResolvedInetAddress should be compliant with InetAddressIPv6 "
+     ::= { cienaCesRadiusUserLoginAcctEntry 2 }
+ 
+ cienaCesRadiusUserLoginAcctResolvedInetAddress OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	   "Specifies the resolved IP address if cienaCesRadiusUserLoginAcctAddr is set to host name.
+            If cienaCesRadiusUserLoginAcctAddr is set to ip address then 
+            cienaCesRadiusUserLoginAcctResolvedInetAddress will contain same information as 
+            cienaCesRadiusUserLoginAcctAddr.
+            This OID should be used in conjuction with cienaCesRadiusUserLoginAcctResolvedInetAddrType."
+     ::= { cienaCesRadiusUserLoginAcctEntry 3 }
+
+ cienaCesRadiusUserLoginAcctAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Host name or IP address of the RADIUS server."
+     ::= { cienaCesRadiusUserLoginAcctEntry 4 }
+ 
+  cienaCesRadiusUserLoginAcctPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Specifies the priority of RADIUS servers configured on the device."
+     ::= { cienaCesRadiusUserLoginAcctEntry 5 } 
+
+ cienaCesRadiusUserLoginAcctAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The destination UDP port number to which RADIUS
+         messages should be sent. The RADIUS server is not 
+         used for authentication if this port number is 0."
+      DEFVAL { 1812 }
+      ::= { cienaCesRadiusUserLoginAcctEntry 6 }
+
+ cienaCesRadiusUserLoginAcctClearStatistics OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+           "This object clears the statistics for a server."
+
+     ::= { cienaCesRadiusUserLoginAcctEntry 7 }
+
+ cienaCesRadiusUserLoginAcctRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that matched it from this RADIUS
+             authentication server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 8 }
+
+ cienaCesRadiusUserLoginAcctRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesRadiusUserLoginAcctEntry 9 }
+
+ cienaCesRadiusUserLoginAcctRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 10 }
+
+ cienaCesRadiusUserLoginAcctAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 11 }
+
+ cienaCesRadiusUserLoginAcctAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginAcctEntry  12 }
+
+ cienaCesRadiusUserLoginAcctAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 13 }
+
+ cienaCesRadiusUserLoginAcctAccountingResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 14 }
+
+ cienaCesRadiusUserLoginAcctMalformedResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesRadiusUserLoginAcctEntry 15 }
+
+ cienaCesRadiusUserLoginAcctBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesRadiusUserLoginAcctEntry 16 }
+
+ cienaCesRadiusUserLoginAcctTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesRadiusUserLoginAcctEntry  17 }
+
+ cienaCesRadiusUserLoginAcctUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesRadiusUserLoginAcctEntry  18 }
+
+ cienaCesRadiusUserLoginAcctPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesRadiusUserLoginAcctEntry  19 }
+      
+ cienaCesRadiusUserLoginAcctStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "To create a row in this table, a manager must specify
+            cienaCesRadiusUserLoginAcctAddr and set this object to createAndGo(4).
+            The RADIUS server will initially be administratively disabled.
+
+            To administratively enable the RADIUS server, set this object to
+            active(1). To administratively disable the RADIUS server set this
+            object to notInService(2)."
+      ::= { cienaCesRadiusUserLoginAcctEntry 20 } 
+
+--
+-- Radius Dot1x Auth Global
+--
+
+ cienaCesRadiusDot1xAuthTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "This is the time in seconds between re-transmissions
+         to the RADIUS server."
+     DEFVAL { 1 }
+     ::= { cienaCesRadiusDot1xAuthGlobal 1 }
+      
+ cienaCesRadiusDot1xAuthRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "Indicates the number of times the RADIUS server should be
+         tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesRadiusDot1xAuthGlobal 2 } 
+ 
+ cienaCesRadiusDot1xAuthAuthKey OBJECT-TYPE
+     SYNTAX        RadiusString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "The authenticaion key to be used for RADIUS servers.
+        Retrieving the value of this object via SNMP returns 
+        an empty string for security reasons."
+     ::= { cienaCesRadiusDot1xAuthGlobal 3 }
+  
+  cienaCesRadiusDot1xAuthSearchType OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        priority(1),
+                        loadBalance(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object sets the search type of the RADIUS client."
+     ::= { cienaCesRadiusDot1xAuthGlobal 4 }
+
+ cienaCesRadiusDot1xAuthGreylistTimeout   OBJECT-TYPE
+     SYNTAX         Unsigned32 (60..14400)
+     UNITS          "seconds"
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "The max greylist timeout for a RADIUS Dot1x Auth server between
+         1 minute and 4 hours."
+     DEFVAL { 600 }
+     ::= { cienaCesRadiusDot1xAuthGlobal 5 } 
+
+   cienaCesRadiusDot1xAuthAuthSecret OBJECT-TYPE
+     SYNTAX       OCTET STRING(SIZE(0..259))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "Used to set the pre-encrypted secret for dot1x auth.
+         When read, this object returns the encrypted secret."
+     ::= { cienaCesRadiusDot1xAuthGlobal 6 }
+ 
+--
+-- Radius Dot1x Auth Table
+--
+
+ cienaCesRadiusDot1xAuthTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesRadiusDot1xAuthEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+        "Lists the possible RADIUS Dot1x auth servers. 
+         While creating an entry, cienaCesRadiusDot1xAuthStatus and 
+         cienaCesRadiusDot1xAuthAddr must be specified. The SNMP multiple 
+         set operation must be used to create an entry."
+     ::= { cienaCesRadiusDot1xAuth 2 }
+      
+  
+ cienaCesRadiusDot1xAuthEntry OBJECT-TYPE
+     SYNTAX       CienaCesRadiusDot1xAuthEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "RADIUS user login entry."
+     INDEX { cienaCesRadiusDot1xAuthIndex }
+     ::= { cienaCesRadiusDot1xAuthTable 1 }
+      
+ CienaCesRadiusDot1xAuthEntry ::= SEQUENCE {
+     cienaCesRadiusDot1xAuthIndex                  			Integer32,
+     cienaCesRadiusDot1xAuthResolvedInetAddrType            InetAddressType,
+     cienaCesRadiusDot1xAuthResolvedInetAddress             InetAddress,
+     cienaCesRadiusDot1xAuthAddr                            DisplayString,
+     cienaCesRadiusDot1xAuthPriority             			   Integer32,
+     cienaCesRadiusDot1xAuthAuthPort                        Integer32,
+     cienaCesRadiusDot1xAuthClearStatistics                 TruthValue,
+     cienaCesRadiusDot1xAuthGreylistTimeRemaining           Unsigned32,
+     cienaCesRadiusDot1xAuthRoundTripTime                   TimeTicks,
+     cienaCesRadiusDot1xAuthRequests                        Counter32,
+     cienaCesRadiusDot1xAuthRetransmissions                 Counter32,
+     cienaCesRadiusDot1xAuthAccessAccepts                   Counter32,
+     cienaCesRadiusDot1xAuthAccessRejects                   Counter32,
+     cienaCesRadiusDot1xAuthAccessChallenges                Counter32,
+     cienaCesRadiusDot1xAuthAccountingResponses             Counter32,
+     cienaCesRadiusDot1xAuthMalformedResponses              Counter32,
+     cienaCesRadiusDot1xAuthBadAuthenticators               Counter32,
+     cienaCesRadiusDot1xAuthTimeouts                        Counter32,
+     cienaCesRadiusDot1xAuthUnknownTypes                    Counter32,
+     cienaCesRadiusDot1xAuthPacketsDropped                  Counter32,
+     cienaCesRadiusDot1xAuthStatus                          RowStatus
+	}
+
+ cienaCesRadiusDot1xAuthIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Specifies the index of this table."
+     ::= { cienaCesRadiusDot1xAuthEntry 1 }
+
+ cienaCesRadiusDot1xAuthResolvedInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "Specifies the resolved IP address type.  This OID is used in conjunction 
+            with cienaCesRadiusDot1xAuthInetAddrress.
+            When set to :
+            ipv4 : cienaCesRadiusDot1xAuthResolvedInetAddress should be compliant with InetAddressIPv4 
+            ipv6 : cienaCesRadiusDot1xAuthResolvedInetAddress should be compliant with InetAddressIPv6 "
+     ::= { cienaCesRadiusDot1xAuthEntry 2 }
+ 
+ cienaCesRadiusDot1xAuthResolvedInetAddress OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	   "Specifies the resolved IP address if cienaCesRadiusDot1xAuthAddr is set to host name.
+            If cienaCesRadiusDot1xAuthAddr is set to ip address then 
+            cienaCesRadiusDot1xAuthResolvedInetAddress will contain same information as 
+            cienaCesRadiusDot1xAuthAddr.
+            This OID should be used in conjuction with cienaCesRadiusDot1xAuthResolvedInetAddrType."
+     ::= { cienaCesRadiusDot1xAuthEntry 3 }
+
+ cienaCesRadiusDot1xAuthAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Host name or IP address of the RADIUS server."
+     ::= { cienaCesRadiusDot1xAuthEntry 4 }
+ 
+ cienaCesRadiusDot1xAuthPriority  OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Specifies the priority of RADIUS servers configured on the device."
+     ::= { cienaCesRadiusDot1xAuthEntry 5 } 
+
+ cienaCesRadiusDot1xAuthAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The destination UDP port number to which RADIUS
+         messages should be sent. The RADIUS server is not 
+         used for authentication if this port number is 0."
+      DEFVAL { 1812 }
+      ::= { cienaCesRadiusDot1xAuthEntry 6 }
+
+ cienaCesRadiusDot1xAuthClearStatistics OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+           "This object clears the statistics for a server."
+     ::= { cienaCesRadiusDot1xAuthEntry 7 }
+
+ cienaCesRadiusDot1xAuthGreylistTimeRemaining OBJECT-TYPE
+     SYNTAX         Unsigned32 (0..14400)
+     UNITS          "seconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+           "Reflects the remaining time before the server removed from the greylist. 
+            A value of '0' (zero) indicates the current server is not greylisted"
+     ::= { cienaCesRadiusDot1xAuthEntry 8 }
+
+ cienaCesRadiusDot1xAuthRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that matched it from this RADIUS
+             authentication server."
+      ::= { cienaCesRadiusDot1xAuthEntry 9 }
+
+ cienaCesRadiusDot1xAuthRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesRadiusDot1xAuthEntry 10 }
+
+ cienaCesRadiusDot1xAuthRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { cienaCesRadiusDot1xAuthEntry 11 }
+
+ cienaCesRadiusDot1xAuthAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAuthEntry 12 }
+
+ cienaCesRadiusDot1xAuthAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAuthEntry  13 }
+
+ cienaCesRadiusDot1xAuthAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAuthEntry 14 }
+
+ cienaCesRadiusDot1xAuthAccountingResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAuthEntry 15 }
+
+ cienaCesRadiusDot1xAuthMalformedResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesRadiusDot1xAuthEntry 16 }
+
+ cienaCesRadiusDot1xAuthBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesRadiusDot1xAuthEntry 17 }
+
+ cienaCesRadiusDot1xAuthTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesRadiusDot1xAuthEntry  18 }
+
+ cienaCesRadiusDot1xAuthUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesRadiusDot1xAuthEntry  19 }
+
+ cienaCesRadiusDot1xAuthPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesRadiusDot1xAuthEntry  20 }
+      
+ cienaCesRadiusDot1xAuthStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "To create a row in this table, a manager must specify
+            cienaCesRadiusDot1xAuthAddr and set this object to createAndGo(4).
+            The RADIUS server will initially be administratively disabled.
+
+            To administratively enable the RADIUS server, set this object to
+            active(1). To administratively disable the RADIUS server set this
+            object to notInService(2)."
+      ::= { cienaCesRadiusDot1xAuthEntry 21 } 
+
+--
+-- Radius Dot1x Acct Global
+--
+
+ cienaCesRadiusDot1xAcctAdminState OBJECT-TYPE     
+     SYNTAX        INTEGER {
+			disabled(1),
+			enabled(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+	     "Setting this object administratively enables/disables the RADIUS Dot1x accounting client on the device."
+     ::= { cienaCesRadiusDot1xAcctGlobal 1 }
+
+ cienaCesRadiusDot1xAcctTimeout OBJECT-TYPE
+     SYNTAX       Integer32 (1..30)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "This is the time in seconds between re-transmissions
+         to the RADIUS server."
+     DEFVAL { 1 }
+     ::= { cienaCesRadiusDot1xAcctGlobal 2 }
+      
+ cienaCesRadiusDot1xAcctRetries   OBJECT-TYPE
+     SYNTAX         Integer32 (0..3)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "Indicates the number of times the RADIUS server should be
+         tried before giving up on the server."
+     DEFVAL { 3 }
+     ::= { cienaCesRadiusDot1xAcctGlobal 3 } 
+ 
+ cienaCesRadiusDot1xAcctAuthKey OBJECT-TYPE
+     SYNTAX        RadiusString
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+        "The authenticaion key to be used for RADIUS servers.
+        Retrieving the value of this object via SNMP returns 
+        an empty string for security reasons."
+     ::= { cienaCesRadiusDot1xAcctGlobal 4 }
+  
+ cienaCesRadiusDot1xAcctSearchType OBJECT-TYPE     
+     SYNTAX        INTEGER {
+                        priority(1),
+                        loadBalance(2)
+                   }
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+             "This object sets the search type of the RADIUS client."
+     ::= { cienaCesRadiusDot1xAcctGlobal 5 }
+
+ cienaCesRadiusDot1xAcctGreylistTimeout   OBJECT-TYPE
+     SYNTAX         Unsigned32 (60..14400)
+     UNITS          "seconds"
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+        "The max greylist timeout for a RADIUS Dot1x Acct server between
+         1 minute and 4 hours."
+     DEFVAL { 600 }
+     ::= { cienaCesRadiusDot1xAcctGlobal 6 } 
+
+ cienaCesRadiusDot1xAcctAuthSecret OBJECT-TYPE
+     SYNTAX       OCTET STRING(SIZE(0..259))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+        "Used to set the pre-encrypted secret for dot1x auth acct.
+         When read, this object returns the encrypted secret."
+     ::= { cienaCesRadiusDot1xAcctGlobal 7 }
+ 
+--
+-- Dadius Dot1x Acct Table
+--
+
+ cienaCesRadiusDot1xAcctTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesRadiusDot1xAcctEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+        "Lists the possible RADIUS Dot1x Acct servers. 
+         While creating an entry, cienaCesRadiusDot1xAcctStatus and 
+         cienaCesRadiusDot1xAcctAddr must be specified. The SNMP multiple 
+         set operation must be used to create an entry."
+     ::= { cienaCesRadiusDot1xAcct 2 }
+      
+  
+ cienaCesRadiusDot1xAcctEntry OBJECT-TYPE
+     SYNTAX       CienaCesRadiusDot1xAcctEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "RADIUS user login entry."
+     INDEX { cienaCesRadiusDot1xAcctIndex }
+     ::= { cienaCesRadiusDot1xAcctTable 1 }
+      
+ CienaCesRadiusDot1xAcctEntry ::= SEQUENCE {
+     cienaCesRadiusDot1xAcctIndex                  			Integer32,
+     cienaCesRadiusDot1xAcctResolvedInetAddrType            InetAddressType,
+     cienaCesRadiusDot1xAcctResolvedInetAddress             InetAddress,
+     cienaCesRadiusDot1xAcctAddr                            DisplayString,
+     cienaCesRadiusDot1xAcctPriority             			   Integer32,
+     cienaCesRadiusDot1xAcctAuthPort                        Integer32,
+     cienaCesRadiusDot1xAcctClearStatistics                 TruthValue,
+     cienaCesRadiusDot1xAcctGreylistTimeRemaining           Unsigned32,   
+     cienaCesRadiusDot1xAcctRoundTripTime                   TimeTicks,
+     cienaCesRadiusDot1xAcctRequests                        Counter32,
+     cienaCesRadiusDot1xAcctRetransmissions                 Counter32,
+     cienaCesRadiusDot1xAcctAccessAccepts                   Counter32,
+     cienaCesRadiusDot1xAcctAccessRejects                   Counter32,
+     cienaCesRadiusDot1xAcctAccessChallenges                Counter32,
+     cienaCesRadiusDot1xAcctAccountingResponses             Counter32,
+     cienaCesRadiusDot1xAcctMalformedResponses              Counter32,
+     cienaCesRadiusDot1xAcctBadAuthenticators               Counter32,
+     cienaCesRadiusDot1xAcctTimeouts                        Counter32,
+     cienaCesRadiusDot1xAcctUnknownTypes                    Counter32,
+     cienaCesRadiusDot1xAcctPacketsDropped                  Counter32,
+     cienaCesRadiusDot1xAcctStatus                          RowStatus
+	}
+
+ cienaCesRadiusDot1xAcctIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..8)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Specifies the index of this table."
+     ::= { cienaCesRadiusDot1xAcctEntry 1 }
+
+ cienaCesRadiusDot1xAcctResolvedInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "Specifies the resolved IP address type.  This OID is used in conjunction 
+            with cienaCesRadiusDot1xAcctInetAddrress.
+            When set to :
+            ipv4 : cienaCesRadiusDot1xAcctResolvedInetAddress should be compliant with InetAddressIPv4 
+            ipv6 : cienaCesRadiusDot1xAcctResolvedInetAddress should be compliant with InetAddressIPv6 "
+     ::= { cienaCesRadiusDot1xAcctEntry 2 }
+ 
+ cienaCesRadiusDot1xAcctResolvedInetAddress OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	   "Specifies the resolved IP address if cienaCesRadiusDot1xAcctAddr is set to host name.
+            If cienaCesRadiusDot1xAcctAddr is set to ip address then 
+            cienaCesRadiusDot1xAcctResolvedInetAddress will contain same information as 
+            cienaCesRadiusDot1xAcctAddr.
+            This OID should be used in conjuction with cienaCesRadiusDot1xAcctResolvedInetAddrType."
+     ::= { cienaCesRadiusDot1xAcctEntry 3 }
+
+ cienaCesRadiusDot1xAcctAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Host name or IP address of the RADIUS server."
+     ::= { cienaCesRadiusDot1xAcctEntry 4 }
+ 
+ cienaCesRadiusDot1xAcctPriority OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "Specifies the priority of RADIUS servers configured on the device."
+     ::= { cienaCesRadiusDot1xAcctEntry 5 } 
+
+ cienaCesRadiusDot1xAcctAuthPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "The destination UDP port number to which RADIUS
+         messages should be sent. The RADIUS server is not 
+         used for authentication if this port number is 0."
+      DEFVAL { 1812 }
+      ::= { cienaCesRadiusDot1xAcctEntry 6 }
+
+ cienaCesRadiusDot1xAcctClearStatistics OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+           "This object clears the statistics for a server."
+     ::= { cienaCesRadiusDot1xAcctEntry 7 }
+
+ cienaCesRadiusDot1xAcctGreylistTimeRemaining OBJECT-TYPE
+     SYNTAX         Unsigned32 (0..14400)
+     UNITS          "seconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+           "Reflects the remaining time before the server removed from the greylist. 
+            A value of '0' (zero) indicates the current server is not greylisted"
+     ::= { cienaCesRadiusDot1xAcctEntry 8 }
+
+ cienaCesRadiusDot1xAcctRoundTripTime  OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The time interval (in hundredths of a second) between
+             the most recent Access-Reply/Access-Challenge and the
+             Access-Request that matched it from this RADIUS
+             authentication server."
+      ::= { cienaCesRadiusDot1xAcctEntry 9 }
+
+ cienaCesRadiusDot1xAcctRequests OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets sent
+             to this server. This does not include retransmissions."
+      ::= { cienaCesRadiusDot1xAcctEntry 10 }
+
+ cienaCesRadiusDot1xAcctRetransmissions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Request packets
+             retransmitted to this RADIUS authentication server."
+      ::= { cienaCesRadiusDot1xAcctEntry 11 }
+
+ cienaCesRadiusDot1xAcctAccessAccepts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Accept packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAcctEntry 12 }
+
+ cienaCesRadiusDot1xAcctAccessRejects OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Reject packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAcctEntry  13 }
+
+ cienaCesRadiusDot1xAcctAccessChallenges OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Challenge packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAcctEntry 14 }
+
+ cienaCesRadiusDot1xAcctAccountingResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Accounting-Response packets
+             (valid or invalid) received from this server."
+      ::= { cienaCesRadiusDot1xAcctEntry 15 }
+
+ cienaCesRadiusDot1xAcctMalformedResponses OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of malformed RADIUS Access-Response
+             packets received from this server.
+             Malformed packets include packets with
+             an invalid length. Bad authenticators or
+             signature attributes or unknown types are not
+             included as malformed access responses."
+      ::= { cienaCesRadiusDot1xAcctEntry 16 }
+
+ cienaCesRadiusDot1xAcctBadAuthenticators OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS Access-Response packets
+             containing invalid authenticators or signature
+             attributes received from this server."
+      ::= { cienaCesRadiusDot1xAcctEntry 17 }
+
+ cienaCesRadiusDot1xAcctTimeouts OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "The number of authentication timeouts to this server.
+             After a timeout the client may retry sending to the same
+             server, send to a different server, or
+             give up. A retry to the same server is counted as a
+             retransmit as well as a timeout. A send to a different
+             server is counted as a request as well as a timeout."
+      ::= { cienaCesRadiusDot1xAcctEntry  18 }
+
+ cienaCesRadiusDot1xAcctUnknownTypes OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets of unknown type which
+             were received from this server on the authentication port."
+      ::= { cienaCesRadiusDot1xAcctEntry  19 }
+
+ cienaCesRadiusDot1xAcctPacketsDropped OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "The number of RADIUS packets which were
+             received from this server on the authentication port
+             and dropped for some other reason."
+      ::= { cienaCesRadiusDot1xAcctEntry  20 }
+       
+ cienaCesRadiusDot1xAcctStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "To create a row in this table, a manager must specify
+            cienaCesRadiusDot1xAcctAddr and set this object to createAndGo(4).
+            The RADIUS server will initially be administratively disabled.
+
+            To administratively enable the RADIUS server, set this object to
+            active(1). To administratively disable the RADIUS server set this
+            object to notInService(2)."
+      ::= { cienaCesRadiusDot1xAcctEntry 21 } 
+
+ END

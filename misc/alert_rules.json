@@ -38,5 +38,17 @@
   {
     "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
     "name": "Device discovered within the last 60 minutes"
+  },
+  {
+    "rule": "%wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Wireless Sensor over limit"
+  },
+  {
+    "rule": "%wireless_sensors.sensor_current <= %wireless_sensors.sensor_limit_low && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Wireless Sensor under limit"
+  },
+  {
+    "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Too many wireless clients"
   }
 ]

@@ -72,6 +72,9 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
+            
+        case 'nfs-server':
+            return 'NFS Server';
 
         case 'ntp':
             return 'NTP';
@@ -111,6 +114,12 @@ function nicecase($item)
         
         case 'php-fpm':
             return 'PHP-FPM';
+
+        case 'opengridscheduler':
+            return 'Open Grid Scheduler';
+
+        case 'sdfsinfo':
+            return 'SDFS info';
 
         default:
             return ucfirst($item);

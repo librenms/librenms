@@ -19,3 +19,22 @@ if ($oids) {
         }
     }
 }
+
+d_echo($pre_cache['netbotz_temperature']);
+
+if (is_array($pre_cache['netbotz_temperature'])) {
+    echo 'NetBotz ';
+    foreach ($pre_cache['netbotz_temperature'] as $index => $data) {
+        if ($data['dewPointSensorValue']) {
+            $divisor = 10;
+            $multiplier = 1;
+            $value = $data['dewPointSensorValue'] / $divisor;
+            $oid = '.1.3.6.1.4.1.5528.100.4.1.3.1.2.' . $index;
+            $index = 'dewPointSensorValue.' . $index;
+            $descr = $data['dewPointSensorLabel'];
+            if (is_numeric($value)) {
+                discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'netbotz', $descr, $divisor, $multiplier, null, null, null, null, $value);
+            }
+        }
+    }
+}

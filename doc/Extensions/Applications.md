@@ -18,9 +18,11 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
 1. [NGINX](#nginx) - Agent
+1. [NFS-server](#nfs-server) - SNMP extend
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
+1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
@@ -29,13 +31,13 @@ Different applications support a variety of ways collect data: by direct connect
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [SDFS info](#sdfs-info) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
-
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -230,7 +232,7 @@ extend memcached /etc/snmp/memcached
 #### Agent
 1. Install the script to your agent: `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/munin -O /usr/lib/check_mk_agent/local/munin`
 2. Make the script executable (`chmod +x /usr/lib/check_mk_agent/local/munin`)
-3. Create the munin scripts dir: `mkdir -p /usr/share/munin`
+3. Create the munin scripts dir: `mkdir -p /usr/share/munin/munin-scripts`
 4. Install your munin scripts into the above directory.
 
 To create your own custom munin scripts, please see this example:
@@ -333,6 +335,17 @@ extend nginx /etc/snmp/nginx-stats
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
+##### NFS-server
+Export the NFS stats from as server.
+
+##### SNMP Extend
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add :
+```
+extend nfs-server /bin/cat /proc/net/rpc/nfsd
+```
+note : find out where cat is located using : `which cat`
+
+2. reload snmpd service to activate the configuration
 
 ### NTP Client
 A shell script that gets stats from ntp client.
@@ -388,6 +401,22 @@ extend nvidia /etc/snmp/nvidia
 The GPU numbering on the graphs will correspond to how the nvidia-smi sees them as being.
 
 For questions about what the various values are/mean, please see the nvidia-smi man file under the section covering dmon.
+
+### Open Grid Scheduler
+Shell script to track the OGS/GE jobs running on clusters.
+
+#### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/rocks.sh
+```
+
+2. Make the script executable (chmod +x /etc/snmp/rocks.sh)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend ogs /etc/snmp/rocks.sh
+```
 
 ### OS Updates
 A small shell script that checks your system package manager for any available updates. Supports apt-get/pacman/yum/zypper package managers).
@@ -698,3 +727,24 @@ extend ups-apcups /etc/snmp/ups-apcups.sh
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `UPS apcups` under the Applications tab.
+
+
+### SDFS info
+A small shell script that exportfs SDFS volume info.
+
+###### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/sdfsinfo -O /etc/snmp/sdfsinfo
+```
+
+2. Make the script executable (chmod +x /etc/snmp/sdfsinfo)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend sdfsinfo /etc/snmp/sdfsinfo
+```
+
+4. Restart snmpd on your host
+
+5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab or wait for it to be auto-discovered.

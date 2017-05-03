@@ -714,6 +714,7 @@ $config['poller_modules']['junose-atm-vp']               = 0;
 $config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
 $config['poller_modules']['wifi']                        = 0;
+$config['poller_modules']['wireless']                    = 1;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -778,6 +779,7 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
+$config['discovery_modules']['wireless']             = 1;
 
 // Enable daily updates
 $config['update'] = 1;

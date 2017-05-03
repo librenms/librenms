@@ -14,7 +14,16 @@ function rewrite_location($location)
             }
         }
     }
-    
+
+    if (is_array($config['location_map_regex_sub'])) {
+        foreach ($config['location_map_regex_sub'] as $reg => $val) {
+            if (preg_match($reg, $location)) {
+                $location = preg_replace($reg, $val, $location);
+                break;
+            }
+        }
+    }
+
     if (isset($config['location_map'][$location])) {
         $location = $config['location_map'][$location];
     }
