@@ -1,0 +1,11 @@
+os: geist-watchdog
+text: 'Geist Watchdog'
+type: environment
+icon: geist
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.21239.
+mib_dir:
+    - geist
+over:
+    - { graph: device_bits, text: 'Device Traffic' }

@@ -1,0 +1,494 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-VLLI-MIB.my
+ --
+
+ CIENA-CES-VLLI-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+   DisplayString, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC                              
+   cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM  CIENA-GLOBAL-MIB
+   CienaGlobalState,CienaStatsClear,CienaMacAddress
+	FROM CIENA-TC
+   cienaCesConfig, cienaCesNotifications 
+	FROM CIENA-SMI;
+        
+ cienaCesVlliMIB MODULE-IDENTITY
+            LAST-UPDATED "201202280000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "Mib Meister
+                     115 North Sullivan Road
+                     Spokane Valley, WA 99037
+                     USA                             
+                     Phone:  +1 509 242 9000
+                     Email:  support@ciena.com"
+           
+            DESCRIPTION
+                "This MIB module illustrates a virtual-link-loss-indication MIB."
+            REVISION    "201202280000Z"
+            DESCRIPTION
+                    "The initial version."
+            ::= { cienaCesConfig 23 }
+        
+
+ --
+ -- Node definitions
+ --
+        
+ cienaCesVlliMIBObjects OBJECT IDENTIFIER ::= { cienaCesVlliMIB 1 }
+ 
+ cienaCesVlli OBJECT IDENTIFIER ::= { cienaCesVlliMIBObjects 1 }
+
+ -- Notifications 
+  
+ cienaCesVlliNotificationPrefix     OBJECT IDENTIFIER ::= { cienaCesNotifications 99 } 
+ cienaCesVlliNotifications          OBJECT IDENTIFIER ::= { cienaCesVlliNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesVlliMIBConformance OBJECT IDENTIFIER ::= { cienaCesVlliMIB 3 } 
+ cienaCesVlliMIBCompliances OBJECT IDENTIFIER ::= { cienaCesVlliMIBConformance 1 }                
+ cienaCesVlliMIBGroups      OBJECT IDENTIFIER ::= { cienaCesVlliMIBConformance 2 }   
+ 
+ 
+ VlliAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the action for the row."
+    SYNTAX      INTEGER {
+                   portShut(1),
+                   portUnshut(2),
+                   ccmStop(3),
+                   ccmResume(4)
+                }
+
+
+ VlliLastEvent ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The last event for each Instance."
+    SYNTAX      INTEGER {
+                   unknown(1),
+                   fault(2),
+                   recovery(3),
+                   adminFault(4),
+                   adminRecovery(5)
+                }
+
+ --
+ -- 
+ --
+
+ cienaCesVlliAdminState  OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies if virtual-link-loss-indication is enabled or disabled." 
+     ::= { cienaCesVlli 1 }
+
+ -- 
+ -- Vlli Instance Group Entry 
+ --
+ cienaCesVlliInstanceGroupTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesVlliInstanceGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of instance group level entries."
+     ::= { cienaCesVlli 2 }
+                
+ cienaCesVlliInstanceGroupEntry  OBJECT-TYPE
+     SYNTAX       CienaCesVlliInstanceGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The instance group entry in the Table."
+     INDEX { cienaCesVlliInstanceGroupId}
+     ::= { cienaCesVlliInstanceGroupTable 1 } 
+
+ CienaCesVlliInstanceGroupEntry ::= SEQUENCE {
+     cienaCesVlliInstanceGroupId                INTEGER,
+     cienaCesVlliInstanceGroupName              DisplayString,
+     cienaCesVlliInstanceGroupDirection         INTEGER, 
+     cienaCesVlliInstanceGroupTrigger           INTEGER,
+     cienaCesVlliInstanceGroupState             INTEGER
+ }
+ 
+ cienaCesVlliInstanceGroupId  OBJECT-TYPE
+     SYNTAX       INTEGER (1..1024)
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+             "Instance Group Id associated with 
+             this group level." 
+     ::= { cienaCesVlliInstanceGroupEntry 1 }     
+
+ cienaCesVlliInstanceGroupName  OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The group level name associated with 
+             this group level." 
+     ::= { cienaCesVlliInstanceGroupEntry 2 }     
+
+ cienaCesVlliInstanceGroupDirection  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        unidirectional(1),
+                        bidirectional(2)                       
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Group level direction used in the group level entry." 
+     ::= { cienaCesVlliInstanceGroupEntry 3 }
+
+ cienaCesVlliInstanceGroupTrigger  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        any(1),
+                        all(2)                       
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             " any -single source can trigger action.
+	       all - all sources should be in the same state to trigger action." 
+     ::= { cienaCesVlliInstanceGroupEntry 4 }
+
+ cienaCesVlliInstanceGroupState  OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies if instance group is enabled or disabled." 
+     ::= { cienaCesVlliInstanceGroupEntry 5 }
+
+ -- 
+ -- Vlli Action Group Entry 
+ --
+ cienaCesVlliActionGroupTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesVlliActionGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of action group level entries."
+     ::= { cienaCesVlli 3 }
+                
+ cienaCesVlliActionGroupEntry  OBJECT-TYPE
+     SYNTAX       CienaCesVlliActionGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The action group entry in the Table."
+     INDEX { cienaCesVlliActionGroupId}
+     ::= { cienaCesVlliActionGroupTable 1 } 
+
+ CienaCesVlliActionGroupEntry ::= SEQUENCE {
+     cienaCesVlliActionGroupId          	INTEGER,
+     cienaCesVlliActionGroupName        	DisplayString,
+     cienaCesVlliActRecoveryPreceOne         	VlliAction, 
+     cienaCesVlliActRecoveryPreceTwo         	VlliAction, 
+     cienaCesVlliActRecoveryPreceThree       	VlliAction, 
+     cienaCesVlliActRecoveryPreceFour        	VlliAction, 
+     cienaCesVlliActRecoveryPreceFive		VlliAction, 
+     cienaCesVlliActRecoveryPreceSix 		VlliAction, 
+     cienaCesVlliActRecoveryPreceSeven 	        VlliAction, 
+     cienaCesVlliActRecoveryPreceEight 		VlliAction, 
+     cienaCesVlliActFaultPreceOne         	VlliAction, 
+     cienaCesVlliActFaultPreceTwo         	VlliAction, 
+     cienaCesVlliActFaultPreceThree       	VlliAction, 
+     cienaCesVlliActFaultPreceFour        	VlliAction, 
+     cienaCesVlliActFaultPreceFive		VlliAction, 
+     cienaCesVlliActFaultPreceSix 		VlliAction, 
+     cienaCesVlliActFaultPreceSeven 		VlliAction, 
+     cienaCesVlliActFaultPreceEight 		VlliAction 
+ }
+ 
+ cienaCesVlliActionGroupId  OBJECT-TYPE
+     SYNTAX       INTEGER (1..64)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Action Group Id associated with 
+             this service level." 
+     ::= { cienaCesVlliActionGroupEntry 1 }     
+
+ cienaCesVlliActionGroupName  OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The action group name associated with 
+             this group level." 
+     ::= { cienaCesVlliActionGroupEntry 2 }     
+
+ cienaCesVlliActRecoveryPreceOne  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 3 }
+
+ cienaCesVlliActRecoveryPreceTwo  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 4 }
+
+ cienaCesVlliActRecoveryPreceThree  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 5 }
+
+ cienaCesVlliActRecoveryPreceFour  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 6 }
+
+ cienaCesVlliActRecoveryPreceFive  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 7 }
+
+ cienaCesVlliActRecoveryPreceSix  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 8 }
+
+ cienaCesVlliActRecoveryPreceSeven  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 9 }
+
+ cienaCesVlliActRecoveryPreceEight  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 10 }
+
+ cienaCesVlliActFaultPreceOne  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 11 }
+
+ cienaCesVlliActFaultPreceTwo  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 12 }
+
+ cienaCesVlliActFaultPreceThree  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 13 }
+
+ cienaCesVlliActFaultPreceFour  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 14 }
+
+ cienaCesVlliActFaultPreceFive  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 15 }
+
+ cienaCesVlliActFaultPreceSix  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 16 }
+
+ cienaCesVlliActFaultPreceSeven  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 17 }
+
+ cienaCesVlliActFaultPreceEight  OBJECT-TYPE
+     SYNTAX       VlliAction 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Action in this precedence entry." 
+     ::= { cienaCesVlliActionGroupEntry 18 }
+
+ -- 
+ -- Vlli Instance Entry 
+ --
+ cienaCesVlliInstanceTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesVlliInstanceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "A table of instance level entries."
+     ::= { cienaCesVlli 4 }
+                
+ cienaCesVlliInstanceEntry  OBJECT-TYPE
+     SYNTAX       CienaCesVlliInstanceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The instance level entry in the Table."
+     INDEX { cienaCesVlliInstanceGrpId, cienaCesVlliInstanceId}
+     ::= { cienaCesVlliInstanceTable 1 } 
+
+ CienaCesVlliInstanceEntry ::= SEQUENCE {
+     cienaCesVlliInstanceGrpId             INTEGER, 
+     cienaCesVlliInstanceId                INTEGER,
+     cienaCesVlliInstanceMode              INTEGER,
+     cienaCesVlliInstanceType              INTEGER,
+     cienaCesVlliInstanceName              DisplayString,
+     cienaCesVlliInstanceActionName        DisplayString,
+     cienaCesVlliInstanceLastEvent 	   VlliLastEvent 
+ }
+ 
+ cienaCesVlliInstanceGrpId  OBJECT-TYPE
+     SYNTAX       INTEGER(1..1024) 
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+             "Instance Group ID which the instance belongs to."
+     ::= { cienaCesVlliInstanceEntry 1 }      
+
+ cienaCesVlliInstanceId  OBJECT-TYPE
+     SYNTAX       INTEGER(1..64) 
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+             "Instance level Id used as index in the instance level entry." 
+     ::= { cienaCesVlliInstanceEntry 2 } 
+
+ cienaCesVlliInstanceMode  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        destination(1),
+                        source(2)                       
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specify the mode in the instance level entry." 
+     ::= { cienaCesVlliInstanceEntry 3 }
+
+ cienaCesVlliInstanceType  OBJECT-TYPE
+     SYNTAX       INTEGER { 
+                        port(1),
+                        cfm(2)                       
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specify the mode in the instance level entry." 
+     ::= { cienaCesVlliInstanceEntry 4 }
+
+ cienaCesVlliInstanceName  OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The instance level name associated with 
+             this instance level." 
+     ::= { cienaCesVlliInstanceEntry 5 }     
+
+ cienaCesVlliInstanceActionName  OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The action group name is used to bind with 
+             this instance level." 
+     ::= { cienaCesVlliInstanceEntry 6 }     
+ 
+ cienaCesVlliInstanceLastEvent  OBJECT-TYPE
+     SYNTAX       VlliLastEvent
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The instance last event." 
+     ::= { cienaCesVlliInstanceEntry 7 }     
+ --
+ -- notifications
+ -- 
+ 
+ cienaCesVlliFaultTrap  NOTIFICATION-TYPE
+    OBJECTS {
+			cienaGlobalSeverity,
+			cienaGlobalMacAddress,
+			cienaCesVlliInstanceGrpId, 
+			cienaCesVlliInstanceId, 
+			cienaCesVlliInstanceGroupName,
+                        cienaCesVlliInstanceName
+                        }
+        STATUS  current
+        DESCRIPTION
+                "A notification is sent whenever the instance fault action is triggered."
+        ::= { cienaCesVlliNotifications 1 }
+
+ cienaCesVlliRecoveryTrap  NOTIFICATION-TYPE
+    OBJECTS {
+			cienaGlobalSeverity,
+			cienaGlobalMacAddress,
+			cienaCesVlliInstanceGrpId, 
+			cienaCesVlliInstanceId, 
+			cienaCesVlliInstanceGroupName,
+                        cienaCesVlliInstanceName
+                        }
+        STATUS  current
+        DESCRIPTION
+                "A notification is sent whenever the instance recovery action is triggered."
+        ::= { cienaCesVlliNotifications 2 }
+
+
+--
+-- Notification Attributes
+--
+
+                
+END
+
+ --
+ -- CIENA-CES-VLLI-MIB
+ --

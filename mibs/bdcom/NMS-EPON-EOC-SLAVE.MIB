@@ -1,0 +1,424 @@
+-- *****************************************************************
+-- NMS-EPON-EOC-SLAVE.MIB:  NMS EOC SLAVE MIB file
+-- SEP 2011
+-- *****************************************************************
+--
+
+               NMS-EPON-EOC-SLAVE DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC
+		    IpAddress
+		        FROM SNMPv2-SMI;
+          
+               nmsEponEocSlave         OBJECT IDENTIFIER ::= { nmsEPONGroup 31 }
+               
+
+               nmsEponEocMasterSlaveBindTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocMasterSlaveBindEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC master and slave binding property table."
+                   ::= { nmsEponEocSlave 1 }
+
+               nmsEponEocMasterSlaveBindEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocMasterSlaveBindEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc master and Slave bind property."
+                   INDEX { bindUniSeqNo,bindTerSeqNo }
+               ::= { nmsEponEocMasterSlaveBindTable 1 }
+               
+               NMSEponEocMasterSlaveBindEntry ::=
+                   SEQUENCE {
+                       bindUniSeqNo
+                           INTEGER,
+                       bindTerSeqNo
+                           INTEGER,
+	               bindEocSlaveMacAddr
+                           MacAddress,
+                       bindOper
+                            INTEGER
+                  }
+                  
+               bindUniSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON ONU UNI port sequence the same value in EoC msater index."
+                   ::= { nmsEponEocMasterSlaveBindEntry 1 } 
+
+                  
+               bindTerSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave terminal sequence number, the unique value in the same EoC master."
+                   ::= { nmsEponEocMasterSlaveBindEntry 2 } 
+
+               bindEocSlaveMacAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave MAC address."
+                   ::= { nmsEponEocMasterSlaveBindEntry 3 } 
+
+               bindOper OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   binding(1),
+                                   unbinding(2)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master and slave binding operation. binding(1), unbinding(2)."
+                   ::= { nmsEponEocMasterSlaveBindEntry 4 } 
+
+
+
+               nmsEponEocSlaveTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocSlaveEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC Slave property table."
+                   ::= { nmsEponEocSlave 2 }
+
+               nmsEponEocSlaveEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocSlaveEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc Slave property."
+                   INDEX { uniSeqNo,terSeqNo }
+               ::= { nmsEponEocSlaveTable 1 }
+               
+               NMSEponEocSlaveEntry ::=
+                   SEQUENCE {
+                       uniSeqNo
+                           INTEGER,
+                       terSeqNo
+                           INTEGER,
+                       slaveMacAddr
+                           MacAddress,
+                       slaveRegStatus
+                       	   INTEGER,
+                       slaveChipType
+                           OCTET STRING,
+                       slaveFWVersion
+                           OCTET STRING,
+                       slaveNid
+                           OCTET STRING,
+                       slaveSnid
+                           OCTET STRING,
+                       slaveCcoMacAddr
+                           MacAddress,
+                       slaveCcoTei
+                           OCTET STRING,
+                       slaveTei
+                           OCTET STRING                                                  
+                   }
+
+               uniSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON ONU UNI port sequence the same value in EoC master index."
+                   ::= { nmsEponEocSlaveEntry 1 } 
+
+               terSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave index."
+                   ::= { nmsEponEocSlaveEntry 2 } 
+
+               slaveMacAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON EoC slave MAC address."
+                   ::= { nmsEponEocSlaveEntry 3 } 
+
+               slaveRegStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+              			present(1),
+              			absent(2)
+                             }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave is present or not. present(1), absent(2)."
+                   ::= { nmsEponEocSlaveEntry 4 } 
+
+               slaveChipType OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave chip type. String length is limited to 16."
+                   ::= { nmsEponEocSlaveEntry 5 } 
+
+               slaveFWVersion OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave chip firmware verion information. String length is limited to 64."
+                   ::= { nmsEponEocSlaveEntry 6 } 
+
+               slaveNid OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave network identifier. String length is limited to 7."
+                   ::= { nmsEponEocSlaveEntry 7 } 
+
+               slaveSnid OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave short network identifier. String length is limited to 1."
+                   ::= { nmsEponEocSlaveEntry 8 } 
+
+               slaveCcoMacAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave belongs to AVLN CCO MAC address."
+                   ::= { nmsEponEocSlaveEntry 9 } 
+
+               slaveCcoTei OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave belongs to AVLN CCO TEI."
+                   ::= { nmsEponEocSlaveEntry 10 } 
+
+               slaveTei OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave TEI."
+                   ::= { nmsEponEocSlaveEntry 11 } 
+
+
+               nmsEponEocSlaveMgmtTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocSlaveMgmtEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC Slave management property table."
+                   ::= { nmsEponEocSlave 3 }
+
+               nmsEponEocSlaveMgmtEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocSlaveMgmtEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc Slave management property."
+                   INDEX { uniSeqNo,terSeqNo }
+               ::= { nmsEponEocSlaveMgmtTable 1 }
+
+               NMSEponEocSlaveMgmtEntry ::=
+                   SEQUENCE {
+                       eocSlaveReset
+                           INTEGER,
+                       eocSlaveUploadWidthLimit
+                           INTEGER,
+                       eocSlaveDownloadWidthLimit
+                       	   INTEGER,
+                       updateFirmware
+                       	   OCTET STRING,
+                       updatePib
+                       	   OCTET STRING,
+                       slaveVlan
+                       	   BIT STRING,
+                       eocSlaveDeregister
+                           INTEGER
+		}
+
+               eocSlaveReset OBJECT-TYPE
+                   SYNTAX  INTEGER{
+              			   reset(1)         
+              			  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave reset operation. reset(1)."
+                   ::= { nmsEponEocSlaveMgmtEntry 1 } 
+
+               eocSlaveUploadWidthLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(64..16384)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master upload bandwidth limitaion is between 64 and 16384, and the unit is kbps."
+                   ::= { nmsEponEocSlaveMgmtEntry 2 } 
+
+               eocSlaveDownloadWidthLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(64..16384)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master download bandwidth limitaion is between 64 and 16384, and the unit is kbps."
+                   ::= { nmsEponEocSlaveMgmtEntry 3 } 
+
+               updateFirmware OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave update firmware. The value is firmware file name. After the updating operation, EoC slave resets automatically."
+                   ::= { nmsEponEocSlaveMgmtEntry 4 } 
+
+               updatePib OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave update PIB operation. The value is PIB file name. After the updating operation, EoC slave resets automatically."
+                   ::= { nmsEponEocSlaveMgmtEntry 5 } 
+
+               slaveVlan OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave VLAN information. bit string length is 4096, and each bit mean corresponding value VLAN is set or not. For each bit, 0-delete vlan, 1-create vlan."
+                   ::= { nmsEponEocSlaveMgmtEntry 6 } 
+
+               eocSlaveDeregister OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   de-register(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave forces to leave AVLN, that is de-registered operation."
+                   ::= { nmsEponEocSlaveMgmtEntry 7 } 
+
+
+
+               nmsEponEocSlavePortVlanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocSlavePortVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC Slave Port Vlan property table."
+                   ::= { nmsEponEocSlave 4 }
+
+               nmsEponEocSlavePortVlanEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocSlavePortVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc Slave Port Vlan property."
+                   INDEX { onuUniSeqNo, eocSlaveSeqNo, eocSlavePortNo }
+               ::= { nmsEponEocSlavePortVlanTable 1 }
+
+               NMSEponEocSlavePortVlanEntry ::=
+                   SEQUENCE {
+                       onuUniSeqNo
+                           INTEGER,
+                       eocSlaveSeqNo
+                           INTEGER,
+                       eocSlavePortNo
+                       	   INTEGER,
+                       eocSlavePortVlan
+                       	   BIT STRING,
+                       eocSlavePortVlanTag
+                       	   INTEGER,
+                       eocSlavePortVlanTranparent
+                       	   INTEGER,
+                       ecoSlavePortPvid
+                       	   INTEGER
+		}
+		
+
+               onuUniSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON ONU UNI port sequence the same value in EoC master index."
+                   ::= { nmsEponEocSlavePortVlanEntry 1 } 
+
+               eocSlaveSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave device index."
+                   ::= { nmsEponEocSlavePortVlanEntry 2 } 
+
+               eocSlavePortNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave port index."
+                   ::= { nmsEponEocSlavePortVlanEntry 3 } 
+
+               eocSlavePortVlan OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave port VLAN information. bit string length is 4094, and each bit mean corresponding value VLAN is set or not. For each bit, 0-delete vlan, 1-create vlan."
+                   ::= { nmsEponEocSlavePortVlanEntry 4 } 
+
+               eocSlavePortVlanTag OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave port VLAN tag.bit string length is 4094, and each bit mean corresponding value VLAN is set or not. For each bit, 0-untagged vlan, 1-tagged vlan."
+                   ::= { nmsEponEocSlavePortVlanEntry 5 } 
+
+               eocSlavePortVlanTranparent OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   transparent(1),
+                   		   no_transparent(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave port VLAN transparent."
+                   ::= { nmsEponEocSlavePortVlanEntry 6 } 
+
+               ecoSlavePortPvid OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC slave port PVID. Default is no configuration."
+                   ::= { nmsEponEocSlavePortVlanEntry 7 } 
+
+
+
+
+END               
+               

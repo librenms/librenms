@@ -338,7 +338,6 @@ $config['graph_colours']['mega']=array_merge(
     $config['graph_colours']['mixed']
 );
 
-
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
@@ -714,6 +713,7 @@ $config['poller_modules']['junose-atm-vp']               = 0;
 $config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
 $config['poller_modules']['wifi']                        = 0;
+$config['poller_modules']['wireless']                    = 1;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -778,14 +778,7 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
-
-$config['modules_compat']['rfc1628']['liebert']    = 1;
-$config['modules_compat']['rfc1628']['netmanplus'] = 1;
-$config['modules_compat']['rfc1628']['deltaups']   = 1;
-$config['modules_compat']['rfc1628']['poweralert'] = 1;
-$config['modules_compat']['rfc1628']['webpower']   = 1;
-$config['modules_compat']['rfc1628']['huaweiups']  = 1;
-$config['modules_compat']['rfc1628']['generex-ups']  = 1;
+$config['discovery_modules']['wireless']             = 1;
 
 // Enable daily updates
 $config['update'] = 1;

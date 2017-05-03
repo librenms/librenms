@@ -141,20 +141,24 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
+        if ($check = ends_with($key, '_except')) {
+            $key = substr($key, 0, -7);
+        }
+
         if ($key == 'sysObjectId') {
-            if (!starts_with($sysObjectId, $value)) {
+            if (starts_with($sysObjectId, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (!str_contains($sysDescr, $value)) {
+            if (str_contains($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (!preg_match_any($sysDescr, $value)) {
+            if (preg_match_any($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysObjectId_regex') {
-            if (!preg_match_any($sysObjectId, $value)) {
+            if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
         }
@@ -367,6 +371,7 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
+    oxidized_reload_nodes();
     return $ret;
 }
 
@@ -714,7 +719,6 @@ function createHost(
 
     $device_id = dbInsert($device, 'devices');
     if ($device_id) {
-        oxidized_reload_nodes();
         return $device_id;
     }
 
@@ -1555,7 +1559,7 @@ function oxidized_reload_nodes()
     global $config;
 
     if ($config['oxidized']['enabled'] === true && $config['oxidized']['reload_nodes'] === true && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload.json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -1646,9 +1650,16 @@ function rrdtest($path, &$stdOutput, &$stdError)
 
 function create_state_index($state_name)
 {
-    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) != true) {
+    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', array($state_name));
+    if (!is_numeric($state_index_id)) {
         $insert = array('state_name' => $state_name);
         return dbInsert($insert, 'state_indexes');
+    } else {
+        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', array($state_index_id));
+        if (count($translations) == 0) {
+            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
+            return $state_index_id;
+        }
     }
 }
 
@@ -1962,10 +1973,12 @@ function initStats()
             'insert_sec' => 0.0,
             'update' => 0,
             'update_sec' => 0.0,
+            'delete' => 0,
+            'delete_sec' => 0.0,
             'fetchcell' => 0,
             'fetchcell_sec' => 0.0,
-            'fetchcol' => 0,
-            'fetchcol_sec' => 0.0,
+            'fetchcolumn' => 0,
+            'fetchcolumn_sec' => 0.0,
             'fetchrow' => 0,
             'fetchrow_sec' => 0.0,
             'fetchrows' => 0,
@@ -2312,4 +2325,70 @@ function db_schema_is_current()
     $latest = key($schemas);
 
     return $current >= $latest;
+}
+
+/**
+ * Get the lock status for a given name
+ * @param $name
+ * @return bool
+ */
+function get_lock($name)
+{
+    global $config;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    if (file_exists($lock_file)) {
+        $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
+        $lpid = trim(file_get_contents($lock_file));
+        if (in_array($lpid, $pids)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Set the lock status for a given name
+ * @param $name
+ */
+function set_lock($name)
+{
+    global $config;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    $lock = get_lock($name);
+
+    if ($lock === true) {
+        echo "$lock_file exists, exiting\n";
+        exit(1);
+    } else {
+        file_put_contents($lock_file, getmypid());
+    }
+}
+
+/**
+ * Release lock file for a given name
+ * @param $name
+ */
+function release_lock($name)
+{
+    global $config;
+    unlink($config['install_dir']."/.$name.lock");
+}
+
+/**
+ * @param $device
+ * @return int|null
+ */
+function get_device_oid_limit($device)
+{
+    global $config;
+
+    $max_oid = $device['snmp_max_oid'];
+
+    if (isset($max_oid) && $max_oid > 0) {
+        return $max_oid;
+    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
+        return $config['snmp']['max_oid'];
+    } else {
+        return 10;
+    }
 }

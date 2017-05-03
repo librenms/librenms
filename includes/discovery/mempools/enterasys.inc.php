@@ -3,6 +3,7 @@
  * LibreNMS Enterasys memory information module
  *
  * Copyright (c) 2017 Dave Bell <me@geordish.org>
+ * Copyright (c) 2017 Neil Lathwood <gh+n@laf.io>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -11,10 +12,18 @@
  */
 
 if ($device['os'] == 'enterasys') {
-    $free = snmp_get($device, 'etsysResourceStorageAvailable.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
-    $total  = snmp_get($device, 'etsysResourceStorageSize.3.ram.0', '-OvQ', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
-
-    if (is_numeric($free) && is_numeric($total)) {
-        discover_mempool($valid_mempool, $device, 0, 'enterasys', 'Memory', '1', null, null);
+    $enterasys_mem = snmpwalk_cache_threepart_oid($device, 'etsysResourceStorageTable', array(), 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
+    foreach ($enterasys_mem as $index => $mem_data) {
+        foreach ($mem_data['ram'] as $mem_id => $ram) {
+            $free = $ram['etsysResourceStorageAvailable'];
+            $total = $ram['etsysResourceStorageSize'];
+            $descr = $ram['etsysResourceStorageDescr'];
+            if ($index > 1000) {
+                $descr = "Slot #" . substr($index, -1) . " $descr";
+            }
+            if (is_numeric($free) && is_numeric($total)) {
+                discover_mempool($valid_mempool, $device, $index, 'enterasys', $descr, '1', $mem_id, null);
+            }
+        }
     }
 }

@@ -7,3 +7,4 @@ discovery:
     - sysDescr:
         - SensorProbe
         - sensorProbe4
+        - securityProbe

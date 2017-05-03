@@ -79,7 +79,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), null, null, 5);
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', 5);
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
@@ -88,7 +88,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
 //end discover_new_device()
 
-function discover_device($device, $options = null)
+function discover_device(&$device, $options = null)
 {
     global $config, $valid;
 
@@ -365,7 +365,7 @@ function sensor_low_limit($class, $current)
             break;
 
         case 'humidity':
-            $limit = '70';
+            $limit = '30';
             break;
 
         case 'frequency':
@@ -386,6 +386,9 @@ function sensor_low_limit($class, $current)
 
         case 'signal':
             $limit = -80;
+            break;
+        case 'airflow':
+            $limit = ($current * 0.95);
             break;
     }//end switch
 
@@ -437,6 +440,9 @@ function sensor_limit($class, $current)
 
         case 'load':
             $limit = 80;
+            break;
+        case 'airflow':
+            $limit = ($current * 1.05);
             break;
     }//end switch
 
@@ -722,30 +728,39 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex)) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
         $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', array($device['device_id'], $ifIndex));
 
-        if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', array($ipv6_network)) < '1') {
-            dbInsert(array('ipv6_network' => $ipv6_network, 'context_name' => $context_name), 'ipv6_networks');
-            echo 'N';
-        } else {
-            //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
-            echo 'n';
+        if (is_numeric($port_id)) {
+            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', array($ipv6_network)) < '1') {
+                dbInsert(array('ipv6_network' => $ipv6_network, 'context_name' => $context_name), 'ipv6_networks');
+                echo 'N';
+            } else {
+                //Update Context
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
+                echo 'n';
+            }
+
+            $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
+
+            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0') {
+                dbInsert(array(
+                    'ipv6_address' => $ipv6_address,
+                    'ipv6_compressed' => $ipv6_compressed,
+                    'ipv6_prefixlen' => $ipv6_prefixlen,
+                    'ipv6_origin' => $ipv6_origin,
+                    'ipv6_network_id' => $ipv6_network_id,
+                    'port_id' => $port_id,
+                    'context_name' => $context_name
+                ), 'ipv6_addresses');
+                echo '+';
+            } else {
+                //Update Context
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
+                echo '.';
+            }
+
+            $full_address = "$ipv6_address/$ipv6_prefixlen";
+            $valid_address = $full_address . '-' . $port_id;
+            $valid['ipv6'][$valid_address] = 1;
         }
-
-
-        $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
-
-        if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0') {
-            dbInsert(array('ipv6_address' => $ipv6_address, 'ipv6_compressed' => $ipv6_compressed, 'ipv6_prefixlen' => $ipv6_prefixlen, 'ipv6_origin' => $ipv6_origin, 'ipv6_network_id' => $ipv6_network_id, 'port_id' => $port_id, 'context_name' => $context_name), 'ipv6_addresses');
-            echo '+';
-        } else {
-            //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
-            echo '.';
-        }
-
-        $full_address = "$ipv6_address/$ipv6_prefixlen";
-        $valid_address = $full_address . '-' . $port_id;
-        $valid['ipv6'][$valid_address] = 1;
     }//end if
 }//end discover_process_ipv6()
 
@@ -938,6 +953,18 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
             return 1;
         }
+    } elseif ($device['os'] == 'apc-mgeups') {
+        if ($sensor_type == 'load') {
+            return 1;
+        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+            return 1;
+        }
+    } elseif ($device['os'] == 'ge-ups') {
+        if ($sensor_type == 'load') {
+            return 1;
+        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+            return 1;
+        }
     }
 
     return 10; //default
@@ -1006,7 +1033,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+        if (isset($config['os'][$device['os']]['rfc1628_compat']) && $config['os'][$device['os']]['rfc1628_compat']) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }

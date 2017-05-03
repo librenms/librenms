@@ -18,24 +18,17 @@ bad_ifXEntry:
     - SG300-28
     - SG300-28MP
 poller_modules:
-    cisco-cbqos: 1
-    cisco-cef: 1
-    cisco-mac-accounting: 1
-    cisco-voice: 1
-    cisco-remote-access-monitor: 1
-    cisco-sla: 1
-    cisco-ipsec-flow-monitor: 1
-    cipsec-tunnels: 1
-    cisco-otv: 1
-    cisco-vpdn: 1
+    bgp-peers: 0
+    hr-mib: 0
+    ntp: 0
+    ospf: 0
+    ucd-diskio: 0
+    ucd-mib: 0
 discovery_modules:
-    cisco-cef: 1
-    cisco-sla: 1
-    cisco-mac-accounting: 1
-    cisco-otv: 1
-    cisco-pw: 1
-    cisco-vrf: 1
-    cisco-vrf-lite: 1
+    bgp-peers: 0
+    cisco-vrf-lite: 0
+    ntp: 0
+    ucd-diskio: 0
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.9.6.1.23.3.13
@@ -46,4 +39,5 @@ discovery:
         - .1.3.6.1.4.1.9.6.1.85
         - .1.3.6.1.4.1.9.6.1.88
         - .1.3.6.1.4.1.9.6.1.89
+        - .1.3.6.1.4.1.9.6.1.95
         - .1.3.6.1.4.1.3955.6.

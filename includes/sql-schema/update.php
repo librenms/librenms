@@ -15,6 +15,8 @@
  * See COPYING for more details.
  */
 
+set_lock('schema');
+
 if (!isset($debug)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = array();
@@ -24,8 +26,11 @@ if (!isset($debug)  && php_sapi_name() == 'cli') {
     $debug = isset($options['d']);
 }
 
+d_echo("DB Schema update started....\n");
+
 if (db_schema_is_current()) {
     d_echo("DB Schema already up to date.\n");
+    release_lock('schema');
     return;
 }
 
@@ -91,3 +96,5 @@ if ($updating) {
         $_SESSION['build-ok'] = true;
     }
 }
+
+release_lock('schema');

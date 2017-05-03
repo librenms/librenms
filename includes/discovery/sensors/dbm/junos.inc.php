@@ -40,7 +40,7 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
         discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
-    if (is_numeric($entry['jnxDomCurrentModuleLaneCount'])) {
+    if (is_numeric($entry['jnxDomCurrentModuleLaneCount']) && $entry['jnxDomCurrentModuleLaneCount'] > 1) {
         for ($x=0; $x<$entry['jnxDomCurrentModuleLaneCount']; $x++) {
             $lane = $pre_cache['junos_multilane_oids'][$index.'.'.$x];
             if (is_numeric($lane['jnxDomCurrentLaneRxLaserPower']) && $lane['jnxDomCurrentLaneRxLaserPower'] != 0 && $lane['jnxDomCurrentLaneTxLaserOutputPower'] != 0) {

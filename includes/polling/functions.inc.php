@@ -544,25 +544,6 @@ function location_to_latlng($device)
 }// end location_to_latlng()
 
 /**
- * @param $device
- * @return int|null
- */
-function get_device_oid_limit($device)
-{
-    global $config;
-
-    $max_oid = $device['snmp_max_oid'];
-
-    if (isset($max_oid) && $max_oid > 0) {
-        return $max_oid;
-    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
-        return $config['snmp']['max_oid'];
-    } else {
-        return 10;
-    }
-}
-
-/**
  * Update the application status and output in the database.
  *
  * @param array $app app from the db, including app_id

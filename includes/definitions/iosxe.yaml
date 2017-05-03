@@ -34,4 +34,5 @@ register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 discovery:
     - sysDescr:
+        - IOS-XE
         - LINUX_IOSD

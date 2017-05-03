@@ -23,7 +23,5 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'hpe-ipdu') {
-    $pre_cache['hpe_ipdu'] = snmpwalk_cache_oid($device, 'mpduOutputEntry', array(), 'CPQPOWER-MIB');
-    d_echo($pre_cache);
-}
+echo 'mpduOutputEntry ';
+$pre_cache['hpe_ipdu'] = snmpwalk_cache_oid($device, 'mpduOutputEntry', array(), 'CPQPOWER-MIB');

@@ -64,7 +64,7 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
                 $db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
                 echo 'Inserted';
             }
-            $valid_vlan_port_ids[] = $db_id;
+            $valid_vlan_port[] = $db_id;
 
             echo PHP_EOL;
         }//end foreach

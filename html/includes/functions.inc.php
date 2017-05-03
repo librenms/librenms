@@ -72,6 +72,9 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
+            
+        case 'nfs-server':
+            return 'NFS Server';
 
         case 'ntp':
             return 'NTP';
@@ -111,6 +114,12 @@ function nicecase($item)
         
         case 'php-fpm':
             return 'PHP-FPM';
+
+        case 'opengridscheduler':
+            return 'Open Grid Scheduler';
+
+        case 'sdfsinfo':
+            return 'SDFS info';
 
         default:
             return ucfirst($item);
@@ -829,7 +838,7 @@ function generate_ap_link($args, $text = null, $type = null)
 {
     global $config;
 
-    $args = ifNameDescr($args);
+    $args = cleanPort($args);
     if (!$text) {
         $text = fixIfName($args['label']);
     }
