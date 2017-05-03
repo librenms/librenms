@@ -6,7 +6,7 @@ You can use Application support to graph performance statistics from many applic
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
 
 1. [Apache](#apache) - SNMP extend, Agent
-1. [BIND9/named](#bind9-aka-named) - Agent
+1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
@@ -67,31 +67,72 @@ extend apache /etc/snmp/apache-stats.py
 2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
 ### BIND9 aka named
-##### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `bind` script to `/usr/lib/check_mk_agent/local/`
 
-Create stats file with appropriate permissions:
+1: Create stats file with appropriate permissions:
 ```shell
-~$ touch /etc/bind/named.stats
-~$ chown bind:bind /etc/bind/named.stats
+~$ touch /var/run/named/stats
+~$ chown bind:bind /var/run/named/stats
 ```
 Change `user:group` to the user and group that's running bind/named.
 
-Bind/named configuration:
+2: Bind/named configuration:
 ```text
 options {
 	...
-	statistics-file "/etc/bind/named.stats";
+	statistics-file "/var/run/named/stats";
 	zone-statistics yes;
 	...
 };
 ```
-Restart your bind9/named after changing the configuration.
 
-Verify that everything works by executing `rndc stats && cat /etc/bind/named.stats`.
-In case you get a `Permission Denied` error, make sure you chown'ed correctly.
+3: Restart your bind9/named after changing the configuration.
 
-Note: if you change the path you will need to change the path in `scripts/agent-local/bind`.
+4: Verify that everything works by executing `rndc stats && cat /var/run/named/stats`. In case you get a `Permission Denied` error, make sure you chown'ed correctly.
+
+5: Also be aware that this file is appended to each time `rndc stats` is called. Given this it is suggested you setup file rotation for it. Alternatively you can also set zero_stats to 1 in the config.
+
+6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards in CentOS/Redhat and libfile-readbackwards-perl Debian/Ubuntu. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
+
+7: You may possible need to configure the agent/extend script as well.
+
+The config file's path defaults to the same path as the script, but with .config appended. So if the script is located at `/etc/snmp/bind`, the config file will be `/etc/snmp/bind.config`. Alternatively you can also specific a config via `-c $file`.
+
+Anything starting with a # is comment. The format for variables is $variable=$value. Empty lines are ignored. Spaces and tabes at either the start or end of a line are ignored.
+
+The variables are as below.
+```
+rndc = The path to rndc. Default: /usr/bin/env rndc
+call_rndc = A 0/1 boolean on weather to call rndc stats. Suggest to set to 0 if using netdata. Default: 1
+stats_file = The path to the named stats file. Default: /var/run/named/stats
+agent = A 0/1 boolean for if this is being used as a LibreNMS agent or not. Default: 0
+zero_stats = A 0/1 boolean for if the stats file should be zeroed first. Default: 0 (1 if guessed)
+```
+
+If you want to guess at the configuration, call it with -g and it will print out what it thinks
+it should be.
+
+8: On the device page in Librenms, edit your host and check `BIND` under the Applications tab.
+
+##### SNMP Extend
+
+1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind)
+
+2: Make the script executable (chmod +x /etc/snmp/bind)
+
+3: Edit your snmpd.conf file and add:
+```
+extend bind /etc/snmp/bind
+```
+
+4: Restart snmpd on the host in question.
+
+##### Agent
+
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/bind` via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/bind -O /usr/lib/check_mk_agent/local/bind`
+
+2: Run `chmod +x /usr/lib/check_mk_agent/local/bind`
+
+3: Set the variable 'agent' to '1' in the config.
 
 
 ### DHCP Stats
