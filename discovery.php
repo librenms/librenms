@@ -33,6 +33,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
+        set_lock('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -137,6 +138,7 @@ if ($discovered_devices) {
     if ($doing === 'new') {
         // We have added a new device by this point so we might want to do some other work
         oxidized_reload_nodes();
+        release_lock('new-discovery');
     }
 }
 
