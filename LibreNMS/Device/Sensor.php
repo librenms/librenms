@@ -95,7 +95,6 @@ class Sensor implements DiscoveryModule, PollerModule
         $entPhysicalIndex = null,
         $entPhysicalMeasured = null
     ) {
-        //
         $this->type = $type;
         $this->device_id = $device_id;
         $this->oids = (array)$oids;
@@ -112,6 +111,11 @@ class Sensor implements DiscoveryModule, PollerModule
         $this->low_limit = $low_limit;
         $this->high_warn = $high_warn;
         $this->low_warn = $low_warn;
+
+        // ensure leading dots
+        array_walk($this->oids, function (&$oid) {
+            $oid = '.' . ltrim($oid, '.');
+        });
 
         $sensor = $this->toArray();
         // validity not checked yet
@@ -547,10 +551,10 @@ class Sensor implements DiscoveryModule, PollerModule
     {
         $table = static::$table;
         $params = array($device_id, $type);
-        $where = '`device_id`=? AND `sensor_class`=? AND `sensor_id`';
+        $where = '`device_id`=? AND `sensor_class`=?';
 
         if (!empty($sensor_ids)) {
-            $where .= ' NOT IN ' . dbGenPlaceholders(count($sensor_ids));
+            $where .= ' AND `sensor_id` NOT IN ' . dbGenPlaceholders(count($sensor_ids));
             $params = array_merge($params, $sensor_ids);
         }
 

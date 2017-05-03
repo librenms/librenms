@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4: 
 WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -26,6 +27,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 	   TruthValue
            FROM SNMPv2-TC
 
+       ifIndex
+           FROM RFC1213-MIB
+
 	   ArubaEnableValue,
 	   ArubaFrameType,
 	   ArubaActiveState,
@@ -41,7 +45,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 	   ArubaUnprovisionedStatus,
 	   ArubaMonitorMode,
 	   ArubaAntennaSetting,
-       ArubaMeshRole
+       ArubaMeshRole,
+	   ArubaHTMode,
+	   ArubaHTExtChannel
 	   		FROM ARUBA-TC
 
        OBJECT-GROUP
@@ -50,7 +56,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxWlanMIB MODULE-IDENTITY 
-       LAST-UPDATED "0707312233Z"
+       LAST-UPDATED "1001261806Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -61,7 +67,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
            "This MIB module defines MIB objects which provide
             information about the Wireless Management System (WMS) in the 
 			Aruba Controller."
-       REVISION        "0707312233Z"
+       REVISION        "1001261806Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 5 }
@@ -69,6 +75,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlsxWlanConfigGroup     	OBJECT IDENTIFIER ::= { wlsxWlanMIB 1 }
    wlsxWlanStateGroup     	OBJECT IDENTIFIER ::= { wlsxWlanMIB 2 }
    wlsxWlanStatsGroup     	OBJECT IDENTIFIER ::= { wlsxWlanMIB 3 }
+   wlsxRAPTraps                 OBJECT IDENTIFIER ::= { wlsxWlanMIB 100 }
 
 -- wlsxWlanAccessPointInfoGroup contains a Local Access Point Information Table.
 -- which lists all the APs connected to the controller, a Global AP Info Table
@@ -81,6 +88,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlsxWlanAssociationInfoGroup  OBJECT IDENTIFIER ::= { wlsxWlanStateGroup 3 }
    wlsxWlanAccessPointStatsGroup  OBJECT IDENTIFIER ::= { wlsxWlanStatsGroup 1 }
    wlsxWlanStationStatsGroup  OBJECT IDENTIFIER ::= { wlsxWlanStatsGroup 2 }
+   wlsxWlanSwitchStatsGroup  OBJECT IDENTIFIER ::= { wlsxWlanStatsGroup 3 }
+   wlsxSSIDConfigGroup  OBJECT IDENTIFIER ::= { wlsxWlanConfigGroup 1 }
+   wlsxAPConfigGroup  OBJECT IDENTIFIER ::= { wlsxWlanConfigGroup 2 }
 
    wlsxWlanTotalNumAccessPoints  OBJECT-TYPE 
          SYNTAX       Unsigned32
@@ -204,7 +214,22 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPLongitude   			DisplayString,
 		 wlanAPLatitude    			DisplayString,
 		 wlanAPAltitude    			DisplayString,
-		 wlanAPMeshRole             ArubaMeshRole
+		 wlanAPMeshRole             ArubaMeshRole,
+         wlanAPSysLocation          DisplayString,
+         wlanAPHwVersion            DisplayString,
+         wlanAPSwVersion            DisplayString,
+         wlanAPNumWarmReboots       Integer32,
+         wlanAPOuterIpAddress       IpAddress,
+         wlanAPRemoteLanIpAddress   IpAddress,
+         wlanAPActiveUplink         INTEGER,
+         wlanAPSwitchIpAddress      IpAddress,
+         wlanAPStandbyIpAddress     IpAddress,
+         wlanAPConnectedAsStandby   INTEGER,
+         wlanAPServiceTag           DisplayString,
+         wlanAPConnectedAsDatazone  INTEGER,
+         wlanAPFlexRadioMode        ArubaFlexRadioMode,
+         wlanAPdot11aAntennaGain10x	Integer32,
+         wlanAPdot11gAntennaGain10x	Integer32
    }
 
    	wlanAPMacAddress OBJECT-TYPE
@@ -520,7 +545,163 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPEntry 31 }
         
+	wlanAPSysLocation OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			AP sysLocation
+            "
+        ::= { wlsxWlanAPEntry 32 }
+        
+    wlanAPHwVersion OBJECT-TYPE
+         SYNTAX       DisplayString  (SIZE(1..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Hardware version of the AP.
+            "
+        ::= { wlsxWlanAPEntry 33 }
  
+    wlanAPSwVersion OBJECT-TYPE
+         SYNTAX       DisplayString  (SIZE(1..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Software version of the AP.
+            "
+        ::= { wlsxWlanAPEntry 34 }
+
+        wlanAPNumWarmReboots OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Number of times the AP has warm-rebooted.
+            "
+        ::= { wlsxWlanAPEntry 35 }
+
+         wlanAPOuterIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Outer IP Address of the Access Point.
+            "
+        ::= { wlsxWlanAPEntry 36 }
+
+        wlanAPRemoteLanIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        LAN IP Address of the Remote Access Point.
+            "
+        ::= { wlsxWlanAPEntry 37 }
+
+        wlanAPActiveUplink OBJECT-TYPE
+         SYNTAX       INTEGER {
+                                  ethernet(1),
+                                  usb(2),
+                                  pppoe(3)
+                             }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Uplink of the RAP(Ethernet or USB).
+            "
+        ::= { wlsxWlanAPEntry 38 }
+
+        wlanAPSwitchIpAddress OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Access points' Serving Controller's IP Address.
+            "
+        ::= { wlsxWlanAPEntry 39 }
+
+        wlanAPStandbyIpAddress OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Access points' Standby Controller's IP Address.
+            "
+        ::= { wlsxWlanAPEntry 40 }
+
+        wlanAPConnectedAsStandby OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                 active(0),
+                                 standby(1)
+                             }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Access point connected as active/standby.
+            "
+        ::= { wlsxWlanAPEntry 41 }
+
+        wlanAPServiceTag OBJECT-TYPE
+        SYNTAX       DisplayString  (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Access point service tag.
+            "
+        ::= { wlsxWlanAPEntry 42 }
+
+        wlanAPConnectedAsDatazone OBJECT-TYPE
+        SYNTAX       INTEGER(0..4)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        This object indicate this AP comes from datazone(1-4) or primary zone(0)
+            "
+        ::= { wlsxWlanAPEntry 43 }
+
+        wlanAPFlexRadioMode OBJECT-TYPE
+        SYNTAX       ArubaFlexRadioMode
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Flex Radio Operating Mode
+            "
+        ::= { wlsxWlanAPEntry 44 }
+ 
+   	wlanAPdot11aAntennaGain10x	OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Configured antenna  gain for 'A' Radio (antennaGain*10)
+            "
+        ::= { wlsxWlanAPEntry 45 }
+
+   	wlanAPdot11gAntennaGain10x	OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Configured antenna  gain for 'G' Radio (antennaGain*10)
+            "
+        ::= { wlsxWlanAPEntry 46 }
+
 -- Radio table is indexed by the Mac Address of the AP and the type of the
 -- radio.
 
@@ -557,7 +738,12 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPRadioNumActiveBSSIDs			Integer32,
 		 wlanAPRadioNumMonitoredBSSIDs		Integer32,
 		 wlanAPRadioBearing     			DisplayString,
-		 wlanAPRadioTiltAngle   			DisplayString
+		 wlanAPRadioTiltAngle   			DisplayString,
+		 wlanAPRadioHTMode					ArubaHTMode,
+		 wlanAPRadioHTExtChannel			ArubaHTExtChannel,
+		 wlanAPRadioHTChannel				DisplayString,
+		 wlanAPRadioAPName  				DisplayString,
+		 wlanAPRadioTransmitPower10x		Integer32
 	 }
 
    	wlanAPRadioNumber OBJECT-TYPE
@@ -596,7 +782,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			The current power level of the radio.
+			The current power level of the radio. (Transmitted as txpwr*2)
             "
         ::= { wlsxWlanRadioEntry 4 }
 
@@ -686,6 +872,57 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanRadioEntry 12 }
 
+	wlanAPRadioHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The HT mode of the radio, if any.
+            "
+        ::= { wlsxWlanRadioEntry 13 }
+
+	wlanAPRadioHTExtChannel OBJECT-TYPE
+         SYNTAX       ArubaHTExtChannel
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            Indicates the offset of the extension channel, if any. Will return secondary channel
+            number in 80+80 MHz mode.
+            "
+        ::= { wlsxWlanRadioEntry 14 }
+
+	wlanAPRadioHTChannel OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+            "
+            A display string indicating the current channel.  If wlanAPRadioHTExtChannel
+            is set to 'above' or 'below', then the channel number will be appended
+			with '+' or '-' respectively.
+            "
+        ::= { wlsxWlanRadioEntry 15 }
+
+	wlanAPRadioAPName OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+            "Name of the AP the radio belongs to"
+        ::= { wlsxWlanRadioEntry 16 }
+
+	wlanAPRadioTransmitPower10x OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The current power level of the radio. (Transmitted as txpwr*10)
+            "
+        ::= { wlsxWlanRadioEntry 17 }
+
 -- Local Access Point Table.
 
    wlsxWlanAPBssidTable  OBJECT-TYPE 
@@ -717,12 +954,16 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPBssidRogueType				ArubaRogueApType,
 		 wlanAPBssidMode					INTEGER,
 		 wlanAPBssidChannel					INTEGER,
-		 wlanAPBssidUpTime				TimeTicks,
+		 wlanAPBssidUpTime					TimeTicks,
 		 wlanAPBssidInactiveTime			TimeTicks,
 		 wlanAPBssidLoadBalancing			TruthValue,
 		 wlanAPBssidNumAssociatedStations	Unsigned32,
 		 wlanAPBssidAPMacAddress			MacAddress,
-		 wlanAPBssidPhyNumber				Integer32
+		 wlanAPBssidPhyNumber				Integer32,
+		 wlanAPBssidHTMode					ArubaHTMode,
+		 wlanAPBssidHTExtChannel			ArubaHTExtChannel,
+         wlanAPBssidHTChannel               DisplayString,
+         wlanAPBssidSnr                     Integer32
    }
 
    	wlanAPBSSID OBJECT-TYPE
@@ -873,6 +1114,48 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 			Indicates the radio number to which this BSSID belongs.
             "
         ::= { wlsxWlanAPBssidEntry 14 }
+
+   	wlanAPBssidHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the HT mode of this BSSID, if any.
+            "
+        ::= { wlsxWlanAPBssidEntry 15 }
+
+   	wlanAPBssidHTExtChannel OBJECT-TYPE
+         SYNTAX       ArubaHTExtChannel
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            Indicates the offset of the 40MHz extension channel, if any.
+            "
+        ::= { wlsxWlanAPBssidEntry 16 }
+
+   	wlanAPBssidHTChannel OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            A display string indicating the current channel.  If wlanAPBssidHTExtChannel
+            is set to 'above' or 'below', then the channel number will be appended
+			with '+' or '-' respectively.
+            "
+        ::= { wlsxWlanAPBssidEntry 17 }
+
+        wlanAPBssidSnr OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Indicates the Signal Noise Ratio of this BSSID.
+            "
+        ::= { wlsxWlanAPBssidEntry 18 }
 
 -- ESSID Table
 
@@ -1044,7 +1327,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanStaAccessPointESSID		DisplayString,
 		 wlanStaPhyNumber				Integer32,
 		 wlanStaRSSI					Integer32,
-		 wlanStaUpTime					TimeTicks
+		 wlanStaUpTime					TimeTicks,
+		 wlanStaHTMode					ArubaHTMode,
+		 wlanStaTransmitRateCode		Unsigned32
    }
 
    	wlanStaPhyAddress OBJECT-TYPE
@@ -1198,6 +1483,26 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanStationEntry 15 }
 
+	wlanStaHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HT status of the station.
+            "
+        ::= { wlsxWlanStationEntry 16 }
+
+    wlanStaTransmitRateCode OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            Transmit rate code with which the Station is associated with this system, unit is mbps.
+            "
+        ::= { wlsxWlanStationEntry 17 }
+
 --Station Association Failure Table contains all the Stations that failed to 
 --associate an ap.
 
@@ -1208,7 +1513,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION 
 	  	"
 			This Table lists all the stations and the BSSID's to which they 
-			failed to associate. Once's a station succefully associates, 
+			failed to associate. Once a station successfully associates, 
 			association failure entries are not reported for that station.
 		"
 	
@@ -1342,7 +1647,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPRxDataPkts64				Counter64,
 		 wlanAPRxDataBytes64			Counter64,
 		 wlanAPTxDataPkts64				Counter64,
-		 wlanAPTxDataBytes64			Counter64
+         wlanAPTxDataBytes64            Counter64,
+         wlanAPWiredRxErrorPkts         Counter32,
+         wlanAPRxErrorPkts              Counter32
    }
 
 	wlanAPCurrentChannel OBJECT-TYPE
@@ -1609,6 +1916,26 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPStatsEntry 25 }
 
+    wlanAPWiredRxErrorPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The number of error packets received from the controller on this BSSID.
+            "
+        ::= { wlsxWlanAPStatsEntry 26 }
+
+    wlanAPRxErrorPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The number of error packets received from stations on this BSSID.
+            "
+        ::= { wlsxWlanAPStatsEntry 27 }
+
 -- This table breaks down the AP statistics observed into different
 -- rate categories.
 
@@ -1635,31 +1962,98 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 	
      WlsxWlanAPRateStatsEntry ::=
      SEQUENCE {
-		 wlanAPStatsTotPktsAt1Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt1Mbps			Counter32  ,
-		 wlanAPStatsTotPktsAt2Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt2Mbps			Counter32  ,
-		 wlanAPStatsTotPktsAt5Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt5Mbps			Counter32  ,
-		 wlanAPStatsTotPktsAt11Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt11Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt6Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt6Mbps			Counter32  ,
-		 wlanAPStatsTotPktsAt12Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt12Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt18Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt18Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt24Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt24Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt36Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt36Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt48Mbps			Counter32  ,
-		 wlanAPStatsTotBytesAt48Mbps		Counter32  ,
-		 wlanAPStatsTotPktsAt54Mbps			Counter32 ,
-		 wlanAPStatsTotBytesAt54Mbps		Counter32 ,
-		 wlanAPStatsTotPktsAt9Mbps			Counter32 ,
-		 wlanAPStatsTotBytesAt9Mbps		Counter32 
-
+		 wlanAPStatsTotPktsAt1Mbps			Counter32,
+		 wlanAPStatsTotBytesAt1Mbps			Counter32,
+		 wlanAPStatsTotPktsAt2Mbps			Counter32,
+		 wlanAPStatsTotBytesAt2Mbps			Counter32,
+		 wlanAPStatsTotPktsAt5Mbps			Counter32,
+		 wlanAPStatsTotBytesAt5Mbps			Counter32,
+		 wlanAPStatsTotPktsAt11Mbps			Counter32,
+		 wlanAPStatsTotBytesAt11Mbps		Counter32,
+		 wlanAPStatsTotPktsAt6Mbps			Counter32,
+		 wlanAPStatsTotBytesAt6Mbps			Counter32,
+		 wlanAPStatsTotPktsAt12Mbps			Counter32,
+		 wlanAPStatsTotBytesAt12Mbps		Counter32,
+		 wlanAPStatsTotPktsAt18Mbps			Counter32,
+		 wlanAPStatsTotBytesAt18Mbps		Counter32,
+		 wlanAPStatsTotPktsAt24Mbps			Counter32,
+		 wlanAPStatsTotBytesAt24Mbps		Counter32,
+		 wlanAPStatsTotPktsAt36Mbps			Counter32,
+		 wlanAPStatsTotBytesAt36Mbps		Counter32,
+		 wlanAPStatsTotPktsAt48Mbps			Counter32,
+		 wlanAPStatsTotBytesAt48Mbps		Counter32,
+		 wlanAPStatsTotPktsAt54Mbps			Counter32,
+		 wlanAPStatsTotBytesAt54Mbps		Counter32,
+		 wlanAPStatsTotPktsAt9Mbps			Counter32,
+		 wlanAPStatsTotBytesAt9Mbps		    Counter32
+--		 wlanAPStatsTotPktsAtHT6dot5Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT6dot5Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT13Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT13Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT13dot5Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT13dot5Mbps	Counter32,
+--		 wlanAPStatsTotPktsAtHT15Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT15Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT19dot5Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT19dot5Mbps	Counter32,
+--		 wlanAPStatsTotPktsAtHT26Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT26Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT27Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT27Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT30Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT30Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT39Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT39Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT40dot5Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT40dot5Mbps	Counter32,
+--		 wlanAPStatsTotPktsAtHT45Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT45Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT52Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT52Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT54Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT54Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT58dot5Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT58dot5Mbps	Counter32,
+--		 wlanAPStatsTotPktsAtHT60Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT60Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT65Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT65Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT78Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT78Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT81Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT81Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT90Mbps			Counter32,
+--		 wlanAPStatsTotBytesAtHT90Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT104Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT104Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT108Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT108Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT117Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT117Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT120Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT120Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT121dot5Mbps	Counter32,
+--		 wlanAPStatsTotBytesAtHT121dot5Mbps	Counter32,
+--		 wlanAPStatsTotPktsAtHT130Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT130Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT135Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT135Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT150Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT150Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT162Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT162Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT180Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT180Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT216Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT216Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT240Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT240Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT243Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT243Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT270Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT270Mbps		Counter32,
+--		 wlanAPStatsTotPktsAtHT300Mbps		Counter32,
+--		 wlanAPStatsTotBytesAtHT300Mbps		Counter32
      }
 
      wlanAPStatsTotPktsAt1Mbps OBJECT-TYPE
@@ -1926,6 +2320,753 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPRateStatsEntry 24 }
 
+--	 wlanAPStatsTotPktsAtHT6dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 6.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 25 }
+--
+--	 wlanAPStatsTotBytesAtHT6dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 6.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 26 }
+--
+--	 wlanAPStatsTotPktsAtHT13Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 13.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 27 }
+--
+--	 wlanAPStatsTotBytesAtHT13Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 13.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 28 }
+--
+--	 wlanAPStatsTotPktsAtHT13dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 13.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 29 }
+--
+--	 wlanAPStatsTotBytesAtHT13dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 13.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 30 }
+--
+--	 wlanAPStatsTotPktsAtHT15Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 15.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 31 }
+--
+--	 wlanAPStatsTotBytesAtHT15Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 15.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 32 }
+--
+--	 wlanAPStatsTotPktsAtHT19dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 19.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 33 }
+--
+--	 wlanAPStatsTotBytesAtHT19dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 19.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 34 }
+--
+--	 wlanAPStatsTotPktsAtHT26Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 26.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 35 }
+--
+--	 wlanAPStatsTotBytesAtHT26Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 26.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 36 }
+--
+--	 wlanAPStatsTotPktsAtHT27Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 27.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 37 }
+--
+--	 wlanAPStatsTotBytesAtHT27Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 27.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 38 }
+--
+--	 wlanAPStatsTotPktsAtHT30Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 30.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 39 }
+--
+--	 wlanAPStatsTotBytesAtHT30Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 30.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 40 }
+--
+--	 wlanAPStatsTotPktsAtHT39Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 39.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 41 }
+--
+--	 wlanAPStatsTotBytesAtHT39Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 39.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 42 }
+--
+--	 wlanAPStatsTotPktsAtHT40dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 40.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 43 }
+--
+--	 wlanAPStatsTotBytesAtHT40dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 40.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 44 }
+--
+--	 wlanAPStatsTotPktsAtHT45Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 45.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 45 }
+--
+--	 wlanAPStatsTotBytesAtHT45Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 45.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 46 }
+--
+--	 wlanAPStatsTotPktsAtHT52Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 52.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 47 }
+--
+--	 wlanAPStatsTotBytesAtHT52Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 52.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 48 }
+--
+--	 wlanAPStatsTotPktsAtHT54Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 54.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 49 }
+--
+--	 wlanAPStatsTotBytesAtHT54Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 54.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 50 }
+--
+--	 wlanAPStatsTotPktsAtHT58dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 58.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 51 }
+--
+--	 wlanAPStatsTotBytesAtHT58dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 58.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 52 }
+--
+--	 wlanAPStatsTotPktsAtHT60Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 60.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 53 }
+--
+--	 wlanAPStatsTotBytesAtHT60Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 60.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 54 }
+--
+--	 wlanAPStatsTotPktsAtHT65Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 65.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 55 }
+--
+--	 wlanAPStatsTotBytesAtHT65Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 65.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 56 }
+--
+--	 wlanAPStatsTotPktsAtHT78Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 78.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 57 }
+--
+--	 wlanAPStatsTotBytesAtHT78Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 78.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 58 }
+--
+--	 wlanAPStatsTotPktsAtHT81Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 81.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 59 }
+--
+--	 wlanAPStatsTotBytesAtHT81Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 81.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 60 }
+--
+--	 wlanAPStatsTotPktsAtHT90Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 90.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 61 }
+--
+--	 wlanAPStatsTotBytesAtHT90Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 90.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 62 }
+--
+--	 wlanAPStatsTotPktsAtHT104Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 104.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 63 }
+--
+--	 wlanAPStatsTotBytesAtHT104Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 104.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 64 }
+--
+--	 wlanAPStatsTotPktsAtHT108Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 108.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 65 }
+--
+--	 wlanAPStatsTotBytesAtHT108Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 108.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 66 }
+--
+--	 wlanAPStatsTotPktsAtHT117Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 117.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 67 }
+--
+--	 wlanAPStatsTotBytesAtHT117Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 117.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 68 }
+--
+--	 wlanAPStatsTotPktsAtHT120Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 120.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 69 }
+--
+--	 wlanAPStatsTotBytesAtHT120Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 120.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 70 }
+--
+--	 wlanAPStatsTotPktsAtHT121dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 121.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 71 }
+--
+--	 wlanAPStatsTotBytesAtHT121dot5Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 121.5 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 72 }
+--
+--	 wlanAPStatsTotPktsAtHT130Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 130.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 73 }
+--
+--	 wlanAPStatsTotBytesAtHT130Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 130.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 74 }
+--
+--	 wlanAPStatsTotPktsAtHT135Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 135.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 75 }
+--
+--	 wlanAPStatsTotBytesAtHT135Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 135.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 76 }
+--
+--	 wlanAPStatsTotPktsAtHT150Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 150.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 77 }
+--
+--	 wlanAPStatsTotBytesAtHT150Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 150.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 78 }
+--
+--	 wlanAPStatsTotPktsAtHT162Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 162.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 79 }
+--
+--	 wlanAPStatsTotBytesAtHT162Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 162.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 80 }
+--
+--	 wlanAPStatsTotPktsAtHT180Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 180.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 81 }
+--
+--	 wlanAPStatsTotBytesAtHT180Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 180.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 82 }
+--
+--	 wlanAPStatsTotPktsAtHT216Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 216.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 83 }
+--
+--	 wlanAPStatsTotBytesAtHT216Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 216.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 84 }
+--
+--	 wlanAPStatsTotPktsAtHT240Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 240.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 85 }
+--
+--	 wlanAPStatsTotBytesAtHT240Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 240.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 86 }
+--
+--	 wlanAPStatsTotPktsAtHT243Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 243.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 87 }
+--
+--	 wlanAPStatsTotBytesAtHT243Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 243.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 88 }
+--
+--	 wlanAPStatsTotPktsAtHT270Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 270.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 89 }
+--
+--	 wlanAPStatsTotBytesAtHT270Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 270.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 90 }
+--
+--	 wlanAPStatsTotPktsAtHT300Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of packets observed
+--			  on this BSSID at the HT 300.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 91 }
+--
+--	 wlanAPStatsTotBytesAtHT300Mbps OBJECT-TYPE
+--		 SYNTAX       Counter32  
+--		 MAX-ACCESS   read-only
+--		 STATUS       current
+--		 DESCRIPTION
+--			"
+--			  This attribute indicates the total number of bytes observed
+--			  on this BSSID at the HT 300.0 rate.
+--			"
+--		::= { wlsxWlanAPRateStatsEntry 92 }
 
 -- This table breaks down the BSSID statistics observed based on the
 -- Destination Address Types. 
@@ -2271,7 +3412,24 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPChFrameRetryErrorRate	Integer32,
 		 wlanAPChBusyRate				Integer32,
 		 wlanAPChNumAPs					Integer32,
-		 wlanAPChFrameReceiveErrorRate	Integer32
+		 wlanAPChFrameReceiveErrorRate	Integer32,
+		 wlanAPChTransmittedFragmentCount	    Counter32,
+		 wlanAPChMulticastTransmittedFrameCount Counter32,
+		 wlanAPChFailedCount            Counter32,
+		 wlanAPChRetryCount             Counter32,
+		 wlanAPChMultipleRetryCount     Counter32,
+		 wlanAPChFrameDuplicateCount    Counter32,
+		 wlanAPChRTSSuccessCount        Counter32,
+		 wlanAPChRTSFailureCount        Counter32,
+		 wlanAPChACKFailureCount        Counter32,
+		 wlanAPChReceivedFragmentCount  Counter32,
+		 wlanAPChMulticastReceivedFrameCount    Counter32,
+		 wlanAPChFCSErrorCount          Counter32,
+		 wlanAPChTransmittedFrameCount  Counter32,
+		 wlanAPChWEPUndecryptableCount  Counter32,
+         wlanAPChRxUtilization       INTEGER,
+         wlanAPChTxUtilization       INTEGER,
+         wlanAPChUtilization  INTEGER
    }
 
 	wlanAPChannelNumber OBJECT-TYPE
@@ -2498,6 +3656,573 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPChStatsEntry 20 }
 
+	wlanAPChTransmittedFragmentCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall be incremented for an acknowledged MPDU
+            with an individual address in the address 1 field or an MPDU
+            with a multicast address in the address 1 field of type Data
+            or Management.
+            "
+        ::= { wlsxWlanAPChStatsEntry 21 }
+
+	wlanAPChMulticastTransmittedFrameCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment only when the multicast bit
+            is set in the destination MAC address of a successfully
+            transmitted MSDU. When operating as a STA in an ESS, where
+            these frames are directed to the AP, this implies having
+            received an acknowledgment to all associated MPDUs.
+            "
+        ::= { wlsxWlanAPChStatsEntry 22 }
+
+	wlanAPChFailedCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when an MSDU is not transmitted
+            successfully due to the number of transmit attempts exceeding
+            either the dot11ShortRetryLimit or dot11LongRetryLimit.
+            "
+        ::= { wlsxWlanAPChStatsEntry 23 }
+
+	wlanAPChRetryCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when an MSDU is successfully
+            transmitted after one or more retransmissions.
+            "
+        ::= { wlsxWlanAPChStatsEntry 24 }
+
+	wlanAPChMultipleRetryCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when an MSDU is successfully
+            transmitted after more than one retransmission.
+            "
+        ::= { wlsxWlanAPChStatsEntry 25 }
+
+	wlanAPChFrameDuplicateCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when a frame is received
+            that the Sequence Control field indicates is a
+            duplicate.
+            "
+        ::= { wlsxWlanAPChStatsEntry 26 }
+
+	wlanAPChRTSSuccessCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when a CTS is received in
+            response to an RTS.
+            "
+        ::= { wlsxWlanAPChStatsEntry 27 }
+
+	wlanAPChRTSFailureCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when a CTS is not received in
+            response to an RTS.
+            "
+        ::= { wlsxWlanAPChStatsEntry 28 }
+
+	wlanAPChACKFailureCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when an ACK is not received
+            when expected.
+            "
+        ::= { wlsxWlanAPChStatsEntry 29 }
+
+	wlanAPChReceivedFragmentCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall be incremented for each successfully
+            received MPDU of type Data or Management.
+            "
+        ::= { wlsxWlanAPChStatsEntry 30 }
+
+	wlanAPChMulticastReceivedFrameCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when a MSDU is received
+            with the multicast bit set in the destination
+            MAC address.
+            "
+        ::= { wlsxWlanAPChStatsEntry 31 }
+
+	wlanAPChFCSErrorCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when an FCS error is
+            detected in a received MPDU.
+            "
+        ::= { wlsxWlanAPChStatsEntry 32 }
+
+	wlanAPChTransmittedFrameCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment for each successfully transmitted
+            MSDU.
+            "
+        ::= { wlsxWlanAPChStatsEntry 33 }
+        
+	wlanAPChWEPUndecryptableCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This counter shall increment when a frame is received with the
+            Protected Frame subfield of the Frame Control field set to one and
+            the WEPOn value for the key mapped to the transmitter's MAC address
+            indicates that the frame should not have been encrypted or that frame
+            is discarded due to the receiving STA not implementing the privacy
+            option.
+            "
+        ::= { wlsxWlanAPChStatsEntry 34 }
+        
+    wlanAPChRxUtilization OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This is the percentage of time spent by the radio 
+            in receiving packets.
+            "
+        ::= { wlsxWlanAPChStatsEntry 35 }
+
+    wlanAPChTxUtilization OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This is the percentage of time spent by the radio 
+            in transmitting packets.
+            "
+        ::= { wlsxWlanAPChStatsEntry 36 }
+
+    wlanAPChUtilization OBJECT-TYPE
+        SYNTAX INTEGER(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This is the percentage of time the channel is busy.
+            "
+        ::= { wlsxWlanAPChStatsEntry 37 }
+
+-- AP Wired Stats table
+
+   wlsxWlanAPWiredStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanAPWiredStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the Wired statistics of all the Access Points
+                         connected to the controller.
+                "
+      ::= { wlsxWlanAccessPointStatsGroup 7 }
+
+   wlsxWlanAPWiredStatsEntry OBJECT-TYPE
+          SYNTAX       WlanAPWiredStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Access Point Wired Stats entry"
+          INDEX {wlanAPMacAddress}
+      ::= { wlsxWlanAPWiredStatsTable 1 }
+
+   WlanAPWiredStatsEntry ::=
+     SEQUENCE {
+                 wlanAPWiredRxPkts                      Counter32,
+                 wlanAPWiredRxDroppedPkts               Counter32,
+                 wlanAPWiredRxBytes                     Counter32,
+                 wlanAPWiredTxBytes                     Counter32,
+                 wlanAPWiredRxRate                      Gauge32,
+                 wlanAPWiredTxRate                      Gauge32
+   }
+
+   wlanAPWiredRxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total packets received from the
+                         AP wired side.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 1 }
+
+   wlanAPWiredRxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total dropped packets received
+                         from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 2 }
+
+   wlanAPWiredRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes of correct packets
+                         received from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 3 }
+
+   wlanAPWiredTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes transmitted from
+                         the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 4 }
+
+   wlanAPWiredRxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         received from AP wired side in sampling interval.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 5 }
+
+   wlanAPWiredTxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         transmitted from AP wired side in sampling interval.
+            "
+        ::= { wlsxWlanAPWiredStatsEntry 6 }
+
+-- AP ESSID Stats table
+
+   wlsxWlanAPESSIDStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanAPESSIDStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the ESSID statistics of all the Access Points
+                         connected to the controller.
+                "
+      ::= { wlsxWlanAccessPointStatsGroup 8 }
+
+   wlsxWlanAPESSIDStatsEntry OBJECT-TYPE
+          SYNTAX       WlanAPESSIDStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Access Point ESSID Stats entry"
+          INDEX {wlanAPMacAddress, wlanESSID}
+      ::= { wlsxWlanAPESSIDStatsTable 1 }
+
+   WlanAPESSIDStatsEntry ::=
+     SEQUENCE {
+                 wlanAPESSIDWirelessRxBytes             Counter32,
+                 wlanAPESSIDWirelessTxBytes             Counter32,
+                 wlanAPESSIDWiredRxBytes                Counter32,
+                 wlanAPESSIDWiredTxBytes                Counter32
+   }
+
+   wlanAPESSIDWirelessRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes of correct packets
+                         received from the AP ESSID wireless side.
+            "
+        ::= { wlsxWlanAPESSIDStatsEntry 1 }
+
+   wlanAPESSIDWirelessTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes transmitted
+                         from the AP ESSID wireless side.
+            "
+        ::= { wlsxWlanAPESSIDStatsEntry 2 }
+
+   wlanAPESSIDWiredRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes of correct packets
+                         received from the AP ESSID wired side.
+            "
+        ::= { wlsxWlanAPESSIDStatsEntry 3 }
+
+   wlanAPESSIDWiredTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes transmitted from
+                         the AP ESSID wired side.
+            "
+        ::= { wlsxWlanAPESSIDStatsEntry 4 }
+
+-- AP Radio Stats table
+
+   wlsxWlanAPRadioStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanAPRadioStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the Radio statistics of all the Access Points
+                         connected to the controller.
+                "
+      ::= { wlsxWlanAccessPointStatsGroup 9 }
+
+   wlsxWlanAPRadioStatsEntry OBJECT-TYPE
+          SYNTAX       WlanAPRadioStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Access Point Radio Stats entry"
+          INDEX {wlanAPMacAddress, wlanAPRadioNumber}
+      ::= { wlsxWlanAPRadioStatsTable 1 }
+
+   WlanAPRadioStatsEntry ::=
+     SEQUENCE {
+                 wlanAPRadioRxPkts                      Counter32,
+                 wlanAPRadioRxBytes                     Counter32,
+                 wlanAPRadioTxPkts                      Counter32,
+                 wlanAPRadioTxBytes                     Counter32,
+                 wlanAPRadioTxDroppedPkts               Counter32,
+                 wlanAPRadioTxErrorPkts                 Counter32,
+                 wlanAPRadioRxRate                      Gauge32,
+                 wlanAPRadioTxRate                      Gauge32,
+                 wlanApRadioAssocReqCount               Counter32,
+                 wlanApRadioAssocReqSuccCount           Counter32,
+                 wlanApRadioReAssocReqCount             Counter32,
+                 wlanApRadioReAssocReqSuccCount         Counter32,
+                 wlanAPRadioStationDuration             Integer32,
+                 wlanAPRadioAssocSuccPercent            Gauge32,
+                 wlanAPRadioTxDataBytes                 Counter32
+   }
+
+   wlanAPRadioRxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total packets transmitted
+                         from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 1 }
+
+   wlanAPRadioRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total correct bytes
+                         received from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 2 }
+
+   wlanAPRadioTxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total packets
+                         transmitted from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 3 }
+
+   wlanAPRadioTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes
+                         transmitted from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 4 }
+
+   wlanAPRadioTxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the dropped packets transmitted
+                         from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 5 }
+
+   wlanAPRadioTxErrorPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the error packets
+                         transmitted from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 6 }
+
+   wlanAPRadioRxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         received from AP radio wireless side in sampling interval.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 7 }
+
+   wlanAPRadioTxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         transmitted from AP radio wireless side in sampling interval.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 8 }
+
+    wlanApRadioAssocReqCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the times of associate request on this 
+            radio."
+        ::= { wlsxWlanAPRadioStatsEntry 9 }
+
+    wlanApRadioAssocReqSuccCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the times of successful associate request
+            on this radio."
+        ::= { wlsxWlanAPRadioStatsEntry 10 }
+
+    wlanApRadioReAssocReqCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the times of re-associate request on this
+            radio."
+        ::= { wlsxWlanAPRadioStatsEntry 11 }
+
+    wlanApRadioReAssocReqSuccCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This attribute indicates the times of successful re-associate 
+            request on this radio.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 12 }
+
+    wlanAPRadioStationDuration OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This attribute indicates the total occupied duration, which is
+            the total duration of user connecting.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 13 }
+
+        wlanAPRadioAssocSuccPercent OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The Association Success Percent.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 14 }
+
+   wlanAPRadioTxDataBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total data bytes
+                         transmitted from the AP radio wireless side.
+            "
+        ::= { wlsxWlanAPRadioStatsEntry 15 }
 
 -- wlsxWlanStationStatsGroup contains all the statistics observed by different 
 -- Air Monitors attached to this controller. 
@@ -2558,7 +4283,9 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanStaFrameRetryErrorRate		Integer32,
 		 wlanStaFrameReceiveErrorRate	Integer32,
 		 wlanStaTxBCastBytes			Counter32,
-		 wlanStaTxMCastBytes			Counter32
+		 wlanStaTxMCastBytes			Counter32,
+		 wlanStaTxBytes64				Counter64,
+		 wlanStaRxBytes64				Counter64
    }
 
 	wlanStaChannelNum OBJECT-TYPE
@@ -2813,6 +4540,26 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanStationStatsEntry 24 }
 
+	wlanStaTxBytes64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of bytes transmitted by this station, 64-bit value
+            "
+        ::= { wlsxWlanStationStatsEntry 25 }
+
+	wlanStaRxBytes64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of bytes received by this station, 64-bit value
+            "
+        ::= { wlsxWlanStationStatsEntry 26 }
+
 
 -- This table breaks down the Station statistics into different
 -- rate categories.
@@ -2839,56 +4586,54 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 	
      WlsxWlanStaRateStatsEntry ::=
      SEQUENCE {
-		 wlanStaTxPktsAt1Mbps			Counter32  ,
-		 wlanStaTxBytesAt1Mbps			Counter32  ,
-		 wlanStaTxPktsAt2Mbps			Counter32  ,
-		 wlanStaTxBytesAt2Mbps			Counter32  ,
-		 wlanStaTxPktsAt5Mbps			Counter32  ,
-		 wlanStaTxBytesAt5Mbps			Counter32  ,
-		 wlanStaTxPktsAt11Mbps			Counter32  ,
-		 wlanStaTxBytesAt11Mbps			Counter32  ,
-		 wlanStaTxPktsAt6Mbps			Counter32  ,
-		 wlanStaTxBytesAt6Mbps			Counter32  ,
-		 wlanStaTxPktsAt12Mbps			Counter32  ,
-		 wlanStaTxBytesAt12Mbps			Counter32  ,
-		 wlanStaTxPktsAt18Mbps			Counter32  ,
-		 wlanStaTxBytesAt18Mbps			Counter32  ,
-		 wlanStaTxPktsAt24Mbps			Counter32  ,
-		 wlanStaTxBytesAt24Mbps			Counter32  ,
-		 wlanStaTxPktsAt36Mbps			Counter32  ,
-		 wlanStaTxBytesAt36Mbps			Counter32  ,
-		 wlanStaTxPktsAt48Mbps			Counter32  ,
-		 wlanStaTxBytesAt48Mbps			Counter32  ,
-		 wlanStaTxPktsAt54Mbps			Counter32  ,
-		 wlanStaTxBytesAt54Mbps			Counter32  ,
-		 wlanStaRxPktsAt1Mbps			Counter32  ,
-		 wlanStaRxBytesAt1Mbps			Counter32  ,
-		 wlanStaRxPktsAt2Mbps			Counter32  ,
-		 wlanStaRxBytesAt2Mbps			Counter32  ,
-		 wlanStaRxPktsAt5Mbps			Counter32  ,
-		 wlanStaRxBytesAt5Mbps			Counter32  ,
-		 wlanStaRxPktsAt11Mbps			Counter32  ,
-		 wlanStaRxBytesAt11Mbps			Counter32  ,
-		 wlanStaRxPktsAt6Mbps			Counter32  ,
-		 wlanStaRxBytesAt6Mbps			Counter32  ,
-		 wlanStaRxPktsAt12Mbps			Counter32  ,
-		 wlanStaRxBytesAt12Mbps			Counter32  ,
-		 wlanStaRxPktsAt18Mbps			Counter32  ,
-		 wlanStaRxBytesAt18Mbps			Counter32  ,
-		 wlanStaRxPktsAt24Mbps			Counter32  ,
-		 wlanStaRxBytesAt24Mbps			Counter32  ,
-		 wlanStaRxPktsAt36Mbps			Counter32  ,
-		 wlanStaRxBytesAt36Mbps			Counter32  ,
-		 wlanStaRxPktsAt48Mbps			Counter32  ,
-		 wlanStaRxBytesAt48Mbps			Counter32  ,
-		 wlanStaRxPktsAt54Mbps			Counter32  ,
-		 wlanStaRxBytesAt54Mbps			Counter32  ,
-		 wlanStaTxPktsAt9Mbps			Counter32  ,
-		 wlanStaTxBytesAt9Mbps			Counter32  ,
-		 wlanStaRxPktsAt9Mbps			Counter32  ,
-		 wlanStaRxBytesAt9Mbps			Counter32 
-
-
+		 wlanStaTxPktsAt1Mbps			Counter32,
+		 wlanStaTxBytesAt1Mbps			Counter32,
+		 wlanStaTxPktsAt2Mbps			Counter32,
+		 wlanStaTxBytesAt2Mbps			Counter32,
+		 wlanStaTxPktsAt5Mbps			Counter32,
+		 wlanStaTxBytesAt5Mbps			Counter32,
+		 wlanStaTxPktsAt11Mbps			Counter32,
+		 wlanStaTxBytesAt11Mbps			Counter32,
+		 wlanStaTxPktsAt6Mbps			Counter32,
+		 wlanStaTxBytesAt6Mbps			Counter32,
+		 wlanStaTxPktsAt12Mbps			Counter32,
+		 wlanStaTxBytesAt12Mbps			Counter32,
+		 wlanStaTxPktsAt18Mbps			Counter32,
+		 wlanStaTxBytesAt18Mbps			Counter32,
+		 wlanStaTxPktsAt24Mbps			Counter32,
+		 wlanStaTxBytesAt24Mbps			Counter32,
+		 wlanStaTxPktsAt36Mbps			Counter32,
+		 wlanStaTxBytesAt36Mbps			Counter32,
+		 wlanStaTxPktsAt48Mbps			Counter32,
+		 wlanStaTxBytesAt48Mbps			Counter32,
+		 wlanStaTxPktsAt54Mbps			Counter32,
+		 wlanStaTxBytesAt54Mbps			Counter32,
+		 wlanStaRxPktsAt1Mbps			Counter32,
+		 wlanStaRxBytesAt1Mbps			Counter32,
+		 wlanStaRxPktsAt2Mbps			Counter32,
+		 wlanStaRxBytesAt2Mbps			Counter32,
+		 wlanStaRxPktsAt5Mbps			Counter32,
+		 wlanStaRxBytesAt5Mbps			Counter32,
+		 wlanStaRxPktsAt11Mbps			Counter32,
+		 wlanStaRxBytesAt11Mbps			Counter32,
+		 wlanStaRxPktsAt6Mbps			Counter32,
+		 wlanStaRxBytesAt6Mbps			Counter32,
+		 wlanStaRxPktsAt12Mbps			Counter32,
+		 wlanStaRxBytesAt12Mbps			Counter32,
+		 wlanStaRxPktsAt18Mbps			Counter32,
+		 wlanStaRxBytesAt18Mbps			Counter32,
+		 wlanStaRxPktsAt24Mbps			Counter32,
+		 wlanStaRxBytesAt24Mbps			Counter32,
+		 wlanStaRxPktsAt36Mbps			Counter32,
+		 wlanStaRxBytesAt36Mbps			Counter32,
+		 wlanStaRxPktsAt48Mbps			Counter32,
+		 wlanStaRxBytesAt48Mbps			Counter32,
+		 wlanStaRxPktsAt54Mbps			Counter32,
+		 wlanStaRxBytesAt54Mbps			Counter32,
+		 wlanStaTxPktsAt9Mbps			Counter32,
+		 wlanStaTxBytesAt9Mbps			Counter32,
+		 wlanStaRxPktsAt9Mbps			Counter32,
+		 wlanStaRxBytesAt9Mbps			Counter32
      }
 
      wlanStaTxPktsAt1Mbps OBJECT-TYPE
@@ -2897,7 +4642,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 1Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 1 }
@@ -2908,7 +4653,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 1Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 2 }
@@ -2919,7 +4664,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 2Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 3 }
@@ -2930,7 +4675,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 2Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 4 }
@@ -2941,7 +4686,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 5Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 5 }
@@ -2952,7 +4697,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 5Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 6 }
@@ -2963,7 +4708,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 11Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 7 }
@@ -2974,7 +4719,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 11Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 8 }
@@ -2985,7 +4730,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 6Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 9 }
@@ -2996,7 +4741,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 6Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 10 }
@@ -3007,7 +4752,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 12Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 11 }
@@ -3018,7 +4763,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 12Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 12 }
@@ -3029,7 +4774,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 18Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 13 }
@@ -3040,7 +4785,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 18Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 14 }
@@ -3051,7 +4796,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 24Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 15 }
@@ -3062,7 +4807,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 24Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 16 }
@@ -3073,7 +4818,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 36Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 17 }
@@ -3084,7 +4829,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 36Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 18 }
@@ -3095,7 +4840,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 48Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 19 }
@@ -3106,7 +4851,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 48Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 20 }
@@ -3117,7 +4862,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 54Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 21 }
@@ -3128,7 +4873,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 54Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 22 }
@@ -3381,7 +5126,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Packets Transmited by the 
+			 This attribute indicates the number of Packets Transmitted by the 
 			 station at 9Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 45 }
@@ -3392,7 +5137,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of Octets Transmited by the 
+			 This attribute indicates the number of Octets Transmitted by the 
 			 station at 9Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 46 }
@@ -3419,7 +5164,6 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 			 station at 9Mbps rate.
             "
         ::= { wlsxWlanStaRateStatsEntry 48 }
-
 
 -- This table breaks down the Station statistics based on the
 -- Destination Address Types. 
@@ -3465,7 +5209,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Broadcast packets 
-			 transmited by this Station.
+			 transmitted by this Station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 1 }
 
@@ -3476,7 +5220,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Broadcast Bytes 
-			 transmited by this Station.
+			 transmitted by this Station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 2 }
 
@@ -3487,7 +5231,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Multicast packets 
-			 transmited by this station.
+			 transmitted by this station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 3 }
 
@@ -3498,7 +5242,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Multicast Bytes 
-			 transmited by this station.
+			 transmitted by this station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 4 }
 
@@ -3509,7 +5253,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the total of Unicast packets 
-			 transmited by this station.
+			 transmitted by this station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 5 }
 
@@ -3520,7 +5264,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the total of Unicast Bytes 
-			 transmited by this station.
+			 transmitted by this station.
             "
         ::= { wlsxWlanStaDATypeStatsEntry 6 }
 
@@ -3570,7 +5314,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Management packets 
+			 This attribute indicates the Transmitted Management packets 
 			 from a station.
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 1 }
@@ -3581,7 +5325,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Management Bytes 
+			 This attribute indicates the Transmitted Management Bytes 
 			 from a station
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 2 }
@@ -3592,7 +5336,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Control packets 
+			 This attribute indicates the Transmitted Control packets 
 			 from a station
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 3 }
@@ -3603,7 +5347,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Control Bytes 
+			 This attribute indicates the Transmitted Control Bytes 
 			 from a station
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 4 }
@@ -3614,7 +5358,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Data packets 
+			 This attribute indicates the Transmitted Data packets 
 			 from a station
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 5 }
@@ -3625,7 +5369,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the Transmited Data Bytes 
+			 This attribute indicates the Transmitted Data Bytes 
 			 observed on this channel.
             "
         ::= { wlsxWlanStaFrameTypeStatsEntry 6 }
@@ -3697,7 +5441,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxWlanStaFrameTypeStatsEntry 12 }
 
 
--- This table breaks down the Station statistics received or transmited by a 
+-- This table breaks down the Station statistics received or transmitted by a 
 -- station into packet size buckets. 
 
    wlsxWlanStaPktSizeStatsTable  OBJECT-TYPE 
@@ -3743,7 +5487,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were less than 64 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 1 }
@@ -3754,7 +5498,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were between 64 and 127 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 2 }
@@ -3765,7 +5509,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were between 128 and 255 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 3 }
@@ -3776,7 +5520,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were between 256 and 511 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 4 }
@@ -3787,7 +5531,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were between 512 and 1023 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 5 }
@@ -3798,7 +5542,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			 This attribute indicates the number of packets transmited by the 
+			 This attribute indicates the number of packets transmitted by the 
 			 station that were between 1024 and 1518 bytes long.
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 6 }
@@ -3869,5 +5613,392 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanStaPktSizeStatsEntry 12 }
 
+-- wlsxWlanSwitchStatsGroup contains all statistics related to
+-- the whole network controlled by the controller.
 
+-- wlsxWlanESSIDStatsTable contains all statistics collected
+-- for an ESSID on the switch
+
+   wlsxWlanESSIDStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanESSIDStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists statistics of the ESSID
+                        controlled by this controller.
+                "
+      ::= { wlsxWlanSwitchStatsGroup 1}
+
+   wlsxWlanESSIDStatsEntry OBJECT-TYPE
+          SYNTAX       WlanESSIDStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "ESSID Stats Entry"
+          INDEX {wlanESSID}
+      ::= { wlsxWlanESSIDStatsTable 1 }
+
+   WlanESSIDStatsEntry ::=
+     SEQUENCE {
+                 wlanESSIDRxPkts                           Counter32,
+                 wlanESSIDRxDroppedPkts                    Counter32,
+                 wlanESSIDRxRetryPkts                      Counter32,
+                 wlanESSIDTxPkts                           Counter32,
+                 wlanESSIDTxDroppedPkts                    Counter32,
+                 wlanESSIDTxRetryPkts                      Counter32,
+                 wlanESSIDTxErrorPkts                      Counter32,
+                 wlanESSIDRxRate                           Gauge32,
+                 wlanESSIDTxRate                           Gauge32,
+                 wlanESSIDWiredRxPkts                      Counter32,
+                 wlanESSIDWiredRxBytes                     Counter32,
+                 wlanESSIDWiredTxBytes                     Counter32
+   }
+
+        wlanESSIDRxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of packets on the ESSID uplink channel
+                         of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 1 }
+
+        wlanESSIDRxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of dropped packets on the ESSID uplink
+                         channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 2 }
+
+        wlanESSIDRxRetryPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of re-transmission packets on the ESSID
+                         uplink channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 3 }
+
+        wlanESSIDTxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of packets on the ESSID downlink channel
+                         of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 4 }
+
+        wlanESSIDTxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of dropped packets on the ESSID downlink
+                         channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 5 }
+
+        wlanESSIDTxRetryPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of re-transmission packets on the ESSID
+                         downlink channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 6 }
+
+        wlanESSIDTxErrorPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of error packets on the ESSID downlink
+                         channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 7 }
+
+        wlanESSIDRxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The data rate received from the ESSID in sampling interval,
+                         unit is kbyte/s.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 8 }
+
+        wlanESSIDTxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The data rate transmitted from the ESSID in sampling interval,
+                         unit is kbyte/s.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 9 }
+
+        wlanESSIDWiredRxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of packets on the ESSID uplink
+                         channel of wired side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 10 }
+
+        wlanESSIDWiredRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of bytes on the ESSID uplink
+                         channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 11 }
+
+        wlanESSIDWiredTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The total number of bytes on the ESSID downlink
+                         channel of wireless side.
+            "
+        ::= { wlsxWlanESSIDStatsEntry 12 }
+
+-- wlsxWlanEthStatsTable will contain all the statistics collected
+-- for all ethernet ports
+
+   wlsxWlanEthStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanEthStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists statistics of all ethernet ports
+                        of this controller.
+                "
+      ::= { wlsxWlanSwitchStatsGroup 2}
+
+   wlsxWlanEthStatsEntry OBJECT-TYPE
+          SYNTAX       WlanEthStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Ethernet Port Stats Entry"
+          INDEX {ifIndex}
+      ::= { wlsxWlanEthStatsTable 1 }
+
+   WlanEthStatsEntry ::=
+     SEQUENCE {
+                 wlanEthRxRate                           Gauge32,
+                 wlanEthTxRate                           Gauge32
+   }
+
+        wlanEthRxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The data rate received from the ethernet port in sampling interval,
+                         unit is kbyte/s.
+            "
+        ::= { wlsxWlanEthStatsEntry 1 }
+
+        wlanEthTxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The data rate transmitted from the ethernet port in sampling interval,
+                         unit is kbyte/s.
+            "
+        ::= { wlsxWlanEthStatsEntry 2 }
+
+-- wlsxSSIDConfigGroup contains all configuration related to
+-- the SSID controlled by the controller.
+
+-- wlsxSSIDConfigTable contains the global configuration of the SSID
+
+   wlsxSSIDConfigTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanSSIDConfigEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the configuration of the SSID.
+                        Note: Currently, this table doesn't return any data.
+                "
+      ::= { wlsxSSIDConfigGroup 1}
+
+   wlsxSSIDConfigEntry OBJECT-TYPE
+          SYNTAX       WlanSSIDConfigEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "AP Configuration Entry"
+          INDEX {wlanAPMacAddress, wlanAPRadioNumber, wlanESSID, wlanESSIDIndex}
+      ::= { wlsxSSIDConfigTable 1 }
+
+   WlanSSIDConfigEntry ::=
+     SEQUENCE {
+                 wlanESSIDIndex                              Integer32,
+                 wlanSSIDConfigHideSSID                      TruthValue,
+                 wlanSSIDConfigNumStaAllowed                 Unsigned32,
+                 wlanSSIDConfigWmmBeDscp                     Unsigned32,
+                 wlanSSIDConfigWmmBkDscp                     Unsigned32,
+                 wlanSSIDConfigWmmViDscp                     Unsigned32,
+                 wlanSSIDConfigWmmVoDscp                     Unsigned32
+   }
+
+        wlanESSIDIndex OBJECT-TYPE
+         SYNTAX       Integer32(1..16)
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the index of ESSID. We support up to 16 ESSIDs.
+            "
+        ::= { wlsxSSIDConfigEntry 1 }
+
+        wlanSSIDConfigHideSSID OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates if SSID is hidden or not.
+            "
+        ::= { wlsxSSIDConfigEntry 2 }
+
+        wlanSSIDConfigNumStaAllowed OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the maximum number of stations that are allowed to access into the network.
+            "
+        ::= { wlsxSSIDConfigEntry 3 }
+
+        wlanSSIDConfigWmmBeDscp OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the QoS priority of best-effort service.
+            "
+        ::= { wlsxSSIDConfigEntry 4 }
+
+        wlanSSIDConfigWmmBkDscp OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the QoS priority of background service.
+            "
+        ::= { wlsxSSIDConfigEntry 5 }
+
+        wlanSSIDConfigWmmViDscp OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the QoS priority of video service.
+            "
+        ::= { wlsxSSIDConfigEntry 6 }
+
+        wlanSSIDConfigWmmVoDscp OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the QoS priority of voice service.
+            "
+        ::= { wlsxSSIDConfigEntry 7 }
+
+-- wlsxAPConfigGroup contains all configuration related to
+-- the APs controlled by the controller.
+
+-- wlsxAPConfigTable contains the global configuration of the AP
+
+   wlsxAPConfigTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanAPConfigEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the configuration of the Access Point.
+                "
+      ::= { wlsxAPConfigGroup 1}
+
+   wlsxAPConfigEntry OBJECT-TYPE
+          SYNTAX       WlanAPConfigEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "AP Configuration Entry"
+          INDEX {wlanAPMacAddress}
+      ::= { wlsxAPConfigTable 1 }
+
+   WlanAPConfigEntry ::=
+     SEQUENCE {
+                 wlanAPConfigNetmask                       IpAddress,
+                 wlanAPConfigGateway                       IpAddress
+   }
+
+        wlanAPConfigNetmask OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The netmask of AP IP Address.
+            "
+        ::= { wlsxAPConfigEntry 1 }
+
+        wlanAPConfigGateway OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        The gateway of the AP.
+            "
+        ::= { wlsxAPConfigEntry 2 }
+
+        --Trap Definition
+         wlsxRAPActiveUplink NOTIFICATION-TYPE
+         OBJECTS {wlanAPActiveUplink, wlanAPMacAddress}
+         STATUS  current
+         DESCRIPTION
+                         "A trap which indicates the RAP Active Uplink"
+         ::= { wlsxRAPTraps 1 }
 END
