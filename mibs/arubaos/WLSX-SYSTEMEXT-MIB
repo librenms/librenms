@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -37,7 +38,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
            FROM ARUBA-MIB;
 
    wlsxSystemExtMIB MODULE-IDENTITY 
-       LAST-UPDATED "0707300652Z"
+       LAST-UPDATED "0812112108Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -47,7 +48,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             System level information about the Aruba controller."
-       REVISION        "0707300652Z"
+       REVISION        "0812112108Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 2 }
@@ -146,7 +147,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
         STATUS       current
         DESCRIPTION
 			"
-			Internal temparature in the controller.
+			Internal temperature in the controller.
 			"
         ::= { wlsxSystemExtGroup 10 }
 
@@ -434,7 +435,8 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 		 sysExtCardFpgaRevision				DisplayString,
 		 sysExtCardSwitchChip				DisplayString,
 		 sysExtCardStatus					ArubaActiveState,
-		 sysExtCardUserSlot					Integer32
+		 sysExtCardUserSlot					Integer32,
+		 sysExtCardServiceTag				DisplayString
    }
 
    sysExtCardSlot OBJECT-TYPE
@@ -574,6 +576,16 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxSysExtCardEntry 13 }
 
+   sysExtCardServiceTag OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Service Tag of the card.
+            "
+        ::= { wlsxSysExtCardEntry 14 }
+
 -- This table lists the Fans in the controller.
 
    wlsxSysExtFanTable  OBJECT-TYPE 
@@ -582,7 +594,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
       STATUS       current 
       DESCRIPTION 
 		"
-		The table of all the fans in the controller.
+		The table of all supported fans in the controller. Not supported in Aruba 200/800 and 2400 controllers.
 		"
 	
       ::= { wlsxSystemExtGroup 17 } 
@@ -632,7 +644,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
       STATUS       current 
       DESCRIPTION 
 		"
-		The table of Power supplies in the controller.
+		The table of all supported Power supplies in the controller. Not supported in Aruba 200, 800 and 2400 controllers.
 		"
 	
       ::= { wlsxSystemExtGroup 18 } 
@@ -931,11 +943,59 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 			"
         ::= { wlsxSystemExtGroup 26 }
 
+   wlsxSysExtHwVersion OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "Hardware version of the switch."
+        ::= { wlsxSystemExtGroup 27 }
+
+   wlsxSysExtSwVersion OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "Software version of the switch."
+        ::= { wlsxSystemExtGroup 28 }
+
+   wlsxSysExtSerialNumber OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "The serial number of the switch."
+        ::= { wlsxSystemExtGroup 29 }
+
+   wlsxSysExtCpuUsedPercent OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "The CPU used percent of the switch"
+        ::= { wlsxSystemExtGroup 30 }
+
+   wlsxSysExtMemoryUsedPercent OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "The memory used percent of the switch"
+        ::= { wlsxSystemExtGroup 31 }
+
+   wlsxSysExtPacketLossPercent OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "The packet loss count of the switch"
+        ::= { wlsxSystemExtGroup 32 }
+
 
    wlsxSysExtUserTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated
         DESCRIPTION
 			"
 			This objects denotes the number of times the user table was 
@@ -946,7 +1006,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtAPBssidTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated
         DESCRIPTION
 			"
 			This objects denotes the number of times the AP BSSID table was 
@@ -958,7 +1018,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtAPRadioTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated
         DESCRIPTION
 			"
 			This objects denotes the number of times the Radio table was 
@@ -970,7 +1030,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtAPTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the AP table was 
@@ -982,7 +1042,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtSwitchListTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the Switch list table was 
@@ -994,7 +1054,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtPortTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated
         DESCRIPTION
 			"
 			This objects denotes the number of times the port table was 
@@ -1006,7 +1066,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtVlanTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the Vlan table was 
@@ -1018,7 +1078,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtVlanInterfaceTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the Vlan Interface table 
@@ -1029,7 +1089,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtLicenseTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated
         DESCRIPTION
 			"
 			This objects denotes the number of times the license table
@@ -1040,7 +1100,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtMonAPTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the monitored AP table
@@ -1051,7 +1111,7 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
    wlsxSysExtMonStationTableGenNumber OBJECT-TYPE
         SYNTAX       Integer32
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
 			"
 			This objects denotes the number of times the monitored station table
@@ -1059,6 +1119,14 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 			"
         ::= { wlsxSystemExtTableGenNumberGroup 11 }
 
+
+   wlsxSysExtPoweredViaPoe OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "Switch is powered using POE power."
+        ::= { wlsxSystemExtGroup 33 }
 
 END
 

@@ -80,7 +80,7 @@ class OS
         }
 
         if (!isset($this->$oid)) {
-            $data = snmp_cache_oid($oid, $this->getDevice(), array(), $mib);
+            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib);
             $this->$oid = array_map('current', $data);
         }
 
@@ -109,10 +109,11 @@ class OS
     /**
      * Poll a channel based OID, but return data in MHz
      *
-     * @param $sensors
+     * @param array $sensors
+     * @param callable $callback Function to modify the value before converting it to a frequency
      * @return array
      */
-    protected function pollWirelessChannelAsFrequency($sensors)
+    protected function pollWirelessChannelAsFrequency($sensors, $callback = null)
     {
         if (empty($sensors)) {
             return array();
@@ -127,7 +128,13 @@ class OS
 
         $data = array();
         foreach ($oids as $id => $oid) {
-            $data[$id] = WirelessSensor::channelToFrequency($snmp_data[$oid]);
+            if (isset($callback)) {
+                $channel = call_user_func($callback, $snmp_data[$oid]);
+            } else {
+                $channel = $snmp_data[$oid];
+            }
+
+            $data[$id] = WirelessSensor::channelToFrequency($channel);
         }
 
         return $data;
