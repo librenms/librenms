@@ -37,43 +37,30 @@ $pagetitle[] = 'Alert Log';
 var grid = $("#alertlog").bootgrid({
     ajax: true,
     templates: {
-        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
-                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\" id=\"result_form\">"+
-                "<div class=\"form-group\">"+
-                "<label>"+
-                "<strong>Device&nbsp;</strong>"+
-                "</label>"+
-                "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Devices</option>"+
-<?php
-foreach (get_all_devices() as $hostname) {
-    $device_id = getidbyname($hostname);
-    if (device_permitted($device_id)) {
-        echo '"<option value=\"'.$device_id.'\""+';
-        if (getidbyname($hostname) == $_POST['device_id']) {
-            echo '" selected "+';
-        }
-
-        echo '">'.$hostname.'</option>"+';
-    }
-}
-?>
-               "</select>"+
-               "</div>"+
-               "<div class=\"form-group\">"+
-               "<label>"+
-               "<strong>&nbsp;State&nbsp;</strong>"+
-               "</label>"+
-               "<select name=\"state\" id=\"state\" class=\"form-control input-sm\">"+
-               "<option value=\"-1\"></option>"+
-               "<option value=\"0\">Ok</option>"+
-               "<option value=\"1\">Alert</option>"+
-               "</select>"+
-               "</div>"+
-               "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
-               "</form></span></div>"+
-               "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
+        header: '<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
+                <div class="col-sm-8 actionBar"><span class="pull-left"> \
+                <form method="post" action="" class="form-inline" role="form" id="result_form"> \
+                <div class="form-group"> \
+                <label> \
+                <strong>Device&nbsp;</strong> \
+                </label> \
+                <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
+                <option value="">All Devices</option> \
+               </select> \
+               </div> \
+               <div class="form-group"> \
+               <label> \
+               <strong>&nbsp;State&nbsp;</strong> \
+               </label> \
+               <select name="state" id="state" class="form-control input-sm"> \
+               <option value="-1"></option> \
+               <option value="0">Ok</option> \
+               <option value="1">Alert</option> \
+               </select> \
+               </div> \
+               <button type="submit" class="btn btn-default input-sm">Filter</button> \
+               </form></span></div> \
+               <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
     },
     post: function ()
     {
@@ -116,4 +103,6 @@ foreach (get_all_devices() as $hostname) {
       });
     });
 });
+
+<?php echo generate_fill_select_js('hostnames', '#device_id', $_POST['device_id']); ?>
 </script>
