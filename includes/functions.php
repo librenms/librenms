@@ -1009,8 +1009,6 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
         // If these are all empty, we are just going to show blank names in the ui
         $valid = 0;
-    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
-        $valid = 0;
     } else {
         $valid = 1;
         $if = strtolower($port['ifDescr']);
@@ -1020,10 +1018,16 @@ function is_port_valid($port, $device)
         if (is_array($config['os'][$device['os']]['bad_if'])) {
             $fringe = array_merge($config['bad_if'], $config['os'][$device['os']]['bad_if']);
         }
+        $config['good_if'] = $config['good_if'] ?: array();
+        if (is_array($config['os'][$device['os']]['good_if'])) {
+            $good_if = array_merge($config['good_if'], $config['os'][$device['os']]['good_if']);
+        }
         foreach ($fringe as $bi) {
             if (stristr($if, $bi)) {
-                $valid = 0;
-                d_echo("ignored : $bi : $if");
+                if (!str_contains($good_if, $if)) {
+                    $valid = 0;
+                    d_echo("ignored : $bi : $if");
+                }
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -1034,7 +1038,7 @@ function is_port_valid($port, $device)
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    d_echo("ignored : $bi : ".$if);
+                    d_echo("ignored : $bi : " . $if);
                 }
             }
         }

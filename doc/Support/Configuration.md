@@ -424,6 +424,18 @@ by continuing the array.
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
 
+### Interfaces that shouldn't be ignored
+
+Examples:
+
+```php
+$config['good_if'][] = 'FastEthernet';
+$config['os']['ios']['good_id'][] = 'FastEthernet';
+```
+
+`good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 
+I.e If bad_if and good_if both contained FastEthernet then ports with this value in the ifDescr will be valid.
+
 ### Interfaces to be rewritten
 
 ```php

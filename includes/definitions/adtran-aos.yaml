@@ -11,3 +11,5 @@ over:
 discovery:
     - sysObjectId: .1.3.6.1.4.1.664
     - sysDescr: 'NetVanta'
+good_if:
+    - 'EtsecBasedVirtualEthernet1'
