@@ -26,10 +26,11 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
-class Ciscowlc extends OS implements WirelessClientsDiscovery
+class Ciscowlc extends OS implements WirelessClientsDiscovery, WirelessApCountDiscovery
 {
     /**
      * Discover wireless client counts. Type is clients.
@@ -74,5 +75,42 @@ class Ciscowlc extends OS implements WirelessClientsDiscovery
         }
 
         return $sensors;
+    }
+
+    /**
+     * Discover wireless capacity.  This is a percent. Type is capacity.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessApCount()
+    {
+        $oids = array(
+            'CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0',
+            'AIRESPACE-SWITCHING-MIB::agentInventoryMaxNumberOfAPsSupported.0',
+        );
+        $data = snmp_get_multi($this->getDevice(), $oids);
+
+        if (isset($data[0]['clsSysApConnectCount'])) {
+            return array(
+                new WirelessSensor(
+                    'ap-count',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.9.9.618.1.8.4.0',
+                    'ciscowlc',
+                    0,
+                    'Connected APs',
+                    $data[0]['clsSysApConnectCount'],
+                    1,
+                    1,
+                    'sum',
+                    null,
+                    $data[0]['agentInventoryMaxNumberOfAPsSupported'],
+                    0
+                ),
+            );
+        }
+
+        return array();
     }
 }
